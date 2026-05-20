@@ -59,3 +59,12 @@ BullMQ workers may consume scheduled-campaign queue events only by referencing d
 - Cancelled, completed, missing, invalid, or early jobs must be skipped or failed locally without provider calls.
 - Worker startup is blocked unless `QUEUE_BACKEND=bullmq`, `REDIS_URL` is configured, `MESSAGING_PROVIDER=dummy`, and `LIVE_MESSAGING_ENABLED` is not `true`.
 - The BullMQ worker must use the same dummy-only send path and idempotent `Message` rows as the database polling worker.
+
+## Post-MVP BullMQ/Redis Smoke
+
+`npm run queue:bullmq:smoke` is an optional operator check:
+
+- It skips successfully unless `QUEUE_BACKEND=bullmq` and `REDIS_URL` are both configured.
+- When enabled, it writes and removes one job in the dedicated `signalstack-bullmq-smoke` queue.
+- It must not touch scheduled campaign queues, database `QueueJob` rows, providers, SMS sends, billing, secrets, or live messaging flags.
+- The default validation gate must not require Redis.

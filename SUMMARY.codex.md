@@ -13,6 +13,7 @@ Run number: 9
 - Updated DB/API/provider contracts, API/data/provider docs, demo-mode docs, schema changelog, plan, and next prompt.
 - Added unit coverage for credential history action classification.
 - Added production go-live gate design documentation clarifying the current demo-safe production deployment boundary and future live-enable requirements.
+- Added optional BullMQ/Redis smoke command that skips by default and only writes/removes a dedicated smoke-queue job when `QUEUE_BACKEND=bullmq` and `REDIS_URL` are configured.
 
 ## Validation
 
@@ -27,5 +28,6 @@ Run number: 9
 - `npm run validate`
 - `npm run test:e2e:demo`
 - `npm run contracts:check`
+- `npm run queue:bullmq:smoke`
 
 Latest full validation and seeded demo E2E passed.

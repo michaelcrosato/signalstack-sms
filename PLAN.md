@@ -95,6 +95,7 @@ Post-MVP:
 - Local provider phone-number metadata API and demo seed
 - Local live-readiness audit trail for configuration changes
 - Local worker jobs-per-poll rate limit
+- Optional BullMQ/Redis smoke command
 - UI expansion
 - Production deployment gates
 - Production go-live gate design documentation
@@ -107,4 +108,4 @@ Post-MVP:
 
 Post-MVP:
 
-- Redis-backed BullMQ integration smoke, deeper settings UI, and deployment documentation
+- Deeper settings UI, deployment documentation, and provider credential rotation-history UI/forms

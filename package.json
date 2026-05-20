@@ -9,6 +9,7 @@
     "worker": "tsx workers/index.ts",
     "worker:watch": "tsx workers/index.ts --watch",
     "worker:bullmq": "tsx workers/bullmq.ts",
+    "queue:bullmq:smoke": "tsx scripts/bullmq-smoke.ts",
     "build": "next build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",

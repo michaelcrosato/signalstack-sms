@@ -25,6 +25,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP local worker rate limit foundation: `WORKER_MAX_JOBS_PER_POLL` clamps due scheduled campaign jobs processed per poll while preserving dummy-only/live-disabled execution.
 - Post-MVP BullMQ/Redis enqueue foundation: optional `QUEUE_BACKEND=bullmq` scheduling mirror with `REDIS_URL`, deterministic BullMQ scheduled-campaign job construction, and database-default validation that does not require Redis.
 - Post-MVP BullMQ worker consumption foundation: `npm run worker:bullmq` starts only when BullMQ/Redis and dummy-only live-disabled gates are configured, consumes BullMQ jobs by durable `queueJobId`, and shares the database worker's idempotent dummy send path.
+- Post-MVP BullMQ/Redis smoke foundation: `npm run queue:bullmq:smoke` skips unless BullMQ/Redis are explicitly configured and otherwise writes/removes one dedicated smoke-queue job without touching campaigns, providers, billing, or live flags.
 - Post-MVP readiness UI foundation: `/settings` renders go-live readiness status from existing compliance, provider, numbers, readiness audit, and queue backend metadata; the investor demo E2E now checks the page.
 - Post-MVP production deployment gate foundation: `npm run production:gate` is part of validation and blocks production-like environments from live messaging, live billing, live provider, live AI, Twilio, or Stripe settings without an explicit future override.
 - Post-MVP production go-live gate design: `docs/PRODUCTION_GO_LIVE.md` documents the current production-like demo deployment gate and future controls required before live SMS/billing/provider/AI enablement.
@@ -62,7 +63,7 @@ READ FIRST:
 SCOPE:
 - Preserve all Milestone 0-10 gates and demo-safe defaults.
 - Implement the next post-MVP slice only when contracts/docs are updated first.
-- Good candidate slices: Redis-backed BullMQ integration smoke, deeper settings UI, deployment documentation, or provider credential rotation-history UI/forms for safe metadata updates.
+- Good candidate slices: deeper settings UI, deployment documentation, or provider credential rotation-history UI/forms for safe metadata updates.
 - Keep live SMS, live billing, real notifications, live AI, and real provider calls blocked unless explicit future hard gates are implemented and tested.
 - Run the full local gate and seeded demo path before committing.
 
