@@ -11,3 +11,10 @@ Milestone 0 hard gates:
 - No real credentials committed.
 
 Future campaign sends must check consent, opt-out state, provider readiness, and live-action flags.
+
+Milestone 2 contact storage rules:
+
+- `OPTED_OUT` contacts must retain `optedOutAt`.
+- `OPTED_IN` contacts should retain `optInAt` and `optInSource` when available.
+- CSV import is local-only and must not send messages or notify contacts.
+- Contact deletion is soft archive only during the MVP foundation.

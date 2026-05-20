@@ -17,3 +17,15 @@ Demo mode uses:
 - Role: `OWNER`
 
 Tenant rule: every tenant-scoped table must include `orgId` unless explicitly documented in `contracts/CONTRACT-DB.md`.
+
+## Milestone 2 Contacts
+
+Contacts now include profile, consent, and import metadata:
+
+- `Contact` stores phone, optional identity fields, consent state, opt-in/out timestamps, source, notes, and `archivedAt`.
+- `Tag`/`ContactTag` provide reusable labels.
+- `ContactList`/`ContactListMember` provide static list membership.
+- `Segment` stores saved segment definitions as JSON for later campaign targeting.
+- `ContactImport` stores CSV import audit counts and row-scoped errors.
+
+The API uses tenant-scoped repositories for contact reads and writes. Contact deletion is a soft archive.

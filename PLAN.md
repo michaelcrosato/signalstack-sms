@@ -15,8 +15,6 @@ Milestone 0:
 - Smoke tests
 - CI and validation skeleton
 
-## Active Milestone
-
 Milestone 1:
 
 - Database/auth/organization foundations
@@ -24,4 +22,18 @@ Milestone 1:
 - Tenant helper guardrails
 - `GET /api/orgs/current`
 
-Do not implement campaign, inbox, AI, billing, or live provider behavior during this milestone.
+Milestone 2:
+
+- Contacts CRUD foundations
+- Consent status and opt-out fields
+- Tags/lists/segments schema foundations
+- CSV import parser and demo-safe import endpoint
+- Tenant-scoped contact repositories and tests
+
+## Active Milestone
+
+Milestone 3:
+
+- Templates and campaign draft foundations
+- Campaign preflight contract before send behavior
+- No live SMS sending
