@@ -1,19 +1,30 @@
-# Full Plan Run 12 Summary
+Agent: Codex implementation agent  
+Run number: 12  
+Branch: `main`
 
-## Completed
+Commits created:
+- `b5c019b` feat: advance SignalStack SMS implementation
+- `7ee425b` feat: advance SignalStack SMS implementation
+- `3e3c389` feat: advance SignalStack SMS implementation
 
-- Added `GET /api/settings/provider/rotations/export` for tenant-scoped CSV export of redacted local provider credential rotation metadata.
-- Reused the existing allowlisted `action` and bounded `limit` query validation from the JSON rotation endpoint.
-- Added `/settings/provider` export link that preserves the selected rotation-history action filter.
-- Extended unit and seeded investor demo E2E coverage for the export path.
-- Updated API/provider/demo docs, contracts, `PLAN.md`, `SUMMARY.codex.md`, `BLOCKERS.codex.md`, and `docs/NEXT_PROMPTS.md`.
-- Added `/settings/exports`, a read-only admin exports page consolidating the readiness audit and provider credential rotation CSV links.
-- Linked the exports page from settings pages and extended the seeded investor demo E2E to cover it.
-- Added `docs/LOCAL_OPERATOR_RUNBOOK.md` and `npm run operator:check`.
-- Wired `operator:check` into `npm run validate` and linked the runbook from README and `docs/LOCAL_GATE.md`.
+Milestones advanced:
+- Post-MVP provider credential rotation CSV export
+- Post-MVP read-only admin exports view
+- Post-MVP local operator runbook and validation gate
 
-## Validation
+Major files changed:
+- `app/api/settings/provider/rotations/export/route.ts`
+- `lib/messaging/provider/credential-rotation-export.ts`
+- `app/settings/exports/page.tsx`
+- `docs/LOCAL_OPERATOR_RUNBOOK.md`
+- `scripts/operator-runbook-check.ts`
+- `scripts/validate.ts`
+- `package.json`
+- `docs/NEXT_PROMPTS.md`
+- `SUMMARY.codex.md`
+- `BLOCKERS.codex.md`
 
+Commands run:
 - `npm run test -- tests/unit/messaging/provider-credentials.test.ts`
 - `npm run contracts:check`
 - `npm run typecheck`
@@ -21,22 +32,21 @@
 - `npm run test`
 - `npm run build`
 - `npm run validate`
+- `npm run operator:check`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
-- `npm run typecheck`
-- `npm run lint`
-- `npm run build`
-- `npm run validate`
-- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
-- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
-- `npm run operator:check`
-- `npm run typecheck`
-- `npm run lint`
-- `npm run validate`
-- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 
-## Blockers
+Validation result:
+- Passed `npm run validate`
+- Passed seeded investor demo E2E
+- Git worktree clean
 
-- No active blockers.
-- Note: running `npm run typecheck` in parallel with `npm run build` can transiently fail while `.next/types` is regenerated. Serial typecheck and full validation passed.
+Remaining blockers:
+- None active.
+- Note recorded: running `typecheck` in parallel with `build` can transiently fail while `.next/types` is regenerated; serial rerun passed.
+
+Next exact command/prompt:
+```text
+Continue from the post-MVP backlog in docs/NEXT_PROMPTS.md. Preserve demo-safe defaults and hard external-impact gates. Implement the next safe slice, with docs/contracts updated first, then run npm run validate and the seeded investor demo path before committing.
+```
