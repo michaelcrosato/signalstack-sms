@@ -27,6 +27,9 @@ Run number: 6
 - Added `npm run worker:bullmq`, guarded BullMQ worker startup, and durable `queueJobId` payload validation.
 - Refactored scheduled-campaign processing so database polling and BullMQ consumption share the same dummy-only/idempotent send path.
 - Preserved default database queue behavior and no-Redis local validation.
+- Advanced a post-MVP UI expansion checkpoint.
+- Added `/settings` go-live readiness page backed by existing provider settings, compliance profile, provider numbers, readiness audit, and queue backend metadata.
+- Linked the investor demo console to the readiness page and expanded the demo Playwright path to cover it.
 
 ## Validation
 
@@ -65,6 +68,11 @@ Run number: 6
 - `npm run test:e2e:demo`
 - `npm run test -- tests/unit/queue/bullmq.test.ts tests/unit/queue/bullmq-worker.test.ts tests/unit/queue/worker.test.ts tests/unit/queue/jobs.test.ts`
 - `npm run worker:bullmq`
+- `npm run validate`
+- `npm run demo:seed`
+- `npm run test:e2e:demo`
+- `npm run typecheck`
+- `npm run lint`
 - `npm run validate`
 - `npm run demo:seed`
 - `npm run test:e2e:demo`
