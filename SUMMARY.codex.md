@@ -1,39 +1,34 @@
 # SUMMARY.codex.md
 
 Agent: Codex
+Run number: 1
 Branch: main
-Date: 2026-05-19
+Date: 2026-05-20
 
 ## Completed
 
-- Confirmed Milestone 0 local gate was already green.
-- Implemented Milestone 1 database/auth/organization foundation only.
-- Added tenant-safe organization/user/membership schema fields and Prisma migration.
-- Added deterministic demo current user and organization foundation.
-- Added `GET /api/orgs/current`.
-- Added Prisma singleton, org repository, role helpers, and tenant guard helpers.
-- Updated DB/API/data-model contracts and active plan.
-- Seeded local demo organization after starting Docker Postgres.
+- Confirmed the existing Milestone 1 foundation was green before starting.
+- Implemented Milestone 2 contacts and consent foundations.
+- Implemented Milestone 3 templates, draft campaigns, campaign recipients, and preflight.
+- Implemented Milestone 4 queue scheduling foundation with durable queued job records.
+- Preserved demo-safe defaults: dummy messaging, fake AI, live messaging disabled, live billing disabled.
 
 ## Validation
 
 Passing:
 
-- `npm install`
 - `npm run db:generate`
-- `npm run db:migrate -- --name milestone1_org_foundation`
+- `npm run db:migrate`
 - `npm run demo:seed`
 - `npm run typecheck`
 - `npm run lint`
 - `npm run test`
 - `npm run build`
 - `npm run validate`
-- `npx playwright install chromium`
 - `npm run test:e2e:smoke` through `npm run validate`
 
-## Notes
+## Commits
 
-- Docker Compose Postgres was started with `docker compose up -d postgres`.
-- Demo-safe defaults remain unchanged: dummy messaging, fake AI, live messaging disabled, live billing disabled.
-- No campaign, inbox, AI, billing, or live provider product behavior was implemented in this pass.
-
+- `a447bfe` - Milestone 2 contacts/import/list/tag/segment foundation.
+- `63ba440` - Milestone 3 template/campaign draft/preflight foundation.
+- Latest commit in this run - Milestone 4 queue schedule/cancel foundation.

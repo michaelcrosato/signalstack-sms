@@ -15,3 +15,7 @@
 ## Milestone 3
 
 - Added message templates, campaign template links, and campaign recipients for draft/preflight workflows.
+
+## Milestone 4
+
+- Added queue job type/status enums and durable `QueueJob` records for scheduled campaign foundations.

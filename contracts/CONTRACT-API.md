@@ -92,4 +92,12 @@ Updates draft campaigns only. Non-draft campaigns return conflict.
 
 Runs a compliance preflight over campaign recipients or the provided `contactIds`. It returns allowed/blocked counts and row-level reasons. It does not send or enqueue messages.
 
+### `POST /api/campaigns/:campaignId/schedule`
+
+Runs preflight, marks a campaign `SCHEDULED`, and stores a queued job record. This does not call providers.
+
+### `POST /api/campaigns/:campaignId/cancel`
+
+Marks queued campaign jobs `CANCELLED` and returns the paused campaign.
+
 Product endpoints must be specified here before implementation.

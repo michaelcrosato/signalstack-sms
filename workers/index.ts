@@ -1,1 +1,1 @@
-console.log("SignalStack SMS worker stub. No jobs are registered in Milestone 0.");
+console.log("SignalStack SMS worker stub. QueueJob records are persisted, but no provider sends run in this worker yet.");

@@ -27,4 +27,9 @@ Milestone 3:
 - `PATCH /api/campaigns/:campaignId`: updates a draft campaign.
 - `POST /api/campaigns/:campaignId/preflight`: checks recipients without sending.
 
+Milestone 4:
+
+- `POST /api/campaigns/:campaignId/schedule`: stores a queued scheduled-campaign job after preflight.
+- `POST /api/campaigns/:campaignId/cancel`: cancels queued jobs and pauses the campaign.
+
 Product API routes must be added to `contracts/CONTRACT-API.md` before implementation.

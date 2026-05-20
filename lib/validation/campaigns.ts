@@ -19,7 +19,12 @@ export const campaignPreflightSchema = z.object({
   contactIds: z.array(z.string().trim().min(1)).optional()
 });
 
+export const campaignScheduleSchema = z.object({
+  scheduledAt: z.string().datetime()
+});
+
 export type TemplateCreateInput = z.infer<typeof templateCreateSchema>;
 export type CampaignCreateInput = z.infer<typeof campaignCreateSchema>;
 export type CampaignUpdateInput = z.infer<typeof campaignUpdateSchema>;
 export type CampaignPreflightInput = z.infer<typeof campaignPreflightSchema>;
+export type CampaignScheduleInput = z.infer<typeof campaignScheduleSchema>;

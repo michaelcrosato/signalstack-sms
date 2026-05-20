@@ -1,7 +1,9 @@
-import { CampaignStatus, type Prisma } from "@prisma/client";
+import { CampaignStatus, QueueJobStatus, QueueJobType, type Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 import { orgWhere } from "@/lib/db/tenant";
 import { preflightCampaignRecipients } from "@/lib/messaging/send-preflight";
+import { scheduledCampaignIdempotencyKey } from "@/lib/queue/idempotency";
+import { scheduledCampaignJobSchema } from "@/lib/queue/jobs";
 import type { CampaignCreateInput, CampaignUpdateInput } from "@/lib/validation/campaigns";
 
 const campaignInclude = {
@@ -93,6 +95,81 @@ export async function preflightCampaign(orgId: string, campaignId: string, conta
   });
 
   return preflightCampaignRecipients(contacts);
+}
+
+export async function scheduleCampaign(orgId: string, campaignId: string, scheduledAt: Date) {
+  return prisma.$transaction(async (tx) => {
+    const campaign = await tx.campaign.findFirst({
+      where: orgWhere(orgId, { id: campaignId }),
+      include: { recipients: true }
+    });
+
+    if (!campaign) {
+      return null;
+    }
+    if (campaign.status !== CampaignStatus.DRAFT && campaign.status !== CampaignStatus.PAUSED) {
+      throw new Error("Only draft or paused campaigns can be scheduled.");
+    }
+
+    const contacts = await tx.contact.findMany({
+      where: { orgId, id: { in: campaign.recipients.map((recipient) => recipient.contactId) } },
+      select: { id: true, phone: true, consentStatus: true, optedOutAt: true, archivedAt: true }
+    });
+    const preflight = preflightCampaignRecipients(contacts);
+    if (!preflight.allowed) {
+      throw new Error("Campaign preflight failed.");
+    }
+
+    const idempotencyKey = scheduledCampaignIdempotencyKey(orgId, campaignId, scheduledAt);
+    const payload = scheduledCampaignJobSchema.parse({
+      version: 1,
+      orgId,
+      campaignId,
+      scheduledAt: scheduledAt.toISOString()
+    });
+
+    await tx.campaign.update({
+      where: { id: campaignId },
+      data: { status: CampaignStatus.SCHEDULED, scheduledAt }
+    });
+
+    return tx.queueJob.upsert({
+      where: { idempotencyKey },
+      update: {
+        status: QueueJobStatus.QUEUED,
+        payload,
+        runAt: scheduledAt
+      },
+      create: {
+        orgId,
+        campaignId,
+        type: QueueJobType.SCHEDULED_CAMPAIGN,
+        status: QueueJobStatus.QUEUED,
+        idempotencyKey,
+        payload,
+        runAt: scheduledAt
+      }
+    });
+  });
+}
+
+export async function cancelCampaign(orgId: string, campaignId: string) {
+  return prisma.$transaction(async (tx) => {
+    const campaign = await tx.campaign.findFirst({ where: orgWhere(orgId, { id: campaignId }) });
+    if (!campaign) {
+      return null;
+    }
+
+    await tx.queueJob.updateMany({
+      where: { orgId, campaignId, status: QueueJobStatus.QUEUED },
+      data: { status: QueueJobStatus.CANCELLED }
+    });
+
+    return tx.campaign.update({
+      where: { id: campaignId },
+      data: { status: CampaignStatus.PAUSED }
+    });
+  });
 }
 
 async function syncCampaignRecipients(

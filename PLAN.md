@@ -41,5 +41,14 @@ Milestone 3:
 Milestone 4:
 
 - Queue/scheduling/send pipeline foundations
-- Dummy provider only for demo sends
+- Durable scheduled campaign job records
+- Schedule/cancel API foundations
 - Hard gates before any live provider behavior
+
+## Next Milestone
+
+Milestone 5:
+
+- Shared inbox workflow foundations
+- Conversation assignment, notes, and resolve APIs
+- STOP/HELP handling remains demo-safe and provider-gated

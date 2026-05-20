@@ -37,3 +37,7 @@ The API uses tenant-scoped repositories for contact reads and writes. Contact de
 - `CampaignRecipient` stores the selected contacts for a draft campaign.
 
 Preflight reads contacts and returns compliance reasons. It does not create messages, queue jobs, or call providers.
+
+## Milestone 4 Queue Jobs
+
+`QueueJob` stores durable scheduled campaign jobs with idempotency keys. Scheduling creates a queued record after preflight. Cancelling marks queued jobs cancelled. Workers and provider sends remain gated future work.

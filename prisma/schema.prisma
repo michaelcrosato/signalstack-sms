@@ -48,6 +48,17 @@ enum CampaignRecipientStatus {
   BLOCKED
 }
 
+enum QueueJobType {
+  SCHEDULED_CAMPAIGN
+}
+
+enum QueueJobStatus {
+  QUEUED
+  CANCELLED
+  COMPLETED
+  FAILED
+}
+
 model Organization {
   id            String         @id @default(cuid())
   name          String
@@ -65,6 +76,7 @@ model Organization {
   contactImports ContactImport[]
   templates     MessageTemplate[]
   campaigns     Campaign[]
+  queueJobs     QueueJob[]
   conversations Conversation[]
   messages      Message[]
 }
@@ -238,6 +250,7 @@ model Campaign {
   org         Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
   template    MessageTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
   recipients  CampaignRecipient[]
+  queueJobs   QueueJob[]
   messages    Message[]
 
   @@index([orgId])
@@ -272,6 +285,25 @@ model Conversation {
   messages  Message[]
 
   @@index([orgId])
+}
+
+model QueueJob {
+  id             String         @id @default(cuid())
+  orgId          String
+  campaignId     String?
+  type           QueueJobType
+  status         QueueJobStatus @default(QUEUED)
+  idempotencyKey String         @unique
+  payload        Json
+  runAt          DateTime
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  org            Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  campaign       Campaign?      @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([orgId, status])
+  @@index([campaignId])
 }
 
 model Message {

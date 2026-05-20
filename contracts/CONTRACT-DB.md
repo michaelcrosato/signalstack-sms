@@ -50,3 +50,8 @@ Contacts are never hard-deleted by the API in Milestone 2. `DELETE /api/contacts
 - `CampaignRecipient`: tenant-scoped join between draft campaign and contact, unique `(campaignId, contactId)`.
 
 Campaign recipients are selected only from contacts in the current organization.
+
+## Milestone 4 Queue Foundation
+
+- `QueueJob`: tenant-scoped durable job record with unique `idempotencyKey`, JSON `payload`, `runAt`, and status.
+- Scheduled campaign jobs link to `Campaign` when applicable.
