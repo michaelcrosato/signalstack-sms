@@ -43,6 +43,11 @@ enum ContactImportStatus {
   FAILED
 }
 
+enum CampaignRecipientStatus {
+  PENDING
+  BLOCKED
+}
+
 model Organization {
   id            String         @id @default(cuid())
   name          String
@@ -58,6 +63,7 @@ model Organization {
   contactLists  ContactList[]
   segments      Segment[]
   contactImports ContactImport[]
+  templates     MessageTemplate[]
   campaigns     Campaign[]
   conversations Conversation[]
   messages      Message[]
@@ -109,6 +115,7 @@ model Contact {
   org           Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
   tagLinks      ContactTag[]
   listLinks     ContactListMember[]
+  campaignRecipients CampaignRecipient[]
   messages      Message[]
 
   @@unique([orgId, phone])
@@ -187,6 +194,21 @@ model Segment {
   @@index([orgId])
 }
 
+model MessageTemplate {
+  id          String       @id @default(cuid())
+  orgId       String
+  name        String
+  body        String
+  variables   Json
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  campaigns   Campaign[]
+
+  @@unique([orgId, name])
+  @@index([orgId])
+}
+
 model ContactImport {
   id           String              @id @default(cuid())
   orgId        String
@@ -206,6 +228,7 @@ model ContactImport {
 model Campaign {
   id          String         @id @default(cuid())
   orgId       String
+  templateId  String?
   name        String
   status      CampaignStatus @default(DRAFT)
   body        String
@@ -213,9 +236,29 @@ model Campaign {
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
   org         Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  template    MessageTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  recipients  CampaignRecipient[]
   messages    Message[]
 
   @@index([orgId])
+  @@index([orgId, status])
+}
+
+model CampaignRecipient {
+  id          String                  @id @default(cuid())
+  orgId       String
+  campaignId  String
+  contactId   String
+  status      CampaignRecipientStatus @default(PENDING)
+  blockReason String?
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+  campaign    Campaign                @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  contact     Contact                 @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, contactId])
+  @@index([orgId])
+  @@index([contactId])
 }
 
 model Conversation {

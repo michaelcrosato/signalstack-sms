@@ -29,3 +29,11 @@ Contacts now include profile, consent, and import metadata:
 - `ContactImport` stores CSV import audit counts and row-scoped errors.
 
 The API uses tenant-scoped repositories for contact reads and writes. Contact deletion is a soft archive.
+
+## Milestone 3 Campaign Drafts
+
+- `MessageTemplate` stores reusable SMS copy and parsed variable names.
+- `Campaign` stores draft campaign copy and an optional template link.
+- `CampaignRecipient` stores the selected contacts for a draft campaign.
+
+Preflight reads contacts and returns compliance reasons. It does not create messages, queue jobs, or call providers.

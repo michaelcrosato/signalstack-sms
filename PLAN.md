@@ -30,10 +30,16 @@ Milestone 2:
 - CSV import parser and demo-safe import endpoint
 - Tenant-scoped contact repositories and tests
 
-## Active Milestone
-
 Milestone 3:
 
 - Templates and campaign draft foundations
 - Campaign preflight contract before send behavior
 - No live SMS sending
+
+## Active Milestone
+
+Milestone 4:
+
+- Queue/scheduling/send pipeline foundations
+- Dummy provider only for demo sends
+- Hard gates before any live provider behavior

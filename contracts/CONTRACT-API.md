@@ -64,4 +64,32 @@ Soft-archives the contact by setting `archivedAt`. It does not hard-delete rows.
 
 Accepts JSON `{ "filename": "contacts.csv", "csv": "..." }`, parses demo-safe CSV locally, upserts valid contacts, and stores an org-scoped `ContactImport` audit record. Invalid rows are returned with row numbers.
 
+### `GET /api/templates`
+
+Returns templates for the current organization.
+
+### `POST /api/templates`
+
+Creates or updates a template by `(orgId, name)`. If `variables` is omitted, variables are extracted from `{{variable}}` placeholders in `body`.
+
+### `GET /api/campaigns`
+
+Returns draft and future campaign records for the current organization.
+
+### `POST /api/campaigns`
+
+Creates a draft campaign and optional recipient set. This does not schedule or send messages.
+
+### `GET /api/campaigns/:campaignId`
+
+Returns a tenant-scoped campaign with template and recipient contacts.
+
+### `PATCH /api/campaigns/:campaignId`
+
+Updates draft campaigns only. Non-draft campaigns return conflict.
+
+### `POST /api/campaigns/:campaignId/preflight`
+
+Runs a compliance preflight over campaign recipients or the provided `contactIds`. It returns allowed/blocked counts and row-level reasons. It does not send or enqueue messages.
+
 Product endpoints must be specified here before implementation.

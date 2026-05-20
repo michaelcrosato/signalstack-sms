@@ -42,3 +42,11 @@ Canonical contact fields:
 - `ContactImport`: org-scoped CSV import audit record with status, row counts, and row-scoped errors.
 
 Contacts are never hard-deleted by the API in Milestone 2. `DELETE /api/contacts/:contactId` sets `archivedAt`.
+
+## Milestone 3 Campaign Draft Foundation
+
+- `MessageTemplate`: tenant-scoped reusable SMS body with JSON `variables`, unique `(orgId, name)`.
+- `Campaign`: tenant-scoped draft campaign with optional `templateId`; Milestone 3 supports draft create/update only.
+- `CampaignRecipient`: tenant-scoped join between draft campaign and contact, unique `(campaignId, contactId)`.
+
+Campaign recipients are selected only from contacts in the current organization.

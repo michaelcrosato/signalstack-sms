@@ -110,6 +110,43 @@ async function main() {
     }
   });
 
+  const template = await prisma.messageTemplate.upsert({
+    where: { orgId_name: { orgId: org.id, name: "Demo intro" } },
+    update: {
+      body: "Hi {{firstName}}, this is SignalStack Demo Co. Reply STOP to opt out.",
+      variables: ["firstName"]
+    },
+    create: {
+      orgId: org.id,
+      name: "Demo intro",
+      body: "Hi {{firstName}}, this is SignalStack Demo Co. Reply STOP to opt out.",
+      variables: ["firstName"]
+    }
+  });
+
+  const campaign = await prisma.campaign.upsert({
+    where: { id: "demo_campaign_intro" },
+    update: {
+      orgId: org.id,
+      templateId: template.id,
+      name: "Demo intro campaign",
+      body: template.body
+    },
+    create: {
+      id: "demo_campaign_intro",
+      orgId: org.id,
+      templateId: template.id,
+      name: "Demo intro campaign",
+      body: template.body
+    }
+  });
+
+  await prisma.campaignRecipient.upsert({
+    where: { campaignId_contactId: { campaignId: campaign.id, contactId: contact.id } },
+    update: {},
+    create: { orgId: org.id, campaignId: campaign.id, contactId: contact.id }
+  });
+
   console.log(
     `Seeded demo organization ${org.slug} for ${user.email} with ${MembershipRole.OWNER} role.`
   );

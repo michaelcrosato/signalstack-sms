@@ -18,3 +18,11 @@ Milestone 2 contact storage rules:
 - `OPTED_IN` contacts should retain `optInAt` and `optInSource` when available.
 - CSV import is local-only and must not send messages or notify contacts.
 - Contact deletion is soft archive only during the MVP foundation.
+
+Milestone 3 preflight rules:
+
+- Empty recipient sets are blocked.
+- Archived contacts are blocked.
+- Contacts not explicitly `OPTED_IN` are blocked.
+- Opted-out contacts are blocked.
+- Preflight does not schedule, enqueue, or send messages.
