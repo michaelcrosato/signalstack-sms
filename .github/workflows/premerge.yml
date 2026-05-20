@@ -1,0 +1,23 @@
+name: premerge
+
+on:
+  workflow_dispatch:
+
+jobs:
+  premerge:
+    runs-on: ubuntu-latest
+    env:
+      DEMO_MODE: "true"
+      LIVE_MESSAGING_ENABLED: "false"
+      LIVE_BILLING_ENABLED: "false"
+      MESSAGING_PROVIDER: dummy
+      AI_PROVIDER: fake
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run premerge

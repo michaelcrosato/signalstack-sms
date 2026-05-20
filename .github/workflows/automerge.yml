@@ -1,0 +1,10 @@
+name: automerge
+
+on:
+  workflow_dispatch:
+
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Automerge policy is a Milestone 0 placeholder. Enable only after repository branch protection exists."

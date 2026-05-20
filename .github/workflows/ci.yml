@@ -1,0 +1,26 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      DEMO_MODE: "true"
+      LIVE_MESSAGING_ENABLED: "false"
+      LIVE_BILLING_ENABLED: "false"
+      MESSAGING_PROVIDER: dummy
+      AI_PROVIDER: fake
+      DATABASE_URL: postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run validate

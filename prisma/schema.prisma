@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MembershipRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum ConsentStatus {
+  UNKNOWN
+  OPTED_IN
+  OPTED_OUT
+}
+
+enum ConversationStatus {
+  OPEN
+  RESOLVED
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  PAUSED
+  COMPLETED
+}
+
+model Organization {
+  id            String         @id @default(cuid())
+  name          String
+  demoMode      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  memberships   Membership[]
+  contacts      Contact[]
+  campaigns     Campaign[]
+  conversations Conversation[]
+  messages      Message[]
+}
+
+model AppUser {
+  id          String       @id @default(cuid())
+  clerkUserId String       @unique
+  email       String       @unique
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  memberships Membership[]
+}
+
+model Membership {
+  id        String         @id @default(cuid())
+  orgId     String
+  userId    String
+  role      MembershipRole @default(MEMBER)
+  createdAt DateTime       @default(now())
+  org       Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user      AppUser        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, userId])
+  @@index([orgId])
+}
+
+model Contact {
+  id            String        @id @default(cuid())
+  orgId         String
+  phone         String
+  displayName   String?
+  consentStatus ConsentStatus @default(UNKNOWN)
+  optInSource   String?
+  optedOutAt    DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  org           Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  messages      Message[]
+
+  @@unique([orgId, phone])
+  @@index([orgId])
+}
+
+model Campaign {
+  id          String         @id @default(cuid())
+  orgId       String
+  name        String
+  status      CampaignStatus @default(DRAFT)
+  body        String
+  scheduledAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  org         Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  messages    Message[]
+
+  @@index([orgId])
+}
+
+model Conversation {
+  id        String             @id @default(cuid())
+  orgId     String
+  contactId String?
+  status    ConversationStatus @default(OPEN)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  org       Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  messages  Message[]
+
+  @@index([orgId])
+}
+
+model Message {
+  id                  String        @id @default(cuid())
+  orgId               String
+  contactId           String?
+  conversationId      String?
+  campaignId          String?
+  direction           String
+  body                String
+  providerMessageId   String?
+  idempotencyKey      String        @unique
+  createdAt           DateTime      @default(now())
+  org                 Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  contact             Contact?      @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  conversation        Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  campaign            Campaign?     @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  @@index([orgId])
+}

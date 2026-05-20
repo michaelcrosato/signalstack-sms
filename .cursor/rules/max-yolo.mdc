@@ -1,0 +1,6 @@
+---
+description: Maximum automation with hard external-impact gates
+alwaysApply: true
+---
+
+Run routine install, build, lint, test, and repair commands automatically. Do not bypass hard gates for live SMS, billing, real secrets, destructive production database operations, compliance-sensitive behavior, spam, data leakage, or real financial cost.
