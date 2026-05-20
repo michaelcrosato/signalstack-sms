@@ -6,6 +6,7 @@ import { listProviderPhoneNumbers } from "@/lib/db/repositories/provider-numbers
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
 import { getProviderSettings } from "@/lib/messaging/provider/settings";
 import { getQueueBackend } from "@/lib/queue/bullmq";
+import { getApiRateLimitPolicy } from "@/lib/rate-limit/api-rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,7 @@ export default async function SettingsPage() {
     complianceProfile,
     env: process.env
   });
+  const apiRateLimit = getApiRateLimitPolicy(process.env);
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
@@ -62,6 +64,14 @@ export default async function SettingsPage() {
           </dl>
         </Panel>
       </section>
+
+      <Panel title="API Protection">
+        <dl className="grid gap-3 text-sm md:grid-cols-3">
+          <StatusRow label="Rate limit enabled" value={String(apiRateLimit.enabled)} />
+          <StatusRow label="Requests" value={String(apiRateLimit.limit)} />
+          <StatusRow label="Window seconds" value={String(apiRateLimit.windowMs / 1000)} />
+        </dl>
+      </Panel>
 
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
         <Panel title="Numbers">

@@ -8,6 +8,7 @@ Run number: 7
 - Added a local in-memory fixed-window limiter for all `/api/*` routes through Next middleware.
 - Added demo-safe rate-limit env defaults and response headers: `Retry-After`, `RateLimit-Limit`, `RateLimit-Remaining`, and `RateLimit-Reset`.
 - Added deterministic unit coverage for rate-limit policy parsing, caller key selection, blocking, reset behavior, and headers.
+- Surfaced API rate-limit status on `/settings` and expanded the investor demo E2E assertion to cover it.
 - Updated API contract, API map, architecture, testing docs, env example, and plan/next-prompt handoff.
 - Preserved hard gates: no Redis requirement, no external rate-limit service, no provider calls, no live messaging, no billing, no notifications, and no secrets.
 - Advanced a post-MVP provider number foundation checkpoint.
@@ -47,6 +48,8 @@ Run number: 7
 - `npm run contracts:check`
 - `npm run validate`
 - `npm run demo:seed`
+- `npm run test:e2e:demo`
+- `npm run typecheck`
 - `npm run test:e2e:demo`
 - `npx prisma migrate dev --name post_mvp_provider_phone_numbers` failed once without `DATABASE_URL`; rerun with local `DATABASE_URL` passed.
 - `npm run test -- tests/unit/validation/provider.test.ts tests/unit/messaging/provider-settings.test.ts`
