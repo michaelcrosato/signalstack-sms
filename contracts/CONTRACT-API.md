@@ -176,4 +176,12 @@ Returns the org billing metadata record, live-billing blocked state, local usage
 
 Records a local usage event. This endpoint must not call Stripe or create live billing artifacts.
 
+### `POST /api/webhooks/twilio/inbound`
+
+Accepts Twilio `application/x-www-form-urlencoded` inbound message webhooks. The request must pass `X-Twilio-Signature` validation with `TWILIO_AUTH_TOKEN`; unsigned requests are rejected. Valid payloads are stored as raw org-scoped webhook events by idempotency key and create local inbound inbox messages only. The handler returns `204` and does not send automatic SMS replies.
+
+### `POST /api/webhooks/twilio/status`
+
+Accepts Twilio `application/x-www-form-urlencoded` delivery status webhooks. The request must pass `X-Twilio-Signature` validation with `TWILIO_AUTH_TOKEN`; unsigned requests are rejected. Valid payloads are stored as raw org-scoped webhook events by idempotency key. The handler returns `204` and does not call any provider.
+
 Product endpoints must be specified here before implementation.

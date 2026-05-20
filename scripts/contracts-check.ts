@@ -80,7 +80,8 @@ const tenantScopedModels = [
   "InternalNote",
   "ComplianceProfile",
   "UsageEvent",
-  "BillingAccount"
+  "BillingAccount",
+  "WebhookEvent"
 ];
 
 const modelsMissingOrgId = tenantScopedModels.filter((model) => {

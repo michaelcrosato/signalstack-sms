@@ -37,3 +37,7 @@
 - Added `UsageEventType` and `BillingAccountStatus`.
 - Added `UsageEvent` for local usage metering.
 - Added `BillingAccount` for org-scoped billing metadata with live billing disabled by default.
+
+## Post-MVP Webhook Foundations
+
+- Added `WebhookEvent` for org-scoped raw provider webhook payloads and idempotency tracking.

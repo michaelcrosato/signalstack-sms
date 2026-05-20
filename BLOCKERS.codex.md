@@ -11,3 +11,4 @@ No active blockers.
 - The demo path requires the local PostgreSQL database to be migrated and seeded before running.
 - The standard `npm run validate` gate runs the smoke Playwright test; the fuller investor demo path is available as `npm run test:e2e:demo`.
 - `npm run db:migrate` requires `DATABASE_URL` in the shell; the validation script supplies the local default internally, but direct Prisma commands do not.
+- Webhook foundations validate and store Twilio inbound/status events, but status transition processing and live provider-number routing remain future slices.

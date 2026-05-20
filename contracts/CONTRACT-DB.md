@@ -75,6 +75,7 @@ Compliance profile completion is required by the centralized messaging hard gate
 
 - `UsageEvent`: tenant-scoped local usage record with `type`, `quantity`, optional JSON metadata, and timestamp.
 - `BillingAccount`: one org-scoped billing metadata record with local status and live-billing flag.
+- `WebhookEvent`: org-scoped raw provider webhook record with provider, event type, unique idempotency key, raw payload, received timestamp, and processed timestamp.
 - `UsageEventType`: `CONTACT_IMPORTED`, `MESSAGE_INBOUND`, `CAMPAIGN_SCHEDULED`, `AI_REQUEST`.
 - `BillingAccountStatus`: `DEMO`, `TRIALING`, `ACTIVE`, `PAST_DUE`, `CANCELLED`.
 

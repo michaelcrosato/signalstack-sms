@@ -105,6 +105,7 @@ model Organization {
   complianceProfile ComplianceProfile?
   usageEvents   UsageEvent[]
   billingAccount BillingAccount?
+  webhookEvents WebhookEvent[]
 }
 
 model AppUser {
@@ -425,4 +426,20 @@ model BillingAccount {
 
   @@index([orgId])
   @@index([status])
+}
+
+model WebhookEvent {
+  id             String       @id @default(cuid())
+  orgId          String
+  provider       String
+  eventType      String
+  idempotencyKey String       @unique
+  rawPayload     Json
+  receivedAt     DateTime     @default(now())
+  processedAt    DateTime?
+  org            Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([orgId, provider, eventType])
+  @@index([receivedAt])
 }

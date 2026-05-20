@@ -14,6 +14,7 @@ Completed through Milestone 10 hardening:
 - Milestone 8: local usage/billing records, analytics overview, and billing usage APIs.
 - Milestone 9: `/demo` investor console and deterministic Playwright demo path.
 - Milestone 10: contract drift gate for API docs, tenant `orgId` invariant check, named seeded demo E2E script, and testing/local-gate doc updates.
+- Post-MVP webhook foundation: Twilio inbound/status route foundations, signature validation helper, raw webhook event persistence, and webhook unit tests.
 
 Demo-safe defaults remain mandatory:
 
@@ -44,7 +45,7 @@ READ FIRST:
 SCOPE:
 - Preserve all Milestone 0-10 gates and demo-safe defaults.
 - Implement the next post-MVP slice only when contracts/docs are updated first.
-- Good candidate slices: UI expansion, worker execution, webhook foundations, provider settings, or production deployment gates.
+- Good candidate slices: UI expansion, worker execution, provider settings, status transition processing, or production deployment gates.
 - Keep live SMS, live billing, real notifications, live AI, and real provider calls blocked unless explicit future hard gates are implemented and tested.
 - Run the full local gate and seeded demo path before committing.
 

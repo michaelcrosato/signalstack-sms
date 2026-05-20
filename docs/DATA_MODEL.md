@@ -60,3 +60,7 @@ STOP-class inbound keywords update local contact consent to `OPTED_OUT`. HELP is
 - `BillingAccount` stores one org-scoped local billing status record with live billing disabled by default.
 
 These records do not trigger Stripe or any live billing provider behavior.
+
+## Post-MVP Webhook Foundations
+
+`WebhookEvent` stores org-scoped raw provider webhook payloads with a unique idempotency key. It is used by Twilio inbound and status webhook foundations to preserve provider data without live external side effects.
