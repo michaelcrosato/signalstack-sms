@@ -34,6 +34,8 @@ The inbox operations screen at `/settings/inbox` displays existing local convers
 
 The team operations screen at `/settings/team` displays existing local organization metadata, membership role and status counts, assigned conversation counts, authored internal-note counts, and member metadata. It is read-only and does not invite users, create users, change roles, suspend members, delete memberships, call Clerk, send email, send notifications, call providers, create billing records, send SMS, or enable live messaging.
 
+The billing operations screen at `/settings/billing` displays existing local billing account status, live billing gate status, Stripe placeholder presence, usage-event totals, and recent usage metadata. It is read-only and does not call Stripe, create subscriptions, create invoices, collect payment methods, charge cards, send email, send notifications, call providers, send SMS, or enable live billing.
+
 The root route `/` is a static local launch dashboard. It shows the demo-safe runtime defaults and links to the existing demo, readiness, provider metadata, system status, usage, and admin export views without requiring database access or creating side effects.
 
 The local operator runbook screen at `/settings/runbook` displays demo-safe validation, seed, worker, export, and repair-loop commands from the local runbook. It is read-only and does not execute commands, mutate records, call providers, create billing records, send notifications, expose secrets, or enable live messaging.

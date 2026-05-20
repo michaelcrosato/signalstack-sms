@@ -55,3 +55,7 @@ Post-MVP inbox operations view:
 Post-MVP team operations view:
 
 - The seeded investor demo path must verify that `/settings/team` renders read-only organization metadata, membership role/status counts, recent member metadata, and safety-boundary text without inviting users, changing roles, suspending members, deleting memberships, calling Clerk, emailing, sending notifications, calling providers, billing, sending SMS, or enabling live messaging.
+
+Post-MVP billing operations view:
+
+- The seeded investor demo path must verify that `/settings/billing` renders read-only local billing account status, live billing blocker status, usage totals, recent usage metadata, and safety-boundary text without Stripe calls, subscription creation, invoices, payment collection, card charges, email, notifications, provider calls, SMS, or live billing enablement.

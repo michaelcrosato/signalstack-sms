@@ -77,6 +77,9 @@ export default function OperatorRunbookPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/exports">
           Admin Exports
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/billing">
+          Billing Operations
+        </Link>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Operator Runbook</h1>
@@ -139,6 +142,7 @@ export default function OperatorRunbookPage() {
           <AdminLink href="/settings/inbox" label="Inbox Operations" />
           <AdminLink href="/settings/team" label="Team Operations" />
           <AdminLink href="/settings/usage" label="Usage & Analytics" />
+          <AdminLink href="/settings/billing" label="Billing Operations" />
           <AdminLink href="/settings/exports" label="Admin Exports" />
           <AdminLink href="/settings/provider" label="Provider Details" />
         </nav>

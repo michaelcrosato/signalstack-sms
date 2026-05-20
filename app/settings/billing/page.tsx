@@ -2,7 +2,6 @@ import { UsageEventType } from "@prisma/client";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
-import { getAnalyticsOverview } from "@/lib/analytics/overview";
 import { getUsageSummary } from "@/lib/billing/metering";
 
 export const dynamic = "force-dynamic";
@@ -14,91 +13,83 @@ const usageTypes = [
   UsageEventType.AI_REQUEST
 ];
 
-export default async function UsageSettingsPage() {
+export default async function BillingOperationsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
-  const [analytics, usage] = await Promise.all([getAnalyticsOverview(currentOrg.orgId), getUsageSummary(currentOrg.orgId)]);
+  const usage = await getUsageSummary(currentOrg.orgId);
+  const totalUsageEvents = usage.recentEvents.reduce((total, event) => total + event.quantity, 0);
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
+        <Link className="text-sm font-medium text-teal-700" href="/demo">
+          Demo Console
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings">
           Go-Live Readiness
         </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/compliance">
-          Compliance Detail
+        <Link className="text-sm font-medium text-teal-700" href="/settings/usage">
+          Usage & Analytics
         </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/system">
           System Status
         </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/campaigns">
-          Campaign Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/contacts">
-          Contact Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/templates">
-          Template Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/audience">
-          Audience Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/inbox">
-          Inbox Operations
-        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
           Operator Runbook
         </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/billing">
-          Billing Operations
-        </Link>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
-          <h1 className="text-4xl font-semibold text-slate-950">Usage & Analytics</h1>
+          <h1 className="text-4xl font-semibold text-slate-950">Billing Operations</h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-            Read-only local metering for {currentOrg.orgName}. This page does not create billing records, call Stripe, send
-            notifications, call providers, or enable live messaging.
+            Read-only local billing boundary for {currentOrg.orgName}. This page does not call Stripe, create
+            subscriptions, create invoices, collect payment methods, charge cards, send email, send notifications, call
+            providers, send SMS, or enable live billing.
           </p>
         </div>
       </header>
 
       <section className="grid gap-3 md:grid-cols-4">
-        <Metric label="Contacts" value={String(analytics.contacts.total)} />
-        <Metric label="Campaigns" value={String(analytics.campaigns.total)} />
-        <Metric label="Conversations" value={String(analytics.conversations.total)} />
-        <Metric label="Messages" value={String(analytics.messages.total)} />
+        <Metric label="Billing status" value={usage.billingAccount.status} />
+        <Metric label="Live billing" value={String(usage.billingAccount.liveBillingEnabled)} />
+        <Metric label="Live blocked" value={String(usage.liveBillingBlocked)} />
+        <Metric label="Usage quantity" value={String(totalUsageEvents)} />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
-        <Panel title="Local Usage Totals">
+        <Panel title="Billing Account">
           <dl className="grid gap-3 text-sm">
-            {usageTypes.map((type) => (
-              <StatusRow key={type} label={formatUsageType(type)} value={String(usage.totals[type])} />
-            ))}
-          </dl>
-        </Panel>
-
-        <Panel title="Billing Boundary">
-          <dl className="grid gap-3 text-sm">
-            <StatusRow label="Billing account status" value={usage.billingAccount.status} />
+            <StatusRow label="Status" value={usage.billingAccount.status} />
             <StatusRow label="Live billing enabled" value={String(usage.billingAccount.liveBillingEnabled)} />
             <StatusRow label="Live billing blocked" value={String(usage.liveBillingBlocked)} />
             <StatusRow label="Stripe customer" value={usage.billingAccount.stripeCustomerId ? "placeholder present" : "not configured"} />
+            <StatusRow
+              label="Stripe subscription"
+              value={usage.billingAccount.stripeSubscriptionId ? "placeholder present" : "not configured"}
+            />
           </dl>
+        </Panel>
+
+        <Panel title="Safety Boundary">
+          <ul className="grid gap-2 text-sm text-slate-700">
+            <li>Billing account data is local tenant metadata only.</li>
+            <li>Stripe customer and subscription values are shown only as presence indicators.</li>
+            <li>Payment collection, subscription changes, invoices, and charges are not available from this view.</li>
+            <li>No email, notifications, provider calls, live SMS, external billing artifacts, or mutations are created.</li>
+          </ul>
         </Panel>
       </section>
 
-      <Panel title="Conversation Analytics">
-        <dl className="grid gap-3 text-sm md:grid-cols-3">
-          <StatusRow label="Open conversations" value={String(analytics.conversations.open)} />
-          <StatusRow label="Resolved conversations" value={String(analytics.conversations.resolved)} />
-          <StatusRow label="Opted-out contacts" value={String(analytics.contacts.optedOut)} />
+      <Panel title="Local Usage Totals">
+        <dl className="grid gap-3 text-sm md:grid-cols-2">
+          {usageTypes.map((type) => (
+            <StatusRow key={type} label={formatUsageType(type)} value={String(usage.totals[type])} />
+          ))}
         </dl>
       </Panel>
 
       <Panel title="Recent Usage Events">
         <ul className="grid gap-3 text-sm">
           {usage.recentEvents.length > 0 ? (
-            usage.recentEvents.slice(0, 20).map((event) => (
+            usage.recentEvents.slice(0, 12).map((event) => (
               <li key={event.id} className="grid gap-2 border-b border-slate-100 pb-3 md:grid-cols-[1fr_auto]">
                 <div>
                   <p className="font-medium text-slate-950">

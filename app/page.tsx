@@ -73,6 +73,11 @@ const launchLinks = [
     description: "Tenant metrics, local usage totals, billing boundary, and recent usage events."
   },
   {
+    href: "/settings/billing",
+    title: "Billing Operations",
+    description: "Read-only local billing account status, live billing blockers, and usage boundary."
+  },
+  {
     href: "/settings/exports",
     title: "Admin Exports",
     description: "Local CSV links for readiness audit and redacted provider rotation history."

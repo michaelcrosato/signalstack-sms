@@ -10,6 +10,11 @@ Run number: 20
 - Linked the team operations view from `/`, `/demo`, `/settings`, `/settings/inbox`, and `/settings/runbook`.
 - Extended the Playwright smoke test and seeded investor demo E2E path to cover the team operations view.
 - Updated API/testing contracts, API map, demo-mode docs, local operator runbook, README, PLAN, and next prompt handoff docs.
+- Advanced a post-MVP local billing operations checkpoint.
+- Added `/settings/billing`, a read-only page that renders local billing account status, live billing gate status, Stripe placeholder presence, usage totals, recent usage metadata, and a safety boundary.
+- Linked the billing operations view from `/`, `/demo`, `/settings`, `/settings/usage`, and `/settings/runbook`.
+- Extended the Playwright smoke test and seeded investor demo E2E path to cover the billing operations view.
+- Updated API/testing contracts, API map, demo-mode docs, local operator runbook, README, PLAN, and next prompt handoff docs.
 
 ## Prior Completed
 
@@ -35,6 +40,12 @@ Run number: 20
 - `npm run db:generate`
 - `npm run validate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
+- `npm run typecheck`
+- `npm run lint`
+- `npm run contracts:check`
+- `npm run validate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 - `npm run typecheck`

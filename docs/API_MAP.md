@@ -92,6 +92,7 @@ Post-MVP provider settings foundation:
 - `/settings/templates`: renders a read-only local template operations view with template counts, variable names, campaign usage, and text previews without editing copy, rendering live outbound messages, scheduling campaigns, provider calls, billing records, notifications, live messaging, mutations, or secrets.
 - `/settings/inbox`: renders a read-only local inbox operations view with conversation status, assignment counts, recent message/note counts, and inbox safety-boundary metadata without creating messages, assigning, resolving, provider calls, billing records, notifications, live messaging, mutations, or secrets.
 - `/settings/team`: renders a read-only local team operations view with organization metadata, membership role/status counts, assigned conversation counts, authored-note counts, and team safety-boundary metadata without inviting users, role changes, suspensions, membership deletion, Clerk calls, email, notifications, provider calls, billing records, live messaging, mutations, or secrets.
+- `/settings/billing`: renders a read-only local billing operations view with billing account status, live billing gate status, Stripe placeholder presence, usage totals, recent usage metadata, and billing safety-boundary text without Stripe calls, subscriptions, invoices, payment collection, card charges, email, notifications, provider calls, SMS, live billing, mutations, or secrets.
 
 Post-MVP provider number foundation:
 

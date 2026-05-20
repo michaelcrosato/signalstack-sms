@@ -173,6 +173,18 @@ Use `/settings/team` for read-only organization and membership review before dem
 
 The page is display-only. It must not invite users, create users, change roles, suspend members, delete memberships, call Clerk, send email, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
+## Billing Operations
+
+Use `/settings/billing` for read-only local billing boundary review before demos or metering repair work. It displays:
+
+- local billing account status
+- live billing gate status
+- Stripe placeholder presence
+- usage-event totals
+- recent usage-event metadata
+
+The page is display-only. It must not call Stripe, create subscriptions, create invoices, collect payment methods, charge cards, send email, expose secrets, call providers, create external billing artifacts, send notifications, send SMS, or enable live billing.
+
 ## Compliance Detail
 
 Use `/settings/compliance` for read-only compliance profile review before demos or repair work. It displays:
