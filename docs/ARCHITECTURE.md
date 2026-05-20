@@ -7,3 +7,5 @@ Post-MVP local workers support one-shot and opt-in continuous polling modes. Con
 Post-MVP BullMQ support is opt-in. `QueueJob` database rows remain durable state, while `QUEUE_BACKEND=bullmq` with `REDIS_URL` can mirror scheduled campaign jobs into a Redis-backed BullMQ queue for future worker execution. Missing Redis configuration falls back to database-only scheduling.
 
 The optional BullMQ worker consumes Redis jobs by `queueJobId` and reloads the durable `QueueJob` row before processing. It shares the local dummy-provider hard gate with the database polling worker.
+
+Post-MVP API rate limiting is enforced in Next middleware with an in-memory fixed-window limiter. It is a local/demo safety guardrail for abuse-prone API bursts; it does not rely on Redis, does not call external services, and does not replace durable idempotency for queue jobs or webhooks.

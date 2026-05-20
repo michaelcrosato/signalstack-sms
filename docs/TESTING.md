@@ -19,3 +19,4 @@ Additional deterministic checks:
 - `WORKER_MAX_JOBS_PER_POLL` caps local worker throughput per poll and is clamped to a bounded range for demos/tests.
 - BullMQ enqueue and worker helpers are unit-tested without requiring Redis. Local validation must remain green with `QUEUE_BACKEND` unset or set to `database`.
 - Production deployment gate tests verify that production-like environments cannot enable external-impact settings without an explicit future override.
+- API rate limiting helpers are unit-tested with deterministic clocks and isolated stores. Local validation keeps the middleware defaults generous enough for smoke and demo paths.

@@ -85,4 +85,10 @@ Post-MVP live-readiness audit foundation:
 
 - `GET /api/settings/readiness-audit`: lists recent local go-live readiness audit events.
 
+Post-MVP API rate limiting foundation:
+
+- All `/api/*` routes are protected by a local in-memory rate limiter before route handlers run.
+- Defaults are `API_RATE_LIMIT_ENABLED=true`, `API_RATE_LIMIT_MAX=120`, and `API_RATE_LIMIT_WINDOW_MS=60000`.
+- Rate-limited responses return `429` plus retry/rate-limit headers and do not execute route-side effects.
+
 Product API routes must be added to `contracts/CONTRACT-API.md` before implementation.

@@ -97,9 +97,10 @@ Post-MVP:
 - Local worker jobs-per-poll rate limit
 - UI expansion
 - Production deployment gates
+- API rate limiting
 
 ## Next Milestone
 
 Post-MVP:
 
-- UI expansion, Redis/BullMQ worker integration, rate limiting, live-readiness audit trails, provider credential management, and production deployment gates
+- Provider credential management, Redis-backed BullMQ integration smoke, deeper settings UI, deployment documentation, and production go-live gates

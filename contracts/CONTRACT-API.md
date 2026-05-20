@@ -201,3 +201,14 @@ Creates or updates tenant-scoped provider phone-number metadata from `{ "phoneNu
 Returns recent tenant-scoped live-readiness audit events for the current organization. These events are local records only and must not trigger notifications, provider calls, billing events, or live messaging.
 
 Product endpoints must be specified here before implementation.
+
+## Cross-Cutting API Rate Limit
+
+Post-MVP API rate limiting foundation:
+
+- All `/api/*` routes pass through a local in-memory rate limiter before route handlers run.
+- The limiter identifies callers from forwarded IP headers when present and otherwise falls back to a deterministic local key.
+- Defaults are demo-safe and generous: enabled, 120 requests per 60 seconds.
+- Environment knobs are local configuration only: `API_RATE_LIMIT_ENABLED`, `API_RATE_LIMIT_MAX`, and `API_RATE_LIMIT_WINDOW_MS`.
+- Rejected requests return `429` with `Retry-After`, `RateLimit-Limit`, `RateLimit-Remaining`, and `RateLimit-Reset` headers.
+- The limiter must not call external services, store secrets, send notifications, enable live messaging, or replace provider/webhook idempotency.

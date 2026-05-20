@@ -1,6 +1,6 @@
 # Codex Blockers
 
-Run number: 6
+Run number: 7
 
 No active blockers.
 
@@ -17,4 +17,5 @@ No active blockers.
 - BullMQ enqueue and worker consumption are now available as opt-in local foundations with `QUEUE_BACKEND=bullmq` and `REDIS_URL`; local validation still does not require Redis.
 - The BullMQ worker has unit coverage and a guarded startup path, but this run did not perform an end-to-end Redis-backed BullMQ integration test against a running Redis service.
 - Production deployment gates are local validation checks only; they do not provision deployment infrastructure or enable live external services.
+- API rate limiting is an in-memory local middleware foundation. It is suitable for demo/local protection but not a distributed production quota system.
 - Windows can produce a Prisma client DLL rename error if `prisma generate` runs concurrently with a Next/Playwright server or another Prisma client process. Run Prisma generation and E2E checks sequentially.

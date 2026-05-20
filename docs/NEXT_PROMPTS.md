@@ -27,6 +27,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP BullMQ worker consumption foundation: `npm run worker:bullmq` starts only when BullMQ/Redis and dummy-only live-disabled gates are configured, consumes BullMQ jobs by durable `queueJobId`, and shares the database worker's idempotent dummy send path.
 - Post-MVP readiness UI foundation: `/settings` renders go-live readiness status from existing compliance, provider, numbers, readiness audit, and queue backend metadata; the investor demo E2E now checks the page.
 - Post-MVP production deployment gate foundation: `npm run production:gate` is part of validation and blocks production-like environments from live messaging, live billing, live provider, live AI, Twilio, or Stripe settings without an explicit future override.
+- Post-MVP API rate limiting foundation: Next middleware protects `/api/*` with local in-memory fixed-window limits, demo-safe env defaults, `429` retry headers, and deterministic unit coverage.
 
 Demo-safe defaults remain mandatory:
 
@@ -57,7 +58,7 @@ READ FIRST:
 SCOPE:
 - Preserve all Milestone 0-10 gates and demo-safe defaults.
 - Implement the next post-MVP slice only when contracts/docs are updated first.
-- Good candidate slices: provider credential management, Redis-backed BullMQ integration smoke, API rate limiting, deeper settings UI, or deployment documentation.
+- Good candidate slices: provider credential management, Redis-backed BullMQ integration smoke, deeper settings UI, deployment documentation, or production go-live gate design.
 - Keep live SMS, live billing, real notifications, live AI, and real provider calls blocked unless explicit future hard gates are implemented and tested.
 - Run the full local gate and seeded demo path before committing.
 

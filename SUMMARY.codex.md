@@ -1,9 +1,15 @@
 # Codex Summary
 
-Run number: 6
+Run number: 7
 
 ## Completed
 
+- Advanced a post-MVP API rate limiting checkpoint.
+- Added a local in-memory fixed-window limiter for all `/api/*` routes through Next middleware.
+- Added demo-safe rate-limit env defaults and response headers: `Retry-After`, `RateLimit-Limit`, `RateLimit-Remaining`, and `RateLimit-Reset`.
+- Added deterministic unit coverage for rate-limit policy parsing, caller key selection, blocking, reset behavior, and headers.
+- Updated API contract, API map, architecture, testing docs, env example, and plan/next-prompt handoff.
+- Preserved hard gates: no Redis requirement, no external rate-limit service, no provider calls, no live messaging, no billing, no notifications, and no secrets.
 - Advanced a post-MVP provider number foundation checkpoint.
 - Added tenant-scoped `ProviderPhoneNumber` metadata and `ProviderPhoneNumberStatus`.
 - Added `GET /api/settings/numbers` and `POST /api/settings/numbers` for local number metadata only.
@@ -35,6 +41,13 @@ Run number: 6
 
 ## Validation
 
+- `npm run test -- tests/unit/rate-limit/api-rate-limit.test.ts`
+- `npm run typecheck`
+- `npm run lint`
+- `npm run contracts:check`
+- `npm run validate`
+- `npm run demo:seed`
+- `npm run test:e2e:demo`
 - `npx prisma migrate dev --name post_mvp_provider_phone_numbers` failed once without `DATABASE_URL`; rerun with local `DATABASE_URL` passed.
 - `npm run test -- tests/unit/validation/provider.test.ts tests/unit/messaging/provider-settings.test.ts`
 - `npm run contracts:check`
