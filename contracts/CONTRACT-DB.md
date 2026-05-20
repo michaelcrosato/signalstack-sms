@@ -55,3 +55,11 @@ Campaign recipients are selected only from contacts in the current organization.
 
 - `QueueJob`: tenant-scoped durable job record with unique `idempotencyKey`, JSON `payload`, `runAt`, and status.
 - Scheduled campaign jobs link to `Campaign` when applicable.
+
+## Milestone 5 Shared Inbox Foundation
+
+- `Conversation`: tenant-scoped inbox thread with optional `contactId`, optional `assignedToUserId`, `status`, `lastMessageAt`, `assignedAt`, and `resolvedAt`.
+- `Message`: tenant-scoped message rows linked to a conversation/contact when available. Milestone 5 demo inbound rows use `direction: "INBOUND"` and never call a provider.
+- `InternalNote`: tenant-scoped note linked to a conversation and author user.
+
+Conversation assignment is limited to active members of the current organization. Resolve/reopen changes only local conversation state.

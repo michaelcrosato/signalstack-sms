@@ -19,3 +19,10 @@
 ## Milestone 4
 
 - Added queue job type/status enums and durable `QueueJob` records for scheduled campaign foundations.
+
+## Milestone 5
+
+- Added conversation assignment and lifecycle timestamps.
+- Linked conversations to contacts and assignees.
+- Added `InternalNote` for shared inbox team notes.
+- Added message indexes for conversation/contact inbox reads.

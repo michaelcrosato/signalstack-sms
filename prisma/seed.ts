@@ -1,4 +1,4 @@
-import { ConsentStatus, MembershipRole, MembershipStatus } from "@prisma/client";
+import { ConsentStatus, ConversationStatus, MembershipRole, MembershipStatus } from "@prisma/client";
 import { prisma } from "../lib/db/prisma";
 
 async function main() {
@@ -145,6 +145,57 @@ async function main() {
     where: { campaignId_contactId: { campaignId: campaign.id, contactId: contact.id } },
     update: {},
     create: { orgId: org.id, campaignId: campaign.id, contactId: contact.id }
+  });
+
+  const conversation = await prisma.conversation.upsert({
+    where: { id: "demo_conversation_ada" },
+    update: {
+      orgId: org.id,
+      contactId: contact.id,
+      assignedToUserId: user.id,
+      status: ConversationStatus.OPEN,
+      lastMessageAt: new Date("2026-01-03T10:00:00.000Z"),
+      assignedAt: new Date("2026-01-03T10:05:00.000Z"),
+      resolvedAt: null
+    },
+    create: {
+      id: "demo_conversation_ada",
+      orgId: org.id,
+      contactId: contact.id,
+      assignedToUserId: user.id,
+      status: ConversationStatus.OPEN,
+      lastMessageAt: new Date("2026-01-03T10:00:00.000Z"),
+      assignedAt: new Date("2026-01-03T10:05:00.000Z")
+    }
+  });
+
+  await prisma.message.upsert({
+    where: { idempotencyKey: "demo-seed-inbound-ada-1" },
+    update: {},
+    create: {
+      orgId: org.id,
+      contactId: contact.id,
+      conversationId: conversation.id,
+      direction: "INBOUND",
+      body: "Can you send pricing?",
+      providerMessageId: "demo_provider_message_ada_1",
+      idempotencyKey: "demo-seed-inbound-ada-1",
+      createdAt: new Date("2026-01-03T10:00:00.000Z")
+    }
+  });
+
+  await prisma.internalNote.upsert({
+    where: { id: "demo_note_ada_1" },
+    update: {
+      body: "Demo note: Ada is interested in SMB launch pricing."
+    },
+    create: {
+      id: "demo_note_ada_1",
+      orgId: org.id,
+      conversationId: conversation.id,
+      authorUserId: user.id,
+      body: "Demo note: Ada is interested in SMB launch pricing."
+    }
   });
 
   console.log(

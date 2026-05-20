@@ -26,3 +26,10 @@ Milestone 3 preflight rules:
 - Contacts not explicitly `OPTED_IN` are blocked.
 - Opted-out contacts are blocked.
 - Preflight does not schedule, enqueue, or send messages.
+
+Milestone 5 inbound rules:
+
+- Demo inbound APIs create local message records only.
+- STOP, STOPALL, UNSUBSCRIBE, CANCEL, END, and QUIT update the local contact to `OPTED_OUT` and set `optedOutAt`.
+- HELP is recorded as an inbound keyword but does not opt a contact in and does not send a live or dummy outbound response yet.
+- Inbox assignment, notes, resolve, and reopen operations are tenant-scoped.

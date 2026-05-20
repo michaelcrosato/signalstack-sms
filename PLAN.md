@@ -36,8 +36,6 @@ Milestone 3:
 - Campaign preflight contract before send behavior
 - No live SMS sending
 
-## Active Milestone
-
 Milestone 4:
 
 - Queue/scheduling/send pipeline foundations
@@ -45,10 +43,25 @@ Milestone 4:
 - Schedule/cancel API foundations
 - Hard gates before any live provider behavior
 
-## Next Milestone
-
 Milestone 5:
 
-- Shared inbox workflow foundations
-- Conversation assignment, notes, and resolve APIs
-- STOP/HELP handling remains demo-safe and provider-gated
+- Shared inbox conversation/message API foundations
+- Demo-safe inbound message creation
+- Conversation assignment, internal notes, and resolve/reopen APIs
+- STOP/HELP parsing foundations with local-only consent updates
+
+## Active Milestone
+
+Milestone 6:
+
+- Compliance gates and demo mode expansion
+- Centralized provider/send hard gates
+- Compliance profile/checklist foundations
+- Demo scenarios for STOP/HELP and inbox flows
+
+## Next Milestone
+
+Milestone 7:
+
+- AI feature foundations
+- Fake AI provider-backed copy, reply suggestion, summaries, and lead qualification APIs

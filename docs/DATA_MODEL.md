@@ -41,3 +41,11 @@ Preflight reads contacts and returns compliance reasons. It does not create mess
 ## Milestone 4 Queue Jobs
 
 `QueueJob` stores durable scheduled campaign jobs with idempotency keys. Scheduling creates a queued record after preflight. Cancelling marks queued jobs cancelled. Workers and provider sends remain gated future work.
+
+## Milestone 5 Shared Inbox
+
+- `Conversation` now tracks contact ownership, optional assignee, open/resolved state, last message time, assignment time, and resolution time.
+- `Message` remains the tenant-scoped message ledger for demo inbound rows and future provider-backed sends.
+- `InternalNote` stores private team notes authored by organization users.
+
+STOP-class inbound keywords update local contact consent to `OPTED_OUT`. HELP is tracked without creating outbound provider activity.

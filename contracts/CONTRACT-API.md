@@ -100,4 +100,44 @@ Runs preflight, marks a campaign `SCHEDULED`, and stores a queued job record. Th
 
 Marks queued campaign jobs `CANCELLED` and returns the paused campaign.
 
+### `GET /api/inbox/conversations`
+
+Returns tenant-scoped conversations with contact, assignee, recent messages, and recent internal notes.
+
+### `POST /api/inbox/conversations`
+
+Creates a demo-safe inbound message from `{ "phone": "...", "body": "..." }`, creating a contact/conversation when needed. This is local-only and does not send SMS.
+
+### `GET /api/inbox/conversations/:conversationId`
+
+Returns one tenant-scoped conversation.
+
+### `GET /api/inbox/conversations/:conversationId/messages`
+
+Returns tenant-scoped messages for the conversation in chronological order.
+
+### `POST /api/inbox/conversations/:conversationId/messages`
+
+Creates a demo-safe inbound message on an existing conversation. STOP-class keywords update local consent to `OPTED_OUT`; HELP is recorded but does not opt the contact in or send a provider response.
+
+### `POST /api/inbox/conversations/:conversationId/assign`
+
+Assigns or clears a conversation assignment with `{ "assignedToUserId": "user_id" }` or `{ "assignedToUserId": null }`. The assignee must be an active member of the current organization.
+
+### `GET /api/inbox/conversations/:conversationId/notes`
+
+Returns tenant-scoped internal notes for the conversation.
+
+### `POST /api/inbox/conversations/:conversationId/notes`
+
+Creates an internal note authored by the current demo user.
+
+### `POST /api/inbox/conversations/:conversationId/resolve`
+
+Resolves or reopens a conversation with `{ "resolved": true }` or `{ "resolved": false }`.
+
+### `POST /api/demo/inbound`
+
+Demo-only inbound entrypoint with the same behavior as `POST /api/inbox/conversations`.
+
 Product endpoints must be specified here before implementation.
