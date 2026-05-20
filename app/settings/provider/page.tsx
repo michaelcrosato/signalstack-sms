@@ -3,16 +3,28 @@ import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getOrCreateComplianceProfile } from "@/lib/db/repositories/compliance";
 import { getProviderCredential, listProviderCredentialRotations } from "@/lib/db/repositories/provider-credentials";
 import { getProviderSettings } from "@/lib/messaging/provider/settings";
+import { providerCredentialRotationActionSchema, type ProviderCredentialRotationAction } from "@/lib/validation/provider";
 import { ProviderCredentialForm } from "./provider-credential-form";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProviderSettingsPage() {
+const rotationActions: ProviderCredentialRotationAction[] = ["CONFIGURED", "REFRESHED", "ROTATED", "DELETED"];
+
+type ProviderSettingsPageProps = {
+  searchParams?: Promise<{
+    action?: string;
+  }>;
+};
+
+export default async function ProviderSettingsPage({ searchParams }: ProviderSettingsPageProps) {
+  const params = await searchParams;
+  const actionFilter = providerCredentialRotationActionSchema.safeParse(params?.action);
+  const selectedAction = actionFilter.success ? actionFilter.data : undefined;
   const currentOrg = await getOrCreateCurrentOrg();
   const [complianceProfile, providerCredential, rotations] = await Promise.all([
     getOrCreateComplianceProfile(currentOrg.orgId),
     getProviderCredential(currentOrg.orgId, "twilio"),
-    listProviderCredentialRotations(currentOrg.orgId, "twilio", 12)
+    listProviderCredentialRotations(currentOrg.orgId, "twilio", 12, selectedAction)
   ]);
   const providerSettings = getProviderSettings({
     demoMode: currentOrg.demoMode,
@@ -64,7 +76,15 @@ export default async function ProviderSettingsPage() {
       <ProviderCredentialForm />
 
       <section className="rounded border border-slate-200 bg-white p-5">
-        <h2 className="text-lg font-semibold text-slate-950">Credential Rotation History</h2>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <h2 className="text-lg font-semibold text-slate-950">Credential Rotation History</h2>
+          <nav aria-label="Credential rotation filters" className="flex flex-wrap gap-2">
+            <FilterLink href="/settings/provider" label="All" active={!selectedAction} />
+            {rotationActions.map((action) => (
+              <FilterLink key={action} href={`/settings/provider?action=${action}`} label={action} active={selectedAction === action} />
+            ))}
+          </nav>
+        </div>
         <ul className="mt-4 grid gap-3 text-sm">
           {rotations.length > 0 ? (
             rotations.map((rotation) => (
@@ -83,6 +103,21 @@ export default async function ProviderSettingsPage() {
         </ul>
       </section>
     </main>
+  );
+}
+
+function FilterLink({ href, label, active }: { href: string; label: string; active: boolean }) {
+  return (
+    <Link
+      className={
+        active
+          ? "rounded border border-slate-950 bg-slate-950 px-3 py-1 text-xs font-semibold text-white"
+          : "rounded border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700"
+      }
+      href={href}
+    >
+      {label}
+    </Link>
   );
 }
 

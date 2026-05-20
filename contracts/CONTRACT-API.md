@@ -198,11 +198,11 @@ Clears local Twilio credential readiness metadata for the current organization. 
 
 ### `GET /api/settings/provider/rotations`
 
-Returns recent tenant-scoped provider credential metadata history for the current organization. Entries include provider, action, redacted account/from-number values, last-four hints, configured booleans, actor ID, and timestamp. The response must not include raw auth tokens, token fingerprints, provider credential values, provider verification results, or trigger provider calls/live messaging.
+Returns recent tenant-scoped provider credential metadata history for the current organization. Optional query parameters are `action=CONFIGURED|REFRESHED|ROTATED|DELETED` and bounded `limit`. Entries include provider, action, redacted account/from-number values, last-four hints, configured booleans, actor ID, and timestamp. The response must not include raw auth tokens, token fingerprints, provider credential values, provider verification results, or trigger provider calls/live messaging.
 
 ### `/settings/provider`
 
-Renders the provider details UI for the current organization. It may submit local Twilio credential metadata to `PATCH /api/settings/provider` and clear local metadata through `DELETE /api/settings/provider`. The page must render redacted values only after submission and must not expose raw auth tokens, token fingerprints, provider verification status, live-send controls, or provider-side revocation controls.
+Renders the provider details UI for the current organization. It may submit local Twilio credential metadata to `PATCH /api/settings/provider`, clear local metadata through `DELETE /api/settings/provider`, and filter local rotation history by action. The page must render redacted values only after submission and must not expose raw auth tokens, token fingerprints, provider verification status, live-send controls, or provider-side revocation controls.
 
 ### `GET /api/settings/numbers`
 

@@ -20,3 +20,13 @@ export const providerSettingsUpdateSchema = z.object({
 });
 
 export type ProviderSettingsUpdateInput = z.infer<typeof providerSettingsUpdateSchema>;
+
+export const providerCredentialRotationActionSchema = z.enum(["CONFIGURED", "REFRESHED", "ROTATED", "DELETED"]);
+
+export const providerCredentialRotationQuerySchema = z.object({
+  action: providerCredentialRotationActionSchema.optional(),
+  limit: z.coerce.number().int().min(1).max(50).default(20)
+});
+
+export type ProviderCredentialRotationAction = z.infer<typeof providerCredentialRotationActionSchema>;
+export type ProviderCredentialRotationQuery = z.infer<typeof providerCredentialRotationQuerySchema>;

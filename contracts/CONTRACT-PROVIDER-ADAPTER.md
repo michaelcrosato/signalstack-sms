@@ -30,6 +30,7 @@ Post-MVP provider credential rotation history:
 
 - Credential metadata configuration, rotation, and deletion must append local rotation-history rows.
 - Rotation-history API responses may expose action labels, provider name, redacted account/from-number values, last-four hints, configured booleans, actor IDs, and timestamps.
+- Rotation-history filtering must use allowlisted action labels and bounded result limits.
 - Rotation-history API responses must not expose raw tokens, token fingerprints, provider credentials, or provider verification results.
 - Rotation history must not call Twilio, revoke provider credentials, enable live messaging, or send SMS.
 

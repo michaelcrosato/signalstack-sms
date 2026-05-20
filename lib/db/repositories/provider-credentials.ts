@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import type { ProviderCredential } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
-import type { ProviderSettingsUpdateInput } from "@/lib/validation/provider";
+import type { ProviderCredentialRotationAction, ProviderSettingsUpdateInput } from "@/lib/validation/provider";
 import type { ReadinessAuditInput } from "@/lib/db/repositories/readiness-audit";
 
 export function redactValue(value: string, visible = 4) {
@@ -39,9 +39,14 @@ export function getCredentialHistoryAction(previous: ProviderCredential | null |
   return changed ? "ROTATED" : "REFRESHED";
 }
 
-export async function listProviderCredentialRotations(orgId: string, provider: string, take = 20) {
+export async function listProviderCredentialRotations(
+  orgId: string,
+  provider: string,
+  take = 20,
+  action?: ProviderCredentialRotationAction
+) {
   const rotations = await prisma.providerCredentialRotation.findMany({
-    where: { orgId, provider },
+    where: { orgId, provider, ...(action ? { action } : {}) },
     orderBy: { createdAt: "desc" },
     take
   });

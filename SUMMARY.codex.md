@@ -11,6 +11,8 @@ Run number: 10
 - Updated provider/API contracts and provider/demo/API docs for the new UI safety boundary.
 - Added `docs/PRODUCTION_DEPLOYMENT.md`, a demo-safe production-like deployment runbook covering required env values, pre-deploy checks, database deployment discipline, post-deploy smoke checks, rollback, and incident switches.
 - Linked the deployment runbook from architecture/local-gate handoff docs and updated the next prompt.
+- Added provider credential rotation-history filtering with allowlisted `action` values and bounded `limit` parsing.
+- Updated `/settings/provider` with rotation action filter links and extended the investor demo E2E to cover the deleted-history filter.
 - Advanced a post-MVP provider credential rotation-history checkpoint.
 - Added org-scoped `ProviderCredentialRotation` schema and migration for local credential metadata configure/refresh/rotate/delete history.
 - Added `GET /api/settings/provider/rotations` returning redacted tenant-scoped history only; raw auth tokens and token fingerprints are not returned.
@@ -39,5 +41,6 @@ Run number: 10
 - `npm run validate`
 - `npm run contracts:check`
 - `npm run queue:bullmq:smoke`
+- `npm run test -- tests/unit/messaging/provider-credentials.test.ts`
 
 Latest full validation and seeded demo E2E passed.

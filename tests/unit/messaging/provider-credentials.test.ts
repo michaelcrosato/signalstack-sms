@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fingerprintSecret, getCredentialHistoryAction, redactValue } from "@/lib/db/repositories/provider-credentials";
-import { providerSettingsUpdateSchema } from "@/lib/validation/provider";
+import { providerCredentialRotationQuerySchema, providerSettingsUpdateSchema } from "@/lib/validation/provider";
 
 describe("provider credential metadata", () => {
   it("redacts identifiers and fingerprints tokens deterministically", () => {
@@ -59,5 +59,17 @@ describe("provider credential metadata", () => {
     expect(getCredentialHistoryAction(null, created)).toBe("CONFIGURED");
     expect(getCredentialHistoryAction(created, created)).toBe("REFRESHED");
     expect(getCredentialHistoryAction(created, rotated)).toBe("ROTATED");
+  });
+
+  it("bounds credential rotation history filters to safe local values", () => {
+    expect(
+      providerCredentialRotationQuerySchema.parse({
+        action: "ROTATED",
+        limit: "12"
+      })
+    ).toEqual({ action: "ROTATED", limit: 12 });
+
+    expect(providerCredentialRotationQuerySchema.safeParse({ action: "SENT", limit: "12" }).success).toBe(false);
+    expect(providerCredentialRotationQuerySchema.safeParse({ action: "ROTATED", limit: "500" }).success).toBe(false);
   });
 });

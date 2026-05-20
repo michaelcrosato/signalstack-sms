@@ -19,6 +19,8 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.locator("dd").filter({ hasText: "redacted_0198" })).toBeVisible();
   await page.getByRole("button", { name: "Clear Metadata" }).click();
   await expect(page.getByText("Metadata cleared locally.")).toBeVisible();
+  await page.getByRole("link", { name: "DELETED" }).click();
+  await expect(page.getByText("DELETED / twilio / not stored").first()).toBeVisible();
   await page.goto("/demo");
 
   const importResponse = await request.post("/api/contacts/imports", {
