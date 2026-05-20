@@ -6,9 +6,9 @@ Demo provider phone-number records are local metadata only. They are suitable fo
 
 Demo provider credential records are redacted local readiness metadata only. The seed contains no raw provider token, does not verify anything with Twilio, and does not enable live messaging.
 
-Demo provider credential rotation history is also local metadata only. Seeded history uses redacted values and configured booleans so readiness screens can show change history without raw secrets or provider calls.
+Demo provider credential rotation history is also local metadata only. Seeded history uses redacted values and configured booleans so readiness screens can show and export change history without raw secrets or provider calls.
 
-The provider details screen can configure, rotate, or clear demo Twilio credential metadata through local API routes. This is a readiness record only: submitted values are reduced to redacted identifiers and token fingerprints, raw auth tokens are not shown after submission, and no provider verification, live sending, billing, or provider-side revocation occurs.
+The provider details screen can configure, rotate, clear, or CSV-export demo Twilio credential metadata history through local API routes. This is a readiness record only: submitted values are reduced to redacted identifiers and token fingerprints, raw auth tokens and fingerprints are not shown after submission or export, and no provider verification, live sending, billing, or provider-side revocation occurs.
 
 The go-live readiness screen can link to a local CSV export of readiness audit events. This export is tenant-scoped demo/admin metadata only and does not call providers, send notifications, create billing records, or enable live messaging.
 

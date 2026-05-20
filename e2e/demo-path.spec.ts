@@ -25,6 +25,10 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("Metadata cleared locally.")).toBeVisible();
   await page.getByRole("link", { name: "DELETED" }).click();
   await expect(page.getByText("DELETED / twilio / not stored").first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Export Rotations CSV" })).toBeVisible();
+  const rotationExportResponse = await request.get("/api/settings/provider/rotations/export?action=DELETED&limit=5");
+  expect(rotationExportResponse.ok()).toBeTruthy();
+  await expect(rotationExportResponse.text()).resolves.toContain("id,provider,action,providerCredentialId,actorUserId,accountSidRedacted");
   await page.goto("/demo");
 
   const importResponse = await request.post("/api/contacts/imports", {

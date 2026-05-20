@@ -78,12 +78,20 @@ export default async function ProviderSettingsPage({ searchParams }: ProviderSet
       <section className="rounded border border-slate-200 bg-white p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <h2 className="text-lg font-semibold text-slate-950">Credential Rotation History</h2>
-          <nav aria-label="Credential rotation filters" className="flex flex-wrap gap-2">
-            <FilterLink href="/settings/provider" label="All" active={!selectedAction} />
-            {rotationActions.map((action) => (
-              <FilterLink key={action} href={`/settings/provider?action=${action}`} label={action} active={selectedAction === action} />
-            ))}
-          </nav>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              className="rounded border border-teal-700 px-3 py-1 text-xs font-semibold text-teal-700"
+              href={`/api/settings/provider/rotations/export?limit=50${selectedAction ? `&action=${selectedAction}` : ""}`}
+            >
+              Export Rotations CSV
+            </Link>
+            <nav aria-label="Credential rotation filters" className="flex flex-wrap gap-2">
+              <FilterLink href="/settings/provider" label="All" active={!selectedAction} />
+              {rotationActions.map((action) => (
+                <FilterLink key={action} href={`/settings/provider?action=${action}`} label={action} active={selectedAction === action} />
+              ))}
+            </nav>
+          </div>
         </div>
         <ul className="mt-4 grid gap-3 text-sm">
           {rotations.length > 0 ? (

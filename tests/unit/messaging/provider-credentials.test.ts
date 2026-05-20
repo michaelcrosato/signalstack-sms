@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fingerprintSecret, getCredentialHistoryAction, redactValue } from "@/lib/db/repositories/provider-credentials";
+import { serializeProviderCredentialRotationsCsv } from "@/lib/messaging/provider/credential-rotation-export";
 import { providerCredentialRotationQuerySchema, providerSettingsUpdateSchema } from "@/lib/validation/provider";
 
 describe("provider credential metadata", () => {
@@ -71,5 +72,33 @@ describe("provider credential metadata", () => {
 
     expect(providerCredentialRotationQuerySchema.safeParse({ action: "SENT", limit: "12" }).success).toBe(false);
     expect(providerCredentialRotationQuerySchema.safeParse({ action: "ROTATED", limit: "500" }).success).toBe(false);
+  });
+
+  it("serializes credential rotation history without raw tokens or fingerprints", () => {
+    const csv = serializeProviderCredentialRotationsCsv([
+      {
+        id: "rotation_1",
+        provider: "twilio",
+        action: "ROTATED",
+        providerCredentialId: "credential_1",
+        actorUserId: "user_1",
+        accountSidRedacted: "redacted_7890",
+        accountSidLast4: "7890",
+        fromNumberRedacted: "redacted_0199",
+        fromNumberLast4: "0199",
+        authTokenConfigured: true,
+        previousAccountSidLast4: "1234",
+        previousFromNumberLast4: "0100",
+        previousAuthTokenConfigured: true,
+        source: "local_metadata",
+        createdAt: new Date("2026-01-01T00:00:00.000Z")
+      }
+    ]);
+
+    expect(csv).toContain("id,provider,action,providerCredentialId,actorUserId,accountSidRedacted");
+    expect(csv).toContain("\"redacted_7890\"");
+    expect(csv).toContain("\"true\"");
+    expect(csv).not.toContain("authTokenFingerprint");
+    expect(csv).not.toContain("demo_token_value");
   });
 });

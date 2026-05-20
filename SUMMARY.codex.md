@@ -1,9 +1,15 @@
 # Codex Summary
 
-Run number: 11
+Run number: 12
 
 ## Completed
 
+- Advanced a post-MVP provider credential rotation export checkpoint.
+- Added `GET /api/settings/provider/rotations/export`, a tenant-scoped CSV export of local credential rotation metadata using the existing allowlisted `action` and bounded `limit` filters.
+- Added a CSV serializer that exports redacted credential identifiers, last-four hints, configured booleans, actions, actor IDs, source, and timestamps without raw auth tokens or token fingerprints.
+- Added an `Export Rotations CSV` link to `/settings/provider` that preserves the selected rotation action filter.
+- Extended provider credential unit coverage and the seeded investor demo E2E to assert the export route and CSV header.
+- Updated API/provider/demo docs and contracts for the export safety boundary.
 - Advanced a post-MVP readiness audit export checkpoint.
 - Added bounded `limit`, `action`, and `subjectType` filtering for `GET /api/settings/readiness-audit`.
 - Added `GET /api/settings/readiness-audit/export`, a tenant-scoped CSV export of local readiness audit metadata only.
@@ -37,6 +43,18 @@ Run number: 11
 - Added read-only `/settings/provider` provider details UI with redacted Twilio metadata, live blockers, credential rotation history, and investor demo E2E coverage.
 
 ## Validation
+
+- Run 12:
+- `npm run test -- tests/unit/messaging/provider-credentials.test.ts`
+- `npm run contracts:check`
+- `npm run typecheck`
+- `npm run lint`
+- `npm run test`
+- `npm run build`
+- `npm run validate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 
 - Run 11:
 - `npm run test -- tests/unit/compliance/readiness-audit-export.test.ts`

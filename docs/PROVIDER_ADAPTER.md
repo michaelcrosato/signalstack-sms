@@ -12,6 +12,8 @@ Twilio is planned as the first live provider after compliance and live-send gate
 
 `GET /api/settings/provider/rotations` lists recent local provider credential metadata history. It supports allowlisted action filtering and bounded result limits. It exposes only redacted identifiers, last-four hints, configured booleans, actions, actor IDs, and timestamps. It never returns raw auth tokens or token fingerprints, never validates credentials with Twilio, and never enables live messaging.
 
-`/settings/provider` includes a local-only Twilio metadata form and action filters for credential rotation history. Submitted auth tokens are sent only to the local metadata API, then the page refreshes redacted readiness and rotation history. The page does not display raw tokens, expose token fingerprints, validate credentials with Twilio, revoke provider-side credentials, enable live messaging, or send SMS.
+`GET /api/settings/provider/rotations/export` exports the same local credential metadata history as CSV with the same allowlisted filters and bounded limits. It includes redacted identifiers and configured booleans only. It never returns raw auth tokens or token fingerprints, never validates credentials with Twilio, and never mutates provider state.
+
+`/settings/provider` includes a local-only Twilio metadata form, action filters for credential rotation history, and a rotation CSV export link. Submitted auth tokens are sent only to the local metadata API, then the page refreshes redacted readiness and rotation history. The page does not display raw tokens, expose token fingerprints, validate credentials with Twilio, revoke provider-side credentials, enable live messaging, or send SMS.
 
 `GET /api/settings/numbers` and `POST /api/settings/numbers` manage local provider phone-number metadata for demo and future setup UI. They do not provision provider numbers, verify ownership, store credentials, enable live messaging, or send SMS.

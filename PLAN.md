@@ -109,9 +109,10 @@ Post-MVP:
 - Provider credential rotation-history filtering
 - Read-only readiness audit filtering and CSV export
 - Production observability planning and local doc gate
+- Provider credential rotation-history CSV export
 
 ## Next Milestone
 
 Post-MVP:
 
-- Safe provider metadata form refinements or additional read-only admin export views
+- Safe provider metadata form refinements, deployment platform notes, local operator runbooks, or additional read-only admin views
