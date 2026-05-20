@@ -6,17 +6,19 @@ import { getUsageSummary } from "@/lib/billing/metering";
 
 export const dynamic = "force-dynamic";
 
-const usageTypes = [
-  UsageEventType.CONTACT_IMPORTED,
-  UsageEventType.MESSAGE_INBOUND,
-  UsageEventType.CAMPAIGN_SCHEDULED,
-  UsageEventType.AI_REQUEST
+const aiEndpoints = [
+  "/api/ai/campaign-copy",
+  "/api/ai/reply-suggestion",
+  "/api/ai/conversation-summary",
+  "/api/ai/lead-qualification"
 ];
 
-export default async function BillingOperationsPage() {
+export default async function AiOperationsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
   const usage = await getUsageSummary(currentOrg.orgId);
-  const totalUsageEvents = usage.recentEvents.reduce((total, event) => total + event.quantity, 0);
+  const aiEvents = usage.recentEvents.filter((event) => event.type === UsageEventType.AI_REQUEST);
+  const aiProvider = process.env.AI_PROVIDER ?? "fake";
+  const fakeAiActive = aiProvider === "fake";
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
@@ -30,74 +32,68 @@ export default async function BillingOperationsPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/usage">
           Usage & Analytics
         </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/system">
-          System Status
+        <Link className="text-sm font-medium text-teal-700" href="/settings/billing">
+          Billing Operations
         </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
           Operator Runbook
         </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/ai">
-          AI Operations
-        </Link>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
-          <h1 className="text-4xl font-semibold text-slate-950">Billing Operations</h1>
+          <h1 className="text-4xl font-semibold text-slate-950">AI Operations</h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-            Read-only local billing boundary for {currentOrg.orgName}. This page does not call Stripe, create
-            subscriptions, create invoices, collect payment methods, charge cards, send email, send notifications, call
-            providers, send SMS, or enable live billing.
+            Read-only local AI boundary for {currentOrg.orgName}. This page shows fake-provider readiness and local AI
+            usage records only; it does not call live AI, create prompts, mutate conversations, send notifications, call
+            providers, create billing artifacts, or expose secrets.
           </p>
         </div>
       </header>
 
       <section className="grid gap-3 md:grid-cols-4">
-        <Metric label="Billing status" value={usage.billingAccount.status} />
-        <Metric label="Live billing" value={String(usage.billingAccount.liveBillingEnabled)} />
-        <Metric label="Live blocked" value={String(usage.liveBillingBlocked)} />
-        <Metric label="Usage quantity" value={String(totalUsageEvents)} />
+        <Metric label="AI provider" value={aiProvider} />
+        <Metric label="Fake AI active" value={String(fakeAiActive)} />
+        <Metric label="Live AI blocked" value={String(!fakeAiActive)} />
+        <Metric label="AI usage quantity" value={String(usage.totals[UsageEventType.AI_REQUEST])} />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
-        <Panel title="Billing Account">
+        <Panel title="Provider Boundary">
           <dl className="grid gap-3 text-sm">
-            <StatusRow label="Status" value={usage.billingAccount.status} />
-            <StatusRow label="Live billing enabled" value={String(usage.billingAccount.liveBillingEnabled)} />
-            <StatusRow label="Live billing blocked" value={String(usage.liveBillingBlocked)} />
-            <StatusRow label="Stripe customer" value={usage.billingAccount.stripeCustomerId ? "placeholder present" : "not configured"} />
-            <StatusRow
-              label="Stripe subscription"
-              value={usage.billingAccount.stripeSubscriptionId ? "placeholder present" : "not configured"}
-            />
+            <StatusRow label="Configured provider" value={aiProvider} />
+            <StatusRow label="Allowed local provider" value="fake" />
+            <StatusRow label="Fake outputs deterministic" value={String(fakeAiActive)} />
+            <StatusRow label="Live AI calls" value="blocked" />
+            <StatusRow label="API keys displayed" value="false" />
           </dl>
         </Panel>
 
-        <Panel title="Safety Boundary">
+        <Panel title="Available AI Endpoints">
           <ul className="grid gap-2 text-sm text-slate-700">
-            <li>Billing account data is local tenant metadata only.</li>
-            <li>Stripe customer and subscription values are shown only as presence indicators.</li>
-            <li>Payment collection, subscription changes, invoices, and charges are not available from this view.</li>
-            <li>No email, notifications, provider calls, live SMS, external billing artifacts, or mutations are created.</li>
+            {aiEndpoints.map((endpoint) => (
+              <li key={endpoint} className="break-words border-b border-slate-100 pb-2 font-mono text-xs text-slate-800">
+                {endpoint}
+              </li>
+            ))}
           </ul>
         </Panel>
       </section>
 
-      <Panel title="Local Usage Totals">
-        <dl className="grid gap-3 text-sm md:grid-cols-2">
-          {usageTypes.map((type) => (
-            <StatusRow key={type} label={formatUsageType(type)} value={String(usage.totals[type])} />
-          ))}
-        </dl>
+      <Panel title="Safety Boundary">
+        <ul className="grid gap-2 text-sm text-slate-700">
+          <li>AI endpoints remain deterministic under the fake provider.</li>
+          <li>Provider values other than fake are blocked by existing AI endpoint gates.</li>
+          <li>This view does not submit prompts, summarize conversations, qualify leads, or write usage events.</li>
+          <li>No live AI, paid model calls, provider calls, billing records, notifications, live SMS, or secrets are created.</li>
+        </ul>
       </Panel>
 
-      <Panel title="Recent Usage Events">
+      <Panel title="Recent AI Usage">
         <ul className="grid gap-3 text-sm">
-          {usage.recentEvents.length > 0 ? (
-            usage.recentEvents.slice(0, 12).map((event) => (
+          {aiEvents.length > 0 ? (
+            aiEvents.slice(0, 20).map((event) => (
               <li key={event.id} className="grid gap-2 border-b border-slate-100 pb-3 md:grid-cols-[1fr_auto]">
                 <div>
-                  <p className="font-medium text-slate-950">
-                    {formatUsageType(event.type)} x {event.quantity}
-                  </p>
+                  <p className="font-medium text-slate-950">AI Request x {event.quantity}</p>
                   <p className="mt-1 break-words text-xs text-slate-600">{formatMetadata(event.metadata)}</p>
                 </div>
                 <time className="text-slate-600" dateTime={event.createdAt.toISOString()}>
@@ -106,20 +102,12 @@ export default async function BillingOperationsPage() {
               </li>
             ))
           ) : (
-            <li className="text-slate-600">No local usage events recorded.</li>
+            <li className="text-slate-600">No local AI usage events recorded.</li>
           )}
         </ul>
       </Panel>
     </main>
   );
-}
-
-function formatUsageType(type: UsageEventType) {
-  return type
-    .toLowerCase()
-    .split("_")
-    .map((part) => part[0].toUpperCase() + part.slice(1))
-    .join(" ");
 }
 
 function formatMetadata(metadata: unknown) {

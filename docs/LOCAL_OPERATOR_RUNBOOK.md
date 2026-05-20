@@ -185,6 +185,18 @@ Use `/settings/billing` for read-only local billing boundary review before demos
 
 The page is display-only. It must not call Stripe, create subscriptions, create invoices, collect payment methods, charge cards, send email, expose secrets, call providers, create external billing artifacts, send notifications, send SMS, or enable live billing.
 
+## AI Operations
+
+Use `/settings/ai` for read-only fake AI boundary review before demos or AI repair work. It displays:
+
+- selected AI provider state
+- fake-provider readiness
+- deterministic AI endpoint coverage
+- local AI usage totals
+- recent AI usage-event metadata
+
+The page is display-only. It must not submit prompts, call live AI, create paid model requests, mutate conversations, expose API keys, create billing artifacts, call providers, send notifications, send SMS, or enable live AI.
+
 ## Compliance Detail
 
 Use `/settings/compliance` for read-only compliance profile review before demos or repair work. It displays:

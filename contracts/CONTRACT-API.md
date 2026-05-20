@@ -256,6 +256,10 @@ Renders a read-only team operations view for the current organization. It may di
 
 Renders a read-only billing operations view for the current organization. It may display local billing account status, live billing gate status, Stripe placeholder presence, usage-event totals, recent local usage-event metadata, and billing safety-boundary text. The page must not create billing accounts beyond the existing local demo-safe upsert helper, call Stripe, create subscriptions, create invoices, collect payment methods, charge cards, send email, send notifications, expose secrets, call messaging providers, send SMS, or enable live billing.
 
+### `/settings/ai`
+
+Renders a read-only AI operations view for the current organization. It may display the selected AI provider, fake-provider readiness, live-AI blocked state, deterministic AI endpoint coverage, local AI usage totals, recent local AI usage-event metadata, and AI safety-boundary text. The page must not submit prompts, mutate conversations, call live AI providers, create paid model requests, expose API keys, create billing provider artifacts, send notifications, call messaging providers, send SMS, or enable live AI.
+
 ### `/`
 
 Renders the local launch dashboard. It may display demo-safe runtime defaults and links to existing local-only demo, readiness, provider metadata, system, usage, and admin export views. The page must not require database access, mutate records, call providers, create billing artifacts, send notifications, expose secrets, or enable live messaging.

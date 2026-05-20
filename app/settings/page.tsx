@@ -92,6 +92,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/settings/billing">
           Billing Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/ai">
+          AI Operations
+        </Link>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Go-Live Readiness</h1>
@@ -209,6 +212,16 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <p className="text-sm leading-6 text-slate-700">
           Review local billing account status, live billing blockers, Stripe placeholder presence, and usage totals
           without Stripe calls, invoices, payment collection, charges, email, or live billing.
+        </p>
+      </Panel>
+
+      <Panel title="AI Operations">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/ai">
+          AI Operations
+        </Link>
+        <p className="text-sm leading-6 text-slate-700">
+          Review fake AI provider status, deterministic endpoint coverage, live-AI blockers, and local AI usage events
+          without submitting prompts, calling live AI, creating billing artifacts, sending notifications, or exposing secrets.
         </p>
       </Panel>
 

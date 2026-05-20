@@ -59,3 +59,7 @@ Post-MVP team operations view:
 Post-MVP billing operations view:
 
 - The seeded investor demo path must verify that `/settings/billing` renders read-only local billing account status, live billing blocker status, usage totals, recent usage metadata, and safety-boundary text without Stripe calls, subscription creation, invoices, payment collection, card charges, email, notifications, provider calls, SMS, or live billing enablement.
+
+Post-MVP AI operations view:
+
+- The seeded investor demo path must verify that `/settings/ai` renders read-only fake-provider status, deterministic endpoint coverage, recent local AI usage metadata, and safety-boundary text without prompt submission, live AI calls, paid model requests, billing artifacts, notifications, provider calls, SMS, or live AI enablement.

@@ -93,6 +93,7 @@ Post-MVP provider settings foundation:
 - `/settings/inbox`: renders a read-only local inbox operations view with conversation status, assignment counts, recent message/note counts, and inbox safety-boundary metadata without creating messages, assigning, resolving, provider calls, billing records, notifications, live messaging, mutations, or secrets.
 - `/settings/team`: renders a read-only local team operations view with organization metadata, membership role/status counts, assigned conversation counts, authored-note counts, and team safety-boundary metadata without inviting users, role changes, suspensions, membership deletion, Clerk calls, email, notifications, provider calls, billing records, live messaging, mutations, or secrets.
 - `/settings/billing`: renders a read-only local billing operations view with billing account status, live billing gate status, Stripe placeholder presence, usage totals, recent usage metadata, and billing safety-boundary text without Stripe calls, subscriptions, invoices, payment collection, card charges, email, notifications, provider calls, SMS, live billing, mutations, or secrets.
+- `/settings/ai`: renders a read-only local AI operations view with selected AI provider state, fake-provider readiness, deterministic endpoint coverage, local AI usage totals, recent AI usage metadata, and safety-boundary text without prompt submission, live AI calls, paid model requests, billing artifacts, notifications, provider calls, SMS, live AI enablement, mutations, or secrets.
 
 Post-MVP provider number foundation:
 

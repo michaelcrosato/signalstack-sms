@@ -127,6 +127,7 @@ Post-MVP:
 - Read-only local inbox operations view
 - Read-only local team operations view
 - Read-only local billing operations view
+- Read-only local AI operations view
 
 ## Next Milestone
 

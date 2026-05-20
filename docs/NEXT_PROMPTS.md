@@ -57,6 +57,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP local inbox operations view: `/settings/inbox` renders existing conversation status counts, assignment counts, recent message/note counts, contact/assignee display metadata, and inbox safety boundaries as read-only local metadata; root/settings/demo/runbook/usage navigation and E2E coverage include it without creating messages, assigning conversations, resolving threads, mutating contacts, provider calls, billing records, notifications, live messaging, or secrets.
 - Post-MVP local team operations view: `/settings/team` renders existing organization metadata, membership role/status counts, assigned conversation counts, authored internal-note counts, member names/emails, and team safety boundaries as read-only local metadata; root/settings/demo/runbook/inbox navigation and E2E coverage include it without inviting users, changing roles, suspending members, deleting memberships, calling Clerk, sending email or notifications, provider calls, billing records, live messaging, mutations, or secrets.
 - Post-MVP local billing operations view: `/settings/billing` renders existing local billing account status, live billing gate status, Stripe placeholder presence, usage-event totals, recent usage metadata, and billing safety boundaries as read-only local metadata; root/settings/demo/runbook/usage navigation and E2E coverage include it without Stripe calls, subscriptions, invoices, payment collection, card charges, email, notifications, provider calls, SMS, live billing, mutations, or secrets.
+- Post-MVP local AI operations view: `/settings/ai` renders existing selected AI provider state, fake-provider readiness, deterministic AI endpoint coverage, local AI usage totals, recent AI usage metadata, and AI safety boundaries as read-only local metadata; root/settings/demo/runbook/usage/billing navigation and E2E coverage include it without prompt submission, live AI calls, paid model requests, conversation mutation, billing artifacts, notifications, provider calls, SMS, live AI enablement, mutations, or secrets.
 
 Demo-safe defaults remain mandatory:
 
@@ -87,7 +88,7 @@ READ FIRST:
 SCOPE:
 - Preserve all Milestone 0-10 gates and demo-safe defaults.
 - Implement the next post-MVP slice only when contracts/docs are updated first.
-- Good candidate slices: additional read-only admin views, safe dashboard refinements, local operator runbook expansion, or deeper links from existing local-only reports into demo-safe operational workflows.
+- Good candidate slices: additional read-only admin views, safe dashboard refinements, local operator runbook expansion, deeper links from existing local-only reports into demo-safe operational workflows, or local export/status views that reuse existing data without new external-impact actions.
 - Keep live SMS, live billing, real notifications, live AI, and real provider calls blocked unless explicit future hard gates are implemented and tested.
 - Run the full local gate and seeded demo path before committing.
 

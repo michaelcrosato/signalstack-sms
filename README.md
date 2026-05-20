@@ -57,6 +57,8 @@ Team operations review is available at `/settings/team`. It renders existing org
 
 Billing operations review is available at `/settings/billing`. It renders existing local billing account status, live billing blockers, Stripe placeholder presence, usage totals, and recent usage metadata only; it does not call Stripe, create subscriptions or invoices, collect payment methods, charge cards, email, notify, call providers, send SMS, or enable live billing.
 
+AI operations review is available at `/settings/ai`. It renders selected AI provider state, fake-provider readiness, deterministic endpoint coverage, local AI usage totals, and recent AI usage metadata only; it does not submit prompts, call live AI, create paid model requests, mutate conversations, create billing artifacts, notify, call providers, send SMS, expose secrets, or enable live AI.
+
 Compliance readiness detail is available at `/settings/compliance`. It renders existing profile fields, checklist status, A2P metadata status, and live-message blockers only; it does not update records, verify provider registration, call providers, or enable live messaging.
 
 Provider number metadata is available at `/settings/numbers`. It renders existing local number rows only; it does not provision numbers, verify provider ownership, call Twilio, mutate records, or enable live messaging.
