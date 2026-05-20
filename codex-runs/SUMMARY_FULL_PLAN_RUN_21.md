@@ -1,37 +1,37 @@
-# Full Plan Run 21 Summary
+Agent: Codex  
+Run number: 21  
+Branch: `main`  
+Commits created:
+- `52d11f6 feat: advance SignalStack SMS implementation`
+- `b981b37 feat: advance SignalStack SMS implementation`
 
-Agent: Codex
+Milestones advanced:
+- Post-MVP local AI operations view
+- Post-MVP local webhook operations view
 
-## Advanced
+Major files changed:
+- Added `app/settings/ai/page.tsx`
+- Added `app/settings/webhooks/page.tsx`
+- Updated navigation in `/`, `/demo`, `/settings`, `/settings/runbook`, usage/billing/inbox pages
+- Updated `contracts/*`, `docs/*`, `README.md`, `PLAN.md`
+- Updated `e2e/demo-path.spec.ts` and `e2e/smoke.spec.ts`
+- Updated `SUMMARY.codex.md`, `BLOCKERS.codex.md`, `docs/NEXT_PROMPTS.md`
 
-- Added the post-MVP read-only local AI operations view at `/settings/ai`.
-- Wired root, demo, settings, runbook, usage, and billing navigation to the new view.
-- Extended smoke and seeded investor demo E2E coverage for the AI operations path.
-- Updated contracts and docs for the new AI operations boundary.
-- Added the post-MVP read-only local webhook operations view at `/settings/webhooks`.
-- Wired root, demo, settings, runbook, and inbox navigation to the new webhook view.
-- Extended smoke and seeded investor demo E2E coverage for the webhook operations path.
-- Updated contracts and docs for the new webhook operations boundary.
-
-## Validation
-
+Commands run:
 - `npm run typecheck`
 - `npm run contracts:check`
 - `npm run lint`
 - `npm run test`
 - `npm run validate`
-- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
-- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
-- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
-- `npm run typecheck`
-- `npm run contracts:check`
-- `npm run lint`
-- `npm run test`
-- `npm run validate`
-- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
-- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
-- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
+- `npm run db:migrate` with local `DATABASE_URL`
+- `npm run demo:seed` with local `DATABASE_URL`
+- `npm run test:e2e:demo` with local `DATABASE_URL`
 
-## Blockers
+Validation result: Green. Full validation and seeded investor demo E2E passed after both checkpoints.
 
-None.
+Remaining blockers: None active. Existing note: `npm run db:migrate` still needs explicit `DATABASE_URL` because Prisma config skips env loading.
+
+Next exact command/prompt:
+```text
+Continue from the post-MVP backlog. Preserve demo-safe defaults and implement the next read-only admin/reporting slice or safe dashboard refinement. Update contracts/docs first, add E2E coverage, run npm run validate and npm run test:e2e:demo, then commit the green checkpoint.
+```
