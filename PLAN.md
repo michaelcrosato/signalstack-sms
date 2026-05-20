@@ -108,9 +108,10 @@ Post-MVP:
 - Production-like demo deployment runbook
 - Provider credential rotation-history filtering
 - Read-only readiness audit filtering and CSV export
+- Production observability planning and local doc gate
 
 ## Next Milestone
 
 Post-MVP:
 
-- Safe provider metadata form refinements, production observability planning, or read-only admin export views
+- Safe provider metadata form refinements or additional read-only admin export views

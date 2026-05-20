@@ -11,6 +11,10 @@ Run number: 11
 - Added unit coverage for readiness audit query bounds and CSV escaping.
 - Extended the seeded investor demo E2E to assert the settings export link and CSV API response.
 - Updated API/compliance contracts and API/compliance/demo docs for the export safety boundary.
+- Advanced a post-MVP production observability planning checkpoint.
+- Added `docs/PRODUCTION_OBSERVABILITY.md` covering demo-safe platform/local signals, logging exclusions, future vendor gates, and validation.
+- Added `npm run observability:check` and wired it into `npm run validate`.
+- Linked the observability plan from README, local gate, and production deployment docs.
 - Advanced a post-MVP provider credential metadata UI/forms checkpoint.
 - Added `/settings/provider` local-only Twilio credential metadata form for save/clear actions backed by the existing safe provider settings APIs.
 - Kept credential submissions redacted after save: raw auth tokens are not displayed, token fingerprints are not exposed, and no Twilio calls, live SMS enablement, provider revocation, billing, or notifications are triggered.
@@ -46,6 +50,9 @@ Run number: 11
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `npm run validate`
 - `npm run test:e2e:demo`
+- `npm run observability:check`
+- `npm run typecheck`
+- `npm run lint`
 
 Earlier run 10:
 

@@ -26,6 +26,7 @@
     "contracts:check": "tsx scripts/contracts-check.ts",
     "compliance:check": "tsx scripts/compliance-check.ts",
     "production:gate": "tsx scripts/production-gate.ts",
+    "observability:check": "tsx scripts/observability-check.ts",
     "secrets:scan": "tsx scripts/secrets-scan.ts",
     "validate": "tsx scripts/validate.ts",
     "agent:status": "tsx scripts/agent-status.ts",

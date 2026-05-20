@@ -33,6 +33,14 @@ QUEUE_BACKEND=bullmq REDIS_URL=redis://localhost:6379 npm run worker:bullmq
 QUEUE_BACKEND=bullmq REDIS_URL=redis://localhost:6379 npm run queue:bullmq:smoke
 ```
 
+Production observability planning check:
+
+```bash
+npm run observability:check
+```
+
+The observability check is included in `npm run validate` and verifies that the production observability plan remains present and demo-safe.
+
 BullMQ/Redis enqueue support is optional. The default local gate does not require Redis, and campaign scheduling must continue to persist database `QueueJob` rows when BullMQ is disabled or not configured.
 
 The BullMQ smoke command skips successfully unless BullMQ and Redis are explicitly configured. When enabled, it uses a dedicated smoke queue and does not touch scheduled campaigns, providers, billing, or live messaging flags.

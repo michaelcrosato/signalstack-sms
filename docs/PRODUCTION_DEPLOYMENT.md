@@ -85,6 +85,8 @@ Verify these behaviors:
 - Billing usage creates local usage records only.
 - Provider credential save/clear updates local metadata and rotation history only.
 
+Production observability planning is documented in `docs/PRODUCTION_OBSERVABILITY.md`. Current observability is platform/local only and must not export secrets, full message bodies, notifications, live provider calls, billing events, or telemetry to a third-party vendor by default.
+
 ## Rollback
 
 Rollback is the hosting platform's previous build plus database migration discipline:

@@ -36,3 +36,5 @@ npm run test:e2e -- e2e/demo-path.spec.ts --project=chromium
 All flows remain local/demo-only unless future hard gates explicitly enable live providers.
 
 Production-like demo deployment is documented in `docs/PRODUCTION_GO_LIVE.md`. The current gate permits demo-safe production deployments only and keeps live SMS, billing, provider calls, and live AI blocked by default.
+
+Production observability planning is documented in `docs/PRODUCTION_OBSERVABILITY.md`. Current observability guidance is local/platform-only and does not add third-party telemetry, notifications, live providers, or billing side effects.

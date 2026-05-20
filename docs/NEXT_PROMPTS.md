@@ -38,6 +38,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP production deployment runbook: `docs/PRODUCTION_DEPLOYMENT.md` documents demo-safe production-like deployment env, pre-deploy checks, database deployment discipline, post-deploy smoke checks, rollback, and incident switches without enabling live external impact.
 - Post-MVP provider credential rotation-history filtering: `GET /api/settings/provider/rotations` accepts allowlisted `action` and bounded `limit` query parameters; `/settings/provider` exposes action filter links and the investor demo E2E covers the deleted-history filter without exposing secrets or provider calls.
 - Post-MVP readiness audit export: `GET /api/settings/readiness-audit` supports bounded `limit`, `action`, and `subjectType` filters; `GET /api/settings/readiness-audit/export` returns a tenant-scoped CSV export; `/settings` exposes action filters and an export link without provider calls, billing records, notifications, live messaging, or mutations.
+- Post-MVP production observability planning: `docs/PRODUCTION_OBSERVABILITY.md` documents demo-safe platform/local observability signals, logging exclusions, and future vendor gates; `npm run observability:check` is part of validation and verifies the no-external-impact planning boundary.
 
 Demo-safe defaults remain mandatory:
 
@@ -68,7 +69,7 @@ READ FIRST:
 SCOPE:
 - Preserve all Milestone 0-10 gates and demo-safe defaults.
 - Implement the next post-MVP slice only when contracts/docs are updated first.
-- Good candidate slices: safe metadata form refinements, deployment platform notes, production observability planning, or read-only audit/export views.
+- Good candidate slices: safe metadata form refinements, deployment platform notes, read-only admin export views, or local operator runbooks.
 - Keep live SMS, live billing, real notifications, live AI, and real provider calls blocked unless explicit future hard gates are implemented and tested.
 - Run the full local gate and seeded demo path before committing.
 
