@@ -16,4 +16,6 @@ Twilio is planned as the first live provider after compliance and live-send gate
 
 `/settings/provider` includes a local-only Twilio metadata form, action filters for credential rotation history, and a rotation CSV export link. Submitted auth tokens are sent only to the local metadata API, then the page refreshes redacted readiness and rotation history. The page does not display raw tokens, expose token fingerprints, validate credentials with Twilio, revoke provider-side credentials, enable live messaging, or send SMS.
 
+The metadata form uses browser-side hints for Twilio-style account SID and E.164 phone-number shape. Clearing metadata requires an explicit local-only confirmation and still only deletes local readiness metadata; it does not revoke or mutate provider-side credentials.
+
 `GET /api/settings/numbers` and `POST /api/settings/numbers` manage local provider phone-number metadata for demo and future setup UI. They do not provision provider numbers, verify ownership, store credentials, enable live messaging, or send SMS.

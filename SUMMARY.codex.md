@@ -10,6 +10,11 @@ Run number: 14
 - Kept the page display-only: it does not mutate records, call Stripe, create billing provider artifacts, expose secrets, call providers, send notifications, or enable live messaging.
 - Extended the seeded investor demo E2E to verify the usage page.
 - Updated API, billing, and testing contracts plus API map, demo-mode docs, local operator runbook, README, PLAN, and next prompt handoff docs.
+- Advanced a second post-MVP safe provider metadata form refinement checkpoint.
+- Added browser-side hints for Twilio-style account SID and E.164 from-number metadata.
+- Added an explicit local-only confirmation checkbox before provider credential metadata can be cleared from `/settings/provider`.
+- Extended the seeded investor demo E2E to verify the clear button is disabled until the local-only confirmation is checked.
+- Updated provider adapter contract/docs, demo-mode docs, PLAN, and next prompt handoff docs for the local-only clear confirmation.
 
 ## Validation
 
@@ -22,6 +27,12 @@ Run number: 14
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
 - `npm run validate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
+- `npm run typecheck`
+- `npm run lint`
+- `npm run contracts:check`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `npm run validate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 
 Latest full validation and seeded demo E2E passed.

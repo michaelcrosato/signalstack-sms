@@ -37,6 +37,8 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await page.getByLabel("From number").fill("+15555550198");
   await page.getByRole("button", { name: "Save Metadata" }).click();
   await expect(page.locator("dd").filter({ hasText: "redacted_0198" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Clear Metadata" })).toBeDisabled();
+  await page.getByLabel("Clear only local readiness metadata; no provider-side credential is revoked.").check();
   await page.getByRole("button", { name: "Clear Metadata" }).click();
   await expect(page.getByText("Metadata cleared locally.")).toBeVisible();
   await page.getByRole("link", { name: "DELETED" }).click();

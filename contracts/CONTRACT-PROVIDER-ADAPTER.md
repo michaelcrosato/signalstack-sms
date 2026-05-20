@@ -39,6 +39,7 @@ Post-MVP provider credential metadata UI:
 - `/settings/provider` may submit Twilio credential metadata to the existing local-only provider settings API.
 - The UI must never render raw auth tokens after submission, expose token fingerprints, call Twilio, enable live messaging, or imply credential verification.
 - Delete actions clear only local metadata through `DELETE /api/settings/provider`; they must not revoke provider-side credentials or mutate live provider accounts.
+- Clear actions require an explicit local-only confirmation in the UI so operators do not confuse metadata clearing with provider-side revocation.
 
 Post-MVP provider number foundation:
 

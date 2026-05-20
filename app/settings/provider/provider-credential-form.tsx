@@ -12,6 +12,7 @@ export function ProviderCredentialForm() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [state, setState] = useState<FormState>({ kind: "idle", message: "" });
+  const [clearConfirmed, setClearConfirmed] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,6 +43,11 @@ export function ProviderCredentialForm() {
   }
 
   async function handleDelete() {
+    if (!clearConfirmed) {
+      setState({ kind: "error", message: "Confirm local metadata clearing first." });
+      return;
+    }
+
     const response = await fetch("/api/settings/provider", {
       method: "DELETE"
     });
@@ -52,6 +58,7 @@ export function ProviderCredentialForm() {
     }
 
     setState({ kind: "success", message: "Metadata cleared locally." });
+    setClearConfirmed(false);
     startTransition(() => router.refresh());
   }
 
@@ -73,6 +80,8 @@ export function ProviderCredentialForm() {
             required
             minLength={8}
             maxLength={80}
+            pattern="AC[A-Za-z0-9]{6,78}"
+            title="Use a Twilio-style Account SID beginning with AC."
           />
         </label>
 
@@ -86,6 +95,7 @@ export function ProviderCredentialForm() {
             required
             minLength={8}
             maxLength={160}
+            title="Use local metadata only. The raw token is fingerprinted and not shown after submission."
           />
         </label>
 
@@ -94,12 +104,25 @@ export function ProviderCredentialForm() {
           <input
             className="rounded border border-slate-300 px-3 py-2 text-slate-950"
             name="fromNumber"
+            type="tel"
             placeholder="+15555550199"
             autoComplete="off"
             required
             minLength={5}
             maxLength={32}
+            pattern="\+[1-9][0-9]{4,31}"
+            title="Use E.164 format, for example +15555550199."
           />
+        </label>
+
+        <label className="flex items-start gap-2 text-sm text-slate-700">
+          <input
+            className="mt-1"
+            type="checkbox"
+            checked={clearConfirmed}
+            onChange={(event) => setClearConfirmed(event.currentTarget.checked)}
+          />
+          Clear only local readiness metadata; no provider-side credential is revoked.
         </label>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -113,7 +136,7 @@ export function ProviderCredentialForm() {
           <button
             className="rounded border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-60"
             type="button"
-            disabled={isPending}
+            disabled={isPending || !clearConfirmed}
             onClick={handleDelete}
           >
             Clear Metadata

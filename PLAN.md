@@ -105,6 +105,7 @@ Post-MVP:
 - Provider credential rotation history
 - Read-only provider settings detail UI
 - Provider credential metadata UI/forms
+- Safe provider metadata form refinements
 - Production-like demo deployment runbook
 - Provider credential rotation-history filtering
 - Read-only readiness audit filtering and CSV export

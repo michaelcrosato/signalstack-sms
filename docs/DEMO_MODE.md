@@ -10,6 +10,8 @@ Demo provider credential rotation history is also local metadata only. Seeded hi
 
 The provider details screen can configure, rotate, clear, or CSV-export demo Twilio credential metadata history through local API routes. This is a readiness record only: submitted values are reduced to redacted identifiers and token fingerprints, raw auth tokens and fingerprints are not shown after submission or export, and no provider verification, live sending, billing, or provider-side revocation occurs.
 
+Clearing provider metadata from the demo UI requires confirming that the action affects local readiness metadata only and does not revoke provider-side credentials.
+
 The go-live readiness screen can link to a local CSV export of readiness audit events. This export is tenant-scoped demo/admin metadata only and does not call providers, send notifications, create billing records, or enable live messaging.
 
 The admin exports screen consolidates local CSV links for readiness audit events and provider credential rotation history. It is read-only and does not create exports through a background job, call providers, expose raw secrets, send notifications, create billing records, or enable live messaging.
