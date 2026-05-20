@@ -12,6 +12,7 @@ Run number: 9
 - Added `/settings` visibility for credential rotation history and extended the investor demo E2E assertion.
 - Updated DB/API/provider contracts, API/data/provider docs, demo-mode docs, schema changelog, plan, and next prompt.
 - Added unit coverage for credential history action classification.
+- Added production go-live gate design documentation clarifying the current demo-safe production deployment boundary and future live-enable requirements.
 
 ## Validation
 
@@ -25,5 +26,6 @@ Run number: 9
 - `npm run demo:seed`
 - `npm run validate`
 - `npm run test:e2e:demo`
+- `npm run contracts:check`
 
 Latest full validation and seeded demo E2E passed.

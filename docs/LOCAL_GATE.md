@@ -38,4 +38,6 @@ Milestone 10 contract hardening is included in `npm run validate`. The contract 
 
 Post-MVP production deployment gates are included in `npm run validate`. Production-like environments (`NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, or `APP_ENV` set to production/prod) are blocked from live messaging, live billing, live provider, live AI, Twilio, or Stripe settings unless a future controlled deployment explicitly sets `ALLOW_PRODUCTION_EXTERNALS=true`.
 
+Production go-live design is documented in `docs/PRODUCTION_GO_LIVE.md`. That document is a planning gate only; it does not authorize live SMS, billing, AI, provider calls, secrets, or external notifications.
+
 The local gate must pass before committing a milestone unless an exact environment blocker is recorded in `BLOCKERS.codex.md`.

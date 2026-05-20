@@ -97,6 +97,7 @@ Post-MVP:
 - Local worker jobs-per-poll rate limit
 - UI expansion
 - Production deployment gates
+- Production go-live gate design documentation
 - API rate limiting
 - Provider credential metadata management
 - Provider credential metadata deletion
@@ -106,4 +107,4 @@ Post-MVP:
 
 Post-MVP:
 
-- Redis-backed BullMQ integration smoke, deeper settings UI, deployment documentation, and production go-live gate design
+- Redis-backed BullMQ integration smoke, deeper settings UI, and deployment documentation
