@@ -86,6 +86,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/settings/system">
           System Status
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/api">
+          API Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
           Operator Runbook
         </Link>
@@ -141,6 +144,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
       </section>
 
       <Panel title="API Protection">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/api">
+          API Operations
+        </Link>
         <dl className="grid gap-3 text-sm md:grid-cols-3">
           <StatusRow label="Rate limit enabled" value={String(apiRateLimit.enabled)} />
           <StatusRow label="Requests" value={String(apiRateLimit.limit)} />

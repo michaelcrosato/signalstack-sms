@@ -129,9 +129,10 @@ Post-MVP:
 - Read-only local team operations view
 - Read-only local billing operations view
 - Read-only local AI operations view
+- Read-only local API operations view
 
 ## Next Milestone
 
 Post-MVP:
 
-- Additional read-only admin views, safe dashboard refinements, local operator runbook expansion, or deeper links from existing local-only reports into demo-safe operational workflows
+- Additional read-only admin views, safe dashboard refinements, local operator runbook expansion, route inventory refinements, or deeper links from existing local-only reports into demo-safe operational workflows

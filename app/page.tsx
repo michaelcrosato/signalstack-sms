@@ -68,6 +68,11 @@ const launchLinks = [
     description: "Read-only runtime flags, queue backend, worker limits, and rate-limit policy."
   },
   {
+    href: "/settings/api",
+    title: "API Operations",
+    description: "Read-only API route inventory, mutation boundaries, and rate-limit policy."
+  },
+  {
     href: "/settings/runbook",
     title: "Operator Runbook",
     description: "Local validation, seed, worker, export, and repair-loop commands with safety boundaries."

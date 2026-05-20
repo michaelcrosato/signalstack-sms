@@ -1,9 +1,15 @@
 # Codex Summary
 
-Run number: 21
+Run number: 22
 
 ## Completed
 
+- Advanced a post-MVP local API operations checkpoint.
+- Added `/settings/api`, a read-only page that renders static local API route inventory, route areas, read/write classification, external-impact classification, route safety notes, and API rate-limit policy.
+- Added `lib/operations/api-operations.ts` plus unit coverage proving the route inventory remains local-only with zero external-impact routes and bounded rate-limit metadata.
+- Linked the API operations view from `/`, `/demo`, `/settings`, and `/settings/system`.
+- Extended the seeded investor demo E2E path to cover the API operations view.
+- Updated API contract, API map, local operator runbook, PLAN, and next prompt handoff docs.
 - Advanced a post-MVP local AI operations checkpoint.
 - Added `/settings/ai`, a read-only page that renders selected AI provider state, fake-provider readiness, live-AI boundary status, deterministic AI endpoint coverage, local AI usage totals, recent AI usage metadata, and safety boundaries.
 - Linked the AI operations view from `/`, `/demo`, `/settings`, `/settings/runbook`, `/settings/usage`, and `/settings/billing`.
@@ -34,6 +40,14 @@ Run number: 21
 - `npm run contracts:check`
 - `npm run lint`
 - `npm run test`
+- `npm run validate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
+- `npm run validate`
+- `npm run test -- tests/unit/operations/api-operations.test.ts`
+- `npm run typecheck`
+- `npm run lint`
 - `npm run validate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`

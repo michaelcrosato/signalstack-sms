@@ -30,6 +30,9 @@ export default async function SystemStatusPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/audience">
           Audience Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/api">
+          API Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
           Operator Runbook
         </Link>

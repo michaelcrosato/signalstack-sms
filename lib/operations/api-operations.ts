@@ -1,0 +1,85 @@
+import { getApiRateLimitPolicy } from "@/lib/rate-limit/api-rate-limit";
+
+export type ApiOperationMethod = "GET" | "POST" | "PATCH" | "DELETE";
+
+export type ApiOperationRoute = {
+  method: ApiOperationMethod;
+  path: string;
+  area: string;
+  mutates: boolean;
+  externalImpact: boolean;
+  safety: string;
+};
+
+export type ApiOperationsStatus = {
+  routeCount: number;
+  mutatingRouteCount: number;
+  externalImpactRouteCount: number;
+  rateLimit: {
+    enabled: boolean;
+    limit: number;
+    windowSeconds: number;
+  };
+  routes: ApiOperationRoute[];
+};
+
+export const apiOperationRoutes: ApiOperationRoute[] = [
+  { method: "GET", path: "/api/health", area: "System", mutates: false, externalImpact: false, safety: "local health metadata only" },
+  { method: "GET", path: "/api/orgs/current", area: "Tenant", mutates: true, externalImpact: false, safety: "demo org bootstrap only" },
+  { method: "GET", path: "/api/contacts", area: "Contacts", mutates: false, externalImpact: false, safety: "tenant-scoped local records" },
+  { method: "POST", path: "/api/contacts", area: "Contacts", mutates: true, externalImpact: false, safety: "local contact write only" },
+  { method: "GET", path: "/api/contacts/[contactId]", area: "Contacts", mutates: false, externalImpact: false, safety: "tenant-scoped local record" },
+  { method: "PATCH", path: "/api/contacts/[contactId]", area: "Contacts", mutates: true, externalImpact: false, safety: "local contact write only" },
+  { method: "POST", path: "/api/contacts/imports", area: "Contacts", mutates: true, externalImpact: false, safety: "local CSV import only" },
+  { method: "GET", path: "/api/templates", area: "Templates", mutates: false, externalImpact: false, safety: "tenant-scoped local records" },
+  { method: "POST", path: "/api/templates", area: "Templates", mutates: true, externalImpact: false, safety: "local template write only" },
+  { method: "GET", path: "/api/campaigns", area: "Campaigns", mutates: false, externalImpact: false, safety: "tenant-scoped local records" },
+  { method: "POST", path: "/api/campaigns", area: "Campaigns", mutates: true, externalImpact: false, safety: "local draft creation only" },
+  { method: "GET", path: "/api/campaigns/[campaignId]", area: "Campaigns", mutates: false, externalImpact: false, safety: "tenant-scoped local record" },
+  { method: "POST", path: "/api/campaigns/[campaignId]/preflight", area: "Campaigns", mutates: false, externalImpact: false, safety: "hard-gate evaluation only" },
+  { method: "POST", path: "/api/campaigns/[campaignId]/schedule", area: "Campaigns", mutates: true, externalImpact: false, safety: "local queue job only" },
+  { method: "POST", path: "/api/campaigns/[campaignId]/cancel", area: "Campaigns", mutates: true, externalImpact: false, safety: "local queue cancellation only" },
+  { method: "GET", path: "/api/inbox/conversations", area: "Inbox", mutates: false, externalImpact: false, safety: "tenant-scoped local records" },
+  { method: "POST", path: "/api/inbox/conversations", area: "Inbox", mutates: true, externalImpact: false, safety: "local conversation write only" },
+  { method: "GET", path: "/api/inbox/conversations/[conversationId]", area: "Inbox", mutates: false, externalImpact: false, safety: "tenant-scoped local record" },
+  { method: "POST", path: "/api/inbox/conversations/[conversationId]/messages", area: "Inbox", mutates: true, externalImpact: false, safety: "local inbound/demo message only" },
+  { method: "POST", path: "/api/inbox/conversations/[conversationId]/assign", area: "Inbox", mutates: true, externalImpact: false, safety: "local assignment only" },
+  { method: "POST", path: "/api/inbox/conversations/[conversationId]/notes", area: "Inbox", mutates: true, externalImpact: false, safety: "local internal note only" },
+  { method: "POST", path: "/api/inbox/conversations/[conversationId]/resolve", area: "Inbox", mutates: true, externalImpact: false, safety: "local status update only" },
+  { method: "POST", path: "/api/demo/inbound", area: "Demo", mutates: true, externalImpact: false, safety: "local simulated inbound only" },
+  { method: "POST", path: "/api/ai/campaign-copy", area: "AI", mutates: false, externalImpact: false, safety: "fake provider by default" },
+  { method: "POST", path: "/api/ai/reply-suggestion", area: "AI", mutates: false, externalImpact: false, safety: "fake provider by default" },
+  { method: "POST", path: "/api/ai/conversation-summary", area: "AI", mutates: false, externalImpact: false, safety: "fake provider by default" },
+  { method: "POST", path: "/api/ai/lead-qualification", area: "AI", mutates: false, externalImpact: false, safety: "fake provider by default" },
+  { method: "GET", path: "/api/analytics/overview", area: "Analytics", mutates: false, externalImpact: false, safety: "local aggregate reads only" },
+  { method: "POST", path: "/api/billing/usage", area: "Billing", mutates: true, externalImpact: false, safety: "local metering only" },
+  { method: "GET", path: "/api/settings/compliance", area: "Settings", mutates: false, externalImpact: false, safety: "local compliance metadata" },
+  { method: "PATCH", path: "/api/settings/compliance", area: "Settings", mutates: true, externalImpact: false, safety: "local compliance metadata only" },
+  { method: "GET", path: "/api/settings/numbers", area: "Settings", mutates: false, externalImpact: false, safety: "local provider-number metadata" },
+  { method: "POST", path: "/api/settings/numbers", area: "Settings", mutates: true, externalImpact: false, safety: "local provider-number metadata only" },
+  { method: "GET", path: "/api/settings/provider", area: "Settings", mutates: false, externalImpact: false, safety: "redacted local credential metadata" },
+  { method: "PATCH", path: "/api/settings/provider", area: "Settings", mutates: true, externalImpact: false, safety: "redacted metadata only" },
+  { method: "DELETE", path: "/api/settings/provider", area: "Settings", mutates: true, externalImpact: false, safety: "local metadata deletion only" },
+  { method: "GET", path: "/api/settings/provider/rotations", area: "Settings", mutates: false, externalImpact: false, safety: "redacted local history" },
+  { method: "GET", path: "/api/settings/provider/rotations/export", area: "Settings", mutates: false, externalImpact: false, safety: "redacted local CSV" },
+  { method: "GET", path: "/api/settings/readiness-audit", area: "Settings", mutates: false, externalImpact: false, safety: "local audit metadata" },
+  { method: "GET", path: "/api/settings/readiness-audit/export", area: "Settings", mutates: false, externalImpact: false, safety: "local audit CSV" },
+  { method: "POST", path: "/api/webhooks/twilio/inbound", area: "Webhooks", mutates: true, externalImpact: false, safety: "idempotent local inbound handling" },
+  { method: "POST", path: "/api/webhooks/twilio/status", area: "Webhooks", mutates: true, externalImpact: false, safety: "idempotent local status handling" }
+];
+
+export function getApiOperationsStatus(env: Record<string, string | undefined> = process.env): ApiOperationsStatus {
+  const rateLimit = getApiRateLimitPolicy(env);
+
+  return {
+    routeCount: apiOperationRoutes.length,
+    mutatingRouteCount: apiOperationRoutes.filter((route) => route.mutates).length,
+    externalImpactRouteCount: apiOperationRoutes.filter((route) => route.externalImpact).length,
+    rateLimit: {
+      enabled: rateLimit.enabled,
+      limit: rateLimit.limit,
+      windowSeconds: rateLimit.windowMs / 1000
+    },
+    routes: apiOperationRoutes
+  };
+}

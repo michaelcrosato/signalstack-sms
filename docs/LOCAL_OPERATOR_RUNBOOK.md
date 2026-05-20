@@ -209,6 +209,18 @@ Use `/settings/ai` for read-only fake AI boundary review before demos or AI repa
 
 The page is display-only. It must not submit prompts, call live AI, create paid model requests, mutate conversations, expose API keys, create billing artifacts, call providers, send notifications, send SMS, or enable live AI.
 
+## API Operations
+
+Use `/settings/api` for read-only API surface review before demos or route-contract repair work. It displays:
+
+- static local API route inventory
+- route area and read/write classification
+- external-impact classification
+- route-level safety notes
+- API rate-limit policy and middleware matcher
+
+The page is display-only. It must not execute API handlers, create or mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, expose secrets, disable rate limits, or enable live messaging, live billing, or live AI.
+
 ## Compliance Detail
 
 Use `/settings/compliance` for read-only compliance profile review before demos or repair work. It displays:
