@@ -13,5 +13,5 @@ No active blockers.
 - Provider settings are read-only readiness metadata. Provider phone-number metadata is local-only and does not prove ownership or provision Twilio numbers.
 - Live-readiness audit events are local records only and do not yet include a dedicated UI surface beyond the API.
 - There is still no provider credential storage UI, live send enablement flow, or real Twilio send path.
-- The local worker processes due scheduled campaigns through the dummy provider only. Continuous polling is available for local demos, but it does not yet integrate Redis/BullMQ or enforce rate limits.
+- The local worker processes due scheduled campaigns through the dummy provider only. Continuous polling and local jobs-per-poll limits are available for demos, but it does not yet integrate Redis/BullMQ.
 - Windows can produce a Prisma client DLL rename error if `prisma generate` runs concurrently with a Next/Playwright server or another Prisma client process. Run Prisma generation and E2E checks sequentially.

@@ -36,4 +36,5 @@ Continuous execution is opt-in and remains local/demo-safe:
 - `npm run worker:watch` or `WORKER_MODE=continuous npm run worker` polls repeatedly.
 - `WORKER_POLL_INTERVAL_MS` controls the poll delay and is clamped to a safe minimum.
 - `WORKER_MAX_ITERATIONS` may cap local/test loops.
+- `WORKER_MAX_JOBS_PER_POLL` caps due jobs processed per poll and is clamped between 1 and 100.
 - Every poll reuses the same dummy-only/live-disabled gate; blocked workers do not process or call providers.

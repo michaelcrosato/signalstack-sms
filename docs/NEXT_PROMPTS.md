@@ -22,6 +22,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP status transition foundation: Twilio status webhooks update matching local `Message` delivery metadata after idempotent raw webhook storage, without provider calls or outbound side effects.
 - Post-MVP provider number foundation: local `ProviderPhoneNumber` metadata, `GET/POST /api/settings/numbers`, seeded demo number, and demo console number visibility without provider provisioning or live sends.
 - Post-MVP live-readiness audit foundation: local `LiveReadinessAuditEvent` records for compliance profile and provider number metadata changes plus `GET /api/settings/readiness-audit`.
+- Post-MVP local worker rate limit foundation: `WORKER_MAX_JOBS_PER_POLL` clamps due scheduled campaign jobs processed per poll while preserving dummy-only/live-disabled execution.
 
 Demo-safe defaults remain mandatory:
 

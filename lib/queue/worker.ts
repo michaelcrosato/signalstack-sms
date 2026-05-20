@@ -15,6 +15,7 @@ export type WorkerMode = "once" | "continuous";
 export type WorkerRuntimeOptions = {
   mode: WorkerMode;
   pollIntervalMs: number;
+  maxJobsPerPoll: number;
   maxIterations?: number;
 };
 
@@ -22,6 +23,7 @@ export type WorkerRunResult = Awaited<ReturnType<typeof processDueScheduledCampa
 
 export type ContinuousWorkerInput = {
   pollIntervalMs: number;
+  maxJobsPerPoll: number;
   maxIterations?: number;
   shouldContinue?: () => boolean;
   onResult?: (result: WorkerRunResult, iteration: number) => void;
@@ -29,6 +31,9 @@ export type ContinuousWorkerInput = {
 
 const DEFAULT_WORKER_POLL_INTERVAL_MS = 5000;
 const MIN_WORKER_POLL_INTERVAL_MS = 1000;
+const DEFAULT_WORKER_MAX_JOBS_PER_POLL = 25;
+const MIN_WORKER_MAX_JOBS_PER_POLL = 1;
+const MAX_WORKER_MAX_JOBS_PER_POLL = 100;
 
 export function localWorkerProviderIsAllowed(input: WorkerSafetyInput) {
   return input.liveMessagingEnabled !== "true" && (input.messagingProvider ?? "dummy") === "dummy";
@@ -53,11 +58,19 @@ export function parseWorkerRuntimeOptions(input: { argv?: string[]; env?: Record
     parsePositiveInteger(env.WORKER_POLL_INTERVAL_MS) ?? DEFAULT_WORKER_POLL_INTERVAL_MS,
     MIN_WORKER_POLL_INTERVAL_MS
   );
+  const maxJobsPerPoll = Math.min(
+    Math.max(
+      parsePositiveInteger(env.WORKER_MAX_JOBS_PER_POLL) ?? DEFAULT_WORKER_MAX_JOBS_PER_POLL,
+      MIN_WORKER_MAX_JOBS_PER_POLL
+    ),
+    MAX_WORKER_MAX_JOBS_PER_POLL
+  );
   const maxIterations = parsePositiveInteger(env.WORKER_MAX_ITERATIONS);
 
   return {
     mode: explicitContinuous && !explicitOnce ? "continuous" : "once",
     pollIntervalMs,
+    maxJobsPerPoll,
     ...(maxIterations ? { maxIterations } : {})
   };
 }
@@ -78,7 +91,10 @@ export function campaignMessageValues(contact: {
   };
 }
 
-export async function processDueScheduledCampaignJobs(now = new Date()) {
+export async function processDueScheduledCampaignJobs(
+  now = new Date(),
+  options: { maxJobsPerPoll?: number } = {}
+) {
   if (
     !localWorkerProviderIsAllowed({
       liveMessagingEnabled: process.env.LIVE_MESSAGING_ENABLED,
@@ -99,7 +115,7 @@ export async function processDueScheduledCampaignJobs(now = new Date()) {
       runAt: { lte: now }
     },
     orderBy: { runAt: "asc" },
-    take: 25
+    take: options.maxJobsPerPoll ?? DEFAULT_WORKER_MAX_JOBS_PER_POLL
   });
 
   let processed = 0;
@@ -167,7 +183,7 @@ export async function runContinuousScheduledCampaignWorker(input: ContinuousWork
 
   while (input.shouldContinue?.() ?? true) {
     iteration += 1;
-    const result = await processDueScheduledCampaignJobs();
+    const result = await processDueScheduledCampaignJobs(new Date(), { maxJobsPerPoll: input.maxJobsPerPoll });
     results.push(result);
     input.onResult?.(result, iteration);
 

@@ -19,7 +19,7 @@ async function main() {
   const options = parseWorkerRuntimeOptions({ argv: process.argv.slice(2), env: process.env });
 
   if (options.mode === "once") {
-    logResult(await processDueScheduledCampaignJobs());
+    logResult(await processDueScheduledCampaignJobs(new Date(), { maxJobsPerPoll: options.maxJobsPerPoll }));
     return;
   }
 
@@ -31,9 +31,10 @@ async function main() {
   process.once("SIGINT", stop);
   process.once("SIGTERM", stop);
 
-  console.log(`SignalStack SMS worker polling every ${options.pollIntervalMs}ms.`);
+  console.log(`SignalStack SMS worker polling every ${options.pollIntervalMs}ms with up to ${options.maxJobsPerPoll} job(s) per poll.`);
   await runContinuousScheduledCampaignWorker({
     pollIntervalMs: options.pollIntervalMs,
+    maxJobsPerPoll: options.maxJobsPerPoll,
     maxIterations: options.maxIterations,
     shouldContinue: () => running,
     onResult: (result, iteration) => logResult(result, `SignalStack SMS worker iteration ${iteration}`)

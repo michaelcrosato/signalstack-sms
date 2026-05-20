@@ -36,11 +36,12 @@ describe("local queue worker", () => {
     expect(
       parseWorkerRuntimeOptions({
         argv: ["--watch"],
-        env: { WORKER_POLL_INTERVAL_MS: "250", WORKER_MAX_ITERATIONS: "2" }
+        env: { WORKER_POLL_INTERVAL_MS: "250", WORKER_MAX_ITERATIONS: "2", WORKER_MAX_JOBS_PER_POLL: "250" }
       })
     ).toEqual({
       mode: "continuous",
       pollIntervalMs: 1000,
+      maxJobsPerPoll: 100,
       maxIterations: 2
     });
   });

@@ -94,6 +94,7 @@ Post-MVP:
 - Local dummy-provider scheduled campaign worker
 - Local provider phone-number metadata API and demo seed
 - Local live-readiness audit trail for configuration changes
+- Local worker jobs-per-poll rate limit
 - UI expansion
 - Production deployment gates
 
