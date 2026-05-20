@@ -18,4 +18,5 @@ Rules:
 - Valid and duplicate events return `204`.
 - Raw payloads are stored in `WebhookEvent.rawPayload` without dropping unknown provider fields.
 - Inbound webhooks may create local inbox messages and local STOP/HELP consent effects through the same demo-safe inbound path.
+- Status webhooks may update matching local `Message` rows by `providerMessageId` with provider status, provider error code, and delivered/failed timestamps.
 - Webhook handlers must not send SMS replies, email, notifications, billing events, or provider mutations.

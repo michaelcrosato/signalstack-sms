@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   normalizeTwilioInbound,
   normalizeTwilioStatus,
+  twilioStatusTransition,
   validateTwilioSignature
 } from "@/lib/messaging/twilio-webhooks";
 
@@ -56,6 +57,25 @@ describe("Twilio webhook helpers", () => {
       status: "delivered",
       errorCode: undefined,
       idempotencyKey: "twilio:status:SM123:delivered:none"
+    });
+  });
+
+  it("maps provider statuses into local message transition fields", () => {
+    const now = new Date("2026-01-01T00:00:00.000Z");
+
+    expect(twilioStatusTransition({ status: "delivered", now })).toEqual({
+      providerStatus: "delivered",
+      providerErrorCode: null,
+      deliveredAt: now
+    });
+    expect(twilioStatusTransition({ status: "undelivered", errorCode: "30007", now })).toEqual({
+      providerStatus: "undelivered",
+      providerErrorCode: "30007",
+      failedAt: now
+    });
+    expect(twilioStatusTransition({ status: "sent", now })).toEqual({
+      providerStatus: "sent",
+      providerErrorCode: null
     });
   });
 });

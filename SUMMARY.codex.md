@@ -12,6 +12,11 @@ Run number: 4
 - Centralized demo-safe runtime defaults, including the local development `DATABASE_URL`, before Prisma client initialization.
 - Repaired direct `npm run demo:seed` and Playwright demo server execution when the shell does not predefine `DATABASE_URL`.
 - Updated queue contract, architecture, testing, and local gate docs for the continuous worker slice.
+- Advanced a post-MVP status transition checkpoint.
+- Added local `Message` provider status metadata fields and migration.
+- Updated Twilio status webhooks to update matching local messages by `providerMessageId` after idempotent webhook recording.
+- Added deterministic status transition mapping for delivered, failed, undelivered, and in-flight statuses.
+- Updated webhook/data-model docs and webhook contract for local status transitions.
 
 ## Validation
 
@@ -31,5 +36,11 @@ Run number: 4
 - `npm run validate`
 - `npm run test:e2e:demo`
 - `WORKER_MAX_ITERATIONS=1 WORKER_POLL_INTERVAL_MS=1000 npm run worker:watch`
+- `npx prisma migrate dev --name post_mvp_message_status_fields`
+- `npm run test -- tests/unit/messaging/twilio-webhooks.test.ts`
+- `npm run typecheck`
+- `npm run validate`
+- `npm run demo:seed`
+- `npm run test:e2e:demo`
 
-Latest full validation, demo seed, seeded demo E2E, one-shot worker, and bounded continuous worker passed.
+Latest full validation, demo seed, seeded demo E2E, one-shot worker, bounded continuous worker, and webhook status tests passed.

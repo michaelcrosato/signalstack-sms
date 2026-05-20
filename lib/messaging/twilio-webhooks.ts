@@ -16,6 +16,13 @@ export type NormalizedTwilioStatus = {
   idempotencyKey: string;
 };
 
+export type MessageStatusTransition = {
+  providerStatus: string;
+  providerErrorCode: string | null;
+  deliveredAt?: Date;
+  failedAt?: Date;
+};
+
 export function formDataToRecord(formData: FormData): Record<string, string> {
   const payload: Record<string, string> = {};
   for (const [key, value] of formData.entries()) {
@@ -71,5 +78,17 @@ export function normalizeTwilioStatus(payload: TwilioWebhookPayload): Normalized
     status,
     errorCode: payload.ErrorCode,
     idempotencyKey: `twilio:status:${providerMessageId}:${status}:${payload.ErrorCode ?? "none"}`
+  };
+}
+
+export function twilioStatusTransition(input: { status: string; errorCode?: string; now?: Date }): MessageStatusTransition {
+  const status = input.status.toLowerCase();
+  const now = input.now ?? new Date();
+
+  return {
+    providerStatus: status,
+    providerErrorCode: input.errorCode ?? null,
+    ...(status === "delivered" ? { deliveredAt: now } : {}),
+    ...(status === "failed" || status === "undelivered" ? { failedAt: now } : {})
   };
 }

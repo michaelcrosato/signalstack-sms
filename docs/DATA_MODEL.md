@@ -64,3 +64,12 @@ These records do not trigger Stripe or any live billing provider behavior.
 ## Post-MVP Webhook Foundations
 
 `WebhookEvent` stores org-scoped raw provider webhook payloads with a unique idempotency key. It is used by Twilio inbound and status webhook foundations to preserve provider data without live external side effects.
+
+## Post-MVP Status Transition Processing
+
+Provider delivery state is stored on `Message` rows:
+
+- `providerStatus`: latest normalized provider status string.
+- `providerErrorCode`: latest provider error code when present.
+- `deliveredAt`: set when a provider status reaches `delivered`.
+- `failedAt`: set when a provider status reaches `failed` or `undelivered`.

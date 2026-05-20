@@ -4,8 +4,10 @@ import { recordWebhookEvent } from "@/lib/db/repositories/webhooks";
 import {
   formDataToRecord,
   normalizeTwilioStatus,
+  twilioStatusTransition,
   validateTwilioSignature
 } from "@/lib/messaging/twilio-webhooks";
+import { prisma } from "@/lib/db/prisma";
 import { twilioWebhookPayloadSchema } from "@/lib/validation/webhooks";
 
 export async function POST(request: Request) {
@@ -27,13 +29,23 @@ export async function POST(request: Request) {
   }
 
   const current = await getOrCreateCurrentOrg();
-  await recordWebhookEvent({
+  const { duplicate } = await recordWebhookEvent({
     orgId: current.orgId,
     provider: "twilio",
     eventType: "status",
     idempotencyKey: status.idempotencyKey,
     rawPayload
   });
+
+  if (!duplicate) {
+    await prisma.message.updateMany({
+      where: {
+        orgId: current.orgId,
+        providerMessageId: status.providerMessageId
+      },
+      data: twilioStatusTransition(status)
+    });
+  }
 
   return new NextResponse(null, { status: 204 });
 }

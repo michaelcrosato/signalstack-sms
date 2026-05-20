@@ -355,6 +355,10 @@ model Message {
   direction           String
   body                String
   providerMessageId   String?
+  providerStatus      String?
+  providerErrorCode   String?
+  deliveredAt         DateTime?
+  failedAt            DateTime?
   idempotencyKey      String        @unique
   createdAt           DateTime      @default(now())
   org                 Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
@@ -365,6 +369,7 @@ model Message {
   @@index([orgId])
   @@index([conversationId])
   @@index([contactId])
+  @@index([providerMessageId])
 }
 
 model InternalNote {

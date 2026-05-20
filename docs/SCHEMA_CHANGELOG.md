@@ -41,3 +41,7 @@
 ## Post-MVP Webhook Foundations
 
 - Added `WebhookEvent` for org-scoped raw provider webhook payloads and idempotency tracking.
+
+## Post-MVP Status Transition Processing
+
+- Added `Message.providerStatus`, `Message.providerErrorCode`, `Message.deliveredAt`, and `Message.failedAt` for local delivery-status updates from provider callbacks.
