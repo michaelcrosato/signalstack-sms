@@ -40,6 +40,9 @@ export default async function DemoPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/system">
           System Status
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/usage">
+          Usage & Analytics
+        </Link>
         <div className="flex flex-col gap-2">
           <p className="text-sm font-semibold uppercase text-slate-500">Investor Demo</p>
           <h1 className="text-4xl font-semibold text-slate-950">SignalStack Demo Console</h1>

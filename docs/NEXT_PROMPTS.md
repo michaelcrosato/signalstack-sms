@@ -44,6 +44,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP local operator runbook: `docs/LOCAL_OPERATOR_RUNBOOK.md` documents local startup, validation, worker, admin export, repair-loop, and production-boundary procedures; `npm run operator:check` is included in validation to keep the runbook present and demo-safe.
 - Post-MVP local system status view: `/settings/system` renders a read-only operations snapshot of demo/live flags, runtime markers, queue backend metadata, worker poll limits, and API rate-limit policy; unit tests and the investor demo E2E cover it without mutations, provider calls, billing records, notifications, live messaging, or secrets.
 - Post-MVP deployment platform notes: `docs/DEPLOYMENT_PLATFORM_NOTES.md` documents demo-safe production-like hosting defaults, build/release commands, smoke routes, worker boundaries, forbidden live-impact env values, and future platform gates; `npm run platform:check` is included in validation.
+- Post-MVP local usage and analytics view: `/settings/usage` renders read-only tenant-scoped metrics, local usage totals, billing boundary status, and recent usage events; the investor demo E2E covers it without Stripe calls, billing provider artifacts, notifications, provider calls, live messaging, mutations, or secrets.
 
 Demo-safe defaults remain mandatory:
 

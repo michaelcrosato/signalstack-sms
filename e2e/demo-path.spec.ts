@@ -10,6 +10,11 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("Runtime")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Queue" })).toBeVisible();
   await expect(page.getByText("API Protection")).toBeVisible();
+  await page.getByRole("link", { name: "Usage & Analytics" }).click();
+  await expect(page.getByRole("heading", { name: "Usage & Analytics" })).toBeVisible();
+  await expect(page.getByText("Local Usage Totals")).toBeVisible();
+  await expect(page.getByText("Billing Boundary")).toBeVisible();
+  await expect(page.getByText("Recent Usage Events")).toBeVisible();
   await page.getByRole("link", { name: "Go-Live Readiness" }).click();
   await expect(page.getByRole("heading", { name: "Go-Live Readiness" })).toBeVisible();
   await expect(page.getByText("Twilio Readiness")).toBeVisible();

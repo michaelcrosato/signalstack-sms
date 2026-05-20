@@ -14,6 +14,8 @@ The go-live readiness screen can link to a local CSV export of readiness audit e
 
 The admin exports screen consolidates local CSV links for readiness audit events and provider credential rotation history. It is read-only and does not create exports through a background job, call providers, expose raw secrets, send notifications, create billing records, or enable live messaging.
 
+The usage and analytics screen at `/settings/usage` displays local tenant-scoped metrics, billing boundary status, and recent usage events. It is read-only and does not call Stripe, create billing provider artifacts, send notifications, call providers, or enable live messaging.
+
 Milestone 6 adds a compliance checklist for go-live readiness, but demo mode still blocks live messaging even when checklist fields are complete. STOP/HELP demo inbound flows update local database state only.
 
 Milestone 7 AI endpoints use deterministic fake outputs only. Setting `AI_PROVIDER` to anything other than `fake` blocks those endpoints until a future live-AI gate exists.

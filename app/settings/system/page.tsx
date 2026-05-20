@@ -15,6 +15,9 @@ export default async function SystemStatusPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings">
           Go-Live Readiness
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/usage">
+          Usage & Analytics
+        </Link>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">System Status</h1>

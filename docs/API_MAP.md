@@ -81,6 +81,7 @@ Post-MVP provider settings foundation:
 - `GET /api/settings/provider/rotations/export`: exports filtered local provider credential metadata history as CSV without raw tokens, token fingerprints, provider calls, billing records, notifications, live sends, or mutations.
 - `/settings/provider`: renders provider details, a local-only credential metadata form, local metadata deletion, redacted readiness, rotation history, and a rotation CSV export link without provider calls or live-send controls.
 - `/settings/system`: renders a read-only operations snapshot with demo/live flags, runtime markers, queue backend metadata, worker poll limits, and API rate-limit policy without mutations, provider calls, billing records, notifications, live messaging, or secrets.
+- `/settings/usage`: renders a read-only local usage and analytics view with tenant-scoped metrics, billing boundary status, and recent usage events without Stripe calls, billing provider artifacts, notifications, provider calls, live messaging, mutations, or secrets.
 
 Post-MVP provider number foundation:
 

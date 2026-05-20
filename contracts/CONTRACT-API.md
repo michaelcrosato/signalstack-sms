@@ -212,6 +212,10 @@ Renders the provider details UI for the current organization. It may submit loca
 
 Renders a read-only local operations snapshot for the current organization. It may display demo/live flags, selected messaging and AI providers, production-like deployment markers, queue backend metadata, Redis presence, local worker jobs-per-poll limits, and API rate-limit policy. The page must not mutate records, expose secrets, call providers, send notifications, create billing records, or enable live messaging.
 
+### `/settings/usage`
+
+Renders a read-only local usage and analytics view for the current organization. It may display tenant-scoped contact, campaign, conversation, message, local usage totals, billing account metadata, and recent local usage events. The page must not mutate records, call Stripe, create billing provider artifacts, send notifications, call providers, expose secrets, or enable live messaging.
+
 ### `GET /api/settings/numbers`
 
 Returns tenant-scoped provider phone-number metadata for the current organization. This endpoint must not call Twilio or expose credentials.

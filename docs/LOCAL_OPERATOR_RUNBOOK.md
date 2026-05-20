@@ -82,6 +82,17 @@ Use `/settings/system` for a read-only local operations snapshot before demos or
 
 The page is display-only. It must not mutate records, expose secrets, call providers, send notifications, create billing records, or enable live messaging.
 
+## Usage And Analytics
+
+Use `/settings/usage` for read-only local metering review before demos or repair work. It displays:
+
+- tenant-scoped contact, campaign, conversation, and message counts
+- local usage totals by event type
+- demo billing account status and live-billing blocked state
+- recent local usage events and metadata
+
+The page is display-only. It must not mutate records, call Stripe, create billing provider artifacts, expose secrets, call providers, send notifications, or enable live messaging.
+
 ## Repair Loop
 
 When validation fails:

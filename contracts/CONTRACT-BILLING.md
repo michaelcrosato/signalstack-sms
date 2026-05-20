@@ -14,3 +14,7 @@ Billing and usage endpoints are local-only:
 - `POST /api/billing/usage` records local usage only.
 
 No endpoint may create Stripe customers, subscriptions, invoices, checkout sessions, payment intents, or charges. `LIVE_BILLING_ENABLED=false` remains the default and validation must prove live billing is blocked by default.
+
+## Post-MVP Local Usage View
+
+`/settings/usage` renders existing tenant-scoped analytics and local usage records for operator review. It is read-only and must not create usage events, call Stripe, create billing provider artifacts, expose secrets, send notifications, call providers, or enable live messaging.

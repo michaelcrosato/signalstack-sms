@@ -23,3 +23,7 @@ Post-MVP deployment platform notes:
 
 - `npm run platform:check` must verify that `docs/DEPLOYMENT_PLATFORM_NOTES.md` documents demo-safe hosting defaults, production gate usage, smoke routes, worker boundaries, and no-external-impact platform constraints.
 - `npm run validate` must include `npm run platform:check`.
+
+Post-MVP local usage view:
+
+- The seeded investor demo path must verify that `/settings/usage` renders local usage totals, billing boundary status, and recent usage events without requiring live billing or provider configuration.

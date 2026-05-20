@@ -114,6 +114,7 @@ Post-MVP:
 - Local operator runbook and validation check
 - Read-only local system status view
 - Deployment platform notes and validation check
+- Read-only local usage and analytics view
 
 ## Next Milestone
 
