@@ -9,6 +9,7 @@ Run number: 8
 - Added `PATCH /api/settings/provider` to store local Twilio readiness metadata without returning raw secrets, calling Twilio, enabling live messaging, or sending SMS.
 - Updated `GET /api/settings/provider` and `/settings` readiness UI to combine environment credential presence with local metadata.
 - Added readiness audit events for provider credential metadata changes.
+- Added `DELETE /api/settings/provider` to clear local Twilio readiness metadata with an audit event and no provider-side revocation or live-send side effects.
 - Seeded demo-only redacted Twilio metadata so the readiness page has deterministic coverage without real credentials.
 - Updated DB/API/provider contracts, API/data/provider docs, demo-mode docs, schema changelog, plan, and next prompt.
 - Added unit coverage for provider credential redaction/fingerprinting, validation, and secret-safe provider readiness.
@@ -25,6 +26,12 @@ Run number: 8
 - `npm run test`
 - `npm run contracts:check`
 - `npm run secrets:scan`
+- `npm run validate`
+- `npm run demo:seed`
+- `npm run test:e2e:demo`
+- `npm run contracts:check`
+- `npm run typecheck`
+- `npm run lint`
 - `npm run validate`
 - `npm run demo:seed`
 - `npm run test:e2e:demo`

@@ -192,6 +192,10 @@ Returns secret-safe messaging provider readiness for the current organization: s
 
 Stores local, secret-safe Twilio credential readiness metadata from `{ "provider": "twilio", "twilio": { "accountSid": "...", "authToken": "...", "fromNumber": "+15555550199" } }`. The handler may persist redacted account/from-number fields and a one-way token fingerprint only. It must not return or persist raw auth tokens, call Twilio, validate live ownership, enable live messaging, or send SMS.
 
+### `DELETE /api/settings/provider`
+
+Clears local Twilio credential readiness metadata for the current organization. The handler must not call Twilio, revoke provider credentials, disable provider accounts, enable live messaging, or send SMS. It records a local readiness audit event.
+
 ### `GET /api/settings/numbers`
 
 Returns tenant-scoped provider phone-number metadata for the current organization. This endpoint must not call Twilio or expose credentials.

@@ -29,6 +29,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP production deployment gate foundation: `npm run production:gate` is part of validation and blocks production-like environments from live messaging, live billing, live provider, live AI, Twilio, or Stripe settings without an explicit future override.
 - Post-MVP API rate limiting foundation: Next middleware protects `/api/*` with local in-memory fixed-window limits, demo-safe env defaults, `429` retry headers, deterministic unit coverage, and `/settings` visibility.
 - Post-MVP provider credential metadata foundation: `ProviderCredential`, `PATCH /api/settings/provider`, redacted Twilio readiness metadata, readiness audit events, demo seed coverage, and tests without raw secret persistence or provider calls.
+- Post-MVP provider credential deletion foundation: `DELETE /api/settings/provider` clears local Twilio readiness metadata and records an audit event without Twilio calls, live-send enablement, or provider-side revocation.
 
 Demo-safe defaults remain mandatory:
 
@@ -59,7 +60,7 @@ READ FIRST:
 SCOPE:
 - Preserve all Milestone 0-10 gates and demo-safe defaults.
 - Implement the next post-MVP slice only when contracts/docs are updated first.
-- Good candidate slices: Redis-backed BullMQ integration smoke, deeper settings UI, deployment documentation, production go-live gate design, or provider credential deletion/rotation metadata.
+- Good candidate slices: Redis-backed BullMQ integration smoke, deeper settings UI, deployment documentation, production go-live gate design, or provider credential rotation history.
 - Keep live SMS, live billing, real notifications, live AI, and real provider calls blocked unless explicit future hard gates are implemented and tested.
 - Run the full local gate and seeded demo path before committing.
 

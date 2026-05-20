@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getOrCreateComplianceProfile } from "@/lib/db/repositories/compliance";
-import { getProviderCredential, upsertProviderCredentialMetadata } from "@/lib/db/repositories/provider-credentials";
+import {
+  deleteProviderCredentialMetadata,
+  getProviderCredential,
+  upsertProviderCredentialMetadata
+} from "@/lib/db/repositories/provider-credentials";
 import { getProviderSettings } from "@/lib/messaging/provider/settings";
 import { providerSettingsUpdateSchema } from "@/lib/validation/provider";
 
@@ -44,6 +48,26 @@ export async function PATCH(request: Request) {
       messagingProvider: process.env.MESSAGING_PROVIDER ?? "dummy",
       complianceProfile,
       providerCredential: credential,
+      env: process.env
+    })
+  });
+}
+
+export async function DELETE() {
+  const currentOrg = await getOrCreateCurrentOrg();
+
+  await deleteProviderCredentialMetadata(currentOrg.orgId, "twilio", {
+    actorUserId: currentOrg.userId
+  });
+  const complianceProfile = await getOrCreateComplianceProfile(currentOrg.orgId);
+
+  return NextResponse.json({
+    providerSettings: getProviderSettings({
+      demoMode: currentOrg.demoMode,
+      liveMessagingEnabled: process.env.LIVE_MESSAGING_ENABLED === "true",
+      messagingProvider: process.env.MESSAGING_PROVIDER ?? "dummy",
+      complianceProfile,
+      providerCredential: null,
       env: process.env
     })
   });

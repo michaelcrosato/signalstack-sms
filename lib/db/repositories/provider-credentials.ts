@@ -79,3 +79,47 @@ export async function upsertProviderCredentialMetadata(
     return credential;
   });
 }
+
+export async function deleteProviderCredentialMetadata(
+  orgId: string,
+  provider: string,
+  audit?: Pick<ReadinessAuditInput, "actorUserId">
+) {
+  return prisma.$transaction(async (tx) => {
+    const credential = await tx.providerCredential.findUnique({
+      where: {
+        orgId_provider: {
+          orgId,
+          provider
+        }
+      }
+    });
+
+    if (credential) {
+      await tx.providerCredential.delete({
+        where: {
+          orgId_provider: {
+            orgId,
+            provider
+          }
+        }
+      });
+    }
+
+    await tx.liveReadinessAuditEvent.create({
+      data: {
+        orgId,
+        actorUserId: audit?.actorUserId,
+        action: "PROVIDER_CREDENTIAL_METADATA_DELETED",
+        subjectType: "ProviderCredential",
+        subjectId: credential?.id,
+        metadata: {
+          provider,
+          existed: Boolean(credential)
+        }
+      }
+    });
+
+    return { deleted: Boolean(credential) };
+  });
+}

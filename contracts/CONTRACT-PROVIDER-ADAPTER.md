@@ -24,6 +24,7 @@ Post-MVP provider credential metadata foundation:
 - Stored metadata may include redacted account/from-number fields and one-way token fingerprints only.
 - Raw auth tokens must not be stored, returned, logged, or used for provider calls.
 - Credential metadata does not enable live messaging and must record a local readiness audit event.
+- Deleting credential metadata only clears local readiness rows; it must not call Twilio, revoke live credentials, or change live messaging flags.
 
 Post-MVP provider number foundation:
 

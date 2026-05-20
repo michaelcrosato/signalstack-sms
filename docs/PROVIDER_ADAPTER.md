@@ -8,4 +8,6 @@ Twilio is planned as the first live provider after compliance and live-send gate
 
 `PATCH /api/settings/provider` records local Twilio credential readiness metadata for future go-live setup. The endpoint stores only redacted account/from-number values and a one-way auth-token fingerprint. It does not keep raw auth tokens, verify credentials with Twilio, enable live messaging, or send SMS.
 
+`DELETE /api/settings/provider` clears local Twilio credential readiness metadata. It records an audit event but does not call Twilio, revoke credentials, mutate provider accounts, enable live messaging, or send SMS.
+
 `GET /api/settings/numbers` and `POST /api/settings/numbers` manage local provider phone-number metadata for demo and future setup UI. They do not provision provider numbers, verify ownership, store credentials, enable live messaging, or send SMS.
