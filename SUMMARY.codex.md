@@ -14,6 +14,8 @@ Run number: 3
 - Added `WebhookEvent` schema/migration and Twilio webhook helper tests.
 - Advanced a post-MVP provider settings checkpoint.
 - Added read-only `GET /api/settings/provider` with secret-safe Twilio readiness booleans, live messaging blockers, and provider settings tests.
+- Advanced a post-MVP local worker checkpoint.
+- Replaced the worker stub with a dummy-provider-only due scheduled campaign processor that writes idempotent outbound message rows and completes queue jobs/campaigns.
 
 ## Validation
 
@@ -28,6 +30,13 @@ Run number: 3
 - `npm run typecheck`
 - `npm run lint`
 - `npm run test`
+- `npm run validate`
+- `npm run demo:seed`
+- `npm run test:e2e:demo`
+- `npm run worker` failed once on top-level await/CJS output and was repaired
+- `npm run typecheck`
+- `npm run test`
+- `npm run worker`
 - `npm run validate`
 - `npm run demo:seed`
 - `npm run test:e2e:demo`

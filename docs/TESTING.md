@@ -14,3 +14,4 @@ Milestone 0 validation runs:
 Additional deterministic checks:
 
 - `npm run test:e2e:demo` runs the investor demo path after the local database has been migrated and seeded.
+- `npm run worker` processes local due scheduled campaign jobs through the dummy provider only.

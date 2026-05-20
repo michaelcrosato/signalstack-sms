@@ -13,3 +13,4 @@ No active blockers.
 - `npm run db:migrate` requires `DATABASE_URL` in the shell; the validation script supplies the local default internally, but direct Prisma commands do not.
 - Webhook foundations validate and store Twilio inbound/status events, but status transition processing and live provider-number routing remain future slices.
 - Provider settings are read-only readiness metadata. There is still no provider credential storage UI, live send enablement flow, or real Twilio send path.
+- The local worker processes due scheduled campaigns through the dummy provider only. It does not yet run continuously, integrate Redis/BullMQ, enforce rate limits, or process Twilio status transitions.

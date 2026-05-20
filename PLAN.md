@@ -91,12 +91,12 @@ Post-MVP:
 
 - Webhook foundations for Twilio inbound/status callbacks
 - Read-only provider settings readiness endpoint
+- Local dummy-provider scheduled campaign worker
 - UI expansion
-- Worker execution
 - Production deployment gates
 
 ## Next Milestone
 
 Post-MVP:
 
-- UI expansion, worker execution, provider credential management, status transition processing, and production deployment gates
+- UI expansion, continuous worker execution, provider credential management, status transition processing, and production deployment gates
