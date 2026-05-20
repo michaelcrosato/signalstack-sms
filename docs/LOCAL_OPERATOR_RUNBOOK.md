@@ -221,6 +221,19 @@ Use `/settings/api` for read-only API surface review before demos or route-contr
 
 The page is display-only. It must not execute API handlers, create or mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, expose secrets, disable rate limits, or enable live messaging, live billing, or live AI.
 
+## Security Operations
+
+Use `/settings/security` for read-only safety and security control review before demos or production-boundary repair work. It displays:
+
+- demo-safe gate status
+- external-impact boundary status
+- API rate-limit policy
+- production override state
+- documented secret-storage boundaries
+- validation-command references
+
+The page is display-only. It must not scan files, read or expose raw environment values, reveal `.env.local`, reveal provider tokens or API keys, create or mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, disable rate limits, or enable live messaging, live billing, or live AI.
+
 ## Compliance Detail
 
 Use `/settings/compliance` for read-only compliance profile review before demos or repair work. It displays:

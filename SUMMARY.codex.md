@@ -10,6 +10,11 @@ Run number: 22
 - Linked the API operations view from `/`, `/demo`, `/settings`, and `/settings/system`.
 - Extended the seeded investor demo E2E path to cover the API operations view.
 - Updated API contract, API map, local operator runbook, PLAN, and next prompt handoff docs.
+- Advanced a post-MVP local security operations checkpoint.
+- Added `/settings/security`, a read-only page that renders demo-safe gate status, external-impact boundary status, API rate-limit policy, production override state, documented secret-storage boundaries, and validation-command references.
+- Linked the security operations view from `/`, `/demo`, `/settings`, `/settings/system`, and `/settings/api`.
+- Extended the seeded investor demo E2E path to cover the security operations view.
+- Updated API contract, API map, local operator runbook, PLAN, and next prompt handoff docs.
 - Advanced a post-MVP local AI operations checkpoint.
 - Added `/settings/ai`, a read-only page that renders selected AI provider state, fake-provider readiness, live-AI boundary status, deterministic AI endpoint coverage, local AI usage totals, recent AI usage metadata, and safety boundaries.
 - Linked the AI operations view from `/`, `/demo`, `/settings`, `/settings/runbook`, `/settings/usage`, and `/settings/billing`.
@@ -35,6 +40,10 @@ Run number: 22
 - `npm run validate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
+- `npm run typecheck`
+- `npm run lint`
+- `npm run validate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 - `npm run typecheck`
 - `npm run contracts:check`

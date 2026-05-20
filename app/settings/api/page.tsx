@@ -22,6 +22,9 @@ export default async function ApiOperationsPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/system">
           System Status
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/security">
+          Security Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
           Operator Runbook
         </Link>

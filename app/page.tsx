@@ -73,6 +73,11 @@ const launchLinks = [
     description: "Read-only API route inventory, mutation boundaries, and rate-limit policy."
   },
   {
+    href: "/settings/security",
+    title: "Security Operations",
+    description: "Read-only safety gates, secret boundaries, rate limiting, and production controls."
+  },
+  {
     href: "/settings/runbook",
     title: "Operator Runbook",
     description: "Local validation, seed, worker, export, and repair-loop commands with safety boundaries."
