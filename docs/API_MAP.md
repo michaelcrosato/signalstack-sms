@@ -57,4 +57,10 @@ Milestone 7:
 - `POST /api/ai/conversation-summary`: returns a fake conversation summary.
 - `POST /api/ai/lead-qualification`: returns fake lead qualification.
 
+Milestone 8:
+
+- `GET /api/analytics/overview`: returns tenant-scoped aggregate analytics.
+- `GET /api/billing/usage`: returns local billing metadata and usage totals.
+- `POST /api/billing/usage`: records a local usage event only.
+
 Product API routes must be added to `contracts/CONTRACT-API.md` before implementation.

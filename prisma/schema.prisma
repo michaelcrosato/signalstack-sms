@@ -66,6 +66,21 @@ enum A2pRegistrationStatus {
   REJECTED
 }
 
+enum UsageEventType {
+  CONTACT_IMPORTED
+  MESSAGE_INBOUND
+  CAMPAIGN_SCHEDULED
+  AI_REQUEST
+}
+
+enum BillingAccountStatus {
+  DEMO
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+}
+
 model Organization {
   id            String         @id @default(cuid())
   name          String
@@ -88,6 +103,8 @@ model Organization {
   messages      Message[]
   internalNotes InternalNote[]
   complianceProfile ComplianceProfile?
+  usageEvents   UsageEvent[]
+  billingAccount BillingAccount?
 }
 
 model AppUser {
@@ -379,4 +396,33 @@ model ComplianceProfile {
   org                Organization          @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
   @@index([orgId])
+}
+
+model UsageEvent {
+  id        String         @id @default(cuid())
+  orgId     String
+  type      UsageEventType
+  quantity  Int            @default(1)
+  metadata  Json?
+  createdAt DateTime       @default(now())
+  org       Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([orgId, type])
+  @@index([createdAt])
+}
+
+model BillingAccount {
+  id                  String               @id @default(cuid())
+  orgId               String               @unique
+  status              BillingAccountStatus @default(DEMO)
+  liveBillingEnabled  Boolean              @default(false)
+  stripeCustomerId    String?
+  stripeSubscriptionId String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  org                 Organization         @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([status])
 }

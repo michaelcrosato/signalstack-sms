@@ -70,3 +70,12 @@ Conversation assignment is limited to active members of the current organization
 - `A2pRegistrationStatus`: `NOT_STARTED`, `PENDING`, `APPROVED`, `REJECTED`.
 
 Compliance profile completion is required by the centralized messaging hard gate but does not enable live messaging by itself.
+
+## Milestone 8 Usage and Billing Foundation
+
+- `UsageEvent`: tenant-scoped local usage record with `type`, `quantity`, optional JSON metadata, and timestamp.
+- `BillingAccount`: one org-scoped billing metadata record with local status and live-billing flag.
+- `UsageEventType`: `CONTACT_IMPORTED`, `MESSAGE_INBOUND`, `CAMPAIGN_SCHEDULED`, `AI_REQUEST`.
+- `BillingAccountStatus`: `DEMO`, `TRIALING`, `ACTIVE`, `PAST_DUE`, `CANCELLED`.
+
+Billing records are local metadata only. Stripe/customer/subscription IDs are nullable placeholders and must not be created by MVP endpoints.

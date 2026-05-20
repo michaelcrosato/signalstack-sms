@@ -164,4 +164,16 @@ Returns a deterministic fake summary from supplied `messages` or a tenant-scoped
 
 Returns deterministic fake lead qualification score, stage, and reasons from supplied `messages` or a tenant-scoped `conversationId`.
 
+### `GET /api/analytics/overview`
+
+Returns tenant-scoped counts for contacts, campaigns, conversations, messages, and local usage totals.
+
+### `GET /api/billing/usage`
+
+Returns the org billing metadata record, live-billing blocked state, local usage totals, and recent usage events.
+
+### `POST /api/billing/usage`
+
+Records a local usage event. This endpoint must not call Stripe or create live billing artifacts.
+
 Product endpoints must be specified here before implementation.

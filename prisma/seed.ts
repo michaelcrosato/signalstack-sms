@@ -1,9 +1,11 @@
 import {
   A2pRegistrationStatus,
+  BillingAccountStatus,
   ConsentStatus,
   ConversationStatus,
   MembershipRole,
-  MembershipStatus
+  MembershipStatus,
+  UsageEventType
 } from "@prisma/client";
 import { prisma } from "../lib/db/prisma";
 
@@ -222,6 +224,57 @@ async function main() {
       privacyPolicyUrl: "https://example.com/privacy",
       termsOfServiceUrl: "https://example.com/terms",
       a2pRegistrationStatus: A2pRegistrationStatus.NOT_STARTED
+    }
+  });
+
+  await prisma.billingAccount.upsert({
+    where: { orgId: org.id },
+    update: {
+      status: BillingAccountStatus.DEMO,
+      liveBillingEnabled: false,
+      stripeCustomerId: null,
+      stripeSubscriptionId: null
+    },
+    create: {
+      orgId: org.id,
+      status: BillingAccountStatus.DEMO,
+      liveBillingEnabled: false
+    }
+  });
+
+  await prisma.usageEvent.upsert({
+    where: { id: "demo_usage_contact_imported" },
+    update: { quantity: 1, metadata: { source: "demo_seed" } },
+    create: {
+      id: "demo_usage_contact_imported",
+      orgId: org.id,
+      type: UsageEventType.CONTACT_IMPORTED,
+      quantity: 1,
+      metadata: { source: "demo_seed" }
+    }
+  });
+
+  await prisma.usageEvent.upsert({
+    where: { id: "demo_usage_message_inbound" },
+    update: { quantity: 1, metadata: { source: "demo_seed" } },
+    create: {
+      id: "demo_usage_message_inbound",
+      orgId: org.id,
+      type: UsageEventType.MESSAGE_INBOUND,
+      quantity: 1,
+      metadata: { source: "demo_seed" }
+    }
+  });
+
+  await prisma.usageEvent.upsert({
+    where: { id: "demo_usage_ai_request" },
+    update: { quantity: 2, metadata: { source: "demo_seed", provider: "fake" } },
+    create: {
+      id: "demo_usage_ai_request",
+      orgId: org.id,
+      type: UsageEventType.AI_REQUEST,
+      quantity: 2,
+      metadata: { source: "demo_seed", provider: "fake" }
     }
   });
 

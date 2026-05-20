@@ -53,3 +53,10 @@ STOP-class inbound keywords update local contact consent to `OPTED_OUT`. HELP is
 ## Milestone 6 Compliance Profile
 
 `ComplianceProfile` stores one org-scoped go-live readiness record with business identity, messaging use case, opt-in description, policy URLs, and demo A2P registration status. It is consumed by the centralized messaging hard gate and does not enable live messaging by itself.
+
+## Milestone 8 Usage and Billing
+
+- `UsageEvent` stores local usage counts by event type for analytics and billing-safe metering.
+- `BillingAccount` stores one org-scoped local billing status record with live billing disabled by default.
+
+These records do not trigger Stripe or any live billing provider behavior.

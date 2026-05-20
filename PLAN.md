@@ -64,16 +64,23 @@ Milestone 7:
 - Tenant-scoped conversation message context for AI endpoints
 - Tests proving fake AI behavior and live AI blocking
 
-## Active Milestone
-
 Milestone 8:
 
-- Analytics and billing model foundations
-- Usage records, overview endpoint, and billing-safe metering
+- Local usage event and billing account data model
+- Analytics overview API
+- Billing usage API with local-only recording
+- Tests proving local metering and live billing defaults
 
-## Next Milestone
+## Active Milestone
 
 Milestone 9:
 
 - Demo polish and investor demo path
 - Deterministic end-to-end demo flow
+
+## Next Milestone
+
+Milestone 10:
+
+- Hardening
+- Contract/test expansion and CI repair

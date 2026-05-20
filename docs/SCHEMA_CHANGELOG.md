@@ -31,3 +31,9 @@
 
 - Added `A2pRegistrationStatus`.
 - Added `ComplianceProfile` as a one-to-one org-scoped go-live readiness record.
+
+## Milestone 8
+
+- Added `UsageEventType` and `BillingAccountStatus`.
+- Added `UsageEvent` for local usage metering.
+- Added `BillingAccount` for org-scoped billing metadata with live billing disabled by default.
