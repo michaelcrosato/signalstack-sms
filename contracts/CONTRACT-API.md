@@ -280,6 +280,10 @@ Renders a read-only API operations view for the current organization. It may dis
 
 Renders a read-only contract operations view for the current organization. It may display static local contract inventory, drift controls, validation command references, and contract safety-boundary text. The page may display the current demo organization name, but must not read contract file contents, execute validation commands, scan files, create or mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, expose secrets, disable rate limits, or enable live messaging, live billing, or live AI.
 
+### `/settings/validation`
+
+Renders a read-only validation operations view for the current organization. It may display static local validation gate inventory, repair signals, and validation safety-boundary text. The page may display the current demo organization name, but must not execute commands, inspect logs or test reports, scan files, read `.env.local`, create or mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, expose secrets, disable rate limits, or enable live messaging, live billing, or live AI.
+
 ### `/settings/security`
 
 Renders a read-only security operations view for the current organization. It may display demo-safe gate status, external-impact boundary status, API rate-limit policy, production override state, documented secret-storage boundaries, and validation-command references. The page must not scan files, read or expose raw environment values, reveal `.env.local`, reveal provider tokens or API keys, create or mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, disable rate limits, or enable live messaging, live billing, or live AI.

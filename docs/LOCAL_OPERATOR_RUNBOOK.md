@@ -279,6 +279,17 @@ Use `/settings/contracts` for read-only contract and drift-control review before
 
 The page is display-only. It must not read contract file contents, execute validation commands, scan files, mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, expose secrets, or enable live features.
 
+## Validation Operations
+
+Use `/settings/validation` for read-only local gate review before demos or validation repair work. It displays:
+
+- validation command inventory
+- gate areas and safety boundaries
+- repair-loop signals
+- validation safety-boundary text
+
+The page is display-only. It must not execute commands, inspect logs or test reports, scan files, read `.env.local`, mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, expose secrets, or enable live features.
+
 ## Compliance Detail
 
 Use `/settings/compliance` for read-only compliance profile review before demos or repair work. It displays:

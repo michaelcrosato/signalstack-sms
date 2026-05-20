@@ -88,6 +88,11 @@ const launchLinks = [
     description: "Read-only contract inventory, drift controls, validation commands, and safety boundary."
   },
   {
+    href: "/settings/validation",
+    title: "Validation Operations",
+    description: "Read-only local gate inventory, repair signals, and validation safety boundary."
+  },
+  {
     href: "/settings/security",
     title: "Security Operations",
     description: "Read-only safety gates, secret boundaries, rate limiting, and production controls."

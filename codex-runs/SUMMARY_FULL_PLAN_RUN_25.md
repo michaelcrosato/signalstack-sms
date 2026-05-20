@@ -3,13 +3,16 @@ Run number: 25
 Branch: main
 
 Commits created:
-- Pending at summary write time.
+- `94297ec feat: advance SignalStack SMS implementation`
+- Final validation-operations checkpoint commit is the current HEAD for this file update.
 
 Milestones advanced:
 - Post-MVP local contract operations view: `/settings/contracts`
+- Post-MVP local validation operations view: `/settings/validation`
 
 Major files changed:
 - `app/settings/contracts/page.tsx`
+- `app/settings/validation/page.tsx`
 - `app/page.tsx`
 - `app/demo/page.tsx`
 - `app/settings/page.tsx`

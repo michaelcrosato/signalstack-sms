@@ -69,6 +69,8 @@ Notification operations review is available at `/settings/notifications`. It ren
 
 Contract operations review is available at `/settings/contracts`. It renders static contract inventory, validation command references, drift controls, and safety-boundary text only; it does not execute checks, scan files, mutate records, call providers, bill, call live AI, notify, email, send SMS, expose secrets, or enable live features.
 
+Validation operations review is available at `/settings/validation`. It renders static local gate inventory, repair signals, and validation safety-boundary text only; it does not execute commands, inspect logs, scan files, mutate records, call providers, bill, call live AI, notify, email, send SMS, expose secrets, or enable live features.
+
 Compliance readiness detail is available at `/settings/compliance`. It renders existing profile fields, checklist status, A2P metadata status, and live-message blockers only; it does not update records, verify provider registration, call providers, or enable live messaging.
 
 Provider number metadata is available at `/settings/numbers`. It renders existing local number rows only; it does not provision numbers, verify provider ownership, call Twilio, mutate records, or enable live messaging.

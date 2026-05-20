@@ -100,6 +100,9 @@ export default async function ContractOperationsPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
           Operator Runbook
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/validation">
+          Validation Operations
+        </Link>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Contract Operations</h1>

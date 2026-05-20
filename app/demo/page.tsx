@@ -79,6 +79,9 @@ export default async function DemoPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/contracts">
           Contract Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/validation">
+          Validation Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/security">
           Security Operations
         </Link>

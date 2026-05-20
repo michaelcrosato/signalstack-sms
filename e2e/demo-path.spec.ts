@@ -24,6 +24,13 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Drift Controls" })).toBeVisible();
   await expect(page.getByText("contracts/CONTRACT-API.md")).toBeVisible();
   await expect(page.getByText("Safety Boundary")).toBeVisible();
+  await page.getByRole("link", { name: "Validation Operations" }).click();
+  await expect(page.getByRole("heading", { name: "Validation Operations" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Gate Inventory" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Repair Signals" })).toBeVisible();
+  await expect(page.getByText("npm run validate")).toBeVisible();
+  await expect(page.getByText("Safety Boundary")).toBeVisible();
+  await page.getByRole("link", { name: "Contract Operations" }).click();
   await page.getByRole("link", { name: "API Operations" }).click();
   await page.getByRole("link", { name: "Security Operations" }).click();
   await expect(page.getByRole("heading", { name: "Security Operations" })).toBeVisible();

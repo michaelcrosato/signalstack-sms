@@ -98,6 +98,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/settings/contracts">
           Contract Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/validation">
+          Validation Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/security">
           Security Operations
         </Link>
@@ -182,6 +185,16 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <p className="text-sm leading-6 text-slate-700">
           Review local contract inventory, drift controls, and validation command references without executing checks,
           scanning files, mutating records, calling providers, sending notifications, exposing secrets, or enabling live features.
+        </p>
+      </Panel>
+
+      <Panel title="Validation Operations">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/validation">
+          Validation Operations
+        </Link>
+        <p className="text-sm leading-6 text-slate-700">
+          Review local gate commands, repair signals, and validation safety boundaries without executing commands,
+          inspecting logs, scanning files, mutating records, exposing secrets, or enabling live features.
         </p>
       </Panel>
 
