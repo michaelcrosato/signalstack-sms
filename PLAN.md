@@ -110,6 +110,7 @@ Post-MVP:
 - Read-only readiness audit filtering and CSV export
 - Production observability planning and local doc gate
 - Provider credential rotation-history CSV export
+- Read-only admin exports view
 
 ## Next Milestone
 

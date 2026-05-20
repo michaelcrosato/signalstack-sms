@@ -40,6 +40,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP readiness audit export: `GET /api/settings/readiness-audit` supports bounded `limit`, `action`, and `subjectType` filters; `GET /api/settings/readiness-audit/export` returns a tenant-scoped CSV export; `/settings` exposes action filters and an export link without provider calls, billing records, notifications, live messaging, or mutations.
 - Post-MVP production observability planning: `docs/PRODUCTION_OBSERVABILITY.md` documents demo-safe platform/local observability signals, logging exclusions, and future vendor gates; `npm run observability:check` is part of validation and verifies the no-external-impact planning boundary.
 - Post-MVP provider credential rotation export: `GET /api/settings/provider/rotations/export` returns a tenant-scoped CSV export of redacted local credential rotation metadata using the same allowlisted filters as the JSON route; `/settings/provider` exposes the export link and the investor demo E2E covers it without raw tokens, provider calls, billing records, notifications, live messaging, or mutations.
+- Post-MVP admin exports view: `/settings/exports` consolidates local CSV export links for readiness audit events and redacted provider credential rotation history with a visible safety boundary; the investor demo E2E covers it without adding mutations, provider calls, billing records, notifications, live messaging, or raw secret exposure.
 
 Demo-safe defaults remain mandatory:
 

@@ -10,6 +10,9 @@ Run number: 12
 - Added an `Export Rotations CSV` link to `/settings/provider` that preserves the selected rotation action filter.
 - Extended provider credential unit coverage and the seeded investor demo E2E to assert the export route and CSV header.
 - Updated API/provider/demo docs and contracts for the export safety boundary.
+- Advanced a post-MVP admin exports view checkpoint.
+- Added `/settings/exports`, a read-only settings page that consolidates local CSV links for readiness audit events and redacted provider credential rotation history.
+- Linked the exports view from `/settings` and `/settings/provider`, added a visible safety boundary, and extended the investor demo E2E to cover it.
 - Advanced a post-MVP readiness audit export checkpoint.
 - Added bounded `limit`, `action`, and `subjectType` filtering for `GET /api/settings/readiness-audit`.
 - Added `GET /api/settings/readiness-audit/export`, a tenant-scoped CSV export of local readiness audit metadata only.
@@ -53,6 +56,13 @@ Run number: 12
 - `npm run build`
 - `npm run validate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
+- `npm run typecheck`
+- `npm run lint`
+- `npm run build`
+- `npm run typecheck`
+- `npm run validate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 

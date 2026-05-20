@@ -53,6 +53,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/demo">
           Demo Console
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/exports">
+          Admin Exports
+        </Link>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Go-Live Readiness</h1>

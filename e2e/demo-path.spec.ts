@@ -10,6 +10,11 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("API Protection")).toBeVisible();
   await expect(page.getByText("Credential Rotation History")).toBeVisible();
   await expect(page.getByRole("link", { name: "Export CSV" })).toBeVisible();
+  await page.getByRole("link", { name: "Admin Exports" }).click();
+  await expect(page.getByRole("heading", { name: "Admin Exports" })).toBeVisible();
+  await expect(page.getByText("Export Safety Boundary")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Export CSV" })).toHaveCount(2);
+  await page.getByRole("link", { name: "Go-Live Readiness" }).click();
   const readinessAuditExportResponse = await request.get("/api/settings/readiness-audit/export?limit=5");
   expect(readinessAuditExportResponse.ok()).toBeTruthy();
   await expect(readinessAuditExportResponse.text()).resolves.toContain("id,action,subjectType,subjectId,actorUserId,createdAt,metadata");
