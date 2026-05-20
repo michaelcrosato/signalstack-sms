@@ -26,6 +26,13 @@ Post-MVP provider credential metadata foundation:
 - Credential metadata does not enable live messaging and must record a local readiness audit event.
 - Deleting credential metadata only clears local readiness rows; it must not call Twilio, revoke live credentials, or change live messaging flags.
 
+Post-MVP provider credential rotation history:
+
+- Credential metadata configuration, rotation, and deletion must append local rotation-history rows.
+- Rotation-history API responses may expose action labels, provider name, redacted account/from-number values, last-four hints, configured booleans, actor IDs, and timestamps.
+- Rotation-history API responses must not expose raw tokens, token fingerprints, provider credentials, or provider verification results.
+- Rotation history must not call Twilio, revoke provider credentials, enable live messaging, or send SMS.
+
 Post-MVP provider number foundation:
 
 - `GET /api/settings/numbers` and `POST /api/settings/numbers` manage local phone-number metadata only.

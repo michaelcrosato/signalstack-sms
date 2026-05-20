@@ -82,6 +82,10 @@ Provider delivery state is stored on `Message` rows:
 
 `ProviderCredential` stores org-scoped local provider readiness metadata. For Twilio it records redacted account SID/from-number fields, credential presence booleans through derived settings, a one-way auth-token fingerprint, and source metadata. It intentionally does not store raw auth tokens or validate credentials with Twilio.
 
+## Post-MVP Provider Credential Rotation History
+
+`ProviderCredentialRotation` stores org-scoped local history for provider credential metadata configuration, rotation, and deletion events. It records provider name, action, optional credential row ID, redacted account/from-number values, last-four hints, configured booleans, optional actor, and timestamp. API responses never expose raw auth tokens or token fingerprints, and these records do not trigger provider calls or live messaging.
+
 ## Post-MVP Live Readiness Audit Foundation
 
 `LiveReadinessAuditEvent` stores org-scoped local audit entries for configuration changes that affect future go-live readiness. It records an action, subject type, optional subject ID, optional actor, metadata, and timestamp. It does not trigger external notifications or provider activity.

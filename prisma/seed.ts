@@ -245,7 +245,7 @@ async function main() {
     }
   });
 
-  await prisma.providerCredential.upsert({
+  const providerCredential = await prisma.providerCredential.upsert({
     where: { orgId_provider: { orgId: org.id, provider: "twilio" } },
     update: {
       accountSidRedacted: "redacted_0199",
@@ -265,6 +265,41 @@ async function main() {
       authTokenConfigured: true,
       fromNumberRedacted: "redacted_0199",
       fromNumberLast4: "0199",
+      source: "local_metadata"
+    }
+  });
+
+  await prisma.providerCredentialRotation.upsert({
+    where: { id: "demo_provider_credential_rotation_configured" },
+    update: {
+      orgId: org.id,
+      provider: "twilio",
+      providerCredentialId: providerCredential.id,
+      action: "CONFIGURED",
+      actorUserId: user.id,
+      accountSidRedacted: "redacted_0199",
+      accountSidLast4: "0199",
+      fromNumberRedacted: "redacted_0199",
+      fromNumberLast4: "0199",
+      authTokenConfigured: true,
+      previousAccountSidLast4: null,
+      previousFromNumberLast4: null,
+      previousAuthTokenConfigured: false,
+      source: "local_metadata"
+    },
+    create: {
+      id: "demo_provider_credential_rotation_configured",
+      orgId: org.id,
+      provider: "twilio",
+      providerCredentialId: providerCredential.id,
+      action: "CONFIGURED",
+      actorUserId: user.id,
+      accountSidRedacted: "redacted_0199",
+      accountSidLast4: "0199",
+      fromNumberRedacted: "redacted_0199",
+      fromNumberLast4: "0199",
+      authTokenConfigured: true,
+      previousAuthTokenConfigured: false,
       source: "local_metadata"
     }
   });

@@ -78,6 +78,7 @@ Compliance profile completion is required by the centralized messaging hard gate
 - `WebhookEvent`: org-scoped raw provider webhook record with provider, event type, unique idempotency key, raw payload, received timestamp, and processed timestamp.
 - `ProviderPhoneNumber`: org-scoped phone-number metadata with `phoneNumber`, provider name, local status, capabilities, and default-number marker.
 - `ProviderCredential`: org-scoped provider credential metadata with provider name, redacted Twilio account/from-number fields, auth-token fingerprint, configured flag, and source.
+- `ProviderCredentialRotation`: org-scoped local history of provider credential metadata configuration, rotation, and deletion events.
 - `LiveReadinessAuditEvent`: org-scoped audit event for go-live readiness configuration changes.
 - `UsageEventType`: `CONTACT_IMPORTED`, `MESSAGE_INBOUND`, `CAMPAIGN_SCHEDULED`, `AI_REQUEST`.
 - `BillingAccountStatus`: `DEMO`, `TRIALING`, `ACTIVE`, `PAST_DUE`, `CANCELLED`.
@@ -91,6 +92,10 @@ Billing records are local metadata only. Stripe/customer/subscription IDs are nu
 ## Post-MVP Provider Credential Metadata Foundation
 
 `ProviderCredential` records are local readiness metadata only. They may store redacted identifiers and a one-way fingerprint of a submitted token, but must not store raw auth tokens, return secrets to API clients, verify credentials with Twilio, enable live messaging, or send SMS.
+
+## Post-MVP Provider Credential Rotation History
+
+`ProviderCredentialRotation` records are local, tenant-scoped history entries for provider credential metadata changes. They may store redacted account/from-number values, last-four hints, credential presence booleans, action labels, and actor IDs. They must not store raw auth tokens, return one-way token fingerprints through API responses, call Twilio, validate credentials, revoke provider-side credentials, enable live messaging, or send SMS.
 
 ## Post-MVP Live Readiness Audit Foundation
 

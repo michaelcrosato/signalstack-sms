@@ -56,6 +56,11 @@
 - Twilio metadata stores redacted account/from-number values and one-way token fingerprints only.
 - Credential metadata does not store raw auth tokens, call Twilio, verify ownership, enable live messaging, or send SMS.
 
+## Post-MVP Provider Credential Rotation History
+
+- Added `ProviderCredentialRotation` for org-scoped local history of provider credential metadata configuration, rotation, refresh, and deletion events.
+- Rotation history stores redacted identifiers and configured booleans only; API responses do not expose raw tokens or token fingerprints.
+
 ## Post-MVP Live Readiness Audit Foundation
 
 - Added `LiveReadinessAuditEvent` for org-scoped local go-live readiness audit events.

@@ -114,6 +114,7 @@ model Organization {
   webhookEvents WebhookEvent[]
   providerPhoneNumbers ProviderPhoneNumber[]
   providerCredentials ProviderCredential[]
+  providerCredentialRotations ProviderCredentialRotation[]
   liveReadinessAuditEvents LiveReadinessAuditEvent[]
 }
 
@@ -479,6 +480,30 @@ model ProviderCredential {
   @@unique([orgId, provider])
   @@index([orgId])
   @@index([orgId, provider])
+}
+
+model ProviderCredentialRotation {
+  id                       String       @id @default(cuid())
+  orgId                    String
+  provider                 String
+  providerCredentialId     String?
+  action                   String
+  actorUserId              String?
+  accountSidRedacted       String?
+  accountSidLast4          String?
+  fromNumberRedacted       String?
+  fromNumberLast4          String?
+  authTokenConfigured      Boolean      @default(false)
+  previousAccountSidLast4  String?
+  previousFromNumberLast4  String?
+  previousAuthTokenConfigured Boolean   @default(false)
+  source                   String       @default("local_metadata")
+  createdAt                DateTime     @default(now())
+  org                      Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([orgId, provider])
+  @@index([createdAt])
 }
 
 model LiveReadinessAuditEvent {

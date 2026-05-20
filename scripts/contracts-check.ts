@@ -83,6 +83,7 @@ const tenantScopedModels = [
   "BillingAccount",
   "ProviderPhoneNumber",
   "ProviderCredential",
+  "ProviderCredentialRotation",
   "LiveReadinessAuditEvent",
   "WebhookEvent"
 ];

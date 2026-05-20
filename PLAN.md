@@ -100,9 +100,10 @@ Post-MVP:
 - API rate limiting
 - Provider credential metadata management
 - Provider credential metadata deletion
+- Provider credential rotation history
 
 ## Next Milestone
 
 Post-MVP:
 
-- Redis-backed BullMQ integration smoke, deeper settings UI, deployment documentation, production go-live gates, and provider credential rotation history
+- Redis-backed BullMQ integration smoke, deeper settings UI, deployment documentation, and production go-live gate design

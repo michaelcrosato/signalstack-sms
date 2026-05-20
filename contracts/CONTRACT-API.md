@@ -196,6 +196,10 @@ Stores local, secret-safe Twilio credential readiness metadata from `{ "provider
 
 Clears local Twilio credential readiness metadata for the current organization. The handler must not call Twilio, revoke provider credentials, disable provider accounts, enable live messaging, or send SMS. It records a local readiness audit event.
 
+### `GET /api/settings/provider/rotations`
+
+Returns recent tenant-scoped provider credential metadata history for the current organization. Entries include provider, action, redacted account/from-number values, last-four hints, configured booleans, actor ID, and timestamp. The response must not include raw auth tokens, token fingerprints, provider credential values, provider verification results, or trigger provider calls/live messaging.
+
 ### `GET /api/settings/numbers`
 
 Returns tenant-scoped provider phone-number metadata for the current organization. This endpoint must not call Twilio or expose credentials.

@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getOrCreateComplianceProfile } from "@/lib/db/repositories/compliance";
-import { getProviderCredential } from "@/lib/db/repositories/provider-credentials";
+import { getProviderCredential, listProviderCredentialRotations } from "@/lib/db/repositories/provider-credentials";
 import { listProviderPhoneNumbers } from "@/lib/db/repositories/provider-numbers";
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
 import { getProviderSettings } from "@/lib/messaging/provider/settings";
@@ -13,11 +13,12 @@ export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
-  const [complianceProfile, numbers, auditEvents, providerCredential] = await Promise.all([
+  const [complianceProfile, numbers, auditEvents, providerCredential, credentialRotations] = await Promise.all([
     getOrCreateComplianceProfile(currentOrg.orgId),
     listProviderPhoneNumbers(currentOrg.orgId),
     listLiveReadinessAuditEvents(currentOrg.orgId, 8),
-    getProviderCredential(currentOrg.orgId, "twilio")
+    getProviderCredential(currentOrg.orgId, "twilio"),
+    listProviderCredentialRotations(currentOrg.orgId, "twilio", 5)
   ]);
   const providerSettings = getProviderSettings({
     demoMode: currentOrg.demoMode,
@@ -121,6 +122,25 @@ export default async function SettingsPage() {
             ))
           ) : (
             <li className="text-slate-600">No audit events recorded.</li>
+          )}
+        </ul>
+      </Panel>
+
+      <Panel title="Credential Rotation History">
+        <ul className="grid gap-3 text-sm">
+          {credentialRotations.length > 0 ? (
+            credentialRotations.map((rotation) => (
+              <li key={rotation.id} className="grid gap-1 border-b border-slate-100 pb-3 md:grid-cols-[1fr_auto]">
+                <span className="font-medium text-slate-950">
+                  {rotation.action} / {rotation.provider} / {rotation.fromNumberRedacted ?? "not stored"}
+                </span>
+                <time className="text-slate-600" dateTime={rotation.createdAt.toISOString()}>
+                  {rotation.createdAt.toISOString()}
+                </time>
+              </li>
+            ))
+          ) : (
+            <li className="text-slate-600">No credential rotation history recorded.</li>
           )}
         </ul>
       </Panel>

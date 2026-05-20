@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fingerprintSecret, redactValue } from "@/lib/db/repositories/provider-credentials";
+import { fingerprintSecret, getCredentialHistoryAction, redactValue } from "@/lib/db/repositories/provider-credentials";
 import { providerSettingsUpdateSchema } from "@/lib/validation/provider";
 
 describe("provider credential metadata", () => {
@@ -32,5 +32,32 @@ describe("provider credential metadata", () => {
         }
       }).success
     ).toBe(false);
+  });
+
+  it("classifies credential history actions without exposing token values", () => {
+    const created = {
+      id: "cred_1",
+      orgId: "org_1",
+      provider: "twilio",
+      accountSidRedacted: "redacted_7890",
+      accountSidLast4: "7890",
+      authTokenFingerprint: "fingerprint_1",
+      authTokenConfigured: true,
+      fromNumberRedacted: "redacted_0199",
+      fromNumberLast4: "0199",
+      source: "local_metadata",
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+      updatedAt: new Date("2026-01-01T00:00:00.000Z")
+    };
+    const rotated = {
+      ...created,
+      authTokenFingerprint: "fingerprint_2",
+      fromNumberRedacted: "redacted_0200",
+      fromNumberLast4: "0200"
+    };
+
+    expect(getCredentialHistoryAction(null, created)).toBe("CONFIGURED");
+    expect(getCredentialHistoryAction(created, created)).toBe("REFRESHED");
+    expect(getCredentialHistoryAction(created, rotated)).toBe("ROTATED");
   });
 });
