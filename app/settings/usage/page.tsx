@@ -36,6 +36,9 @@ export default async function UsageSettingsPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/contacts">
           Contact Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/templates">
+          Template Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/inbox">
           Inbox Operations
         </Link>

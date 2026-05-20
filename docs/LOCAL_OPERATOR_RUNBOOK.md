@@ -128,6 +128,17 @@ Use `/settings/contacts` for read-only contact data review before demos or impor
 
 The page is display-only. It must not import contacts, create contacts, update consent, mutate tags or lists, hard-delete records, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
+## Template Operations
+
+Use `/settings/templates` for read-only message template review before demos or campaign repair work. It displays:
+
+- message template counts
+- variable names used by templates
+- campaign usage counts
+- local text previews
+
+The page is display-only. It must not create templates, edit template copy, render live outbound messages, schedule campaigns, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
+
 ## Inbox Operations
 
 Use `/settings/inbox` for read-only shared inbox review before demos or inbox repair work. It displays:

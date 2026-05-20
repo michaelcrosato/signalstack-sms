@@ -65,6 +65,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/settings/contacts">
           Contact Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/templates">
+          Template Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/inbox">
           Inbox Operations
         </Link>
@@ -147,6 +150,16 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <p className="text-sm leading-6 text-slate-700">
           Review contact consent, CSV import history, tags, and lists without importing contacts, updating consent,
           mutating labels, sending notifications, calling providers, or enabling live messaging.
+        </p>
+      </Panel>
+
+      <Panel title="Template Operations">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/templates">
+          Template Operations
+        </Link>
+        <p className="text-sm leading-6 text-slate-700">
+          Review local message template variables, campaign usage, and text previews without editing copy, rendering live
+          sends, scheduling campaigns, calling providers, or enabling live messaging.
         </p>
       </Panel>
 

@@ -52,6 +52,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP local provider numbers view: `/settings/numbers` renders existing tenant-scoped provider phone-number metadata, default-number state, capabilities, and safety boundaries as read-only local metadata; root/settings/demo/provider navigation and E2E coverage include it without provisioning numbers, provider verification, mutations, notifications, billing records, live messaging, or secrets.
 - Post-MVP local campaign operations view: `/settings/campaigns` renders existing campaign status counts, recipient counts, scheduled campaign metadata, queue job status, idempotency keys, and worker safety boundaries as read-only local metadata; root/settings/demo/runbook/usage navigation and E2E coverage include it without scheduling campaigns, running workers, mutating queue rows, provider calls, billing records, notifications, live messaging, or secrets.
 - Post-MVP local contact operations view: `/settings/contacts` renders existing contact consent counts, CSV import status, row totals, tag counts, list counts, and recent contact/import metadata as read-only local metadata; root/settings/demo/runbook/usage/campaign/inbox navigation and E2E coverage include it without importing contacts, updating consent, mutating labels, provider calls, billing records, notifications, live messaging, or secrets.
+- Post-MVP local template operations view: `/settings/templates` renders existing message template counts, variable names, campaign usage, text previews, and safety boundaries as read-only local metadata; root/settings/demo/runbook/usage/campaign/contact/inbox navigation and E2E coverage include it without creating templates, editing copy, rendering live outbound messages, scheduling campaigns, provider calls, billing records, notifications, live messaging, or secrets.
 - Post-MVP local inbox operations view: `/settings/inbox` renders existing conversation status counts, assignment counts, recent message/note counts, contact/assignee display metadata, and inbox safety boundaries as read-only local metadata; root/settings/demo/runbook/usage navigation and E2E coverage include it without creating messages, assigning conversations, resolving threads, mutating contacts, provider calls, billing records, notifications, live messaging, or secrets.
 
 Demo-safe defaults remain mandatory:
@@ -83,7 +84,7 @@ READ FIRST:
 SCOPE:
 - Preserve all Milestone 0-10 gates and demo-safe defaults.
 - Implement the next post-MVP slice only when contracts/docs are updated first.
-- Good candidate slices: additional read-only admin views such as template/list/segment operations, safe dashboard refinements, local operator runbook expansion, or deeper links from existing local-only reports into demo-safe operational workflows.
+- Good candidate slices: additional read-only admin views such as list/segment operations, safe dashboard refinements, local operator runbook expansion, or deeper links from existing local-only reports into demo-safe operational workflows.
 - Keep live SMS, live billing, real notifications, live AI, and real provider calls blocked unless explicit future hard gates are implemented and tested.
 - Run the full local gate and seeded demo path before committing.
 

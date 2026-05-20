@@ -47,6 +47,8 @@ Campaign operations review is available at `/settings/campaigns`. It renders exi
 
 Contact operations review is available at `/settings/contacts`. It renders existing consent status, CSV import state, tag counts, list counts, and recent contact metadata only; it does not import contacts, update consent, mutate labels, call providers, bill, notify, send SMS, or enable live messaging.
 
+Template operations review is available at `/settings/templates`. It renders existing message template variables, campaign usage, and text previews only; it does not create templates, edit copy, render live outbound messages, schedule campaigns, call providers, bill, notify, send SMS, or enable live messaging.
+
 Inbox operations review is available at `/settings/inbox`. It renders existing conversation status, assignment counts, recent message metadata, and shared inbox boundaries only; it does not create messages, assign or resolve conversations, mutate contacts, call providers, bill, notify, send SMS, or enable live messaging.
 
 Compliance readiness detail is available at `/settings/compliance`. It renders existing profile fields, checklist status, A2P metadata status, and live-message blockers only; it does not update records, verify provider registration, call providers, or enable live messaging.

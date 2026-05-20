@@ -40,6 +40,10 @@ Post-MVP contact operations view:
 
 - The seeded investor demo path must verify that `/settings/contacts` renders read-only consent status, import status, recent contact metadata, and safety-boundary text without importing contacts, mutating consent, changing labels, calling providers, billing, sending notifications, or enabling live messaging.
 
+Post-MVP template operations view:
+
+- The seeded investor demo path must verify that `/settings/templates` renders read-only template variable coverage, recent template previews, campaign usage, and safety-boundary text without creating templates, editing copy, rendering live outbound messages, scheduling campaigns, calling providers, billing, sending notifications, or enabling live messaging.
+
 Post-MVP inbox operations view:
 
 - The seeded investor demo path must verify that `/settings/inbox` renders read-only conversation status, recent conversation metadata, and safety-boundary text without creating messages, assigning conversations, resolving conversations, calling providers, billing, sending notifications, mutating contacts, or enabling live messaging.
