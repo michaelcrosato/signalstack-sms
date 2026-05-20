@@ -107,9 +107,10 @@ Post-MVP:
 - Provider credential metadata UI/forms
 - Production-like demo deployment runbook
 - Provider credential rotation-history filtering
+- Read-only readiness audit filtering and CSV export
 
 ## Next Milestone
 
 Post-MVP:
 
-- Safe provider metadata form refinements and production observability planning
+- Safe provider metadata form refinements, production observability planning, or read-only admin export views

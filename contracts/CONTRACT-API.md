@@ -214,7 +214,11 @@ Creates or updates tenant-scoped provider phone-number metadata from `{ "phoneNu
 
 ### `GET /api/settings/readiness-audit`
 
-Returns recent tenant-scoped live-readiness audit events for the current organization. These events are local records only and must not trigger notifications, provider calls, billing events, or live messaging.
+Returns recent tenant-scoped live-readiness audit events for the current organization. Optional query parameters are bounded `limit`, `action`, and `subjectType` filters. These events are local records only and must not trigger notifications, provider calls, billing events, or live messaging.
+
+### `GET /api/settings/readiness-audit/export`
+
+Returns a CSV export of tenant-scoped live-readiness audit events for the current organization using the same bounded `limit`, `action`, and `subjectType` filters as the JSON audit endpoint. The export includes local audit metadata only. It must not expose secrets, call providers, send notifications, create billing records, enable live messaging, or mutate audit records.
 
 Product endpoints must be specified here before implementation.
 

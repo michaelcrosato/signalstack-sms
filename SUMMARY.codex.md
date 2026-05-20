@@ -1,9 +1,16 @@
 # Codex Summary
 
-Run number: 10
+Run number: 11
 
 ## Completed
 
+- Advanced a post-MVP readiness audit export checkpoint.
+- Added bounded `limit`, `action`, and `subjectType` filtering for `GET /api/settings/readiness-audit`.
+- Added `GET /api/settings/readiness-audit/export`, a tenant-scoped CSV export of local readiness audit metadata only.
+- Added `/settings` readiness audit action filters and an `Export CSV` link that preserves the selected action filter.
+- Added unit coverage for readiness audit query bounds and CSV escaping.
+- Extended the seeded investor demo E2E to assert the settings export link and CSV API response.
+- Updated API/compliance contracts and API/compliance/demo docs for the export safety boundary.
 - Advanced a post-MVP provider credential metadata UI/forms checkpoint.
 - Added `/settings/provider` local-only Twilio credential metadata form for save/clear actions backed by the existing safe provider settings APIs.
 - Kept credential submissions redacted after save: raw auth tokens are not displayed, token fingerprints are not exposed, and no Twilio calls, live SMS enablement, provider revocation, billing, or notifications are triggered.
@@ -26,6 +33,21 @@ Run number: 10
 - Added read-only `/settings/provider` provider details UI with redacted Twilio metadata, live blockers, credential rotation history, and investor demo E2E coverage.
 
 ## Validation
+
+- Run 11:
+- `npm run test -- tests/unit/compliance/readiness-audit-export.test.ts`
+- `npm run typecheck`
+- `npm run contracts:check`
+- `npm run lint`
+- `npm run test`
+- `npm run build`
+- `npm run db:generate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `npm run validate`
+- `npm run test:e2e:demo`
+
+Earlier run 10:
 
 - `npm run db:generate`
 - `npm run test -- tests/unit/messaging/provider-credentials.test.ts tests/unit/messaging/provider-settings.test.ts`

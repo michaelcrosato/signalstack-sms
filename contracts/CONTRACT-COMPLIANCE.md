@@ -46,4 +46,5 @@ Post-MVP live-readiness audit rules:
 
 - Compliance profile updates record local `LiveReadinessAuditEvent` rows.
 - Provider phone-number metadata changes record local `LiveReadinessAuditEvent` rows.
-- Audit events must not send notifications, call providers, call billing systems, or enable live messaging.
+- Audit listing and export filters must be bounded and tenant-scoped.
+- Audit events and audit exports must not expose secrets, send notifications, call providers, call billing systems, mutate records, or enable live messaging.

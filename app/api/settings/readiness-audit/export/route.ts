@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { serializeReadinessAuditEventsCsv } from "@/lib/compliance/readiness-audit-export";
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
 import { readinessAuditQuerySchema } from "@/lib/validation/readiness-audit";
 
@@ -13,10 +14,16 @@ export async function GET(request: Request) {
   });
 
   if (!query.success) {
-    return NextResponse.json({ error: "Invalid readiness audit query.", issues: query.error.flatten() }, { status: 400 });
+    return NextResponse.json({ error: "Invalid readiness audit export query.", issues: query.error.flatten() }, { status: 400 });
   }
 
   const events = await listLiveReadinessAuditEvents(currentOrg.orgId, query.data.limit, query.data);
+  const csv = serializeReadinessAuditEventsCsv(events);
 
-  return NextResponse.json({ events });
+  return new NextResponse(csv, {
+    headers: {
+      "Content-Type": "text/csv; charset=utf-8",
+      "Content-Disposition": "attachment; filename=\"signalstack-readiness-audit.csv\""
+    }
+  });
 }

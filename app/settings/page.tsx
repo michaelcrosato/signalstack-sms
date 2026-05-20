@@ -8,15 +8,32 @@ import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-au
 import { getProviderSettings } from "@/lib/messaging/provider/settings";
 import { getQueueBackend } from "@/lib/queue/bullmq";
 import { getApiRateLimitPolicy } from "@/lib/rate-limit/api-rate-limit";
+import { readinessAuditQuerySchema } from "@/lib/validation/readiness-audit";
 
 export const dynamic = "force-dynamic";
 
-export default async function SettingsPage() {
+const readinessAuditActions = [
+  "COMPLIANCE_PROFILE_UPDATED",
+  "PROVIDER_NUMBER_UPSERTED",
+  "PROVIDER_CREDENTIAL_METADATA_UPSERTED",
+  "PROVIDER_CREDENTIAL_METADATA_DELETED"
+];
+
+type SettingsPageProps = {
+  searchParams?: Promise<{
+    auditAction?: string;
+  }>;
+};
+
+export default async function SettingsPage({ searchParams }: SettingsPageProps) {
+  const params = await searchParams;
+  const auditActionFilter = readinessAuditQuerySchema.shape.action.safeParse(params?.auditAction);
+  const selectedAuditAction = auditActionFilter.success ? auditActionFilter.data : undefined;
   const currentOrg = await getOrCreateCurrentOrg();
   const [complianceProfile, numbers, auditEvents, providerCredential, credentialRotations] = await Promise.all([
     getOrCreateComplianceProfile(currentOrg.orgId),
     listProviderPhoneNumbers(currentOrg.orgId),
-    listLiveReadinessAuditEvents(currentOrg.orgId, 8),
+    listLiveReadinessAuditEvents(currentOrg.orgId, 12, { action: selectedAuditAction }),
     getProviderCredential(currentOrg.orgId, "twilio"),
     listProviderCredentialRotations(currentOrg.orgId, "twilio", 5)
   ]);
@@ -111,6 +128,20 @@ export default async function SettingsPage() {
       </section>
 
       <Panel title="Readiness Audit">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <nav aria-label="Readiness audit filters" className="flex flex-wrap gap-2">
+            <FilterLink href="/settings" label="All" active={!selectedAuditAction} />
+            {readinessAuditActions.map((action) => (
+              <FilterLink key={action} href={`/settings?auditAction=${action}`} label={action} active={selectedAuditAction === action} />
+            ))}
+          </nav>
+          <Link
+            className="text-sm font-medium text-teal-700"
+            href={`/api/settings/readiness-audit/export?limit=200${selectedAuditAction ? `&action=${selectedAuditAction}` : ""}`}
+          >
+            Export CSV
+          </Link>
+        </div>
         <ul className="grid gap-3 text-sm">
           {auditEvents.length > 0 ? (
             auditEvents.map((event) => (
@@ -166,6 +197,21 @@ function Panel({ title, children }: { title: string; children: ReactNode }) {
       <h2 className="text-lg font-semibold text-slate-950">{title}</h2>
       <div className="mt-4">{children}</div>
     </section>
+  );
+}
+
+function FilterLink({ href, label, active }: { href: string; label: string; active: boolean }) {
+  return (
+    <Link
+      className={
+        active
+          ? "rounded border border-slate-950 bg-slate-950 px-3 py-1 text-xs font-semibold text-white"
+          : "rounded border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700"
+      }
+      href={href}
+    >
+      {label}
+    </Link>
   );
 }
 

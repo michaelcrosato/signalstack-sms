@@ -26,3 +26,5 @@ Live messaging remains blocked unless all of these are true:
 The compliance settings API stores go-live readiness metadata only. It does not send messages or enable live provider calls.
 
 Compliance profile updates and provider number metadata changes write local live-readiness audit events. The audit ledger is for demo/admin visibility only and does not notify users, call providers, call billing systems, or enable live messaging.
+
+Readiness audit APIs support bounded local filters and a CSV export for admin review. The export is read-only, tenant-scoped, and contains local metadata only; it must not expose secrets or trigger provider, billing, notification, or messaging side effects.
