@@ -17,6 +17,14 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("External impact routes", { exact: true })).toBeVisible();
   await expect(page.getByText("/api/webhooks/twilio/inbound")).toBeVisible();
   await expect(page.getByText("Safety Boundary")).toBeVisible();
+  await page.getByRole("link", { name: "Contract Operations" }).click();
+  await expect(page.getByRole("heading", { name: "Contract Operations" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Contract Inventory" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Validation Commands" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Drift Controls" })).toBeVisible();
+  await expect(page.getByText("contracts/CONTRACT-API.md")).toBeVisible();
+  await expect(page.getByText("Safety Boundary")).toBeVisible();
+  await page.getByRole("link", { name: "API Operations" }).click();
   await page.getByRole("link", { name: "Security Operations" }).click();
   await expect(page.getByRole("heading", { name: "Security Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Safety Gates" })).toBeVisible();

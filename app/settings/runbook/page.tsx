@@ -89,6 +89,9 @@ export default function OperatorRunbookPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/ai">
           AI Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/contracts">
+          Contract Operations
+        </Link>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Operator Runbook</h1>
@@ -155,6 +158,7 @@ export default function OperatorRunbookPage() {
           <AdminLink href="/settings/usage" label="Usage & Analytics" />
           <AdminLink href="/settings/billing" label="Billing Operations" />
           <AdminLink href="/settings/ai" label="AI Operations" />
+          <AdminLink href="/settings/contracts" label="Contract Operations" />
           <AdminLink href="/settings/exports" label="Admin Exports" />
           <AdminLink href="/settings/provider" label="Provider Details" />
         </nav>

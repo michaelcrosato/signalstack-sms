@@ -268,6 +268,17 @@ Use `/settings/notifications` for read-only notification no-send boundary review
 
 The page is display-only. It must not create recipients, subscriptions, templates, jobs, sends, alerts, or webhooks; call providers, call Stripe, call live AI, send SMS, send email, send notifications, mutate records, expose secrets, or enable live features.
 
+## Contract Operations
+
+Use `/settings/contracts` for read-only contract and drift-control review before demos or route-contract repair work. It displays:
+
+- contract file inventory
+- validation command references
+- drift-control expectations
+- safety-boundary text
+
+The page is display-only. It must not read contract file contents, execute validation commands, scan files, mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, expose secrets, or enable live features.
+
 ## Compliance Detail
 
 Use `/settings/compliance` for read-only compliance profile review before demos or repair work. It displays:

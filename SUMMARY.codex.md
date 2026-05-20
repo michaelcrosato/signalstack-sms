@@ -1,23 +1,19 @@
 # Codex Summary
 
-Run number: 24
+Run number: 25
 
 ## Completed
 
-- Advanced a post-MVP local queue operations checkpoint.
-- Added `/settings/queue`, a read-only page that renders tenant-scoped scheduled-campaign queue job counts, due versus future queued jobs, payload validity, idempotency keys, worker poll settings, queue backend metadata, Redis presence, related campaign names, and safety boundaries.
-- Linked the queue operations view from `/`, `/demo`, `/settings`, `/settings/campaigns`, and `/settings/system`.
-- Advanced a post-MVP local notification operations checkpoint.
-- Added `/settings/notifications`, a read-only page that renders email, in-app, SMS alert, and webhook notification boundaries, no-send controls, runtime gate status, provider status, production override status, and future notification-provider gate requirements.
-- Linked the notification operations view from `/`, `/demo`, `/settings`, `/settings/security`, and `/settings/system`.
-- Extended the seeded investor demo E2E path to cover the queue operations view.
-- Extended the seeded investor demo E2E path to cover the notification operations view.
+- Advanced a post-MVP local contract operations checkpoint.
+- Added `/settings/contracts`, a read-only page that renders static local contract inventory, drift controls, validation command references, and safety-boundary text.
+- Linked the contract operations view from `/`, `/demo`, `/settings`, `/settings/api`, `/settings/security`, and `/settings/runbook`.
+- Extended the seeded investor demo E2E path to cover the contract operations view.
 - Updated API/testing contracts, API map, demo-mode docs, local operator runbook, README, PLAN, and next prompt handoff docs.
 
 ## Prior Completed
 
 - Completed Milestones 0-10.
-- Added post-MVP webhook foundations, provider settings/readiness, local workers, BullMQ optional smoke/worker foundations, readiness UI, production gates/runbooks, API rate limiting, provider credential metadata management, local admin exports, system status, usage/analytics, launch dashboard, operator runbook app view, compliance detail, provider numbers, campaign operations, contact operations, audience operations, template operations, inbox operations, team operations, billing operations, AI operations, API operations, security operations, webhook operations, data operations, queue operations, and notification operations.
+- Added post-MVP webhook foundations, provider settings/readiness, local workers, BullMQ optional smoke/worker foundations, readiness UI, production gates/runbooks, API rate limiting, provider credential metadata management, local admin exports, system status, usage/analytics, launch dashboard, operator runbook app view, compliance detail, provider numbers, campaign operations, contact operations, audience operations, template operations, inbox operations, team operations, billing operations, AI operations, API operations, security operations, webhook operations, data operations, queue operations, notification operations, and contract operations.
 
 ## Validation
 

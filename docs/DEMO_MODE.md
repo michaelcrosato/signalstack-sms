@@ -46,6 +46,8 @@ The AI operations screen at `/settings/ai` displays the selected AI provider, fa
 
 The notification operations screen at `/settings/notifications` displays email, in-app, SMS alert, and webhook notification boundaries plus no-send controls and runtime gate status. It is read-only and does not create recipients, subscriptions, templates, jobs, sends, alerts, webhooks, provider calls, billing records, live AI calls, notifications, SMS, email, mutations, expose secrets, or enable live features.
 
+The contract operations screen at `/settings/contracts` displays static contract inventory, drift controls, validation command references, and safety-boundary text. It is read-only and does not read contract file contents, execute checks, scan files, mutate records, call providers, create billing records, call live AI, send notifications, SMS, email, expose secrets, or enable live features.
+
 The root route `/` is a static local launch dashboard. It shows the demo-safe runtime defaults and links to the existing demo, readiness, provider metadata, system status, usage, and admin export views without requiring database access or creating side effects.
 
 The local operator runbook screen at `/settings/runbook` displays demo-safe validation, seed, worker, export, and repair-loop commands from the local runbook. It is read-only and does not execute commands, mutate records, call providers, create billing records, send notifications, expose secrets, or enable live messaging.

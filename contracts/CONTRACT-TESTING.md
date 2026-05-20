@@ -74,6 +74,10 @@ Post-MVP notification operations view:
 
 - The seeded investor demo path must verify that `/settings/notifications` renders read-only notification channel boundaries, no-send controls, runtime gates, and safety-boundary text without creating recipients, subscriptions, templates, jobs, sends, alerts, webhooks, provider calls, billing records, live AI calls, SMS, email, mutations, or notification delivery.
 
+Post-MVP contract operations view:
+
+- The seeded investor demo path must verify that `/settings/contracts` renders read-only contract inventory, validation commands, drift controls, and safety-boundary text without reading contract file contents, executing checks, scanning files, mutating records, provider calls, billing records, live AI calls, SMS, email, notifications, secret exposure, or live feature enablement.
+
 Post-MVP webhook operations view:
 
 - The seeded investor demo path must verify that `/settings/webhooks` renders read-only Twilio route coverage, event-type summaries, recent local webhook metadata, and safety-boundary text without webhook replay, provider calls, outbound replies, message/contact mutation, notifications, billing records, SMS, or live messaging enablement.
