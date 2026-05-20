@@ -1,10 +1,10 @@
-Agent: Codex
-Run number: 25
+Agent: Codex  
+Run number: 25  
 Branch: main
 
 Commits created:
 - `94297ec feat: advance SignalStack SMS implementation`
-- Final validation-operations checkpoint commit is the current HEAD for this file update.
+- `c8186fa feat: advance SignalStack SMS implementation`
 
 Milestones advanced:
 - Post-MVP local contract operations view: `/settings/contracts`
@@ -16,9 +16,8 @@ Major files changed:
 - `app/page.tsx`
 - `app/demo/page.tsx`
 - `app/settings/page.tsx`
-- `app/settings/api/page.tsx`
-- `app/settings/security/page.tsx`
 - `app/settings/runbook/page.tsx`
+- `app/settings/security/page.tsx`
 - `e2e/demo-path.spec.ts`
 - `contracts/CONTRACT-API.md`
 - `contracts/CONTRACT-TESTING.md`
@@ -26,8 +25,6 @@ Major files changed:
 - `docs/DEMO_MODE.md`
 - `docs/LOCAL_OPERATOR_RUNBOOK.md`
 - `docs/NEXT_PROMPTS.md`
-- `README.md`
-- `PLAN.md`
 - `SUMMARY.codex.md`
 - `BLOCKERS.codex.md`
 
@@ -42,11 +39,11 @@ Commands run:
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 
 Validation result:
-- Green. Full validation, local migration check, demo seed, and seeded demo E2E passed.
+- Green. Full validation and seeded demo E2E passed.
 
 Remaining blockers:
 - No active blockers.
-- `npm run db:migrate` still requires explicit `DATABASE_URL` in this local setup because Prisma config skips environment loading.
+- Existing note: `npm run db:migrate` still needs explicit `DATABASE_URL` locally.
 
 Next exact command/prompt:
 ```text
