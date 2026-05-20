@@ -65,6 +65,8 @@ Billing operations review is available at `/settings/billing`. It renders existi
 
 AI operations review is available at `/settings/ai`. It renders selected AI provider state, fake-provider readiness, deterministic endpoint coverage, local AI usage totals, and recent AI usage metadata only; it does not submit prompts, call live AI, create paid model requests, mutate conversations, create billing artifacts, notify, call providers, send SMS, expose secrets, or enable live AI.
 
+Notification operations review is available at `/settings/notifications`. It renders email, in-app, SMS alert, and webhook notification no-send boundaries only; it does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, call live AI, notify, email, send SMS, mutate records, expose secrets, or enable live features.
+
 Compliance readiness detail is available at `/settings/compliance`. It renders existing profile fields, checklist status, A2P metadata status, and live-message blockers only; it does not update records, verify provider registration, call providers, or enable live messaging.
 
 Provider number metadata is available at `/settings/numbers`. It renders existing local number rows only; it does not provision numbers, verify provider ownership, call Twilio, mutate records, or enable live messaging.

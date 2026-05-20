@@ -47,6 +47,9 @@ export default async function SecurityOperationsPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/api">
           API Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/notifications">
+          Notification Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
           Operator Runbook
         </Link>

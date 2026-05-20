@@ -280,6 +280,10 @@ Renders a read-only API operations view for the current organization. It may dis
 
 Renders a read-only security operations view for the current organization. It may display demo-safe gate status, external-impact boundary status, API rate-limit policy, production override state, documented secret-storage boundaries, and validation-command references. The page must not scan files, read or expose raw environment values, reveal `.env.local`, reveal provider tokens or API keys, create or mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, disable rate limits, or enable live messaging, live billing, or live AI.
 
+### `/settings/notifications`
+
+Renders a read-only notification operations view for the current organization. It may display demo-safe notification channel boundaries, no-send controls, live messaging/billing status, provider status, and future notification-provider gate requirements. The page must not create notification recipients, subscriptions, templates, jobs, sends, alerts, or webhooks; call email, SMS, browser notification, provider, Stripe, or live AI services; expose secrets; send notifications; send SMS; send email; mutate records; or enable live messaging, live billing, or live AI.
+
 ### `/`
 
 Renders the local launch dashboard. It may display demo-safe runtime defaults and links to existing local-only demo, readiness, provider metadata, system, usage, and admin export views. The page must not require database access, mutate records, call providers, create billing artifacts, send notifications, expose secrets, or enable live messaging.

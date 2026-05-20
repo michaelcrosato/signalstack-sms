@@ -23,6 +23,12 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Runtime Controls" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Control Inventory" })).toBeVisible();
   await expect(page.getByText("Secret scanning remains")).toBeVisible();
+  await page.getByRole("link", { name: "Notification Operations" }).click();
+  await expect(page.getByRole("heading", { name: "Notification Operations" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Channel Boundaries" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "No-Send Controls" })).toBeVisible();
+  await expect(page.getByText("Safety Boundary")).toBeVisible();
+  await page.getByRole("link", { name: "Security Operations" }).click();
   await page.getByRole("link", { name: "Operator Runbook" }).click();
   await expect(page.getByRole("heading", { name: "Operator Runbook" })).toBeVisible();
   await expect(page.getByText("Daily Local Start")).toBeVisible();

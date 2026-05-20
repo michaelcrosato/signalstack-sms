@@ -88,6 +88,11 @@ const launchLinks = [
     description: "Read-only safety gates, secret boundaries, rate limiting, and production controls."
   },
   {
+    href: "/settings/notifications",
+    title: "Notification Operations",
+    description: "Read-only email, alert, webhook, and SMS notification no-send boundary."
+  },
+  {
     href: "/settings/runbook",
     title: "Operator Runbook",
     description: "Local validation, seed, worker, export, and repair-loop commands with safety boundaries."

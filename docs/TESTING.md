@@ -32,5 +32,6 @@ Additional deterministic checks:
 - The seeded investor demo path verifies `/settings/inbox` as a read-only shared inbox operations surface without message creation, assignment, resolution, provider calls, billing, notifications, contact mutation, or messaging enablement.
 - The seeded investor demo path verifies `/settings/team` as a read-only team operations surface without invites, role changes, suspensions, membership deletion, Clerk calls, email, notifications, provider calls, billing, SMS, or messaging enablement.
 - The seeded investor demo path verifies `/settings/billing` as a read-only local billing operations surface without Stripe calls, subscriptions, invoices, payment collection, card charges, email, notifications, provider calls, SMS, or live billing enablement.
+- The seeded investor demo path verifies `/settings/notifications` as a read-only notification no-send boundary without recipients, templates, jobs, sends, alerts, webhooks, provider calls, billing records, live AI calls, SMS, email, mutations, or notification delivery.
 - The Playwright smoke test verifies the root local launch dashboard links to existing local-only operational views while still rendering demo-safe defaults.
 - The seeded investor demo path verifies `/settings/runbook` as a read-only local operator checklist without command execution or external-impact side effects.

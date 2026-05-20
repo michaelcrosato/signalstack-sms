@@ -257,6 +257,17 @@ Use `/settings/security` for read-only safety and security control review before
 
 The page is display-only. It must not scan files, read or expose raw environment values, reveal `.env.local`, reveal provider tokens or API keys, create or mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, disable rate limits, or enable live messaging, live billing, or live AI.
 
+## Notification Operations
+
+Use `/settings/notifications` for read-only notification no-send boundary review before demos or production-boundary repair work. It displays:
+
+- email, in-app, SMS alert, and webhook notification boundaries
+- runtime live messaging and live billing gate status
+- provider and production override status
+- future notification-provider gate requirements
+
+The page is display-only. It must not create recipients, subscriptions, templates, jobs, sends, alerts, or webhooks; call providers, call Stripe, call live AI, send SMS, send email, send notifications, mutate records, expose secrets, or enable live features.
+
 ## Compliance Detail
 
 Use `/settings/compliance` for read-only compliance profile review before demos or repair work. It displays:
