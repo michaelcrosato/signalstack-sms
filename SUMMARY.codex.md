@@ -1,8 +1,16 @@
 # Codex Summary
 
-Run number: 16
+Run number: 17
 
 ## Completed
+
+- Advanced a post-MVP local provider numbers view checkpoint.
+- Added `/settings/numbers`, a read-only page that renders tenant-scoped provider phone-number metadata, default-number state, provider/status labels, capabilities, and a safety boundary.
+- Linked the numbers view from `/`, `/demo`, `/settings`, and `/settings/provider`.
+- Extended smoke and seeded investor demo E2E coverage for the provider numbers view.
+- Updated API/provider/testing contracts, API map, demo-mode docs, provider adapter docs, local operator runbook, README, PLAN, and next prompt handoff docs.
+
+## Prior Completed
 
 - Advanced a post-MVP local compliance detail checkpoint.
 - Added `/settings/compliance`, a read-only page that renders compliance profile completeness, demo A2P metadata status, live-message hard-gate blockers, and recent local compliance readiness audit events.
@@ -11,7 +19,7 @@ Run number: 16
 - Extended smoke and seeded investor demo E2E coverage for the compliance detail page and export link.
 - Updated API/compliance/testing contracts, API map, demo-mode docs, local operator runbook, README, PLAN, and next prompt handoff docs.
 
-## Prior Completed
+## Earlier Completed
 
 - Advanced a post-MVP local launch dashboard checkpoint.
 - Updated `/` from the original Milestone 0 scaffold copy into a static local command center with links to `/demo`, `/settings`, `/settings/provider`, `/settings/system`, `/settings/usage`, and `/settings/exports`.
@@ -72,6 +80,15 @@ Run number: 16
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `npm run validate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
+- `npm run validate`
+- `npm run typecheck`
+- `npm run contracts:check`
+- `npm run lint`
+- `npm run test`
+- `npm run build`
+- `npm run validate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 - `npm run validate`
 

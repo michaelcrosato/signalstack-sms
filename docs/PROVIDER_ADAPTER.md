@@ -19,3 +19,5 @@ Twilio is planned as the first live provider after compliance and live-send gate
 The metadata form uses browser-side hints for Twilio-style account SID and E.164 phone-number shape. Clearing metadata requires an explicit local-only confirmation and still only deletes local readiness metadata; it does not revoke or mutate provider-side credentials.
 
 `GET /api/settings/numbers` and `POST /api/settings/numbers` manage local provider phone-number metadata for demo and future setup UI. They do not provision provider numbers, verify ownership, store credentials, enable live messaging, or send SMS.
+
+`/settings/numbers` renders the same local phone-number metadata as a read-only operator view. It may show labels, providers, local statuses, default-number state, and capabilities, but it does not mutate number rows, call Twilio, prove provider ownership, expose credentials, enable live messaging, or send SMS.

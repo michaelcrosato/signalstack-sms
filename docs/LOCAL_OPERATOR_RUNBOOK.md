@@ -84,6 +84,17 @@ Use `/settings/system` for a read-only local operations snapshot before demos or
 
 The page is display-only. It must not mutate records, expose secrets, call providers, send notifications, create billing records, or enable live messaging.
 
+## Provider Numbers
+
+Use `/settings/numbers` for read-only local number metadata review before demos or repair work. It displays:
+
+- tenant-scoped provider phone-number metadata
+- local status and provider labels
+- default-number marker
+- recorded capabilities
+
+The page is display-only. It must not provision numbers, verify provider ownership, mutate metadata, expose secrets, call providers, send notifications, create billing records, or enable live messaging.
+
 ## Usage And Analytics
 
 Use `/settings/usage` for read-only local metering review before demos or repair work. It displays:

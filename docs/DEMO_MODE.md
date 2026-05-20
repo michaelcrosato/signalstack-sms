@@ -4,6 +4,8 @@ Demo mode is the default. Demo mode uses the dummy messaging provider and fake A
 
 Demo provider phone-number records are local metadata only. They are suitable for setup screens and seeded demos, but they do not provision or verify live provider numbers.
 
+The provider numbers screen at `/settings/numbers` displays existing local number metadata, default-number markers, provider labels, statuses, and capabilities. It is read-only and does not provision numbers, verify provider ownership, mutate metadata, call providers, create billing records, send notifications, or enable live messaging.
+
 Demo provider credential records are redacted local readiness metadata only. The seed contains no raw provider token, does not verify anything with Twilio, and does not enable live messaging.
 
 Demo provider credential rotation history is also local metadata only. Seeded history uses redacted values and configured booleans so readiness screens can show and export change history without raw secrets or provider calls.

@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 16
+Run number: 17
 
 No active blockers.
 
 ## Notes
 
+- `/settings/numbers` is a read-only local provider number metadata view. It displays existing tenant-scoped number rows, default state, provider/status labels, and capabilities; it does not provision numbers, verify provider ownership, mutate metadata, expose secrets, call providers, send notifications, create billing records, or enable live messaging.
 - `/settings/compliance` is a read-only local compliance detail view. It displays existing profile readiness, A2P metadata, hard-gate blockers, and local readiness audit export links; it does not update records, verify provider registration, call providers, send notifications, create billing records, expose secrets, or enable live messaging.
 - `/` is now a static local launch dashboard for existing demo-safe views. It does not require database access, mutate records, call providers, create billing artifacts, send notifications, expose secrets, or enable live messaging.
 - `/settings/runbook` is a read-only local operator checklist. It displays commands and safety boundaries only; it does not execute commands, mutate records, call providers, create billing artifacts, send notifications, expose secrets, or enable live messaging.

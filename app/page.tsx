@@ -18,6 +18,11 @@ const launchLinks = [
     description: "Redacted local Twilio metadata, safe forms, rotation history, and CSV export."
   },
   {
+    href: "/settings/numbers",
+    title: "Provider Numbers",
+    description: "Read-only local number metadata, default sender status, capabilities, and safety boundary."
+  },
+  {
     href: "/settings/compliance",
     title: "Compliance Detail",
     description: "Read-only profile completeness, A2P metadata, hard-gate blockers, and audit export."

@@ -36,6 +36,12 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   expect(complianceAuditExportResponse.ok()).toBeTruthy();
   await expect(complianceAuditExportResponse.text()).resolves.toContain("id,action,subjectType,subjectId,actorUserId,createdAt,metadata");
   await page.getByRole("link", { name: "Go-Live Readiness" }).click();
+  await page.getByRole("link", { name: "Provider Numbers" }).first().click();
+  await expect(page.getByRole("heading", { name: "Provider Numbers" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Number Metadata" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Safety Boundary" })).toBeVisible();
+  await expect(page.getByText("+15555550199").first()).toBeVisible();
+  await page.getByRole("link", { name: "Go-Live Readiness" }).click();
   await page.getByRole("link", { name: "Admin Exports" }).click();
   await expect(page.getByRole("heading", { name: "Admin Exports" })).toBeVisible();
   await expect(page.getByText("Export Safety Boundary")).toBeVisible();

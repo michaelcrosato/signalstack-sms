@@ -44,6 +44,9 @@ export default async function ProviderSettingsPage({ searchParams }: ProviderSet
         <Link className="text-sm font-medium text-teal-700" href="/settings/exports">
           Admin Exports
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/numbers">
+          Provider Numbers
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/system">
           System Status
         </Link>

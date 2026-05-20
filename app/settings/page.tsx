@@ -59,6 +59,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/settings/compliance">
           Compliance Detail
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/numbers">
+          Provider Numbers
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/system">
           System Status
         </Link>
@@ -120,6 +123,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
         <Panel title="Numbers">
+          <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/numbers">
+            Provider Numbers
+          </Link>
           <ul className="grid gap-3 text-sm">
             {numbers.length > 0 ? (
               numbers.map((number) => (

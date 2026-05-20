@@ -44,5 +44,7 @@ Post-MVP provider credential metadata UI:
 Post-MVP provider number foundation:
 
 - `GET /api/settings/numbers` and `POST /api/settings/numbers` manage local phone-number metadata only.
+- `/settings/numbers` renders existing local phone-number metadata as a read-only operator view.
 - Number metadata may record provider name, capabilities, local status, and default selection.
 - Number metadata must not be treated as proof that a live Twilio number is owned, provisioned, or safe to send from.
+- The numbers view must not provision provider numbers, verify ownership, mutate metadata, expose credentials, enable live messaging, or send SMS.

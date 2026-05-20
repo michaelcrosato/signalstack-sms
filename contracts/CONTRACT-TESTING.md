@@ -27,3 +27,7 @@ Post-MVP deployment platform notes:
 Post-MVP local usage view:
 
 - The seeded investor demo path must verify that `/settings/usage` renders local usage totals, billing boundary status, and recent usage events without requiring live billing or provider configuration.
+
+Post-MVP provider numbers view:
+
+- The seeded investor demo path must verify that `/settings/numbers` renders read-only local number metadata and its safety boundary without provisioning numbers, calling providers, or enabling live messaging.
