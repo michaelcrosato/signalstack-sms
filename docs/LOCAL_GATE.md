@@ -4,6 +4,9 @@ Run:
 
 ```bash
 npm install
+npm run db:generate
+npm run db:migrate
+npm run demo:seed
 npm run validate
 ```
 
@@ -14,4 +17,10 @@ npx playwright install chromium
 npm run test:e2e:smoke
 ```
 
-The local gate must pass before Milestone 1 work starts unless an exact environment blocker is recorded in `BLOCKERS.bootstrap.md`.
+Milestone 9 demo path check:
+
+```bash
+npm run test:e2e -- e2e/demo-path.spec.ts --project=chromium
+```
+
+The local gate must pass before committing a milestone unless an exact environment blocker is recorded in `BLOCKERS.codex.md`.

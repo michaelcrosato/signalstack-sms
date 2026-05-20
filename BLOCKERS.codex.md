@@ -1,9 +1,11 @@
-# BLOCKERS.codex.md
+# Codex Blockers
 
-No validation blockers remain.
+Run number: 2
 
-## Residual Risk
+No active blockers.
 
-- Live SMS, live billing, and live provider behavior remain intentionally blocked by defaults and are not implemented.
-- The worker still does not execute queued provider sends; Milestone 4 only persists schedule/cancel job records.
-- Existing audit note remains: `npm audit --audit-level=moderate` previously reported moderate Next/PostCSS transitive findings where the suggested forced fix was not acceptable.
+## Notes
+
+- `codex-runs/FULL_PLAN_RUN_2.md` was already untracked at the start of the run and was left untouched.
+- The demo path requires the local PostgreSQL database to be migrated and seeded before running.
+- The standard `npm run validate` gate runs the smoke Playwright test; the fuller investor demo path is documented as an additional command in `docs/LOCAL_GATE.md`.

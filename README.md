@@ -1,6 +1,6 @@
 # SignalStack SMS
 
-SignalStack SMS is a 100% AI-coded SMB SMS/MMS SaaS repo. Milestone 0 establishes the scaffold, contracts, safety defaults, and validation gates only.
+SignalStack SMS is a 100% AI-coded SMB SMS/MMS SaaS repo. The current implementation is demo-safe through Milestone 9 foundations: contacts, consent, CSV import, campaigns, preflight/scheduling records, shared inbox, compliance gates, fake AI, local analytics/billing records, and an investor demo path.
 
 ## Demo-safe defaults
 
@@ -14,6 +14,9 @@ SignalStack SMS is a 100% AI-coded SMB SMS/MMS SaaS repo. Milestone 0 establishe
 
 ```bash
 npm install
+npm run db:generate
+npm run db:migrate
+npm run demo:seed
 npm run validate
 ```
 
@@ -24,4 +27,10 @@ npx playwright install chromium
 npm run test:e2e:smoke
 ```
 
-Product work starts only after Milestone 0 is green.
+Investor demo path:
+
+```bash
+npm run test:e2e -- e2e/demo-path.spec.ts --project=chromium
+```
+
+All flows remain local/demo-only unless future hard gates explicitly enable live providers.

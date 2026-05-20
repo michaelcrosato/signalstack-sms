@@ -1,34 +1,22 @@
-# SUMMARY.codex.md
+# Codex Summary
 
-Agent: Codex
-Run number: 1
-Branch: main
-Date: 2026-05-20
+Run number: 2
 
 ## Completed
 
-- Confirmed the existing Milestone 1 foundation was green before starting.
-- Implemented Milestone 2 contacts and consent foundations.
-- Implemented Milestone 3 templates, draft campaigns, campaign recipients, and preflight.
-- Implemented Milestone 4 queue scheduling foundation with durable queued job records.
-- Preserved demo-safe defaults: dummy messaging, fake AI, live messaging disabled, live billing disabled.
+- Advanced implementation from Milestone 5 through Milestone 9.
+- Added shared inbox APIs, demo inbound STOP/HELP handling, assignment, notes, and resolve/reopen.
+- Added compliance profile/checklist API and centralized messaging hard gates.
+- Added deterministic fake AI endpoints for campaign copy, reply suggestions, summaries, and lead qualification.
+- Added local-only analytics and billing usage records.
+- Added `/demo` investor console and `e2e/demo-path.spec.ts`.
+- Updated README, local gate, contracts, API map, data model docs, demo docs, schema changelog, and next prompts.
 
 ## Validation
 
-Passing:
-
-- `npm run db:generate`
 - `npm run db:migrate`
 - `npm run demo:seed`
-- `npm run typecheck`
-- `npm run lint`
-- `npm run test`
-- `npm run build`
+- `npm run test:e2e -- e2e/demo-path.spec.ts --project=chromium`
 - `npm run validate`
-- `npm run test:e2e:smoke` through `npm run validate`
 
-## Commits
-
-- `a447bfe` - Milestone 2 contacts/import/list/tag/segment foundation.
-- `63ba440` - Milestone 3 template/campaign draft/preflight foundation.
-- Latest commit in this run - Milestone 4 queue schedule/cancel foundation.
+Latest full validation passed.
