@@ -90,13 +90,13 @@ Milestone 10:
 Post-MVP:
 
 - Webhook foundations for Twilio inbound/status callbacks
+- Read-only provider settings readiness endpoint
 - UI expansion
 - Worker execution
-- Provider settings
 - Production deployment gates
 
 ## Next Milestone
 
 Post-MVP:
 
-- UI expansion, worker execution, provider settings, status transition processing, and production deployment gates
+- UI expansion, worker execution, provider credential management, status transition processing, and production deployment gates

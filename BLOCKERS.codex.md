@@ -12,3 +12,4 @@ No active blockers.
 - The standard `npm run validate` gate runs the smoke Playwright test; the fuller investor demo path is available as `npm run test:e2e:demo`.
 - `npm run db:migrate` requires `DATABASE_URL` in the shell; the validation script supplies the local default internally, but direct Prisma commands do not.
 - Webhook foundations validate and store Twilio inbound/status events, but status transition processing and live provider-number routing remain future slices.
+- Provider settings are read-only readiness metadata. There is still no provider credential storage UI, live send enablement flow, or real Twilio send path.

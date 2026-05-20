@@ -12,6 +12,8 @@ Run number: 3
 - Advanced a post-MVP webhook foundation checkpoint.
 - Added Twilio inbound/status webhook routes with signature validation, raw payload persistence, idempotency keys, and no outbound provider side effects.
 - Added `WebhookEvent` schema/migration and Twilio webhook helper tests.
+- Advanced a post-MVP provider settings checkpoint.
+- Added read-only `GET /api/settings/provider` with secret-safe Twilio readiness booleans, live messaging blockers, and provider settings tests.
 
 ## Validation
 
@@ -25,6 +27,12 @@ Run number: 3
 - `npm run contracts:check`
 - `npm run typecheck`
 - `npm run lint`
+- `npm run test`
+- `npm run validate`
+- `npm run demo:seed`
+- `npm run test:e2e:demo`
+- `npm run contracts:check`
+- `npm run typecheck`
 - `npm run test`
 - `npm run validate`
 - `npm run demo:seed`

@@ -72,4 +72,8 @@ Post-MVP webhook foundation:
 - `POST /api/webhooks/twilio/inbound`: validates a Twilio form webhook signature, stores raw inbound payloads idempotently, and creates a local inbound inbox message without sending replies.
 - `POST /api/webhooks/twilio/status`: validates a Twilio form webhook signature and stores raw delivery-status payloads idempotently without provider callbacks.
 
+Post-MVP provider settings foundation:
+
+- `GET /api/settings/provider`: returns secret-safe provider readiness, live messaging blockers, and Twilio credential presence booleans.
+
 Product API routes must be added to `contracts/CONTRACT-API.md` before implementation.

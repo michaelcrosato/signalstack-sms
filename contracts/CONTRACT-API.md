@@ -184,4 +184,8 @@ Accepts Twilio `application/x-www-form-urlencoded` inbound message webhooks. The
 
 Accepts Twilio `application/x-www-form-urlencoded` delivery status webhooks. The request must pass `X-Twilio-Signature` validation with `TWILIO_AUTH_TOKEN`; unsigned requests are rejected. Valid payloads are stored as raw org-scoped webhook events by idempotency key. The handler returns `204` and does not call any provider.
 
+### `GET /api/settings/provider`
+
+Returns secret-safe messaging provider readiness for the current organization: selected provider, demo mode, live messaging flag, live messaging blockers, compliance readiness, and Twilio credential presence booleans. This endpoint must not return credential values, mutate provider state, or enable live SMS.
+
 Product endpoints must be specified here before implementation.
