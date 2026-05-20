@@ -23,6 +23,11 @@ const launchLinks = [
     description: "Read-only contact consent, imports, tags, lists, and local data safety boundary."
   },
   {
+    href: "/settings/audience",
+    title: "Audience Operations",
+    description: "Read-only tags, lists, saved segments, definitions, and audience safety boundary."
+  },
+  {
     href: "/settings/templates",
     title: "Template Operations",
     description: "Read-only message template variables, campaign usage, previews, and safety boundary."

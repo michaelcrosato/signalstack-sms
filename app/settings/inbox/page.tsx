@@ -32,6 +32,9 @@ export default async function InboxOperationsPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/templates">
           Template Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/audience">
+          Audience Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/usage">
           Usage & Analytics
         </Link>

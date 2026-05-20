@@ -4,6 +4,11 @@ Run number: 19
 
 ## Completed
 
+- Advanced a third post-MVP local audience operations checkpoint.
+- Added `/settings/audience`, a read-only page that renders tenant-scoped tag counts, list member counts, saved segment definitions, segment update timestamps, and a safety boundary.
+- Linked the audience operations view from `/`, `/demo`, `/settings`, `/settings/campaigns`, `/settings/contacts`, `/settings/templates`, `/settings/inbox`, `/settings/usage`, `/settings/system`, `/settings/compliance`, `/settings/exports`, and `/settings/runbook`.
+- Extended the Playwright smoke test and seeded investor demo E2E path to cover the audience operations view.
+- Updated API/testing contracts, API map, demo-mode docs, local operator runbook, README, PLAN, and next prompt handoff docs.
 - Advanced a second post-MVP local template operations checkpoint.
 - Added `/settings/templates`, a read-only page that renders tenant-scoped message template counts, variable coverage, campaign usage counts, local text previews, and a safety boundary.
 - Linked the template operations view from `/`, `/demo`, `/settings`, `/settings/campaigns`, `/settings/contacts`, `/settings/inbox`, `/settings/usage`, `/settings/system`, `/settings/compliance`, `/settings/exports`, and `/settings/runbook`.
@@ -35,5 +40,11 @@ Run number: 19
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 - `npm run validate`
+- `npm run typecheck`
+- `npm run contracts:check`
+- `npm run lint`
+- `npm run validate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 
 Latest full validation and seeded demo E2E passed.

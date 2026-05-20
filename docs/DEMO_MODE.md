@@ -26,6 +26,8 @@ The campaign operations screen at `/settings/campaigns` displays existing local 
 
 The contact operations screen at `/settings/contacts` displays existing local contact consent counts, CSV import status, tag counts, list counts, and recent contact/import metadata. It is read-only and does not import contacts, update consent, mutate tags or lists, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
+The audience operations screen at `/settings/audience` displays existing local tag counts, list member counts, saved segment definitions, and segment update timestamps. It is read-only and does not create tags, update lists, change contact memberships, evaluate segments for sends, call providers, create billing records, send notifications, send SMS, or enable live messaging.
+
 The template operations screen at `/settings/templates` displays existing local message template counts, variable names, campaign usage, and text previews. It is read-only and does not create templates, edit copy, render live outbound messages, schedule campaigns, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
 The inbox operations screen at `/settings/inbox` displays existing local conversation status, assignment counts, recent message and note counts, and shared inbox safety boundaries. It is read-only and does not create messages, assign conversations, resolve threads, mutate contacts or consent, call providers, create billing records, send notifications, send SMS, or enable live messaging.

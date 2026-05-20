@@ -128,6 +128,17 @@ Use `/settings/contacts` for read-only contact data review before demos or impor
 
 The page is display-only. It must not import contacts, create contacts, update consent, mutate tags or lists, hard-delete records, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
+## Audience Operations
+
+Use `/settings/audience` for read-only audience label and saved segment review before demos or campaign repair work. It displays:
+
+- tag counts
+- list member counts
+- saved segment definitions
+- segment update timestamps
+
+The page is display-only. It must not create tags, update lists, change contact memberships, evaluate segments for sends, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
+
 ## Template Operations
 
 Use `/settings/templates` for read-only message template review before demos or campaign repair work. It displays:

@@ -65,6 +65,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/settings/contacts">
           Contact Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/audience">
+          Audience Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/templates">
           Template Operations
         </Link>
@@ -150,6 +153,16 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <p className="text-sm leading-6 text-slate-700">
           Review contact consent, CSV import history, tags, and lists without importing contacts, updating consent,
           mutating labels, sending notifications, calling providers, or enabling live messaging.
+        </p>
+      </Panel>
+
+      <Panel title="Audience Operations">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/audience">
+          Audience Operations
+        </Link>
+        <p className="text-sm leading-6 text-slate-700">
+          Review local tags, lists, and saved segment definitions without changing memberships, evaluating sends, calling
+          providers, creating billing records, or enabling live messaging.
         </p>
       </Panel>
 
