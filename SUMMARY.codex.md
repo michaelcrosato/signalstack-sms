@@ -1,6 +1,6 @@
 # Codex Summary
 
-Run number: 5
+Run number: 6
 
 ## Completed
 
@@ -18,6 +18,11 @@ Run number: 5
 - Advanced a post-MVP local worker rate-limit checkpoint.
 - Added `WORKER_MAX_JOBS_PER_POLL` parsing, clamping, one-shot wiring, and continuous worker wiring.
 - Updated queue/testing docs for bounded jobs-per-poll processing.
+- Advanced a post-MVP BullMQ/Redis enqueue foundation checkpoint.
+- Added optional `QUEUE_BACKEND=bullmq` scheduling mirror with `REDIS_URL`, while keeping durable `QueueJob` rows as the source of truth.
+- Wired campaign scheduling to safely no-op BullMQ enqueue unless BullMQ and Redis are explicitly configured.
+- Added Redis URL parsing, deterministic BullMQ job construction, and unit tests that do not require Redis.
+- Updated queue, architecture, testing, local gate, and env example docs for database-default queue behavior.
 
 ## Validation
 
@@ -46,5 +51,13 @@ Run number: 5
 - `npm run demo:seed`
 - `npm run test:e2e:demo`
 - `WORKER_MAX_ITERATIONS=1 WORKER_POLL_INTERVAL_MS=1000 WORKER_MAX_JOBS_PER_POLL=1 npm run worker:watch`
+- `npm run test -- tests/unit/queue/bullmq.test.ts tests/unit/queue/worker.test.ts tests/unit/queue/jobs.test.ts`
+- `npm run typecheck`
+- `npm run lint`
+- `npm run contracts:check`
+- `npm run secrets:scan`
+- `npm run validate`
+- `npm run demo:seed`
+- `npm run test:e2e:demo`
 
 Latest full validation, demo seed, and seeded demo E2E passed.

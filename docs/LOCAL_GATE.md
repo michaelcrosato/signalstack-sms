@@ -28,7 +28,10 @@ Optional local worker checks:
 ```bash
 npm run worker
 WORKER_MAX_ITERATIONS=1 WORKER_POLL_INTERVAL_MS=1000 npm run worker:watch
+QUEUE_BACKEND=bullmq REDIS_URL=redis://localhost:6379 npm run worker
 ```
+
+BullMQ/Redis enqueue support is optional. The default local gate does not require Redis, and campaign scheduling must continue to persist database `QueueJob` rows when BullMQ is disabled or not configured.
 
 Milestone 10 contract hardening is included in `npm run validate`. The contract gate now verifies that implemented API route/method pairs are documented in both `contracts/CONTRACT-API.md` and `docs/API_MAP.md`, and that tenant-scoped Prisma models retain an `orgId` field.
 

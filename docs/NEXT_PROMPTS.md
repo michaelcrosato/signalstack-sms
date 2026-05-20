@@ -23,6 +23,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP provider number foundation: local `ProviderPhoneNumber` metadata, `GET/POST /api/settings/numbers`, seeded demo number, and demo console number visibility without provider provisioning or live sends.
 - Post-MVP live-readiness audit foundation: local `LiveReadinessAuditEvent` records for compliance profile and provider number metadata changes plus `GET /api/settings/readiness-audit`.
 - Post-MVP local worker rate limit foundation: `WORKER_MAX_JOBS_PER_POLL` clamps due scheduled campaign jobs processed per poll while preserving dummy-only/live-disabled execution.
+- Post-MVP BullMQ/Redis enqueue foundation: optional `QUEUE_BACKEND=bullmq` scheduling mirror with `REDIS_URL`, deterministic BullMQ scheduled-campaign job construction, and database-default validation that does not require Redis.
 
 Demo-safe defaults remain mandatory:
 
@@ -53,7 +54,7 @@ READ FIRST:
 SCOPE:
 - Preserve all Milestone 0-10 gates and demo-safe defaults.
 - Implement the next post-MVP slice only when contracts/docs are updated first.
-- Good candidate slices: UI expansion, provider credential management, Redis/BullMQ worker integration, rate limiting, live-readiness audit trails, or production deployment gates.
+- Good candidate slices: UI expansion, provider credential management, BullMQ worker consumption, API rate limiting, live-readiness audit UI, or production deployment gates.
 - Keep live SMS, live billing, real notifications, live AI, and real provider calls blocked unless explicit future hard gates are implemented and tested.
 - Run the full local gate and seeded demo path before committing.
 

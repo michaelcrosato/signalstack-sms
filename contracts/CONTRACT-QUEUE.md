@@ -38,3 +38,14 @@ Continuous execution is opt-in and remains local/demo-safe:
 - `WORKER_MAX_ITERATIONS` may cap local/test loops.
 - `WORKER_MAX_JOBS_PER_POLL` caps due jobs processed per poll and is clamped between 1 and 100.
 - Every poll reuses the same dummy-only/live-disabled gate; blocked workers do not process or call providers.
+
+## Post-MVP BullMQ/Redis Enqueue Foundation
+
+Durable `QueueJob` rows remain the source of truth. BullMQ is an optional delivery accelerator only:
+
+- Default queue backend is `database`; BullMQ is disabled unless `QUEUE_BACKEND=bullmq`.
+- BullMQ enqueue also requires `REDIS_URL`; missing Redis configuration must not break campaign scheduling.
+- BullMQ job names and payloads must use the same validated scheduled-campaign payload contract as `QueueJob.payload`.
+- BullMQ job IDs must use the durable `QueueJob.idempotencyKey`.
+- BullMQ enqueue must not call providers, send SMS, enable live messaging, store secrets, or replace database idempotency.
+- Local validation must pass without Redis running.

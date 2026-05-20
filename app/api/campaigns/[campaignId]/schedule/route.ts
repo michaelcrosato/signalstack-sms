@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { scheduleCampaign } from "@/lib/db/repositories/campaigns";
+import { enqueueScheduledCampaignBullMqJob } from "@/lib/queue/bullmq";
 import { campaignScheduleSchema } from "@/lib/validation/campaigns";
 
 type CampaignParams = {
@@ -20,6 +21,7 @@ export async function POST(request: Request, { params }: CampaignParams) {
     if (!queueJob) {
       return NextResponse.json({ error: "Campaign not found." }, { status: 404 });
     }
+    await enqueueScheduledCampaignBullMqJob(queueJob);
     return NextResponse.json({ queueJob }, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Campaign schedule failed." }, { status: 409 });
