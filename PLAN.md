@@ -57,16 +57,23 @@ Milestone 6:
 - Demo seed compliance readiness metadata
 - Hard-gate tests for live messaging, provider readiness, A2P status, and consent
 
-## Active Milestone
-
 Milestone 7:
 
-- AI feature foundations
-- Fake AI provider-backed campaign copy, reply suggestions, summaries, and lead qualification APIs
+- Deterministic fake AI provider functions
+- Campaign copy, reply suggestion, conversation summary, and lead qualification APIs
+- Tenant-scoped conversation message context for AI endpoints
+- Tests proving fake AI behavior and live AI blocking
 
-## Next Milestone
+## Active Milestone
 
 Milestone 8:
 
 - Analytics and billing model foundations
 - Usage records, overview endpoint, and billing-safe metering
+
+## Next Milestone
+
+Milestone 9:
+
+- Demo polish and investor demo path
+- Deterministic end-to-end demo flow

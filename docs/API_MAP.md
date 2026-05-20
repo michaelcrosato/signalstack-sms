@@ -32,4 +32,29 @@ Milestone 4:
 - `POST /api/campaigns/:campaignId/schedule`: stores a queued scheduled-campaign job after preflight.
 - `POST /api/campaigns/:campaignId/cancel`: cancels queued jobs and pauses the campaign.
 
+Milestone 5:
+
+- `GET /api/inbox/conversations`: lists inbox conversations.
+- `POST /api/inbox/conversations`: creates demo-safe inbound messages.
+- `GET /api/inbox/conversations/:conversationId`: reads one conversation.
+- `GET /api/inbox/conversations/:conversationId/messages`: lists conversation messages.
+- `POST /api/inbox/conversations/:conversationId/messages`: creates a demo-safe inbound message.
+- `POST /api/inbox/conversations/:conversationId/assign`: assigns or clears conversation assignment.
+- `GET /api/inbox/conversations/:conversationId/notes`: lists internal notes.
+- `POST /api/inbox/conversations/:conversationId/notes`: creates an internal note.
+- `POST /api/inbox/conversations/:conversationId/resolve`: resolves or reopens a conversation.
+- `POST /api/demo/inbound`: creates a demo-safe inbound message.
+
+Milestone 6:
+
+- `GET /api/settings/compliance`: returns compliance profile and hard-gate checklist.
+- `PATCH /api/settings/compliance`: updates compliance readiness metadata.
+
+Milestone 7:
+
+- `POST /api/ai/campaign-copy`: returns fake campaign copy variants.
+- `POST /api/ai/reply-suggestion`: returns a fake reply suggestion.
+- `POST /api/ai/conversation-summary`: returns a fake conversation summary.
+- `POST /api/ai/lead-qualification`: returns fake lead qualification.
+
 Product API routes must be added to `contracts/CONTRACT-API.md` before implementation.

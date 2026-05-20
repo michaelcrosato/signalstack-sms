@@ -148,4 +148,20 @@ Returns the org-scoped compliance profile plus a checklist containing `complete`
 
 Updates business identity, messaging use case, opt-in description, policy URLs, and demo A2P status metadata. This endpoint does not enable live SMS.
 
+### `POST /api/ai/campaign-copy`
+
+Returns deterministic fake campaign copy variants from `{ "prompt": "..." }`.
+
+### `POST /api/ai/reply-suggestion`
+
+Returns a deterministic fake reply suggestion from supplied `messages` or a tenant-scoped `conversationId`.
+
+### `POST /api/ai/conversation-summary`
+
+Returns a deterministic fake summary from supplied `messages` or a tenant-scoped `conversationId`.
+
+### `POST /api/ai/lead-qualification`
+
+Returns deterministic fake lead qualification score, stage, and reasons from supplied `messages` or a tenant-scoped `conversationId`.
+
 Product endpoints must be specified here before implementation.
