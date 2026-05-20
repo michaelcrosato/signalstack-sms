@@ -11,6 +11,7 @@ No active blockers.
 - The standard `npm run validate` gate runs the smoke Playwright test; the fuller investor demo path is available as `npm run test:e2e:demo`.
 - Webhook foundations validate and store Twilio inbound/status events. Status webhooks now update local message delivery metadata.
 - Provider settings are read-only readiness metadata. Provider phone-number metadata is local-only and does not prove ownership or provision Twilio numbers.
+- Live-readiness audit events are local records only and do not yet include a dedicated UI surface beyond the API.
 - There is still no provider credential storage UI, live send enablement flow, or real Twilio send path.
 - The local worker processes due scheduled campaigns through the dummy provider only. Continuous polling is available for local demos, but it does not yet integrate Redis/BullMQ or enforce rate limits.
 - Windows can produce a Prisma client DLL rename error if `prisma generate` runs concurrently with a Next/Playwright server or another Prisma client process. Run Prisma generation and E2E checks sequentially.

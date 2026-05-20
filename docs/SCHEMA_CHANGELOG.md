@@ -49,3 +49,7 @@
 ## Post-MVP Provider Number Foundation
 
 - Added `ProviderPhoneNumber` and `ProviderPhoneNumberStatus` for org-scoped local number metadata.
+
+## Post-MVP Live Readiness Audit Foundation
+
+- Added `LiveReadinessAuditEvent` for org-scoped local go-live readiness audit events.

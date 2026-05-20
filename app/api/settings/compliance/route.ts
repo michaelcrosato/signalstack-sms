@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { complianceProfileIsComplete, evaluateMessagingHardGate } from "@/lib/compliance/gates";
 import { getOrCreateComplianceProfile, updateComplianceProfile } from "@/lib/db/repositories/compliance";
+import { recordLiveReadinessAuditEvent } from "@/lib/db/repositories/readiness-audit";
 import { complianceProfileUpdateSchema } from "@/lib/validation/compliance";
 
 export async function GET() {
@@ -33,6 +34,16 @@ export async function PATCH(request: Request) {
   }
 
   const profile = await updateComplianceProfile(currentOrg.orgId, payload.data);
+  await recordLiveReadinessAuditEvent(currentOrg.orgId, {
+    actorUserId: currentOrg.userId,
+    action: "COMPLIANCE_PROFILE_UPDATED",
+    subjectType: "ComplianceProfile",
+    subjectId: profile.id,
+    metadata: {
+      a2pRegistrationStatus: profile.a2pRegistrationStatus,
+      complete: complianceProfileIsComplete(profile)
+    }
+  });
   const gate = evaluateMessagingHardGate({
     demoMode: currentOrg.demoMode,
     liveMessagingEnabled: process.env.LIVE_MESSAGING_ENABLED === "true",

@@ -113,6 +113,7 @@ model Organization {
   billingAccount BillingAccount?
   webhookEvents WebhookEvent[]
   providerPhoneNumbers ProviderPhoneNumber[]
+  liveReadinessAuditEvents LiveReadinessAuditEvent[]
 }
 
 model AppUser {
@@ -457,6 +458,22 @@ model ProviderPhoneNumber {
   @@index([orgId])
   @@index([orgId, isDefault])
   @@index([orgId, provider])
+}
+
+model LiveReadinessAuditEvent {
+  id           String       @id @default(cuid())
+  orgId        String
+  actorUserId  String?
+  action       String
+  subjectType  String
+  subjectId    String?
+  metadata     Json?
+  createdAt    DateTime     @default(now())
+  org          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([orgId, action])
+  @@index([createdAt])
 }
 
 model WebhookEvent {

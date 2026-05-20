@@ -196,4 +196,8 @@ Returns tenant-scoped provider phone-number metadata for the current organizatio
 
 Creates or updates tenant-scoped provider phone-number metadata from `{ "phoneNumber": "+15555550123", "provider": "dummy", "capabilities": ["sms"], "isDefault": true }`. This endpoint is local metadata only; it must not provision numbers, validate live ownership, store secrets, enable live messaging, or send SMS.
 
+### `GET /api/settings/readiness-audit`
+
+Returns recent tenant-scoped live-readiness audit events for the current organization. These events are local records only and must not trigger notifications, provider calls, billing events, or live messaging.
+
 Product endpoints must be specified here before implementation.

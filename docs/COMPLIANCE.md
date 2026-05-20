@@ -24,3 +24,5 @@ Live messaging remains blocked unless all of these are true:
 - The contact is active, explicitly opted in, and not opted out.
 
 The compliance settings API stores go-live readiness metadata only. It does not send messages or enable live provider calls.
+
+Compliance profile updates and provider number metadata changes write local live-readiness audit events. The audit ledger is for demo/admin visibility only and does not notify users, call providers, call billing systems, or enable live messaging.

@@ -1,6 +1,7 @@
 import { ProviderPhoneNumberStatus } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 import type { ProviderPhoneNumberInput } from "@/lib/validation/provider";
+import type { ReadinessAuditInput } from "@/lib/db/repositories/readiness-audit";
 
 export async function listProviderPhoneNumbers(orgId: string) {
   return prisma.providerPhoneNumber.findMany({
@@ -9,7 +10,11 @@ export async function listProviderPhoneNumbers(orgId: string) {
   });
 }
 
-export async function upsertProviderPhoneNumber(orgId: string, input: ProviderPhoneNumberInput) {
+export async function upsertProviderPhoneNumber(
+  orgId: string,
+  input: ProviderPhoneNumberInput,
+  audit?: Pick<ReadinessAuditInput, "actorUserId">
+) {
   return prisma.$transaction(async (tx) => {
     if (input.isDefault) {
       await tx.providerPhoneNumber.updateMany({
@@ -18,7 +23,7 @@ export async function upsertProviderPhoneNumber(orgId: string, input: ProviderPh
       });
     }
 
-    return tx.providerPhoneNumber.upsert({
+    const number = await tx.providerPhoneNumber.upsert({
       where: {
         orgId_phoneNumber: {
           orgId,
@@ -42,5 +47,22 @@ export async function upsertProviderPhoneNumber(orgId: string, input: ProviderPh
         status: input.provider === "dummy" ? ProviderPhoneNumberStatus.DEMO : ProviderPhoneNumberStatus.CONFIGURED
       }
     });
+
+    await tx.liveReadinessAuditEvent.create({
+      data: {
+        orgId,
+        actorUserId: audit?.actorUserId,
+        action: "PROVIDER_NUMBER_UPSERTED",
+        subjectType: "ProviderPhoneNumber",
+        subjectId: number.id,
+        metadata: {
+          provider: number.provider,
+          isDefault: number.isDefault,
+          status: number.status
+        }
+      }
+    });
+
+    return number;
   });
 }

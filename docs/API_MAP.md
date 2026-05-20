@@ -81,4 +81,8 @@ Post-MVP provider number foundation:
 - `GET /api/settings/numbers`: lists local provider phone-number metadata.
 - `POST /api/settings/numbers`: creates or updates local provider phone-number metadata without provisioning, provider calls, or live sends.
 
+Post-MVP live-readiness audit foundation:
+
+- `GET /api/settings/readiness-audit`: lists recent local go-live readiness audit events.
+
 Product API routes must be added to `contracts/CONTRACT-API.md` before implementation.

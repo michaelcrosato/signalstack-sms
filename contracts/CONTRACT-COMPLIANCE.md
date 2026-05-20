@@ -41,3 +41,9 @@ Milestone 6 hard gate rules:
 - The centralized messaging hard gate must block when the selected provider is `dummy`.
 - The centralized messaging hard gate must block when the compliance profile is incomplete or A2P status is not `APPROVED`.
 - Contact-level consent and opt-out checks remain required even if provider/configuration gates pass.
+
+Post-MVP live-readiness audit rules:
+
+- Compliance profile updates record local `LiveReadinessAuditEvent` rows.
+- Provider phone-number metadata changes record local `LiveReadinessAuditEvent` rows.
+- Audit events must not send notifications, call providers, call billing systems, or enable live messaging.

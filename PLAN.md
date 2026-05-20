@@ -93,6 +93,7 @@ Post-MVP:
 - Read-only provider settings readiness endpoint
 - Local dummy-provider scheduled campaign worker
 - Local provider phone-number metadata API and demo seed
+- Local live-readiness audit trail for configuration changes
 - UI expansion
 - Production deployment gates
 

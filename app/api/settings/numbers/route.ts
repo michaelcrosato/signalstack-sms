@@ -18,7 +18,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid provider number payload.", issues: payload.error.issues }, { status: 400 });
   }
 
-  const number = await upsertProviderPhoneNumber(currentOrg.orgId, payload.data);
+  const number = await upsertProviderPhoneNumber(currentOrg.orgId, payload.data, {
+    actorUserId: currentOrg.userId
+  });
 
   return NextResponse.json({ number }, { status: 201 });
 }
