@@ -40,6 +40,9 @@ export default async function DemoPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/compliance">
           Compliance Detail
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/campaigns">
+          Campaign Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/numbers">
           Provider Numbers
         </Link>

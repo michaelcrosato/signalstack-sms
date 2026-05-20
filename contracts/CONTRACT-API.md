@@ -228,6 +228,10 @@ Renders a read-only local operator checklist based on `docs/LOCAL_OPERATOR_RUNBO
 
 Renders a read-only local usage and analytics view for the current organization. It may display tenant-scoped contact, campaign, conversation, message, local usage totals, billing account metadata, and recent local usage events. The page must not mutate records, call Stripe, create billing provider artifacts, send notifications, call providers, expose secrets, or enable live messaging.
 
+### `/settings/campaigns`
+
+Renders a read-only campaign operations view for the current organization. It may display existing campaign status counts, recipient counts, scheduled campaign metadata, queue job status counts, idempotency keys, and local worker boundary text. The page must not create, update, schedule, cancel, send, or delete campaigns; run workers; mutate queue rows; call messaging providers; create billing records; send notifications; expose secrets; or enable live messaging.
+
 ### `/`
 
 Renders the local launch dashboard. It may display demo-safe runtime defaults and links to existing local-only demo, readiness, provider metadata, system, usage, and admin export views. The page must not require database access, mutate records, call providers, create billing artifacts, send notifications, expose secrets, or enable live messaging.

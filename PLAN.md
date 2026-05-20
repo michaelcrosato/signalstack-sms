@@ -120,6 +120,7 @@ Post-MVP:
 - Read-only local operator runbook app view
 - Read-only local compliance detail view
 - Read-only local provider numbers view
+- Read-only local campaign operations view
 
 ## Next Milestone
 

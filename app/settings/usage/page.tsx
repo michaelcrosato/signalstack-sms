@@ -30,6 +30,9 @@ export default async function UsageSettingsPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/system">
           System Status
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/campaigns">
+          Campaign Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
           Operator Runbook
         </Link>

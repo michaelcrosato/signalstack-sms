@@ -106,6 +106,17 @@ Use `/settings/usage` for read-only local metering review before demos or repair
 
 The page is display-only. It must not mutate records, call Stripe, create billing provider artifacts, expose secrets, call providers, send notifications, or enable live messaging.
 
+## Campaign Operations
+
+Use `/settings/campaigns` for read-only campaign and queue review before demos or worker repair work. It displays:
+
+- campaign status counts
+- recipient counts and scheduled timestamps
+- queue job status counts
+- local worker execution boundary
+
+The page is display-only. It must not schedule campaigns, cancel campaigns, run workers, mutate queue rows, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
+
 ## Compliance Detail
 
 Use `/settings/compliance` for read-only compliance profile review before demos or repair work. It displays:

@@ -31,3 +31,7 @@ Post-MVP local usage view:
 Post-MVP provider numbers view:
 
 - The seeded investor demo path must verify that `/settings/numbers` renders read-only local number metadata and its safety boundary without provisioning numbers, calling providers, or enabling live messaging.
+
+Post-MVP campaign operations view:
+
+- The seeded investor demo path must verify that `/settings/campaigns` renders read-only campaign status, queue status, and safety-boundary metadata without scheduling campaigns, running workers, calling providers, billing, sending notifications, mutating queue rows, or enabling live messaging.

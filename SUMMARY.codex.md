@@ -1,8 +1,16 @@
 # Codex Summary
 
-Run number: 17
+Run number: 18
 
 ## Completed
+
+- Advanced a post-MVP local campaign operations checkpoint.
+- Added `/settings/campaigns`, a read-only page that renders tenant-scoped campaign status counts, recipient counts, scheduled campaign metadata, queue job status, idempotency keys, and local worker safety boundaries.
+- Linked the campaign operations view from `/`, `/demo`, `/settings`, `/settings/usage`, `/settings/runbook`, and `/settings/exports`.
+- Extended smoke and seeded investor demo E2E coverage for the campaign operations view.
+- Updated API/testing contracts, API map, demo-mode docs, local operator runbook, README, PLAN, and next prompt handoff docs.
+
+## Prior Completed
 
 - Advanced a post-MVP local provider numbers view checkpoint.
 - Added `/settings/numbers`, a read-only page that renders tenant-scoped provider phone-number metadata, default-number state, provider/status labels, capabilities, and a safety boundary.
@@ -10,7 +18,7 @@ Run number: 17
 - Extended smoke and seeded investor demo E2E coverage for the provider numbers view.
 - Updated API/provider/testing contracts, API map, demo-mode docs, provider adapter docs, local operator runbook, README, PLAN, and next prompt handoff docs.
 
-## Prior Completed
+## Earlier Completed
 
 - Advanced a post-MVP local compliance detail checkpoint.
 - Added `/settings/compliance`, a read-only page that renders compliance profile completeness, demo A2P metadata status, live-message hard-gate blockers, and recent local compliance readiness audit events.
@@ -91,5 +99,13 @@ Run number: 17
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 - `npm run validate`
+- `npm run typecheck`
+- `npm run contracts:check`
+- `npm run lint`
+- `npm run test`
+- `npm run build`
+- `npm run validate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 
 Latest full validation and seeded demo E2E passed.

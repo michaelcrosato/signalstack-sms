@@ -13,6 +13,11 @@ const launchLinks = [
     description: "Compliance, provider blockers, readiness audit, numbers, queue, and API protection."
   },
   {
+    href: "/settings/campaigns",
+    title: "Campaign Operations",
+    description: "Read-only campaign status, recipient counts, queued jobs, and local worker boundary."
+  },
+  {
     href: "/settings/provider",
     title: "Provider Details",
     description: "Redacted local Twilio metadata, safe forms, rotation history, and CSV export."

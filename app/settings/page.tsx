@@ -59,6 +59,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/settings/compliance">
           Compliance Detail
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/campaigns">
+          Campaign Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/numbers">
           Provider Numbers
         </Link>
@@ -119,6 +122,16 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
           <StatusRow label="Requests" value={String(apiRateLimit.limit)} />
           <StatusRow label="Window seconds" value={String(apiRateLimit.windowMs / 1000)} />
         </dl>
+      </Panel>
+
+      <Panel title="Campaign Operations">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/campaigns">
+          Campaign Operations
+        </Link>
+        <p className="text-sm leading-6 text-slate-700">
+          Review campaign status, recipient counts, and queued scheduled-campaign jobs without running workers, sending SMS,
+          mutating queue rows, or enabling provider integrations.
+        </p>
       </Panel>
 
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
