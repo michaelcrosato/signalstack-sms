@@ -27,3 +27,13 @@ Milestone 4 does not call live providers.
 - Valid due jobs create idempotent outbound `Message` rows through the dummy provider.
 - Completed jobs are marked `COMPLETED`; campaigns are marked `COMPLETED`.
 - The worker must not call Twilio or any live provider.
+
+## Post-MVP Continuous Local Worker
+
+Continuous execution is opt-in and remains local/demo-safe:
+
+- `npm run worker` performs one processing pass and exits.
+- `npm run worker:watch` or `WORKER_MODE=continuous npm run worker` polls repeatedly.
+- `WORKER_POLL_INTERVAL_MS` controls the poll delay and is clamped to a safe minimum.
+- `WORKER_MAX_ITERATIONS` may cap local/test loops.
+- Every poll reuses the same dummy-only/live-disabled gate; blocked workers do not process or call providers.

@@ -1,4 +1,7 @@
 import { PrismaClient } from "@prisma/client";
+import { applyDemoSafeRuntimeDefaults } from "@/lib/env/defaults";
+
+applyDemoSafeRuntimeDefaults();
 
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;
@@ -13,4 +16,3 @@ export const prisma =
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
-

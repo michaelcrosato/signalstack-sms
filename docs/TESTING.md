@@ -15,3 +15,4 @@ Additional deterministic checks:
 
 - `npm run test:e2e:demo` runs the investor demo path after the local database has been migrated and seeded.
 - `npm run worker` processes local due scheduled campaign jobs through the dummy provider only.
+- `npm run worker:watch` runs the same worker in continuous polling mode for local demos. It is still blocked unless `MESSAGING_PROVIDER=dummy` and live messaging is disabled.

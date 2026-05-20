@@ -1,50 +1,35 @@
 # Codex Summary
 
-Run number: 3
+Run number: 4
 
 ## Completed
 
-- Advanced Milestone 10 hardening.
-- Strengthened `npm run contracts:check` so it verifies implemented API route/method pairs are documented in both `contracts/CONTRACT-API.md` and `docs/API_MAP.md`.
-- Added a tenant invariant check so tenant-scoped Prisma models must retain `orgId`.
-- Added `npm run test:e2e:demo` as the named seeded investor-demo Playwright path.
-- Updated testing/local-gate docs and testing contract for the new hardening checks.
-- Advanced a post-MVP webhook foundation checkpoint.
-- Added Twilio inbound/status webhook routes with signature validation, raw payload persistence, idempotency keys, and no outbound provider side effects.
-- Added `WebhookEvent` schema/migration and Twilio webhook helper tests.
-- Advanced a post-MVP provider settings checkpoint.
-- Added read-only `GET /api/settings/provider` with secret-safe Twilio readiness booleans, live messaging blockers, and provider settings tests.
-- Advanced a post-MVP local worker checkpoint.
-- Replaced the worker stub with a dummy-provider-only due scheduled campaign processor that writes idempotent outbound message rows and completes queue jobs/campaigns.
+- Advanced a post-MVP continuous local worker checkpoint.
+- Added opt-in worker polling through `npm run worker:watch`, `--watch`, or `WORKER_MODE=continuous`.
+- Kept `npm run worker` as a one-shot local processing pass.
+- Added worker runtime parsing for poll interval and bounded local/test loops through `WORKER_POLL_INTERVAL_MS` and `WORKER_MAX_ITERATIONS`.
+- Preserved the existing dummy-provider/live-disabled hard gate before every worker poll.
+- Centralized demo-safe runtime defaults, including the local development `DATABASE_URL`, before Prisma client initialization.
+- Repaired direct `npm run demo:seed` and Playwright demo server execution when the shell does not predefine `DATABASE_URL`.
+- Updated queue contract, architecture, testing, and local gate docs for the continuous worker slice.
 
 ## Validation
 
-- `npm run contracts:check`
-- `npm run test` after correcting an invalid one-off Vitest flag invocation
-- `npm run db:migrate` failed once without `DATABASE_URL`, then passed with the documented local database URL
-- `npm run demo:seed`
-- `npm run validate`
-- `npm run test:e2e:demo`
-- `npx prisma migrate dev --name post_mvp_webhook_events`
-- `npm run contracts:check`
+- `npm run test -- tests/unit/queue/worker.test.ts`
 - `npm run typecheck`
+- `WORKER_MAX_ITERATIONS=1 WORKER_POLL_INTERVAL_MS=1000 npm run worker:watch`
 - `npm run lint`
 - `npm run test`
-- `npm run validate`
-- `npm run demo:seed`
-- `npm run test:e2e:demo`
-- `npm run worker` failed once on top-level await/CJS output and was repaired
-- `npm run typecheck`
-- `npm run test`
-- `npm run worker`
-- `npm run validate`
-- `npm run demo:seed`
-- `npm run test:e2e:demo`
 - `npm run contracts:check`
-- `npm run typecheck`
-- `npm run test`
-- `npm run validate`
+- `npm run db:generate`
+- `DATABASE_URL=postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public npm run db:migrate`
 - `npm run demo:seed`
+- `npm run validate`
+- `npm run worker`
+- `npm run test -- tests/smoke/bootstrap.test.ts tests/unit/queue/worker.test.ts`
+- `npm run demo:seed`
+- `npm run validate`
 - `npm run test:e2e:demo`
+- `WORKER_MAX_ITERATIONS=1 WORKER_POLL_INTERVAL_MS=1000 npm run worker:watch`
 
-Latest full validation and demo E2E passed.
+Latest full validation, demo seed, seeded demo E2E, one-shot worker, and bounded continuous worker passed.

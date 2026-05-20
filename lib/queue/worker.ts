@@ -1,3 +1,4 @@
+import { setTimeout as sleep } from "node:timers/promises";
 import { CampaignStatus, QueueJobStatus, QueueJobType } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
@@ -9,8 +10,56 @@ export type WorkerSafetyInput = {
   messagingProvider?: string;
 };
 
+export type WorkerMode = "once" | "continuous";
+
+export type WorkerRuntimeOptions = {
+  mode: WorkerMode;
+  pollIntervalMs: number;
+  maxIterations?: number;
+};
+
+export type WorkerRunResult = Awaited<ReturnType<typeof processDueScheduledCampaignJobs>>;
+
+export type ContinuousWorkerInput = {
+  pollIntervalMs: number;
+  maxIterations?: number;
+  shouldContinue?: () => boolean;
+  onResult?: (result: WorkerRunResult, iteration: number) => void;
+};
+
+const DEFAULT_WORKER_POLL_INTERVAL_MS = 5000;
+const MIN_WORKER_POLL_INTERVAL_MS = 1000;
+
 export function localWorkerProviderIsAllowed(input: WorkerSafetyInput) {
   return input.liveMessagingEnabled !== "true" && (input.messagingProvider ?? "dummy") === "dummy";
+}
+
+function parsePositiveInteger(value: string | undefined) {
+  if (!value) {
+    return undefined;
+  }
+
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+export function parseWorkerRuntimeOptions(input: { argv?: string[]; env?: Record<string, string | undefined> } = {}): WorkerRuntimeOptions {
+  const argv = input.argv ?? [];
+  const env = input.env ?? process.env;
+  const explicitOnce = argv.includes("--once") || env.WORKER_MODE === "once";
+  const explicitContinuous =
+    argv.includes("--watch") || argv.includes("--continuous") || env.WORKER_MODE === "continuous";
+  const pollIntervalMs = Math.max(
+    parsePositiveInteger(env.WORKER_POLL_INTERVAL_MS) ?? DEFAULT_WORKER_POLL_INTERVAL_MS,
+    MIN_WORKER_POLL_INTERVAL_MS
+  );
+  const maxIterations = parsePositiveInteger(env.WORKER_MAX_ITERATIONS);
+
+  return {
+    mode: explicitContinuous && !explicitOnce ? "continuous" : "once",
+    pollIntervalMs,
+    ...(maxIterations ? { maxIterations } : {})
+  };
 }
 
 export function campaignMessageValues(contact: {
@@ -110,4 +159,24 @@ export async function processDueScheduledCampaignJobs(now = new Date()) {
     skipped,
     blocked: false
   };
+}
+
+export async function runContinuousScheduledCampaignWorker(input: ContinuousWorkerInput) {
+  const results: WorkerRunResult[] = [];
+  let iteration = 0;
+
+  while (input.shouldContinue?.() ?? true) {
+    iteration += 1;
+    const result = await processDueScheduledCampaignJobs();
+    results.push(result);
+    input.onResult?.(result, iteration);
+
+    if (result.blocked || (input.maxIterations && iteration >= input.maxIterations)) {
+      break;
+    }
+
+    await sleep(input.pollIntervalMs);
+  }
+
+  return results;
 }
