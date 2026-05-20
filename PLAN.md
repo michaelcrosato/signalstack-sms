@@ -50,18 +50,23 @@ Milestone 5:
 - Conversation assignment, internal notes, and resolve/reopen APIs
 - STOP/HELP parsing foundations with local-only consent updates
 
-## Active Milestone
-
 Milestone 6:
 
-- Compliance gates and demo mode expansion
-- Centralized provider/send hard gates
-- Compliance profile/checklist foundations
-- Demo scenarios for STOP/HELP and inbox flows
+- Centralized messaging hard gate
+- Compliance profile/checklist API foundations
+- Demo seed compliance readiness metadata
+- Hard-gate tests for live messaging, provider readiness, A2P status, and consent
 
-## Next Milestone
+## Active Milestone
 
 Milestone 7:
 
 - AI feature foundations
-- Fake AI provider-backed copy, reply suggestion, summaries, and lead qualification APIs
+- Fake AI provider-backed campaign copy, reply suggestions, summaries, and lead qualification APIs
+
+## Next Milestone
+
+Milestone 8:
+
+- Analytics and billing model foundations
+- Usage records, overview endpoint, and billing-safe metering

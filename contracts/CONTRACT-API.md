@@ -140,4 +140,12 @@ Resolves or reopens a conversation with `{ "resolved": true }` or `{ "resolved":
 
 Demo-only inbound entrypoint with the same behavior as `POST /api/inbox/conversations`.
 
+### `GET /api/settings/compliance`
+
+Returns the org-scoped compliance profile plus a checklist containing `complete`, `liveMessagingAllowed`, and `blockers`.
+
+### `PATCH /api/settings/compliance`
+
+Updates business identity, messaging use case, opt-in description, policy URLs, and demo A2P status metadata. This endpoint does not enable live SMS.
+
 Product endpoints must be specified here before implementation.

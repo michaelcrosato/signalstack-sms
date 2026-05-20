@@ -59,6 +59,13 @@ enum QueueJobStatus {
   FAILED
 }
 
+enum A2pRegistrationStatus {
+  NOT_STARTED
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model Organization {
   id            String         @id @default(cuid())
   name          String
@@ -80,6 +87,7 @@ model Organization {
   conversations Conversation[]
   messages      Message[]
   internalNotes InternalNote[]
+  complianceProfile ComplianceProfile?
 }
 
 model AppUser {
@@ -355,4 +363,20 @@ model InternalNote {
   @@index([orgId])
   @@index([conversationId])
   @@index([authorUserId])
+}
+
+model ComplianceProfile {
+  id                 String                @id @default(cuid())
+  orgId              String                @unique
+  businessName       String?
+  messagingUseCase   String?
+  optInDescription   String?
+  privacyPolicyUrl   String?
+  termsOfServiceUrl  String?
+  a2pRegistrationStatus A2pRegistrationStatus @default(NOT_STARTED)
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  org                Organization          @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
 }

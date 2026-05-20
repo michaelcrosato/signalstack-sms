@@ -63,3 +63,10 @@ Campaign recipients are selected only from contacts in the current organization.
 - `InternalNote`: tenant-scoped note linked to a conversation and author user.
 
 Conversation assignment is limited to active members of the current organization. Resolve/reopen changes only local conversation state.
+
+## Milestone 6 Compliance Profile Foundation
+
+- `ComplianceProfile`: one org-scoped record with business identity, messaging use case, opt-in description, policy URLs, and `a2pRegistrationStatus`.
+- `A2pRegistrationStatus`: `NOT_STARTED`, `PENDING`, `APPROVED`, `REJECTED`.
+
+Compliance profile completion is required by the centralized messaging hard gate but does not enable live messaging by itself.

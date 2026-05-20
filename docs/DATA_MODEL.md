@@ -49,3 +49,7 @@ Preflight reads contacts and returns compliance reasons. It does not create mess
 - `InternalNote` stores private team notes authored by organization users.
 
 STOP-class inbound keywords update local contact consent to `OPTED_OUT`. HELP is tracked without creating outbound provider activity.
+
+## Milestone 6 Compliance Profile
+
+`ComplianceProfile` stores one org-scoped go-live readiness record with business identity, messaging use case, opt-in description, policy URLs, and demo A2P registration status. It is consumed by the centralized messaging hard gate and does not enable live messaging by itself.

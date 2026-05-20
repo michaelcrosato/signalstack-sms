@@ -1,4 +1,10 @@
-import { ConsentStatus, ConversationStatus, MembershipRole, MembershipStatus } from "@prisma/client";
+import {
+  A2pRegistrationStatus,
+  ConsentStatus,
+  ConversationStatus,
+  MembershipRole,
+  MembershipStatus
+} from "@prisma/client";
 import { prisma } from "../lib/db/prisma";
 
 async function main() {
@@ -195,6 +201,27 @@ async function main() {
       conversationId: conversation.id,
       authorUserId: user.id,
       body: "Demo note: Ada is interested in SMB launch pricing."
+    }
+  });
+
+  await prisma.complianceProfile.upsert({
+    where: { orgId: org.id },
+    update: {
+      businessName: "SignalStack Demo Co",
+      messagingUseCase: "Demo-only marketing and shared inbox workflows.",
+      optInDescription: "Contacts are seeded with explicit demo consent and can reply STOP to opt out.",
+      privacyPolicyUrl: "https://example.com/privacy",
+      termsOfServiceUrl: "https://example.com/terms",
+      a2pRegistrationStatus: A2pRegistrationStatus.NOT_STARTED
+    },
+    create: {
+      orgId: org.id,
+      businessName: "SignalStack Demo Co",
+      messagingUseCase: "Demo-only marketing and shared inbox workflows.",
+      optInDescription: "Contacts are seeded with explicit demo consent and can reply STOP to opt out.",
+      privacyPolicyUrl: "https://example.com/privacy",
+      termsOfServiceUrl: "https://example.com/terms",
+      a2pRegistrationStatus: A2pRegistrationStatus.NOT_STARTED
     }
   });
 

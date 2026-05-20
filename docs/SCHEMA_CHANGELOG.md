@@ -26,3 +26,8 @@
 - Linked conversations to contacts and assignees.
 - Added `InternalNote` for shared inbox team notes.
 - Added message indexes for conversation/contact inbox reads.
+
+## Milestone 6
+
+- Added `A2pRegistrationStatus`.
+- Added `ComplianceProfile` as a one-to-one org-scoped go-live readiness record.

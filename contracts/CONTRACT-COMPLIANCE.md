@@ -33,3 +33,11 @@ Milestone 5 inbound rules:
 - STOP, STOPALL, UNSUBSCRIBE, CANCEL, END, and QUIT update the local contact to `OPTED_OUT` and set `optedOutAt`.
 - HELP is recorded as an inbound keyword but does not opt a contact in and does not send a live or dummy outbound response yet.
 - Inbox assignment, notes, resolve, and reopen operations are tenant-scoped.
+
+Milestone 6 hard gate rules:
+
+- The centralized messaging hard gate must block when `LIVE_MESSAGING_ENABLED` is not true.
+- The centralized messaging hard gate must block when `DEMO_MODE` is active.
+- The centralized messaging hard gate must block when the selected provider is `dummy`.
+- The centralized messaging hard gate must block when the compliance profile is incomplete or A2P status is not `APPROVED`.
+- Contact-level consent and opt-out checks remain required even if provider/configuration gates pass.
