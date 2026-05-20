@@ -248,6 +248,10 @@ Renders a read-only template operations view for the current organization. It ma
 
 Renders a read-only inbox operations view for the current organization. It may display conversation status counts, assignment counts, recent message/note counts, contact display names, assignee display names, and local inbox safety-boundary text. The page must not create messages, assign conversations, resolve conversations, add notes, mutate contacts or consent, call messaging providers, send notifications, create billing records, expose secrets, send SMS, or enable live messaging.
 
+### `/settings/team`
+
+Renders a read-only team operations view for the current organization. It may display organization metadata, membership role/status counts, member display names, member emails, assigned conversation counts, authored internal-note counts, and local team safety-boundary text. The page must not invite users, create users, update roles, suspend members, delete memberships, call Clerk, send email, send notifications, expose secrets, create billing records, call messaging providers, send SMS, or enable live messaging.
+
 ### `/`
 
 Renders the local launch dashboard. It may display demo-safe runtime defaults and links to existing local-only demo, readiness, provider metadata, system, usage, and admin export views. The page must not require database access, mutate records, call providers, create billing artifacts, send notifications, expose secrets, or enable live messaging.

@@ -38,6 +38,11 @@ const launchLinks = [
     description: "Read-only shared inbox status, assignment counts, recent messages, and safety boundary."
   },
   {
+    href: "/settings/team",
+    title: "Team Operations",
+    description: "Read-only organization metadata, membership roles, assigned threads, and safety boundary."
+  },
+  {
     href: "/settings/provider",
     title: "Provider Details",
     description: "Redacted local Twilio metadata, safe forms, rotation history, and CSV export."

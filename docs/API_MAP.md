@@ -91,6 +91,7 @@ Post-MVP provider settings foundation:
 - `/settings/audience`: renders a read-only local audience operations view with tag counts, list member counts, saved segment definitions, and segment update timestamps without changing memberships, evaluating segments for sends, provider calls, billing records, notifications, live messaging, mutations, or secrets.
 - `/settings/templates`: renders a read-only local template operations view with template counts, variable names, campaign usage, and text previews without editing copy, rendering live outbound messages, scheduling campaigns, provider calls, billing records, notifications, live messaging, mutations, or secrets.
 - `/settings/inbox`: renders a read-only local inbox operations view with conversation status, assignment counts, recent message/note counts, and inbox safety-boundary metadata without creating messages, assigning, resolving, provider calls, billing records, notifications, live messaging, mutations, or secrets.
+- `/settings/team`: renders a read-only local team operations view with organization metadata, membership role/status counts, assigned conversation counts, authored-note counts, and team safety-boundary metadata without inviting users, role changes, suspensions, membership deletion, Clerk calls, email, notifications, provider calls, billing records, live messaging, mutations, or secrets.
 
 Post-MVP provider number foundation:
 

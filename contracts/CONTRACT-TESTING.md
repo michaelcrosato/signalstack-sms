@@ -51,3 +51,7 @@ Post-MVP template operations view:
 Post-MVP inbox operations view:
 
 - The seeded investor demo path must verify that `/settings/inbox` renders read-only conversation status, recent conversation metadata, and safety-boundary text without creating messages, assigning conversations, resolving conversations, calling providers, billing, sending notifications, mutating contacts, or enabling live messaging.
+
+Post-MVP team operations view:
+
+- The seeded investor demo path must verify that `/settings/team` renders read-only organization metadata, membership role/status counts, recent member metadata, and safety-boundary text without inviting users, changing roles, suspending members, deleting memberships, calling Clerk, emailing, sending notifications, calling providers, billing, sending SMS, or enabling live messaging.

@@ -1,8 +1,17 @@
 # Codex Summary
 
-Run number: 19
+Run number: 20
 
 ## Completed
+
+- Advanced a post-MVP local team operations checkpoint.
+- Added `/settings/team`, a read-only page that renders organization metadata, membership role/status counts, assigned conversation counts, authored internal-note counts, member display names/emails, and a safety boundary.
+- Seeded demo-safe local manager and sales memberships without invites, email, notifications, Clerk calls, provider calls, billing, live SMS, or secrets.
+- Linked the team operations view from `/`, `/demo`, `/settings`, `/settings/inbox`, and `/settings/runbook`.
+- Extended the Playwright smoke test and seeded investor demo E2E path to cover the team operations view.
+- Updated API/testing contracts, API map, demo-mode docs, local operator runbook, README, PLAN, and next prompt handoff docs.
+
+## Prior Completed
 
 - Advanced a third post-MVP local audience operations checkpoint.
 - Added `/settings/audience`, a read-only page that renders tenant-scoped tag counts, list member counts, saved segment definitions, segment update timestamps, and a safety boundary.
@@ -14,22 +23,23 @@ Run number: 19
 - Linked the template operations view from `/`, `/demo`, `/settings`, `/settings/campaigns`, `/settings/contacts`, `/settings/inbox`, `/settings/usage`, `/settings/system`, `/settings/compliance`, `/settings/exports`, and `/settings/runbook`.
 - Extended the Playwright smoke test and seeded investor demo E2E path to cover the template operations view.
 - Updated API/testing contracts, API map, demo-mode docs, local operator runbook, README, PLAN, and next prompt handoff docs.
-- Advanced a post-MVP local contact operations checkpoint.
-- Added `/settings/contacts`, a read-only page that renders tenant-scoped contact consent counts, CSV import status and row totals, tag counts, list counts, recent import metadata, recent contact metadata, and a local safety boundary.
-- Linked the contact operations view from `/`, `/demo`, `/settings`, `/settings/campaigns`, `/settings/inbox`, `/settings/usage`, `/settings/system`, `/settings/compliance`, `/settings/exports`, and `/settings/runbook`.
-- Extended the Playwright smoke test and seeded investor demo E2E path to cover the contact operations view.
-- Updated API/testing contracts, API map, demo-mode docs, local operator runbook, README, PLAN, and next prompt handoff docs.
-
-## Prior Completed
-
 - Completed Milestones 0-10.
-- Added post-MVP webhook foundations, provider settings/readiness, local workers, BullMQ optional smoke/worker foundations, readiness UI, production gates/runbooks, API rate limiting, provider credential metadata management, local admin exports, system status, usage/analytics, launch dashboard, operator runbook app view, compliance detail, provider numbers, campaign operations, and inbox operations.
+- Added post-MVP webhook foundations, provider settings/readiness, local workers, BullMQ optional smoke/worker foundations, readiness UI, production gates/runbooks, API rate limiting, provider credential metadata management, local admin exports, system status, usage/analytics, launch dashboard, operator runbook app view, compliance detail, provider numbers, campaign operations, contact operations, audience operations, template operations, and inbox operations.
 
 ## Validation
 
 - `npm run typecheck`
 - `npm run contracts:check`
 - `npm run lint`
+- `npm run test`
+- `npm run db:generate`
+- `npm run validate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
+- `npm run typecheck`
+- `npm run contracts:check`
+- `npm run lint`
 - `npm run validate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
@@ -47,4 +57,4 @@ Run number: 19
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 
-Latest full validation and seeded demo E2E passed.
+Latest full validation, local migration check, demo seed, and seeded demo E2E passed.

@@ -23,6 +23,32 @@ async function main() {
     }
   });
 
+  const managerUser = await prisma.appUser.upsert({
+    where: { clerkUserId: "demo_user_manager_signalstack" },
+    update: {
+      email: "manager@signalstack.example",
+      displayName: "Demo Manager"
+    },
+    create: {
+      clerkUserId: "demo_user_manager_signalstack",
+      email: "manager@signalstack.example",
+      displayName: "Demo Manager"
+    }
+  });
+
+  const salesUser = await prisma.appUser.upsert({
+    where: { clerkUserId: "demo_user_sales_signalstack" },
+    update: {
+      email: "sales@signalstack.example",
+      displayName: "Demo Sales"
+    },
+    create: {
+      clerkUserId: "demo_user_sales_signalstack",
+      email: "sales@signalstack.example",
+      displayName: "Demo Sales"
+    }
+  });
+
   const org = await prisma.organization.upsert({
     where: { slug: "demo-signalstack" },
     update: {
@@ -51,6 +77,44 @@ async function main() {
       orgId: org.id,
       userId: user.id,
       role: MembershipRole.OWNER,
+      status: MembershipStatus.ACTIVE
+    }
+  });
+
+  await prisma.membership.upsert({
+    where: {
+      orgId_userId: {
+        orgId: org.id,
+        userId: managerUser.id
+      }
+    },
+    update: {
+      role: MembershipRole.ADMIN,
+      status: MembershipStatus.ACTIVE
+    },
+    create: {
+      orgId: org.id,
+      userId: managerUser.id,
+      role: MembershipRole.ADMIN,
+      status: MembershipStatus.ACTIVE
+    }
+  });
+
+  await prisma.membership.upsert({
+    where: {
+      orgId_userId: {
+        orgId: org.id,
+        userId: salesUser.id
+      }
+    },
+    update: {
+      role: MembershipRole.MEMBER,
+      status: MembershipStatus.ACTIVE
+    },
+    create: {
+      orgId: org.id,
+      userId: salesUser.id,
+      role: MembershipRole.MEMBER,
       status: MembershipStatus.ACTIVE
     }
   });

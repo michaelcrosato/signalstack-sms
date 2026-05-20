@@ -161,6 +161,18 @@ Use `/settings/inbox` for read-only shared inbox review before demos or inbox re
 
 The page is display-only. It must not create messages, assign conversations, resolve conversations, add notes, mutate contacts or consent, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
+## Team Operations
+
+Use `/settings/team` for read-only organization and membership review before demos or auth repair work. It displays:
+
+- organization metadata
+- membership role and status counts
+- assigned conversation counts
+- authored internal-note counts
+- member display names and emails
+
+The page is display-only. It must not invite users, create users, change roles, suspend members, delete memberships, call Clerk, send email, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
+
 ## Compliance Detail
 
 Use `/settings/compliance` for read-only compliance profile review before demos or repair work. It displays:
