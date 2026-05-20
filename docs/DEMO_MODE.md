@@ -24,6 +24,8 @@ The usage and analytics screen at `/settings/usage` displays local tenant-scoped
 
 The campaign operations screen at `/settings/campaigns` displays existing local campaign status, recipient counts, scheduled campaign metadata, and queue job status. It is read-only and does not schedule campaigns, run workers, mutate queue rows, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
+The queue operations screen at `/settings/queue` displays scheduled-campaign queue job counts, due/future timing, payload validity, idempotency keys, worker poll settings, queue backend metadata, and Redis presence. It is read-only and does not enqueue jobs, run workers, mutate queue rows, update campaigns, call Redis, call providers, create billing records, send notifications, send SMS, expose secrets, or enable live messaging.
+
 The contact operations screen at `/settings/contacts` displays existing local contact consent counts, CSV import status, tag counts, list counts, and recent contact/import metadata. It is read-only and does not import contacts, update consent, mutate tags or lists, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
 The data operations screen at `/settings/data` displays tenant-scoped local record totals, active and archived contact counts, import row totals, retention signals, and recent archived contact metadata. It is read-only and does not hard-delete records, restore archived contacts, run exports, mutate records, call providers, create billing records, send notifications, send SMS, call live AI, expose secrets, or enable live features.

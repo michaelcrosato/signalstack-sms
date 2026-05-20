@@ -51,6 +51,13 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Campaign Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Queue Status" })).toBeVisible();
   await expect(page.getByText("Safety Boundary")).toBeVisible();
+  await page.getByRole("link", { name: "Queue Operations" }).click();
+  await expect(page.getByRole("heading", { name: "Queue Operations" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Queue Status" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Worker Boundary" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Scheduled Timing" })).toBeVisible();
+  await expect(page.getByText("Safety Boundary")).toBeVisible();
+  await page.getByRole("link", { name: "Campaign Operations" }).click();
   await page.getByRole("link", { name: "Contact Operations" }).click();
   await expect(page.getByRole("heading", { name: "Contact Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Consent Status" })).toBeVisible();

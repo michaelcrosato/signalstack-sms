@@ -132,6 +132,7 @@ Post-MVP:
 - Read-only local API operations view
 - Read-only local security operations view
 - Read-only local data operations view
+- Read-only local queue operations view
 
 ## Next Milestone
 

@@ -62,6 +62,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/settings/campaigns">
           Campaign Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/queue">
+          Queue Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/contacts">
           Contact Operations
         </Link>
@@ -170,6 +173,16 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <p className="text-sm leading-6 text-slate-700">
           Review campaign status, recipient counts, and queued scheduled-campaign jobs without running workers, sending SMS,
           mutating queue rows, or enabling provider integrations.
+        </p>
+      </Panel>
+
+      <Panel title="Queue Operations">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/queue">
+          Queue Operations
+        </Link>
+        <p className="text-sm leading-6 text-slate-700">
+          Review scheduled job timing, queue status, payload validity, and worker settings without running workers,
+          mutating jobs, calling Redis, calling providers, billing, sending notifications, or enabling live messaging.
         </p>
       </Panel>
 

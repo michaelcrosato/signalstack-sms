@@ -36,6 +36,10 @@ Post-MVP campaign operations view:
 
 - The seeded investor demo path must verify that `/settings/campaigns` renders read-only campaign status, queue status, and safety-boundary metadata without scheduling campaigns, running workers, calling providers, billing, sending notifications, mutating queue rows, or enabling live messaging.
 
+Post-MVP queue operations view:
+
+- The seeded investor demo path must verify that `/settings/queue` renders read-only scheduled job timing, queue status, worker boundary, payload validity, and safety-boundary metadata without enqueueing jobs, running workers, calling Redis, calling providers, billing, sending notifications, mutating queue rows, updating campaigns, or enabling live messaging.
+
 Post-MVP contact operations view:
 
 - The seeded investor demo path must verify that `/settings/contacts` renders read-only consent status, import status, recent contact metadata, and safety-boundary text without importing contacts, mutating consent, changing labels, calling providers, billing, sending notifications, or enabling live messaging.

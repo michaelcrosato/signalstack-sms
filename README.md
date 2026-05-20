@@ -45,6 +45,8 @@ Local usage and analytics review is available at `/settings/usage`. It renders e
 
 Campaign operations review is available at `/settings/campaigns`. It renders existing campaign status, recipient counts, queue job state, and worker boundaries only; it does not schedule campaigns, run workers, mutate queue rows, call providers, bill, notify, send SMS, or enable live messaging.
 
+Queue operations review is available at `/settings/queue`. It renders scheduled job timing, due/future status, payload validity, worker settings, queue backend metadata, and idempotency keys only; it does not enqueue jobs, run workers, mutate queue rows, update campaigns, call Redis, call providers, bill, notify, send SMS, or enable live messaging.
+
 Contact operations review is available at `/settings/contacts`. It renders existing consent status, CSV import state, tag counts, list counts, and recent contact metadata only; it does not import contacts, update consent, mutate labels, call providers, bill, notify, send SMS, or enable live messaging.
 
 Data operations review is available at `/settings/data`. It renders tenant-scoped local record totals, soft-archive state, import ledger totals, retention signals, and recent archived contact metadata only; it does not hard-delete or restore records, run exports, mutate data, call providers, bill, notify, call live AI, send SMS, expose secrets, or enable live features.

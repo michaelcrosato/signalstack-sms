@@ -117,6 +117,18 @@ Use `/settings/campaigns` for read-only campaign and queue review before demos o
 
 The page is display-only. It must not schedule campaigns, cancel campaigns, run workers, mutate queue rows, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
+## Queue Operations
+
+Use `/settings/queue` for read-only scheduled queue review before demos or worker repair work. It displays:
+
+- scheduled job status counts
+- due versus future queued jobs
+- scheduled-campaign payload validity
+- worker poll settings and queue backend metadata
+- Redis presence without opening Redis connections
+
+The page is display-only. It must not enqueue jobs, run workers, mutate queue rows, update campaign status, call Redis, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
+
 ## Contact Operations
 
 Use `/settings/contacts` for read-only contact data review before demos or import repair work. It displays:

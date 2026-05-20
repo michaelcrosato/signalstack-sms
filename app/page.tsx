@@ -18,6 +18,11 @@ const launchLinks = [
     description: "Read-only campaign status, recipient counts, queued jobs, and local worker boundary."
   },
   {
+    href: "/settings/queue",
+    title: "Queue Operations",
+    description: "Read-only scheduled job timing, payload validity, worker settings, and queue safety boundary."
+  },
+  {
     href: "/settings/contacts",
     title: "Contact Operations",
     description: "Read-only contact consent, imports, tags, lists, and local data safety boundary."
