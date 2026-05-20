@@ -232,6 +232,10 @@ Renders a read-only local usage and analytics view for the current organization.
 
 Renders a read-only campaign operations view for the current organization. It may display existing campaign status counts, recipient counts, scheduled campaign metadata, queue job status counts, idempotency keys, and local worker boundary text. The page must not create, update, schedule, cancel, send, or delete campaigns; run workers; mutate queue rows; call messaging providers; create billing records; send notifications; expose secrets; or enable live messaging.
 
+### `/settings/contacts`
+
+Renders a read-only contact operations view for the current organization. It may display active contact counts, consent status counts, contact import status counts, imported/failed row totals, tag counts, list counts, and recent contact/import metadata. The page must not import contacts, create or update contacts, update consent, mutate tags/lists, hard-delete records, call messaging providers, send notifications, create billing records, expose secrets, send SMS, or enable live messaging.
+
 ### `/settings/inbox`
 
 Renders a read-only inbox operations view for the current organization. It may display conversation status counts, assignment counts, recent message/note counts, contact display names, assignee display names, and local inbox safety-boundary text. The page must not create messages, assign conversations, resolve conversations, add notes, mutate contacts or consent, call messaging providers, send notifications, create billing records, expose secrets, send SMS, or enable live messaging.

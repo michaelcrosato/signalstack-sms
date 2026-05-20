@@ -38,6 +38,9 @@ export default async function CampaignOperationsPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/usage">
           Usage & Analytics
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/contacts">
+          Contact Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/inbox">
           Inbox Operations
         </Link>

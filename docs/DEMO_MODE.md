@@ -24,6 +24,8 @@ The usage and analytics screen at `/settings/usage` displays local tenant-scoped
 
 The campaign operations screen at `/settings/campaigns` displays existing local campaign status, recipient counts, scheduled campaign metadata, and queue job status. It is read-only and does not schedule campaigns, run workers, mutate queue rows, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
+The contact operations screen at `/settings/contacts` displays existing local contact consent counts, CSV import status, tag counts, list counts, and recent contact/import metadata. It is read-only and does not import contacts, update consent, mutate tags or lists, call providers, create billing records, send notifications, send SMS, or enable live messaging.
+
 The inbox operations screen at `/settings/inbox` displays existing local conversation status, assignment counts, recent message and note counts, and shared inbox safety boundaries. It is read-only and does not create messages, assign conversations, resolve threads, mutate contacts or consent, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
 The root route `/` is a static local launch dashboard. It shows the demo-safe runtime defaults and links to the existing demo, readiness, provider metadata, system status, usage, and admin export views without requiring database access or creating side effects.

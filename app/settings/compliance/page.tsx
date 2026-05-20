@@ -41,6 +41,9 @@ export default async function ComplianceSettingsPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/system">
           System Status
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/contacts">
+          Contact Operations
+        </Link>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Compliance Detail</h1>

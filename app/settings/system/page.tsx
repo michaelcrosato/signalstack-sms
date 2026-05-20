@@ -21,6 +21,9 @@ export default async function SystemStatusPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/usage">
           Usage & Analytics
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/contacts">
+          Contact Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
           Operator Runbook
         </Link>

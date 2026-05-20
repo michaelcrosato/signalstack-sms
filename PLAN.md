@@ -121,6 +121,7 @@ Post-MVP:
 - Read-only local compliance detail view
 - Read-only local provider numbers view
 - Read-only local campaign operations view
+- Read-only local contact operations view
 - Read-only local inbox operations view
 
 ## Next Milestone
