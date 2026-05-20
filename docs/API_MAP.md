@@ -74,6 +74,7 @@ Post-MVP webhook foundation:
 
 Post-MVP provider settings foundation:
 
+- `/`: renders a static local launch dashboard with demo-safe defaults and links to existing local-only admin/demo views without database access, mutations, provider calls, billing artifacts, notifications, live messaging, or secrets.
 - `GET /api/settings/provider`: returns secret-safe provider readiness, live messaging blockers, and Twilio credential presence booleans.
 - `PATCH /api/settings/provider`: stores local redacted Twilio credential readiness metadata without raw token persistence, provider calls, or live sends.
 - `DELETE /api/settings/provider`: clears local Twilio credential readiness metadata without provider calls or live-send side effects.

@@ -46,6 +46,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP local system status view: `/settings/system` renders a read-only operations snapshot of demo/live flags, runtime markers, queue backend metadata, worker poll limits, and API rate-limit policy; unit tests and the investor demo E2E cover it without mutations, provider calls, billing records, notifications, live messaging, or secrets.
 - Post-MVP deployment platform notes: `docs/DEPLOYMENT_PLATFORM_NOTES.md` documents demo-safe production-like hosting defaults, build/release commands, smoke routes, worker boundaries, forbidden live-impact env values, and future platform gates; `npm run platform:check` is included in validation.
 - Post-MVP local usage and analytics view: `/settings/usage` renders read-only tenant-scoped metrics, local usage totals, billing boundary status, and recent usage events; the investor demo E2E covers it without Stripe calls, billing provider artifacts, notifications, provider calls, live messaging, mutations, or secrets.
+- Post-MVP local launch dashboard: `/` now renders a static local command center with demo-safe defaults and links to the seeded demo, go-live readiness, provider details, system status, usage, and admin exports without database access, mutations, provider calls, billing artifacts, notifications, live messaging, or secrets.
 
 Demo-safe defaults remain mandatory:
 
@@ -76,7 +77,7 @@ READ FIRST:
 SCOPE:
 - Preserve all Milestone 0-10 gates and demo-safe defaults.
 - Implement the next post-MVP slice only when contracts/docs are updated first.
-- Good candidate slices: safe metadata form refinements, local operator runbook expansion, additional read-only admin views, or dashboard links to existing local-only reports.
+- Good candidate slices: local operator runbook expansion, additional read-only admin views, safe dashboard refinements, or deeper links from the local launch dashboard into existing local-only reports.
 - Keep live SMS, live billing, real notifications, live AI, and real provider calls blocked unless explicit future hard gates are implemented and tested.
 - Run the full local gate and seeded demo path before committing.
 

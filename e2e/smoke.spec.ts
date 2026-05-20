@@ -1,8 +1,15 @@
 import { expect, test } from "@playwright/test";
 
-test("Milestone 0 home page renders demo-safe defaults", async ({ page }) => {
+test("home page renders local launch dashboard and demo-safe defaults", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "SignalStack SMS" })).toBeVisible();
+  await expect(page.getByText("Local Launch Dashboard")).toBeVisible();
+  await expect(page.getByRole("link", { name: /Demo Console/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Go-Live Readiness/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Provider Details/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /System Status/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Usage & Analytics/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Admin Exports/ })).toBeVisible();
   await expect(page.getByText("DEMO_MODE")).toBeVisible();
   await expect(page.getByText("MESSAGING_PROVIDER")).toBeVisible();
 });

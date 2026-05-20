@@ -1,8 +1,16 @@
 # Codex Summary
 
-Run number: 14
+Run number: 15
 
 ## Completed
+
+- Advanced a post-MVP local launch dashboard checkpoint.
+- Updated `/` from the original Milestone 0 scaffold copy into a static local command center with links to `/demo`, `/settings`, `/settings/provider`, `/settings/system`, `/settings/usage`, and `/settings/exports`.
+- Kept the root page no-database and read-only: it does not mutate records, call providers, create billing provider artifacts, send notifications, expose secrets, or enable live messaging.
+- Extended the Playwright smoke test to verify the dashboard links and demo-safe defaults.
+- Updated API contract/docs, API map, demo-mode docs, testing docs, README, PLAN, and next prompt handoff docs for the local launch dashboard.
+
+## Prior Completed
 
 - Advanced a post-MVP local usage and analytics admin-view checkpoint.
 - Added `/settings/usage`, a read-only page that renders tenant-scoped contact, campaign, conversation, message, local usage totals, billing boundary status, and recent usage events.
@@ -18,6 +26,12 @@ Run number: 14
 
 ## Validation
 
+- `npm run typecheck`
+- `npm run lint`
+- `npm run contracts:check`
+- `npm run validate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 - `npm run typecheck`
 - `npm run contracts:check`
 - `npm run lint`
