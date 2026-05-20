@@ -248,6 +248,10 @@ Renders a read-only template operations view for the current organization. It ma
 
 Renders a read-only inbox operations view for the current organization. It may display conversation status counts, assignment counts, recent message/note counts, contact display names, assignee display names, and local inbox safety-boundary text. The page must not create messages, assign conversations, resolve conversations, add notes, mutate contacts or consent, call messaging providers, send notifications, create billing records, expose secrets, send SMS, or enable live messaging.
 
+### `/settings/webhooks`
+
+Renders a read-only webhook operations view for the current organization. It may display Twilio webhook route coverage, local stored webhook event counts, provider/event-type summaries, recent idempotency keys, received timestamps, and webhook safety-boundary text. The page must not replay webhooks, create webhook events, mutate messages or contacts, call Twilio, send automatic replies, send notifications, expose secrets, create billing records, send SMS, or enable live messaging.
+
 ### `/settings/team`
 
 Renders a read-only team operations view for the current organization. It may display organization metadata, membership role/status counts, member display names, member emails, assigned conversation counts, authored internal-note counts, and local team safety-boundary text. The page must not invite users, create users, update roles, suspend members, delete memberships, call Clerk, send email, send notifications, expose secrets, create billing records, call messaging providers, send SMS, or enable live messaging.

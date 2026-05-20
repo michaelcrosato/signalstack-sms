@@ -161,6 +161,18 @@ Use `/settings/inbox` for read-only shared inbox review before demos or inbox re
 
 The page is display-only. It must not create messages, assign conversations, resolve conversations, add notes, mutate contacts or consent, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
+## Webhook Operations
+
+Use `/settings/webhooks` for read-only webhook review before demos or webhook repair work. It displays:
+
+- Twilio webhook route coverage
+- local stored webhook event counts
+- provider and event-type summaries
+- recent webhook idempotency keys
+- local webhook safety boundary
+
+The page is display-only. It must not replay payloads, create webhook events, mutate messages or contacts, call Twilio, send automatic replies, expose secrets, create billing records, send notifications, send SMS, or enable live messaging.
+
 ## Team Operations
 
 Use `/settings/team` for read-only organization and membership review before demos or auth repair work. It displays:

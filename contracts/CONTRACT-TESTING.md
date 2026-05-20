@@ -63,3 +63,7 @@ Post-MVP billing operations view:
 Post-MVP AI operations view:
 
 - The seeded investor demo path must verify that `/settings/ai` renders read-only fake-provider status, deterministic endpoint coverage, recent local AI usage metadata, and safety-boundary text without prompt submission, live AI calls, paid model requests, billing artifacts, notifications, provider calls, SMS, or live AI enablement.
+
+Post-MVP webhook operations view:
+
+- The seeded investor demo path must verify that `/settings/webhooks` renders read-only Twilio route coverage, event-type summaries, recent local webhook metadata, and safety-boundary text without webhook replay, provider calls, outbound replies, message/contact mutation, notifications, billing records, SMS, or live messaging enablement.

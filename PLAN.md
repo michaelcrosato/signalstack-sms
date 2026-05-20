@@ -125,6 +125,7 @@ Post-MVP:
 - Read-only local audience operations view
 - Read-only local template operations view
 - Read-only local inbox operations view
+- Read-only local webhook operations view
 - Read-only local team operations view
 - Read-only local billing operations view
 - Read-only local AI operations view

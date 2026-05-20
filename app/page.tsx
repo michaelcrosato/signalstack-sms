@@ -38,6 +38,11 @@ const launchLinks = [
     description: "Read-only shared inbox status, assignment counts, recent messages, and safety boundary."
   },
   {
+    href: "/settings/webhooks",
+    title: "Webhook Operations",
+    description: "Read-only Twilio webhook route coverage, idempotency metadata, and local event history."
+  },
+  {
     href: "/settings/team",
     title: "Team Operations",
     description: "Read-only organization metadata, membership roles, assigned threads, and safety boundary."
