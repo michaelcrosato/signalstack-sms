@@ -81,6 +81,12 @@ enum BillingAccountStatus {
   CANCELLED
 }
 
+enum ProviderPhoneNumberStatus {
+  DEMO
+  CONFIGURED
+  DISABLED
+}
+
 model Organization {
   id            String         @id @default(cuid())
   name          String
@@ -106,6 +112,7 @@ model Organization {
   usageEvents   UsageEvent[]
   billingAccount BillingAccount?
   webhookEvents WebhookEvent[]
+  providerPhoneNumbers ProviderPhoneNumber[]
 }
 
 model AppUser {
@@ -431,6 +438,25 @@ model BillingAccount {
 
   @@index([orgId])
   @@index([status])
+}
+
+model ProviderPhoneNumber {
+  id           String                    @id @default(cuid())
+  orgId        String
+  phoneNumber  String
+  label        String?
+  provider     String                    @default("dummy")
+  status       ProviderPhoneNumberStatus @default(DEMO)
+  capabilities Json
+  isDefault    Boolean                   @default(false)
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+  org          Organization              @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, phoneNumber])
+  @@index([orgId])
+  @@index([orgId, isDefault])
+  @@index([orgId, provider])
 }
 
 model WebhookEvent {

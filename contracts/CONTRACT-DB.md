@@ -76,7 +76,12 @@ Compliance profile completion is required by the centralized messaging hard gate
 - `UsageEvent`: tenant-scoped local usage record with `type`, `quantity`, optional JSON metadata, and timestamp.
 - `BillingAccount`: one org-scoped billing metadata record with local status and live-billing flag.
 - `WebhookEvent`: org-scoped raw provider webhook record with provider, event type, unique idempotency key, raw payload, received timestamp, and processed timestamp.
+- `ProviderPhoneNumber`: org-scoped phone-number metadata with `phoneNumber`, provider name, local status, capabilities, and default-number marker.
 - `UsageEventType`: `CONTACT_IMPORTED`, `MESSAGE_INBOUND`, `CAMPAIGN_SCHEDULED`, `AI_REQUEST`.
 - `BillingAccountStatus`: `DEMO`, `TRIALING`, `ACTIVE`, `PAST_DUE`, `CANCELLED`.
 
 Billing records are local metadata only. Stripe/customer/subscription IDs are nullable placeholders and must not be created by MVP endpoints.
+
+## Post-MVP Provider Number Foundation
+
+`ProviderPhoneNumber` records are configuration metadata only. Creating or updating one must not provision a provider number, validate ownership with Twilio, store credentials, enable live messaging, or send SMS.

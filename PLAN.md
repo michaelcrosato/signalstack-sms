@@ -92,6 +92,7 @@ Post-MVP:
 - Webhook foundations for Twilio inbound/status callbacks
 - Read-only provider settings readiness endpoint
 - Local dummy-provider scheduled campaign worker
+- Local provider phone-number metadata API and demo seed
 - UI expansion
 - Production deployment gates
 
@@ -99,4 +100,4 @@ Post-MVP:
 
 Post-MVP:
 
-- UI expansion, continuous worker execution, provider credential management, status transition processing, and production deployment gates
+- UI expansion, Redis/BullMQ worker integration, rate limiting, live-readiness audit trails, provider credential management, and production deployment gates

@@ -227,6 +227,24 @@ async function main() {
     }
   });
 
+  await prisma.providerPhoneNumber.upsert({
+    where: { orgId_phoneNumber: { orgId: org.id, phoneNumber: "+15555550199" } },
+    update: {
+      label: "Demo local number",
+      provider: "dummy",
+      capabilities: ["sms"],
+      isDefault: true
+    },
+    create: {
+      orgId: org.id,
+      phoneNumber: "+15555550199",
+      label: "Demo local number",
+      provider: "dummy",
+      capabilities: ["sms"],
+      isDefault: true
+    }
+  });
+
   await prisma.billingAccount.upsert({
     where: { orgId: org.id },
     update: {

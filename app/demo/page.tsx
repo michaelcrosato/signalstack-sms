@@ -5,15 +5,17 @@ import { getUsageSummary } from "@/lib/billing/metering";
 import { listCampaigns } from "@/lib/db/repositories/campaigns";
 import { listContacts } from "@/lib/db/repositories/contacts";
 import { listConversations } from "@/lib/db/repositories/inbox";
+import { listProviderPhoneNumbers } from "@/lib/db/repositories/provider-numbers";
 
 export const dynamic = "force-dynamic";
 
 export default async function DemoPage() {
   const currentOrg = await getOrCreateCurrentOrg();
-  const [contacts, campaigns, conversations, analytics, usage] = await Promise.all([
+  const [contacts, campaigns, conversations, numbers, analytics, usage] = await Promise.all([
     listContacts(currentOrg.orgId),
     listCampaigns(currentOrg.orgId),
     listConversations(currentOrg.orgId),
+    listProviderPhoneNumbers(currentOrg.orgId),
     getAnalyticsOverview(currentOrg.orgId),
     getUsageSummary(currentOrg.orgId)
   ]);
@@ -46,7 +48,7 @@ export default async function DemoPage() {
         <Metric label="Campaigns" value={campaigns.length} />
         <Metric label="Conversations" value={conversations.length} />
         <Metric label="Messages" value={analytics.messages.total} />
-        <Metric label="AI usage" value={usage.totals.AI_REQUEST} />
+        <Metric label="Numbers" value={numbers.length} />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
@@ -79,6 +81,7 @@ export default async function DemoPage() {
       <section className="grid gap-6 lg:grid-cols-3">
         <Panel title="Latest Contacts" items={contacts.slice(0, 4).map((contact) => contact.displayName ?? contact.phone)} />
         <Panel title="Campaigns" items={campaigns.slice(0, 4).map((campaign) => `${campaign.name} (${campaign.status})`)} />
+        <Panel title="Numbers" items={numbers.slice(0, 4).map((number) => `${number.phoneNumber} (${number.provider})`)} />
         <Panel
           title="Inbox"
           items={conversations.slice(0, 4).map((conversation) => {

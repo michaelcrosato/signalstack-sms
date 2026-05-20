@@ -73,3 +73,7 @@ Provider delivery state is stored on `Message` rows:
 - `providerErrorCode`: latest provider error code when present.
 - `deliveredAt`: set when a provider status reaches `delivered`.
 - `failedAt`: set when a provider status reaches `failed` or `undelivered`.
+
+## Post-MVP Provider Number Foundation
+
+`ProviderPhoneNumber` stores org-scoped phone-number metadata for demo and future provider setup screens. It tracks phone number, provider, local status, capabilities, and default selection. These rows are not credentials and do not prove live provider ownership.

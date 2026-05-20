@@ -76,4 +76,9 @@ Post-MVP provider settings foundation:
 
 - `GET /api/settings/provider`: returns secret-safe provider readiness, live messaging blockers, and Twilio credential presence booleans.
 
+Post-MVP provider number foundation:
+
+- `GET /api/settings/numbers`: lists local provider phone-number metadata.
+- `POST /api/settings/numbers`: creates or updates local provider phone-number metadata without provisioning, provider calls, or live sends.
+
 Product API routes must be added to `contracts/CONTRACT-API.md` before implementation.

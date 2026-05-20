@@ -17,3 +17,9 @@ Post-MVP provider settings foundation:
 - `GET /api/settings/provider` is read-only and secret-safe.
 - Provider readiness may expose credential presence booleans only.
 - Provider readiness must not return credential values, mutate settings, enable live messaging, or call Twilio.
+
+Post-MVP provider number foundation:
+
+- `GET /api/settings/numbers` and `POST /api/settings/numbers` manage local phone-number metadata only.
+- Number metadata may record provider name, capabilities, local status, and default selection.
+- Number metadata must not be treated as proof that a live Twilio number is owned, provisioned, or safe to send from.

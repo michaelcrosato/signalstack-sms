@@ -81,6 +81,7 @@ const tenantScopedModels = [
   "ComplianceProfile",
   "UsageEvent",
   "BillingAccount",
+  "ProviderPhoneNumber",
   "WebhookEvent"
 ];
 

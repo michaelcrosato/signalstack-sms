@@ -45,3 +45,7 @@
 ## Post-MVP Status Transition Processing
 
 - Added `Message.providerStatus`, `Message.providerErrorCode`, `Message.deliveredAt`, and `Message.failedAt` for local delivery-status updates from provider callbacks.
+
+## Post-MVP Provider Number Foundation
+
+- Added `ProviderPhoneNumber` and `ProviderPhoneNumberStatus` for org-scoped local number metadata.

@@ -188,4 +188,12 @@ Accepts Twilio `application/x-www-form-urlencoded` delivery status webhooks. The
 
 Returns secret-safe messaging provider readiness for the current organization: selected provider, demo mode, live messaging flag, live messaging blockers, compliance readiness, and Twilio credential presence booleans. This endpoint must not return credential values, mutate provider state, or enable live SMS.
 
+### `GET /api/settings/numbers`
+
+Returns tenant-scoped provider phone-number metadata for the current organization. This endpoint must not call Twilio or expose credentials.
+
+### `POST /api/settings/numbers`
+
+Creates or updates tenant-scoped provider phone-number metadata from `{ "phoneNumber": "+15555550123", "provider": "dummy", "capabilities": ["sms"], "isDefault": true }`. This endpoint is local metadata only; it must not provision numbers, validate live ownership, store secrets, enable live messaging, or send SMS.
+
 Product endpoints must be specified here before implementation.
