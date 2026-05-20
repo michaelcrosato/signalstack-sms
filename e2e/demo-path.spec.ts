@@ -4,6 +4,12 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await page.goto("/demo");
   await expect(page.getByRole("heading", { name: "SignalStack Demo Console" })).toBeVisible();
   await expect(page.getByText("Live messaging, live billing, and live AI remain blocked.")).toBeVisible();
+  await page.getByRole("link", { name: "System Status" }).click();
+  await expect(page.getByRole("heading", { name: "System Status" })).toBeVisible();
+  await expect(page.getByText("Safety Defaults")).toBeVisible();
+  await expect(page.getByText("Runtime")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Queue" })).toBeVisible();
+  await expect(page.getByText("API Protection")).toBeVisible();
   await page.getByRole("link", { name: "Go-Live Readiness" }).click();
   await expect(page.getByRole("heading", { name: "Go-Live Readiness" })).toBeVisible();
   await expect(page.getByText("Twilio Readiness")).toBeVisible();

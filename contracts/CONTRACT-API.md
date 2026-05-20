@@ -208,6 +208,10 @@ Returns a CSV export of recent tenant-scoped provider credential metadata histor
 
 Renders the provider details UI for the current organization. It may submit local Twilio credential metadata to `PATCH /api/settings/provider`, clear local metadata through `DELETE /api/settings/provider`, filter local rotation history by action, and link to the local CSV rotation-history export. The page must render/export redacted values only after submission and must not expose raw auth tokens, token fingerprints, provider verification status, live-send controls, or provider-side revocation controls.
 
+### `/settings/system`
+
+Renders a read-only local operations snapshot for the current organization. It may display demo/live flags, selected messaging and AI providers, production-like deployment markers, queue backend metadata, Redis presence, local worker jobs-per-poll limits, and API rate-limit policy. The page must not mutate records, expose secrets, call providers, send notifications, create billing records, or enable live messaging.
+
 ### `GET /api/settings/numbers`
 
 Returns tenant-scoped provider phone-number metadata for the current organization. This endpoint must not call Twilio or expose credentials.

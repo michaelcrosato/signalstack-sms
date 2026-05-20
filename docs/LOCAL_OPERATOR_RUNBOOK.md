@@ -69,6 +69,19 @@ Use `/settings/exports` for read-only local CSV exports:
 
 Exports are tenant-scoped local metadata only. They must not expose raw auth tokens, provider token fingerprints, customer secrets, provider verification results, full message bodies, live billing identifiers, or provider-side state. Export routes must not mutate records, call providers, create billing records, send notifications, or enable live messaging.
 
+## System Status
+
+Use `/settings/system` for a read-only local operations snapshot before demos or repair work. It displays:
+
+- demo/live messaging/live billing flags
+- selected messaging and AI providers
+- production-like runtime markers
+- queue backend and Redis presence
+- local worker jobs-per-poll limit
+- API rate-limit policy
+
+The page is display-only. It must not mutate records, expose secrets, call providers, send notifications, create billing records, or enable live messaging.
+
 ## Repair Loop
 
 When validation fails:
