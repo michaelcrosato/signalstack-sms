@@ -77,6 +77,7 @@ Compliance profile completion is required by the centralized messaging hard gate
 - `BillingAccount`: one org-scoped billing metadata record with local status and live-billing flag.
 - `WebhookEvent`: org-scoped raw provider webhook record with provider, event type, unique idempotency key, raw payload, received timestamp, and processed timestamp.
 - `ProviderPhoneNumber`: org-scoped phone-number metadata with `phoneNumber`, provider name, local status, capabilities, and default-number marker.
+- `ProviderCredential`: org-scoped provider credential metadata with provider name, redacted Twilio account/from-number fields, auth-token fingerprint, configured flag, and source.
 - `LiveReadinessAuditEvent`: org-scoped audit event for go-live readiness configuration changes.
 - `UsageEventType`: `CONTACT_IMPORTED`, `MESSAGE_INBOUND`, `CAMPAIGN_SCHEDULED`, `AI_REQUEST`.
 - `BillingAccountStatus`: `DEMO`, `TRIALING`, `ACTIVE`, `PAST_DUE`, `CANCELLED`.
@@ -86,6 +87,10 @@ Billing records are local metadata only. Stripe/customer/subscription IDs are nu
 ## Post-MVP Provider Number Foundation
 
 `ProviderPhoneNumber` records are configuration metadata only. Creating or updating one must not provision a provider number, validate ownership with Twilio, store credentials, enable live messaging, or send SMS.
+
+## Post-MVP Provider Credential Metadata Foundation
+
+`ProviderCredential` records are local readiness metadata only. They may store redacted identifiers and a one-way fingerprint of a submitted token, but must not store raw auth tokens, return secrets to API clients, verify credentials with Twilio, enable live messaging, or send SMS.
 
 ## Post-MVP Live Readiness Audit Foundation
 

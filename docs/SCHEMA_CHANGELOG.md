@@ -50,6 +50,12 @@
 
 - Added `ProviderPhoneNumber` and `ProviderPhoneNumberStatus` for org-scoped local number metadata.
 
+## Post-MVP Provider Credential Metadata Foundation
+
+- Added `ProviderCredential` for org-scoped local provider readiness metadata.
+- Twilio metadata stores redacted account/from-number values and one-way token fingerprints only.
+- Credential metadata does not store raw auth tokens, call Twilio, verify ownership, enable live messaging, or send SMS.
+
 ## Post-MVP Live Readiness Audit Foundation
 
 - Added `LiveReadinessAuditEvent` for org-scoped local go-live readiness audit events.

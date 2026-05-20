@@ -9,3 +9,14 @@ export const providerPhoneNumberSchema = z.object({
 });
 
 export type ProviderPhoneNumberInput = z.infer<typeof providerPhoneNumberSchema>;
+
+export const providerSettingsUpdateSchema = z.object({
+  provider: z.literal("twilio"),
+  twilio: z.object({
+    accountSid: z.string().trim().min(8).max(80),
+    authToken: z.string().trim().min(8).max(160),
+    fromNumber: z.string().trim().min(5).max(32).regex(/^\+[1-9]\d{4,31}$/)
+  })
+});
+
+export type ProviderSettingsUpdateInput = z.infer<typeof providerSettingsUpdateSchema>;

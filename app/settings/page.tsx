@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getOrCreateComplianceProfile } from "@/lib/db/repositories/compliance";
+import { getProviderCredential } from "@/lib/db/repositories/provider-credentials";
 import { listProviderPhoneNumbers } from "@/lib/db/repositories/provider-numbers";
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
 import { getProviderSettings } from "@/lib/messaging/provider/settings";
@@ -12,16 +13,18 @@ export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
-  const [complianceProfile, numbers, auditEvents] = await Promise.all([
+  const [complianceProfile, numbers, auditEvents, providerCredential] = await Promise.all([
     getOrCreateComplianceProfile(currentOrg.orgId),
     listProviderPhoneNumbers(currentOrg.orgId),
-    listLiveReadinessAuditEvents(currentOrg.orgId, 8)
+    listLiveReadinessAuditEvents(currentOrg.orgId, 8),
+    getProviderCredential(currentOrg.orgId, "twilio")
   ]);
   const providerSettings = getProviderSettings({
     demoMode: currentOrg.demoMode,
     liveMessagingEnabled: process.env.LIVE_MESSAGING_ENABLED === "true",
     messagingProvider: process.env.MESSAGING_PROVIDER ?? "dummy",
     complianceProfile,
+    providerCredential,
     env: process.env
   });
   const apiRateLimit = getApiRateLimitPolicy(process.env);
@@ -61,6 +64,9 @@ export default async function SettingsPage() {
             <StatusRow label="Auth token" value={String(providerSettings.twilio.authTokenConfigured)} />
             <StatusRow label="From number" value={String(providerSettings.twilio.fromNumberConfigured)} />
             <StatusRow label="Configured" value={String(providerSettings.twilio.configured)} />
+            <StatusRow label="Source" value={providerSettings.twilio.source} />
+            <StatusRow label="Account" value={providerSettings.twilio.accountSidRedacted ?? "not stored"} />
+            <StatusRow label="From" value={providerSettings.twilio.fromNumberRedacted ?? "not stored"} />
           </dl>
         </Panel>
       </section>

@@ -49,7 +49,10 @@ describe("provider settings", () => {
       accountSidConfigured: true,
       authTokenConfigured: true,
       fromNumberConfigured: true,
-      configured: true
+      configured: true,
+      source: "environment",
+      accountSidRedacted: null,
+      fromNumberRedacted: null
     });
     expect(JSON.stringify(settings)).not.toContain("secret");
   });
@@ -67,5 +70,34 @@ describe("provider settings", () => {
 
     expect(settings.liveMessagingAllowed).toBe(false);
     expect(settings.blockers).toContain("TWILIO_CREDENTIALS_INCOMPLETE");
+  });
+
+  it("uses local credential metadata for readiness without exposing raw values", () => {
+    const settings = getProviderSettings({
+      demoMode: false,
+      liveMessagingEnabled: true,
+      messagingProvider: "twilio",
+      complianceProfile: completeProfile,
+      providerCredential: {
+        id: "cred_1",
+        orgId: "org_1",
+        provider: "twilio",
+        accountSidRedacted: "redacted_7890",
+        accountSidLast4: "7890",
+        authTokenFingerprint: "abc123",
+        authTokenConfigured: true,
+        fromNumberRedacted: "redacted_0199",
+        fromNumberLast4: "0199",
+        source: "local_metadata",
+        createdAt: new Date("2026-01-01T00:00:00.000Z"),
+        updatedAt: new Date("2026-01-01T00:00:00.000Z")
+      },
+      env: {}
+    });
+
+    expect(settings.liveMessagingAllowed).toBe(true);
+    expect(settings.twilio.configured).toBe(true);
+    expect(settings.twilio.source).toBe("local_metadata");
+    expect(JSON.stringify(settings)).not.toContain("abc123");
   });
 });

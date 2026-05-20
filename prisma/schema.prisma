@@ -113,6 +113,7 @@ model Organization {
   billingAccount BillingAccount?
   webhookEvents WebhookEvent[]
   providerPhoneNumbers ProviderPhoneNumber[]
+  providerCredentials ProviderCredential[]
   liveReadinessAuditEvents LiveReadinessAuditEvent[]
 }
 
@@ -457,6 +458,26 @@ model ProviderPhoneNumber {
   @@unique([orgId, phoneNumber])
   @@index([orgId])
   @@index([orgId, isDefault])
+  @@index([orgId, provider])
+}
+
+model ProviderCredential {
+  id                    String       @id @default(cuid())
+  orgId                 String
+  provider              String
+  accountSidRedacted    String?
+  accountSidLast4       String?
+  authTokenFingerprint  String?
+  authTokenConfigured   Boolean      @default(false)
+  fromNumberRedacted    String?
+  fromNumberLast4       String?
+  source                String       @default("local_metadata")
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  org                   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, provider])
+  @@index([orgId])
   @@index([orgId, provider])
 }
 

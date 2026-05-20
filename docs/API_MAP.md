@@ -75,6 +75,7 @@ Post-MVP webhook foundation:
 Post-MVP provider settings foundation:
 
 - `GET /api/settings/provider`: returns secret-safe provider readiness, live messaging blockers, and Twilio credential presence booleans.
+- `PATCH /api/settings/provider`: stores local redacted Twilio credential readiness metadata without raw token persistence, provider calls, or live sends.
 
 Post-MVP provider number foundation:
 

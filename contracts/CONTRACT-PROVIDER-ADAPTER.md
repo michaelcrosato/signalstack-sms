@@ -18,6 +18,13 @@ Post-MVP provider settings foundation:
 - Provider readiness may expose credential presence booleans only.
 - Provider readiness must not return credential values, mutate settings, enable live messaging, or call Twilio.
 
+Post-MVP provider credential metadata foundation:
+
+- `PATCH /api/settings/provider` may store local Twilio readiness metadata.
+- Stored metadata may include redacted account/from-number fields and one-way token fingerprints only.
+- Raw auth tokens must not be stored, returned, logged, or used for provider calls.
+- Credential metadata does not enable live messaging and must record a local readiness audit event.
+
 Post-MVP provider number foundation:
 
 - `GET /api/settings/numbers` and `POST /api/settings/numbers` manage local phone-number metadata only.
