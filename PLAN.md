@@ -77,12 +77,23 @@ Milestone 9:
 - Deterministic Playwright demo path for import, campaign preflight/schedule, inbound STOP/HELP, fake AI, analytics, and usage
 - Demo mode documentation for the end-to-end flow
 
-## Active Milestone
-
 Milestone 10:
 
 - Hardening
 - Contract/test expansion and CI repair
+- API documentation drift gate
+- Tenant `orgId` invariant gate
+- Named seeded investor-demo E2E script
+
+## Active Milestone
+
+Post-MVP:
+
+- UI expansion
+- Worker execution
+- Webhook foundations
+- Provider settings
+- Production deployment gates
 
 ## Next Milestone
 

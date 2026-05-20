@@ -1,22 +1,22 @@
 # Codex Summary
 
-Run number: 2
+Run number: 3
 
 ## Completed
 
-- Advanced implementation from Milestone 5 through Milestone 9.
-- Added shared inbox APIs, demo inbound STOP/HELP handling, assignment, notes, and resolve/reopen.
-- Added compliance profile/checklist API and centralized messaging hard gates.
-- Added deterministic fake AI endpoints for campaign copy, reply suggestions, summaries, and lead qualification.
-- Added local-only analytics and billing usage records.
-- Added `/demo` investor console and `e2e/demo-path.spec.ts`.
-- Updated README, local gate, contracts, API map, data model docs, demo docs, schema changelog, and next prompts.
+- Advanced Milestone 10 hardening.
+- Strengthened `npm run contracts:check` so it verifies implemented API route/method pairs are documented in both `contracts/CONTRACT-API.md` and `docs/API_MAP.md`.
+- Added a tenant invariant check so tenant-scoped Prisma models must retain `orgId`.
+- Added `npm run test:e2e:demo` as the named seeded investor-demo Playwright path.
+- Updated testing/local-gate docs and testing contract for the new hardening checks.
 
 ## Validation
 
-- `npm run db:migrate`
+- `npm run contracts:check`
+- `npm run test` after correcting an invalid one-off Vitest flag invocation
+- `npm run db:migrate` failed once without `DATABASE_URL`, then passed with the documented local database URL
 - `npm run demo:seed`
-- `npm run test:e2e -- e2e/demo-path.spec.ts --project=chromium`
 - `npm run validate`
+- `npm run test:e2e:demo`
 
-Latest full validation passed.
+Latest full validation and demo E2E passed.

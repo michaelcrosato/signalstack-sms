@@ -20,7 +20,9 @@ npm run test:e2e:smoke
 Milestone 9 demo path check:
 
 ```bash
-npm run test:e2e -- e2e/demo-path.spec.ts --project=chromium
+npm run test:e2e:demo
 ```
+
+Milestone 10 contract hardening is included in `npm run validate`. The contract gate now verifies that implemented API route/method pairs are documented in both `contracts/CONTRACT-API.md` and `docs/API_MAP.md`, and that tenant-scoped Prisma models retain an `orgId` field.
 
 The local gate must pass before committing a milestone unless an exact environment blocker is recorded in `BLOCKERS.codex.md`.

@@ -2,7 +2,7 @@
 
 ## Current State
 
-Completed through Milestone 9 foundations:
+Completed through Milestone 10 hardening:
 
 - Milestone 1: org/auth foundation and `GET /api/orgs/current`.
 - Milestone 2: contacts, consent fields, tags/lists/segments schema, CSV import API.
@@ -13,6 +13,7 @@ Completed through Milestone 9 foundations:
 - Milestone 7: deterministic fake AI copy, reply suggestion, summary, and lead qualification APIs.
 - Milestone 8: local usage/billing records, analytics overview, and billing usage APIs.
 - Milestone 9: `/demo` investor console and deterministic Playwright demo path.
+- Milestone 10: contract drift gate for API docs, tenant `orgId` invariant check, named seeded demo E2E script, and testing/local-gate doc updates.
 
 Demo-safe defaults remain mandatory:
 
@@ -22,13 +23,13 @@ Demo-safe defaults remain mandatory:
 - `MESSAGING_PROVIDER=dummy`
 - `AI_PROVIDER=fake`
 
-## Next Milestone 10 Prompt
+## Next Post-MVP Prompt
 
 ```text
 You are the autonomous implementation agent for SignalStack SMS.
 
 MISSION:
-Implement Milestone 10 hardening from the repo-local doctrine.
+Continue from the post-MVP backlog after Milestone 10 hardening.
 
 READ FIRST:
 1. AGENTS.md
@@ -41,11 +42,11 @@ READ FIRST:
 8. docs/LOCAL_GATE.md
 
 SCOPE:
-- Review contracts/docs/API map for drift and repair.
-- Expand focused tests for tenant isolation, hard gates, local-only billing, fake AI, and demo path stability where feasible.
-- Consider adding the demo path to the standard local gate only if it remains deterministic in CI.
-- Repair any validation, migration, seed, or CI drift.
-- Update SUMMARY/BLOCKERS with exact residual risk.
+- Preserve all Milestone 0-10 gates and demo-safe defaults.
+- Implement the next post-MVP slice only when contracts/docs are updated first.
+- Good candidate slices: UI expansion, worker execution, webhook foundations, provider settings, or production deployment gates.
+- Keep live SMS, live billing, real notifications, live AI, and real provider calls blocked unless explicit future hard gates are implemented and tested.
+- Run the full local gate and seeded demo path before committing.
 
 DO NOT:
 - Send live SMS, email, notifications, or billing events.
@@ -60,5 +61,5 @@ MESSAGING_PROVIDER=dummy
 AI_PROVIDER=fake
 
 VALIDATION:
-Run db generate/migrate, demo seed, typecheck, lint, test, build, npm run validate, and smoke/demo E2E as appropriate. Repair failures before committing.
+Run db generate/migrate, demo seed, typecheck, lint, test, build, npm run validate, and `npm run test:e2e:demo` as appropriate. Repair failures before committing.
 ```
