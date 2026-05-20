@@ -71,16 +71,21 @@ Milestone 8:
 - Billing usage API with local-only recording
 - Tests proving local metering and live billing defaults
 
-## Active Milestone
-
 Milestone 9:
 
-- Demo polish and investor demo path
-- Deterministic end-to-end demo flow
+- `/demo` investor demo console
+- Deterministic Playwright demo path for import, campaign preflight/schedule, inbound STOP/HELP, fake AI, analytics, and usage
+- Demo mode documentation for the end-to-end flow
 
-## Next Milestone
+## Active Milestone
 
 Milestone 10:
 
 - Hardening
 - Contract/test expansion and CI repair
+
+## Next Milestone
+
+Post-MVP:
+
+- UI expansion, worker execution, webhooks, provider settings, and production deployment gates

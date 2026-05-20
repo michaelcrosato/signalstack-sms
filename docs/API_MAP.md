@@ -63,4 +63,8 @@ Milestone 8:
 - `GET /api/billing/usage`: returns local billing metadata and usage totals.
 - `POST /api/billing/usage`: records a local usage event only.
 
+Milestone 9:
+
+- `GET /demo`: renders the investor demo console backed by seeded local data.
+
 Product API routes must be added to `contracts/CONTRACT-API.md` before implementation.
