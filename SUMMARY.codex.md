@@ -1,35 +1,19 @@
 # Codex Summary
 
-Run number: 22
+Run number: 23
 
 ## Completed
 
-- Advanced a post-MVP local API operations checkpoint.
-- Added `/settings/api`, a read-only page that renders static local API route inventory, route areas, read/write classification, external-impact classification, route safety notes, and API rate-limit policy.
-- Added `lib/operations/api-operations.ts` plus unit coverage proving the route inventory remains local-only with zero external-impact routes and bounded rate-limit metadata.
-- Linked the API operations view from `/`, `/demo`, `/settings`, and `/settings/system`.
-- Extended the seeded investor demo E2E path to cover the API operations view.
-- Updated API contract, API map, local operator runbook, PLAN, and next prompt handoff docs.
-- Advanced a post-MVP local security operations checkpoint.
-- Added `/settings/security`, a read-only page that renders demo-safe gate status, external-impact boundary status, API rate-limit policy, production override state, documented secret-storage boundaries, and validation-command references.
-- Linked the security operations view from `/`, `/demo`, `/settings`, `/settings/system`, and `/settings/api`.
-- Extended the seeded investor demo E2E path to cover the security operations view.
-- Updated API contract, API map, local operator runbook, PLAN, and next prompt handoff docs.
-- Advanced a post-MVP local AI operations checkpoint.
-- Added `/settings/ai`, a read-only page that renders selected AI provider state, fake-provider readiness, live-AI boundary status, deterministic AI endpoint coverage, local AI usage totals, recent AI usage metadata, and safety boundaries.
-- Linked the AI operations view from `/`, `/demo`, `/settings`, `/settings/runbook`, `/settings/usage`, and `/settings/billing`.
-- Extended the Playwright smoke test and seeded investor demo E2E path to cover the AI operations view.
-- Updated API/AI/testing contracts, API map, demo-mode docs, local operator runbook, README, PLAN, and next prompt handoff docs.
-- Advanced a post-MVP local webhook operations checkpoint.
-- Added `/settings/webhooks`, a read-only page that renders Twilio webhook route coverage, stored local webhook counts, provider/event-type summaries, recent idempotency keys, received timestamps, and safety boundaries.
-- Linked the webhook operations view from `/`, `/demo`, `/settings`, `/settings/runbook`, and `/settings/inbox`.
-- Extended the Playwright smoke test and seeded investor demo E2E path to cover the webhook operations view.
-- Updated API/webhook/testing contracts, API map, demo-mode docs, local operator runbook, README, PLAN, and next prompt handoff docs.
+- Advanced a post-MVP local data operations checkpoint.
+- Added `/settings/data`, a read-only page that renders tenant-scoped local record totals, active and archived contact counts, import ledger row totals, retention signals, recent archived contact metadata, and safety boundaries.
+- Linked the data operations view from `/`, `/demo`, `/settings`, `/settings/contacts`, and `/settings/runbook`.
+- Extended the seeded investor demo E2E path to cover the data operations view.
+- Updated API/testing contracts, API map, demo-mode docs, local operator runbook, README, PLAN, and next prompt handoff docs.
 
 ## Prior Completed
 
 - Completed Milestones 0-10.
-- Added post-MVP webhook foundations, provider settings/readiness, local workers, BullMQ optional smoke/worker foundations, readiness UI, production gates/runbooks, API rate limiting, provider credential metadata management, local admin exports, system status, usage/analytics, launch dashboard, operator runbook app view, compliance detail, provider numbers, campaign operations, contact operations, audience operations, template operations, inbox operations, team operations, and billing operations.
+- Added post-MVP webhook foundations, provider settings/readiness, local workers, BullMQ optional smoke/worker foundations, readiness UI, production gates/runbooks, API rate limiting, provider credential metadata management, local admin exports, system status, usage/analytics, launch dashboard, operator runbook app view, compliance detail, provider numbers, campaign operations, contact operations, audience operations, template operations, inbox operations, team operations, billing operations, AI operations, API operations, security operations, and webhook operations.
 
 ## Validation
 
@@ -37,26 +21,6 @@ Run number: 22
 - `npm run contracts:check`
 - `npm run lint`
 - `npm run test`
-- `npm run validate`
-- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
-- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
-- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
-- `npm run typecheck`
-- `npm run lint`
-- `npm run validate`
-- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
-- `npm run typecheck`
-- `npm run contracts:check`
-- `npm run lint`
-- `npm run test`
-- `npm run validate`
-- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
-- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
-- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
-- `npm run validate`
-- `npm run test -- tests/unit/operations/api-operations.test.ts`
-- `npm run typecheck`
-- `npm run lint`
 - `npm run validate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`

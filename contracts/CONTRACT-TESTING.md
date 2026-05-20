@@ -42,6 +42,8 @@ Post-MVP contact operations view:
 
 Post-MVP audience operations view:
 
+- The seeded investor demo path must verify that `/settings/data` renders read-only local data operations metadata, soft-archive counts, import ledger totals, retention signals, and safety-boundary text without hard deletion, record mutation, provider calls, billing, notifications, live AI, SMS, or live feature enablement.
+
 - The seeded investor demo path must verify that `/settings/audience` renders read-only tag, list, saved segment, and safety-boundary text without changing memberships, evaluating segments for campaign sends, calling providers, billing, sending notifications, mutating contact labels, or enabling live messaging.
 
 Post-MVP template operations view:

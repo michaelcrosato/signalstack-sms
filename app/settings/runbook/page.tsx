@@ -62,6 +62,9 @@ export default function OperatorRunbookPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/contacts">
           Contact Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/data">
+          Data Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/templates">
           Template Operations
         </Link>
@@ -143,6 +146,7 @@ export default function OperatorRunbookPage() {
           <AdminLink href="/settings/compliance" label="Compliance Detail" />
           <AdminLink href="/settings/campaigns" label="Campaign Operations" />
           <AdminLink href="/settings/contacts" label="Contact Operations" />
+          <AdminLink href="/settings/data" label="Data Operations" />
           <AdminLink href="/settings/audience" label="Audience Operations" />
           <AdminLink href="/settings/templates" label="Template Operations" />
           <AdminLink href="/settings/inbox" label="Inbox Operations" />

@@ -128,6 +128,17 @@ Use `/settings/contacts` for read-only contact data review before demos or impor
 
 The page is display-only. It must not import contacts, create contacts, update consent, mutate tags or lists, hard-delete records, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
+## Data Operations
+
+Use `/settings/data` for read-only local data governance review before demos or retention-boundary repair work. It displays:
+
+- tenant-scoped local record totals
+- active and archived contact counts
+- import ledger row totals
+- retention signals and recent archived contact metadata
+
+The page is display-only. It must not hard-delete records, restore archived contacts, run exports, mutate records, expose secrets, call providers, create billing records, send notifications, call live AI, send SMS, or enable live features.
+
 ## Audience Operations
 
 Use `/settings/audience` for read-only audience label and saved segment review before demos or campaign repair work. It displays:

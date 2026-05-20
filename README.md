@@ -47,6 +47,8 @@ Campaign operations review is available at `/settings/campaigns`. It renders exi
 
 Contact operations review is available at `/settings/contacts`. It renders existing consent status, CSV import state, tag counts, list counts, and recent contact metadata only; it does not import contacts, update consent, mutate labels, call providers, bill, notify, send SMS, or enable live messaging.
 
+Data operations review is available at `/settings/data`. It renders tenant-scoped local record totals, soft-archive state, import ledger totals, retention signals, and recent archived contact metadata only; it does not hard-delete or restore records, run exports, mutate data, call providers, bill, notify, call live AI, send SMS, expose secrets, or enable live features.
+
 Audience operations review is available at `/settings/audience`. It renders existing tags, lists, saved segment definitions, and segment timestamps only; it does not change memberships, evaluate segments for sends, call providers, bill, notify, send SMS, or enable live messaging.
 
 Template operations review is available at `/settings/templates`. It renders existing message template variables, campaign usage, and text previews only; it does not create templates, edit copy, render live outbound messages, schedule campaigns, call providers, bill, notify, send SMS, or enable live messaging.

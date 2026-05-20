@@ -131,6 +131,7 @@ Post-MVP:
 - Read-only local AI operations view
 - Read-only local API operations view
 - Read-only local security operations view
+- Read-only local data operations view
 
 ## Next Milestone
 

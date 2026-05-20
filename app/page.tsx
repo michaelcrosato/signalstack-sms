@@ -23,6 +23,11 @@ const launchLinks = [
     description: "Read-only contact consent, imports, tags, lists, and local data safety boundary."
   },
   {
+    href: "/settings/data",
+    title: "Data Operations",
+    description: "Read-only local record totals, soft-archive state, import ledger, and retention boundaries."
+  },
+  {
     href: "/settings/audience",
     title: "Audience Operations",
     description: "Read-only tags, lists, saved segments, definitions, and audience safety boundary."

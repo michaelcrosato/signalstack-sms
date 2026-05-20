@@ -236,6 +236,10 @@ Renders a read-only campaign operations view for the current organization. It ma
 
 Renders a read-only contact operations view for the current organization. It may display active contact counts, consent status counts, contact import status counts, imported/failed row totals, tag counts, list counts, and recent contact/import metadata. The page must not import contacts, create or update contacts, update consent, mutate tags/lists, hard-delete records, call messaging providers, send notifications, create billing records, expose secrets, send SMS, or enable live messaging.
 
+### `/settings/data`
+
+Renders a read-only data operations view for the current organization. It may display tenant-scoped local record totals, active versus archived contact counts, import row totals, local audit/export boundary status, and recent archived contact metadata. The page must not hard-delete data, restore archived records, run exports, mutate records, call providers, create billing records, send notifications, expose secrets, send SMS, call live AI, or enable live messaging, live billing, or live AI.
+
 ### `/settings/audience`
 
 Renders a read-only audience operations view for the current organization. It may display tag counts, list member counts, saved segment names, segment definitions, and segment update timestamps. The page must not create or update tags/lists/segments, change contact memberships, evaluate segments for campaign sending, call messaging providers, send notifications, create billing records, expose secrets, send SMS, or enable live messaging.
