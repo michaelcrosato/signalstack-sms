@@ -11,6 +11,11 @@ Run number: 13
 - Added unit coverage for system-status defaults and review-state reporting.
 - Extended the seeded investor demo E2E to verify the system status page.
 - Updated API/testing contracts, API map, README, local operator runbook, and next prompt handoff docs.
+- Advanced a post-MVP deployment platform notes checkpoint.
+- Added `docs/DEPLOYMENT_PLATFORM_NOTES.md` for demo-safe production-like hosting defaults, forbidden live-impact env values, build/release commands, database deployment discipline, worker boundaries, smoke routes, and future platform gates.
+- Added `npm run platform:check` and wired it into `npm run validate`.
+- Linked platform notes from README, local gate, and production deployment docs.
+- Updated testing contracts, plan, and next prompt handoff docs for the platform notes validation gate.
 
 ## Validation
 
@@ -23,5 +28,6 @@ Run number: 13
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 - `npm run validate`
+- `npm run platform:check`
 
 Latest full validation and seeded demo E2E passed.

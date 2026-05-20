@@ -49,6 +49,14 @@ npm run operator:check
 
 The operator runbook check is included in `npm run validate` and verifies that `docs/LOCAL_OPERATOR_RUNBOOK.md` keeps the local repair loop, worker commands, admin exports, and demo-safe external-impact boundary documented.
 
+Deployment platform notes check:
+
+```bash
+npm run platform:check
+```
+
+The platform notes check is included in `npm run validate` and verifies that `docs/DEPLOYMENT_PLATFORM_NOTES.md` keeps demo-safe hosting defaults, production gate usage, smoke routes, worker limits, and no-external-impact platform boundaries documented.
+
 BullMQ/Redis enqueue support is optional. The default local gate does not require Redis, and campaign scheduling must continue to persist database `QueueJob` rows when BullMQ is disabled or not configured.
 
 The BullMQ smoke command skips successfully unless BullMQ and Redis are explicitly configured. When enabled, it uses a dedicated smoke queue and does not touch scheduled campaigns, providers, billing, or live messaging flags.
@@ -60,5 +68,7 @@ Post-MVP production deployment gates are included in `npm run validate`. Product
 Production go-live design is documented in `docs/PRODUCTION_GO_LIVE.md`. That document is a planning gate only; it does not authorize live SMS, billing, AI, provider calls, secrets, or external notifications.
 
 Production-like demo deployment operations are documented in `docs/PRODUCTION_DEPLOYMENT.md`. That runbook requires demo-safe defaults and treats provider credential metadata as local readiness data only.
+
+Demo-safe hosting platform notes are documented in `docs/DEPLOYMENT_PLATFORM_NOTES.md`. They do not authorize live messaging, billing, AI, provider calls, notifications, third-party telemetry exports, real secrets, or destructive data operations.
 
 The local gate must pass before committing a milestone unless an exact environment blocker is recorded in `BLOCKERS.codex.md`.

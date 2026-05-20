@@ -28,6 +28,7 @@
     "production:gate": "tsx scripts/production-gate.ts",
     "observability:check": "tsx scripts/observability-check.ts",
     "operator:check": "tsx scripts/operator-runbook-check.ts",
+    "platform:check": "tsx scripts/platform-notes-check.ts",
     "secrets:scan": "tsx scripts/secrets-scan.ts",
     "validate": "tsx scripts/validate.ts",
     "agent:status": "tsx scripts/agent-status.ts",

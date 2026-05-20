@@ -113,9 +113,10 @@ Post-MVP:
 - Read-only admin exports view
 - Local operator runbook and validation check
 - Read-only local system status view
+- Deployment platform notes and validation check
 
 ## Next Milestone
 
 Post-MVP:
 
-- Safe provider metadata form refinements, deployment platform notes, local operator runbook expansion, additional read-only admin views, or dashboard links to existing local-only reports
+- Safe provider metadata form refinements, local operator runbook expansion, additional read-only admin views, or dashboard links to existing local-only reports

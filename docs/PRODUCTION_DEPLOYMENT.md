@@ -87,6 +87,8 @@ Verify these behaviors:
 
 Production observability planning is documented in `docs/PRODUCTION_OBSERVABILITY.md`. Current observability is platform/local only and must not export secrets, full message bodies, notifications, live provider calls, billing events, or telemetry to a third-party vendor by default.
 
+Platform-specific hosting notes are documented in `docs/DEPLOYMENT_PLATFORM_NOTES.md`. Current platform guidance covers demo-safe production-like hosting only and does not authorize live messaging, billing, AI, provider calls, notifications, third-party telemetry exports, real secrets, or destructive data operations.
+
 ## Rollback
 
 Rollback is the hosting platform's previous build plus database migration discipline:

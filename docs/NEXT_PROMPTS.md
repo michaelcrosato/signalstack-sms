@@ -43,6 +43,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP admin exports view: `/settings/exports` consolidates local CSV export links for readiness audit events and redacted provider credential rotation history with a visible safety boundary; the investor demo E2E covers it without adding mutations, provider calls, billing records, notifications, live messaging, or raw secret exposure.
 - Post-MVP local operator runbook: `docs/LOCAL_OPERATOR_RUNBOOK.md` documents local startup, validation, worker, admin export, repair-loop, and production-boundary procedures; `npm run operator:check` is included in validation to keep the runbook present and demo-safe.
 - Post-MVP local system status view: `/settings/system` renders a read-only operations snapshot of demo/live flags, runtime markers, queue backend metadata, worker poll limits, and API rate-limit policy; unit tests and the investor demo E2E cover it without mutations, provider calls, billing records, notifications, live messaging, or secrets.
+- Post-MVP deployment platform notes: `docs/DEPLOYMENT_PLATFORM_NOTES.md` documents demo-safe production-like hosting defaults, build/release commands, smoke routes, worker boundaries, forbidden live-impact env values, and future platform gates; `npm run platform:check` is included in validation.
 
 Demo-safe defaults remain mandatory:
 
@@ -73,7 +74,7 @@ READ FIRST:
 SCOPE:
 - Preserve all Milestone 0-10 gates and demo-safe defaults.
 - Implement the next post-MVP slice only when contracts/docs are updated first.
-- Good candidate slices: safe metadata form refinements, deployment platform notes, local operator runbook expansion, additional read-only admin views, or dashboard links to existing local-only reports.
+- Good candidate slices: safe metadata form refinements, local operator runbook expansion, additional read-only admin views, or dashboard links to existing local-only reports.
 - Keep live SMS, live billing, real notifications, live AI, and real provider calls blocked unless explicit future hard gates are implemented and tested.
 - Run the full local gate and seeded demo path before committing.
 

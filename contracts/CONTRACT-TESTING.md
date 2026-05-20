@@ -18,3 +18,8 @@ Post-MVP local operations status:
 
 - Unit tests must verify that the system-status helper reports demo-safe defaults as external-impact blocked.
 - The seeded investor demo path must verify that `/settings/system` renders read-only safety, runtime, queue, and API protection metadata.
+
+Post-MVP deployment platform notes:
+
+- `npm run platform:check` must verify that `docs/DEPLOYMENT_PLATFORM_NOTES.md` documents demo-safe hosting defaults, production gate usage, smoke routes, worker boundaries, and no-external-impact platform constraints.
+- `npm run validate` must include `npm run platform:check`.
