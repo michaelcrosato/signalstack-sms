@@ -9,6 +9,8 @@ Run number: 10
 - Kept credential submissions redacted after save: raw auth tokens are not displayed, token fingerprints are not exposed, and no Twilio calls, live SMS enablement, provider revocation, billing, or notifications are triggered.
 - Extended the seeded investor demo E2E to exercise provider metadata save, redacted readiness refresh, and local metadata clearing.
 - Updated provider/API contracts and provider/demo/API docs for the new UI safety boundary.
+- Added `docs/PRODUCTION_DEPLOYMENT.md`, a demo-safe production-like deployment runbook covering required env values, pre-deploy checks, database deployment discipline, post-deploy smoke checks, rollback, and incident switches.
+- Linked the deployment runbook from architecture/local-gate handoff docs and updated the next prompt.
 - Advanced a post-MVP provider credential rotation-history checkpoint.
 - Added org-scoped `ProviderCredentialRotation` schema and migration for local credential metadata configure/refresh/rotate/delete history.
 - Added `GET /api/settings/provider/rotations` returning redacted tenant-scoped history only; raw auth tokens and token fingerprints are not returned.

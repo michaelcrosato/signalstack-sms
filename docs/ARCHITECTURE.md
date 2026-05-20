@@ -12,4 +12,4 @@ The optional BullMQ worker consumes Redis jobs by `queueJobId` and reloads the d
 
 Post-MVP API rate limiting is enforced in Next middleware with an in-memory fixed-window limiter. It is a local/demo safety guardrail for abuse-prone API bursts; it does not rely on Redis, does not call external services, and does not replace durable idempotency for queue jobs or webhooks.
 
-Production-like deployments are allowed only as demo-safe deployments today. `npm run production:gate` blocks live messaging, live billing, live provider, live AI, Twilio, and Stripe configuration unless a future controlled go-live milestone explicitly enables external impact. The operator checklist is documented in `docs/PRODUCTION_GO_LIVE.md`.
+Production-like deployments are allowed only as demo-safe deployments today. `npm run production:gate` blocks live messaging, live billing, live provider, live AI, Twilio, and Stripe configuration unless a future controlled go-live milestone explicitly enables external impact. The go-live gate is documented in `docs/PRODUCTION_GO_LIVE.md`; the demo-safe deployment runbook is documented in `docs/PRODUCTION_DEPLOYMENT.md`.

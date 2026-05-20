@@ -43,4 +43,6 @@ Post-MVP production deployment gates are included in `npm run validate`. Product
 
 Production go-live design is documented in `docs/PRODUCTION_GO_LIVE.md`. That document is a planning gate only; it does not authorize live SMS, billing, AI, provider calls, secrets, or external notifications.
 
+Production-like demo deployment operations are documented in `docs/PRODUCTION_DEPLOYMENT.md`. That runbook requires demo-safe defaults and treats provider credential metadata as local readiness data only.
+
 The local gate must pass before committing a milestone unless an exact environment blocker is recorded in `BLOCKERS.codex.md`.
