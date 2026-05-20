@@ -103,9 +103,10 @@ Post-MVP:
 - Provider credential metadata management
 - Provider credential metadata deletion
 - Provider credential rotation history
+- Read-only provider settings detail UI
 
 ## Next Milestone
 
 Post-MVP:
 
-- Deeper settings UI, deployment documentation, and provider credential rotation-history UI/forms
+- Deployment documentation and provider credential rotation-history UI/forms

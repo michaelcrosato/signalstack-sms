@@ -60,6 +60,9 @@ export default async function SettingsPage() {
         </Panel>
 
         <Panel title="Twilio Readiness">
+          <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/provider">
+            Provider Details
+          </Link>
           <dl className="grid gap-3 text-sm">
             <StatusRow label="Account SID" value={String(providerSettings.twilio.accountSidConfigured)} />
             <StatusRow label="Auth token" value={String(providerSettings.twilio.authTokenConfigured)} />

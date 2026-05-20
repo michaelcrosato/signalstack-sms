@@ -9,6 +9,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("Twilio Readiness")).toBeVisible();
   await expect(page.getByText("API Protection")).toBeVisible();
   await expect(page.getByText("Credential Rotation History")).toBeVisible();
+  await page.getByRole("link", { name: "Provider Details" }).click();
+  await expect(page.getByRole("heading", { name: "Provider Details" })).toBeVisible();
+  await expect(page.getByText("Twilio Metadata")).toBeVisible();
   await page.goto("/demo");
 
   const importResponse = await request.post("/api/contacts/imports", {

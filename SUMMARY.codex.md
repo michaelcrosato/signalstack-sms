@@ -14,6 +14,7 @@ Run number: 9
 - Added unit coverage for credential history action classification.
 - Added production go-live gate design documentation clarifying the current demo-safe production deployment boundary and future live-enable requirements.
 - Added optional BullMQ/Redis smoke command that skips by default and only writes/removes a dedicated smoke-queue job when `QUEUE_BACKEND=bullmq` and `REDIS_URL` are configured.
+- Added read-only `/settings/provider` provider details UI with redacted Twilio metadata, live blockers, credential rotation history, and investor demo E2E coverage.
 
 ## Validation
 
