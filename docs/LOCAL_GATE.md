@@ -36,4 +36,6 @@ BullMQ/Redis enqueue support is optional. The default local gate does not requir
 
 Milestone 10 contract hardening is included in `npm run validate`. The contract gate now verifies that implemented API route/method pairs are documented in both `contracts/CONTRACT-API.md` and `docs/API_MAP.md`, and that tenant-scoped Prisma models retain an `orgId` field.
 
+Post-MVP production deployment gates are included in `npm run validate`. Production-like environments (`NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, or `APP_ENV` set to production/prod) are blocked from live messaging, live billing, live provider, live AI, Twilio, or Stripe settings unless a future controlled deployment explicitly sets `ALLOW_PRODUCTION_EXTERNALS=true`.
+
 The local gate must pass before committing a milestone unless an exact environment blocker is recorded in `BLOCKERS.codex.md`.

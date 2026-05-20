@@ -30,6 +30,8 @@ Run number: 6
 - Advanced a post-MVP UI expansion checkpoint.
 - Added `/settings` go-live readiness page backed by existing provider settings, compliance profile, provider numbers, readiness audit, and queue backend metadata.
 - Linked the investor demo console to the readiness page and expanded the demo Playwright path to cover it.
+- Advanced a post-MVP production deployment gate checkpoint.
+- Added `npm run production:gate`, validation wiring, and unit coverage for blocking production-like external-impact settings without an explicit future override.
 
 ## Validation
 
@@ -51,6 +53,7 @@ Run number: 6
 - `npm run validate`
 - `npm run demo:seed`
 - `npm run test:e2e:demo`
+- `npm run production:gate`
 - `npm run test -- tests/unit/queue/worker.test.ts`
 - `npm run typecheck`
 - `npm run lint`
