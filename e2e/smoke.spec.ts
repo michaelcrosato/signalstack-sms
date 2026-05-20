@@ -8,6 +8,7 @@ test("home page renders local launch dashboard and demo-safe defaults", async ({
   await expect(page.getByRole("link", { name: /Go-Live Readiness/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Provider Details/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /System Status/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Operator Runbook/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Usage & Analytics/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Admin Exports/ })).toBeVisible();
   await expect(page.getByText("DEMO_MODE")).toBeVisible();

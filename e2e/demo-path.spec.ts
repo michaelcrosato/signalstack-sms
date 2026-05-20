@@ -10,6 +10,11 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("Runtime")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Queue" })).toBeVisible();
   await expect(page.getByText("API Protection")).toBeVisible();
+  await page.getByRole("link", { name: "Operator Runbook" }).click();
+  await expect(page.getByRole("heading", { name: "Operator Runbook" })).toBeVisible();
+  await expect(page.getByText("Daily Local Start")).toBeVisible();
+  await expect(page.getByText("Repair Loop")).toBeVisible();
+  await expect(page.getByText("Command execution")).toBeVisible();
   await page.getByRole("link", { name: "Usage & Analytics" }).click();
   await expect(page.getByRole("heading", { name: "Usage & Analytics" })).toBeVisible();
   await expect(page.getByText("Local Usage Totals")).toBeVisible();

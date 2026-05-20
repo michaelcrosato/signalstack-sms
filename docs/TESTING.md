@@ -22,3 +22,4 @@ Additional deterministic checks:
 - API rate limiting helpers are unit-tested with deterministic clocks and isolated stores. Local validation keeps the middleware defaults generous enough for smoke and demo paths.
 - The seeded investor demo path verifies `/settings/usage` as a read-only local usage and analytics surface without live billing or provider configuration.
 - The Playwright smoke test verifies the root local launch dashboard links to existing local-only operational views while still rendering demo-safe defaults.
+- The seeded investor demo path verifies `/settings/runbook` as a read-only local operator checklist without command execution or external-impact side effects.

@@ -9,6 +9,11 @@ Run number: 15
 - Kept the root page no-database and read-only: it does not mutate records, call providers, create billing provider artifacts, send notifications, expose secrets, or enable live messaging.
 - Extended the Playwright smoke test to verify the dashboard links and demo-safe defaults.
 - Updated API contract/docs, API map, demo-mode docs, testing docs, README, PLAN, and next prompt handoff docs for the local launch dashboard.
+- Advanced a second post-MVP local operator runbook app-view checkpoint.
+- Added `/settings/runbook`, a read-only local checklist that displays demo-safe defaults, daily validation/seed commands, worker commands, BullMQ smoke commands, repair-loop steps, and local admin links.
+- Linked the runbook from `/`, `/demo`, `/settings`, `/settings/system`, `/settings/usage`, and `/settings/exports`.
+- Extended smoke and seeded investor demo E2E coverage for the runbook view.
+- Updated API contract/docs, API map, demo-mode docs, local operator runbook, testing docs, README, PLAN, and next prompt handoff docs for the runbook page.
 
 ## Prior Completed
 
@@ -32,6 +37,9 @@ Run number: 15
 - `npm run validate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
+- `npm run typecheck`
+- `npm run lint`
+- `npm run contracts:check`
 - `npm run typecheck`
 - `npm run contracts:check`
 - `npm run lint`

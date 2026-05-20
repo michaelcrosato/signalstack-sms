@@ -23,6 +23,11 @@ const launchLinks = [
     description: "Read-only runtime flags, queue backend, worker limits, and rate-limit policy."
   },
   {
+    href: "/settings/runbook",
+    title: "Operator Runbook",
+    description: "Local validation, seed, worker, export, and repair-loop commands with safety boundaries."
+  },
+  {
     href: "/settings/usage",
     title: "Usage & Analytics",
     description: "Tenant metrics, local usage totals, billing boundary, and recent usage events."
