@@ -78,6 +78,7 @@ Post-MVP provider settings foundation:
 - `PATCH /api/settings/provider`: stores local redacted Twilio credential readiness metadata without raw token persistence, provider calls, or live sends.
 - `DELETE /api/settings/provider`: clears local Twilio credential readiness metadata without provider calls or live-send side effects.
 - `GET /api/settings/provider/rotations`: lists recent local provider credential metadata history without raw tokens, token fingerprints, provider calls, or live sends.
+- `/settings/provider`: renders provider details, a local-only credential metadata form, local metadata deletion, redacted readiness, and rotation history without provider calls or live-send controls.
 
 Post-MVP provider number foundation:
 

@@ -34,6 +34,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP provider credential deletion foundation: `DELETE /api/settings/provider` clears local Twilio readiness metadata and records an audit event without Twilio calls, live-send enablement, or provider-side revocation.
 - Post-MVP provider credential rotation history: `ProviderCredentialRotation`, `GET /api/settings/provider/rotations`, local history writes for configure/refresh/rotate/delete, seeded redacted demo history, and `/settings` visibility without raw token or fingerprint exposure.
 - Post-MVP provider settings detail UI: `/settings/provider` renders read-only Twilio metadata, live blockers, and credential rotation history using existing redacted local metadata.
+- Post-MVP provider credential metadata UI/forms: `/settings/provider` can save and clear local Twilio credential readiness metadata through existing safe APIs, refreshes redacted readiness/rotation history, and the seeded investor demo E2E covers the flow without provider calls or live sends.
 
 Demo-safe defaults remain mandatory:
 
@@ -64,7 +65,7 @@ READ FIRST:
 SCOPE:
 - Preserve all Milestone 0-10 gates and demo-safe defaults.
 - Implement the next post-MVP slice only when contracts/docs are updated first.
-- Good candidate slices: deployment documentation or provider credential rotation-history UI/forms for safe metadata updates.
+- Good candidate slices: deployment documentation, production operations runbooks, provider credential rotation-history filtering, or safe metadata form refinements.
 - Keep live SMS, live billing, real notifications, live AI, and real provider calls blocked unless explicit future hard gates are implemented and tested.
 - Run the full local gate and seeded demo path before committing.
 

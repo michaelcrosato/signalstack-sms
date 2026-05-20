@@ -12,6 +12,13 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await page.getByRole("link", { name: "Provider Details" }).click();
   await expect(page.getByRole("heading", { name: "Provider Details" })).toBeVisible();
   await expect(page.getByText("Twilio Metadata")).toBeVisible();
+  await page.getByLabel("Account SID").fill("AC111122223333");
+  await page.getByLabel("Auth token").fill("demo_token_value_10");
+  await page.getByLabel("From number").fill("+15555550198");
+  await page.getByRole("button", { name: "Save Metadata" }).click();
+  await expect(page.locator("dd").filter({ hasText: "redacted_0198" })).toBeVisible();
+  await page.getByRole("button", { name: "Clear Metadata" }).click();
+  await expect(page.getByText("Metadata cleared locally.")).toBeVisible();
   await page.goto("/demo");
 
   const importResponse = await request.post("/api/contacts/imports", {

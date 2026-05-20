@@ -8,6 +8,8 @@ Demo provider credential records are redacted local readiness metadata only. The
 
 Demo provider credential rotation history is also local metadata only. Seeded history uses redacted values and configured booleans so readiness screens can show change history without raw secrets or provider calls.
 
+The provider details screen can configure, rotate, or clear demo Twilio credential metadata through local API routes. This is a readiness record only: submitted values are reduced to redacted identifiers and token fingerprints, raw auth tokens are not shown after submission, and no provider verification, live sending, billing, or provider-side revocation occurs.
+
 Milestone 6 adds a compliance checklist for go-live readiness, but demo mode still blocks live messaging even when checklist fields are complete. STOP/HELP demo inbound flows update local database state only.
 
 Milestone 7 AI endpoints use deterministic fake outputs only. Setting `AI_PROVIDER` to anything other than `fake` blocks those endpoints until a future live-AI gate exists.

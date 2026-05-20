@@ -3,6 +3,7 @@ import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getOrCreateComplianceProfile } from "@/lib/db/repositories/compliance";
 import { getProviderCredential, listProviderCredentialRotations } from "@/lib/db/repositories/provider-credentials";
 import { getProviderSettings } from "@/lib/messaging/provider/settings";
+import { ProviderCredentialForm } from "./provider-credential-form";
 
 export const dynamic = "force-dynamic";
 
@@ -59,6 +60,8 @@ export default async function ProviderSettingsPage() {
           </ul>
         </section>
       </section>
+
+      <ProviderCredentialForm />
 
       <section className="rounded border border-slate-200 bg-white p-5">
         <h2 className="text-lg font-semibold text-slate-950">Credential Rotation History</h2>

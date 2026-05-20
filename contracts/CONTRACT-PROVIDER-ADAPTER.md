@@ -33,6 +33,12 @@ Post-MVP provider credential rotation history:
 - Rotation-history API responses must not expose raw tokens, token fingerprints, provider credentials, or provider verification results.
 - Rotation history must not call Twilio, revoke provider credentials, enable live messaging, or send SMS.
 
+Post-MVP provider credential metadata UI:
+
+- `/settings/provider` may submit Twilio credential metadata to the existing local-only provider settings API.
+- The UI must never render raw auth tokens after submission, expose token fingerprints, call Twilio, enable live messaging, or imply credential verification.
+- Delete actions clear only local metadata through `DELETE /api/settings/provider`; they must not revoke provider-side credentials or mutate live provider accounts.
+
 Post-MVP provider number foundation:
 
 - `GET /api/settings/numbers` and `POST /api/settings/numbers` manage local phone-number metadata only.

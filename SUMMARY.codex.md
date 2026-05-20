@@ -1,9 +1,14 @@
 # Codex Summary
 
-Run number: 9
+Run number: 10
 
 ## Completed
 
+- Advanced a post-MVP provider credential metadata UI/forms checkpoint.
+- Added `/settings/provider` local-only Twilio credential metadata form for save/clear actions backed by the existing safe provider settings APIs.
+- Kept credential submissions redacted after save: raw auth tokens are not displayed, token fingerprints are not exposed, and no Twilio calls, live SMS enablement, provider revocation, billing, or notifications are triggered.
+- Extended the seeded investor demo E2E to exercise provider metadata save, redacted readiness refresh, and local metadata clearing.
+- Updated provider/API contracts and provider/demo/API docs for the new UI safety boundary.
 - Advanced a post-MVP provider credential rotation-history checkpoint.
 - Added org-scoped `ProviderCredentialRotation` schema and migration for local credential metadata configure/refresh/rotate/delete history.
 - Added `GET /api/settings/provider/rotations` returning redacted tenant-scoped history only; raw auth tokens and token fingerprints are not returned.
@@ -28,6 +33,8 @@ Run number: 9
 - `npm run demo:seed`
 - `npm run validate`
 - `npm run test:e2e:demo`
+- `npm run build`
+- `npm run validate`
 - `npm run contracts:check`
 - `npm run queue:bullmq:smoke`
 

@@ -200,6 +200,10 @@ Clears local Twilio credential readiness metadata for the current organization. 
 
 Returns recent tenant-scoped provider credential metadata history for the current organization. Entries include provider, action, redacted account/from-number values, last-four hints, configured booleans, actor ID, and timestamp. The response must not include raw auth tokens, token fingerprints, provider credential values, provider verification results, or trigger provider calls/live messaging.
 
+### `/settings/provider`
+
+Renders the provider details UI for the current organization. It may submit local Twilio credential metadata to `PATCH /api/settings/provider` and clear local metadata through `DELETE /api/settings/provider`. The page must render redacted values only after submission and must not expose raw auth tokens, token fingerprints, provider verification status, live-send controls, or provider-side revocation controls.
+
 ### `GET /api/settings/numbers`
 
 Returns tenant-scoped provider phone-number metadata for the current organization. This endpoint must not call Twilio or expose credentials.
