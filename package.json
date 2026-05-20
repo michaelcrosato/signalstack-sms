@@ -8,6 +8,7 @@
     "dev": "next dev",
     "worker": "tsx workers/index.ts",
     "worker:watch": "tsx workers/index.ts --watch",
+    "worker:bullmq": "tsx workers/bullmq.ts",
     "build": "next build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",

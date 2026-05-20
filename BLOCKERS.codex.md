@@ -14,5 +14,6 @@ No active blockers.
 - Live-readiness audit events are local records only and do not yet include a dedicated UI surface beyond the API.
 - There is still no provider credential storage UI, live send enablement flow, or real Twilio send path.
 - The local worker processes due scheduled campaigns through the dummy provider only. Continuous polling and local jobs-per-poll limits are available for demos, but it does not yet integrate Redis/BullMQ.
-- BullMQ enqueue is now available as an opt-in scheduling mirror with `QUEUE_BACKEND=bullmq` and `REDIS_URL`; local validation still does not require Redis, and the worker still processes from durable database jobs.
+- BullMQ enqueue and worker consumption are now available as opt-in local foundations with `QUEUE_BACKEND=bullmq` and `REDIS_URL`; local validation still does not require Redis.
+- The BullMQ worker has unit coverage and a guarded startup path, but this run did not perform an end-to-end Redis-backed BullMQ integration test against a running Redis service.
 - Windows can produce a Prisma client DLL rename error if `prisma generate` runs concurrently with a Next/Playwright server or another Prisma client process. Run Prisma generation and E2E checks sequentially.

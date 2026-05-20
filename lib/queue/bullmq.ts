@@ -1,7 +1,11 @@
 import { Queue, type JobsOptions } from "bullmq";
 import type { QueueJob } from "@prisma/client";
 import { getRedisQueueConfig, redisConnectionFromUrl } from "@/lib/queue/redis";
-import { scheduledCampaignJobSchema, type ScheduledCampaignJob } from "@/lib/queue/jobs";
+import {
+  scheduledCampaignBullMqJobDataSchema,
+  scheduledCampaignJobSchema,
+  type ScheduledCampaignJob
+} from "@/lib/queue/jobs";
 
 export const scheduledCampaignBullMqQueueName = "signalstack-scheduled-campaigns";
 export const scheduledCampaignBullMqJobName = "scheduled-campaign";
@@ -69,6 +73,10 @@ export async function enqueueScheduledCampaignBullMqJob(
     runAt: queueJob.runAt,
     now: input.now
   });
+  const jobData = scheduledCampaignBullMqJobDataSchema.safeParse(job.data);
+  if (!jobData.success) {
+    return { enqueued: false, reason: "invalid-payload", error: jobData.error.message };
+  }
   const queue = new Queue(scheduledCampaignBullMqQueueName, {
     connection: redisConnectionFromUrl(redisUrl)
   });

@@ -1,5 +1,5 @@
 import { setTimeout as sleep } from "node:timers/promises";
-import { CampaignStatus, QueueJobStatus, QueueJobType } from "@prisma/client";
+import { CampaignStatus, QueueJobStatus, QueueJobType, type QueueJob } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
 import { renderTemplate } from "@/lib/messaging/render-template";
@@ -20,6 +20,13 @@ export type WorkerRuntimeOptions = {
 };
 
 export type WorkerRunResult = Awaited<ReturnType<typeof processDueScheduledCampaignJobs>>;
+
+export type SingleQueueJobProcessResult = {
+  processed: 0 | 1;
+  skipped: 0 | 1;
+  blocked: boolean;
+  reason?: "provider-blocked" | "missing-job" | "not-due" | "invalid-payload" | "invalid-campaign";
+};
 
 export type ContinuousWorkerInput = {
   pollIntervalMs: number;
@@ -122,52 +129,9 @@ export async function processDueScheduledCampaignJobs(
   let skipped = 0;
 
   for (const job of jobs) {
-    const payload = scheduledCampaignJobSchema.safeParse(job.payload);
-    if (!payload.success || payload.data.orgId !== job.orgId || payload.data.campaignId !== job.campaignId) {
-      await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.FAILED } });
-      skipped += 1;
-      continue;
-    }
-
-    const campaign = await prisma.campaign.findFirst({
-      where: { id: payload.data.campaignId, orgId: job.orgId },
-      include: { recipients: { include: { contact: true } } }
-    });
-    if (!campaign || campaign.status !== CampaignStatus.SCHEDULED) {
-      await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.FAILED } });
-      skipped += 1;
-      continue;
-    }
-
-    for (const recipient of campaign.recipients) {
-      const idempotencyKey = `dummy-outbound:${job.id}:${recipient.contactId}`;
-      const body = renderTemplate(campaign.body, campaignMessageValues(recipient.contact));
-      const result = await dummyProvider.send({
-        to: recipient.contact.phone,
-        from: "demo-signalstack",
-        body,
-        orgId: job.orgId,
-        idempotencyKey
-      });
-
-      await prisma.message.upsert({
-        where: { idempotencyKey },
-        update: {},
-        create: {
-          orgId: job.orgId,
-          contactId: recipient.contactId,
-          campaignId: campaign.id,
-          direction: "OUTBOUND",
-          body,
-          providerMessageId: result.providerMessageId,
-          idempotencyKey
-        }
-      });
-    }
-
-    await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.COMPLETED } });
-    await prisma.campaign.update({ where: { id: campaign.id }, data: { status: CampaignStatus.COMPLETED } });
-    processed += 1;
+    const result = await processScheduledCampaignQueueJob(job, now);
+    processed += result.processed;
+    skipped += result.skipped;
   }
 
   return {
@@ -175,6 +139,90 @@ export async function processDueScheduledCampaignJobs(
     skipped,
     blocked: false
   };
+}
+
+export async function processScheduledCampaignQueueJobById(queueJobId: string, now = new Date()) {
+  const job = await prisma.queueJob.findFirst({
+    where: {
+      id: queueJobId,
+      type: QueueJobType.SCHEDULED_CAMPAIGN,
+      status: QueueJobStatus.QUEUED
+    }
+  });
+
+  if (!job) {
+    return {
+      processed: 0,
+      skipped: 1,
+      blocked: false,
+      reason: "missing-job"
+    } satisfies SingleQueueJobProcessResult;
+  }
+
+  return processScheduledCampaignQueueJob(job, now);
+}
+
+async function processScheduledCampaignQueueJob(
+  job: QueueJob,
+  now = new Date()
+): Promise<SingleQueueJobProcessResult> {
+  if (
+    !localWorkerProviderIsAllowed({
+      liveMessagingEnabled: process.env.LIVE_MESSAGING_ENABLED,
+      messagingProvider: process.env.MESSAGING_PROVIDER
+    })
+  ) {
+    return { processed: 0, skipped: 0, blocked: true, reason: "provider-blocked" };
+  }
+
+  if (job.runAt.getTime() > now.getTime()) {
+    return { processed: 0, skipped: 1, blocked: false, reason: "not-due" };
+  }
+
+  const payload = scheduledCampaignJobSchema.safeParse(job.payload);
+  if (!payload.success || payload.data.orgId !== job.orgId || payload.data.campaignId !== job.campaignId) {
+    await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.FAILED } });
+    return { processed: 0, skipped: 1, blocked: false, reason: "invalid-payload" };
+  }
+
+  const campaign = await prisma.campaign.findFirst({
+    where: { id: payload.data.campaignId, orgId: job.orgId },
+    include: { recipients: { include: { contact: true } } }
+  });
+  if (!campaign || campaign.status !== CampaignStatus.SCHEDULED) {
+    await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.FAILED } });
+    return { processed: 0, skipped: 1, blocked: false, reason: "invalid-campaign" };
+  }
+
+  for (const recipient of campaign.recipients) {
+    const idempotencyKey = `dummy-outbound:${job.id}:${recipient.contactId}`;
+    const body = renderTemplate(campaign.body, campaignMessageValues(recipient.contact));
+    const result = await dummyProvider.send({
+      to: recipient.contact.phone,
+      from: "demo-signalstack",
+      body,
+      orgId: job.orgId,
+      idempotencyKey
+    });
+
+    await prisma.message.upsert({
+      where: { idempotencyKey },
+      update: {},
+      create: {
+        orgId: job.orgId,
+        contactId: recipient.contactId,
+        campaignId: campaign.id,
+        direction: "OUTBOUND",
+        body,
+        providerMessageId: result.providerMessageId,
+        idempotencyKey
+      }
+    });
+  }
+
+  await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.COMPLETED } });
+  await prisma.campaign.update({ where: { id: campaign.id }, data: { status: CampaignStatus.COMPLETED } });
+  return { processed: 1, skipped: 0, blocked: false };
 }
 
 export async function runContinuousScheduledCampaignWorker(input: ContinuousWorkerInput) {

@@ -29,6 +29,7 @@ Optional local worker checks:
 npm run worker
 WORKER_MAX_ITERATIONS=1 WORKER_POLL_INTERVAL_MS=1000 npm run worker:watch
 QUEUE_BACKEND=bullmq REDIS_URL=redis://localhost:6379 npm run worker
+QUEUE_BACKEND=bullmq REDIS_URL=redis://localhost:6379 npm run worker:bullmq
 ```
 
 BullMQ/Redis enqueue support is optional. The default local gate does not require Redis, and campaign scheduling must continue to persist database `QueueJob` rows when BullMQ is disabled or not configured.

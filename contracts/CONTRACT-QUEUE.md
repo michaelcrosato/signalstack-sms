@@ -49,3 +49,13 @@ Durable `QueueJob` rows remain the source of truth. BullMQ is an optional delive
 - BullMQ job IDs must use the durable `QueueJob.idempotencyKey`.
 - BullMQ enqueue must not call providers, send SMS, enable live messaging, store secrets, or replace database idempotency.
 - Local validation must pass without Redis running.
+
+## Post-MVP BullMQ Worker Consumption Foundation
+
+BullMQ workers may consume scheduled-campaign queue events only by referencing durable database jobs:
+
+- BullMQ worker payloads must include `queueJobId` plus the version-1 scheduled-campaign payload.
+- The BullMQ worker must reload and process the matching `QueueJob` row from the database.
+- Cancelled, completed, missing, invalid, or early jobs must be skipped or failed locally without provider calls.
+- Worker startup is blocked unless `QUEUE_BACKEND=bullmq`, `REDIS_URL` is configured, `MESSAGING_PROVIDER=dummy`, and `LIVE_MESSAGING_ENABLED` is not `true`.
+- The BullMQ worker must use the same dummy-only send path and idempotent `Message` rows as the database polling worker.

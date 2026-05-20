@@ -17,4 +17,4 @@ Additional deterministic checks:
 - `npm run worker` processes local due scheduled campaign jobs through the dummy provider only.
 - `npm run worker:watch` runs the same worker in continuous polling mode for local demos. It is still blocked unless `MESSAGING_PROVIDER=dummy` and live messaging is disabled.
 - `WORKER_MAX_JOBS_PER_POLL` caps local worker throughput per poll and is clamped to a bounded range for demos/tests.
-- BullMQ enqueue helpers are unit-tested without requiring Redis. Local validation must remain green with `QUEUE_BACKEND` unset or set to `database`.
+- BullMQ enqueue and worker helpers are unit-tested without requiring Redis. Local validation must remain green with `QUEUE_BACKEND` unset or set to `database`.

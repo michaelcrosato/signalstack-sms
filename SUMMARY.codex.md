@@ -23,6 +23,10 @@ Run number: 6
 - Wired campaign scheduling to safely no-op BullMQ enqueue unless BullMQ and Redis are explicitly configured.
 - Added Redis URL parsing, deterministic BullMQ job construction, and unit tests that do not require Redis.
 - Updated queue, architecture, testing, local gate, and env example docs for database-default queue behavior.
+- Advanced a post-MVP BullMQ worker consumption checkpoint.
+- Added `npm run worker:bullmq`, guarded BullMQ worker startup, and durable `queueJobId` payload validation.
+- Refactored scheduled-campaign processing so database polling and BullMQ consumption share the same dummy-only/idempotent send path.
+- Preserved default database queue behavior and no-Redis local validation.
 
 ## Validation
 
@@ -56,6 +60,11 @@ Run number: 6
 - `npm run lint`
 - `npm run contracts:check`
 - `npm run secrets:scan`
+- `npm run validate`
+- `npm run demo:seed`
+- `npm run test:e2e:demo`
+- `npm run test -- tests/unit/queue/bullmq.test.ts tests/unit/queue/bullmq-worker.test.ts tests/unit/queue/worker.test.ts tests/unit/queue/jobs.test.ts`
+- `npm run worker:bullmq`
 - `npm run validate`
 - `npm run demo:seed`
 - `npm run test:e2e:demo`

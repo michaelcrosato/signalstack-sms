@@ -7,4 +7,9 @@ export const scheduledCampaignJobSchema = z.object({
   scheduledAt: z.string().datetime()
 });
 
+export const scheduledCampaignBullMqJobDataSchema = scheduledCampaignJobSchema.extend({
+  queueJobId: z.string().min(1)
+});
+
 export type ScheduledCampaignJob = z.infer<typeof scheduledCampaignJobSchema>;
+export type ScheduledCampaignBullMqJobData = z.infer<typeof scheduledCampaignBullMqJobDataSchema>;
