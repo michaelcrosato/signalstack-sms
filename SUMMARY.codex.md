@@ -13,6 +13,9 @@ Run number: 12
 - Advanced a post-MVP admin exports view checkpoint.
 - Added `/settings/exports`, a read-only settings page that consolidates local CSV links for readiness audit events and redacted provider credential rotation history.
 - Linked the exports view from `/settings` and `/settings/provider`, added a visible safety boundary, and extended the investor demo E2E to cover it.
+- Advanced a post-MVP local operator runbook checkpoint.
+- Added `docs/LOCAL_OPERATOR_RUNBOOK.md` covering local startup, validation, demo E2E, dummy workers, optional BullMQ smoke, admin exports, repair loops, and production boundaries.
+- Added `npm run operator:check` and wired it into `npm run validate`, with links from README and `docs/LOCAL_GATE.md`.
 - Advanced a post-MVP readiness audit export checkpoint.
 - Added bounded `limit`, `action`, and `subjectType` filtering for `GET /api/settings/readiness-audit`.
 - Added `GET /api/settings/readiness-audit/export`, a tenant-scoped CSV export of local readiness audit metadata only.
@@ -64,6 +67,11 @@ Run number: 12
 - `npm run typecheck`
 - `npm run validate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
+- `npm run operator:check`
+- `npm run typecheck`
+- `npm run lint`
+- `npm run validate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 
 - Run 11:

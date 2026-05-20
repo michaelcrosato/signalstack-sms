@@ -6,6 +6,7 @@ const commands = [
   ["npm", ["run", "compliance:check"]],
   ["npm", ["run", "production:gate"]],
   ["npm", ["run", "observability:check"]],
+  ["npm", ["run", "operator:check"]],
   ["npm", ["run", "lint"]],
   ["npm", ["run", "typecheck"]],
   ["npx", ["prisma", "validate"]],

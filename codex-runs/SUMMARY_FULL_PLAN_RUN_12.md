@@ -9,6 +9,8 @@
 - Updated API/provider/demo docs, contracts, `PLAN.md`, `SUMMARY.codex.md`, `BLOCKERS.codex.md`, and `docs/NEXT_PROMPTS.md`.
 - Added `/settings/exports`, a read-only admin exports page consolidating the readiness audit and provider credential rotation CSV links.
 - Linked the exports page from settings pages and extended the seeded investor demo E2E to cover it.
+- Added `docs/LOCAL_OPERATOR_RUNBOOK.md` and `npm run operator:check`.
+- Wired `operator:check` into `npm run validate` and linked the runbook from README and `docs/LOCAL_GATE.md`.
 
 ## Validation
 
@@ -27,6 +29,11 @@
 - `npm run build`
 - `npm run validate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
+- `npm run operator:check`
+- `npm run typecheck`
+- `npm run lint`
+- `npm run validate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 
 ## Blockers

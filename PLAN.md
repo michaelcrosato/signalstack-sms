@@ -111,6 +111,7 @@ Post-MVP:
 - Production observability planning and local doc gate
 - Provider credential rotation-history CSV export
 - Read-only admin exports view
+- Local operator runbook and validation check
 
 ## Next Milestone
 

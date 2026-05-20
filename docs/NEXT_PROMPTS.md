@@ -41,6 +41,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP production observability planning: `docs/PRODUCTION_OBSERVABILITY.md` documents demo-safe platform/local observability signals, logging exclusions, and future vendor gates; `npm run observability:check` is part of validation and verifies the no-external-impact planning boundary.
 - Post-MVP provider credential rotation export: `GET /api/settings/provider/rotations/export` returns a tenant-scoped CSV export of redacted local credential rotation metadata using the same allowlisted filters as the JSON route; `/settings/provider` exposes the export link and the investor demo E2E covers it without raw tokens, provider calls, billing records, notifications, live messaging, or mutations.
 - Post-MVP admin exports view: `/settings/exports` consolidates local CSV export links for readiness audit events and redacted provider credential rotation history with a visible safety boundary; the investor demo E2E covers it without adding mutations, provider calls, billing records, notifications, live messaging, or raw secret exposure.
+- Post-MVP local operator runbook: `docs/LOCAL_OPERATOR_RUNBOOK.md` documents local startup, validation, worker, admin export, repair-loop, and production-boundary procedures; `npm run operator:check` is included in validation to keep the runbook present and demo-safe.
 
 Demo-safe defaults remain mandatory:
 
