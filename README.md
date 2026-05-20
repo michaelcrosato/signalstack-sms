@@ -45,6 +45,8 @@ Local usage and analytics review is available at `/settings/usage`. It renders e
 
 Campaign operations review is available at `/settings/campaigns`. It renders existing campaign status, recipient counts, queue job state, and worker boundaries only; it does not schedule campaigns, run workers, mutate queue rows, call providers, bill, notify, send SMS, or enable live messaging.
 
+Inbox operations review is available at `/settings/inbox`. It renders existing conversation status, assignment counts, recent message metadata, and shared inbox boundaries only; it does not create messages, assign or resolve conversations, mutate contacts, call providers, bill, notify, send SMS, or enable live messaging.
+
 Compliance readiness detail is available at `/settings/compliance`. It renders existing profile fields, checklist status, A2P metadata status, and live-message blockers only; it does not update records, verify provider registration, call providers, or enable live messaging.
 
 Provider number metadata is available at `/settings/numbers`. It renders existing local number rows only; it does not provision numbers, verify provider ownership, call Twilio, mutate records, or enable live messaging.

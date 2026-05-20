@@ -87,6 +87,7 @@ Post-MVP provider settings foundation:
 - `/settings/runbook`: renders a read-only local operator checklist with validation, seed, worker, export, and repair-loop commands without executing commands, mutations, provider calls, billing records, notifications, live messaging, or secrets.
 - `/settings/usage`: renders a read-only local usage and analytics view with tenant-scoped metrics, billing boundary status, and recent usage events without Stripe calls, billing provider artifacts, notifications, provider calls, live messaging, mutations, or secrets.
 - `/settings/campaigns`: renders a read-only local campaign operations view with campaign status, recipient counts, queue job status, and worker safety-boundary metadata without scheduling, running workers, provider calls, billing records, notifications, live messaging, mutations, or secrets.
+- `/settings/inbox`: renders a read-only local inbox operations view with conversation status, assignment counts, recent message/note counts, and inbox safety-boundary metadata without creating messages, assigning, resolving, provider calls, billing records, notifications, live messaging, mutations, or secrets.
 
 Post-MVP provider number foundation:
 

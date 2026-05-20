@@ -18,6 +18,11 @@ const launchLinks = [
     description: "Read-only campaign status, recipient counts, queued jobs, and local worker boundary."
   },
   {
+    href: "/settings/inbox",
+    title: "Inbox Operations",
+    description: "Read-only shared inbox status, assignment counts, recent messages, and safety boundary."
+  },
+  {
     href: "/settings/provider",
     title: "Provider Details",
     description: "Redacted local Twilio metadata, safe forms, rotation history, and CSV export."

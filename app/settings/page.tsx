@@ -62,6 +62,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/settings/campaigns">
           Campaign Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/inbox">
+          Inbox Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/numbers">
           Provider Numbers
         </Link>
@@ -131,6 +134,16 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <p className="text-sm leading-6 text-slate-700">
           Review campaign status, recipient counts, and queued scheduled-campaign jobs without running workers, sending SMS,
           mutating queue rows, or enabling provider integrations.
+        </p>
+      </Panel>
+
+      <Panel title="Inbox Operations">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/inbox">
+          Inbox Operations
+        </Link>
+        <p className="text-sm leading-6 text-slate-700">
+          Review shared inbox status, assignment counts, and recent local message metadata without creating replies,
+          mutating contacts, sending notifications, calling providers, or enabling live messaging.
         </p>
       </Panel>
 

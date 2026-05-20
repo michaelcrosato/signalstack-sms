@@ -117,6 +117,17 @@ Use `/settings/campaigns` for read-only campaign and queue review before demos o
 
 The page is display-only. It must not schedule campaigns, cancel campaigns, run workers, mutate queue rows, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
+## Inbox Operations
+
+Use `/settings/inbox` for read-only shared inbox review before demos or inbox repair work. It displays:
+
+- conversation status counts
+- assignment counts
+- recent local message and note counts
+- local inbox safety boundary
+
+The page is display-only. It must not create messages, assign conversations, resolve conversations, add notes, mutate contacts or consent, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
+
 ## Compliance Detail
 
 Use `/settings/compliance` for read-only compliance profile review before demos or repair work. It displays:

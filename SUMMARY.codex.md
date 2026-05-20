@@ -9,6 +9,11 @@ Run number: 18
 - Linked the campaign operations view from `/`, `/demo`, `/settings`, `/settings/usage`, `/settings/runbook`, and `/settings/exports`.
 - Extended smoke and seeded investor demo E2E coverage for the campaign operations view.
 - Updated API/testing contracts, API map, demo-mode docs, local operator runbook, README, PLAN, and next prompt handoff docs.
+- Advanced a second post-MVP local inbox operations checkpoint.
+- Added `/settings/inbox`, a read-only page that renders tenant-scoped conversation status counts, assignment counts, recent message/note counts, and local inbox safety boundaries.
+- Linked the inbox operations view from `/`, `/demo`, `/settings`, `/settings/usage`, `/settings/runbook`, and `/settings/exports`.
+- Extended smoke and seeded investor demo E2E coverage for the inbox operations view.
+- Updated API/testing contracts, API map, demo-mode docs, local operator runbook, README, PLAN, and next prompt handoff docs.
 
 ## Prior Completed
 

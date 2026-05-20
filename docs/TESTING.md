@@ -24,5 +24,6 @@ Additional deterministic checks:
 - The seeded investor demo path verifies `/settings/usage` as a read-only local usage and analytics surface without live billing or provider configuration.
 - The seeded investor demo path verifies `/settings/numbers` as a read-only local provider-number metadata surface without provisioning, provider calls, or messaging enablement.
 - The seeded investor demo path verifies `/settings/campaigns` as a read-only campaign and queue operations surface without scheduling campaigns, running workers, provider calls, billing, notifications, queue mutation, or messaging enablement.
+- The seeded investor demo path verifies `/settings/inbox` as a read-only shared inbox operations surface without message creation, assignment, resolution, provider calls, billing, notifications, contact mutation, or messaging enablement.
 - The Playwright smoke test verifies the root local launch dashboard links to existing local-only operational views while still rendering demo-safe defaults.
 - The seeded investor demo path verifies `/settings/runbook` as a read-only local operator checklist without command execution or external-impact side effects.

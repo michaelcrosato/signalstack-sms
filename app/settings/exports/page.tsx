@@ -30,6 +30,9 @@ export default async function SettingsExportsPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/campaigns">
           Campaign Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/inbox">
+          Inbox Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
           Operator Runbook
         </Link>
