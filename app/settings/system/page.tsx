@@ -15,6 +15,9 @@ export default async function SystemStatusPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings">
           Go-Live Readiness
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/compliance">
+          Compliance Detail
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/usage">
           Usage & Analytics
         </Link>

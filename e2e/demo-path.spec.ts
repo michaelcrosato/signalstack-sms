@@ -26,6 +26,16 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("API Protection")).toBeVisible();
   await expect(page.getByText("Credential Rotation History")).toBeVisible();
   await expect(page.getByRole("link", { name: "Export CSV" })).toBeVisible();
+  await page.getByRole("link", { name: "Compliance Detail" }).first().click();
+  await expect(page.getByRole("heading", { name: "Compliance Detail" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Compliance Profile" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Hard Gate" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Compliance Audit" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Export Compliance CSV" })).toBeVisible();
+  const complianceAuditExportResponse = await request.get("/api/settings/readiness-audit/export?subjectType=ComplianceProfile&limit=5");
+  expect(complianceAuditExportResponse.ok()).toBeTruthy();
+  await expect(complianceAuditExportResponse.text()).resolves.toContain("id,action,subjectType,subjectId,actorUserId,createdAt,metadata");
+  await page.getByRole("link", { name: "Go-Live Readiness" }).click();
   await page.getByRole("link", { name: "Admin Exports" }).click();
   await expect(page.getByRole("heading", { name: "Admin Exports" })).toBeVisible();
   await expect(page.getByText("Export Safety Boundary")).toBeVisible();

@@ -43,6 +43,8 @@ Production observability planning is documented in `docs/PRODUCTION_OBSERVABILIT
 
 Local usage and analytics review is available at `/settings/usage`. It renders existing tenant-scoped metrics and usage events only; it does not call Stripe, create billing provider artifacts, call providers, send notifications, or enable live messaging.
 
+Compliance readiness detail is available at `/settings/compliance`. It renders existing profile fields, checklist status, A2P metadata status, and live-message blockers only; it does not update records, verify provider registration, call providers, or enable live messaging.
+
 The root route `/` is a local launch dashboard with demo-safe defaults and links to the seeded demo, go-live readiness, provider metadata, system status, usage, and admin export views.
 
 Local operator procedures are documented in `docs/LOCAL_OPERATOR_RUNBOOK.md`; `npm run operator:check` verifies the runbook and is included in `npm run validate`.

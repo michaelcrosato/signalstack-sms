@@ -48,6 +48,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP local usage and analytics view: `/settings/usage` renders read-only tenant-scoped metrics, local usage totals, billing boundary status, and recent usage events; the investor demo E2E covers it without Stripe calls, billing provider artifacts, notifications, provider calls, live messaging, mutations, or secrets.
 - Post-MVP local launch dashboard: `/` now renders a static local command center with demo-safe defaults and links to the seeded demo, go-live readiness, provider details, system status, usage, and admin exports without database access, mutations, provider calls, billing artifacts, notifications, live messaging, or secrets.
 - Post-MVP local operator runbook app view: `/settings/runbook` renders demo-safe validation, seed, worker, BullMQ smoke, admin-view, and repair-loop commands as read-only text; root/settings/demo navigation and E2E coverage include it without executing commands, mutating records, provider calls, billing records, notifications, live messaging, or secrets.
+- Post-MVP local compliance detail view: `/settings/compliance` renders existing compliance profile completeness, A2P metadata status, live-message hard-gate blockers, and compliance readiness audit export links as read-only local metadata; root/settings/demo/runbook navigation and E2E coverage include it without mutating records, provider verification, notifications, billing records, live messaging, or secrets.
 
 Demo-safe defaults remain mandatory:
 
@@ -78,7 +79,7 @@ READ FIRST:
 SCOPE:
 - Preserve all Milestone 0-10 gates and demo-safe defaults.
 - Implement the next post-MVP slice only when contracts/docs are updated first.
-- Good candidate slices: additional read-only admin views, safe dashboard refinements, local operator runbook expansion, or deeper links from the local launch dashboard into existing local-only reports.
+- Good candidate slices: additional read-only admin views, safe dashboard refinements, local operator runbook expansion, or deeper links from existing local-only reports into demo-safe operational workflows.
 - Keep live SMS, live billing, real notifications, live AI, and real provider calls blocked unless explicit future hard gates are implemented and tested.
 - Run the full local gate and seeded demo path before committing.
 

@@ -95,6 +95,17 @@ Use `/settings/usage` for read-only local metering review before demos or repair
 
 The page is display-only. It must not mutate records, call Stripe, create billing provider artifacts, expose secrets, call providers, send notifications, or enable live messaging.
 
+## Compliance Detail
+
+Use `/settings/compliance` for read-only compliance profile review before demos or repair work. It displays:
+
+- profile field completeness
+- demo A2P metadata status
+- live-message hard-gate blockers
+- recent local compliance readiness audit events and CSV export link
+
+The page is display-only. It must not mutate compliance records, verify provider registration, expose secrets, call providers, send notifications, create billing records, or enable live messaging.
+
 ## Repair Loop
 
 When validation fails:

@@ -50,6 +50,9 @@ export default function OperatorRunbookPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings">
           Go-Live Readiness
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/compliance">
+          Compliance Detail
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/system">
           System Status
         </Link>
@@ -110,6 +113,7 @@ export default function OperatorRunbookPage() {
       <Panel title="Local Admin Views">
         <nav aria-label="Local admin views" className="grid gap-3 text-sm md:grid-cols-4">
           <AdminLink href="/settings/system" label="System Status" />
+          <AdminLink href="/settings/compliance" label="Compliance Detail" />
           <AdminLink href="/settings/usage" label="Usage & Analytics" />
           <AdminLink href="/settings/exports" label="Admin Exports" />
           <AdminLink href="/settings/provider" label="Provider Details" />

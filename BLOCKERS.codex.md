@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 15
+Run number: 16
 
 No active blockers.
 
 ## Notes
 
+- `/settings/compliance` is a read-only local compliance detail view. It displays existing profile readiness, A2P metadata, hard-gate blockers, and local readiness audit export links; it does not update records, verify provider registration, call providers, send notifications, create billing records, expose secrets, or enable live messaging.
 - `/` is now a static local launch dashboard for existing demo-safe views. It does not require database access, mutate records, call providers, create billing artifacts, send notifications, expose secrets, or enable live messaging.
 - `/settings/runbook` is a read-only local operator checklist. It displays commands and safety boundaries only; it does not execute commands, mutate records, call providers, create billing artifacts, send notifications, expose secrets, or enable live messaging.
 - `/settings/usage` is read-only local metadata and analytics visibility. It does not mutate records, call Stripe, create billing provider artifacts, expose secrets, call providers, send notifications, or enable live messaging.
