@@ -18,6 +18,7 @@ type ContactDetailFormProps = {
     notes: string;
     tags: string[];
     lists: string[];
+    archived: boolean;
   };
 };
 
@@ -87,6 +88,29 @@ export function ContactDetailForm({ contact }: ContactDetailFormProps) {
     }
 
     router.push("/dashboard/contacts");
+    router.refresh();
+  }
+
+  async function restoreContact() {
+    setPending(true);
+    setStatus(null);
+    setError(null);
+
+    const response = await fetch(`/api/contacts/${contact.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ archived: false })
+    });
+    const payload = await response.json();
+
+    if (!response.ok) {
+      setError(payload.error ?? "Contact could not be restored.");
+      setPending(false);
+      return;
+    }
+
+    setStatus("Contact restored locally. Campaign sends still require consent and preflight.");
+    setPending(false);
     router.refresh();
   }
 
@@ -190,14 +214,25 @@ export function ContactDetailForm({ contact }: ContactDetailFormProps) {
         >
           {pending ? "Saving" : "Save Contact"}
         </button>
-        <button
-          className="rounded border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:text-slate-400"
-          disabled={pending}
-          onClick={archiveContact}
-          type="button"
-        >
-          Archive Contact
-        </button>
+        {contact.archived ? (
+          <button
+            className="rounded border border-teal-300 px-4 py-2 text-sm font-semibold text-teal-700 disabled:cursor-not-allowed disabled:text-slate-400"
+            disabled={pending}
+            onClick={restoreContact}
+            type="button"
+          >
+            Restore Contact
+          </button>
+        ) : (
+          <button
+            className="rounded border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:text-slate-400"
+            disabled={pending}
+            onClick={archiveContact}
+            type="button"
+          >
+            Archive Contact
+          </button>
+        )}
         <p className="text-sm text-slate-600">Local metadata only. No provider calls, SMS, live AI, or billing actions run.</p>
       </div>
 

@@ -7,7 +7,7 @@ This repo follows `docs/CANONICAL_IMPLEMENTATION_PLAN.md`. That canonical plan r
 As of 2026-05-21:
 
 - The repo has strong demo-safe foundations: data model, tenant boundaries, contracts, validation gates, seed data, local worker paths, Twilio webhook foundations, read-only operations surfaces, and automated tests.
-- The browser experience now has a product-facing dashboard, contacts, campaigns, inbox, templates, and compliance flow, with remaining gaps around deeper lifecycle workflows and polish.
+- The browser experience now has a product-facing dashboard, contacts, contact restore, campaigns, inbox, templates, and compliance flow, with remaining gaps around deeper lifecycle workflows and polish.
 - Live messaging remains blocked by default. The only intentional live external-impact path is the isolated `/demo` live-test SMS surface, which requires explicit Twilio credentials, live flags, a recipient allowlist, and the confirmation phrase.
 - Live campaign sending, live AI, live billing, real auth, production secret management, production Redis/rate-limit infrastructure, and production deployment are not complete.
 - Planning inputs from Claude, Gemini, Grok, and Codex are captured under `planning/`; the current consensus is summarized in `planning/CONSENSUS-2026-05-21.md`.
@@ -54,7 +54,7 @@ Goal: make the repo understandable in minutes and remove known correctness risks
 Goal: make SignalStack feel like usable SMS software, not only a system audit console.
 
 - Product shell at `/dashboard` has primary navigation for contacts, campaigns, inbox, templates, analytics, compliance, and settings.
-- Keep the contacts list/import UI on existing APIs and add contact detail/edit later.
+- Keep the contacts list/import/detail UI on existing APIs, including local soft archive and restore.
 - Campaign composer, recipient selection, preflight, schedule, and status UI on existing APIs are in place for the first product demo path.
 - Inbox list/thread UI with demo inbound, assignment, notes, resolve/reopen, and STOP visibility is in place on existing APIs.
 - Template list/create UI and contact detail/edit UI are in place on existing APIs.
@@ -84,6 +84,6 @@ Goal: turn the demo-safe product into a paid production SaaS.
 ## Next Concrete Work
 
 1. Keep `docs/CURRENT_STATE_MATRIX.md` current.
-2. Add contact restore/merge workflow after the core product demo remains stable.
+2. Add contact merge workflow after the core product demo remains stable.
 3. Harden production worker policy before broader live sending.
 4. Add separate template detail/edit only if needed after product demo review.

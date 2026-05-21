@@ -1913,3 +1913,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Add contact restore/merge or campaign detail/edit only after the core product demo remains stable.
+
+## Run 209  GREEN  product-contact-restore-workflow  2026-05-21 15:07
+Objective:    Add an owner-facing contact restore workflow on existing local contact APIs.
+Changed:
+- Added archived contact rows to `/dashboard/contacts` with restore links into the tenant-scoped detail page.
+- Added a restore action to `/dashboard/contacts/:contactId` using the existing local `PATCH` archive-state contract.
+- Extended product contact unit coverage, validation coverage, seeded product E2E, contracts, roadmap, state matrix, README, and handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Add contact merge workflow or campaign detail/edit only after the core product demo remains stable.

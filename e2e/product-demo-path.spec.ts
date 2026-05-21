@@ -125,6 +125,17 @@ test("product contact detail page updates local profile and consent metadata", a
   await expect(page.getByLabel("Lists")).toHaveValue("Product Detail, Updated Contacts");
   await expect(page.getByRole("heading", { name: "Safety Boundary" })).toBeVisible();
   await expect(page.getByText("It does not send SMS, call providers")).toBeVisible();
+
+  await page.getByRole("button", { name: "Archive Contact" }).click();
+  await expect(page).toHaveURL(/\/dashboard\/contacts$/);
+  await expect(page.getByRole("heading", { name: "Archived contacts" })).toBeVisible();
+  await expect(page.getByRole("row").filter({ hasText: updatedName })).toBeVisible();
+  await page.getByRole("link", { name: `Restore ${updatedName}` }).click();
+  await expect(page.getByRole("heading", { name: updatedName })).toBeVisible();
+  await expect(page.getByText("Archived").locator("..")).toContainText("yes");
+  await page.getByRole("button", { name: "Restore Contact" }).click();
+  await expect(page.getByRole("status")).toContainText("Contact restored locally");
+  await expect(page.getByText("Archived").locator("..")).toContainText("no");
 });
 
 test("product campaigns page creates, preflights, and schedules a local campaign", async ({ page }) => {

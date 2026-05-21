@@ -3,6 +3,22 @@ import { describe, expect, it, vi } from "vitest";
 import { getProductContactDetail, getProductContacts } from "@/lib/product/contacts";
 
 vi.mock("@/lib/db/repositories/contacts", () => ({
+  listArchivedContacts: vi.fn(async () => [
+    {
+      id: "contact_archived",
+      displayName: "Archived Buyer",
+      firstName: "Archived",
+      lastName: "Buyer",
+      phone: "+15555550109",
+      email: "archived@example.com",
+      consentStatus: ConsentStatus.OPTED_IN,
+      optInSource: "manual",
+      source: "demo",
+      updatedAt: new Date("2026-01-05T00:00:00.000Z"),
+      tagLinks: [{ tag: { name: "archive" } }],
+      listLinks: [{ list: { name: "Dormant" } }]
+    }
+  ]),
   getContact: vi.fn(async (_orgId: string, contactId: string) => {
     if (contactId === "missing") {
       return null;
@@ -77,6 +93,7 @@ describe("getProductContacts", () => {
 
     expect(result.summary).toEqual({
       total: 3,
+      archived: 1,
       optedIn: 1,
       optedOut: 1,
       unknown: 1
@@ -88,6 +105,11 @@ describe("getProductContacts", () => {
     ]);
     expect(result.contacts[0].tags).toEqual(["alpha", "beta"]);
     expect(result.contacts[0].lists).toEqual(["Leads"]);
+    expect(result.archivedContacts).toHaveLength(1);
+    expect(result.archivedContacts[0]).toMatchObject({
+      displayName: "Archived Buyer",
+      lists: ["Dormant"]
+    });
   });
 
   it("builds a detail row for the product contact edit page", async () => {

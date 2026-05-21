@@ -342,11 +342,11 @@ Renders a read-only local go-live readiness audit view for the current organizat
 
 ### `/dashboard/contacts`
 
-Renders the product-facing contacts workspace for the current organization. It may display tenant-scoped active contacts, consent state, list/tag labels, contact metrics, and a local CSV import form that posts to the existing `POST /api/contacts/imports` endpoint. It must not send SMS, call providers, create billing records, call live AI, expose secrets, hard-delete contacts, bypass import validation, or enable live messaging.
+Renders the product-facing contacts workspace for the current organization. It may display tenant-scoped active contacts, archived contacts, consent state, list/tag labels, contact metrics, restore links for soft-archived contacts, and a local CSV import form that posts to the existing `POST /api/contacts/imports` endpoint. It must not send SMS, call providers, create billing records, call live AI, expose secrets, hard-delete contacts, bypass import validation, or enable live messaging.
 
 ### `/dashboard/contacts/:contactId`
 
-Renders the product-facing contact detail workspace for a tenant-scoped contact. It may update local profile fields, consent status/evidence, notes, tags, and lists through `PATCH /api/contacts/:contactId`, and may soft-archive through `DELETE /api/contacts/:contactId`. It must not send SMS, call providers, create billing records, call live AI, expose secrets, hard-delete contacts, bypass consent/preflight checks, or enable live messaging.
+Renders the product-facing contact detail workspace for a tenant-scoped contact. It may update local profile fields, consent status/evidence, notes, tags, and lists through `PATCH /api/contacts/:contactId`, restore a soft-archived contact through `PATCH /api/contacts/:contactId`, and may soft-archive through `DELETE /api/contacts/:contactId`. It must not send SMS, call providers, create billing records, call live AI, expose secrets, hard-delete contacts, bypass consent/preflight checks, or enable live messaging.
 
 ### `/dashboard/campaigns`
 

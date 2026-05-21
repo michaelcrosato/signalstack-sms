@@ -17,6 +17,14 @@ export async function listContacts(orgId: string) {
   });
 }
 
+export async function listArchivedContacts(orgId: string) {
+  return prisma.contact.findMany({
+    where: { orgId, archivedAt: { not: null } },
+    orderBy: { archivedAt: "desc" },
+    include: contactInclude
+  });
+}
+
 export async function getContact(orgId: string, contactId: string) {
   return prisma.contact.findFirst({
     where: orgWhere(orgId, { id: contactId }),

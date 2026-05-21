@@ -14,5 +14,6 @@ describe("contact validation", () => {
 
   it("supports soft archive updates", () => {
     expect(contactUpdateSchema.parse({ archived: true })).toEqual({ archived: true });
+    expect(contactUpdateSchema.parse({ archived: false })).toEqual({ archived: false });
   });
 });

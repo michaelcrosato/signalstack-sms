@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function ContactsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
-  const { contacts, summary } = await getProductContacts(currentOrg.orgId);
+  const { archivedContacts, contacts, summary } = await getProductContacts(currentOrg.orgId);
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
@@ -41,11 +41,12 @@ export default async function ContactsPage() {
       </header>
 
       <div className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-6">
-        <section aria-label="Contact metrics" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <section aria-label="Contact metrics" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <Metric label="Active Contacts" value={summary.total} />
           <Metric label="Opted In" value={summary.optedIn} />
           <Metric label="Opted Out" value={summary.optedOut} />
           <Metric label="Unknown Consent" value={summary.unknown} />
+          <Metric label="Archived" value={summary.archived} />
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1fr_0.8fr]">
@@ -104,6 +105,56 @@ export default async function ContactsPage() {
               <ContactImportForm />
             </div>
           </section>
+        </section>
+
+        <section className="rounded border border-slate-200 bg-white">
+          <div className="border-b border-slate-200 p-5">
+            <h2 className="text-xl font-semibold">Archived contacts</h2>
+            <p className="mt-1 text-sm text-slate-600">
+              Soft-archived contacts are excluded from campaigns until restored from their detail page.
+            </p>
+          </div>
+          {archivedContacts.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+                <thead className="bg-slate-100 text-xs uppercase tracking-wide text-slate-600">
+                  <tr>
+                    <th className="px-4 py-3">Contact</th>
+                    <th className="px-4 py-3">Consent</th>
+                    <th className="px-4 py-3">Lists</th>
+                    <th className="px-4 py-3">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {archivedContacts.map((contact) => (
+                    <tr className="border-t border-slate-100" key={contact.id}>
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-slate-950">{contact.displayName}</div>
+                        <div className="text-slate-600">{contact.phone}</div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="rounded border border-slate-300 bg-slate-50 px-2 py-1 text-xs font-semibold">
+                          {contact.consentStatus}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-slate-700">{contact.lists.join(", ") || "None"}</td>
+                      <td className="px-4 py-3">
+                        <Link
+                          aria-label={`Restore ${contact.displayName}`}
+                          className="text-xs font-semibold text-teal-700"
+                          href={`/dashboard/contacts/${contact.id}`}
+                        >
+                          Restore from details
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="p-5 text-sm text-slate-600">No archived contacts.</p>
+          )}
         </section>
       </div>
     </main>
