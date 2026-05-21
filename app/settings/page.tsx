@@ -95,6 +95,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/settings/system">
           System Status
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/environment">
+          Environment Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/health">
           Health Operations
         </Link>
@@ -183,6 +186,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
       </section>
 
       <Panel title="API Protection">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/environment">
+          Environment Operations
+        </Link>
         <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/health">
           Health Operations
         </Link>
@@ -229,6 +235,16 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <p className="text-sm leading-6 text-slate-700">
           Review the local health endpoint contract, demo-safe defaults, and runtime blockers without executing probes,
           calling APIs, mutating records, exposing secrets, notifying, billing, sending, or enabling live features.
+        </p>
+      </Panel>
+
+      <Panel title="Environment Operations">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/environment">
+          Environment Operations
+        </Link>
+        <p className="text-sm leading-6 text-slate-700">
+          Review demo-safe defaults, allowlisted configuration categories, and derived runtime status without reading
+          environment files, exposing raw values or secrets, mutating configuration, calling providers, notifying, billing, sending, or enabling live features.
         </p>
       </Panel>
 

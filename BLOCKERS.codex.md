@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 34
+Run number: 35
 
 No active blockers.
 
 ## Notes
 
+- `/settings/environment` is a read-only local environment operations view. It displays demo-safe defaults, allowlisted configuration categories, derived runtime status, operational links, and safety boundaries; it does not read environment files, expose raw values or secrets, mutate configuration, write files, execute commands, call APIs, call Redis, call providers, create billing records, send notifications, send SMS or email, deploy, or enable live features.
 - `/settings/health` is a read-only local health operations view. It displays the existing health endpoint contract, service identity, demo-safe defaults, runtime blockers, local operations links, and safety boundary; it does not execute probes, call APIs, run commands, mutate records, expose raw environment values or secrets, call providers, create billing records, send notifications, send SMS or email, or enable live features.
 - `/settings/releases` is a read-only local release operations view. It displays protected local gate expectations, migration/seed/demo path command references, premerge validation metadata, release surface links, runtime safety, and safety boundaries; it does not execute commands, run scripts, start migrations, launch tests or browsers, perform git operations, deploy, mutate records, create exports, enqueue jobs, call Redis, expose logs, diffs, environment values, or secrets, call providers, create billing records, send notifications, send SMS or email, or enable live features.
 - `/settings/workflows` is a read-only local workflow operations view. It displays existing demo workflow checkpoints across audience intake, campaign readiness, queue handoff, inbox response, delivery evidence, AI, usage, and reporting; it does not import contacts, schedule campaigns, run workers, create inbox replies, retry deliveries, submit prompts, execute reports, create exports, mutate records, enqueue jobs, call Redis, call providers, create billing records, send notifications, send SMS or email, expose secrets, or enable live features.

@@ -32,6 +32,8 @@ The release operations screen at `/settings/releases` displays local release che
 
 The health operations screen at `/settings/health` displays the existing local health endpoint contract, demo-safe defaults, runtime blockers, and local operations links. It is read-only and does not execute probes, call APIs, run commands, mutate records, expose raw environment values or secrets, call providers, bill, notify, send SMS or email, or enable live features.
 
+The environment operations screen at `/settings/environment` displays demo-safe defaults, allowlisted configuration categories, and derived runtime status. It is read-only and does not read environment files, expose raw values or secrets, mutate configuration, execute commands, call APIs, call Redis, call providers, bill, notify, send SMS or email, deploy, or enable live features.
+
 The campaign operations screen at `/settings/campaigns` displays existing local campaign status, recipient counts, scheduled campaign metadata, and queue job status. It is read-only and does not schedule campaigns, run workers, mutate queue rows, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
 The queue operations screen at `/settings/queue` displays scheduled-campaign queue job counts, due/future timing, payload validity, idempotency keys, worker poll settings, queue backend metadata, and Redis presence. It is read-only and does not enqueue jobs, run workers, mutate queue rows, update campaigns, call Redis, call providers, create billing records, send notifications, send SMS, expose secrets, or enable live messaging.

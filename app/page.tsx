@@ -83,6 +83,11 @@ const launchLinks = [
     description: "Read-only runtime flags, queue backend, worker limits, and rate-limit policy."
   },
   {
+    href: "/settings/environment",
+    title: "Environment Operations",
+    description: "Read-only demo-safe defaults, configuration categories, and derived runtime status."
+  },
+  {
     href: "/settings/health",
     title: "Health Operations",
     description: "Read-only local health endpoint contract, demo-safe defaults, and runtime blockers."

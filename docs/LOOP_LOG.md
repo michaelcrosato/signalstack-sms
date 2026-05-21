@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 035  GREEN  environment-operations  2026-05-20 18:20
+Objective:    Add a read-only local environment operations checkpoint for demo-safe defaults and runtime configuration boundaries.
+Changed:
+- Added `/settings/environment` with demo-safe defaults, allowlisted configuration categories, derived runtime status, operational links, and safety boundary.
+- Linked the view from `/`, `/demo`, `/settings`, `/settings/system`, and `/settings/runbook`.
+- Extended root smoke and seeded investor demo E2E coverage for the environment view and navigation path.
+- Updated API contract/map docs, README, PLAN, demo-mode docs, local operator runbook, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only admin/reporting/environment refinements without live external-impact actions.
+
 ## Run 034  GREEN  health-operations  2026-05-20 18:11
 Objective:    Add a read-only local health operations checkpoint for the existing health endpoint and demo-safe defaults.
 Changed:

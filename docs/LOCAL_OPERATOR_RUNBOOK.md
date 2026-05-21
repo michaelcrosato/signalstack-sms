@@ -96,6 +96,17 @@ Use `/settings/health` for a read-only local health checkpoint before demos or r
 
 The page is display-only. It must not execute probes, call APIs, run commands, mutate records, expose raw environment values or secrets, call providers, create billing records, send notifications, send SMS, send email, or enable live features.
 
+## Environment Operations
+
+Use `/settings/environment` for a read-only local configuration checkpoint before demos, release work, or repair work. It displays:
+
+- demo-safe defaults
+- allowlisted configuration categories
+- derived runtime status
+- links to system, security, validation, and release operations
+
+The page is display-only. It must not read environment files, expose raw values or secrets, mutate configuration, write files, execute commands, call APIs, call Redis, call providers, create billing records, send notifications, send SMS, send email, deploy, or enable live features.
+
 ## Provider Numbers
 
 Use `/settings/numbers` for read-only local number metadata review before demos or repair work. It displays:

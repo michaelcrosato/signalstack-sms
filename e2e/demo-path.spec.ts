@@ -12,7 +12,13 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("Runtime")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Queue" })).toBeVisible();
   await expect(page.getByText("API Protection")).toBeVisible();
-  await page.getByRole("link", { name: "Health Operations" }).click();
+  await page.getByRole("link", { name: "Environment Operations" }).click();
+  await expect(page.getByRole("heading", { name: "Environment Operations" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Demo-Safe Defaults" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Configuration Categories" })).toBeVisible();
+  await expect(page.getByText("External-impact gates")).toBeVisible();
+  await expect(page.getByText("Safety Boundary")).toBeVisible();
+  await page.getByRole("link", { name: "Health Operations" }).first().click();
   await expect(page.getByRole("heading", { name: "Health Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Health Signals" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Demo-Safe Defaults" })).toBeVisible();

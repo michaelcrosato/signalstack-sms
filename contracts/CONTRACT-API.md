@@ -224,6 +224,10 @@ Renders a read-only local operations snapshot for the current organization. It m
 
 Renders a read-only local health operations checkpoint. It may display the existing `GET /api/health` contract, static service name, demo-safe defaults, runtime blockers, and links to local system/API/security/validation surfaces. The page must not execute health probes, call APIs, run commands, mutate records, expose raw environment values or secrets, call providers, call Stripe, call live AI, send SMS, send email, send notifications, create billing records, or enable live features.
 
+### `/settings/environment`
+
+Renders a read-only local environment operations checkpoint. It may display demo-safe defaults, allowlisted configuration category names, derived runtime status, and links to local system/security/validation/release surfaces. The page must not read environment files, display `.env.local` contents, expose raw environment values, expose credentials or token fingerprints, mutate configuration, write files, execute commands, call APIs, call Redis, call providers, call Stripe, call live AI, send SMS, send email, send notifications, create billing records, deploy, or enable live features.
+
 ### `/settings/runbook`
 
 Renders a read-only local operator checklist based on `docs/LOCAL_OPERATOR_RUNBOOK.md`. It may display local validation, database migration/seed, worker, BullMQ smoke, admin export, and repair-loop commands. The page must not execute commands, mutate records, expose secrets, call providers, send notifications, create billing records, or enable live messaging.

@@ -98,3 +98,5 @@ Local operator procedures are documented in `docs/LOCAL_OPERATOR_RUNBOOK.md`; `n
 The same local-only operator checklist is visible at `/settings/runbook`. It displays commands, safety boundaries, and links to current local admin views only; it does not execute commands or create side effects.
 
 The read-only `/settings/system` page summarizes local safety defaults, runtime markers, queue backend metadata, worker limits, and API rate-limit policy without mutations or external side effects.
+
+Environment operations review is available at `/settings/environment`. It renders demo-safe defaults, allowlisted configuration categories, and derived runtime status only; it does not read environment files, expose raw values or secrets, mutate configuration, call providers, bill, notify, send SMS or email, or enable live features.
