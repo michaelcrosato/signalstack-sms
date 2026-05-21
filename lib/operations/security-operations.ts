@@ -55,6 +55,13 @@ const forbiddenSecretMetadataPatterns = [
   /\b(?:TWILIO_AUTH_TOKEN|STRIPE_SECRET_KEY|OPENAI_API_KEY|CLERK_SECRET_KEY)\s*=/,
   /\bBearer\s+[A-Za-z0-9._-]{12,}/
 ] as const;
+const forbiddenCommandMetadataPatterns = [
+  /\bnpm\s+run\b/i,
+  /\bnpx\b/i,
+  /\bpowershell\b/i,
+  /\bcurl\b/i,
+  /\bInvoke-WebRequest\b/i
+] as const;
 
 const securityOperationStatusSummary = Object.freeze({
   commandExecution: "none",
@@ -85,6 +92,12 @@ function assertNonblankString(value: unknown, errorMessage: string) {
 
 function assertNoSecretLikeMetadata(value: string, errorMessage: string) {
   if (forbiddenSecretMetadataPatterns.some((pattern) => pattern.test(value))) {
+    throw new Error(errorMessage);
+  }
+}
+
+function assertNoCommandLikeMetadata(value: string, errorMessage: string) {
+  if (forbiddenCommandMetadataPatterns.some((pattern) => pattern.test(value))) {
     throw new Error(errorMessage);
   }
 }
@@ -123,6 +136,9 @@ function assertSecurityControl(control: SecurityOperationControl) {
   assertCleanSecurityMetadata(control.name, `Whitespace-unsafe security operation control name for ${control.name}`);
   assertCleanSecurityMetadata(control.status, `Whitespace-unsafe security operation status for ${control.name}`);
   assertCleanSecurityMetadata(control.detail, `Whitespace-unsafe security operation detail for ${control.name}`);
+  assertNoCommandLikeMetadata(control.name, `Command-like security operation control name for ${control.name}`);
+  assertNoCommandLikeMetadata(control.status, `Command-like security operation status for ${control.name}`);
+  assertNoCommandLikeMetadata(control.detail, `Command-like security operation detail for ${control.name}`);
   assertNoSecretLikeMetadata(control.detail, `Secret-like security operation detail for ${control.name}`);
 
   if (!allowedSecurityOperationControlStatuses.includes(control.status as (typeof allowedSecurityOperationControlStatuses)[number])) {
@@ -148,6 +164,7 @@ function assertValidationReference(reference: SecurityOperationValidationReferen
   assertNonblankString(reference.purpose, `Invalid security operation validation purpose for ${reference.command}`);
   assertCleanSecurityMetadata(reference.command, `Whitespace-unsafe security operation validation command ${reference.command}`);
   assertCleanSecurityMetadata(reference.purpose, `Whitespace-unsafe security operation validation purpose for ${reference.command}`);
+  assertNoCommandLikeMetadata(reference.purpose, `Command-like security operation validation purpose for ${reference.command}`);
   assertNoSecretLikeMetadata(reference.purpose, `Secret-like security operation validation purpose for ${reference.command}`);
 }
 
@@ -196,6 +213,7 @@ function freezeSafetyBoundaries(boundaries: string[]) {
   for (const boundary of boundaries) {
     assertNonblankString(boundary, "Invalid security operation safety boundary");
     assertCleanSecurityMetadata(boundary, "Whitespace-unsafe security operation safety boundary");
+    assertNoCommandLikeMetadata(boundary, "Command-like security operation safety boundary");
     assertNoSecretLikeMetadata(boundary, "Secret-like security operation safety boundary");
   }
 
@@ -230,7 +248,7 @@ export const securityOperationControls = freezeSecurityControls([
   {
     name: "Production gate",
     status: "validation enforced",
-    detail: "npm run validate includes the production deployment gate and blocks unsafe live-impact production-like settings."
+    detail: "The validation gate includes the production deployment gate and blocks unsafe live-impact production-like settings."
   }
 ]);
 
@@ -255,8 +273,8 @@ export const securityOperationValidationReferences = freezeValidationReferences(
 
 export const securityOperationSafetyBoundaries = freezeSafetyBoundaries([
   "This view does not read or display raw secrets, `.env.local`, provider tokens, or API keys.",
-  "Secret scanning remains an explicit validation command through `npm run secrets:scan`.",
-  "Production safety remains enforced through `npm run production:gate` inside `npm run validate`.",
+  "Secret scanning remains an explicit validation reference without displaying raw local environment secrets.",
+  "Production safety remains enforced through the production gate inside the protected validation command.",
   "No provider calls, live AI calls, Stripe calls, SMS, email, notifications, mutations, or live feature enablement occur here."
 ]);
 

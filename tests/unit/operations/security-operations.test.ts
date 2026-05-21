@@ -217,8 +217,8 @@ describe("getSecurityOperationsStatus", () => {
     ]);
     expect(securityOperationSafetyBoundaries).toEqual([
       "This view does not read or display raw secrets, `.env.local`, provider tokens, or API keys.",
-      "Secret scanning remains an explicit validation command through `npm run secrets:scan`.",
-      "Production safety remains enforced through `npm run production:gate` inside `npm run validate`.",
+      "Secret scanning remains an explicit validation reference without displaying raw local environment secrets.",
+      "Production safety remains enforced through the production gate inside the protected validation command.",
       "No provider calls, live AI calls, Stripe calls, SMS, email, notifications, mutations, or live feature enablement occur here."
     ]);
   });
@@ -256,5 +256,22 @@ describe("getSecurityOperationsStatus", () => {
     ];
 
     expect(staticCopy.filter((copy) => secretLikePatterns.some((pattern) => pattern.test(copy)))).toEqual([]);
+  });
+
+  it("keeps security operation non-command metadata free of command-like literals", () => {
+    const nonCommandCopy = [
+      ...securityOperationControls.flatMap((control) => [control.name, control.status, control.detail]),
+      ...securityOperationValidationReferences.map((reference) => reference.purpose),
+      ...securityOperationSafetyBoundaries
+    ];
+    const commandLikePatterns = [
+      /\bnpm\s+run\b/i,
+      /\bnpx\b/i,
+      /\bpowershell\b/i,
+      /\bcurl\b/i,
+      /\bInvoke-WebRequest\b/i
+    ];
+
+    expect(nonCommandCopy.filter((copy) => commandLikePatterns.some((pattern) => pattern.test(copy)))).toEqual([]);
   });
 });

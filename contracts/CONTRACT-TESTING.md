@@ -189,6 +189,7 @@ Post-MVP security operations view:
 - Unit tests must verify that the static security operations inventory keeps validation command references inside the runtime-frozen supported command allowlist and backed by `package.json` scripts before `/settings/security` renders them.
 - Unit tests must verify that the static security operations inventory keeps controls, validation references, and safety boundaries whitespace-clean before `/settings/security` renders metadata.
 - Unit tests must verify that the static security operations inventory rejects secret-like literals before `/settings/security` renders metadata.
+- Unit tests must verify that the static security operations inventory rejects command-like literals outside the allowlisted validation-command field before `/settings/security` renders metadata.
 - The seeded investor demo path must verify that `/settings/security` renders command-execution, external-impact, mutation, and secrets-displayed no-impact labels without scanning files, exposing raw env values, mutating records, provider calls, billing records, live AI, SMS, email, notifications, or live feature enablement.
 
 Post-MVP notification operations view:
