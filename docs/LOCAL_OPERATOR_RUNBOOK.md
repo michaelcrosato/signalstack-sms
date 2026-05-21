@@ -4,6 +4,8 @@ This runbook covers local and demo-safe operations only. It does not authorize l
 
 The same local-only checklist is available in the app at `/settings/runbook`. That page is read-only: it displays commands and safety boundaries, but it must not execute commands, mutate records, call providers, create billing records, send notifications, expose secrets, or enable live messaging.
 
+The root launch dashboard, runbook admin links, and go-live readiness navigation are projected from the shared local operator surface inventory. Unit coverage keeps those projections aligned with implemented `app/**/page.tsx` files before browser demo coverage.
+
 ## Required Defaults
 
 Use these defaults for local operation:

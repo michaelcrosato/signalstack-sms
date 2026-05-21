@@ -2,6 +2,7 @@ import { existsSync, readdirSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  getLaunchDashboardLinks,
   getOperatorSurfaceSummary,
   getRunbookAdminLinks,
   getSettingsNavigationLinks,
@@ -112,5 +113,18 @@ describe("operator surface inventory", () => {
       ])
     );
     expect(navigationRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+  });
+
+  it("projects the launch dashboard from the full shared surface inventory", () => {
+    const sourceLinks = operatorSurfaceGroups.flatMap((group) => group.links);
+    const launchLinks = getLaunchDashboardLinks();
+    const launchRoutes = launchLinks.map((link) => link.href);
+
+    expect(launchLinks).toEqual(sourceLinks);
+    expect(launchLinks).toHaveLength(35);
+    expect(launchRoutes).toEqual(getOperatorSurfaceSummary().routes);
+    expect(launchRoutes).toContain("/demo");
+    expect(launchRoutes).toContain("/settings");
+    expect(launchRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
   });
 });

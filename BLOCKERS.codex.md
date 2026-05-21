@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 44
+Run number: 45
 
 No active blockers.
 
 ## Notes
 
+- `/` now projects its local launch dashboard links from the shared local operator surface inventory. Unit coverage verifies full shared-route alignment, `/demo` and `/settings` inclusion, and backing `app/**/page.tsx` files. The check is local filesystem validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `/settings` now projects its local admin navigation from the shared local operator surface inventory, excluding the current `/settings` page and non-settings surfaces. Unit coverage verifies expected local surfaces and backing `app/**/page.tsx` files. The check is local filesystem validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `/settings/api` inventory tests now verify listed API route-method rows are unique, each listed API path has a backing `app/**/route.ts`, and every implemented local API route method has a static inventory row, catching stale API inventory before browser demo coverage. The check is local filesystem validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `/settings/runbook` now projects its local admin links from the shared local operator surface inventory. Unit coverage verifies label alignment, settings-only projection, backing `app/**/page.tsx` files, and the intentional `/demo` exclusion. The check is local filesystem validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

@@ -55,7 +55,7 @@ Operations index review is available at `/settings/operations`. It renders group
 
 The operations index route inventory is shared with unit tests so local surface counts, backing app pages, implemented operator pages, duplicate routes, and safety-sensitive links fail fast before browser demo coverage.
 
-The `/settings/runbook` admin links and `/settings` go-live readiness navigation are projected from the same shared local operator surface inventory, with unit coverage for label alignment, current-page exclusion, and backing app pages.
+The root launch dashboard, `/settings/runbook` admin links, and `/settings` go-live readiness navigation are projected from the same shared local operator surface inventory, with unit coverage for launch coverage, label alignment, current-page exclusion, and backing app pages.
 
 Release operations review is available at `/settings/releases`. It renders local release checklist commands, protected gate expectations, seeded demo path, premerge metadata, and release surface links only; it does not execute commands, run migrations, launch tests or browsers, perform git operations, deploy, mutate records, call providers, bill, notify, expose logs, diffs, environment values, or secrets, or enable live features.
 
@@ -99,7 +99,7 @@ Compliance readiness detail is available at `/settings/compliance`. It renders e
 
 Provider number metadata is available at `/settings/numbers`. It renders existing local number rows only; it does not provision numbers, verify provider ownership, call Twilio, mutate records, or enable live messaging.
 
-The root route `/` is a local launch dashboard with demo-safe defaults and links to the seeded demo, go-live readiness, provider metadata, system status, usage, and admin export views.
+The root route `/` is a local launch dashboard with demo-safe defaults and links projected from the shared local operator surface inventory, including the seeded demo, go-live readiness, provider metadata, system status, usage, and admin export views.
 
 Local operator procedures are documented in `docs/LOCAL_OPERATOR_RUNBOOK.md`; `npm run operator:check` verifies the runbook and is included in `npm run validate`.
 

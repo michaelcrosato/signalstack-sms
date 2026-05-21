@@ -38,6 +38,8 @@ The `/settings/runbook` admin-link list is derived from that same shared local o
 
 The `/settings` go-live readiness navigation is also projected from the shared local operator surface inventory, excluding the current page and non-settings surfaces, so readiness navigation stays aligned with operations and runbook surfaces.
 
+The root launch dashboard is projected from the full shared local operator surface inventory, including `/demo` and `/settings`, so new local operator surfaces appear in the launch view when they are added to the shared inventory.
+
 The release operations screen at `/settings/releases` displays local release checklist commands, protected gate expectations, seeded demo path, premerge metadata, release surface links, and runtime safety boundaries. It is read-only and does not execute commands, run migrations, launch tests or browsers, perform git operations, deploy, mutate records, enqueue jobs, call Redis, call providers, bill, notify, expose logs, diffs, environment values, or secrets, or enable live features.
 
 The health operations screen at `/settings/health` displays the existing local health endpoint contract, demo-safe defaults, runtime blockers, and local operations links. It is read-only and does not execute probes, call APIs, run commands, mutate records, expose raw environment values or secrets, call providers, bill, notify, send SMS or email, or enable live features.
@@ -74,7 +76,7 @@ The validation operations screen at `/settings/validation` displays static local
 
 The API operations inventory is unit-tested so listed local API route-method rows stay unique, point at implemented `app/**/route.ts` files, include every implemented local API route method, and keep external-impact classification at zero.
 
-The root route `/` is a static local launch dashboard. It shows the demo-safe runtime defaults and links to the existing demo, readiness, provider metadata, system status, usage, and admin export views without requiring database access or creating side effects.
+The root route `/` is a static local launch dashboard. It shows the demo-safe runtime defaults and shared-inventory links to the existing demo, readiness, provider metadata, system status, usage, and admin export views without requiring database access or creating side effects.
 
 The local operator runbook screen at `/settings/runbook` displays demo-safe validation, seed, worker, export, and repair-loop commands from the local runbook. It is read-only and does not execute commands, mutate records, call providers, create billing records, send notifications, expose secrets, or enable live messaging.
 

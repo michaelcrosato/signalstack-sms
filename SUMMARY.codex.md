@@ -1,16 +1,21 @@
 # Codex Summary
 
-Run number: 44
+Run number: 45
 
 ## Completed
+
+- Advanced a post-MVP local launch dashboard navigation hardening checkpoint.
+- Refactored `/` local launch links to project from the shared operator surface inventory instead of duplicating the list.
+- Added unit coverage for launch dashboard projection, `/demo` and `/settings` inclusion, full shared-route alignment, and backing `app/**/page.tsx` files.
+- Updated testing contract, README, demo-mode docs, local operator runbook, PLAN, BLOCKERS, and next-prompt handoff docs with the launch dashboard drift check.
+
+## Prior Completed
 
 - Advanced a post-MVP go-live readiness navigation hardening checkpoint.
 - Refactored `/settings` local admin navigation to project from the shared operator surface inventory instead of duplicating the list.
 - Added unit coverage for readiness navigation current-page exclusion, non-settings exclusion, expected local surfaces, and backing `app/**/page.tsx` files.
 - Updated the seeded investor demo path to choose the first Provider Details link now that shared header navigation intentionally exposes the same route.
 - Updated testing contract, README, demo-mode docs, local operator runbook, PLAN, BLOCKERS, and next-prompt handoff docs with the shared readiness navigation drift check.
-
-## Prior Completed
 
 - Advanced a post-MVP local API operations inventory reverse-coverage checkpoint.
 - Added unit coverage that fails when an implemented local API route method under `app/api/**/route.ts` is missing from the static `/settings/api` inventory.

@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 045  GREEN  launch-dashboard-navigation  2026-05-20 19:18
+Objective:    Project `/` local launch dashboard links from the shared operator surface inventory.
+Changed:
+- Added `getLaunchDashboardLinks` to the shared local operator surface inventory.
+- Refactored `/` to render launch links from the shared inventory instead of a duplicated hard-coded list.
+- Added unit coverage for launch dashboard projection, `/demo` and `/settings` inclusion, full shared-route alignment, and backing app pages.
+- Updated testing contract, README, demo-mode docs, local operator runbook, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only navigation, inventory, or admin/reporting refinements without live external-impact actions.
+
 ## Run 044  GREEN  go-live-readiness-navigation  2026-05-20 19:13
 Objective:    Project `/settings` local admin navigation from the shared operator surface inventory.
 Changed:

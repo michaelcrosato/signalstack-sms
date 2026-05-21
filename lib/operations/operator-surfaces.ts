@@ -84,3 +84,7 @@ export function getRunbookAdminLinks(groups: OperatorSurfaceGroup[] = operatorSu
 export function getSettingsNavigationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return getRunbookAdminLinks(groups).filter((link) => link.href !== "/settings");
 }
+
+export function getLaunchDashboardLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return groups.flatMap((group) => group.links);
+}
