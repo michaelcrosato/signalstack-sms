@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP loop-log truth repair checkpoint.
+- Synchronized root and docs loop logs with runs 106-113 from the existing commit history and current handoff summaries.
+- Preserved the local-only operator hardening history without changing product code, contracts, protected gate scripts, or live-action settings.
+- Protected local gate passed for the coordination-only repair.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 114
+
+## Previous Run
+
 - Advanced a post-MVP shared operator supplied-inventory inventory-array-shape checkpoint.
 - Tightened the shared operator surface validator so supplied inventory arrays must be plain arrays with no extra string or symbol fields.
 - Added unit coverage proving custom-prototype and decorated supplied inventory arrays fail before summaries or projections derive local navigation.

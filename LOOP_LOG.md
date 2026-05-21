@@ -873,3 +873,92 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 106  GREEN  supplied-inventory-sparse-group-guard  2026-05-21 00:13
+Objective:    Fail supplied shared operator inventory sparse group entries before projection.
+Changed:
+- Added unit coverage proving sparse/missing supplied group entries fail before summaries or projections derive local navigation.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: 03ee7f3
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 107  GREEN  supplied-inventory-data-field-guard  2026-05-21 00:17
+Objective:    Fail accessor-backed supplied shared operator inventory fields before projection.
+Changed:
+- Added descriptor guards requiring supplied group/link navigation fields to be plain data properties.
+- Added unit coverage proving accessor-backed supplied group/link fields fail before summaries or projections read local navigation values.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: 24c04da
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 108  GREEN  supplied-inventory-enumerable-field-guard  2026-05-21 00:22
+Objective:    Fail non-enumerable supplied shared operator inventory fields before projection.
+Changed:
+- Tightened descriptor guards so supplied group/link navigation fields must be enumerable data properties.
+- Added unit coverage proving hidden required fields fail before summaries or projections derive local navigation.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: 39bf20f
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 109  GREEN  supplied-inventory-plain-record-guard  2026-05-21 00:26
+Objective:    Fail custom-prototype supplied shared operator inventory records before projection.
+Changed:
+- Added prototype guards requiring supplied operator groups and links to be ordinary object records.
+- Added unit coverage proving custom-prototype supplied group/link records fail before summaries or projections derive local navigation.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: a1a3c03
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 110  GREEN  canonical-pre-export-validation  2026-05-21 00:30
+Objective:    Validate the canonical shared operator inventory before export.
+Changed:
+- Reused the shared operator surface validator before freezing the canonical inventory.
+- Added unit coverage aligning exported canonical routes with summary routes.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: da095b7
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 111  GREEN  supplied-inventory-exact-field-guard  2026-05-21 00:35
+Objective:    Fail supplied shared operator inventory groups and links with extra fields before projection.
+Changed:
+- Tightened the shared validator so supplied groups and links expose only exact public fields.
+- Added unit coverage proving extra string or symbol fields fail before summaries or projections derive local navigation.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: 3010d4e
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 112  GREEN  supplied-inventory-link-array-shape  2026-05-21 00:40
+Objective:    Fail supplied shared operator inventory link arrays with custom shape before projection.
+Changed:
+- Tightened the shared validator so supplied group link arrays must be plain arrays with no extra string or symbol fields.
+- Added unit coverage proving custom-prototype and decorated supplied link arrays fail before summaries or projections derive local navigation.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: 453bf15
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 113  GREEN  supplied-inventory-array-shape  2026-05-21 00:44
+Objective:    Fail supplied shared operator inventory arrays with custom shape before projection.
+Changed:
+- Tightened the shared validator so supplied inventory arrays must be plain arrays with no extra string or symbol fields.
+- Added unit coverage proving custom-prototype and decorated supplied inventory arrays fail before summaries or projections derive local navigation.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: 3cb217e
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 114  GREEN  loop-log-truth-repair  2026-05-21 00:49
+Objective:    Restore missing loop-log entries for recent green shared-inventory runs.
+Changed:
+- Synchronized root and docs loop logs with runs 106-113 from existing commit history and current handoff summaries.
+- Updated SUMMARY and BLOCKERS to record this coordination-only repair.
+- Preserved product code, contracts, protected gate scripts, demo-safe defaults, and live-action settings unchanged.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
