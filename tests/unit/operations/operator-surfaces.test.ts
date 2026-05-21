@@ -334,6 +334,16 @@ describe("operator surface inventory", () => {
     expect(() => getDemoOperationsLinks(groupsWithArray)).toThrow("Invalid operator surface group");
   });
 
+  it("rejects supplied operator inventories with sparse group entries before projection", () => {
+    const sparseGroups = cloneSurfaceGroups(operatorSurfaceGroups);
+    delete sparseGroups[1];
+    const groups = sparseGroups as unknown as OperatorSurfaceGroup[];
+
+    expect(() => getOperatorSurfaceSummary(groups)).toThrow("Invalid operator surface group");
+    expect(() => getLaunchDashboardLinks(groups)).toThrow("Invalid operator surface group");
+    expect(() => getDemoOperationsLinks(groups)).toThrow("Invalid operator surface group");
+  });
+
   it("rejects supplied operator inventories with invalid link objects before projection", () => {
     const groupsWithNullLink = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
       ...group,

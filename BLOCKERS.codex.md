@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 105
+Run number: 106
 
 No active blockers.
 
 ## Notes
 
+- Latest shared supplied-inventory sparse-group hardening added unit coverage proving sparse/missing supplied operator inventory group entries fail before summaries, launch links, or demo operation projections can derive local navigation. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest shared supplied-inventory own-field hardening added a guard and unit coverage proving prototype-backed supplied operator groups or links fail before summaries or projections derive local navigation. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest shared supplied-inventory sparse-link hardening changed the operator surface validator to walk each supplied link slot explicitly and added unit coverage proving sparse/missing link entries fail before summaries, launch links, or demo operation projections can silently drop malformed local navigation. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest shared supplied-inventory route-shape variant hardening expanded unit coverage so hash-bearing, trailing-slash, and double-slash supplied routes are explicitly rejected alongside non-local, uppercase, query-bearing, and dynamic route shapes before local navigation helpers can render them. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

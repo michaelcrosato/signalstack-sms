@@ -1,5 +1,14 @@
 # Codex Summary
 
+- Advanced a post-MVP shared operator supplied-inventory sparse-group checkpoint.
+- Added unit coverage proving sparse/missing supplied group entries fail before summaries or projections can derive local navigation.
+- Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 106
+
+## Previous Run
+
 - Advanced a post-MVP shared operator supplied-inventory own-field checkpoint.
 - Added validator guards requiring supplied operator groups and links to carry required navigation fields as own properties before summaries or projections are derived.
 - Added unit coverage proving prototype-backed supplied group/link records fail before local navigation can render them.
