@@ -344,6 +344,18 @@ Renders a read-only local go-live readiness audit view for the current organizat
 
 Renders the product-facing contacts workspace for the current organization. It may display tenant-scoped active contacts, consent state, list/tag labels, contact metrics, and a local CSV import form that posts to the existing `POST /api/contacts/imports` endpoint. It must not send SMS, call providers, create billing records, call live AI, expose secrets, hard-delete contacts, bypass import validation, or enable live messaging.
 
+### `/dashboard/campaigns`
+
+Renders the product-facing campaign workspace for the current organization. It may create local draft campaigns through the existing campaign API, run preflight, and schedule local queue records through existing endpoints. It must not send SMS, call providers, create billing records, call live AI, expose secrets, bypass compliance preflight, execute workers, or enable live messaging.
+
+### `/dashboard/inbox`
+
+Renders the product-facing inbox workspace for the current organization. It may display tenant-scoped conversations, create local inbound demo messages, add internal notes, assign conversations, and resolve or reopen threads through existing inbox endpoints. It must not send outbound SMS, call providers, create billing records, call live AI, expose secrets, notify contacts, or enable live messaging.
+
+### `/dashboard/templates`
+
+Renders the product-facing template workspace for the current organization. It may list tenant-scoped message templates and create or update local reusable copy through `POST /api/templates`, including variable extraction from template placeholders. It must not render live outbound messages, schedule campaigns, send SMS, call providers, create billing records, call live AI, expose secrets, or enable live messaging.
+
 ### `/`
 
 Renders the local launch dashboard. It may display demo-safe runtime defaults and links to existing local-only demo, readiness, provider metadata, system, usage, and admin export views. The page must not require database access, mutate records, call providers, create billing artifacts, send notifications, expose secrets, or enable live messaging.

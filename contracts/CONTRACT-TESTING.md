@@ -144,6 +144,7 @@ Post-MVP AI operations view:
 - The seeded investor demo path must verify that `/settings/contacts`, `/settings/campaigns`, `/settings/audience`, `/settings/templates`, `/settings/inbox`, and `/settings/data` header navigation labels and link targets are projected from the shared local operator surface inventory.
 - The seeded investor demo path must verify that `/settings/provider`, `/settings/numbers`, `/settings/compliance`, `/settings/system`, `/settings/usage`, and `/settings/readiness-audit` header navigation labels and link targets are projected from the shared local operator surface inventory.
 - The seeded product demo path must verify `/dashboard/inbox` renders the owner-facing inbox list/thread workflow and exercises local inbound reply, note, resolve, and reopen actions without SMS, provider calls, billing, live AI, secrets, or live feature enablement.
+- The seeded product demo path must verify `/dashboard/templates` renders the owner-facing template list/create workflow and creates local reusable copy without rendering live outbound messages, scheduling campaigns, provider calls, SMS, billing, live AI, secrets, or live feature enablement.
 
 Post-MVP reporting index view:
 

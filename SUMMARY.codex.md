@@ -1,11 +1,11 @@
 # Codex Summary
 
-- Advanced Phase 1 product UI by adding `/dashboard/contacts`.
-- The contacts workspace renders tenant-scoped active contacts with consent, list, and tag context, and imports local CSV rows through the existing validated contacts import API.
-- Updated product navigation and seeded product-demo coverage so `/dashboard/contacts` is exercised after the dashboard.
+- Advanced Phase 1 product UI by adding `/dashboard/templates`.
+- The template workspace creates local reusable SMS copy through the existing template API, previews detected variables, lists saved templates, and shows campaign usage counts.
+- Updated product navigation and seeded product-demo coverage so `/dashboard/templates` is exercised after dashboard, contacts, campaigns, and inbox flows.
 - No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, worker execution, Redis calls, or protected gate-script edits were used.
 
-Run number: 204
+Run number: 205
 
 ## Previous Run
 

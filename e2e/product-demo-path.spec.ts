@@ -110,23 +110,32 @@ test("product campaigns page creates, preflights, and schedules a local campaign
 });
 
 test("product inbox page manages a local conversation thread", async ({ page }) => {
-  const noteBody = `Product E2E note ${Date.now()}: STOP should remain local and update consent.`;
+  const uniqueSuffix = Date.now().toString().slice(-7);
+  const phone = `+1555${uniqueSuffix}`;
+  const noteBody = `Product E2E note ${Date.now()}: local reply should remain provider-free.`;
+
+  await page.request.post("/api/inbox/conversations", {
+    data: {
+      phone,
+      body: "Can you send pricing?"
+    }
+  });
 
   await page.goto("/dashboard/inbox");
 
   await expect(page.getByRole("heading", { name: "Inbox workspace" })).toBeVisible();
   await expect(page.getByLabel("Inbox metrics").getByText("Open Threads")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Conversation list" })).toBeVisible();
-  await expect(page.getByText("Ada Lovelace")).toBeVisible();
-  await expect(page.getByText("Can you send pricing?")).toBeVisible();
+  await expect(page.getByText(phone).first()).toBeVisible();
+  await expect(page.getByText("Can you send pricing?").first()).toBeVisible();
   await expect(page.getByRole("heading", { name: "Thread" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Demo inbound" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Internal note" })).toBeVisible();
 
-  await page.getByLabel("Reply body").fill("STOP");
+  await page.getByLabel("Reply body").fill("HELP");
   await page.getByRole("button", { name: "Add Local Reply" }).click();
   await expect(page.getByRole("status")).toContainText("Local inbound reply added");
-  await expect(page.getByText("STOP").first()).toBeVisible();
+  await expect(page.getByText("HELP").first()).toBeVisible();
 
   await page.getByLabel("Note body").fill(noteBody);
   await page.getByRole("button", { name: "Add Note" }).click();
@@ -140,4 +149,29 @@ test("product inbox page manages a local conversation thread", async ({ page }) 
   await page.getByRole("button", { name: "Reopen" }).click();
   await expect(page.getByRole("status")).toContainText("Conversation reopened");
   await expect(page.getByText("OPEN").first()).toBeVisible();
+});
+
+test("product templates page creates local reusable copy", async ({ page }) => {
+  const templateName = `Product E2E template ${Date.now()}`;
+
+  await page.goto("/dashboard/templates");
+
+  await expect(page.getByRole("heading", { name: "Template workspace" })).toBeVisible();
+  await expect(page.getByLabel("Template metrics").getByText("Saved Templates")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Template editor" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Saved templates" })).toBeVisible();
+  await expect(page.getByText("Demo intro")).toBeVisible();
+
+  await page.getByLabel("Template name").fill(templateName);
+  await page.getByLabel("Message body").fill("Hi {{firstName}}, {{company}} has a new demo slot. Reply STOP to opt out.");
+  await expect(page.getByLabel("Detected variables")).toContainText("company, firstName");
+
+  await page.getByRole("button", { name: "Save Template" }).click();
+  await expect(page.getByRole("status")).toContainText("Template saved locally");
+
+  const savedRow = page.getByRole("row").filter({ hasText: templateName });
+  await expect(savedRow).toBeVisible();
+  await expect(savedRow.getByRole("cell", { name: /^(company, firstName|firstName, company)$/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Safety Boundary" })).toBeVisible();
+  await expect(page.getByText("No provider calls, SMS, live AI requests")).toBeVisible();
 });

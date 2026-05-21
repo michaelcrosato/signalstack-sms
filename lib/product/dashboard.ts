@@ -4,7 +4,7 @@ export const productNavigation = Object.freeze([
   { href: "/dashboard/contacts", label: "Contacts", note: "audience and consent" },
   { href: "/dashboard/campaigns", label: "Campaigns", note: "drafts and scheduling" },
   { href: "/dashboard/inbox", label: "Inbox", note: "open conversations" },
-  { href: "#templates", label: "Templates", note: "message copy" },
+  { href: "/dashboard/templates", label: "Templates", note: "message copy" },
   { href: "#analytics", label: "Analytics", note: "local performance" },
   { href: "#compliance", label: "Compliance", note: "go-live readiness" },
   { href: "/settings", label: "Settings", note: "operator controls" }

@@ -1893,3 +1893,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Build template list/detail UI on existing template APIs.
+
+## Run 205  GREEN  product-template-workspace  2026-05-21 14:37
+Objective:    Add an owner-facing template create/list workflow on existing template APIs.
+Changed:
+- Added `/dashboard/templates` with local template creation, detected variable preview, saved template rows, usage counts, and explicit no-live-send safety boundary.
+- Added a product template data adapter and updated product navigation from the dashboard template anchor to the new workspace route.
+- Extended seeded product E2E to create reusable local template copy and made the inbox scenario create its own unique local conversation for repeatable runs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Expand product-facing compliance readiness from the dashboard summary.
