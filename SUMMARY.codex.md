@@ -1,8 +1,13 @@
 # Codex Summary
 
-Run number: 74
+Run number: 75
 
 ## Completed
+
+- Advanced a post-MVP shared operator focused-projection reachability checkpoint.
+- Added unit coverage so every shared operator surface route must be reachable from at least one focused page-specific or rich projection outside the broad inventory views.
+- Updated testing contract/docs, README, PLAN, BLOCKERS, loop logs, and next-prompt handoff docs with the focused projection reachability guard.
+- Targeted operator-surface unit coverage passed.
 
 - Advanced a post-MVP full shared operator projection supplied-inventory checkpoint.
 - Expanded unit coverage so every shared operator navigation projection, plus demo checkpoint signals, workflow owners, and integration labels/notes, is proven to derive visible copy from the supplied inventory instance.

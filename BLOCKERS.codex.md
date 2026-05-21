@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 74
+Run number: 75
 
 No active blockers.
 
 ## Notes
 
+- Every shared operator surface route now has unit coverage proving it is reachable from at least one focused page-specific or rich projection, outside the broad launch/settings/runbook inventory projections. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Root `LOOP_LOG.md` is synced with `docs/LOOP_LOG.md` through run 072. This coordination-only change preserves recent green loop history at the root without product code changes, protected gate script changes, live-action settings, credential use, or external-impact behavior.
 - Every shared operator navigation projection plus rich demo/workflow/integration projection labels and notes now have unit coverage proving they derive visible copy from the supplied inventory instance. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator navigation projections now have unit coverage proving labels and notes derive from the supplied inventory instance. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

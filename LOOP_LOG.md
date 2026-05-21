@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 075  GREEN  projection-focused-reachability  2026-05-20 21:54
+Objective:    Guard shared operator surfaces against becoming orphaned from focused projections.
+Changed:
+- Added unit coverage that verifies every shared operator surface route is reachable from at least one focused page-specific or rich projection.
+- Excluded broad launch/settings/runbook inventory projections from the reachability proof so the guard catches missing operational cross-links.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 074  GREEN  projection-full-supplied-inventory-copy  2026-05-20 21:50
 Objective:    Extend supplied-inventory copy coverage across every shared operator projection.
 Changed:

@@ -288,6 +288,46 @@ describe("operator surface inventory", () => {
     }
   });
 
+  it("keeps every operator surface reachable from focused projections", () => {
+    const inventoryRoutes = operatorSurfaceGroups.flatMap((group) => group.links.map((link) => link.href));
+    const focusedProjectedRoutes = [
+      ...getDemoOperationsLinks().map((link) => link.href),
+      ...getReportingIndexLinks().map((link) => link.href),
+      ...getReleaseOperationSurfaceLinks().map((link) => link.href),
+      ...getSecurityOperationLinks().map((link) => link.href),
+      ...getEnvironmentOperationLinks().map((link) => link.href),
+      ...getHealthOperationLinks().map((link) => link.href),
+      ...getContractOperationLinks().map((link) => link.href),
+      ...getValidationOperationLinks().map((link) => link.href),
+      ...getQueueOperationLinks().map((link) => link.href),
+      ...getContactOperationLinks().map((link) => link.href),
+      ...getCampaignOperationLinks().map((link) => link.href),
+      ...getAudienceOperationLinks().map((link) => link.href),
+      ...getTemplateOperationLinks().map((link) => link.href),
+      ...getInboxOperationLinks().map((link) => link.href),
+      ...getDataOperationLinks().map((link) => link.href),
+      ...getNotificationOperationLinks().map((link) => link.href),
+      ...getExportOperationLinks().map((link) => link.href),
+      ...getWebhookOperationLinks().map((link) => link.href),
+      ...getDeliveryOperationLinks().map((link) => link.href),
+      ...getTeamOperationLinks().map((link) => link.href),
+      ...getBillingOperationLinks().map((link) => link.href),
+      ...getAiOperationLinks().map((link) => link.href),
+      ...getProviderOperationLinks().map((link) => link.href),
+      ...getNumberOperationLinks().map((link) => link.href),
+      ...getComplianceOperationLinks().map((link) => link.href),
+      ...getSystemOperationLinks().map((link) => link.href),
+      ...getUsageOperationLinks().map((link) => link.href),
+      ...getReadinessAuditOperationLinks().map((link) => link.href),
+      ...getDemoOperationsCheckpoints().map((checkpoint) => checkpoint.href),
+      ...getWorkflowOperationSteps().map((step) => step.href),
+      ...getIntegrationOperationAreas().map((area) => area.href)
+    ];
+    const focusedProjectedRouteSet = new Set(focusedProjectedRoutes);
+
+    expect(inventoryRoutes.filter((route) => !focusedProjectedRouteSet.has(route))).toEqual([]);
+  });
+
   it("derives projected operator copy from the supplied inventory", () => {
     const groups = withCustomSurfaceCopy(operatorSurfaceGroups, "/settings/usage", {
       label: "Usage Review",
