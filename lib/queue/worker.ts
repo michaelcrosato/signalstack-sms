@@ -1,8 +1,9 @@
 import { setTimeout as sleep } from "node:timers/promises";
-import { CampaignStatus, QueueJobStatus, QueueJobType, type QueueJob } from "@prisma/client";
+import { CampaignStatus, QueueJobStatus, QueueJobType, type Contact, type QueueJob } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
 import { renderTemplate } from "@/lib/messaging/render-template";
+import { preflightCampaignRecipients } from "@/lib/messaging/send-preflight";
 import { scheduledCampaignJobSchema } from "@/lib/queue/jobs";
 
 export type WorkerSafetyInput = {
@@ -25,7 +26,13 @@ export type SingleQueueJobProcessResult = {
   processed: 0 | 1;
   skipped: 0 | 1;
   blocked: boolean;
-  reason?: "provider-blocked" | "missing-job" | "not-due" | "invalid-payload" | "invalid-campaign";
+  reason?:
+    | "provider-blocked"
+    | "missing-job"
+    | "not-due"
+    | "invalid-payload"
+    | "invalid-campaign"
+    | "send-preflight-failed";
 };
 
 export type ContinuousWorkerInput = {
@@ -96,6 +103,12 @@ export function campaignMessageValues(contact: {
     lastName: contact.lastName ?? "",
     displayName: contact.displayName ?? contact.firstName ?? contact.phone
   };
+}
+
+export function scheduledCampaignSendIsAllowed(
+  contacts: Array<Pick<Contact, "id" | "phone" | "consentStatus" | "optedOutAt" | "archivedAt">>
+) {
+  return preflightCampaignRecipients(contacts).allowed;
 }
 
 export async function processDueScheduledCampaignJobs(
@@ -192,6 +205,13 @@ async function processScheduledCampaignQueueJob(
   if (!campaign || campaign.status !== CampaignStatus.SCHEDULED) {
     await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.FAILED } });
     return { processed: 0, skipped: 1, blocked: false, reason: "invalid-campaign" };
+  }
+
+  const recipientContacts = campaign.recipients.map((recipient) => recipient.contact);
+  if (!scheduledCampaignSendIsAllowed(recipientContacts)) {
+    await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.FAILED } });
+    await prisma.campaign.update({ where: { id: campaign.id }, data: { status: CampaignStatus.PAUSED } });
+    return { processed: 0, skipped: 1, blocked: false, reason: "send-preflight-failed" };
   }
 
   for (const recipient of campaign.recipients) {

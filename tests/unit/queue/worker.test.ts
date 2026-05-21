@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { campaignMessageValues, localWorkerProviderIsAllowed, parseWorkerRuntimeOptions } from "@/lib/queue/worker";
+import { ConsentStatus } from "@prisma/client";
+import {
+  campaignMessageValues,
+  localWorkerProviderIsAllowed,
+  parseWorkerRuntimeOptions,
+  scheduledCampaignSendIsAllowed
+} from "@/lib/queue/worker";
 
 describe("local queue worker", () => {
   it("only allows dummy provider processing while live messaging is disabled", () => {
@@ -24,6 +30,33 @@ describe("local queue worker", () => {
       lastName: "",
       displayName: "Ada"
     });
+  });
+
+  it("rechecks recipient consent and archive state before scheduled worker sends", () => {
+    const sendableContact = {
+      id: "contact_sendable",
+      phone: "+15555550100",
+      consentStatus: ConsentStatus.OPTED_IN,
+      optedOutAt: null,
+      archivedAt: null
+    };
+
+    expect(scheduledCampaignSendIsAllowed([sendableContact])).toBe(true);
+    expect(
+      scheduledCampaignSendIsAllowed([
+        sendableContact,
+        {
+          id: "contact_stale_opt_out",
+          phone: "+15555550101",
+          consentStatus: ConsentStatus.OPTED_OUT,
+          optedOutAt: new Date("2026-05-21T12:00:00.000Z"),
+          archivedAt: null
+        }
+      ])
+    ).toBe(false);
+    expect(scheduledCampaignSendIsAllowed([{ ...sendableContact, archivedAt: new Date("2026-05-21T12:00:00.000Z") }])).toBe(
+      false
+    );
   });
 
   it("keeps one-shot mode as the default worker runtime", () => {

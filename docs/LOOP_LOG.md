@@ -1796,3 +1796,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP API/contract/validation operations hardening or safe read-only operator surface refinements.
+
+## Run 200  GREEN  worker-send-time-consent-recheck  2026-05-21 13:39
+Objective:    Recheck recipient consent and archive state at scheduled worker send time before dummy outbound rows are created.
+Changed:
+- Added scheduled campaign send eligibility reuse of campaign preflight rules in the local worker path.
+- Failed the queued job and paused the campaign when execution-time recipient eligibility no longer passes.
+- Added unit coverage for stale opt-out and archived recipient blocking before worker sends.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue Phase 0 correctness hardening: RBAC enforcement on mutating routes or tenant-scoped idempotency behavior.
