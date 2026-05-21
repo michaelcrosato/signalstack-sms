@@ -21,12 +21,14 @@ export type ContractOperationsStatus = {
 
 const contractOperationFileFields = ["name", "path", "boundary"] as const;
 const contractOperationValidationCheckFields = ["command", "purpose"] as const;
-const allowedContractOperationValidationCommands = [
+export const allowedContractOperationValidationCommands = Object.freeze([
   "npm run contracts:check",
   "npm run validate",
   "npm run test:e2e:demo",
   "npm run secrets:scan"
-] as const;
+] as const);
+
+export type ContractOperationSupportedValidationCommand = (typeof allowedContractOperationValidationCommands)[number];
 const forbiddenSecretMetadataPatterns = [
   /\bsk_(?:live|test)_[A-Za-z0-9]+/,
   /\bpk_live_[A-Za-z0-9]+/,
@@ -89,7 +91,7 @@ function assertValidationCheck(check: ContractOperationValidationCheck) {
 
   if (
     !allowedContractOperationValidationCommands.includes(
-      check.command as (typeof allowedContractOperationValidationCommands)[number]
+      check.command as ContractOperationSupportedValidationCommand
     )
   ) {
     throw new Error(`Unsupported contract operation validation command ${check.command}`);

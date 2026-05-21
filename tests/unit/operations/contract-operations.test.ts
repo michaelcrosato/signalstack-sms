@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  allowedContractOperationValidationCommands,
   contractOperationDriftControls,
   contractOperationFiles,
   contractOperationValidationChecks,
@@ -157,13 +158,25 @@ describe("getContractOperationsStatus", () => {
       .map((check) => check.command.replace("npm run ", ""))
       .filter((scriptName) => !Object.prototype.hasOwnProperty.call(scripts, scriptName));
 
-    expect(contractOperationValidationChecks.map((check) => check.command)).toEqual([
+    expect(contractOperationValidationChecks.map((check) => check.command)).toEqual(allowedContractOperationValidationCommands);
+    expect(missingScripts).toEqual([]);
+  });
+
+  it("keeps contract operation validation commands inside a frozen supported vocabulary", () => {
+    const validationCommands = contractOperationValidationChecks.map((check) => check.command);
+    const allowedCommands = new Set<string>(allowedContractOperationValidationCommands);
+
+    expect(allowedContractOperationValidationCommands).toEqual([
       "npm run contracts:check",
       "npm run validate",
       "npm run test:e2e:demo",
       "npm run secrets:scan"
     ]);
-    expect(missingScripts).toEqual([]);
+    expect(Object.isFrozen(allowedContractOperationValidationCommands)).toBe(true);
+    expect(validationCommands.filter((command) => !allowedCommands.has(command))).toEqual([]);
+    expect(() => (allowedContractOperationValidationCommands as unknown as string[]).push("npm run unsafe")).toThrow(
+      TypeError
+    );
   });
 
   it("keeps contract operation static metadata free of secret-like literals", () => {

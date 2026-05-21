@@ -1354,6 +1354,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP readiness audit operations hardening or safe read-only operator surface refinements.
 
+## Run 164  GREEN  contract-validation-command-vocabulary  2026-05-21 04:26
+Objective:    Keep `/settings/contracts` validation command references inside an exported frozen vocabulary.
+Changed:
+- Exported the contract operations supported validation-command vocabulary and typed validation metadata against it.
+- Added unit coverage proving static contract validation references stay inside the vocabulary and reject caller mutation.
+- Updated testing contract/docs, README, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP contract/security/validation operations hardening or safe read-only operator surface refinements.
+
 ## Run 154  GREEN  readiness-audit-default-query-limit-vocabulary  2026-05-21 03:49
 Objective:    Keep readiness-audit JSON/CSV default query limits tied to a frozen supported operations vocabulary.
 Changed:
