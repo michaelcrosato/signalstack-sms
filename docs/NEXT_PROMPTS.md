@@ -82,6 +82,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP local runbook inventory hardening: `/settings/runbook` now projects its local admin links from the shared operator surface inventory, while unit coverage verifies label alignment, settings-only projection, backing `app/**/page.tsx` files, and the intentional `/demo` exclusion before browser demo coverage.
 - Post-MVP go-live readiness navigation hardening: `/settings` now projects its local admin navigation from the shared operator surface inventory, while unit coverage verifies current-page exclusion, non-settings exclusion, expected local surfaces, and backing `app/**/page.tsx` files before browser demo coverage.
 - Post-MVP local launch dashboard navigation hardening: `/` now projects its local launch links from the full shared operator surface inventory, while unit coverage verifies `/demo`, `/settings`, all shared routes, and backing `app/**/page.tsx` files before browser smoke coverage.
+- Post-MVP local launch dashboard browser smoke hardening: the root Playwright smoke test now verifies visible launch links from the same shared operator surface inventory instead of a duplicated hard-coded browser list.
 
 Demo-safe defaults remain mandatory:
 

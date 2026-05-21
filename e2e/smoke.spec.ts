@@ -1,34 +1,15 @@
 import { expect, test } from "@playwright/test";
+import { getLaunchDashboardLinks } from "@/lib/operations/operator-surfaces";
+
+const launchDashboardLinks = getLaunchDashboardLinks();
 
 test("home page renders local launch dashboard and demo-safe defaults", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "SignalStack SMS" })).toBeVisible();
   await expect(page.getByText("Local Launch Dashboard")).toBeVisible();
-  await expect(page.getByRole("link", { name: /Demo Console/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Demo Operations/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Operations Index/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Go-Live Readiness/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Campaign Operations/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Contact Operations/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Audience Operations/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Template Operations/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Inbox Operations/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Webhook Operations/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Team Operations/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Provider Details/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Provider Numbers/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Compliance Detail/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /System Status/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Environment Operations/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Health Operations/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Operator Runbook/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Usage & Analytics/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Reporting Index/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Workflow Operations/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Release Operations/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Billing Operations/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /AI Operations/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Admin Exports/ })).toBeVisible();
+  for (const link of launchDashboardLinks) {
+    await expect(page.getByRole("link", { name: link.label })).toBeVisible();
+  }
   await expect(page.getByText("DEMO_MODE")).toBeVisible();
   await expect(page.getByText("MESSAGING_PROVIDER")).toBeVisible();
 });

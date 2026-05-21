@@ -155,6 +155,7 @@ Post-MVP:
 - Local operations index reverse page inventory coverage
 - Local go-live readiness shared-navigation coverage
 - Local launch dashboard shared-inventory coverage
+- Local launch dashboard shared-inventory browser smoke coverage
 
 ## Next Milestone
 

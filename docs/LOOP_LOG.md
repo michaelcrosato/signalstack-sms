@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 046  GREEN  launch-dashboard-smoke-inventory  2026-05-20 19:28
+Objective:    Verify `/` launch dashboard browser smoke links from the shared operator surface inventory.
+Changed:
+- Refactored `e2e/smoke.spec.ts` to iterate `getLaunchDashboardLinks()` for visible root launch links instead of a duplicated hard-coded label list.
+- Updated testing contract, README, demo-mode docs, local operator runbook, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only navigation, inventory, or admin/reporting refinements without live external-impact actions.
+
 ## Run 045  GREEN  launch-dashboard-navigation  2026-05-20 19:18
 Objective:    Project `/` local launch dashboard links from the shared operator surface inventory.
 Changed:
