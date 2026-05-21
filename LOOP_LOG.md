@@ -675,3 +675,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 094  GREEN  supplied-inventory-empty-group-guard  2026-05-20 23:21
+Objective:    Fail supplied shared operator inventories with empty groups before projection.
+Changed:
+- Added a shared empty-group guard for operator surface summaries and projections.
+- Added unit coverage proving empty supplied groups fail before local navigation can render unreachable group headings.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.

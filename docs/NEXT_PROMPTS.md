@@ -126,6 +126,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP shared summary public-field hardening: unit coverage now verifies shared operator surface summaries expose only public aggregate fields, preventing extra supplied inventory group or link fields from leaking into local operation counts or route lists.
 - Post-MVP shared summary fresh-route-array hardening: unit coverage now verifies shared operator surface summaries return a fresh frozen routes array per call, preventing caller-side route array changes from leaking into later local operation counts or route lists.
 - Post-MVP shared supplied-inventory duplicate-route hardening: summaries and projections now fail before deriving local navigation from supplied operator inventories with duplicate route entries, preventing silent route shadowing.
+- Post-MVP shared supplied-inventory empty-group hardening: summaries and projections now fail before deriving local navigation from supplied operator inventories with empty groups, preventing headings with no reachable local surface.
 - Post-MVP shared supplied-inventory duplicate-copy hardening: summaries and projections now fail before deriving local navigation from supplied operator inventories with duplicate group names, labels, or notes, preventing ambiguous rendered navigation copy.
 
 Demo-safe defaults remain mandatory:

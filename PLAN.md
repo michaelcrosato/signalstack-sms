@@ -197,6 +197,7 @@ Post-MVP:
 - Local shared operator summary public-field coverage
 - Local shared operator summary fresh-route-array coverage
 - Local shared operator supplied-inventory duplicate-route failure coverage
+- Local shared operator supplied-inventory empty-group failure coverage
 - Local shared operator supplied-inventory duplicate-copy failure coverage
 
 ## Next Milestone

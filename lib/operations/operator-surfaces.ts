@@ -59,6 +59,10 @@ function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) 
   const seenNotes = new Set<string>();
 
   for (const group of groups) {
+    if (group.links.length === 0) {
+      throw new Error(`Empty operator surface group ${group.name}`);
+    }
+
     if (seenGroupNames.has(group.name)) {
       throw new Error(`Duplicate operator surface group name ${group.name}`);
     }

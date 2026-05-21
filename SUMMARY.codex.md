@@ -1,8 +1,13 @@
 # Codex Summary
 
-Run number: 93
+Run number: 94
 
 ## Completed
+
+- Advanced a post-MVP shared operator supplied-inventory empty-group checkpoint.
+- Added a shared empty-group guard so summaries and projections fail before deriving local navigation from supplied operator inventories with group headings that have no reachable links.
+- Added unit coverage proving empty supplied groups fail across summary, broad launch, and focused projection helpers.
+- Preserved the local-only operator inventory boundary without executing routes, API handlers, provider calls, billing, notifications, SMS, email, live AI, or other live features.
 
 - Advanced a post-MVP shared operator supplied-inventory duplicate-copy checkpoint.
 - Added a shared copy uniqueness guard so summaries and projections fail before deriving local navigation from supplied operator inventories with duplicate group names, labels, or notes.
@@ -346,6 +351,7 @@ Run number: 93
 
 ## Validation
 
+- Latest shared supplied-inventory empty-group hardening added a shared guard and unit coverage proving summaries and projections fail before deriving local navigation from supplied operator inventories with empty groups. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest route-copy alignment hardening added unit coverage that verifies shared operator surface labels and notes stay semantically aligned with route names, including singular/plural route segment variants. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest public-field projection hardening sanitizes projected operator links to public navigation fields only and adds unit coverage proving injected extra fields on supplied inventories do not leak into regular navigation or rich integration projections. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest summary public-field hardening added unit coverage proving shared operator surface summaries expose only `groupCount`, `surfaceCount`, and `routes`, even when supplied inventories include extra group or link properties. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
