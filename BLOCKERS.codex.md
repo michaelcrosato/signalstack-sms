@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 115
+Run number: 116
 
 No active blockers.
 
 ## Notes
 
+- Latest shared supplied-inventory sparse-index descriptor hardening rejects missing supplied operator inventory array slots and group link array slots before summaries or projections read local navigation entries. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest shared supplied-inventory array-index descriptor hardening rejects accessor-backed or non-enumerable supplied operator inventory array slots and group link array slots before summaries or projections read local navigation entries. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest loop-log truth repair synchronized root and docs loop logs with runs 106-113 from existing commit history and current handoff summaries. The check is coordination-only and does not execute routes, API handlers, provider calls, billing, notifications, SMS, email, live AI, destructive database actions, or protected gate-script edits.
 - Latest shared supplied-inventory inventory-array-shape hardening rejects supplied operator inventory arrays with custom prototypes or extra string/symbol fields before summaries or projections derive local navigation. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

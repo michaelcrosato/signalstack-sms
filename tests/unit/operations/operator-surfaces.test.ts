@@ -332,7 +332,7 @@ describe("operator surface inventory", () => {
     );
   });
 
-  it("rejects supplied operator inventories with unsafe inventory array index descriptors before projection", () => {
+  it("rejects supplied operator inventories with unsafe or missing inventory array index descriptors before projection", () => {
     let getterWasRead = false;
     const groupsWithAccessorIndex = cloneSurfaceGroups(operatorSurfaceGroups);
     Object.defineProperty(groupsWithAccessorIndex, "1", {
@@ -349,11 +349,17 @@ describe("operator surface inventory", () => {
       enumerable: false
     });
 
+    const groupsWithMissingIndex = cloneSurfaceGroups(operatorSurfaceGroups);
+    delete groupsWithMissingIndex[1];
+
     expect(() => getOperatorSurfaceSummary(groupsWithAccessorIndex)).toThrow(
       "Invalid operator surface inventory array field descriptors"
     );
     expect(getterWasRead).toBe(false);
     expect(() => getLaunchDashboardLinks(groupsWithHiddenIndex)).toThrow(
+      "Invalid operator surface inventory array field descriptors"
+    );
+    expect(() => getDemoOperationsLinks(groupsWithMissingIndex)).toThrow(
       "Invalid operator surface inventory array field descriptors"
     );
   });
@@ -388,9 +394,15 @@ describe("operator surface inventory", () => {
     delete sparseGroups[1];
     const groups = sparseGroups as unknown as OperatorSurfaceGroup[];
 
-    expect(() => getOperatorSurfaceSummary(groups)).toThrow("Invalid operator surface group");
-    expect(() => getLaunchDashboardLinks(groups)).toThrow("Invalid operator surface group");
-    expect(() => getDemoOperationsLinks(groups)).toThrow("Invalid operator surface group");
+    expect(() => getOperatorSurfaceSummary(groups)).toThrow(
+      "Invalid operator surface inventory array field descriptors"
+    );
+    expect(() => getLaunchDashboardLinks(groups)).toThrow(
+      "Invalid operator surface inventory array field descriptors"
+    );
+    expect(() => getDemoOperationsLinks(groups)).toThrow(
+      "Invalid operator surface inventory array field descriptors"
+    );
   });
 
   it("rejects supplied operator inventories with invalid link objects before projection", () => {
@@ -698,9 +710,15 @@ describe("operator surface inventory", () => {
       links: groupIndex === 1 ? sparseLinks : group.links
     })) as unknown as OperatorSurfaceGroup[];
 
-    expect(() => getOperatorSurfaceSummary(groups)).toThrow("Invalid operator surface link");
-    expect(() => getLaunchDashboardLinks(groups)).toThrow("Invalid operator surface link");
-    expect(() => getDemoOperationsLinks(groups)).toThrow("Invalid operator surface link");
+    expect(() => getOperatorSurfaceSummary(groups)).toThrow(
+      `Invalid operator surface link array field descriptors for group ${operatorSurfaceGroups[1].name}`
+    );
+    expect(() => getLaunchDashboardLinks(groups)).toThrow(
+      `Invalid operator surface link array field descriptors for group ${operatorSurfaceGroups[1].name}`
+    );
+    expect(() => getDemoOperationsLinks(groups)).toThrow(
+      `Invalid operator surface link array field descriptors for group ${operatorSurfaceGroups[1].name}`
+    );
   });
 
   it("rejects supplied operator inventories with ambiguous copy before projection", () => {

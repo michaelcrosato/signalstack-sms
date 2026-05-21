@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP shared operator supplied-inventory sparse-index descriptor checkpoint.
+- Tightened supplied operator inventory and group link array validation so missing indexed slots fail as descriptor errors before summaries or projections read local navigation entries.
+- Updated unit coverage and docs/contracts so sparse group/link entries are treated at the same array descriptor boundary as accessor-backed or hidden slots.
+- Protected local gate passed for the local-only validator hardening.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 116
+
+## Previous Run
+
 - Advanced a post-MVP shared operator supplied-inventory array-index descriptor checkpoint.
 - Tightened supplied operator inventory and group link array validation so accessor-backed or non-enumerable index slots fail before summaries or projections read local navigation entries.
 - Added unit coverage proving accessor-backed array slots are rejected without reading their getters, and hidden array slots fail before projection.

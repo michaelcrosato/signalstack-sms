@@ -972,3 +972,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 116  GREEN  supplied-inventory-sparse-index-descriptor  2026-05-21 00:56
+Objective:    Fail sparse supplied shared operator inventory array slots at descriptor validation.
+Changed:
+- Tightened supplied inventory and group link array descriptor guards so missing indexed slots fail before local navigation entries are read.
+- Updated unit coverage so sparse supplied group/link entries report descriptor failures across summary and projection helpers.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.

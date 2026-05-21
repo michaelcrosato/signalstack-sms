@@ -109,7 +109,7 @@ function assertOperatorSurfaceLinkArray(links: readonly OperatorSurfaceLink[], g
   for (let index = 0; index < links.length; index += 1) {
     const descriptor = Object.getOwnPropertyDescriptor(links, String(index));
 
-    if (descriptor && (!("value" in descriptor) || !descriptor.enumerable)) {
+    if (!descriptor || !("value" in descriptor) || !descriptor.enumerable) {
       throw new Error(`Invalid operator surface link array field descriptors for group ${groupName}`);
     }
   }
@@ -132,7 +132,7 @@ function assertOperatorSurfaceInventoryArray(groups: readonly OperatorSurfaceGro
   for (let index = 0; index < groups.length; index += 1) {
     const descriptor = Object.getOwnPropertyDescriptor(groups, String(index));
 
-    if (descriptor && (!("value" in descriptor) || !descriptor.enumerable)) {
+    if (!descriptor || !("value" in descriptor) || !descriptor.enumerable) {
       throw new Error("Invalid operator surface inventory array field descriptors");
     }
   }
