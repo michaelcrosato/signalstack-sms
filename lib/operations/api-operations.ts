@@ -216,6 +216,8 @@ export const apiOperationRoutes = freezeApiOperationRoutes([
   { method: "POST", path: "/api/contacts/imports", area: "Contacts", mutates: true, externalImpact: false, safety: "local CSV import only" },
   { method: "GET", path: "/api/templates", area: "Templates", mutates: false, externalImpact: false, safety: "tenant-scoped local records" },
   { method: "POST", path: "/api/templates", area: "Templates", mutates: true, externalImpact: false, safety: "local template write only" },
+  { method: "GET", path: "/api/templates/[templateId]", area: "Templates", mutates: false, externalImpact: false, safety: "tenant-scoped local record" },
+  { method: "PATCH", path: "/api/templates/[templateId]", area: "Templates", mutates: true, externalImpact: false, safety: "local template update only" },
   { method: "GET", path: "/api/campaigns", area: "Campaigns", mutates: false, externalImpact: false, safety: "tenant-scoped local records" },
   { method: "POST", path: "/api/campaigns", area: "Campaigns", mutates: true, externalImpact: false, safety: "local draft creation only" },
   { method: "GET", path: "/api/campaigns/[campaignId]", area: "Campaigns", mutates: false, externalImpact: false, safety: "tenant-scoped local record" },

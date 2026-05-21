@@ -1,5 +1,14 @@
 # Codex Summary
 
+- Added `/dashboard/templates/:templateId` for owner-facing local template detail/edit.
+- Added tenant-scoped `GET/PATCH /api/templates/:templateId` and product template detail projection coverage.
+- Linked saved templates to detail pages, extended seeded product-demo coverage, and refreshed API/testing contracts, roadmap, state matrix, README, and handoff docs.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+Run number: 213
+
+## Previous Run
+
 - Added `/dashboard/campaigns/:campaignId` for owner-facing campaign lifecycle review.
 - Draft campaigns can now be edited locally from the detail page, and scheduled campaigns can be canceled through the existing local cancel API.
 - Linked campaign rows to detail pages, added product campaign detail projection coverage, extended seeded product-demo coverage, and refreshed API/testing contracts, roadmap, state matrix, README, and handoff docs.

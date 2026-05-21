@@ -69,7 +69,7 @@ describe("getApiOperationsStatus", () => {
   it("reports local API route inventory and isolates live test SMS as external impact", () => {
     const status = getApiOperationsStatus({});
 
-    expect(status.routeCount).toBe(50);
+    expect(status.routeCount).toBe(52);
     expect(status.mutatingRouteCount).toBeGreaterThan(10);
     expect(status.externalImpactRouteCount).toBe(1);
     expect(status.commandExecution).toBe("none");
@@ -87,6 +87,8 @@ describe("getApiOperationsStatus", () => {
         "DELETE /api/contacts/[contactId]",
         "POST /api/contacts/[contactId]/merge",
         "PATCH /api/campaigns/[campaignId]",
+        "GET /api/templates/[templateId]",
+        "PATCH /api/templates/[templateId]",
         "GET /api/inbox/conversations/[conversationId]/messages",
         "GET /api/inbox/conversations/[conversationId]/notes",
         "GET /api/billing/usage",
@@ -175,6 +177,8 @@ describe("getApiOperationsStatus", () => {
       "POST /api/contacts/imports",
       "GET /api/templates",
       "POST /api/templates",
+      "GET /api/templates/[templateId]",
+      "PATCH /api/templates/[templateId]",
       "GET /api/campaigns",
       "POST /api/campaigns",
       "GET /api/campaigns/[campaignId]",
@@ -348,7 +352,7 @@ describe("getApiOperationsStatus", () => {
     const inventoryRouteKeys = new Set(apiOperationRoutes.map((route) => `${route.method} ${route.path}`));
     const implementedRouteMethods = collectImplementedApiRouteMethods(join(process.cwd(), "app", "api"));
 
-    expect(implementedRouteMethods).toHaveLength(50);
+    expect(implementedRouteMethods).toHaveLength(52);
     expect(implementedRouteMethods.filter((routeMethod) => !inventoryRouteKeys.has(routeMethod))).toEqual([]);
   });
 

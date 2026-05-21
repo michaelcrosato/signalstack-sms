@@ -8,6 +8,13 @@ export async function listTemplates(orgId: string) {
   });
 }
 
+export async function getTemplate(orgId: string, templateId: string) {
+  return prisma.messageTemplate.findFirst({
+    where: { id: templateId, orgId },
+    include: { _count: { select: { campaigns: true } } }
+  });
+}
+
 export async function upsertTemplate(orgId: string, input: TemplateCreateInput) {
   return prisma.messageTemplate.upsert({
     where: { orgId_name: { orgId, name: input.name } },
@@ -17,6 +24,23 @@ export async function upsertTemplate(orgId: string, input: TemplateCreateInput) 
     },
     create: {
       orgId,
+      name: input.name,
+      body: input.body,
+      variables: input.variables
+    }
+  });
+}
+
+export async function updateTemplate(orgId: string, templateId: string, input: TemplateCreateInput) {
+  const existing = await prisma.messageTemplate.findFirst({ where: { id: templateId, orgId } });
+
+  if (!existing) {
+    return null;
+  }
+
+  return prisma.messageTemplate.update({
+    where: { id: templateId },
+    data: {
       name: input.name,
       body: input.body,
       variables: input.variables

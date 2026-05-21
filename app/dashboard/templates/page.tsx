@@ -77,7 +77,9 @@ export default async function TemplatesPage() {
                   {templates.map((template) => (
                     <tr className="border-t border-slate-100 align-top" key={template.id}>
                       <td className="px-4 py-3">
-                        <div className="font-medium text-slate-950">{template.name}</div>
+                        <Link className="font-medium text-teal-700 underline-offset-2 hover:underline" href={`/dashboard/templates/${template.id}`}>
+                          {template.name}
+                        </Link>
                         <div className="mt-1 max-w-xl text-slate-600">{template.body}</div>
                       </td>
                       <td className="px-4 py-3 text-slate-700">

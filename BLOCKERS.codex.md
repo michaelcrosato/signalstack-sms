@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 213
+
+- No blocker from the latest product template detail workflow. `/dashboard/templates/:templateId` edits tenant-scoped local reusable copy through `PATCH /api/templates/:templateId`; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
 Run number: 212
 
 - No blocker from the latest product campaign detail workflow. `/dashboard/campaigns/:campaignId` edits local drafts and cancels scheduled local queue jobs through existing tenant-scoped APIs; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.

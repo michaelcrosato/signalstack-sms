@@ -22,6 +22,8 @@ Milestone 3:
 
 - `GET /api/templates`: lists message templates.
 - `POST /api/templates`: creates or upserts a message template.
+- `GET /api/templates/:templateId`: returns one tenant-scoped message template.
+- `PATCH /api/templates/:templateId`: updates one tenant-scoped local message template.
 - `GET /api/campaigns`: lists campaigns.
 - `POST /api/campaigns`: creates a draft campaign.
 - `GET /api/campaigns/:campaignId`: reads a tenant-scoped campaign.
@@ -84,6 +86,7 @@ Post-MVP provider settings foundation:
 - `/dashboard/campaigns/:campaignId`: renders a product-facing campaign detail workspace with local draft edit and queued-campaign cancellation actions backed by existing campaign APIs without provider calls, SMS, billing, live AI, notifications, secrets, worker execution, or live messaging enablement.
 - `/dashboard/inbox`: renders a product-facing inbox workspace with tenant-scoped threads, local inbound replies, notes, assignment, and resolve/reopen actions backed by existing inbox APIs without outbound SMS, provider calls, billing, live AI, notifications, secrets, or live messaging enablement.
 - `/dashboard/templates`: renders a product-facing template workspace with tenant-scoped template rows, local template creation/upsert, detected variables, and campaign usage counts backed by `GET/POST /api/templates` without live outbound rendering, provider calls, SMS, billing, live AI, secrets, or live messaging enablement.
+- `/dashboard/templates/:templateId`: renders a product-facing template detail/edit workflow backed by `GET/PATCH /api/templates/:templateId` without live outbound rendering, scheduling campaigns, provider calls, SMS, billing, live AI, secrets, hard deletion, or live messaging enablement.
 - `/dashboard/analytics`: renders a product-facing analytics workspace with tenant-scoped contact, campaign, inbox, message, and usage totals backed by the existing analytics overview without report execution, exports, mutations, provider calls, Stripe calls, billing artifacts, live AI, SMS, secrets, or live feature enablement.
 - `/dashboard/compliance`: renders a product-facing compliance readiness workspace with required profile fields, A2P status, runtime hard-gate blockers, and demo-safe live messaging state without registering A2P campaigns, provider calls, SMS, billing, live AI, secrets, or live feature enablement.
 - `/settings/demo`: renders a read-only local demo operations checkpoint with seeded demo readiness, shared-inventory workflow links, local metrics, usage totals, and runtime gates without imports, campaign scheduling, worker execution, inbox replies, report execution, exports, mutations, provider calls, billing records, notifications, live feature enablement, or secrets.

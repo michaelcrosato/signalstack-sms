@@ -303,6 +303,7 @@ test("product inbox page manages a local conversation thread", async ({ page }) 
 
 test("product templates page creates local reusable copy", async ({ page }) => {
   const templateName = `Product E2E template ${Date.now()}`;
+  const updatedTemplateName = `${templateName} updated`;
 
   await page.goto("/dashboard/templates");
 
@@ -322,8 +323,17 @@ test("product templates page creates local reusable copy", async ({ page }) => {
   const savedRow = page.getByRole("row").filter({ hasText: templateName });
   await expect(savedRow).toBeVisible();
   await expect(savedRow.getByRole("cell", { name: /^(company, firstName|firstName, company)$/ })).toBeVisible();
+  await savedRow.getByRole("link", { name: templateName }).click();
+  await expect(page.getByRole("heading", { name: templateName })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Template detail" })).toBeVisible();
+  await page.getByLabel("Template name").fill(updatedTemplateName);
+  await page.getByLabel("Message body").fill("Hi {{firstName}}, {{company}} has a new local detail edit. Reply STOP to opt out.");
+  await expect(page.getByLabel("Detected variables")).toContainText("company, firstName");
+  await page.getByRole("button", { name: "Save Template" }).click();
+  await expect(page.getByRole("status")).toContainText("Template updated locally");
+  await expect(page.getByRole("heading", { name: updatedTemplateName })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Safety Boundary" })).toBeVisible();
-  await expect(page.getByText("No provider calls, SMS, live AI requests")).toBeVisible();
+  await expect(page.getByText("It does not render live outbound messages")).toBeVisible();
 });
 
 test("product analytics page renders local overview detail", async ({ page }) => {

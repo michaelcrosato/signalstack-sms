@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db/prisma";
+import { getTemplate } from "@/lib/db/repositories/templates";
 
 export async function getProductTemplates(orgId: string) {
   const templates = await prisma.messageTemplate.findMany({
@@ -25,6 +26,23 @@ export async function getProductTemplates(orgId: string) {
       campaignUsage
     },
     variableNames
+  };
+}
+
+export async function getProductTemplateDetail(orgId: string, templateId: string) {
+  const template = await getTemplate(orgId, templateId);
+
+  if (!template) {
+    return null;
+  }
+
+  return {
+    id: template.id,
+    name: template.name,
+    body: template.body,
+    variables: normalizeVariables(template.variables),
+    campaignUsage: template._count.campaigns,
+    updatedAt: template.updatedAt
   };
 }
 

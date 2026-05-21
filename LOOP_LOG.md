@@ -1875,6 +1875,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Continue Phase 0 correctness hardening: RBAC enforcement on mutating routes or tenant-scoped idempotency behavior.
 
+## Run 213  GREEN  product-template-detail-workflow  2026-05-21 15:34
+Objective:    Add owner-facing local template detail/edit on tenant-scoped template APIs.
+Changed:
+- Added tenant-scoped `GET/PATCH /api/templates/:templateId` and repository/product detail projection helpers.
+- Added `/dashboard/templates/:templateId`, linked saved templates to it, and extended seeded product-demo coverage for local template edits.
+- Refreshed API/testing contracts, API map, roadmap/state/handoff docs, README, SUMMARY, and BLOCKERS.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep the product demo path stable while collecting review feedback; defer live-provider work until production policy is specified.
+
 ## Run 201  GREEN  tenant-scoped-idempotency-keys  2026-05-21 13:46
 Objective:    Scope retry/idempotency keys by tenant for queue jobs, messages, and webhook events.
 Changed:

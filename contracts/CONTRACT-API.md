@@ -76,6 +76,14 @@ Returns templates for the current organization.
 
 Creates or updates a template by `(orgId, name)`. If `variables` is omitted, variables are extracted from `{{variable}}` placeholders in `body`.
 
+### `GET /api/templates/:templateId`
+
+Returns a single message template only when it belongs to the current organization.
+
+### `PATCH /api/templates/:templateId`
+
+Updates a tenant-scoped message template from `{ "name": "...", "body": "..." }`. If `variables` is omitted, variables are extracted from `{{variable}}` placeholders in `body`. This endpoint must not render live outbound messages, schedule campaigns, send SMS, call providers, create billing records, call live AI, expose secrets, or enable live messaging.
+
 ### `GET /api/campaigns`
 
 Returns draft and future campaign records for the current organization.
@@ -367,6 +375,10 @@ Renders the product-facing inbox workspace for the current organization. It may 
 ### `/dashboard/templates`
 
 Renders the product-facing template workspace for the current organization. It may list tenant-scoped message templates and create or update local reusable copy through `POST /api/templates`, including variable extraction from template placeholders. It must not render live outbound messages, schedule campaigns, send SMS, call providers, create billing records, call live AI, expose secrets, or enable live messaging.
+
+### `/dashboard/templates/:templateId`
+
+Renders the product-facing template detail workflow for a tenant-scoped message template. It may update local reusable copy through `PATCH /api/templates/:templateId`, including variable extraction from template placeholders. It must not render live outbound messages, schedule campaigns, send SMS, call providers, create billing records, call live AI, expose secrets, hard-delete templates, or enable live messaging.
 
 ### `/dashboard/analytics`
 
