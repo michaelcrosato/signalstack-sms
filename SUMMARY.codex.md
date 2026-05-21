@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP security operations validation-command vocabulary checkpoint.
+- Exported `/settings/security` supported validation command references as a runtime-frozen vocabulary.
+- Added unit coverage proving the static security validation references stay inside that vocabulary before local security metadata renders.
+- Updated README, PLAN, testing contract docs, next-prompt handoff docs, blockers, and loop logs.
+- Focused security operations unit coverage and typecheck passed; protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 160
+
+## Previous Run
+
 - Advanced a post-MVP validation operations runtime-frozen vocabulary checkpoint.
 - Exported `/settings/validation` command-execution, external-impact, and secrets-displayed no-impact vocabularies.
 - Added unit coverage proving validation summary values stay inside those vocabularies and that exported vocabularies reject caller mutation before local validation metadata renders.

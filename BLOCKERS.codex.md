@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 159
+Run number: 160
 
 No active blockers.
 
 ## Notes
 
+- Latest security operations validation-command vocabulary hardening exports the supported `/settings/security` validation command references as a runtime-frozen vocabulary and verifies static references stay inside it before local security metadata renders. The check is local static metadata validation only and does not execute commands, scan files, read raw env values, mutate records, call providers, bill, notify, send SMS or email, call live AI, expose secrets, or enable live features.
 - Latest validation operations runtime-frozen vocabulary hardening exports command-execution, external-impact, and secrets-displayed no-impact vocabularies for `/settings/validation`, and verifies rendered summary values stay inside those vocabularies before local validation metadata renders. The check is local static metadata validation only and does not execute commands, inspect logs, scan files, mutate records, call providers, bill, notify, send SMS or email, call live AI, expose secrets, or enable live features.
 - Latest API operations method-vocabulary hardening exports a runtime-frozen supported method vocabulary and verifies the static `/settings/api` route inventory remains aligned to it before render. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, mutate records, expose secrets, or enable live features.
 - Latest security operations exported vocabulary mutation hardening keeps every exported `/settings/security` supported vocabulary runtime-frozen and covered against caller mutation before rendering local security metadata. The check is local static metadata validation only and does not execute commands, scan files, read raw env values, mutate records, call providers, bill, notify, send SMS or email, call live AI, expose secrets, or enable live features.

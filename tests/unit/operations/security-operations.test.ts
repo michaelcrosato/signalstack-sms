@@ -6,6 +6,7 @@ import {
   allowedSecurityOperationControlStatuses,
   allowedSecurityOperationExternalImpactStates,
   allowedSecurityOperationSecretsDisplayedStates,
+  allowedSecurityOperationValidationCommands,
   getSecurityOperationsStatus,
   securityOperationControls,
   securityOperationSafetyBoundaries,
@@ -171,12 +172,26 @@ describe("getSecurityOperationsStatus", () => {
   });
 
   it("keeps security operation validation references inside the supported command allowlist", () => {
+    expect(allowedSecurityOperationValidationCommands).toEqual([
+      "npm run validate",
+      "npm run production:gate",
+      "npm run secrets:scan",
+      "npm run compliance:check"
+    ]);
+    expect(Object.isFrozen(allowedSecurityOperationValidationCommands)).toBe(true);
     expect(securityOperationValidationReferences.map((reference) => reference.command)).toEqual([
       "npm run validate",
       "npm run production:gate",
       "npm run secrets:scan",
       "npm run compliance:check"
     ]);
+    const allowedCommands = new Set<string>(allowedSecurityOperationValidationCommands);
+
+    expect(
+      securityOperationValidationReferences
+        .map((reference) => reference.command)
+        .filter((command) => !allowedCommands.has(command))
+    ).toEqual([]);
   });
 
   it("keeps security operation inventory order stable for local review pages", () => {

@@ -26,23 +26,24 @@ export const allowedSecurityOperationControlStatuses = Object.freeze([
   "rate limited",
   "validation enforced"
 ] as const);
+export const allowedSecurityOperationValidationCommands = Object.freeze([
+  "npm run validate",
+  "npm run production:gate",
+  "npm run secrets:scan",
+  "npm run compliance:check"
+] as const);
 export const allowedSecurityOperationCommandExecutionStates = Object.freeze(["none"] as const);
 export const allowedSecurityOperationExternalImpactStates = Object.freeze(["none"] as const);
 export const allowedSecurityOperationSecretsDisplayedStates = Object.freeze([false] as const);
 
 export type SecurityOperationControlStatus = (typeof allowedSecurityOperationControlStatuses)[number];
+export type SecurityOperationValidationCommand = (typeof allowedSecurityOperationValidationCommands)[number];
 export type SecurityOperationCommandExecutionState = (typeof allowedSecurityOperationCommandExecutionStates)[number];
 export type SecurityOperationExternalImpactState = (typeof allowedSecurityOperationExternalImpactStates)[number];
 export type SecurityOperationSecretsDisplayedState = (typeof allowedSecurityOperationSecretsDisplayedStates)[number];
 
 const securityOperationControlFields = ["name", "status", "detail"] as const;
 const securityOperationValidationReferenceFields = ["command", "purpose"] as const;
-const allowedSecurityOperationValidationCommands = [
-  "npm run validate",
-  "npm run production:gate",
-  "npm run secrets:scan",
-  "npm run compliance:check"
-] as const;
 const requiredSafetyBoundaryTerms = ["secrets", "provider calls", "SMS", "email", "notifications", "mutations"] as const;
 const forbiddenSecretMetadataPatterns = [
   /\bsk_(?:live|test)_[A-Za-z0-9]+/,

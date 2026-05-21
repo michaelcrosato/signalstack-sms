@@ -19,6 +19,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP security operations hardening or safe read-only operator surface refinements.
 
+## Run 160  GREEN  security-validation-command-vocabulary  2026-05-21 04:11
+Objective:    Keep `/settings/security` validation command references tied to an exported runtime-frozen vocabulary.
+Changed:
+- Exported the supported security operation validation command vocabulary.
+- Added unit coverage proving static security validation references stay inside that vocabulary before local security metadata renders.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP security/validation operations hardening or safe read-only operator surface refinements.
+
 ## Run 143  GREEN  notification-operations-exported-channel-vocabulary  2026-05-21 02:57
 Objective:    Keep notification operation channel metadata typed from the exported supported vocabulary.
 Changed:
