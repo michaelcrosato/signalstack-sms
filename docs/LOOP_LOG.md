@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 058  GREEN  billing-ai-shared-inventory  2026-05-20 20:39
+Objective:    Project billing and AI operations navigation from the shared operator surface inventory.
+Changed:
+- Added shared inventory projections for `/settings/billing` and `/settings/ai` header navigation.
+- Refactored those pages to consume shared projected links instead of local duplicated navigation lists.
+- Extended unit and seeded browser coverage for projected labels, route targets, and backing pages.
+- Updated testing contract, README, demo-mode docs, local operator runbook, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only inventory, navigation, route coverage, or admin surface hardening without live external-impact actions.
+
 ## Run 054  GREEN  safety-runtime-shared-inventory  2026-05-20 20:10
 Objective:    Project environment, health, contract, and validation operation links from the shared operator surface inventory.
 Changed:

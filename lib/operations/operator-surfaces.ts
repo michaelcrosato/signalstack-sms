@@ -352,6 +352,24 @@ const teamOperationNavigationRoutes = [
   "/settings/runbook"
 ] as const;
 
+const billingOperationNavigationRoutes = [
+  "/demo",
+  "/settings",
+  "/settings/usage",
+  "/settings/reports",
+  "/settings/system",
+  "/settings/runbook",
+  "/settings/ai"
+] as const;
+
+const aiOperationNavigationRoutes = [
+  "/demo",
+  "/settings",
+  "/settings/usage",
+  "/settings/billing",
+  "/settings/runbook"
+] as const;
+
 export function getDemoOperationsCheckpoints(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups): DemoOperationsCheckpoint[] {
   return demoOperationsCheckpointDefinitions.map((checkpoint) => {
     const link = findOperatorSurfaceLink(checkpoint.href, groups);
@@ -436,4 +454,12 @@ export function getDeliveryOperationLinks(groups: OperatorSurfaceGroup[] = opera
 
 export function getTeamOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return teamOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getBillingOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return billingOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getAiOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return aiOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }

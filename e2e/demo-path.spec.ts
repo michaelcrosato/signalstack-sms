@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 import {
+  getAiOperationLinks,
+  getBillingOperationLinks,
   getDemoOperationsCheckpoints,
   getDemoOperationsLinks,
   getDemoConsoleLinks,
@@ -42,6 +44,8 @@ const exportOperationLinks = getExportOperationLinks();
 const webhookOperationLinks = getWebhookOperationLinks();
 const deliveryOperationLinks = getDeliveryOperationLinks();
 const teamOperationLinks = getTeamOperationLinks();
+const billingOperationLinks = getBillingOperationLinks();
+const aiOperationLinks = getAiOperationLinks();
 
 test.setTimeout(60_000);
 
@@ -222,6 +226,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Billing Account" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Local Usage Totals" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent Usage Events" })).toBeVisible();
+  for (const link of billingOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Reporting Index" }).click();
   await expect(page.getByRole("heading", { name: "Reporting Index" })).toBeVisible();
@@ -240,6 +247,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Provider Boundary" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Available AI Endpoints" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent AI Usage" })).toBeVisible();
+  for (const link of aiOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Usage & Analytics" }).click();
   await page.getByRole("link", { name: "Campaign Operations" }).click();

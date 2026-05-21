@@ -2,6 +2,8 @@ import { existsSync, readdirSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  getAiOperationLinks,
+  getBillingOperationLinks,
   getDemoOperationsCheckpoints,
   getDemoOperationsLinks,
   getDemoConsoleLinks,
@@ -427,5 +429,35 @@ describe("operator surface inventory", () => {
     ]);
     expect(teamLinks).toEqual(teamRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
     expect(teamRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+  });
+
+  it("projects billing and AI operation links from the shared surface inventory", () => {
+    const inventoryLinks = operatorSurfaceGroups.flatMap((group) => group.links);
+    const billingLinks = getBillingOperationLinks();
+    const aiLinks = getAiOperationLinks();
+    const billingRoutes = billingLinks.map((link) => link.href);
+    const aiRoutes = aiLinks.map((link) => link.href);
+
+    expect(billingRoutes).toEqual([
+      "/demo",
+      "/settings",
+      "/settings/usage",
+      "/settings/reports",
+      "/settings/system",
+      "/settings/runbook",
+      "/settings/ai"
+    ]);
+    expect(billingLinks).toEqual(billingRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
+    expect(billingRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+
+    expect(aiRoutes).toEqual([
+      "/demo",
+      "/settings",
+      "/settings/usage",
+      "/settings/billing",
+      "/settings/runbook"
+    ]);
+    expect(aiLinks).toEqual(aiRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
+    expect(aiRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
   });
 });

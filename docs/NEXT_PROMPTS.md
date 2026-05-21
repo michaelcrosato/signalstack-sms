@@ -94,6 +94,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP queue/notification shared-inventory hardening: `/settings/queue` and `/settings/notifications` now project header navigation from the shared operator surface inventory, with unit plus seeded browser coverage for labels, route targets, and backing pages.
 - Post-MVP admin exports shared-inventory hardening: `/settings/exports` now projects admin navigation from the shared operator surface inventory, with unit plus seeded browser coverage for labels, notes, route targets, and backing pages.
 - Post-MVP webhook/delivery/team shared-inventory hardening: `/settings/webhooks`, `/settings/delivery`, and `/settings/team` now project header navigation from the shared operator surface inventory, with unit plus seeded browser coverage for labels, route targets, and backing pages.
+- Post-MVP billing/AI shared-inventory hardening: `/settings/billing` and `/settings/ai` now project header navigation from the shared operator surface inventory, with unit plus seeded browser coverage for labels, route targets, and backing pages.
 
 Demo-safe defaults remain mandatory:
 

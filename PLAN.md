@@ -165,6 +165,7 @@ Post-MVP:
 - Local environment, health, contract, and validation shared-inventory coverage
 - Local admin exports shared-inventory coverage
 - Local webhook, delivery, and team shared-inventory coverage
+- Local billing and AI shared-inventory coverage
 
 ## Next Milestone
 
