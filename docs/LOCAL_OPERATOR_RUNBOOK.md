@@ -4,7 +4,7 @@ This runbook covers local and demo-safe operations only. It does not authorize l
 
 The same local-only checklist is available in the app at `/settings/runbook`. That page is read-only: it displays commands and safety boundaries, but it must not execute commands, mutate records, call providers, create billing records, send notifications, expose secrets, or enable live messaging.
 
-The root launch dashboard, runbook admin links, and go-live readiness navigation are projected from the shared local operator surface inventory. Unit coverage keeps those projections aligned with implemented `app/**/page.tsx` files, and the root browser smoke test verifies visible launch links from that same inventory before browser demo coverage.
+The root launch dashboard, runbook admin links, go-live readiness navigation, and focused safety/runtime operation links are projected from the shared local operator surface inventory. Unit coverage keeps those projections aligned with implemented `app/**/page.tsx` files, and the root/browser demo checks verify visible links from that same inventory before green handoff.
 
 ## Required Defaults
 
@@ -96,6 +96,8 @@ Use `/settings/health` for a read-only local health checkpoint before demos or r
 - runtime blockers
 - links to system, API, security, and validation operations
 
+Those operation links are projected from the shared local operator surface inventory.
+
 The page is display-only. It must not execute probes, call APIs, run commands, mutate records, expose raw environment values or secrets, call providers, create billing records, send notifications, send SMS, send email, or enable live features.
 
 ## Environment Operations
@@ -106,6 +108,8 @@ Use `/settings/environment` for a read-only local configuration checkpoint befor
 - allowlisted configuration categories
 - derived runtime status
 - links to system, security, validation, and release operations
+
+Those operation links are projected from the shared local operator surface inventory.
 
 The page is display-only. It must not read environment files, expose raw values or secrets, mutate configuration, write files, execute commands, call APIs, call Redis, call providers, create billing records, send notifications, send SMS, send email, deploy, or enable live features.
 
@@ -392,6 +396,8 @@ Use `/settings/contracts` for read-only contract and drift-control review before
 - drift-control expectations
 - safety-boundary text
 
+Its navigation links are projected from the shared local operator surface inventory.
+
 The page is display-only. It must not read contract file contents, execute validation commands, scan files, mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, expose secrets, or enable live features.
 
 ## Validation Operations
@@ -402,6 +408,8 @@ Use `/settings/validation` for read-only local gate review before demos or valid
 - gate areas and safety boundaries
 - repair-loop signals
 - validation safety-boundary text
+
+Its navigation links are projected from the shared local operator surface inventory.
 
 The page is display-only. It must not execute commands, inspect logs or test reports, scan files, read `.env.local`, mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, expose secrets, or enable live features.
 

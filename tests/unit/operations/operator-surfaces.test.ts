@@ -5,6 +5,9 @@ import {
   getDemoOperationsCheckpoints,
   getDemoOperationsLinks,
   getDemoConsoleLinks,
+  getContractOperationLinks,
+  getEnvironmentOperationLinks,
+  getHealthOperationLinks,
   getIntegrationOperationAreas,
   getLaunchDashboardLinks,
   getOperatorSurfaceSummary,
@@ -13,6 +16,7 @@ import {
   getRunbookAdminLinks,
   getSecurityOperationLinks,
   getSettingsNavigationLinks,
+  getValidationOperationLinks,
   getWorkflowOperationSteps,
   operatorSurfaceGroups
 } from "@/lib/operations/operator-surfaces";
@@ -267,5 +271,58 @@ describe("operator surface inventory", () => {
     ]);
     expect(securityLinks).toEqual(securityRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
     expect(securityRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+  });
+
+  it("projects environment, health, contract, and validation operation links from the shared surface inventory", () => {
+    const inventoryLinks = operatorSurfaceGroups.flatMap((group) => group.links);
+    const environmentLinks = getEnvironmentOperationLinks();
+    const healthLinks = getHealthOperationLinks();
+    const contractLinks = getContractOperationLinks();
+    const validationLinks = getValidationOperationLinks();
+    const environmentRoutes = environmentLinks.map((link) => link.href);
+    const healthRoutes = healthLinks.map((link) => link.href);
+    const contractRoutes = contractLinks.map((link) => link.href);
+    const validationRoutes = validationLinks.map((link) => link.href);
+
+    expect(environmentRoutes).toEqual([
+      "/settings/system",
+      "/settings/health",
+      "/settings/security",
+      "/settings/validation",
+      "/settings/releases"
+    ]);
+    expect(environmentLinks).toEqual(environmentRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
+    expect(environmentRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+
+    expect(healthRoutes).toEqual([
+      "/settings/system",
+      "/settings/api",
+      "/settings/security",
+      "/settings/validation"
+    ]);
+    expect(healthLinks).toEqual(healthRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
+    expect(healthRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+
+    expect(contractRoutes).toEqual([
+      "/demo",
+      "/settings",
+      "/settings/api",
+      "/settings/security",
+      "/settings/runbook",
+      "/settings/validation"
+    ]);
+    expect(contractLinks).toEqual(contractRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
+    expect(contractRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+
+    expect(validationRoutes).toEqual([
+      "/demo",
+      "/settings",
+      "/settings/contracts",
+      "/settings/runbook",
+      "/settings/security",
+      "/settings/releases"
+    ]);
+    expect(validationLinks).toEqual(validationRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
+    expect(validationRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
   });
 });

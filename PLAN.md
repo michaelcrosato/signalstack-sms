@@ -162,6 +162,7 @@ Post-MVP:
 - Local demo operations shared-inventory checkpoint coverage
 - Local demo operations shared-inventory browser checkpoint coverage
 - Local integration and security shared-inventory coverage
+- Local environment, health, contract, and validation shared-inventory coverage
 
 ## Next Milestone
 

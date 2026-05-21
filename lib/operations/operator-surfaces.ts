@@ -258,6 +258,39 @@ const securityOperationNavigationRoutes = [
   "/settings/releases"
 ] as const;
 
+const environmentOperationLinkRoutes = [
+  "/settings/system",
+  "/settings/health",
+  "/settings/security",
+  "/settings/validation",
+  "/settings/releases"
+] as const;
+
+const healthOperationLinkRoutes = [
+  "/settings/system",
+  "/settings/api",
+  "/settings/security",
+  "/settings/validation"
+] as const;
+
+const contractOperationNavigationRoutes = [
+  "/demo",
+  "/settings",
+  "/settings/api",
+  "/settings/security",
+  "/settings/runbook",
+  "/settings/validation"
+] as const;
+
+const validationOperationNavigationRoutes = [
+  "/demo",
+  "/settings",
+  "/settings/contracts",
+  "/settings/runbook",
+  "/settings/security",
+  "/settings/releases"
+] as const;
+
 export function getDemoOperationsCheckpoints(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups): DemoOperationsCheckpoint[] {
   return demoOperationsCheckpointDefinitions.map((checkpoint) => {
     const link = findOperatorSurfaceLink(checkpoint.href, groups);
@@ -302,4 +335,20 @@ export function getIntegrationOperationAreas(groups: OperatorSurfaceGroup[] = op
 
 export function getSecurityOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return securityOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getEnvironmentOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return environmentOperationLinkRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getHealthOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return healthOperationLinkRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getContractOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return contractOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getValidationOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return validationOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }

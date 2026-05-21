@@ -1,12 +1,13 @@
 # Codex Blockers
 
-Run number: 53
+Run number: 54
 
 No active blockers.
 
 ## Notes
 
 - `/settings/integrations` now projects integration surface links from the shared local operator surface inventory, and `/settings/security` now projects its header navigation from the same inventory. Unit and seeded browser coverage verify labels, route targets, states, boundaries, and backing `app/**/page.tsx` files without executing commands, calling providers, billing, notifying, sending SMS or email, exposing secrets, mutating records, or enabling live features.
+- `/settings/environment`, `/settings/health`, `/settings/contracts`, and `/settings/validation` now project operation links from the shared local operator surface inventory. Unit and seeded browser coverage verify labels, notes, route targets, and backing `app/**/page.tsx` files without executing commands, scanning files, reading env files or logs, calling APIs/providers, billing, notifying, sending SMS or email, exposing secrets, mutating records, or enabling live features.
 - `/settings/reports`, `/settings/workflows`, and `/settings/releases` now project report links, workflow checkpoint owners, and release surface links from the shared local operator surface inventory. Unit and seeded browser coverage verify labels, notes, route targets, workflow boundaries, and backing `app/**/page.tsx` files without executing commands, reports, workflow actions, exports, provider calls, billing, notifications, SMS, email, secrets, or live features.
 - `/settings` go-live readiness browser coverage now reads the shared local operator surface inventory and verifies visible navigation labels and link targets. The check renders local readiness navigation only and does not execute commands, mutate records, create exports, call providers, bill, notify, send SMS or email, expose secrets, or enable live features.
 - `/demo` now projects its console navigation from the shared local operator surface inventory, excluding only its own self-link. Unit and browser coverage verify the projected links, including Admin Exports, without executing commands, mutating records, creating exports, calling providers, billing, notifying, sending SMS or email, exposing secrets, or enabling live features.

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { envDefaults } from "@/lib/env/defaults";
+import { getEnvironmentOperationLinks } from "@/lib/operations/operator-surfaces";
 import { getSystemStatus } from "@/lib/operations/system-status";
 
 export const dynamic = "force-dynamic";
@@ -35,25 +36,16 @@ const configurationGroups = [
 
 export default function EnvironmentOperationsPage() {
   const status = getSystemStatus(process.env);
+  const operationLinks = getEnvironmentOperationLinks();
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
-        <Link className="text-sm font-medium text-teal-700" href="/settings">
-          Go-Live Readiness
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/system">
-          System Status
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/health">
-          Health Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/security">
-          Security Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
-          Operator Runbook
-        </Link>
+        {operationLinks.map((link) => (
+          <Link key={link.href} className="text-sm font-medium text-teal-700" href={link.href}>
+            {link.label}
+          </Link>
+        ))}
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Environment Operations</h1>
@@ -107,11 +99,9 @@ export default function EnvironmentOperationsPage() {
 
         <Panel title="Operational Links">
           <ul className="grid gap-3 text-sm">
-            <OperationLink href="/settings/system" label="System Status" note="runtime flags, queue backend, and rate limits" />
-            <OperationLink href="/settings/health" label="Health Operations" note="health endpoint contract and demo-safe defaults" />
-            <OperationLink href="/settings/security" label="Security Operations" note="secret boundaries and external-impact controls" />
-            <OperationLink href="/settings/validation" label="Validation Operations" note="protected local gate and repair signals" />
-            <OperationLink href="/settings/releases" label="Release Operations" note="release checks and production-like deployment boundaries" />
+            {operationLinks.map((link) => (
+              <OperationLink key={link.href} href={link.href} label={link.label} note={link.note} />
+            ))}
           </ul>
         </Panel>
       </section>
