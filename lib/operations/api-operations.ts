@@ -23,6 +23,65 @@ export type ApiOperationsStatus = {
   routes: readonly ApiOperationRoute[];
 };
 
+const apiOperationMethods = new Set<ApiOperationMethod>(["GET", "POST", "PATCH", "DELETE"]);
+const apiOperationRouteFields = ["method", "path", "area", "mutates", "externalImpact", "safety"] as const;
+
+function assertExactApiOperationRouteFields(route: ApiOperationRoute) {
+  const actualKeys = Reflect.ownKeys(route);
+
+  if (
+    actualKeys.length !== apiOperationRouteFields.length ||
+    actualKeys.some((key) => !apiOperationRouteFields.includes(key as typeof apiOperationRouteFields[number]))
+  ) {
+    throw new Error("Invalid API operation route fields");
+  }
+}
+
+function assertApiOperationRoute(route: ApiOperationRoute) {
+  assertExactApiOperationRouteFields(route);
+
+  if (!apiOperationMethods.has(route.method)) {
+    throw new Error(`Invalid API operation method ${String(route.method)}`);
+  }
+
+  if (
+    typeof route.path !== "string" ||
+    !route.path.startsWith("/api/") ||
+    route.path.endsWith("/") ||
+    route.path.includes("?") ||
+    route.path.includes("#") ||
+    route.path.includes("//")
+  ) {
+    throw new Error(`Invalid API operation path ${String(route.path)}`);
+  }
+
+  if (typeof route.area !== "string" || route.area.trim().length === 0) {
+    throw new Error("Invalid API operation area");
+  }
+
+  if (typeof route.mutates !== "boolean" || typeof route.externalImpact !== "boolean") {
+    throw new Error(`Invalid API operation flags for ${route.method} ${route.path}`);
+  }
+
+  if (typeof route.safety !== "string" || route.safety.trim().length === 0) {
+    throw new Error(`Invalid API operation safety for ${route.method} ${route.path}`);
+  }
+}
+
+function assertUniqueApiOperationRoutes(routes: readonly ApiOperationRoute[]) {
+  const seenRoutes = new Set<string>();
+
+  for (const route of routes) {
+    const routeKey = `${route.method} ${route.path}`;
+
+    if (seenRoutes.has(routeKey)) {
+      throw new Error(`Duplicate API operation route ${routeKey}`);
+    }
+
+    seenRoutes.add(routeKey);
+  }
+}
+
 function freezeApiOperationRoute(route: ApiOperationRoute) {
   return Object.freeze({
     method: route.method,
@@ -35,6 +94,12 @@ function freezeApiOperationRoute(route: ApiOperationRoute) {
 }
 
 function freezeApiOperationRoutes(routes: ApiOperationRoute[]) {
+  for (const route of routes) {
+    assertApiOperationRoute(route);
+  }
+
+  assertUniqueApiOperationRoutes(routes);
+
   return Object.freeze(routes.map((route) => freezeApiOperationRoute(route)));
 }
 

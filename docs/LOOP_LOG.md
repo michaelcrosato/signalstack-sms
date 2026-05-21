@@ -982,3 +982,33 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 117  GREEN  api-operations-frozen-snapshot  2026-05-21 01:01
+Objective:    Prevent API operations inventory snapshot mutation from drifting later local renders.
+Changed:
+- Froze the exported static API route inventory and per-call route snapshots.
+- Added unit coverage proving caller-side array or route-object mutation is rejected and fresh status snapshots are returned.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: ec9a284
+Next:         Continue post-MVP API operations hardening or safe read-only operator surface refinements.
+
+## Run 118  GREEN  api-operations-public-fields  2026-05-21 01:05
+Objective:    Keep API operations inventory/status snapshots limited to documented public fields.
+Changed:
+- Sanitized API operation route snapshots to documented public route fields only.
+- Added unit coverage proving exported route entries, status snapshots, rate-limit snapshots, and per-call route snapshots expose only public fields.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: b065160
+Next:         Continue post-MVP API operations hardening or safe read-only operator surface refinements.
+
+## Run 119  GREEN  api-operations-value-shape  2026-05-21 01:18
+Objective:    Validate API operations route value shape before freezing local inventory metadata.
+Changed:
+- Added pre-export API operation inventory validation for supported methods, local `/api/` path shape, boolean flags, nonblank public copy, exact fields, and duplicate method/path rows.
+- Added unit coverage proving exported API route inventory values stay canonical before `/settings/api` renders depend on them.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP API operations hardening or safe read-only operator surface refinements.

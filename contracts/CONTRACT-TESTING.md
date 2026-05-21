@@ -181,6 +181,7 @@ Post-MVP API operations inventory:
 - The inventory must continue to report zero external-impact routes until future live SMS, billing, notification, provider, or AI gates are designed and tested.
 - Unit tests must verify that the exported API operations inventory and per-call status route snapshots are frozen, and that status calls return fresh route arrays so caller mutation cannot leak into later local API inventory renders.
 - Unit tests must verify that exported API route entries, returned status snapshots, rate-limit snapshots, and per-call route snapshots expose only their public documented fields.
+- Unit tests must verify that exported API route entries keep supported methods, canonical local `/api/` path shape, boolean mutation/external-impact flags, nonblank area/safety copy, and unique method/path rows before local API operations renders.
 
 Post-MVP webhook operations view:
 

@@ -98,7 +98,7 @@ Contract operations review is available at `/settings/contracts`. It renders sta
 Validation operations review is available at `/settings/validation`. It renders static local gate inventory, repair signals, and validation safety-boundary text only; it does not execute commands, inspect logs, scan files, mutate records, call providers, bill, call live AI, notify, email, send SMS, expose secrets, or enable live features.
 
 API operations review is available at `/settings/api`. Its static route inventory is covered by unit tests so implemented local API methods stay visible, duplicate route-method rows fail fast, listed paths have backing `app/**/route.ts` files, implemented route methods have inventory rows, and external-impact routes remain zero.
-The API operations inventory is frozen at export, status calls return fresh frozen route snapshots, and both exported/status snapshots expose only public route/status fields so caller-side mutation or accidental extra fields cannot drift local API inventory renders.
+The API operations inventory is value-shape validated before export, frozen at export, status calls return fresh frozen route snapshots, and both exported/status snapshots expose only public route/status fields so malformed route metadata, caller-side mutation, or accidental extra fields cannot drift local API inventory renders.
 
 Compliance readiness detail is available at `/settings/compliance`. It renders existing profile fields, checklist status, A2P metadata status, and live-message blockers only; it does not update records, verify provider registration, call providers, or enable live messaging.
 

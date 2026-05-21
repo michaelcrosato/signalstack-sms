@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP API operations value-shape checkpoint.
+- Added pre-export validation for API operation inventory entries covering supported methods, local `/api/` path shape, boolean flags, nonblank public copy, exact fields, and duplicate method/path rows.
+- Added unit coverage proving exported API inventory values stay canonical before `/settings/api` renders depend on them.
+- Targeted API operations unit coverage and typecheck passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 119
+
+## Previous Run
+
 - Advanced a post-MVP API operations public-field checkpoint.
 - Changed API route snapshot freezing to emit only documented public route fields.
 - Added unit coverage proving exported route entries, status snapshots, rate-limit snapshots, and per-call route snapshots expose only public fields.

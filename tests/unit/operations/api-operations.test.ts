@@ -90,6 +90,21 @@ describe("getApiOperationsStatus", () => {
     expect(missingRouteFiles).toEqual([]);
   });
 
+  it("keeps API inventory values in a canonical local route shape", () => {
+    const supportedMethods = new Set(["GET", "POST", "PATCH", "DELETE"]);
+    const routeKeys = apiOperationRoutes.map((route) => `${route.method} ${route.path}`);
+
+    expect(apiOperationRoutes.every((route) => supportedMethods.has(route.method))).toBe(true);
+    expect(apiOperationRoutes.map((route) => route.path).filter((path) => !path.startsWith("/api/"))).toEqual([]);
+    expect(apiOperationRoutes.map((route) => route.path).filter((path) => path.endsWith("/"))).toEqual([]);
+    expect(apiOperationRoutes.map((route) => route.path).filter((path) => path.includes("?") || path.includes("#"))).toEqual([]);
+    expect(apiOperationRoutes.map((route) => route.path).filter((path) => path.includes("//"))).toEqual([]);
+    expect(apiOperationRoutes.map((route) => route.area).filter((area) => area.trim().length === 0)).toEqual([]);
+    expect(apiOperationRoutes.map((route) => route.safety).filter((safety) => safety.trim().length === 0)).toEqual([]);
+    expect(apiOperationRoutes.filter((route) => typeof route.mutates !== "boolean" || typeof route.externalImpact !== "boolean")).toEqual([]);
+    expect(new Set(routeKeys).size).toBe(routeKeys.length);
+  });
+
   it("keeps the exported API inventory frozen against runtime mutation", () => {
     const firstRoute = apiOperationRoutes[0];
 
