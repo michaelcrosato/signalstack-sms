@@ -754,3 +754,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 104  GREEN  supplied-inventory-sparse-link-guard  2026-05-21 00:03
+Objective:    Fail supplied shared operator inventory sparse link entries before projection.
+Changed:
+- Changed shared operator surface validation to walk every supplied link slot before deriving summaries or projections.
+- Added unit coverage proving sparse/missing supplied link entries fail before local navigation helpers can silently drop malformed links.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.

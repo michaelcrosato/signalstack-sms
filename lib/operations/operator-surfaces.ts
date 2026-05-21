@@ -124,10 +124,16 @@ function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) 
     seenGroupNames.add(group.name);
   }
 
-  const links = groups.flatMap((group) => group.links);
+  const links: OperatorSurfaceLink[] = [];
+
+  for (const group of groups) {
+    for (const link of group.links) {
+      assertOperatorSurfaceLink(link);
+      links.push(link);
+    }
+  }
 
   for (const link of links) {
-    assertOperatorSurfaceLink(link);
     assertNonBlankOperatorSurfaceField("route", link.href);
     assertNonBlankOperatorSurfaceField("label", link.label);
     assertNonBlankOperatorSurfaceField("note", link.note);
