@@ -33,15 +33,13 @@ export default async function DemoPage() {
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
-      <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
-        <Link className="text-sm font-medium text-teal-700" href="/">
-          SignalStack SMS
-        </Link>
-        {demoConsoleLinks.map((link) => (
-          <Link key={link.href} className="text-sm font-medium text-teal-700" href={link.href}>
-            {link.label}
-          </Link>
-        ))}
+      <header className="flex flex-col gap-6 border-b border-slate-200 pb-6">
+        <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium text-teal-700" aria-label="Primary demo navigation">
+          <Link href="/">SignalStack SMS</Link>
+          <Link href="/settings/demo">Demo Ops</Link>
+          <Link href="/settings">Readiness</Link>
+          <Link href="/settings/operations">Operations</Link>
+        </nav>
         <div className="flex flex-col gap-2">
           <p className="text-sm font-semibold uppercase text-slate-500">Investor Demo</p>
           <h1 className="text-4xl font-semibold text-slate-950">SignalStack Demo Console</h1>
@@ -57,6 +55,22 @@ export default async function DemoPage() {
         <Metric label="Conversations" value={conversations.length} />
         <Metric label="Messages" value={analytics.messages.total} />
         <Metric label="Numbers" value={numbers.length} />
+      </section>
+
+      <section className="border-y border-slate-200 py-5" aria-label="Demo console operations">
+        <div className="mb-3 flex flex-col gap-1">
+          <h2 className="text-sm font-semibold uppercase text-slate-500">Operator Surfaces</h2>
+          <p className="text-sm leading-6 text-slate-600">
+            Read-only local views for validating the demo, safety gates, and operations inventory.
+          </p>
+        </div>
+        <nav className="grid gap-2 text-sm font-medium text-teal-700 sm:grid-cols-2 lg:grid-cols-4">
+          {demoConsoleLinks.map((link) => (
+            <Link key={link.href} className="border-l border-slate-200 pl-3 leading-6 transition hover:text-teal-900" href={link.href}>
+              {link.label}
+            </Link>
+          ))}
+        </nav>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
