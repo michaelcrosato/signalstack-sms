@@ -136,6 +136,7 @@ Post-MVP:
 - Read-only local data operations view
 - Read-only local queue operations view
 - Read-only local notification operations view
+- Read-only local readiness audit operations view
 
 ## Next Milestone
 

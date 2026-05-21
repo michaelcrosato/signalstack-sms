@@ -74,6 +74,10 @@ Post-MVP notification operations view:
 
 - The seeded investor demo path must verify that `/settings/notifications` renders read-only notification channel boundaries, no-send controls, runtime gates, and safety-boundary text without creating recipients, subscriptions, templates, jobs, sends, alerts, webhooks, provider calls, billing records, live AI calls, SMS, email, mutations, or notification delivery.
 
+Post-MVP readiness audit operations view:
+
+- The seeded investor demo path must verify that `/settings/readiness-audit` renders tenant-scoped local readiness audit events, action/subject filters, a bounded CSV export link, and safety-boundary text without mutating audit events, exposing secrets, calling providers, billing, live AI, SMS, email, notifications, or enabling live features.
+
 Post-MVP contract operations view:
 
 - The seeded investor demo path must verify that `/settings/contracts` renders read-only contract inventory, validation commands, drift controls, and safety-boundary text without reading contract file contents, executing checks, scanning files, mutating records, provider calls, billing records, live AI calls, SMS, email, notifications, secret exposure, or live feature enablement.

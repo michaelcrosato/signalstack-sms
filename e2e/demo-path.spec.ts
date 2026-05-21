@@ -147,6 +147,17 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Admin Exports" })).toBeVisible();
   await expect(page.getByText("Export Safety Boundary")).toBeVisible();
   await expect(page.getByRole("link", { name: "Export CSV" })).toHaveCount(2);
+  await page.getByRole("link", { name: "Review Events" }).click();
+  await expect(page.getByRole("heading", { name: "Readiness Audit" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Action Filters" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Subject Filters" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Audit Events" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Export Audit CSV" })).toBeVisible();
+  await page.getByRole("link", { name: "COMPLIANCE_PROFILE_UPDATED" }).click();
+  await expect(page.getByText("Action filter", { exact: true })).toBeVisible();
+  const filteredReadinessAuditExportResponse = await request.get("/api/settings/readiness-audit/export?action=COMPLIANCE_PROFILE_UPDATED&limit=5");
+  expect(filteredReadinessAuditExportResponse.ok()).toBeTruthy();
+  await expect(filteredReadinessAuditExportResponse.text()).resolves.toContain("id,action,subjectType,subjectId,actorUserId,createdAt,metadata");
   await page.getByRole("link", { name: "Go-Live Readiness" }).click();
   const readinessAuditExportResponse = await request.get("/api/settings/readiness-audit/export?limit=5");
   expect(readinessAuditExportResponse.ok()).toBeTruthy();

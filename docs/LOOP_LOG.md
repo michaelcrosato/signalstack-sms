@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 027  GREEN  readiness-audit-operations  2026-05-20 17:19
+Objective:    Add a focused read-only local readiness audit operations view.
+Changed:
+- Added `/settings/readiness-audit` with tenant-scoped local audit event listing, action/subject filters, metadata display, and bounded CSV export links.
+- Linked the view from the launch dashboard, demo console, go-live readiness page, and admin exports.
+- Updated API/testing contracts, API map, README, PLAN, testing docs, SUMMARY, and BLOCKERS with the local-only safety boundary.
+- Extended the seeded investor demo E2E path to cover the view and filtered CSV export contract.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only admin/reporting refinements without live external-impact actions.
+
 ## Run 026  GREEN  api-operations-inventory  2026-05-20 17:11
 Objective:    Complete the read-only API operations inventory for already implemented local route methods.
 Changed:

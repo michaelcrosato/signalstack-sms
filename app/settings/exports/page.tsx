@@ -21,6 +21,9 @@ export default async function SettingsExportsPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/compliance">
           Compliance Detail
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/readiness-audit">
+          Readiness Audit
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/system">
           System Status
         </Link>
@@ -57,6 +60,7 @@ export default async function SettingsExportsPage() {
           count={auditEvents.length}
           description="Local go-live readiness audit events with action, subject, actor, timestamp, and metadata columns."
           href="/api/settings/readiness-audit/export?limit=200"
+          detailHref="/settings/readiness-audit"
         />
         <ExportPanel
           title="Provider Credential Rotations"
@@ -79,7 +83,7 @@ export default async function SettingsExportsPage() {
   );
 }
 
-function ExportPanel({ title, count, description, href }: { title: string; count: number; description: string; href: string }) {
+function ExportPanel({ title, count, description, href, detailHref }: { title: string; count: number; description: string; href: string; detailHref?: string }) {
   return (
     <section className="rounded border border-slate-200 bg-white p-5">
       <div className="flex items-start justify-between gap-4">
@@ -89,9 +93,16 @@ function ExportPanel({ title, count, description, href }: { title: string; count
         </div>
         <span className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-600">{count} recent</span>
       </div>
-      <Link className="mt-5 inline-flex rounded border border-teal-700 px-3 py-2 text-sm font-semibold text-teal-700" href={href}>
-        Export CSV
-      </Link>
+      <div className="mt-5 flex flex-wrap gap-3">
+        <Link className="inline-flex rounded border border-teal-700 px-3 py-2 text-sm font-semibold text-teal-700" href={href}>
+          Export CSV
+        </Link>
+        {detailHref ? (
+          <Link className="inline-flex rounded border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700" href={detailHref}>
+            Review Events
+          </Link>
+        ) : null}
+      </div>
     </section>
   );
 }

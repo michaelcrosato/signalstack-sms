@@ -126,6 +126,11 @@ const launchLinks = [
     href: "/settings/exports",
     title: "Admin Exports",
     description: "Local CSV links for readiness audit and redacted provider rotation history."
+  },
+  {
+    href: "/settings/readiness-audit",
+    title: "Readiness Audit",
+    description: "Read-only local go-live readiness history, filters, and bounded CSV export."
   }
 ];
 

@@ -107,6 +107,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/settings/notifications">
           Notification Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/readiness-audit">
+          Readiness Audit
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
           Operator Runbook
         </Link>
@@ -315,6 +318,16 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <p className="text-sm leading-6 text-slate-700">
           Review the local no-send boundary for email, SMS alerts, browser notifications, and outbound webhook-style
           alerts without creating recipients, templates, jobs, provider calls, or live notifications.
+        </p>
+      </Panel>
+
+      <Panel title="Readiness Audit">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/readiness-audit">
+          Readiness Audit
+        </Link>
+        <p className="text-sm leading-6 text-slate-700">
+          Review local go-live readiness audit events, filters, and bounded CSV export links without mutating records,
+          exposing secrets, calling providers, billing, sending notifications, or enabling live messaging.
         </p>
       </Panel>
 

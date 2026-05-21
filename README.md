@@ -67,6 +67,8 @@ AI operations review is available at `/settings/ai`. It renders selected AI prov
 
 Notification operations review is available at `/settings/notifications`. It renders email, in-app, SMS alert, and webhook notification no-send boundaries only; it does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, call live AI, notify, email, send SMS, mutate records, expose secrets, or enable live features.
 
+Readiness audit review is available at `/settings/readiness-audit`. It renders tenant-scoped local go-live readiness audit events, filters, and bounded CSV export links; it does not mutate audit events, expose secrets, call providers, bill, call live AI, notify, email, send SMS, or enable live features.
+
 Contract operations review is available at `/settings/contracts`. It renders static contract inventory, validation command references, drift controls, and safety-boundary text only; it does not execute checks, scan files, mutate records, call providers, bill, call live AI, notify, email, send SMS, expose secrets, or enable live features.
 
 Validation operations review is available at `/settings/validation`. It renders static local gate inventory, repair signals, and validation safety-boundary text only; it does not execute commands, inspect logs, scan files, mutate records, call providers, bill, call live AI, notify, email, send SMS, expose secrets, or enable live features.

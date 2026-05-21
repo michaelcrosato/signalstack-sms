@@ -88,6 +88,9 @@ export default async function DemoPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/notifications">
           Notification Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/readiness-audit">
+          Readiness Audit
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
           Operator Runbook
         </Link>
