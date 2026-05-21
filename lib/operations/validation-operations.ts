@@ -46,6 +46,13 @@ const requiredRepairSignalTerms = [
   "live AI",
   "smallest failing command"
 ] as const;
+const forbiddenSecretMetadataPatterns = [
+  /\bsk_(?:live|test)_[A-Za-z0-9]+/,
+  /\bpk_live_[A-Za-z0-9]+/,
+  /\bAC[a-fA-F0-9]{32}\b/,
+  /\b(?:TWILIO_AUTH_TOKEN|STRIPE_SECRET_KEY|OPENAI_API_KEY|CLERK_SECRET_KEY)\s*=/,
+  /\bBearer\s+[A-Za-z0-9._-]{12,}/
+] as const;
 
 function assertExactFields<T extends object>(value: T, fields: readonly string[], errorMessage: string) {
   const actualKeys = Reflect.ownKeys(value);
@@ -57,6 +64,12 @@ function assertExactFields<T extends object>(value: T, fields: readonly string[]
 
 function assertUniqueValues(values: readonly string[], errorMessage: string) {
   if (new Set(values).size !== values.length) {
+    throw new Error(errorMessage);
+  }
+}
+
+function assertNoSecretLikeMetadata(value: string, errorMessage: string) {
+  if (forbiddenSecretMetadataPatterns.some((pattern) => pattern.test(value))) {
     throw new Error(errorMessage);
   }
 }
@@ -79,10 +92,12 @@ function assertGateCommand(command: ValidationOperationGateCommand) {
   if (!allowedValidationOperationAreas.includes(command.area as (typeof allowedValidationOperationAreas)[number])) {
     throw new Error(`Unsupported validation operation area for ${command.command}`);
   }
+  assertNoSecretLikeMetadata(command.area, `Secret-like validation operation area for ${command.command}`);
 
   if (typeof command.boundary !== "string" || command.boundary.trim().length === 0) {
     throw new Error(`Invalid validation operation boundary for ${command.command}`);
   }
+  assertNoSecretLikeMetadata(command.boundary, `Secret-like validation operation boundary for ${command.command}`);
 }
 
 function freezeGateCommands(commands: ValidationOperationGateCommand[]) {
@@ -118,6 +133,7 @@ function freezeRepairSignals(signals: string[]) {
     if (typeof signal !== "string" || signal.trim().length === 0) {
       throw new Error("Invalid validation operation repair signal");
     }
+    assertNoSecretLikeMetadata(signal, "Secret-like validation operation repair signal");
   }
 
   assertUniqueValues(signals, "Duplicate validation operation repair signals");

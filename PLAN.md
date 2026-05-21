@@ -236,6 +236,7 @@ Post-MVP:
 - Local validation operations inventory static-metadata coverage
 - Local validation operations value-boundary coverage
 - Local validation operations package-script coverage
+- Local validation operations secret-literal coverage
 - Local security operations package-script coverage
 - Local security operations secret-literal coverage
 

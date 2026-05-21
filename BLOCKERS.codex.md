@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 133
+Run number: 134
 
 No active blockers.
 
 ## Notes
 
+- Latest validation operations secret-literal hardening keeps `/settings/validation` static gate area, boundary, and repair-signal metadata free of common secret-like token patterns before render. The check is local static metadata validation only and does not execute commands, inspect logs, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.
 - Latest contract operations secret-literal hardening keeps `/settings/contracts` static contract file metadata, validation purposes, and drift-control copy free of common secret-like token patterns before render. The check is local static metadata validation only and does not read contract contents, execute commands, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.
 - Latest security operations secret-literal hardening keeps `/settings/security` static control details, validation purposes, and safety-boundary copy free of common secret-like token patterns before render. The check is local static metadata validation only and does not scan files, inspect logs, read raw environment values, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.
 - Latest contract operations package-script hardening keeps `/settings/contracts` static validation command references inside an explicit command allowlist and verifies each listed `npm run ...` command is backed by `package.json` before render. The check is local static metadata validation only and does not read contract contents, execute commands, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.

@@ -1173,3 +1173,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP contract operations hardening or safe read-only operator surface refinements.
+
+## Run 134  GREEN  validation-operations-secret-literals  2026-05-21 02:15
+Objective:    Keep `/settings/validation` static metadata free of secret-like literals before rendering.
+Changed:
+- Added secret-like metadata guards for validation operation gate area, boundary, and repair-signal copy.
+- Added unit coverage proving common API key, provider token, account SID, env assignment, and bearer-token patterns are absent from validation operation metadata.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP validation operations hardening or safe read-only operator surface refinements.

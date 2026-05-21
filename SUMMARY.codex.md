@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP validation operations secret-literal checkpoint.
+- Added metadata guards so `/settings/validation` static gate area, boundary, and repair-signal copy reject common secret-like token patterns before render.
+- Added unit coverage proving API key, provider token, account SID, env assignment, and bearer-token patterns are absent from validation operation metadata.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- Focused validation operations unit coverage, `git diff --check`, build, and the protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 134
+
+## Previous Run
+
 - Advanced a post-MVP contract operations secret-literal checkpoint.
 - Added metadata guards so `/settings/contracts` static contract file boundaries, validation purposes, and drift-control copy reject common secret-like token patterns before render.
 - Added unit coverage proving API key, provider token, account SID, env assignment, and bearer-token patterns are absent from contract operation metadata.
