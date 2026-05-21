@@ -21,13 +21,12 @@ This file is the handoff for the next automated loop. It should stay short enoug
 
 ## Next Best Work
 
-1. Add a product-demo Playwright path that a non-technical investor can follow from `/dashboard`.
-2. Build contacts list/import UI on the existing contacts/import APIs.
-3. Build campaign composer, preflight, schedule, and status UI on existing campaign APIs.
-4. Build inbox list/thread UI on existing inbox APIs.
-5. Build template list/detail UI on existing template APIs.
-6. Expand product-facing compliance readiness from the dashboard summary.
-7. Harden production worker policy before broader live sending.
+1. Build contacts list/import UI on the existing contacts/import APIs.
+2. Build campaign composer, preflight, schedule, and status UI on existing campaign APIs.
+3. Build inbox list/thread UI on existing inbox APIs.
+4. Build template list/detail UI on existing template APIs.
+5. Expand product-facing compliance readiness from the dashboard summary.
+6. Harden production worker policy before broader live sending.
 
 ## Guardrails
 

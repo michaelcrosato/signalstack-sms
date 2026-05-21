@@ -17,6 +17,7 @@
     "test:e2e": "playwright test",
     "test:e2e:smoke": "playwright test e2e/smoke.spec.ts --project=chromium",
     "test:e2e:demo": "playwright test e2e/demo-path.spec.ts --project=chromium",
+    "test:e2e:product-demo": "playwright test e2e/product-demo-path.spec.ts --project=chromium",
     "db:generate": "prisma generate",
     "db:validate": "prisma validate",
     "db:migrate": "prisma migrate dev",

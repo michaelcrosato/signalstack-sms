@@ -14,6 +14,7 @@ Milestone 0 validation runs:
 Additional deterministic checks:
 
 - `npm run test:e2e:demo` runs the investor demo path after the local database has been migrated and seeded.
+- `npm run test:e2e:product-demo` runs the seeded product dashboard path for `/dashboard` after the local database has been migrated and seeded.
 - `npm run worker` processes local due scheduled campaign jobs through the dummy provider only.
 - `npm run worker:watch` runs the same worker in continuous polling mode for local demos. It is still blocked unless `MESSAGING_PROVIDER=dummy` and live messaging is disabled.
 - `WORKER_MAX_JOBS_PER_POLL` caps local worker throughput per poll and is clamped to a bounded range for demos/tests.
@@ -101,4 +102,5 @@ Additional deterministic checks:
 - The seeded investor demo path verifies `/settings/notifications` as a read-only notification no-send boundary without recipients, templates, jobs, sends, alerts, webhooks, provider calls, billing records, live AI calls, SMS, email, mutations, or notification delivery.
 - The seeded investor demo path verifies `/settings/readiness-audit` as a read-only local readiness audit surface with filters, bounded CSV export links, and no-impact summary labels for command execution, external impact, mutation, and secrets displayed without mutating audit events, exposing secrets, calling providers, billing, live AI, SMS, email, notifications, or enabling live features.
 - The Playwright smoke test verifies the root local launch dashboard links from the shared local operator surface inventory while still rendering demo-safe defaults, so browser coverage follows the same route source as the page.
+- The seeded product-demo path verifies `/dashboard` renders the owner-facing product navigation, seeded metrics, consent/compliance readiness, campaign, inbox, template, analytics, and demo-safe live-blocked states without provider calls, billing records, notifications, live AI, SMS, email, secrets, or live feature enablement.
 - The seeded investor demo path verifies `/settings/runbook` as a read-only local operator checklist with links to current local admin surfaces, including queue, delivery, readiness audit, and provider numbers, without command execution or external-impact side effects.

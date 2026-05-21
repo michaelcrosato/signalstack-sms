@@ -84,8 +84,7 @@ Goal: turn the demo-safe product into a paid production SaaS.
 ## Next Concrete Work
 
 1. Keep `docs/CURRENT_STATE_MATRIX.md` current.
-2. Add product-demo E2E coverage for `/dashboard`.
-3. Build contacts list/import UI on existing APIs.
-4. Build campaign composer, preflight, schedule, and status UI.
-5. Add product-facing compliance readiness detail.
-6. Harden production worker policy before broader live sending.
+2. Build contacts list/import UI on existing APIs.
+3. Build campaign composer, preflight, schedule, and status UI.
+4. Add product-facing compliance readiness detail.
+5. Harden production worker policy before broader live sending.

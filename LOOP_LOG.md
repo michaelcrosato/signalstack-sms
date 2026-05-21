@@ -1854,3 +1854,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue Phase 0 correctness hardening: RBAC enforcement on mutating routes, then product shell work.
+
+## Run 202  GREEN  product-dashboard-e2e  2026-05-21 14:05
+Objective:    Add seeded browser coverage for the owner-facing `/dashboard` product workflow.
+Changed:
+- Added `e2e/product-demo-path.spec.ts` for product navigation, seeded metrics, compliance readiness, and demo-safe blocked live states.
+- Added `npm run test:e2e:product-demo` and refreshed testing docs, roadmap, state matrix, and handoff notes.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Build contacts list/import UI on existing APIs.
