@@ -1,15 +1,20 @@
 # Codex Summary
 
-Run number: 71
+Run number: 72
 
 ## Completed
+
+- Advanced a loop-log reconciliation checkpoint.
+- Synced the root `LOOP_LOG.md` with `docs/LOOP_LOG.md` so root-level loop history includes the recent green runs that were already present in the documented log.
+- Preserved existing attempts and avoided product code, protected gate scripts, live-action settings, credentials, and external-impact behavior.
+- Protected local gate passed after rerunning `db:migrate` and `demo:seed` with the documented local `DATABASE_URL`.
+
+## Prior Completed
 
 - Advanced a post-MVP shared operator inventory concise-copy checkpoint.
 - Added unit coverage that keeps shared operator surface group names, labels, and notes short enough for operator scanning and keeps labels on predictable navigation suffixes.
 - Updated testing contract/docs, README, PLAN, BLOCKERS, loop logs, and next-prompt handoff docs with the concise-copy guard.
 - Targeted operator-surface unit coverage passed.
-
-## Prior Completed
 
 - Advanced a post-MVP shared operator inventory whitespace-clean checkpoint.
 - Added unit coverage that keeps shared operator surface routes, group names, labels, and notes free of leading/trailing whitespace, doubled spaces, and embedded newlines.
