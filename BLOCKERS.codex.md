@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 212
+
+- No blocker from the latest product campaign detail workflow. `/dashboard/campaigns/:campaignId` edits local drafts and cancels scheduled local queue jobs through existing tenant-scoped APIs; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
 Run number: 211
 
 - No blocker from the latest production worker policy hardening. Scheduled campaign database and BullMQ workers now block production-like runtime markers even with demo-safe provider defaults; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.

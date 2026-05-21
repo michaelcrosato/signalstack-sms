@@ -77,7 +77,9 @@ export default async function CampaignsPage() {
                   {campaigns.map((campaign) => (
                     <tr className="border-t border-slate-100" key={campaign.id}>
                       <td className="px-4 py-3">
-                        <div className="font-medium text-slate-950">{campaign.name}</div>
+                        <Link className="font-medium text-teal-700" href={`/dashboard/campaigns/${campaign.id}`}>
+                          {campaign.name}
+                        </Link>
                         <div className="text-slate-600">{campaign.templateName}</div>
                       </td>
                       <td className="px-4 py-3">

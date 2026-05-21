@@ -211,6 +211,54 @@ test("product campaigns page creates, preflights, and schedules a local campaign
   await expect(page.getByRole("row").filter({ hasText: campaignName }).getByText("SCHEDULED")).toBeVisible();
 });
 
+test("product campaign detail page edits a draft and cancels a queued campaign locally", async ({ page }) => {
+  const uniqueSuffix = Date.now().toString().slice(-7);
+  const phone = `+1888${uniqueSuffix}`;
+  const campaignName = `Detail campaign ${uniqueSuffix}`;
+  const updatedName = `Detail campaign updated ${uniqueSuffix}`;
+
+  const contactResponse = await page.request.post("/api/contacts", {
+    data: {
+      phone,
+      displayName: `Campaign Recipient ${uniqueSuffix}`,
+      consentStatus: "OPTED_IN",
+      optInSource: "campaign_detail_e2e"
+    }
+  });
+  const contactPayload = await contactResponse.json();
+  const campaignResponse = await page.request.post("/api/campaigns", {
+    data: {
+      name: campaignName,
+      body: "Hi {{firstName}}, this local campaign can be edited before scheduling.",
+      contactIds: [contactPayload.contact.id]
+    }
+  });
+  const campaignPayload = await campaignResponse.json();
+
+  await page.goto(`/dashboard/campaigns/${campaignPayload.campaign.id}`);
+
+  await expect(page.getByRole("heading", { name: campaignName })).toBeVisible();
+  await expect(page.getByLabel("Campaign lifecycle").getByText("DRAFT")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Campaign detail" })).toBeVisible();
+  await page.getByLabel("Campaign name").fill(updatedName);
+  await page.getByRole("button", { name: "Save Draft" }).click();
+
+  await expect(page.getByRole("status")).toContainText("Campaign draft updated locally");
+  await expect(page.getByRole("heading", { name: updatedName })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Safety Boundary" })).toBeVisible();
+  await expect(page.getByText("It does not send SMS, call")).toBeVisible();
+
+  await page.request.post(`/api/campaigns/${campaignPayload.campaign.id}/schedule`, {
+    data: { scheduledAt: new Date(Date.now() + 90 * 60 * 1000).toISOString() }
+  });
+
+  await page.goto(`/dashboard/campaigns/${campaignPayload.campaign.id}`);
+  await expect(page.getByLabel("Campaign lifecycle").getByText("SCHEDULED")).toBeVisible();
+  await page.getByRole("button", { name: "Cancel Scheduled Campaign" }).click();
+  await expect(page.getByRole("status")).toContainText("Campaign queue job canceled locally");
+  await expect(page.getByLabel("Campaign lifecycle").getByText("PAUSED")).toBeVisible();
+});
+
 test("product inbox page manages a local conversation thread", async ({ page }) => {
   const uniqueSuffix = Date.now().toString().slice(-7);
   const phone = `+1555${uniqueSuffix}`;

@@ -1,5 +1,14 @@
 # Codex Summary
 
+- Added `/dashboard/campaigns/:campaignId` for owner-facing campaign lifecycle review.
+- Draft campaigns can now be edited locally from the detail page, and scheduled campaigns can be canceled through the existing local cancel API.
+- Linked campaign rows to detail pages, added product campaign detail projection coverage, extended seeded product-demo coverage, and refreshed API/testing contracts, roadmap, state matrix, README, and handoff docs.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, worker execution, Redis calls, hard deletion, or protected gate-script edits were used.
+
+Run number: 212
+
+## Previous Run
+
 - Hardened production worker policy for scheduled campaign workers.
 - Database and BullMQ workers now block production-like runtime markers even when dummy provider mode and live messaging disabled are set.
 - Added queue unit coverage for production-like worker blocking and updated queue contract, testing docs, roadmap, state matrix, README, and handoff docs.

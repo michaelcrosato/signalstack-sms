@@ -1,5 +1,5 @@
 import { CampaignStatus, ConsentStatus } from "@prisma/client";
-import { listCampaigns } from "@/lib/db/repositories/campaigns";
+import { getCampaign, listCampaigns } from "@/lib/db/repositories/campaigns";
 import { listContacts } from "@/lib/db/repositories/contacts";
 import { listTemplates } from "@/lib/db/repositories/templates";
 
@@ -33,6 +33,59 @@ export async function getProductCampaigns(orgId: string) {
       phone: contact.phone,
       consentStatus: contact.consentStatus,
       disabled: contact.consentStatus !== ConsentStatus.OPTED_IN || Boolean(contact.archivedAt)
+    })),
+    templates: templates.map((template) => ({
+      id: template.id,
+      name: template.name,
+      body: template.body
+    }))
+  };
+}
+
+export async function getProductCampaignDetail(orgId: string, campaignId: string) {
+  const [campaign, contacts, templates] = await Promise.all([
+    getCampaign(orgId, campaignId),
+    listContacts(orgId),
+    listTemplates(orgId)
+  ]);
+
+  if (!campaign) {
+    return null;
+  }
+
+  const selectedContactIds = new Set(campaign.recipients.map((recipient) => recipient.contactId));
+
+  return {
+    id: campaign.id,
+    name: campaign.name,
+    body: campaign.body,
+    status: campaign.status,
+    templateId: campaign.templateId ?? "",
+    templateName: campaign.template?.name ?? "Custom copy",
+    scheduledAt: campaign.scheduledAt?.toISOString() ?? null,
+    createdAt: campaign.createdAt.toISOString(),
+    updatedAt: campaign.updatedAt.toISOString(),
+    canEdit: campaign.status === CampaignStatus.DRAFT,
+    canCancel: campaign.status === CampaignStatus.SCHEDULED,
+    selectedContactIds: [...selectedContactIds],
+    recipientRows: campaign.recipients.map((recipient) => {
+      const contact = recipient.contact;
+      return {
+        id: contact.id,
+        displayName:
+          contact.displayName ?? ([contact.firstName, contact.lastName].filter(Boolean).join(" ") || contact.phone),
+        phone: contact.phone,
+        consentStatus: contact.consentStatus,
+        archived: Boolean(contact.archivedAt)
+      };
+    }),
+    contacts: contacts.map((contact) => ({
+      id: contact.id,
+      displayName: contact.displayName ?? ([contact.firstName, contact.lastName].filter(Boolean).join(" ") || contact.phone),
+      phone: contact.phone,
+      consentStatus: contact.consentStatus,
+      disabled: contact.consentStatus !== ConsentStatus.OPTED_IN || Boolean(contact.archivedAt),
+      selected: selectedContactIds.has(contact.id)
     })),
     templates: templates.map((template) => ({
       id: template.id,

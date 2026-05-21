@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 212  GREEN  product-campaign-detail-workflow  2026-05-21 15:28
+Objective:    Add owner-facing campaign detail, draft edit, and local cancel lifecycle controls.
+Changed:
+- Added `/dashboard/campaigns/:campaignId` with tenant-scoped campaign status, recipients, local draft editing, and scheduled-campaign cancel controls.
+- Linked campaign status rows to the new detail page and added product campaign detail adapter coverage.
+- Extended seeded product-demo coverage and refreshed API/testing contracts, roadmap, state matrix, README, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Add template detail/edit only if product demo review needs it, otherwise start live-provider design after production worker policy.
+
 ## Run 211  GREEN  production-worker-runtime-block  2026-05-21 15:18
 Objective:    Block scheduled campaign workers in production-like runtimes before broader live-send work.
 Changed:
