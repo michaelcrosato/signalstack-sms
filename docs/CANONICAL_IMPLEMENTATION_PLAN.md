@@ -1793,7 +1793,7 @@ Jobs:
 5. `prisma`
 
    * `npm run db:generate`.
-   * `npx prisma validate`.
+   * `npm run db:validate`.
 6. `unit-integration-contract`
 
    * Start Postgres/Redis services.
@@ -2473,7 +2473,7 @@ Tests should prevent AI-agent regressions, especially:
 |  2 | Create source-of-truth docs and contract stubs.                                                                                    | repo-bootstrap/docs-orchestrator | `README.md`, `PLAN.md`, `AGENTS.md`, `docs/**`, `contracts/**`                                   | All required docs/contracts exist with owner/update rules.         | `npm run contracts:check`                    |
 |  3 | Add `.env.example` and env safety script.                                                                                          | repo-bootstrap/tests-quality     | `.env.example`, `scripts/check-env-safety.ts`                                                    | No real secrets; live flags default false; CI safety check passes. | `npm run secrets:scan`                       |
 |  4 | Add one-command validation script.                                                                                                 | repo-bootstrap/tests-quality     | `scripts/validate.ts`, `docs/LOCAL_GATE.md`                                                      | Runs lint/typecheck/prisma/test/build/compliance where available.  | `npm run validate`                           |
-|  5 | Create Prisma baseline schema for org/user/membership/contact/compliance/message/campaign/conversation.                            | backend-data                     | `prisma/schema.prisma`, `contracts/CONTRACT-DB.md`                                               | Schema validates; tenant-scoped models include `orgId`.            | `npm run db:generate && npx prisma validate` |
+|  5 | Create Prisma baseline schema for org/user/membership/contact/compliance/message/campaign/conversation.                            | backend-data                     | `prisma/schema.prisma`, `contracts/CONTRACT-DB.md`                                               | Schema validates; tenant-scoped models include `orgId`.            | `npm run db:generate && npm run db:validate` |
 |  6 | Implement compliance gate library skeleton and tests.                                                                              | backend-data/tests-quality       | `lib/compliance/gates.ts`, `tests/unit/compliance/**`, `CONTRACT-COMPLIANCE.md`                  | Opt-out/missing consent/live disabled cases block sends.           | `npm run test -- compliance`                 |
 |  7 | Implement provider adapter interface and dummy provider.                                                                           | backend-data                     | `lib/messaging/provider/**`, `CONTRACT-PROVIDER-ADAPTER.md`                                      | Dummy provider deterministic; no external calls.                   | `npm run test -- provider`                   |
 |  8 | Add demo seed fixtures and seed script.                                                                                            | backend-data/tests-quality       | `prisma/seed.ts`, `prisma/fixtures/**`, `docs/DEMO_MODE.md`                                      | Demo org, contacts, campaigns, conversations seeded.               | `npm run demo:seed`                          |

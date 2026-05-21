@@ -18,7 +18,7 @@ It intentionally avoids adding doctrine, retry counters, multi-agent machinery,
 or alternate validation rules.
 
 Run:
-  .\codex-skynet-max.ps1 -FullYolo -KeepAwake -FuseMinutes 840
+  .\codex-skynet-max.ps1 -FullYolo -KeepAwake -FuseMinutes 4320
 
 Optional one-shot preflight:
   .\codex-skynet-max.ps1 -PreflightOnly
@@ -29,8 +29,8 @@ param(
   [string]$Repo = "C:\dev\signalstack-sms",
 
   # Cost/time fuse. This is the unattended backstop for "Never Stop Looping."
-  # 840 minutes = 14 hours.
-  [int]$FuseMinutes = 840,
+  # 4320 minutes = 72 hours, enough for an unattended weekend run.
+  [int]$FuseMinutes = 4320,
 
   [switch]$FullYolo,
   [switch]$KeepAwake,
