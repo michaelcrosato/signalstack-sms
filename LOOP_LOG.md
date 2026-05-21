@@ -715,3 +715,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 098  GREEN  supplied-inventory-invalid-group-object-guard  2026-05-20 23:39
+Objective:    Fail supplied shared operator inventory entries that are not group objects before projection.
+Changed:
+- Added a shared invalid-group-object guard before reading supplied operator surface group fields.
+- Added unit coverage proving malformed supplied group entries fail before summary, broad launch, or focused demo projections can surface generic runtime errors.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.

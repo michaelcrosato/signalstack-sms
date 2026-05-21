@@ -57,6 +57,12 @@ function assertNonBlankOperatorSurfaceField(fieldName: string, value: string) {
   }
 }
 
+function assertOperatorSurfaceGroup(group: OperatorSurfaceGroup) {
+  if (!group || typeof group !== "object" || Array.isArray(group)) {
+    throw new Error("Invalid operator surface group");
+  }
+}
+
 function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) {
   if (groups.length === 0) {
     throw new Error("Empty operator surface inventory");
@@ -68,6 +74,7 @@ function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) 
   const seenNotes = new Set<string>();
 
   for (const group of groups) {
+    assertOperatorSurfaceGroup(group);
     assertNonBlankOperatorSurfaceField("group name", group.name);
 
     if (!Array.isArray(group.links)) {

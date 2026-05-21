@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP shared operator supplied-inventory invalid-group-object checkpoint.
+- Added a shared guard so summaries and projections fail before deriving local navigation from supplied inventory entries that are not group objects.
+- Added unit coverage proving malformed supplied group entries are rejected for summary, launch, and demo operation projections.
+- Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop log.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 98
+
+## Previous Run
+
 - Advanced a post-MVP shared operator supplied-inventory invalid-link-array checkpoint.
 - Added a shared guard so summaries and projections fail before deriving local navigation from supplied inventory groups whose `links` field is not an array.
 - Added unit coverage proving malformed supplied group link arrays are rejected for summary, launch, and demo operation projections.
@@ -8,7 +18,7 @@
 
 Run number: 97
 
-## Previous Run
+## Earlier Run
 
 - Advanced a post-MVP shared operator supplied-inventory blank-field checkpoint.
 - Added a shared guard so summaries and projections fail before deriving local navigation from supplied inventories with blank group names, routes, labels, or notes.
