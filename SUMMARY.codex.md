@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP security operations package-script checkpoint.
+- Added an explicit allowlist for `/settings/security` validation command metadata.
+- Added unit coverage proving each listed `npm run ...` security validation reference is backed by `package.json`.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- Targeted security operations unit coverage and typecheck passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 130
+
+## Previous Run
+
 - Advanced a post-MVP handoff truth repair checkpoint.
 - Reconciled stale handoff files so the latest validation operations package-script and value-boundary runs are visible at the top of `SUMMARY.codex.md` and `BLOCKERS.codex.md`.
 - Updated root and docs loop logs with this coordination-only Run 129 entry.

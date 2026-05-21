@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   getSecurityOperationsStatus,
@@ -21,6 +23,14 @@ const publicStatusFields = [
 
 function sortedFields(value: object) {
   return Object.keys(value).sort();
+}
+
+function packageScripts() {
+  const packageJson = JSON.parse(readFileSync(join(process.cwd(), "package.json"), "utf8")) as {
+    scripts?: Record<string, string>;
+  };
+
+  return packageJson.scripts ?? {};
 }
 
 describe("getSecurityOperationsStatus", () => {
@@ -109,6 +119,15 @@ describe("getSecurityOperationsStatus", () => {
     expect(securityOperationSafetyBoundaries.join(" ")).toContain("mutations");
   });
 
+  it("keeps security operation validation references inside the supported command allowlist", () => {
+    expect(securityOperationValidationReferences.map((reference) => reference.command)).toEqual([
+      "npm run validate",
+      "npm run production:gate",
+      "npm run secrets:scan",
+      "npm run compliance:check"
+    ]);
+  });
+
   it("keeps security operation inventory order stable for local review pages", () => {
     expect(securityOperationControls.map((control) => control.name)).toEqual([
       "Secret storage",
@@ -137,5 +156,14 @@ describe("getSecurityOperationsStatus", () => {
     expect(new Set(controlNames).size).toBe(controlNames.length);
     expect(new Set(validationCommands).size).toBe(validationCommands.length);
     expect(new Set(securityOperationSafetyBoundaries).size).toBe(securityOperationSafetyBoundaries.length);
+  });
+
+  it("keeps security operation validation command references backed by package scripts", () => {
+    const scripts = packageScripts();
+    const missingScripts = securityOperationValidationReferences
+      .map((reference) => reference.command.replace("npm run ", ""))
+      .filter((scriptName) => !Object.prototype.hasOwnProperty.call(scripts, scriptName));
+
+    expect(missingScripts).toEqual([]);
   });
 });

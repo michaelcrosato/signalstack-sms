@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 130  GREEN  security-operations-package-scripts  2026-05-21 01:58
+Objective:    Keep `/settings/security` validation references backed by local package scripts before rendering.
+Changed:
+- Added an explicit allowlist for security operation validation commands.
+- Added unit coverage proving each listed `npm run ...` security validation reference exists in `package.json`.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP security operations hardening or safe read-only operator surface refinements.
+
 ## Run 129  GREEN  handoff-truth-repair  2026-05-21 01:54
 Objective:    Reconcile stale handoff files with the latest validated loop state.
 Changed:

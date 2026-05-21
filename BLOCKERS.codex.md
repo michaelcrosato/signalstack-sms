@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 129
+Run number: 130
 
 No active blockers.
 
 ## Notes
 
+- Latest security operations package-script hardening keeps `/settings/security` static validation command references inside an explicit command allowlist and verifies each listed `npm run ...` command is backed by `package.json` before render. The check is local static metadata validation only and does not execute commands, inspect logs, scan files, read raw environment values, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.
 - Latest handoff truth repair reconciles `SUMMARY.codex.md`, `BLOCKERS.codex.md`, root `LOOP_LOG.md`, and `docs/LOOP_LOG.md` with the latest validated loop state. This is coordination-only and does not change product code, contracts, protected gate scripts, demo-safe defaults, live-action settings, secrets, providers, billing, notifications, SMS/email, live AI, or destructive database behavior.
 - Latest validation operations package-script hardening keeps `/settings/validation` static gate command metadata inside an explicit command allowlist and verifies each listed `npm run ...` command is backed by `package.json` before render. The check is local static metadata validation only and does not execute commands, inspect logs, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.
 - Latest validation operations value-boundary hardening keeps `/settings/validation` static gate areas inside an explicit local-only vocabulary and requires gate boundary and repair-signal copy to keep naming local/demo-safe checks, blocked settings, secrets, command execution, `DATABASE_URL`, Playwright, live provider/AI boundaries, and smallest-command repair flow. The check is local static metadata validation only and does not execute commands, inspect logs, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.

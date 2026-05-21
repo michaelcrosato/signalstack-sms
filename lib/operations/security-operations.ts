@@ -22,6 +22,12 @@ export type SecurityOperationsStatus = {
 
 const securityOperationControlFields = ["name", "status", "detail"] as const;
 const securityOperationValidationReferenceFields = ["command", "purpose"] as const;
+const allowedSecurityOperationValidationCommands = [
+  "npm run validate",
+  "npm run production:gate",
+  "npm run secrets:scan",
+  "npm run compliance:check"
+] as const;
 const allowedSecurityOperationControlStatuses = [
   "local metadata only",
   "blocked by default",
@@ -66,6 +72,14 @@ function assertValidationReference(reference: SecurityOperationValidationReferen
 
   if (typeof reference.command !== "string" || !reference.command.startsWith("npm run ")) {
     throw new Error(`Invalid security operation validation command ${String(reference.command)}`);
+  }
+
+  if (
+    !allowedSecurityOperationValidationCommands.includes(
+      reference.command as (typeof allowedSecurityOperationValidationCommands)[number]
+    )
+  ) {
+    throw new Error(`Unsupported security operation validation command ${reference.command}`);
   }
 
   assertNonblankString(reference.purpose, `Invalid security operation validation purpose for ${reference.command}`);
