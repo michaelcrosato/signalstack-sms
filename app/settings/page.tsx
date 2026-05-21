@@ -116,6 +116,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/settings/workflows">
           Workflow Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/releases">
+          Release Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/readiness-audit">
           Readiness Audit
         </Link>
@@ -370,6 +373,16 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <p className="text-sm leading-6 text-slate-700">
           Review the local demo workflow checkpoints across audience, campaigns, queue, inbox, delivery, AI, usage,
           and reporting without executing workflow steps, mutating records, exporting data, or enabling live features.
+        </p>
+      </Panel>
+
+      <Panel title="Release Operations">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/releases">
+          Release Operations
+        </Link>
+        <p className="text-sm leading-6 text-slate-700">
+          Review the local release checklist, protected gate expectations, seeded demo path, and premerge boundary
+          without executing commands, committing, deploying, mutating records, calling providers, billing, notifying, or enabling live features.
         </p>
       </Panel>
 

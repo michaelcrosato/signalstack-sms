@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 033  GREEN  release-operations  2026-05-20 18:05
+Objective:    Add a read-only local release operations checkpoint for protected gate and handoff readiness.
+Changed:
+- Added `/settings/releases` with local gate, migration, demo seed, seeded demo path, premerge metadata, release surface links, runtime boundary, and safety boundary.
+- Linked the view from `/`, `/demo`, `/settings`, `/settings/workflows`, `/settings/validation`, `/settings/security`, and `/settings/runbook`.
+- Extended root smoke and seeded investor demo E2E coverage for the release view and runbook link.
+- Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only admin/release/workflow refinements without live external-impact actions.
+
 ## Run 032  GREEN  workflow-operations  2026-05-20 17:52
 Objective:    Add a read-only local workflow operations view for the existing demo-safe product path.
 Changed:

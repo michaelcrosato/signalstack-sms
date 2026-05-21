@@ -144,6 +144,18 @@ Use `/settings/workflows` for read-only demo workflow review before demos or wor
 
 The page is display-only. It must not import contacts, schedule or cancel campaigns, run workers, create inbox replies, retry deliveries, submit prompts, execute reports, create exports, mutate records, enqueue jobs, call Redis, expose secrets, call providers, create billing records, send notifications, send SMS, send email, or enable live features.
 
+## Release Operations
+
+Use `/settings/releases` for read-only local release readiness review before integration or handoff work. It displays:
+
+- protected local gate expectations
+- local migration, demo seed, and seeded demo path command references
+- premerge validation metadata
+- links to validation, contract, security, system, runbook, and workflow surfaces
+- runtime safety boundaries
+
+The page is display-only. It must not execute commands, run scripts, start migrations, launch tests or browsers, perform git operations, deploy, mutate records, create exports, enqueue jobs, call Redis, expose logs, diffs, environment values, or secrets, call providers, create billing records, send notifications, send SMS, send email, or enable live features.
+
 ## Campaign Operations
 
 Use `/settings/campaigns` for read-only campaign and queue review before demos or worker repair work. It displays:

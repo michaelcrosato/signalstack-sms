@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 32
+Run number: 33
 
 No active blockers.
 
 ## Notes
 
+- `/settings/releases` is a read-only local release operations view. It displays protected local gate expectations, migration/seed/demo path command references, premerge validation metadata, release surface links, runtime safety, and safety boundaries; it does not execute commands, run scripts, start migrations, launch tests or browsers, perform git operations, deploy, mutate records, create exports, enqueue jobs, call Redis, expose logs, diffs, environment values, or secrets, call providers, create billing records, send notifications, send SMS or email, or enable live features.
 - `/settings/workflows` is a read-only local workflow operations view. It displays existing demo workflow checkpoints across audience intake, campaign readiness, queue handoff, inbox response, delivery evidence, AI, usage, and reporting; it does not import contacts, schedule campaigns, run workers, create inbox replies, retry deliveries, submit prompts, execute reports, create exports, mutate records, enqueue jobs, call Redis, call providers, create billing records, send notifications, send SMS or email, expose secrets, or enable live features.
 - `/settings/integrations` is a read-only local integration operations view. It displays existing provider, provider-number, webhook, AI, billing, and notification boundaries; it does not call providers, submit prompts, call live AI, call Stripe, send notifications, send SMS or email, emit outbound webhooks, mutate records, enqueue jobs, create exports, expose secrets, or enable live features.
 - `/settings/reports` is a read-only local reporting index. It displays existing local reporting surfaces, tenant metrics, usage totals, readiness signals, and safety boundaries; it does not execute reports, create exports, mutate records, call providers, call Stripe, call live AI, send SMS, send email, send notifications, expose secrets, or enable live features.

@@ -125,6 +125,9 @@ export default function OperatorRunbookPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/workflows">
           Workflow Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/releases">
+          Release Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/readiness-audit">
           Readiness Audit
         </Link>
@@ -204,6 +207,7 @@ export default function OperatorRunbookPage() {
           <AdminLink href="/settings/notifications" label="Notification Operations" />
           <AdminLink href="/settings/integrations" label="Integration Operations" />
           <AdminLink href="/settings/workflows" label="Workflow Operations" />
+          <AdminLink href="/settings/releases" label="Release Operations" />
           <AdminLink href="/settings/readiness-audit" label="Readiness Audit" />
           <AdminLink href="/settings/exports" label="Admin Exports" />
           <AdminLink href="/settings/provider" label="Provider Details" />

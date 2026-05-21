@@ -1,16 +1,22 @@
 # Codex Summary
 
-Run number: 32
+Run number: 33
 
 ## Completed
+
+- Advanced a post-MVP local release operations checkpoint.
+- Added `/settings/releases`, a read-only page that maps protected local gate expectations, migration/seed/demo path commands, premerge validation metadata, release surface links, runtime safety, and release safety boundaries.
+- Linked the release operations view from the launch dashboard, demo console, go-live readiness, workflow operations, validation operations, security operations, and operator runbook views.
+- Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, and next-prompt handoff docs with the release boundary.
+- Protected local gate, local migration check, demo seed, and seeded investor demo E2E passed.
+
+## Prior Completed
 
 - Advanced a post-MVP local workflow operations checkpoint.
 - Added `/settings/workflows`, a read-only page that maps the existing demo workflow across audience intake, campaign readiness, queue handoff, inbox response, delivery evidence, AI, usage, and reporting.
 - Linked the workflow operations view from the launch dashboard, demo console, go-live readiness, integration operations, reporting index, and operator runbook views.
 - Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, and next-prompt handoff docs with the workflow boundary.
 - Protected local gate, local migration check, demo seed, and seeded investor demo E2E passed.
-
-## Prior Completed
 
 - Advanced a post-MVP local integration operations checkpoint.
 - Added `/settings/integrations`, a read-only page that maps existing provider, provider-number, webhook, AI, billing, and notification boundaries.

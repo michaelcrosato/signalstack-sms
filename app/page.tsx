@@ -118,6 +118,11 @@ const launchLinks = [
     description: "Read-only demo workflow checkpoints across audience, campaigns, queue, inbox, delivery, AI, and reports."
   },
   {
+    href: "/settings/releases",
+    title: "Release Operations",
+    description: "Read-only local release readiness checklist, validation boundary, and premerge expectations."
+  },
+  {
     href: "/settings/runbook",
     title: "Operator Runbook",
     description: "Local validation, seed, worker, export, and repair-loop commands with safety boundaries."

@@ -78,6 +78,9 @@ export default async function WorkflowOperationsPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/reports">
           Reporting Index
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/releases">
+          Release Operations
+        </Link>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Workflow Operations</h1>

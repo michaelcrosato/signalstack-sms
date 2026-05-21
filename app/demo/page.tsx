@@ -97,6 +97,9 @@ export default async function DemoPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/workflows">
           Workflow Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/releases">
+          Release Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/readiness-audit">
           Readiness Audit
         </Link>
