@@ -1,10 +1,18 @@
 # Codex Summary
 
-- Added an executable `WORKER_DEPLOYMENT_CLASS` worker readiness guard for Run 218.
-- Latest repo truth: database and BullMQ scheduled campaign workers accept only an unset worker deployment class or `local-demo`; any production/live class is blocked before worker processing.
+- Added a planning-only `production-live-campaign` control checklist for Run 219.
+- Latest repo truth: database and BullMQ scheduled campaign workers accept only an unset worker deployment class or `local-demo`; every production/live class, including reserved `production-live-campaign`, is blocked before worker processing.
 - No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
 
-Run number: 218
+Run number: 219
+
+## Previous Run
+
+- Added the reserved `production-live-campaign` worker control checklist to `docs/PRODUCTION_WORKER_POLICY.md` as a planning label only.
+- Extended `npm run production-worker:check` plus database and BullMQ worker tests to prove `production-live-campaign` remains blocked until future executable gates exist.
+- Updated queue/testing contracts, README, roadmap, state matrix, next-prompt handoff docs, and loop records.
+- Protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
 
 ## Previous Run
 

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 219  GREEN  live-worker-control-checklist  2026-05-21 16:55
+Objective:    Specify planning-only live campaign worker controls while keeping every live worker class blocked.
+Changed:
+- Added the reserved `production-live-campaign` control checklist to the production worker policy as a planning label only.
+- Extended the production worker policy check and queue/BullMQ unit tests so `production-live-campaign` remains blocked before processing.
+- Updated queue/testing contracts, README, roadmap, state matrix, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live campaign workers blocked; convert the `production-live-campaign` checklist into executable gates before adding any supported live worker class.
+
 ## Run 218  GREEN  worker-deployment-class-guard  2026-05-21 16:50
 Objective:    Add an executable worker deployment-class guard before live-worker design proceeds.
 Changed:

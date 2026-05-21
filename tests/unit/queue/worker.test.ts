@@ -47,9 +47,17 @@ describe("local queue worker", () => {
     expect(workerDeploymentClassIsAllowed({})).toBe(true);
     expect(workerDeploymentClassIsAllowed({ workerDeploymentClass: "local-demo" })).toBe(true);
     expect(workerDeploymentClassIsAllowed({ workerDeploymentClass: "production-live" })).toBe(false);
+    expect(workerDeploymentClassIsAllowed({ workerDeploymentClass: "production-live-campaign" })).toBe(false);
     expect(
       localWorkerReadiness({
         workerDeploymentClass: "production-live",
+        liveMessagingEnabled: "false",
+        messagingProvider: "dummy"
+      })
+    ).toEqual({ allowed: false, reason: "production-worker-blocked" });
+    expect(
+      localWorkerReadiness({
+        workerDeploymentClass: "production-live-campaign",
         liveMessagingEnabled: "false",
         messagingProvider: "dummy"
       })

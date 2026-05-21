@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 219
+
+- No blocker from the live worker control checklist. `production-live-campaign` is documented as a reserved planning-only class and remains blocked in database and BullMQ worker readiness tests; the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.
+
 Run number: 218
 
 - No blocker from the worker deployment class guard. Database and BullMQ scheduled campaign workers now reject non-`local-demo` `WORKER_DEPLOYMENT_CLASS` values before processing jobs; the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.

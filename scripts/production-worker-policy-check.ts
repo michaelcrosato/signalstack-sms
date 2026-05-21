@@ -27,6 +27,18 @@ const requiredTexts: RequiredText[] = [
     text: "The isolated `/demo` live-test SMS path remains separate from campaign workers"
   },
   {
+    file: "docs/PRODUCTION_WORKER_POLICY.md",
+    text: "The reserved future class name is `production-live-campaign`. It is a planning label only."
+  },
+  {
+    file: "docs/PRODUCTION_WORKER_POLICY.md",
+    text: "A provider mutation boundary that calls the centralized messaging hard gate immediately before every outbound provider request."
+  },
+  {
+    file: "docs/PRODUCTION_WORKER_POLICY.md",
+    text: "A rollback runbook that disables live campaign workers without code changes"
+  },
+  {
     file: "lib/queue/worker.ts",
     text: "reason: \"production-worker-blocked\""
   },
@@ -51,8 +63,16 @@ const requiredTexts: RequiredText[] = [
     text: "allows only the current local-demo worker deployment class"
   },
   {
+    file: "tests/unit/queue/worker.test.ts",
+    text: "production-live-campaign"
+  },
+  {
     file: "tests/unit/queue/bullmq-worker.test.ts",
     text: "WORKER_DEPLOYMENT_CLASS"
+  },
+  {
+    file: "tests/unit/queue/bullmq-worker.test.ts",
+    text: "production-live-campaign"
   },
   {
     file: "package.json",
