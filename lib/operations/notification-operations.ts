@@ -20,6 +20,13 @@ const notificationOperationChannelFields = ["name", "status", "boundary"] as con
 const allowedNotificationOperationChannelStatuses = ["blocked", "not implemented", "inbound only"] as const;
 const requiredNotificationControlTerms = ["LIVE_MESSAGING_ENABLED", "LIVE_BILLING_ENABLED", "API keys", "worker", "local"] as const;
 const requiredNotificationBoundaryTerms = ["email", "SMS", "webhooks", "provider calls", "billing", "mutations"] as const;
+const forbiddenCommandMetadataPatterns = [
+  /\bnpm\s+run\b/i,
+  /\bnpx\b/i,
+  /\bpowershell\b/i,
+  /\bcurl\b/i,
+  /\bInvoke-WebRequest\b/i
+] as const;
 const forbiddenSecretMetadataPatterns = [
   /\bsk_(?:live|test)_[A-Za-z0-9]+/,
   /\bpk_live_[A-Za-z0-9]+/,
@@ -60,6 +67,12 @@ function assertNoSecretLikeMetadata(value: string, errorMessage: string) {
   }
 }
 
+function assertNoCommandLikeMetadata(value: string, errorMessage: string) {
+  if (forbiddenCommandMetadataPatterns.some((pattern) => pattern.test(value))) {
+    throw new Error(errorMessage);
+  }
+}
+
 function assertChannel(channel: NotificationOperationChannel) {
   assertExactFields(channel, notificationOperationChannelFields, "Invalid notification operation channel fields");
   assertNonblankString(channel.name, "Invalid notification operation channel name");
@@ -69,7 +82,11 @@ function assertChannel(channel: NotificationOperationChannel) {
   assertCleanCopy(channel.status, `Whitespace-unsafe notification operation status for ${channel.name}`);
   assertCleanCopy(channel.boundary, `Whitespace-unsafe notification operation boundary for ${channel.name}`);
   assertNoSecretLikeMetadata(channel.name, `Secret-like notification operation channel name for ${channel.name}`);
+  assertNoSecretLikeMetadata(channel.status, `Secret-like notification operation status for ${channel.name}`);
   assertNoSecretLikeMetadata(channel.boundary, `Secret-like notification operation boundary for ${channel.name}`);
+  assertNoCommandLikeMetadata(channel.name, `Command-like notification operation channel name for ${channel.name}`);
+  assertNoCommandLikeMetadata(channel.status, `Command-like notification operation status for ${channel.name}`);
+  assertNoCommandLikeMetadata(channel.boundary, `Command-like notification operation boundary for ${channel.name}`);
 
   if (!allowedNotificationOperationChannelStatuses.includes(channel.status as (typeof allowedNotificationOperationChannelStatuses)[number])) {
     throw new Error(`Unsupported notification operation status for ${channel.name}`);
@@ -102,6 +119,7 @@ function freezeCopyList(values: string[], label: string) {
     assertNonblankString(value, `Invalid notification operation ${label}`);
     assertCleanCopy(value, `Whitespace-unsafe notification operation ${label}`);
     assertNoSecretLikeMetadata(value, `Secret-like notification operation ${label}`);
+    assertNoCommandLikeMetadata(value, `Command-like notification operation ${label}`);
   }
 
   assertUniqueValues(values, `Duplicate notification operation ${label}s`);

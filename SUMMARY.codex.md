@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP notification operations command-literal checkpoint.
+- Added command-like metadata guards so `/settings/notifications` static channel, control, and safety-boundary copy rejects command snippets such as `npm run`, `npx`, PowerShell, curl, and `Invoke-WebRequest` before render.
+- Added unit coverage proving notification operation metadata stays command-free alongside existing public-field, frozen snapshot, order, value-boundary, whitespace-clean, and secret-like literal guards.
+- Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
+- Focused notification operations unit coverage, typecheck, `git diff --check`, and the protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 138
+
+## Previous Run
+
 - Advanced a post-MVP notification operations whitespace-clean checkpoint.
 - Added whitespace-clean validation so `/settings/notifications` static channel, control, and safety-boundary copy rejects leading/trailing whitespace, doubled spaces, and embedded newlines before render.
 - Added unit coverage proving notification operation metadata remains whitespace-clean alongside existing public-field, frozen snapshot, order, value-boundary, and secret-like literal guards.

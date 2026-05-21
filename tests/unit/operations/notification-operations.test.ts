@@ -152,4 +152,21 @@ describe("getNotificationOperationsStatus", () => {
 
     expect(staticCopy.filter((copy) => secretLikePatterns.some((pattern) => pattern.test(copy)))).toEqual([]);
   });
+
+  it("keeps notification operation static metadata free of command-like literals", () => {
+    const staticCopy = [
+      ...notificationOperationChannels.flatMap((channel) => [channel.name, channel.status, channel.boundary]),
+      ...notificationOperationControls,
+      ...notificationOperationSafetyBoundaries
+    ];
+    const commandLikePatterns = [
+      /\bnpm\s+run\b/i,
+      /\bnpx\b/i,
+      /\bpowershell\b/i,
+      /\bcurl\b/i,
+      /\bInvoke-WebRequest\b/i
+    ];
+
+    expect(staticCopy.filter((copy) => commandLikePatterns.some((pattern) => pattern.test(copy)))).toEqual([]);
+  });
 });

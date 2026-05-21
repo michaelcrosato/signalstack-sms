@@ -1214,3 +1214,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP validation operations hardening or safe read-only operator surface refinements.
+## Run 138  GREEN  notification-operations-command-literals  2026-05-21 02:33
+Objective:    Keep `/settings/notifications` static metadata free of command-like literals before rendering.
+Changed:
+- Added command-like metadata guards for notification operation channel, control, and safety-boundary copy.
+- Added unit coverage proving common command snippets such as `npm run`, `npx`, PowerShell, curl, and `Invoke-WebRequest` are absent from notification operation metadata.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP notification operations hardening or safe read-only operator surface refinements.
