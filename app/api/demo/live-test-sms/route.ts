@@ -1,4 +1,6 @@
+import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { requireApiRole } from "@/lib/auth/api-authorization";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getLiveTestSmsStatus, sendLiveTestSms } from "@/lib/messaging/live-test-sms";
 import { liveTestSmsSchema } from "@/lib/validation/live-test-sms";
@@ -17,6 +19,10 @@ export async function POST(request: Request) {
   }
 
   const currentOrg = await getOrCreateCurrentOrg();
+  const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+  if (roleResponse) {
+    return roleResponse;
+  }
 
   try {
     const result = await sendLiveTestSms({

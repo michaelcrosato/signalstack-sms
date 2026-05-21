@@ -1,4 +1,6 @@
+import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { requireApiRole } from "@/lib/auth/api-authorization";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getCampaign, updateCampaign } from "@/lib/db/repositories/campaigns";
 import { campaignUpdateSchema } from "@/lib/validation/campaigns";
@@ -20,6 +22,11 @@ export async function GET(_request: Request, { params }: CampaignParams) {
 
 export async function PATCH(request: Request, { params }: CampaignParams) {
   const [{ campaignId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
+  const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+  if (roleResponse) {
+    return roleResponse;
+  }
+
   const payload = campaignUpdateSchema.safeParse(await request.json());
 
   if (!payload.success) {

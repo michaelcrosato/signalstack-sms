@@ -1,4 +1,6 @@
+import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { requireApiRole } from "@/lib/auth/api-authorization";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { createDemoInboundMessage, listConversations } from "@/lib/db/repositories/inbox";
 import { inboundMessageSchema } from "@/lib/validation/inbox";
@@ -12,6 +14,11 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const currentOrg = await getOrCreateCurrentOrg();
+  const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+  if (roleResponse) {
+    return roleResponse;
+  }
+
   const payload = inboundMessageSchema.safeParse(await request.json());
 
   if (!payload.success) {

@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 202  GREEN  mutating-route-rbac-enforcement  2026-05-21 14:20
+Objective:    Enforce membership role scopes on mutating API routes before local record mutations.
+Changed:
+- Added a central API authorization helper returning structured `403` responses for insufficient membership roles.
+- Applied `ADMIN` checks to manager/admin mutations and `MEMBER` checks to agent-level inbox and conversation AI actions.
+- Preserved Twilio webhook signature scoping instead of adding membership role checks to provider webhooks.
+- Added focused auth unit coverage for structured route-boundary authorization errors.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Build the product dashboard shell and product-demo path, or continue product-facing compliance readiness.
+
 ## Run 197  GREEN  validation-operations-detached-counts  2026-05-21 07:04
 Objective:    Keep `/settings/validation` returned arrays detached while read-only counts stay aligned.
 Changed:

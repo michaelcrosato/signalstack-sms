@@ -1,4 +1,6 @@
+import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { requireApiRole } from "@/lib/auth/api-authorization";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { addConversationNote, listConversationNotes } from "@/lib/db/repositories/inbox";
 import { conversationNoteCreateSchema } from "@/lib/validation/inbox";
@@ -20,6 +22,11 @@ export async function GET(_request: Request, { params }: ConversationParams) {
 
 export async function POST(request: Request, { params }: ConversationParams) {
   const [{ conversationId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
+  const roleResponse = requireApiRole(currentOrg, MembershipRole.MEMBER);
+  if (roleResponse) {
+    return roleResponse;
+  }
+
   const payload = conversationNoteCreateSchema.safeParse(await request.json());
 
   if (!payload.success) {

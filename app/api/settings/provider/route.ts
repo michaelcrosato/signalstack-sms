@@ -1,4 +1,6 @@
+import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { requireApiRole } from "@/lib/auth/api-authorization";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getOrCreateComplianceProfile } from "@/lib/db/repositories/compliance";
 import {
@@ -30,6 +32,11 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   const currentOrg = await getOrCreateCurrentOrg();
+  const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+  if (roleResponse) {
+    return roleResponse;
+  }
+
   const payload = providerSettingsUpdateSchema.safeParse(await request.json());
 
   if (!payload.success) {
@@ -55,6 +62,10 @@ export async function PATCH(request: Request) {
 
 export async function DELETE() {
   const currentOrg = await getOrCreateCurrentOrg();
+  const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+  if (roleResponse) {
+    return roleResponse;
+  }
 
   await deleteProviderCredentialMetadata(currentOrg.orgId, "twilio", {
     actorUserId: currentOrg.userId

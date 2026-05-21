@@ -16,3 +16,14 @@ export function assertRoleAtLeast(actual: MembershipRole, required: MembershipRo
   }
 }
 
+export function getRoleAuthorizationError(actual: MembershipRole, required: MembershipRole) {
+  if (hasRoleAtLeast(actual, required)) {
+    return null;
+  }
+
+  return {
+    error: `Requires ${required} role or higher.`,
+    requiredRole: required,
+    currentRole: actual
+  };
+}

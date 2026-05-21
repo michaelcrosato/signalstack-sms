@@ -1,4 +1,6 @@
+import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { requireApiRole } from "@/lib/auth/api-authorization";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { resolveAiMessages } from "@/lib/ai/conversation-context";
 import { assertFakeAiProvider, fakeLeadQualification } from "@/lib/ai/fake-ai-provider";
@@ -6,6 +8,11 @@ import { conversationAiRequestSchema } from "@/lib/validation/ai";
 
 export async function POST(request: Request) {
   const currentOrg = await getOrCreateCurrentOrg();
+  const roleResponse = requireApiRole(currentOrg, MembershipRole.MEMBER);
+  if (roleResponse) {
+    return roleResponse;
+  }
+
   const payload = conversationAiRequestSchema.safeParse(await request.json());
 
   if (!payload.success) {

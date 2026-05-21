@@ -1,4 +1,6 @@
+import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { requireApiRole } from "@/lib/auth/api-authorization";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { archiveContact, getContact, updateContact } from "@/lib/db/repositories/contacts";
 import { contactUpdateSchema } from "@/lib/validation/contacts";
@@ -20,6 +22,11 @@ export async function GET(_request: Request, { params }: ContactParams) {
 
 export async function PATCH(request: Request, { params }: ContactParams) {
   const [{ contactId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
+  const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+  if (roleResponse) {
+    return roleResponse;
+  }
+
   const payload = contactUpdateSchema.safeParse(await request.json());
 
   if (!payload.success) {
@@ -36,6 +43,11 @@ export async function PATCH(request: Request, { params }: ContactParams) {
 
 export async function DELETE(_request: Request, { params }: ContactParams) {
   const [{ contactId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
+  const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+  if (roleResponse) {
+    return roleResponse;
+  }
+
   const contact = await archiveContact(currentOrg.orgId, contactId);
 
   if (!contact) {

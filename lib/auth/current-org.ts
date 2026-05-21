@@ -1,4 +1,4 @@
-import { MembershipStatus } from "@prisma/client";
+import { MembershipRole, MembershipStatus } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 import { getDemoSession } from "@/lib/auth/demo-session";
 
@@ -8,7 +8,7 @@ export type CurrentOrg = {
   orgName: string;
   userId: string;
   email: string;
-  role: "OWNER" | "ADMIN" | "MEMBER";
+  role: MembershipRole;
   demoMode: boolean;
 };
 
@@ -70,4 +70,3 @@ export async function getOrCreateCurrentOrg(): Promise<CurrentOrg> {
     demoMode: org.demoMode
   };
 }
-

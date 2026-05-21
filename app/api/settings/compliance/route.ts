@@ -1,4 +1,6 @@
+import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { requireApiRole } from "@/lib/auth/api-authorization";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { complianceProfileIsComplete, evaluateMessagingHardGate } from "@/lib/compliance/gates";
 import { getOrCreateComplianceProfile, updateComplianceProfile } from "@/lib/db/repositories/compliance";
@@ -27,6 +29,11 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   const currentOrg = await getOrCreateCurrentOrg();
+  const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+  if (roleResponse) {
+    return roleResponse;
+  }
+
   const payload = complianceProfileUpdateSchema.safeParse(await request.json());
 
   if (!payload.success) {

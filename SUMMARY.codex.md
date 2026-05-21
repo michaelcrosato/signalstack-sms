@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced Phase 0 correctness by enforcing membership role scopes on mutating API routes.
+- Added a central API authorization helper that returns structured `403` responses for insufficient roles.
+- Applied `ADMIN` checks to manager/admin mutations and `MEMBER` checks to agent-level inbox and conversation AI actions while preserving Twilio webhook signature scoping.
+- Added focused unit coverage for structured route-boundary authorization errors.
+- Focused auth tests, `git diff --check`, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, worker execution, Redis calls, or protected gate-script edits were used.
+
+Run number: 202
+
+## Previous Run
+
 - Advanced a post-MVP API operations method-scan vocabulary checkpoint.
 - Updated API operations reverse route-method coverage so implemented-route scanning derives from the exported runtime-frozen method vocabulary instead of a duplicated test-local method list.
 - Updated testing contract/docs, README, blockers, and loop logs.
