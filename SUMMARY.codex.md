@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP API operations order-stability checkpoint.
+- Added unit coverage fixing the exported API route-method order used by `/settings/api` local review pages.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- Targeted API operations unit coverage passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 120
+
+## Previous Run
+
 - Advanced a post-MVP API operations value-shape checkpoint.
 - Added pre-export validation for API operation inventory entries covering supported methods, local `/api/` path shape, boolean flags, nonblank public copy, exact fields, and duplicate method/path rows.
 - Added unit coverage proving exported API inventory values stay canonical before `/settings/api` renders depend on them.

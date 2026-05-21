@@ -1,12 +1,13 @@
 # Codex Blockers
 
-Run number: 119
+Run number: 120
 
 No active blockers.
 
 ## Notes
 
 - Latest API operations value-shape hardening validates API inventory entries before export and adds unit coverage for supported methods, local `/api/` path shape, boolean flags, nonblank public copy, and unique method/path rows. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
+- Latest API operations order-stability hardening fixes the exported route-method order used by `/settings/api` local review pages so accidental inventory reordering fails in unit coverage. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest API operations public-field hardening emits only documented public route fields from API route snapshots and adds unit coverage proving exported route entries, status snapshots, rate-limit snapshots, and per-call route snapshots expose only public fields. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest API operations inventory frozen-snapshot hardening freezes the exported static API route inventory and returns fresh frozen route snapshots from `getApiOperationsStatus()`, preventing caller-side mutation from drifting later local API inventory renders. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest shared supplied-inventory sparse-index descriptor hardening rejects missing supplied operator inventory array slots and group link array slots before summaries or projections read local navigation entries. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

@@ -105,6 +105,58 @@ describe("getApiOperationsStatus", () => {
     expect(new Set(routeKeys).size).toBe(routeKeys.length);
   });
 
+  it("keeps API inventory route order stable for local review pages", () => {
+    expect(apiOperationRoutes.map((route) => `${route.method} ${route.path}`)).toEqual([
+      "GET /api/health",
+      "GET /api/orgs/current",
+      "GET /api/contacts",
+      "POST /api/contacts",
+      "GET /api/contacts/[contactId]",
+      "PATCH /api/contacts/[contactId]",
+      "DELETE /api/contacts/[contactId]",
+      "POST /api/contacts/imports",
+      "GET /api/templates",
+      "POST /api/templates",
+      "GET /api/campaigns",
+      "POST /api/campaigns",
+      "GET /api/campaigns/[campaignId]",
+      "PATCH /api/campaigns/[campaignId]",
+      "POST /api/campaigns/[campaignId]/preflight",
+      "POST /api/campaigns/[campaignId]/schedule",
+      "POST /api/campaigns/[campaignId]/cancel",
+      "GET /api/inbox/conversations",
+      "POST /api/inbox/conversations",
+      "GET /api/inbox/conversations/[conversationId]",
+      "GET /api/inbox/conversations/[conversationId]/messages",
+      "POST /api/inbox/conversations/[conversationId]/messages",
+      "POST /api/inbox/conversations/[conversationId]/assign",
+      "GET /api/inbox/conversations/[conversationId]/notes",
+      "POST /api/inbox/conversations/[conversationId]/notes",
+      "POST /api/inbox/conversations/[conversationId]/resolve",
+      "POST /api/demo/inbound",
+      "POST /api/ai/campaign-copy",
+      "POST /api/ai/reply-suggestion",
+      "POST /api/ai/conversation-summary",
+      "POST /api/ai/lead-qualification",
+      "GET /api/analytics/overview",
+      "GET /api/billing/usage",
+      "POST /api/billing/usage",
+      "GET /api/settings/compliance",
+      "PATCH /api/settings/compliance",
+      "GET /api/settings/numbers",
+      "POST /api/settings/numbers",
+      "GET /api/settings/provider",
+      "PATCH /api/settings/provider",
+      "DELETE /api/settings/provider",
+      "GET /api/settings/provider/rotations",
+      "GET /api/settings/provider/rotations/export",
+      "GET /api/settings/readiness-audit",
+      "GET /api/settings/readiness-audit/export",
+      "POST /api/webhooks/twilio/inbound",
+      "POST /api/webhooks/twilio/status"
+    ]);
+  });
+
   it("keeps the exported API inventory frozen against runtime mutation", () => {
     const firstRoute = apiOperationRoutes[0];
 

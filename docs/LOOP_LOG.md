@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 120  GREEN  api-operations-order-stability  2026-05-21 01:16
+Objective:    Keep API operations route-method order stable for local review pages.
+Changed:
+- Added unit coverage fixing the exported API operation route-method order used by `/settings/api`.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+- Preserved local-only behavior without executing API handlers, mutating records, provider calls, billing, notifications, SMS, email, live AI, destructive database actions, or protected gate-script edits.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP API operations hardening or safe read-only operator surface refinements.
+
 ## Run 118  GREEN  api-operations-public-fields  2026-05-21 01:06
 Objective:    Prevent API operations snapshots from exposing accidental extra runtime fields.
 Changed:
