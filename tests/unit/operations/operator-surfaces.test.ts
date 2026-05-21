@@ -19,7 +19,10 @@ import {
   getRunbookAdminLinks,
   getSecurityOperationLinks,
   getSettingsNavigationLinks,
+  getTeamOperationLinks,
   getValidationOperationLinks,
+  getDeliveryOperationLinks,
+  getWebhookOperationLinks,
   getWorkflowOperationSteps,
   operatorSurfaceGroups
 } from "@/lib/operations/operator-surfaces";
@@ -380,5 +383,49 @@ describe("operator surface inventory", () => {
     ]);
     expect(exportLinks).toEqual(exportRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
     expect(exportRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+  });
+
+  it("projects webhook, delivery, and team operation links from the shared surface inventory", () => {
+    const inventoryLinks = operatorSurfaceGroups.flatMap((group) => group.links);
+    const webhookLinks = getWebhookOperationLinks();
+    const deliveryLinks = getDeliveryOperationLinks();
+    const teamLinks = getTeamOperationLinks();
+    const webhookRoutes = webhookLinks.map((link) => link.href);
+    const deliveryRoutes = deliveryLinks.map((link) => link.href);
+    const teamRoutes = teamLinks.map((link) => link.href);
+
+    expect(webhookRoutes).toEqual([
+      "/demo",
+      "/settings",
+      "/settings/system",
+      "/settings/inbox",
+      "/settings/delivery",
+      "/settings/runbook"
+    ]);
+    expect(webhookLinks).toEqual(webhookRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
+    expect(webhookRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+
+    expect(deliveryRoutes).toEqual([
+      "/demo",
+      "/settings",
+      "/settings/campaigns",
+      "/settings/queue",
+      "/settings/inbox",
+      "/settings/webhooks"
+    ]);
+    expect(deliveryLinks).toEqual(deliveryRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
+    expect(deliveryRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+
+    expect(teamRoutes).toEqual([
+      "/demo",
+      "/settings",
+      "/settings/campaigns",
+      "/settings/contacts",
+      "/settings/inbox",
+      "/settings/system",
+      "/settings/runbook"
+    ]);
+    expect(teamLinks).toEqual(teamRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
+    expect(teamRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
   });
 });

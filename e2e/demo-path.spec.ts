@@ -14,7 +14,10 @@ import {
   getReportingIndexLinks,
   getSecurityOperationLinks,
   getSettingsNavigationLinks,
+  getTeamOperationLinks,
   getValidationOperationLinks,
+  getDeliveryOperationLinks,
+  getWebhookOperationLinks,
   getWorkflowOperationSteps,
   operatorSurfaceGroups
 } from "@/lib/operations/operator-surfaces";
@@ -36,6 +39,9 @@ const validationOperationLinks = getValidationOperationLinks();
 const queueOperationLinks = getQueueOperationLinks();
 const notificationOperationLinks = getNotificationOperationLinks();
 const exportOperationLinks = getExportOperationLinks();
+const webhookOperationLinks = getWebhookOperationLinks();
+const deliveryOperationLinks = getDeliveryOperationLinks();
+const teamOperationLinks = getTeamOperationLinks();
 
 test.setTimeout(60_000);
 
@@ -285,12 +291,18 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Route Coverage" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Event Types" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent Webhook Events" })).toBeVisible();
+  for (const link of webhookOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Delivery Operations" }).click();
   await expect(page.getByRole("heading", { name: "Delivery Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Direction Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Delivery Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent Messages" })).toBeVisible();
+  for (const link of deliveryOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Inbox Operations" }).click();
   await page.getByRole("link", { name: "Team Operations" }).click();
@@ -298,6 +310,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Organization" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Membership Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Team Members" })).toBeVisible();
+  for (const link of teamOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Go-Live Readiness" }).click();
   await expect(page.getByRole("heading", { name: "Go-Live Readiness" })).toBeVisible();

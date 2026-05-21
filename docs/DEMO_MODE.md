@@ -62,7 +62,13 @@ The inbox operations screen at `/settings/inbox` displays existing local convers
 
 The webhook operations screen at `/settings/webhooks` displays existing local Twilio webhook route coverage, stored webhook counts, event-type summaries, recent idempotency keys, and webhook safety boundaries. It is read-only and does not replay payloads, create webhook events, mutate messages or contacts, call Twilio, send automatic replies, create billing records, send notifications, send SMS, expose secrets, or enable live messaging.
 
+Its navigation links are projected from the shared local operator surface inventory so webhook navigation stays aligned with the demo console, readiness, inbox, delivery, system, and runbook surfaces.
+
+The delivery operations screen at `/settings/delivery` displays existing local message direction counts, delivery metadata, provider status labels, provider message ID presence, campaign/conversation context, and recent idempotency keys. Its navigation links are projected from the shared local operator surface inventory so delivery navigation stays aligned with the demo console, readiness, campaign, queue, inbox, and webhook surfaces. It is read-only and does not send SMS, retry deliveries, replay webhooks, mutate messages, call providers, create billing records, send notifications, expose secrets, or enable live messaging.
+
 The team operations screen at `/settings/team` displays existing local organization metadata, membership role and status counts, assigned conversation counts, authored internal-note counts, and member metadata. It is read-only and does not invite users, create users, change roles, suspend members, delete memberships, call Clerk, send email, send notifications, call providers, create billing records, send SMS, or enable live messaging.
+
+Its navigation links are projected from the shared local operator surface inventory so team navigation stays aligned with the demo console, readiness, campaign, contact, inbox, system, and runbook surfaces.
 
 The billing operations screen at `/settings/billing` displays existing local billing account status, live billing gate status, Stripe placeholder presence, usage-event totals, and recent usage metadata. It is read-only and does not call Stripe, create subscriptions, create invoices, collect payment methods, charge cards, send email, send notifications, call providers, send SMS, or enable live billing.
 

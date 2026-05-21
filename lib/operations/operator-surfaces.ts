@@ -324,6 +324,34 @@ const exportOperationNavigationRoutes = [
   "/settings/runbook"
 ] as const;
 
+const webhookOperationNavigationRoutes = [
+  "/demo",
+  "/settings",
+  "/settings/system",
+  "/settings/inbox",
+  "/settings/delivery",
+  "/settings/runbook"
+] as const;
+
+const deliveryOperationNavigationRoutes = [
+  "/demo",
+  "/settings",
+  "/settings/campaigns",
+  "/settings/queue",
+  "/settings/inbox",
+  "/settings/webhooks"
+] as const;
+
+const teamOperationNavigationRoutes = [
+  "/demo",
+  "/settings",
+  "/settings/campaigns",
+  "/settings/contacts",
+  "/settings/inbox",
+  "/settings/system",
+  "/settings/runbook"
+] as const;
+
 export function getDemoOperationsCheckpoints(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups): DemoOperationsCheckpoint[] {
   return demoOperationsCheckpointDefinitions.map((checkpoint) => {
     const link = findOperatorSurfaceLink(checkpoint.href, groups);
@@ -396,4 +424,16 @@ export function getNotificationOperationLinks(groups: OperatorSurfaceGroup[] = o
 
 export function getExportOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return exportOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getWebhookOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return webhookOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getDeliveryOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return deliveryOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getTeamOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return teamOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }

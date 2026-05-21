@@ -305,6 +305,19 @@ Use `/settings/inbox` for read-only shared inbox review before demos or inbox re
 
 The page is display-only. It must not create messages, assign conversations, resolve conversations, add notes, mutate contacts or consent, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
+## Delivery Operations
+
+Use `/settings/delivery` for read-only delivery review before demos or delivery repair work. It displays:
+
+- message direction counts
+- delivery status metadata
+- provider status labels and provider message ID presence
+- campaign/conversation context and recent idempotency keys
+
+Its navigation links are projected from the shared local operator surface inventory.
+
+The page is display-only. It must not send SMS, retry deliveries, replay webhooks, mutate messages, expose secrets, call providers, create billing records, send notifications, or enable live messaging.
+
 ## Webhook Operations
 
 Use `/settings/webhooks` for read-only webhook review before demos or webhook repair work. It displays:
@@ -314,6 +327,8 @@ Use `/settings/webhooks` for read-only webhook review before demos or webhook re
 - provider and event-type summaries
 - recent webhook idempotency keys
 - local webhook safety boundary
+
+Its navigation links are projected from the shared local operator surface inventory.
 
 The page is display-only. It must not replay payloads, create webhook events, mutate messages or contacts, call Twilio, send automatic replies, expose secrets, create billing records, send notifications, send SMS, or enable live messaging.
 
@@ -326,6 +341,8 @@ Use `/settings/team` for read-only organization and membership review before dem
 - assigned conversation counts
 - authored internal-note counts
 - member display names and emails
+
+Its navigation links are projected from the shared local operator surface inventory.
 
 The page is display-only. It must not invite users, create users, change roles, suspend members, delete memberships, call Clerk, send email, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
