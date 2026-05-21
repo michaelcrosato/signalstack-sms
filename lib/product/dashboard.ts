@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db/prisma";
 
 export const productNavigation = Object.freeze([
   { href: "/dashboard/contacts", label: "Contacts", note: "audience and consent" },
-  { href: "#campaigns", label: "Campaigns", note: "drafts and scheduling" },
+  { href: "/dashboard/campaigns", label: "Campaigns", note: "drafts and scheduling" },
   { href: "#inbox", label: "Inbox", note: "open conversations" },
   { href: "#templates", label: "Templates", note: "message copy" },
   { href: "#analytics", label: "Analytics", note: "local performance" },

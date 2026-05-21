@@ -84,3 +84,25 @@ test("product contacts page lists seeded contacts and imports local CSV rows", a
   await expect(importedRow.getByText("+15555550156")).toBeVisible();
   await expect(importedRow.getByText("trial")).toBeVisible();
 });
+
+test("product campaigns page creates, preflights, and schedules a local campaign", async ({ page }) => {
+  await page.goto("/dashboard/campaigns");
+
+  await expect(page.getByRole("heading", { name: "Campaign workspace" })).toBeVisible();
+  await expect(page.getByLabel("Campaign metrics").getByText("Ready Recipients")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Composer" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Campaign status" })).toBeVisible();
+  await expect(page.getByText("Demo intro campaign")).toBeVisible();
+
+  await page.getByLabel("Campaign name").fill("Product E2E campaign");
+  await page.getByRole("button", { name: "Save Draft And Preflight" }).click();
+
+  await expect(page.getByRole("status")).toContainText("Draft saved");
+  const preflight = page.getByLabel("Campaign preflight");
+  await expect(preflight.getByText("Allowed recipients")).toBeVisible();
+  await expect(preflight.getByText("blocked by default")).toBeVisible();
+
+  await page.getByRole("button", { name: "Schedule Locally" }).click();
+  await expect(page.getByRole("status")).toContainText("Campaign scheduled locally");
+  await expect(page.getByRole("row").filter({ hasText: "Product E2E campaign" }).getByText("SCHEDULED")).toBeVisible();
+});

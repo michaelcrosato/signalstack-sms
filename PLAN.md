@@ -55,7 +55,7 @@ Goal: make SignalStack feel like usable SMS software, not only a system audit co
 
 - Add a real product shell at `/dashboard` with primary navigation for contacts, campaigns, inbox, templates, analytics, compliance, and settings.
 - Keep the contacts list/import UI on existing APIs and add contact detail/edit later.
-- Build campaign composer, recipient selection, preflight, schedule, and status UI on existing APIs.
+- Campaign composer, recipient selection, preflight, schedule, and status UI on existing APIs are in place for the first product demo path.
 - Build inbox thread UI with demo inbound, reply drafting, assignment, notes, resolve/reopen, and STOP/HELP visibility.
 - Build template list/detail UI for existing template APIs.
 - Keep the gated live-test SMS demo available but visually separated from normal campaign sending.
@@ -84,7 +84,7 @@ Goal: turn the demo-safe product into a paid production SaaS.
 ## Next Concrete Work
 
 1. Keep `docs/CURRENT_STATE_MATRIX.md` current.
-2. Build campaign composer, preflight, schedule, and status UI.
-3. Build inbox list/thread UI on existing APIs.
+2. Build inbox list/thread UI on existing APIs.
+3. Build template list/detail UI on existing template APIs.
 4. Add product-facing compliance readiness detail.
 5. Harden production worker policy before broader live sending.

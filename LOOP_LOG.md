@@ -1873,3 +1873,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Build contacts list/import UI on existing APIs.
+
+## Run 203  GREEN  product-campaign-workspace  2026-05-21 14:18
+Objective:    Add an owner-facing campaign compose, preflight, and local schedule workflow.
+Changed:
+- Added `/dashboard/campaigns` with template-backed draft composition, opted-in recipient selection, preflight summary, local scheduling, and campaign status rows.
+- Added product campaign data adapter and unit coverage for summary counts, ready-recipient filtering, contact rows, and template rows.
+- Extended seeded product E2E to create, preflight, and locally schedule a campaign without live external impact.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Build inbox list/thread UI on existing inbox APIs.

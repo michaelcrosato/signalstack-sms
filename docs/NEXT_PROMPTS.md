@@ -15,18 +15,17 @@ This file is the handoff for the next automated loop. It should stay short enoug
 ## Current State
 
 - The backend foundation is strong: tenant helpers, contacts, campaigns, queue jobs, inbox, compliance gates, fake AI, local billing/analytics, provider metadata, Twilio webhook foundations, readiness audit, operations inventory, and validation gates.
-- The browser product now has an initial `/dashboard` shell and `/dashboard/contacts` list/import workflow, but campaigns, inbox, templates, and compliance detail are still not polished owner/operator workflows.
+- The browser product now has an initial `/dashboard` shell, `/dashboard/contacts` list/import workflow, and `/dashboard/campaigns` compose/preflight/local schedule workflow, but inbox, templates, and compliance detail are still not polished owner/operator workflows.
 - The only live external-impact route is the isolated gated live-test SMS demo path.
 - Live campaign sending, live billing, live AI, production auth, production secrets, and production deployment remain blocked.
 
 ## Next Best Work
 
-1. Build campaign composer, preflight, schedule, and status UI on existing campaign APIs.
-2. Build inbox list/thread UI on existing inbox APIs.
-3. Build template list/detail UI on existing template APIs.
-4. Expand product-facing compliance readiness from the dashboard summary.
-5. Add contact detail/edit after the first campaign and inbox product flows exist.
-6. Harden production worker policy before broader live sending.
+1. Build inbox list/thread UI on existing inbox APIs.
+2. Build template list/detail UI on existing template APIs.
+3. Expand product-facing compliance readiness from the dashboard summary.
+4. Add contact detail/edit after the first campaign and inbox product flows exist.
+5. Harden production worker policy before broader live sending.
 
 ## Guardrails
 

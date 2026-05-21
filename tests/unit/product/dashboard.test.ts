@@ -14,7 +14,7 @@ describe("product dashboard navigation", () => {
     ]);
     expect(productNavigation.map((item) => item.href)).toEqual([
       "/dashboard/contacts",
-      "#campaigns",
+      "/dashboard/campaigns",
       "#inbox",
       "#templates",
       "#analytics",
