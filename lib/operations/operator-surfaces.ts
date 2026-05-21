@@ -91,7 +91,14 @@ function assertOperatorSurfaceGroup(group: OperatorSurfaceGroup) {
   const nameDescriptor = Object.getOwnPropertyDescriptor(group, "name");
   const linksDescriptor = Object.getOwnPropertyDescriptor(group, "links");
 
-  if (!nameDescriptor || !("value" in nameDescriptor) || !linksDescriptor || !("value" in linksDescriptor)) {
+  if (
+    !nameDescriptor ||
+    !("value" in nameDescriptor) ||
+    !nameDescriptor.enumerable ||
+    !linksDescriptor ||
+    !("value" in linksDescriptor) ||
+    !linksDescriptor.enumerable
+  ) {
     throw new Error("Invalid operator surface group field descriptors");
   }
 }
@@ -112,10 +119,13 @@ function assertOperatorSurfaceLink(link: OperatorSurfaceLink) {
   if (
     !hrefDescriptor ||
     !("value" in hrefDescriptor) ||
+    !hrefDescriptor.enumerable ||
     !labelDescriptor ||
     !("value" in labelDescriptor) ||
+    !labelDescriptor.enumerable ||
     !noteDescriptor ||
-    !("value" in noteDescriptor)
+    !("value" in noteDescriptor) ||
+    !noteDescriptor.enumerable
   ) {
     throw new Error("Invalid operator surface link field descriptors");
   }

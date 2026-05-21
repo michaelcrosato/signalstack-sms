@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 107
+Run number: 108
 
 No active blockers.
 
 ## Notes
 
+- Latest shared supplied-inventory enumerable-field hardening tightened descriptor guards and added unit coverage proving non-enumerable supplied operator inventory group/link fields fail before summaries or projections derive local navigation. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest shared supplied-inventory data-field hardening added descriptor guards and unit coverage proving accessor-backed supplied operator inventory group/link fields fail before summaries or projections derive local navigation. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest shared supplied-inventory sparse-group hardening added unit coverage proving sparse/missing supplied operator inventory group entries fail before summaries, launch links, or demo operation projections can derive local navigation. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest shared supplied-inventory own-field hardening added a guard and unit coverage proving prototype-backed supplied operator groups or links fail before summaries or projections derive local navigation. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

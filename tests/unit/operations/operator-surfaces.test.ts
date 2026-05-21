@@ -433,6 +433,55 @@ describe("operator surface inventory", () => {
     );
   });
 
+  it("rejects supplied operator inventories with non-enumerable fields before projection", () => {
+    const hiddenFieldGroup = {} as OperatorSurfaceGroup;
+    Object.defineProperty(hiddenFieldGroup, "name", {
+      value: "Hidden Field Group",
+      enumerable: false
+    });
+    Object.defineProperty(hiddenFieldGroup, "links", {
+      value: operatorSurfaceGroups[1].links,
+      enumerable: true
+    });
+    const groupsWithHiddenFieldGroup = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) =>
+      groupIndex === 1 ? hiddenFieldGroup : group
+    );
+
+    const hiddenFieldLink = {} as OperatorSurfaceLink;
+    Object.defineProperty(hiddenFieldLink, "href", {
+      value: operatorSurfaceGroups[1].links[0].href,
+      enumerable: true
+    });
+    Object.defineProperty(hiddenFieldLink, "label", {
+      value: operatorSurfaceGroups[1].links[0].label,
+      enumerable: false
+    });
+    Object.defineProperty(hiddenFieldLink, "note", {
+      value: operatorSurfaceGroups[1].links[0].note,
+      enumerable: true
+    });
+    const groupsWithHiddenFieldLink = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [hiddenFieldLink, ...group.links.slice(1)]
+          : group.links
+    }));
+
+    expect(() => getOperatorSurfaceSummary(groupsWithHiddenFieldGroup)).toThrow(
+      "Invalid operator surface group field descriptors"
+    );
+    expect(() => getLaunchDashboardLinks(groupsWithHiddenFieldGroup)).toThrow(
+      "Invalid operator surface group field descriptors"
+    );
+    expect(() => getSettingsNavigationLinks(groupsWithHiddenFieldLink)).toThrow(
+      "Invalid operator surface link field descriptors"
+    );
+    expect(() => getDemoOperationsLinks(groupsWithHiddenFieldLink)).toThrow(
+      "Invalid operator surface link field descriptors"
+    );
+  });
+
   it("rejects supplied operator inventories with sparse link entries before projection", () => {
     const sparseLinks = [...operatorSurfaceGroups[1].links];
     delete sparseLinks[0];
