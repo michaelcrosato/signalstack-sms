@@ -87,6 +87,17 @@ describe("getValidationOperationsStatus", () => {
     expect(getValidationOperationsStatus().gateCommands[0].command).toBe(validationOperationGateCommands[0].command);
   });
 
+  it("keeps validation operation returned arrays detached while counts stay aligned", () => {
+    const status = getValidationOperationsStatus();
+
+    expect(status.gateCommandCount).toBe(status.gateCommands.length);
+    expect(status.repairSignalCount).toBe(status.repairSignals.length);
+    expect(status.gateCommands).toEqual(validationOperationGateCommands);
+    expect(status.repairSignals).toEqual(validationOperationRepairSignals);
+    expect(status.gateCommands).not.toBe(validationOperationGateCommands);
+    expect(status.repairSignals).not.toBe(validationOperationRepairSignals);
+  });
+
   it("keeps validation operation metadata in canonical local-only shape", () => {
     expect(validationOperationGateCommands.map((gate) => gate.command).filter((command) => !command.startsWith("npm run "))).toEqual([]);
     expect(validationOperationGateCommands.map((gate) => gate.area).filter((area) => area.trim().length === 0)).toEqual([]);

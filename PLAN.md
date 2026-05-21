@@ -291,6 +291,7 @@ Post-MVP:
 - Local validation operations whitespace-clean metadata coverage
 - Local validation operations command-literal metadata coverage
 - Local validation operations mutation no-impact summary coverage
+- Local validation operations detached status-array count coverage
 - Local security operations package-script coverage
 - Local security operations secret-literal coverage
 - Local security operations command-literal metadata coverage

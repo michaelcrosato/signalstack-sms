@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 197  GREEN  validation-operations-detached-counts  2026-05-21 07:04
+Objective:    Keep `/settings/validation` returned arrays detached while read-only counts stay aligned.
+Changed:
+- Added validation operations unit coverage proving returned gate-command and repair-signal arrays are detached from exported metadata.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP validation/security/contract operations hardening or safe read-only operator surface refinements.
+
 ## Run 192  GREEN  api-operations-detached-route-counts  2026-05-21 06:44
 Objective:    Keep `/settings/api` returned route snapshots detached while counts stay aligned.
 Changed:
