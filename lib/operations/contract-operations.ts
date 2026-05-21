@@ -30,6 +30,12 @@ function assertExactFields<T extends object>(value: T, fields: readonly string[]
   }
 }
 
+function assertUniqueValues(values: readonly string[], errorMessage: string) {
+  if (new Set(values).size !== values.length) {
+    throw new Error(errorMessage);
+  }
+}
+
 function assertContractOperationFile(file: ContractOperationFile) {
   assertExactFields(file, contractOperationFileFields, "Invalid contract operation file fields");
 
@@ -70,6 +76,15 @@ function freezeContractOperationFiles(files: ContractOperationFile[]) {
     assertContractOperationFile(file);
   }
 
+  assertUniqueValues(
+    files.map((file) => file.name),
+    "Duplicate contract operation file names"
+  );
+  assertUniqueValues(
+    files.map((file) => file.path),
+    "Duplicate contract operation file paths"
+  );
+
   return Object.freeze(files.map((file) => Object.freeze({ name: file.name, path: file.path, boundary: file.boundary })));
 }
 
@@ -77,6 +92,11 @@ function freezeValidationChecks(checks: ContractOperationValidationCheck[]) {
   for (const check of checks) {
     assertValidationCheck(check);
   }
+
+  assertUniqueValues(
+    checks.map((check) => check.command),
+    "Duplicate contract operation validation commands"
+  );
 
   return Object.freeze(checks.map((check) => Object.freeze({ command: check.command, purpose: check.purpose })));
 }
@@ -87,6 +107,8 @@ function freezeDriftControls(controls: string[]) {
       throw new Error("Invalid contract operation drift control");
     }
   }
+
+  assertUniqueValues(controls, "Duplicate contract operation drift controls");
 
   return Object.freeze([...controls]);
 }

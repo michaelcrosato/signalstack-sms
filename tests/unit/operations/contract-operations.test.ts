@@ -131,4 +131,15 @@ describe("getContractOperationsStatus", () => {
       "Seeded demo path coverage must expand when demo-visible operational routes are added."
     ]);
   });
+
+  it("keeps contract operation identifiers unique before local review pages render them", () => {
+    const fileNames = contractOperationFiles.map((file) => file.name);
+    const filePaths = contractOperationFiles.map((file) => file.path);
+    const validationCommands = contractOperationValidationChecks.map((check) => check.command);
+
+    expect(new Set(fileNames).size).toBe(fileNames.length);
+    expect(new Set(filePaths).size).toBe(filePaths.length);
+    expect(new Set(validationCommands).size).toBe(validationCommands.length);
+    expect(new Set(contractOperationDriftControls).size).toBe(contractOperationDriftControls.length);
+  });
 });

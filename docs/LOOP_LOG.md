@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 123  GREEN  contract-operations-unique-identifiers  2026-05-21 01:30
+Objective:    Keep `/settings/contracts` metadata identifiers unambiguous before rendering.
+Changed:
+- Added duplicate guards for contract operation file names, file paths, validation commands, and drift controls before static metadata freezes.
+- Added unit coverage proving contract operation identifiers remain unique for local review pages.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP contract operations hardening or safe read-only operator surface refinements.
+
 ## Run 121  GREEN  contract-operations-inventory-hardening  2026-05-21 01:20
 Objective:    Keep `/settings/contracts` static inventory validated and immutable before rendering.
 Changed:
