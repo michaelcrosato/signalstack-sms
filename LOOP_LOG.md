@@ -1779,3 +1779,11 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP security/validation/contract operations hardening or safe read-only operator surface refinements.
+## Run 193  GREEN  queue-worker-command-vocabulary-handoff  2026-05-21 07:05
+Objective:    Reconcile queue operations testing docs with the existing runtime-frozen worker command allowlist coverage.
+Changed:
+- Updated queue testing docs and contracts to name the worker-command vocabulary and caller-mutation rejection guard.
+- Updated README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP queue/readiness/notification operations hardening or safe read-only operator surface refinements.

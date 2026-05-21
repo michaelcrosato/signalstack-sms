@@ -1,5 +1,14 @@
 # Codex Summary
 
+- Advanced a post-MVP queue operations worker-command vocabulary handoff checkpoint.
+- Reconciled queue testing docs with the existing runtime-frozen worker command allowlist and caller-mutation rejection coverage.
+- No product behavior changed; the slice is local static metadata documentation alignment only.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, worker execution, Redis calls, record mutations, or protected gate-script edits were used.
+
+Run number: 193
+
+## Previous Run
+
 - Advanced a post-MVP API operations detached route-count checkpoint.
 - Added unit coverage proving `/settings/api` returned route snapshots stay detached from exported metadata while route, mutating-route, and external-impact counts remain aligned.
 - Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.

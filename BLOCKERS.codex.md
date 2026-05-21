@@ -1,7 +1,8 @@
 # Codex Blockers
 
-Run number: 192
+Run number: 193
 
+- No blocker from the latest queue operations worker-command vocabulary handoff. The change reconciles docs with existing local static metadata coverage for the runtime-frozen worker command allowlist and caller-mutation rejection; it does not execute workers, enqueue jobs, call Redis, call providers, bill, notify, send SMS/email, mutate records, expose secrets, or enable live features.
 - No blocker from the latest API operations detached route-count coverage. Focused API operations unit coverage was added for local static metadata only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, mutate records, expose secrets, execute workers, call Redis, or enable live features.
 - Latest notification operations detached status-array count coverage keeps returned `/settings/notifications` status arrays detached from exported metadata and keeps rendered counts aligned. The check is local static metadata coverage only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, execute workers, call Redis, or enable live features.
 - Latest readiness-audit export-link limit rejection coverage pins the centralized local readiness-audit CSV link helper against unsupported limits before render. The check is local static metadata/link construction only and does not mutate audit events, expose secrets, call providers, bill, notify, send SMS/email, call live AI, execute workers, call Redis, or enable live features.

@@ -158,6 +158,7 @@ Post-MVP:
 - Local notification operations mutation no-impact summary hardening
 - Local queue operations static-metadata hardening
 - Local queue operations mode-vocabulary hardening
+- Local queue operations worker-command vocabulary handoff
 - Local queue operations command-literal metadata hardening
 - Local queue operations no-impact summary rendering coverage
 - Local queue operations mutation no-impact summary hardening
