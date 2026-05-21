@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 217  GREEN  handoff-truth-repair  2026-05-21 16:42
+Objective:    Reconcile Codex handoff files with the latest committed production worker policy validation run.
+Changed:
+- Updated `SUMMARY.codex.md` and `BLOCKERS.codex.md` so they report Run 216 as completed and identify this Run 217 truth repair.
+- Preserved product behavior, validation scripts, protected gate files, live-action gates, and local/demo-only worker boundaries unchanged.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep the product demo path stable; start live-provider design only after a dedicated production worker deployment class and live-worker controls are specified.
+
 ## Run 216  GREEN  production-worker-policy-validation  2026-05-21 16:40
 Objective:    Make the production worker policy an executable validation check before live-provider worker design.
 Changed:

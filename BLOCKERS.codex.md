@@ -1,5 +1,13 @@
 # Codex Blockers
 
+Run number: 217
+
+- No blocker from the latest handoff truth repair. The update reconciles Codex summary/blocker files with the already committed Run 216 production worker policy validation state; it does not change product behavior, validation scripts, protected gate files, live SMS, provider calls, billing, notifications, live AI, secrets, database data, worker execution, Redis, hard deletion, or live feature flags.
+
+Run number: 216
+
+- No blocker from the production worker policy validation gate. `npm run production-worker:check` is included in validation and verifies that current scheduled campaign workers remain local/demo-only and production-like worker execution remains unauthorized; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
 Run number: 215
 
 - No blocker from the production worker policy planning gate. The new document is non-executable guidance and does not authorize production worker execution, live campaign sends, live SMS, provider calls, billing, notifications, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits.

@@ -1,5 +1,22 @@
 # Codex Summary
 
+- Repaired the Codex handoff truth after Run 216 so the summary and blockers reflect the latest committed production worker policy validation state.
+- Latest repo truth: `npm run production-worker:check` is wired into validation and verifies the local/demo-only worker boundary across policy docs, worker source, BullMQ source, queue tests, and package scripts.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+Run number: 217
+
+## Previous Run
+
+- Added `npm run production-worker:check` to verify the local/demo-only worker boundary remains present in policy docs, worker source, BullMQ source, queue tests, and worker package scripts.
+- Wired the production worker policy check into `npm run validate`.
+- Updated local gate, state matrix, and next-prompt handoff docs to reflect that worker policy validation is now executable while live worker execution remains unauthorized.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+Run number: 216
+
+## Previous Run
+
 - Added `docs/PRODUCTION_WORKER_POLICY.md` as a planning gate for future live campaign worker deployment.
 - Linked the worker policy from go-live, deployment, queue/testing contracts, roadmap, README, current state, and next-prompt handoff docs while preserving the current production-like worker block.
 - No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
