@@ -1,15 +1,20 @@
 # Codex Summary
 
-Run number: 52
+Run number: 53
 
 ## Completed
+
+- Advanced a post-MVP integration/security shared-inventory hardening checkpoint.
+- Refactored `/settings/integrations` surface links and `/settings/security` navigation links to project from the shared operator surface inventory.
+- Extended unit and seeded browser coverage for integration/security labels, route targets, states, boundaries, and backing pages.
+- Protected local gate, local migration check, demo seed, and seeded investor demo E2E passed.
+
+## Prior Completed
 
 - Advanced a post-MVP reporting/workflow/release shared-inventory hardening checkpoint.
 - Refactored `/settings/reports`, `/settings/workflows`, and `/settings/releases` to project their links/checkpoints from the shared operator surface inventory.
 - Extended unit and seeded browser coverage for projected labels, notes, workflow owners, boundaries, route targets, and backing pages.
 - Protected local gate, local migration check, demo seed, and seeded investor demo E2E passed.
-
-## Prior Completed
 
 - Advanced a post-MVP go-live readiness browser navigation hardening checkpoint.
 - Extended the seeded investor demo path to verify `/settings` visible navigation labels and link targets from the shared operator surface inventory.
@@ -155,10 +160,11 @@ Run number: 52
 
 ## Validation
 
-- Latest reporting/workflow/release shared-inventory hardening moved `/settings/reports`, `/settings/workflows`, and `/settings/releases` link projections into the shared local operator surface inventory. Unit and seeded browser coverage now verify their labels, notes, owners, route targets, and backing app pages without executing commands, reports, workflow actions, exports, provider calls, billing, notifications, SMS, email, secrets, or live features.
+- Latest integration/security shared-inventory hardening moved `/settings/integrations` surface links and `/settings/security` navigation links into the shared local operator surface inventory. Unit and seeded browser coverage now verify labels, route targets, states, boundaries, and backing app pages without executing commands, provider calls, billing, notifications, SMS, email, secrets, mutations, or live features.
 - `npm run typecheck`
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - `.\scripts\local-gate.ps1`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate; npm run demo:seed; npm run test:e2e:demo`
 - `npm install`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`

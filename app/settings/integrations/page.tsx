@@ -1,52 +1,15 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { getIntegrationOperationAreas } from "@/lib/operations/operator-surfaces";
 import { getSystemStatus } from "@/lib/operations/system-status";
 
 export const dynamic = "force-dynamic";
 
-const integrationAreas = [
-  {
-    name: "Messaging provider",
-    href: "/settings/provider",
-    state: "dummy-first",
-    boundary: "Provider metadata stays local and redacted; no Twilio verification, provisioning, revocation, or sends run here."
-  },
-  {
-    name: "Provider numbers",
-    href: "/settings/numbers",
-    state: "metadata only",
-    boundary: "Phone-number rows are local readiness records, not proof of provider ownership or send approval."
-  },
-  {
-    name: "Webhooks",
-    href: "/settings/webhooks",
-    state: "inbound only",
-    boundary: "Webhook routes persist inbound/status events locally and do not emit replies or provider mutations."
-  },
-  {
-    name: "AI",
-    href: "/settings/ai",
-    state: "fake provider",
-    boundary: "AI endpoints use deterministic fake output; this view does not submit prompts or call paid models."
-  },
-  {
-    name: "Billing",
-    href: "/settings/billing",
-    state: "local ledger",
-    boundary: "Usage and billing records are local metadata; no Stripe customers, invoices, subscriptions, or charges are created."
-  },
-  {
-    name: "Notifications",
-    href: "/settings/notifications",
-    state: "no-send",
-    boundary: "Email, SMS alerts, browser push, and outbound webhooks remain blocked until future hard gates exist."
-  }
-];
-
 export default async function IntegrationOperationsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
   const status = getSystemStatus(process.env);
+  const integrationAreas = getIntegrationOperationAreas();
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
@@ -94,9 +57,9 @@ export default async function IntegrationOperationsPage() {
         <Panel title="Integration Surfaces">
           <ul className="grid gap-3 text-sm">
             {integrationAreas.map((area) => (
-              <li key={area.name} className="grid gap-2 border-b border-slate-100 pb-3 md:grid-cols-[180px_140px_1fr]">
+              <li key={area.href} className="grid gap-2 border-b border-slate-100 pb-3 md:grid-cols-[180px_140px_1fr]">
                 <Link className="font-semibold text-teal-700" href={area.href}>
-                  {area.name}
+                  {area.label}
                 </Link>
                 <span className="text-slate-600">{area.state}</span>
                 <span className="text-slate-700">{area.boundary}</span>

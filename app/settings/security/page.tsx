@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { getSecurityOperationLinks } from "@/lib/operations/operator-surfaces";
 import { getSystemStatus } from "@/lib/operations/system-status";
 
 export const dynamic = "force-dynamic";
@@ -31,37 +32,16 @@ const securityControls = [
 export default async function SecurityOperationsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
   const status = getSystemStatus(process.env);
+  const navigationLinks = getSecurityOperationLinks();
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
-        <Link className="text-sm font-medium text-teal-700" href="/demo">
-          Demo Console
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings">
-          Go-Live Readiness
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/system">
-          System Status
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/api">
-          API Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/contracts">
-          Contract Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/notifications">
-          Notification Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/validation">
-          Validation Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
-          Operator Runbook
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/releases">
-          Release Operations
-        </Link>
+        {navigationLinks.map((link) => (
+          <Link key={link.href} className="text-sm font-medium text-teal-700" href={link.href}>
+            {link.label}
+          </Link>
+        ))}
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Security Operations</h1>

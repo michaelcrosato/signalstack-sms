@@ -3,8 +3,10 @@ import {
   getDemoOperationsCheckpoints,
   getDemoOperationsLinks,
   getDemoConsoleLinks,
+  getIntegrationOperationAreas,
   getReleaseOperationSurfaceLinks,
   getReportingIndexLinks,
+  getSecurityOperationLinks,
   getSettingsNavigationLinks,
   getWorkflowOperationSteps,
   operatorSurfaceGroups
@@ -18,6 +20,8 @@ const settingsNavigationLinks = getSettingsNavigationLinks();
 const reportingIndexLinks = getReportingIndexLinks();
 const workflowOperationSteps = getWorkflowOperationSteps();
 const releaseOperationSurfaceLinks = getReleaseOperationSurfaceLinks();
+const integrationOperationAreas = getIntegrationOperationAreas();
+const securityOperationLinks = getSecurityOperationLinks();
 
 test.setTimeout(60_000);
 
@@ -104,6 +108,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await page.getByRole("link", { name: "API Operations" }).click();
   await page.getByRole("link", { name: "Security Operations" }).click();
   await expect(page.getByRole("heading", { name: "Security Operations" })).toBeVisible();
+  for (const link of securityOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await expect(page.getByRole("heading", { name: "Safety Gates" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Runtime Controls" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Control Inventory" })).toBeVisible();
@@ -118,6 +125,11 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Integration Surfaces" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Runtime Gates" })).toBeVisible();
   await expect(page.getByText("dummy-first")).toBeVisible();
+  for (const area of integrationOperationAreas) {
+    await expect(page.getByRole("link", { name: area.label }).first()).toHaveAttribute("href", area.href);
+    await expect(page.getByText(area.state, { exact: true })).toBeVisible();
+    await expect(page.getByText(area.boundary)).toBeVisible();
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Workflow Operations" }).first().click();
   await expect(page.getByRole("heading", { name: "Workflow Operations" })).toBeVisible();

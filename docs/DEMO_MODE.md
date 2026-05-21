@@ -78,6 +78,8 @@ The API operations inventory is unit-tested so listed local API route-method row
 
 The root route `/` is a static local launch dashboard. It shows the demo-safe runtime defaults and shared-inventory links to the existing demo, readiness, provider metadata, system status, usage, and admin export views without requiring database access or creating side effects.
 
+The integration operations surface list and security operations navigation are also projected from the shared local operator surface inventory. Unit and seeded browser coverage verify their visible labels, route targets, states, and boundaries without calling providers, billing, notifications, live AI, SMS, email, commands, exports, mutations, secrets, or live feature enablement.
+
 The local operator runbook screen at `/settings/runbook` displays demo-safe validation, seed, worker, export, and repair-loop commands from the local runbook. It is read-only and does not execute commands, mutate records, call providers, create billing records, send notifications, expose secrets, or enable live messaging.
 
 Milestone 6 adds a compliance checklist for go-live readiness, but demo mode still blocks live messaging even when checklist fields are complete. STOP/HELP demo inbound flows update local database state only.

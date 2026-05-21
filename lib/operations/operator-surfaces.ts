@@ -23,6 +23,11 @@ export type WorkflowOperationStep = {
   boundary: string;
 };
 
+export type IntegrationOperationArea = OperatorSurfaceLink & {
+  state: string;
+  boundary: string;
+};
+
 export const operatorSurfaceGroups = [
   {
     name: "Demo And Workflow",
@@ -208,6 +213,51 @@ const releaseOperationSurfaceRoutes = [
   "/settings/workflows"
 ] as const;
 
+const integrationOperationAreaDefinitions = [
+  {
+    href: "/settings/provider",
+    state: "dummy-first",
+    boundary: "Provider metadata stays local and redacted; no Twilio verification, provisioning, revocation, or sends run here."
+  },
+  {
+    href: "/settings/numbers",
+    state: "metadata only",
+    boundary: "Phone-number rows are local readiness records, not proof of provider ownership or send approval."
+  },
+  {
+    href: "/settings/webhooks",
+    state: "inbound only",
+    boundary: "Webhook routes persist inbound/status events locally and do not emit replies or provider mutations."
+  },
+  {
+    href: "/settings/ai",
+    state: "fake provider",
+    boundary: "AI endpoints use deterministic fake output; this view does not submit prompts or call paid models."
+  },
+  {
+    href: "/settings/billing",
+    state: "local ledger",
+    boundary: "Usage and billing records are local metadata; no Stripe customers, invoices, subscriptions, or charges are created."
+  },
+  {
+    href: "/settings/notifications",
+    state: "no-send",
+    boundary: "Email, SMS alerts, browser push, and outbound webhooks remain blocked until future hard gates exist."
+  }
+] as const;
+
+const securityOperationNavigationRoutes = [
+  "/demo",
+  "/settings",
+  "/settings/system",
+  "/settings/api",
+  "/settings/contracts",
+  "/settings/notifications",
+  "/settings/validation",
+  "/settings/runbook",
+  "/settings/releases"
+] as const;
+
 export function getDemoOperationsCheckpoints(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups): DemoOperationsCheckpoint[] {
   return demoOperationsCheckpointDefinitions.map((checkpoint) => {
     const link = findOperatorSurfaceLink(checkpoint.href, groups);
@@ -240,4 +290,16 @@ export function getWorkflowOperationSteps(groups: OperatorSurfaceGroup[] = opera
 
 export function getReleaseOperationSurfaceLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return releaseOperationSurfaceRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getIntegrationOperationAreas(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups): IntegrationOperationArea[] {
+  return integrationOperationAreaDefinitions.map((area) => ({
+    ...findOperatorSurfaceLink(area.href, groups),
+    state: area.state,
+    boundary: area.boundary
+  }));
+}
+
+export function getSecurityOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return securityOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }

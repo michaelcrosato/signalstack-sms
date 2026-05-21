@@ -5,11 +5,13 @@ import {
   getDemoOperationsCheckpoints,
   getDemoOperationsLinks,
   getDemoConsoleLinks,
+  getIntegrationOperationAreas,
   getLaunchDashboardLinks,
   getOperatorSurfaceSummary,
   getReleaseOperationSurfaceLinks,
   getReportingIndexLinks,
   getRunbookAdminLinks,
+  getSecurityOperationLinks,
   getSettingsNavigationLinks,
   getWorkflowOperationSteps,
   operatorSurfaceGroups
@@ -226,5 +228,44 @@ describe("operator surface inventory", () => {
     ]);
     expect(releaseLinks).toEqual(releaseRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
     expect(releaseRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+  });
+
+  it("projects integration and security operation links from the shared surface inventory", () => {
+    const inventoryLinks = operatorSurfaceGroups.flatMap((group) => group.links);
+    const integrationAreas = getIntegrationOperationAreas();
+    const securityLinks = getSecurityOperationLinks();
+    const integrationRoutes = integrationAreas.map((area) => area.href);
+    const securityRoutes = securityLinks.map((link) => link.href);
+
+    expect(integrationRoutes).toEqual([
+      "/settings/provider",
+      "/settings/numbers",
+      "/settings/webhooks",
+      "/settings/ai",
+      "/settings/billing",
+      "/settings/notifications"
+    ]);
+    expect(integrationAreas.map(({ href, label, note }) => ({ href, label, note }))).toEqual(
+      integrationRoutes.map((route) => {
+        const link = inventoryLinks.find((item) => item.href === route);
+        return { href: link?.href, label: link?.label, note: link?.note };
+      })
+    );
+    expect(integrationAreas.every((area) => area.state.length > 0 && area.boundary.length > 0)).toBe(true);
+    expect(integrationRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+
+    expect(securityRoutes).toEqual([
+      "/demo",
+      "/settings",
+      "/settings/system",
+      "/settings/api",
+      "/settings/contracts",
+      "/settings/notifications",
+      "/settings/validation",
+      "/settings/runbook",
+      "/settings/releases"
+    ]);
+    expect(securityLinks).toEqual(securityRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
+    expect(securityRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
   });
 });
