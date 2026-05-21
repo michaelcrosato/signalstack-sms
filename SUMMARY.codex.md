@@ -1,15 +1,20 @@
 # Codex Summary
 
-Run number: 65
+Run number: 66
 
 ## Completed
+
+- Advanced a post-MVP shared operator inventory order-stability checkpoint.
+- Added unit coverage that pins shared operator surface group order and route order so projected navigation does not churn without an intentional inventory update.
+- Updated testing contract/docs, README, PLAN, BLOCKERS, and next-prompt handoff docs with the order-stability guard.
+- Protected local gate and targeted operator-surface unit coverage passed.
+
+## Prior Completed
 
 - Advanced a post-MVP shared operator inventory copy-shape checkpoint.
 - Added unit coverage that keeps shared operator surface group names and labels in stable Title Case navigation format, while notes remain short lower-case sentence fragments without terminal punctuation.
 - Updated testing contract/docs, README, PLAN, BLOCKERS, and next-prompt handoff docs with the copy-shape guard.
 - Protected local gate and targeted operator-surface unit coverage passed.
-
-## Prior Completed
 
 - Advanced a post-MVP page-specific operator projection self-link checkpoint.
 - Added unit coverage that verifies page-specific operator navigation projections do not link back to their own current route, while preserving broader inventory projections such as the runbook.

@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 65
+Run number: 66
 
 No active blockers.
 
 ## Notes
 
+- Shared operator surface groups and route order now have unit coverage for stable projected navigation order. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator surface group names, link labels, and link notes now have unit coverage for copy shape: group names and labels must stay in Title Case navigation format, and notes must stay short lower-case sentence fragments without terminal punctuation. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Page-specific operator navigation projections now have unit coverage that rejects self-links to their own current route, while broader inventory projections such as the runbook may intentionally list all local admin pages. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator surface routes now have unit coverage for canonical static local app-page shape. The check rejects query/hash routes, trailing slashes, dynamic segments, double slashes, non-lowercase routes, and routes outside `/demo`, `/settings`, or `/settings/**`; it does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

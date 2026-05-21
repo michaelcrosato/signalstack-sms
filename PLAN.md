@@ -173,6 +173,7 @@ Post-MVP:
 - Local shared operator inventory canonical-route-shape coverage
 - Local page-specific operator projection self-link coverage
 - Local shared operator inventory copy-shape coverage
+- Local shared operator inventory order-stability coverage
 
 ## Next Milestone
 

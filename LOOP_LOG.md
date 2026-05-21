@@ -1,3 +1,12 @@
+## Run 066  GREEN  inventory-order-stability  2026-05-20 21:20
+Objective:    Add a shared guard against accidental projected-navigation order churn.
+Changed:
+- Added unit coverage that pins shared operator surface group order and route order.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 065  GREEN  inventory-copy-shape  2026-05-20 21:16
 Objective:    Add a shared guard for operator inventory navigation-copy format.
 Changed:

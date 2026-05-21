@@ -108,6 +108,66 @@ describe("operator surface inventory", () => {
     expect(routes.filter((route) => route !== "/demo" && route !== "/settings" && !route.startsWith("/settings/"))).toEqual([]);
   });
 
+  it("keeps inventory group and route order stable for projected navigation", () => {
+    expect(
+      operatorSurfaceGroups.map((group) => ({
+        name: group.name,
+        routes: group.links.map((link) => link.href)
+      }))
+    ).toEqual([
+      {
+        name: "Demo And Workflow",
+        routes: ["/demo", "/settings/demo", "/settings/workflows", "/settings/releases"]
+      },
+      {
+        name: "Data And Messaging",
+        routes: [
+          "/settings/contacts",
+          "/settings/audience",
+          "/settings/templates",
+          "/settings/campaigns",
+          "/settings/queue",
+          "/settings/inbox",
+          "/settings/webhooks",
+          "/settings/delivery"
+        ]
+      },
+      {
+        name: "Safety And Runtime",
+        routes: [
+          "/settings",
+          "/settings/operations",
+          "/settings/system",
+          "/settings/environment",
+          "/settings/health",
+          "/settings/security",
+          "/settings/validation",
+          "/settings/contracts",
+          "/settings/api"
+        ]
+      },
+      {
+        name: "Provider And Reporting",
+        routes: [
+          "/settings/provider",
+          "/settings/numbers",
+          "/settings/compliance",
+          "/settings/readiness-audit",
+          "/settings/exports",
+          "/settings/reports",
+          "/settings/usage",
+          "/settings/billing",
+          "/settings/ai",
+          "/settings/notifications",
+          "/settings/integrations",
+          "/settings/team",
+          "/settings/data",
+          "/settings/runbook"
+        ]
+      }
+    ]);
+  });
+
   it("keeps inventory group names, labels, and notes unambiguous", () => {
     const groupNames = operatorSurfaceGroups.map((group) => group.name);
     const links = operatorSurfaceGroups.flatMap((group) => group.links);

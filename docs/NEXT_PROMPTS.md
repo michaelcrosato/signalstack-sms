@@ -102,6 +102,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP shared inventory route-shape hardening: unit coverage now verifies that every shared operator surface route remains lowercase, static, query-free, hash-free, slash-normalized, and limited to `/demo`, `/settings`, or `/settings/**`.
 - Post-MVP page-specific projection self-link hardening: unit coverage now verifies that page-specific operator navigation projections exclude their own current route, while broader inventory views such as the runbook may intentionally list all local admin pages.
 - Post-MVP shared inventory copy-shape hardening: unit coverage now verifies that shared operator surface group names and labels stay in stable Title Case navigation format, and notes stay short lower-case sentence fragments without terminal punctuation.
+- Post-MVP shared inventory order-stability hardening: unit coverage now verifies that shared operator surface groups and route order remain stable so projected navigation does not churn without an intentional inventory update.
 
 Demo-safe defaults remain mandatory:
 
