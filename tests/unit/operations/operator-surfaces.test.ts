@@ -383,10 +383,54 @@ describe("operator surface inventory", () => {
           : group.links
     }));
 
-    expect(() => getOperatorSurfaceSummary(groupsWithPrototypeBackedGroup)).toThrow("Invalid operator surface group fields");
-    expect(() => getLaunchDashboardLinks(groupsWithPrototypeBackedGroup)).toThrow("Invalid operator surface group fields");
-    expect(() => getSettingsNavigationLinks(groupsWithPrototypeBackedLink)).toThrow("Invalid operator surface link fields");
-    expect(() => getDemoOperationsLinks(groupsWithPrototypeBackedLink)).toThrow("Invalid operator surface link fields");
+    expect(() => getOperatorSurfaceSummary(groupsWithPrototypeBackedGroup)).toThrow(
+      "Invalid operator surface group prototype"
+    );
+    expect(() => getLaunchDashboardLinks(groupsWithPrototypeBackedGroup)).toThrow(
+      "Invalid operator surface group prototype"
+    );
+    expect(() => getSettingsNavigationLinks(groupsWithPrototypeBackedLink)).toThrow(
+      "Invalid operator surface link prototype"
+    );
+    expect(() => getDemoOperationsLinks(groupsWithPrototypeBackedLink)).toThrow(
+      "Invalid operator surface link prototype"
+    );
+  });
+
+  it("rejects supplied operator inventories with custom-prototype records before projection", () => {
+    const customPrototypeGroup = Object.assign(Object.create({ kind: "custom-group" }), {
+      name: "Custom Prototype Group",
+      links: operatorSurfaceGroups[1].links
+    }) as OperatorSurfaceGroup;
+    const groupsWithCustomPrototypeGroup = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) =>
+      groupIndex === 1 ? customPrototypeGroup : group
+    );
+
+    const customPrototypeLink = Object.assign(Object.create({ kind: "custom-link" }), {
+      href: operatorSurfaceGroups[1].links[0].href,
+      label: operatorSurfaceGroups[1].links[0].label,
+      note: operatorSurfaceGroups[1].links[0].note
+    }) as OperatorSurfaceLink;
+    const groupsWithCustomPrototypeLink = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [customPrototypeLink, ...group.links.slice(1)]
+          : group.links
+    }));
+
+    expect(() => getOperatorSurfaceSummary(groupsWithCustomPrototypeGroup)).toThrow(
+      "Invalid operator surface group prototype"
+    );
+    expect(() => getLaunchDashboardLinks(groupsWithCustomPrototypeGroup)).toThrow(
+      "Invalid operator surface group prototype"
+    );
+    expect(() => getSettingsNavigationLinks(groupsWithCustomPrototypeLink)).toThrow(
+      "Invalid operator surface link prototype"
+    );
+    expect(() => getDemoOperationsLinks(groupsWithCustomPrototypeLink)).toThrow(
+      "Invalid operator surface link prototype"
+    );
   });
 
   it("rejects supplied operator inventories with accessor-backed fields before projection", () => {

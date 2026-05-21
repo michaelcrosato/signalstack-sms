@@ -142,6 +142,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP shared supplied-inventory own-field hardening: summaries and projections now fail before deriving local navigation from prototype-backed supplied operator groups or links, requiring required navigation fields to be own properties.
 - Post-MVP shared supplied-inventory data-field hardening: summaries and projections now fail before deriving local navigation from accessor-backed supplied operator groups or links, requiring required navigation fields to be plain data properties.
 - Post-MVP shared supplied-inventory enumerable-field hardening: summaries and projections now fail before deriving local navigation from supplied operator groups or links with non-enumerable required fields, requiring required navigation fields to be normal enumerable data properties.
+- Post-MVP shared supplied-inventory plain-record hardening: summaries and projections now fail before deriving local navigation from supplied operator groups or links with custom prototypes, requiring ordinary object records.
 
 Demo-safe defaults remain mandatory:
 

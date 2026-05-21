@@ -84,6 +84,10 @@ function assertOperatorSurfaceGroup(group: OperatorSurfaceGroup) {
     throw new Error("Invalid operator surface group");
   }
 
+  if (Object.getPrototypeOf(group) !== Object.prototype) {
+    throw new Error("Invalid operator surface group prototype");
+  }
+
   if (!Object.hasOwn(group, "name") || !Object.hasOwn(group, "links")) {
     throw new Error("Invalid operator surface group fields");
   }
@@ -106,6 +110,10 @@ function assertOperatorSurfaceGroup(group: OperatorSurfaceGroup) {
 function assertOperatorSurfaceLink(link: OperatorSurfaceLink) {
   if (!link || typeof link !== "object" || Array.isArray(link)) {
     throw new Error("Invalid operator surface link");
+  }
+
+  if (Object.getPrototypeOf(link) !== Object.prototype) {
+    throw new Error("Invalid operator surface link prototype");
   }
 
   if (!Object.hasOwn(link, "href") || !Object.hasOwn(link, "label") || !Object.hasOwn(link, "note")) {

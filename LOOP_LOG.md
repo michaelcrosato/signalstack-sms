@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 109  GREEN  supplied-inventory-plain-record-guard  2026-05-21 00:24
+Objective:    Fail custom-prototype supplied shared operator inventory records before projection.
+Changed:
+- Added prototype guards requiring supplied operator group/link records to be ordinary object records.
+- Added unit coverage proving custom-prototype supplied group/link records fail before summaries or projections derive local navigation.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 108  GREEN  supplied-inventory-enumerable-field-guard  2026-05-21 00:21
 Objective:    Fail non-enumerable supplied shared operator inventory fields before projection.
 Changed:
