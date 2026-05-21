@@ -185,6 +185,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP readiness audit operations static-metadata hardening: `/settings/readiness-audit` action filters, subject filters, bounded CSV export-limit vocabulary, safety-boundary copy, and no-impact summary states are validated, runtime-frozen, and covered by unit tests before rendering local readiness history metadata.
 - Post-MVP readiness audit query allowlist hardening: JSON and CSV readiness-audit endpoints now accept only the supported action and subject-type vocabularies exported by the readiness-audit operations helper, with unit coverage for unsupported local-looking filters.
 - Post-MVP readiness audit command-execution vocabulary hardening: `/settings/readiness-audit` now exposes an allowlisted runtime-frozen command-execution state of `none`, renders it as local read-only metadata, and unit coverage keeps it inside the no-impact vocabulary before readiness filters or CSV links render.
+- Post-MVP readiness audit exported vocabulary mutation hardening: unit coverage now verifies every exported readiness-audit operations vocabulary rejects caller mutation before local readiness filters or CSV links render.
 
 Demo-safe defaults remain mandatory:
 

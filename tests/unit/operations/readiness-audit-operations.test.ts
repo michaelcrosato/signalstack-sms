@@ -76,6 +76,23 @@ describe("getReadinessAuditOperationsStatus", () => {
     expect(() => (firstStatus.safetyBoundaries as unknown as string[]).push("unsafe")).toThrow(TypeError);
   });
 
+  it("keeps every exported readiness audit vocabulary frozen against caller mutation", () => {
+    const vocabularies = [
+      allowedReadinessAuditOperationActions,
+      allowedReadinessAuditOperationSubjectTypes,
+      allowedReadinessAuditOperationExportLimits,
+      allowedReadinessAuditOperationCommandExecutionStates,
+      allowedReadinessAuditOperationExternalImpactStates,
+      allowedReadinessAuditOperationMutationStates,
+      allowedReadinessAuditOperationSecretsDisplayedStates
+    ];
+
+    for (const vocabulary of vocabularies) {
+      expect(Object.isFrozen(vocabulary)).toBe(true);
+      expect(() => ((vocabulary as unknown) as unknown[]).push("unsafe")).toThrow(TypeError);
+    }
+  });
+
   it("keeps readiness audit operation metadata whitespace-clean", () => {
     const staticCopy = [
       ...allowedReadinessAuditOperationActions,

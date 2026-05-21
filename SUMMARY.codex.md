@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP readiness audit exported-vocabulary mutation checkpoint.
+- Added unit coverage proving every exported readiness-audit operations vocabulary is runtime-frozen and rejects caller mutation before local readiness filters or CSV links render.
+- Updated testing contract/docs, PLAN, next-prompt handoff docs, blockers, and loop logs.
+- Focused readiness-audit operations unit coverage passed; protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 151
+
+## Previous Run
+
 - Advanced a post-MVP readiness audit command-execution vocabulary checkpoint.
 - Exported and validated the supported readiness-audit command-execution state of `none`.
 - Rendered the command-execution state on `/settings/readiness-audit` alongside local audit filter and impact metadata.

@@ -1346,3 +1346,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP readiness audit operations hardening or safe read-only operator surface refinements.
+
+## Run 151  GREEN  readiness-audit-exported-vocabulary-mutation  2026-05-21 03:34
+Objective:    Keep exported readiness-audit operations vocabularies frozen against caller mutation.
+Changed:
+- Added unit coverage proving every exported readiness-audit operations vocabulary is runtime-frozen and rejects caller mutation.
+- Updated testing contract/docs, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP readiness audit operations hardening or safe read-only operator surface refinements.
