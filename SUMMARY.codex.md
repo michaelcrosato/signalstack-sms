@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP security operations exported vocabulary mutation coverage repair.
+- Extended security operations unit coverage so the exported validation-command vocabulary is included in caller-mutation rejection checks with the other exported security vocabularies.
+- Updated blockers and loop logs.
+- Focused security operations unit coverage passed; protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 163
+
+## Previous Run
+
 - Advanced a post-MVP validation operations whitespace-clean metadata checkpoint.
 - Added validation operations guards rejecting leading/trailing whitespace, doubled spaces, and embedded newlines in static gate command, area, boundary, and repair-signal copy before render.
 - Added unit coverage proving `/settings/validation` static metadata stays whitespace-clean before local validation metadata renders.

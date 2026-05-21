@@ -160,6 +160,7 @@ describe("getSecurityOperationsStatus", () => {
   it("keeps exported security operation vocabularies frozen against caller mutation", () => {
     const vocabularies = [
       allowedSecurityOperationControlStatuses,
+      allowedSecurityOperationValidationCommands,
       allowedSecurityOperationCommandExecutionStates,
       allowedSecurityOperationExternalImpactStates,
       allowedSecurityOperationSecretsDisplayedStates

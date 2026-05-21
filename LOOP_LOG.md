@@ -1374,6 +1374,15 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP readiness audit operations hardening or safe read-only operator surface refinements.
 
+## Run 163  GREEN  security-validation-command-vocabulary-mutation  2026-05-21 04:20
+Objective:    Keep every exported `/settings/security` supported vocabulary covered against caller mutation.
+Changed:
+- Extended the security operations exported-vocabulary mutation test to include the supported validation-command vocabulary.
+- Updated SUMMARY, BLOCKERS, and loop logs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP security/validation operations hardening or safe read-only operator surface refinements.
+
 ## Run 154  GREEN  readiness-audit-default-query-limit-vocabulary  2026-05-21 03:49
 Objective:    Keep readiness-audit JSON/CSV default query limits tied to a frozen supported operations vocabulary.
 Changed:
