@@ -55,6 +55,7 @@ Additional deterministic checks:
 - Unit coverage verifies that shared operator surface labels and notes remain aligned with their route names, including singular/plural route segment variants.
 - Unit coverage verifies that rich shared operator projections for demo checkpoints, workflow steps, and integration areas have unique route entries, point at implemented app pages, and derive their visible labels from the shared local operator surface inventory.
 - Unit coverage verifies that rich shared operator projection names, labels, states, and boundaries stay unique, whitespace-clean, and explicit about read-only/no-impact boundaries.
+- Unit coverage verifies that rich shared operator projection boundaries name external-impact exclusions such as provider calls, SMS, billing, mutations, exports, queue activity, or paid AI before those boundaries are rendered in local operator surfaces.
 - Unit coverage verifies that page-specific operator navigation projections exclude their own current route, while broader inventory views such as the operator runbook may intentionally list all local admin pages.
 - Unit coverage verifies that every shared operator surface route stays in canonical static app-page form: lowercase, no trailing slash, no query/hash, no dynamic segment, no double slash, and limited to `/demo`, `/settings`, or `/settings/**`.
 - Unit coverage verifies that shared operator surface routes, group names, labels, and notes stay whitespace-clean without leading/trailing whitespace, doubled spaces, or embedded newlines.

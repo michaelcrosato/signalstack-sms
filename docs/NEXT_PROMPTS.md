@@ -114,6 +114,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP shared projection missing-route hardening: unit coverage now verifies that shared operator projections fail loudly with the missing route when the supplied inventory omits a referenced local operator surface.
 - Post-MVP shared route-copy alignment hardening: unit coverage now verifies that shared operator surface labels and notes stay semantically aligned with their route names, including singular/plural route segment variants.
 - Post-MVP shared action-neutral copy hardening: unit coverage now verifies that shared operator surface group names, labels, and notes avoid command-style action copy while preserving read-only boundary language.
+- Post-MVP rich boundary external-impact hardening: unit coverage now verifies that demo checkpoint, workflow step, and integration area boundary text explicitly names external-impact exclusions such as provider calls, SMS, billing, mutations, exports, queue activity, or paid AI.
 
 Demo-safe defaults remain mandatory:
 

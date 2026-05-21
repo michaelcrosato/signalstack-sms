@@ -1,8 +1,13 @@
 # Codex Summary
 
-Run number: 78
+Run number: 80
 
 ## Completed
+
+- Advanced a post-MVP rich operator boundary external-impact checkpoint.
+- Added unit coverage proving demo checkpoint, workflow step, and integration area boundary text explicitly names external-impact exclusions such as provider calls, SMS, billing, mutations, exports, queue activity, or paid AI.
+- Updated the testing contract/docs, README, PLAN, BLOCKERS, loop logs, and next-prompt handoff docs with the rich boundary external-impact guard.
+- Targeted operator-surface unit coverage passed.
 
 - Advanced a post-MVP shared operator route-copy alignment checkpoint.
 - Added unit coverage proving shared operator surface labels and notes stay aligned with their route names, including singular/plural route segment variants.

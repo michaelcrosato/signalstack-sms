@@ -184,6 +184,7 @@ Post-MVP:
 - Local shared operator missing-route failure coverage
 - Local shared operator route-copy alignment coverage
 - Local shared operator action-neutral copy coverage
+- Local rich operator boundary external-impact coverage
 
 ## Next Milestone
 

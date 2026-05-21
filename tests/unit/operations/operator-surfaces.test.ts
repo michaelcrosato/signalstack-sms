@@ -851,6 +851,18 @@ describe("operator surface inventory", () => {
     expect(integrationAreas.map((area) => area.state).filter((state) => state !== state.toLowerCase())).toEqual([]);
   });
 
+  it("keeps rich operator boundaries explicit about external-impact exclusions", () => {
+    const allBoundaries = [
+      ...getDemoOperationsCheckpoints().map((checkpoint) => checkpoint.boundary),
+      ...getWorkflowOperationSteps().map((step) => step.boundary),
+      ...getIntegrationOperationAreas().map((area) => area.boundary)
+    ];
+    const externalImpactTerms =
+      /\b(provider|providers|send|sending|sends|sms|message|messages|billing|stripe|paid model|paid models|twilio|mutation|mutating|exports|enqueueing|polling|redis|charge|charges|prompts|replies|consent|scheduling|canceling|assigning)\b/i;
+
+    expect(allBoundaries.filter((boundary) => !externalImpactTerms.test(boundary))).toEqual([]);
+  });
+
   it("keeps page-specific operator navigation from linking to the current page", () => {
     const pageSpecificProjections = [
       { route: "/demo", links: getDemoConsoleLinks() },

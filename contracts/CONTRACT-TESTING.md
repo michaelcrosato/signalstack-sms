@@ -35,6 +35,7 @@ Post-MVP local operations status:
 - Unit tests must verify that every shared per-page operator navigation projection has unique route entries, points at implemented `app/**/page.tsx` files, and resolves only through the shared operations inventory.
 - Unit tests must verify that rich shared operator projections for demo checkpoints, workflow steps, and integration areas keep unique route entries, point at implemented `app/**/page.tsx` files, and derive visible labels from the shared operations inventory.
 - Unit tests must verify that rich shared operator projection names, labels, states, and boundaries stay unambiguous, whitespace-clean, and explicit about read-only/no-impact boundaries.
+- Unit tests must verify that rich shared operator projection boundaries explicitly name external-impact exclusions such as provider calls, SMS, billing, mutations, exports, queue activity, or paid AI.
 - Unit tests must verify that page-specific operator navigation projections exclude their own current route, while broader inventory views such as the runbook may intentionally list all local admin pages.
 - Unit tests must verify that the shared operator surface inventory keeps group names, link labels, and link notes unambiguous so projected navigation and browser checks cannot silently collide.
 - Unit tests must verify that shared operator surface routes, group names, labels, and notes remain whitespace-clean without leading/trailing whitespace, doubled spaces, or embedded newlines.
