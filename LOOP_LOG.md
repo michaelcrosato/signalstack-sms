@@ -1173,3 +1173,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP contract operations hardening or safe read-only operator surface refinements.
+
+## Run 132  GREEN  contract-operations-package-script  2026-05-21 02:06
+Objective:    Keep contract operations validation command references backed by package scripts.
+Changed:
+- Added an explicit allowlist for `/settings/contracts` static validation command metadata.
+- Added unit coverage proving every listed `npm run ...` contract validation reference exists in `package.json`.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP contract operations hardening or safe read-only operator surface refinements.

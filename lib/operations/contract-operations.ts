@@ -21,6 +21,12 @@ export type ContractOperationsStatus = {
 
 const contractOperationFileFields = ["name", "path", "boundary"] as const;
 const contractOperationValidationCheckFields = ["command", "purpose"] as const;
+const allowedContractOperationValidationCommands = [
+  "npm run contracts:check",
+  "npm run validate",
+  "npm run test:e2e:demo",
+  "npm run secrets:scan"
+] as const;
 
 function assertExactFields<T extends object>(value: T, fields: readonly string[], errorMessage: string) {
   const actualKeys = Reflect.ownKeys(value);
@@ -64,6 +70,14 @@ function assertValidationCheck(check: ContractOperationValidationCheck) {
 
   if (typeof check.command !== "string" || !check.command.startsWith("npm run ")) {
     throw new Error(`Invalid contract operation validation command ${String(check.command)}`);
+  }
+
+  if (
+    !allowedContractOperationValidationCommands.includes(
+      check.command as (typeof allowedContractOperationValidationCommands)[number]
+    )
+  ) {
+    throw new Error(`Unsupported contract operation validation command ${check.command}`);
   }
 
   if (typeof check.purpose !== "string" || check.purpose.trim().length === 0) {

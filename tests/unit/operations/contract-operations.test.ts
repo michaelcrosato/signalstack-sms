@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
@@ -22,6 +22,14 @@ const publicStatusFields = [
 
 function sortedFields(value: object) {
   return Object.keys(value).sort();
+}
+
+function packageScripts() {
+  const packageJson = JSON.parse(readFileSync(join(process.cwd(), "package.json"), "utf8")) as {
+    scripts?: Record<string, string>;
+  };
+
+  return packageJson.scripts ?? {};
 }
 
 describe("getContractOperationsStatus", () => {
@@ -141,5 +149,20 @@ describe("getContractOperationsStatus", () => {
     expect(new Set(filePaths).size).toBe(filePaths.length);
     expect(new Set(validationCommands).size).toBe(validationCommands.length);
     expect(new Set(contractOperationDriftControls).size).toBe(contractOperationDriftControls.length);
+  });
+
+  it("keeps contract operation validation command references backed by package scripts", () => {
+    const scripts = packageScripts();
+    const missingScripts = contractOperationValidationChecks
+      .map((check) => check.command.replace("npm run ", ""))
+      .filter((scriptName) => !Object.prototype.hasOwnProperty.call(scripts, scriptName));
+
+    expect(contractOperationValidationChecks.map((check) => check.command)).toEqual([
+      "npm run contracts:check",
+      "npm run validate",
+      "npm run test:e2e:demo",
+      "npm run secrets:scan"
+    ]);
+    expect(missingScripts).toEqual([]);
   });
 });
