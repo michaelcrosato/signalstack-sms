@@ -240,4 +240,20 @@ describe("getValidationOperationsStatus", () => {
 
     expect(staticCopy.filter((copy) => secretLikePatterns.some((pattern) => pattern.test(copy)))).toEqual([]);
   });
+
+  it("keeps validation operation non-command metadata free of command-like literals", () => {
+    const nonCommandCopy = [
+      ...validationOperationGateCommands.flatMap((gate) => [gate.area, gate.boundary]),
+      ...validationOperationRepairSignals
+    ];
+    const commandLikePatterns = [
+      /\bnpm\s+run\b/i,
+      /\bnpx\b/i,
+      /\bpowershell\b/i,
+      /\bcurl\b/i,
+      /\bInvoke-WebRequest\b/i
+    ];
+
+    expect(nonCommandCopy.filter((copy) => commandLikePatterns.some((pattern) => pattern.test(copy)))).toEqual([]);
+  });
 });

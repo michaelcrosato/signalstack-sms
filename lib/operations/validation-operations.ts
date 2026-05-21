@@ -65,6 +65,13 @@ const forbiddenSecretMetadataPatterns = [
   /\b(?:TWILIO_AUTH_TOKEN|STRIPE_SECRET_KEY|OPENAI_API_KEY|CLERK_SECRET_KEY)\s*=/,
   /\bBearer\s+[A-Za-z0-9._-]{12,}/
 ] as const;
+const forbiddenCommandMetadataPatterns = [
+  /\bnpm\s+run\b/i,
+  /\bnpx\b/i,
+  /\bpowershell\b/i,
+  /\bcurl\b/i,
+  /\bInvoke-WebRequest\b/i
+] as const;
 
 const validationOperationStatusSummary = Object.freeze({
   commandExecution: "none",
@@ -89,6 +96,12 @@ function assertUniqueValues(values: readonly string[], errorMessage: string) {
 
 function assertNoSecretLikeMetadata(value: string, errorMessage: string) {
   if (forbiddenSecretMetadataPatterns.some((pattern) => pattern.test(value))) {
+    throw new Error(errorMessage);
+  }
+}
+
+function assertNoCommandLikeMetadata(value: string, errorMessage: string) {
+  if (forbiddenCommandMetadataPatterns.some((pattern) => pattern.test(value))) {
     throw new Error(errorMessage);
   }
 }
@@ -140,12 +153,14 @@ function assertGateCommand(command: ValidationOperationGateCommand) {
     throw new Error(`Unsupported validation operation area for ${command.command}`);
   }
   assertNoSecretLikeMetadata(command.area, `Secret-like validation operation area for ${command.command}`);
+  assertNoCommandLikeMetadata(command.area, `Command-like validation operation area for ${command.command}`);
 
   if (typeof command.boundary !== "string" || command.boundary.trim().length === 0) {
     throw new Error(`Invalid validation operation boundary for ${command.command}`);
   }
   assertCleanValidationMetadata(command.boundary, `Whitespace-unsafe validation operation boundary for ${command.command}`);
   assertNoSecretLikeMetadata(command.boundary, `Secret-like validation operation boundary for ${command.command}`);
+  assertNoCommandLikeMetadata(command.boundary, `Command-like validation operation boundary for ${command.command}`);
 }
 
 function freezeGateCommands(commands: ValidationOperationGateCommand[]) {
@@ -183,6 +198,7 @@ function freezeRepairSignals(signals: string[]) {
     }
     assertCleanValidationMetadata(signal, "Whitespace-unsafe validation operation repair signal");
     assertNoSecretLikeMetadata(signal, "Secret-like validation operation repair signal");
+    assertNoCommandLikeMetadata(signal, "Command-like validation operation repair signal");
   }
 
   assertUniqueValues(signals, "Duplicate validation operation repair signals");

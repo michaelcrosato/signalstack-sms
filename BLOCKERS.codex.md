@@ -1,13 +1,14 @@
 # Codex Blockers
 
-Run number: 183
+Run number: 184
 
-- Latest security operations command-literal hardening keeps `/settings/security` non-command static metadata free of command-like snippets while preserving the allowlisted validation-command field. The check is local static metadata coverage only and does not execute commands, inspect logs, scan files, read raw environment values, mutate records, expose secrets, call providers, bill, notify, send SMS/email, call live AI, execute workers, call Redis, or enable live features.
+- Latest validation operations command-literal hardening keeps `/settings/validation` non-command static metadata free of command-like snippets while preserving the allowlisted gate-command field. The check is local static metadata coverage only and does not execute commands, inspect logs, scan files, read raw environment values, mutate records, expose secrets, call providers, bill, notify, send SMS/email, call live AI, execute workers, call Redis, or enable live features.
 
 No active blockers.
 
 ## Notes
 
+- Latest security operations command-literal hardening keeps `/settings/security` non-command static metadata free of command-like snippets while preserving the allowlisted validation-command field. The check is local static metadata coverage only and does not execute commands, inspect logs, scan files, read raw environment values, mutate records, expose secrets, call providers, bill, notify, send SMS/email, call live AI, execute workers, call Redis, or enable live features.
 - Latest security operations mutation no-impact summary hardening displays the validated Mutation label on `/settings/security` and keeps it inside a runtime-frozen local no-mutation vocabulary. The check is local static metadata and read-only rendering/browser coverage only and does not execute commands, inspect logs, scan files, read raw environment values, mutate records, expose secrets, call providers, bill, notify, send SMS/email, call live AI, execute workers, call Redis, or enable live features.
 - Latest validation operations mutation no-impact summary hardening displays the validated Mutation label on `/settings/validation` and keeps it inside a runtime-frozen local no-mutation vocabulary. The check is local static metadata and read-only rendering/browser coverage only and does not execute commands, inspect logs, scan files, mutate records, expose secrets, call providers, bill, notify, send SMS/email, call live AI, execute workers, call Redis, or enable live features.
 - Latest contract operations mutation no-impact summary hardening displays the validated Mutation label on `/settings/contracts` and keeps it inside a runtime-frozen local no-mutation vocabulary. The check is local static metadata and read-only rendering/browser coverage only and does not execute checks, scan files, mutate records, expose secrets, call providers, bill, notify, send SMS/email, call live AI, execute workers, call Redis, or enable live features.
