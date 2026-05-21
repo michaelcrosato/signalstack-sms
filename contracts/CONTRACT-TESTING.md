@@ -48,7 +48,7 @@ Post-MVP local operations status:
 - Unit tests must verify that every shared operator navigation projection, plus rich demo/workflow/integration projection labels and notes, derives visible copy from the supplied inventory instance instead of stale global copy.
 - Unit tests must verify that broad shared operator inventory projections honor the supplied inventory instance when routes are omitted instead of reintroducing stale global routes.
 - Unit tests must verify that shared operator inventory projection helpers do not mutate supplied inventory groups or links while deriving navigation, rich checkpoints, workflow steps, or integration areas.
-- Unit tests must verify that shared operator inventory projection helpers return fresh result arrays per call so caller-side array mutation cannot contaminate later projections.
+- Unit tests must verify that shared operator inventory projection helpers return fresh and frozen result arrays per call so caller-side array mutation cannot contaminate later projections.
 - Unit tests must verify that shared operator inventory projection helpers return frozen result objects so caller-side link or rich-projection mutation cannot leak back into supplied inventory instances.
 - Unit tests must verify that the canonical shared operator surface inventory is frozen at runtime so accidental mutation of the exported route groups, nested link arrays, or link copy fails before projection drift can leak into pages.
 - Unit tests must verify that every shared operator surface route is reachable from at least one focused page-specific or rich operator projection, outside the broad launch/settings/runbook inventory projections.

@@ -549,7 +549,7 @@ describe("operator surface inventory", () => {
     expect(groups).toEqual(originalGroups);
   });
 
-  it("keeps operator projection result arrays fresh per call", () => {
+  it("keeps operator projection result arrays fresh and frozen per call", () => {
     const projectionFactories = [
       { name: "runbook", build: () => getRunbookAdminLinks() },
       { name: "settings", build: () => getSettingsNavigationLinks() },
@@ -594,12 +594,19 @@ describe("operator surface inventory", () => {
       const expectedLength = first.length;
 
       expect(first, projection.name).not.toBe(second);
+      expect(Object.isFrozen(first), projection.name).toBe(true);
 
-      first.pop();
+      expect(() => (first as unknown[]).pop()).toThrow(TypeError);
 
       expect(second, projection.name).toHaveLength(expectedLength);
       expect(projection.build(), projection.name).toHaveLength(expectedLength);
     }
+
+    const summary = getOperatorSurfaceSummary();
+
+    expect(Object.isFrozen(summary), "summary").toBe(true);
+    expect(Object.isFrozen(summary.routes), "summary routes").toBe(true);
+    expect(() => (summary.routes as string[]).pop()).toThrow(TypeError);
   });
 
   it("keeps operator projection result objects frozen per call", () => {

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 085  GREEN  projection-array-freeze  2026-05-20 22:43
+Objective:    Guard shared operator projection result arrays against caller-side mutation.
+Changed:
+- Updated shared operator projection helpers to return frozen result arrays, including summary route arrays.
+- Added unit coverage proving projection arrays are fresh per call, frozen, and reject caller-side mutation while later projections keep their expected lengths.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs with the array-freeze guard.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 084  GREEN  projection-result-freeze  2026-05-20 22:38
 Objective:    Guard shared operator projection result objects against caller-side mutation.
 Changed:

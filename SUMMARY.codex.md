@@ -1,8 +1,13 @@
 # Codex Summary
 
-Run number: 84
+Run number: 85
 
 ## Completed
+
+- Advanced a post-MVP shared operator projection array-freeze checkpoint.
+- Updated shared operator projection helpers to return frozen result arrays, including summary route arrays, while preserving fresh arrays per call and frozen result objects.
+- Added unit coverage proving caller-side array mutation is rejected and later projections keep their expected lengths.
+- Targeted operator-surface unit coverage, typecheck, lint, protected local gate, and seeded investor demo path passed.
 
 - Advanced a post-MVP shared operator projection result-freeze checkpoint.
 - Updated shared operator projection helpers to return frozen link and rich-projection result objects, including projections derived from mutable supplied inventories.
@@ -301,6 +306,13 @@ Run number: 84
 ## Validation
 
 - Latest route-copy alignment hardening added unit coverage that verifies shared operator surface labels and notes stay semantically aligned with route names, including singular/plural route segment variants. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
+- Latest projection array-freeze hardening updated shared operator projection helpers to return frozen result arrays, including the summary route array, while preserving fresh results per call and frozen result objects. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
+- `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
+- `npm run typecheck`
+- `npm run lint`
+- `git diff --check`
+- `.\scripts\local-gate.ps1`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed; npm run test:e2e:demo`
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - Latest projection immutability hardening added unit coverage that verifies shared operator projection helpers leave supplied inventory groups and links unchanged while deriving navigation, rich checkpoints, workflow steps, and integration areas. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`

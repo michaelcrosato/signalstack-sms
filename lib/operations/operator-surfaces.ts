@@ -32,6 +32,10 @@ function freezeOperatorSurfaceLink(link: OperatorSurfaceLink) {
   return Object.freeze({ ...link });
 }
 
+function freezeProjectionArray<T>(items: T[]) {
+  return Object.freeze(items);
+}
+
 function freezeOperatorSurfaceGroups(groups: OperatorSurfaceGroup[]) {
   return Object.freeze(
     groups.map((group) =>
@@ -104,30 +108,32 @@ export const operatorSurfaceGroups = freezeOperatorSurfaceGroups([
 export function getOperatorSurfaceSummary(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   const links = groups.flatMap((group) => group.links);
 
-  return {
+  return Object.freeze({
     groupCount: groups.length,
     surfaceCount: links.length,
-    routes: links.map((link) => link.href)
-  };
+    routes: freezeProjectionArray(links.map((link) => link.href))
+  });
 }
 
 export function getRunbookAdminLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return groups
-    .flatMap((group) => group.links)
-    .filter((link) => link.href === "/settings" || link.href.startsWith("/settings/"))
-    .map((link) => freezeOperatorSurfaceLink(link));
+  return freezeProjectionArray(
+    groups
+      .flatMap((group) => group.links)
+      .filter((link) => link.href === "/settings" || link.href.startsWith("/settings/"))
+      .map((link) => freezeOperatorSurfaceLink(link))
+  );
 }
 
 export function getSettingsNavigationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return getRunbookAdminLinks(groups).filter((link) => link.href !== "/settings");
+  return freezeProjectionArray(getRunbookAdminLinks(groups).filter((link) => link.href !== "/settings"));
 }
 
 export function getLaunchDashboardLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return groups.flatMap((group) => group.links).map((link) => freezeOperatorSurfaceLink(link));
+  return freezeProjectionArray(groups.flatMap((group) => group.links).map((link) => freezeOperatorSurfaceLink(link)));
 }
 
 export function getDemoConsoleLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return getLaunchDashboardLinks(groups).filter((link) => link.href !== "/demo");
+  return freezeProjectionArray(getLaunchDashboardLinks(groups).filter((link) => link.href !== "/demo"));
 }
 
 function findOperatorSurfaceLink(href: string, groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
@@ -519,146 +525,152 @@ const readinessAuditOperationNavigationRoutes = [
   "/settings/provider"
 ] as const;
 
-export function getDemoOperationsCheckpoints(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups): DemoOperationsCheckpoint[] {
-  return demoOperationsCheckpointDefinitions.map((checkpoint) => {
-    const link = findOperatorSurfaceLink(checkpoint.href, groups);
+export function getDemoOperationsCheckpoints(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups): readonly DemoOperationsCheckpoint[] {
+  return freezeProjectionArray(
+    demoOperationsCheckpointDefinitions.map((checkpoint) => {
+      const link = findOperatorSurfaceLink(checkpoint.href, groups);
 
-    return Object.freeze({
-      ...checkpoint,
-      signal: link.label
-    });
-  });
-}
-
-export function getDemoOperationsLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return demoOperationsLinkRoutes.map((href) => findOperatorSurfaceLink(href, groups));
-}
-
-export function getReportingIndexLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return reportingIndexRoutes.map((href) => findOperatorSurfaceLink(href, groups));
-}
-
-export function getWorkflowOperationSteps(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups): WorkflowOperationStep[] {
-  return workflowOperationStepDefinitions.map((step) => {
-    const link = findOperatorSurfaceLink(step.href, groups);
-
-    return Object.freeze({
-      ...step,
-      owner: link.label
-    });
-  });
-}
-
-export function getReleaseOperationSurfaceLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return releaseOperationSurfaceRoutes.map((href) => findOperatorSurfaceLink(href, groups));
-}
-
-export function getIntegrationOperationAreas(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups): IntegrationOperationArea[] {
-  return integrationOperationAreaDefinitions.map((area) =>
-    Object.freeze({
-      ...findOperatorSurfaceLink(area.href, groups),
-      state: area.state,
-      boundary: area.boundary
+      return Object.freeze({
+        ...checkpoint,
+        signal: link.label
+      });
     })
   );
 }
 
+export function getDemoOperationsLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return freezeProjectionArray(demoOperationsLinkRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
+}
+
+export function getReportingIndexLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return freezeProjectionArray(reportingIndexRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
+}
+
+export function getWorkflowOperationSteps(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups): readonly WorkflowOperationStep[] {
+  return freezeProjectionArray(
+    workflowOperationStepDefinitions.map((step) => {
+      const link = findOperatorSurfaceLink(step.href, groups);
+
+      return Object.freeze({
+        ...step,
+        owner: link.label
+      });
+    })
+  );
+}
+
+export function getReleaseOperationSurfaceLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return freezeProjectionArray(releaseOperationSurfaceRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
+}
+
+export function getIntegrationOperationAreas(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups): readonly IntegrationOperationArea[] {
+  return freezeProjectionArray(
+    integrationOperationAreaDefinitions.map((area) =>
+      Object.freeze({
+        ...findOperatorSurfaceLink(area.href, groups),
+        state: area.state,
+        boundary: area.boundary
+      })
+    )
+  );
+}
+
 export function getSecurityOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return securityOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(securityOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getEnvironmentOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return environmentOperationLinkRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(environmentOperationLinkRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getHealthOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return healthOperationLinkRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(healthOperationLinkRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getContractOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return contractOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(contractOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getValidationOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return validationOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(validationOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getQueueOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return queueOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(queueOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getContactOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return contactOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(contactOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getCampaignOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return campaignOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(campaignOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getAudienceOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return audienceOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(audienceOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getTemplateOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return templateOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(templateOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getInboxOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return inboxOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(inboxOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getDataOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return dataOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(dataOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getNotificationOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return notificationOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(notificationOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getExportOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return exportOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(exportOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getWebhookOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return webhookOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(webhookOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getDeliveryOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return deliveryOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(deliveryOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getTeamOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return teamOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(teamOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getBillingOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return billingOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(billingOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getAiOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return aiOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(aiOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getProviderOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return providerOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(providerOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getNumberOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return numberOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(numberOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getComplianceOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return complianceOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(complianceOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getSystemOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return systemOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(systemOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getUsageOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return usageOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(usageOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
 
 export function getReadinessAuditOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return readinessAuditOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+  return freezeProjectionArray(readinessAuditOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups)));
 }
