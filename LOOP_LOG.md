@@ -1067,6 +1067,16 @@ Gate:         passed
 Commit/Saved: 3010d4e
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
 
+## Run 133  GREEN  contract-operations-secret-literal  2026-05-21 02:09
+Objective:    Keep contract operations metadata free of secret-like literals before render.
+Changed:
+- Added metadata guards so `/settings/contracts` static contract boundaries, validation purposes, and drift-control copy reject common secret-like token patterns.
+- Added unit coverage proving API key, provider token, account SID, env assignment, and bearer-token patterns are absent from contract operation metadata.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP read-only operator surface metadata hardening or safe local admin refinements.
+
 ## Run 112  GREEN  supplied-inventory-link-array-shape  2026-05-21 00:40
 Objective:    Fail supplied shared operator inventory link arrays with custom shape before projection.
 Changed:

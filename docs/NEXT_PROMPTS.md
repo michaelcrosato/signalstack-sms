@@ -163,6 +163,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP security operations package-script hardening: `/settings/security` static validation references now reject unsupported command references, and unit coverage verifies every listed `npm run ...` command exists in `package.json` before rendering local security inventory.
 - Post-MVP security operations secret-literal hardening: `/settings/security` static controls, validation references, and boundary copy now reject common secret-like token patterns before rendering local security metadata.
 - Post-MVP contract operations package-script hardening: `/settings/contracts` static validation references now reject unsupported command references, and unit coverage verifies every listed `npm run ...` command exists in `package.json` before rendering local contract inventory.
+- Post-MVP contract operations secret-literal hardening: `/settings/contracts` static contract file metadata, validation purposes, and drift-control copy now reject common secret-like token patterns before rendering local contract metadata.
 
 Demo-safe defaults remain mandatory:
 

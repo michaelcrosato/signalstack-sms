@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP contract operations secret-literal checkpoint.
+- Added metadata guards so `/settings/contracts` static contract file boundaries, validation purposes, and drift-control copy reject common secret-like token patterns before render.
+- Added unit coverage proving API key, provider token, account SID, env assignment, and bearer-token patterns are absent from contract operation metadata.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- Targeted contract operations unit coverage and typecheck passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 133
+
+## Previous Run
+
 - Advanced a post-MVP contract operations package-script checkpoint.
 - Added an explicit allowlist for `/settings/contracts` validation command metadata.
 - Added unit coverage proving each listed `npm run ...` contract validation reference is backed by `package.json`.

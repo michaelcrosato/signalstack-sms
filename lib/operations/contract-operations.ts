@@ -27,6 +27,13 @@ const allowedContractOperationValidationCommands = [
   "npm run test:e2e:demo",
   "npm run secrets:scan"
 ] as const;
+const forbiddenSecretMetadataPatterns = [
+  /\bsk_(?:live|test)_[A-Za-z0-9]+/,
+  /\bpk_live_[A-Za-z0-9]+/,
+  /\bAC[a-fA-F0-9]{32}\b/,
+  /\b(?:TWILIO_AUTH_TOKEN|STRIPE_SECRET_KEY|OPENAI_API_KEY|CLERK_SECRET_KEY)\s*=/,
+  /\bBearer\s+[A-Za-z0-9._-]{12,}/
+] as const;
 
 function assertExactFields<T extends object>(value: T, fields: readonly string[], errorMessage: string) {
   const actualKeys = Reflect.ownKeys(value);
@@ -42,12 +49,19 @@ function assertUniqueValues(values: readonly string[], errorMessage: string) {
   }
 }
 
+function assertNoSecretLikeMetadata(value: string, errorMessage: string) {
+  if (forbiddenSecretMetadataPatterns.some((pattern) => pattern.test(value))) {
+    throw new Error(errorMessage);
+  }
+}
+
 function assertContractOperationFile(file: ContractOperationFile) {
   assertExactFields(file, contractOperationFileFields, "Invalid contract operation file fields");
 
   if (typeof file.name !== "string" || file.name.trim().length === 0) {
     throw new Error("Invalid contract operation file name");
   }
+  assertNoSecretLikeMetadata(file.name, `Secret-like contract operation file name for ${file.path}`);
 
   if (
     typeof file.path !== "string" ||
@@ -63,6 +77,7 @@ function assertContractOperationFile(file: ContractOperationFile) {
   if (typeof file.boundary !== "string" || file.boundary.trim().length === 0) {
     throw new Error(`Invalid contract operation boundary for ${file.path}`);
   }
+  assertNoSecretLikeMetadata(file.boundary, `Secret-like contract operation boundary for ${file.path}`);
 }
 
 function assertValidationCheck(check: ContractOperationValidationCheck) {
@@ -83,6 +98,7 @@ function assertValidationCheck(check: ContractOperationValidationCheck) {
   if (typeof check.purpose !== "string" || check.purpose.trim().length === 0) {
     throw new Error(`Invalid contract operation validation purpose for ${check.command}`);
   }
+  assertNoSecretLikeMetadata(check.purpose, `Secret-like contract operation validation purpose for ${check.command}`);
 }
 
 function freezeContractOperationFiles(files: ContractOperationFile[]) {
@@ -120,6 +136,7 @@ function freezeDriftControls(controls: string[]) {
     if (typeof control !== "string" || control.trim().length === 0) {
       throw new Error("Invalid contract operation drift control");
     }
+    assertNoSecretLikeMetadata(control, "Secret-like contract operation drift control");
   }
 
   assertUniqueValues(controls, "Duplicate contract operation drift controls");
