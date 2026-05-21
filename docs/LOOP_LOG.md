@@ -685,3 +685,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 097  GREEN  supplied-inventory-invalid-link-array-guard  2026-05-20 23:34
+Objective:    Fail supplied shared operator inventory groups with invalid link arrays before projection.
+Changed:
+- Added a shared invalid-link-array guard before flattening supplied operator surface groups.
+- Added unit coverage proving malformed supplied group link arrays fail before summary, broad launch, or focused demo projections can surface generic runtime errors.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.

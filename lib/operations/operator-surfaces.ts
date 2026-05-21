@@ -62,7 +62,6 @@ function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) 
     throw new Error("Empty operator surface inventory");
   }
 
-  const links = groups.flatMap((group) => group.links);
   const seenGroupNames = new Set<string>();
   const seenRoutes = new Set<string>();
   const seenLabels = new Set<string>();
@@ -70,6 +69,10 @@ function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) 
 
   for (const group of groups) {
     assertNonBlankOperatorSurfaceField("group name", group.name);
+
+    if (!Array.isArray(group.links)) {
+      throw new Error(`Invalid operator surface links for group ${group.name}`);
+    }
 
     if (group.links.length === 0) {
       throw new Error(`Empty operator surface group ${group.name}`);
@@ -81,6 +84,8 @@ function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) 
 
     seenGroupNames.add(group.name);
   }
+
+  const links = groups.flatMap((group) => group.links);
 
   for (const link of links) {
     assertNonBlankOperatorSurfaceField("route", link.href);
