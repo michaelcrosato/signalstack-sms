@@ -1,8 +1,13 @@
 # Codex Summary
 
-Run number: 77
+Run number: 78
 
 ## Completed
+
+- Advanced a post-MVP shared operator route-copy alignment checkpoint.
+- Added unit coverage proving shared operator surface labels and notes stay aligned with their route names, including singular/plural route segment variants.
+- Updated testing docs, README, PLAN, BLOCKERS, loop logs, and next-prompt handoff docs with the route-copy alignment guard.
+- Targeted operator-surface unit coverage passed.
 
 - Advanced a post-MVP broad operator projection supplied-inventory omission checkpoint.
 - Added unit coverage proving summary, launch, settings, runbook, and demo-console projections honor supplied inventory route omissions instead of reintroducing stale global routes.
@@ -270,6 +275,8 @@ Run number: 77
 
 ## Validation
 
+- Latest route-copy alignment hardening added unit coverage that verifies shared operator surface labels and notes stay semantically aligned with route names, including singular/plural route segment variants. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
+- `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - Latest broad projection supplied-inventory omission hardening added unit coverage that removes `/settings/usage` from the supplied operator inventory and verifies broad summary, launch, settings, runbook, and demo-console projections do not reintroduce stale global routes. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - Latest missing-route projection hardening added unit coverage that removes referenced routes from supplied operator inventories and verifies standard navigation, demo checkpoint, workflow, and integration projections throw route-specific missing-link errors. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

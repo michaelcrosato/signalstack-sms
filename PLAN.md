@@ -182,6 +182,7 @@ Post-MVP:
 - Local broad operator projection supplied-inventory omission coverage
 - Local shared operator focused-projection reachability coverage
 - Local shared operator missing-route failure coverage
+- Local shared operator route-copy alignment coverage
 
 ## Next Milestone
 

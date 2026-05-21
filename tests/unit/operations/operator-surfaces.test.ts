@@ -144,6 +144,31 @@ describe("operator surface inventory", () => {
     expect(routes.filter((route) => route !== "/demo" && route !== "/settings" && !route.startsWith("/settings/"))).toEqual([]);
   });
 
+  it("keeps operator surface copy aligned with route names", () => {
+    const links = operatorSurfaceGroups.flatMap((group) => group.links);
+    const expectedCopyTermsByRoute = new Map([
+      ["/demo", ["demo"]],
+      ["/settings", ["go-live", "readiness"]]
+    ]);
+
+    const copyDrift = links.filter((link) => {
+      const routeTerms =
+        expectedCopyTermsByRoute.get(link.href) ??
+        link.href
+          .split("/")
+          .filter(Boolean)
+          .at(-1)
+          ?.split("-")
+          .flatMap((term) => (term.endsWith("s") ? [term, term.slice(0, -1)] : [term])) ??
+        [];
+      const searchableCopy = `${link.label} ${link.note}`.toLowerCase();
+
+      return !routeTerms.some((term) => searchableCopy.includes(term));
+    });
+
+    expect(copyDrift).toEqual([]);
+  });
+
   it("keeps inventory group and route order stable for projected navigation", () => {
     expect(
       operatorSurfaceGroups.map((group) => ({

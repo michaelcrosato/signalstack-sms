@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 078  GREEN  route-copy-alignment  2026-05-20 22:11
+Objective:    Add a shared guard against operator surface route/copy drift.
+Changed:
+- Added unit coverage that keeps shared operator surface labels and notes aligned with their route names, including singular/plural route segment variants.
+- Updated testing docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs with the route-copy alignment guard.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 077  GREEN  broad-projection-inventory-omission  2026-05-20 22:09
 Objective:    Guard broad operator inventory projections against stale global route fallback.
 Changed:

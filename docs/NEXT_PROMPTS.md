@@ -112,6 +112,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP broad projection supplied-inventory omission hardening: unit coverage now verifies that summary, launch, settings, runbook, and demo-console projections honor supplied inventory route omissions instead of reintroducing stale global routes.
 - Post-MVP shared projection reachability hardening: unit coverage now verifies that every shared operator surface route is reachable from at least one focused page-specific or rich operator projection, outside the broad launch/settings/runbook inventory projections.
 - Post-MVP shared projection missing-route hardening: unit coverage now verifies that shared operator projections fail loudly with the missing route when the supplied inventory omits a referenced local operator surface.
+- Post-MVP shared route-copy alignment hardening: unit coverage now verifies that shared operator surface labels and notes stay semantically aligned with their route names, including singular/plural route segment variants.
 
 Demo-safe defaults remain mandatory:
 
