@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 38
+Run number: 39
 
 No active blockers.
 
 ## Notes
 
+- `/settings/operations` inventory tests now also verify that every listed local operator surface has a backing `app/**/page.tsx`, catching stale navigation before seeded browser coverage. The check is local filesystem validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `/settings/operations` now uses a shared local operator surface inventory with unit coverage for grouped app routes, duplicate route prevention, current surface count, and safety-sensitive operations links. The page remains read-only and still does not execute commands, inspect files, call APIs, mutate records, create exports, enqueue jobs, call Redis, call providers, call Stripe, call live AI, send notifications, send SMS or email, expose secrets, or enable live features.
 - `/settings/operations` is a read-only local operations index. It displays grouped links to existing local operator surfaces, static surface counts, route names, and safety boundaries; it does not execute commands, inspect files, call APIs, mutate records, create exports, enqueue jobs, call Redis, call providers, call Stripe, call live AI, send notifications, send SMS or email, expose secrets, or enable live features.
 - `/settings/environment` is a read-only local environment operations view. It displays demo-safe defaults, allowlisted configuration categories, derived runtime status, operational links, and safety boundaries; it does not read environment files, expose raw values or secrets, mutate configuration, write files, execute commands, call APIs, call Redis, call providers, create billing records, send notifications, send SMS or email, deploy, or enable live features.

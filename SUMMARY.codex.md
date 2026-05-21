@@ -1,15 +1,19 @@
 # Codex Summary
 
-Run number: 38
+Run number: 39
 
 ## Completed
+
+- Advanced a post-MVP local operations index backing-page coverage checkpoint.
+- Extended the shared `/settings/operations` inventory unit test to fail when any listed local operator surface does not have a corresponding `app/**/page.tsx`.
+- Updated testing contract, README, demo-mode docs, local operator runbook, PLAN, BLOCKERS, and next-prompt handoff docs with the backing-page drift check.
+
+## Prior Completed
 
 - Advanced a post-MVP local operations index inventory hardening checkpoint.
 - Moved the `/settings/operations` grouped local operator surface inventory into a shared module.
 - Added unit coverage for operations index group count, surface count, duplicate route protection, app-route-only links, and safety-sensitive local surfaces.
 - Updated testing contract, README, demo-mode docs, and local operator runbook with the fast inventory drift check.
-
-## Prior Completed
 
 - Advanced a post-MVP local operations index checkpoint.
 - Added `/settings/operations`, a read-only grouped index of existing local operator surfaces, route names, static surface counts, and safety boundaries.
@@ -109,4 +113,4 @@ Run number: 38
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 
-Latest protected local gate, local migration check, demo seed, and seeded demo E2E passed.
+Latest targeted operations inventory test and protected local gate passed.

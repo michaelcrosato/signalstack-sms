@@ -148,6 +148,7 @@ Post-MVP:
 - Read-only local health operations view
 - Read-only local environment operations view
 - Local operations index inventory unit coverage
+- Local operations index backing page coverage
 
 ## Next Milestone
 
