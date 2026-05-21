@@ -5,12 +5,21 @@ describe("getApiOperationsStatus", () => {
   it("reports local API route inventory and keeps external impact at zero", () => {
     const status = getApiOperationsStatus({});
 
-    expect(status.routeCount).toBeGreaterThan(30);
+    expect(status.routeCount).toBe(47);
     expect(status.mutatingRouteCount).toBeGreaterThan(10);
     expect(status.externalImpactRouteCount).toBe(0);
     expect(status.routes.every((route) => route.path.startsWith("/api/"))).toBe(true);
     expect(status.routes.some((route) => route.path === "/api/webhooks/twilio/inbound")).toBe(true);
     expect(status.routes.some((route) => route.path === "/api/settings/provider/rotations/export")).toBe(true);
+    expect(status.routes.map((route) => `${route.method} ${route.path}`)).toEqual(
+      expect.arrayContaining([
+        "DELETE /api/contacts/[contactId]",
+        "PATCH /api/campaigns/[campaignId]",
+        "GET /api/inbox/conversations/[conversationId]/messages",
+        "GET /api/inbox/conversations/[conversationId]/notes",
+        "GET /api/billing/usage"
+      ])
+    );
     expect(status.rateLimit).toMatchObject({
       enabled: true,
       limit: 120,
