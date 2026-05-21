@@ -114,6 +114,20 @@ describe("getContractOperationsStatus", () => {
     expect(getContractOperationsStatus().contractFiles[0].path).toBe(contractOperationFiles[0].path);
   });
 
+  it("keeps contract operation returned arrays detached while counts stay aligned", () => {
+    const status = getContractOperationsStatus();
+
+    expect(status.contractFileCount).toBe(status.contractFiles.length);
+    expect(status.validationCheckCount).toBe(status.validationChecks.length);
+    expect(status.driftControlCount).toBe(status.driftControls.length);
+    expect(status.contractFiles).toEqual(contractOperationFiles);
+    expect(status.validationChecks).toEqual(contractOperationValidationChecks);
+    expect(status.driftControls).toEqual(contractOperationDriftControls);
+    expect(status.contractFiles).not.toBe(contractOperationFiles);
+    expect(status.validationChecks).not.toBe(contractOperationValidationChecks);
+    expect(status.driftControls).not.toBe(contractOperationDriftControls);
+  });
+
   it("keeps contract operation metadata in canonical local-only shape", () => {
     const allowedPaths = new Set<string>(allowedContractOperationFilePaths);
 
