@@ -135,6 +135,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP shared supplied-inventory invalid-link-object hardening: summaries and projections now fail before deriving local navigation from supplied operator inventory links that are not link objects, preventing malformed runtime link entries from surfacing generic errors.
 - Post-MVP shared supplied-inventory invalid-array hardening: summaries and projections now fail before deriving local navigation from supplied operator inventories that are not arrays, preventing malformed runtime inventory values from surfacing generic errors.
 - Post-MVP shared supplied-inventory invalid-field-type hardening: summaries and projections now fail before deriving local navigation from supplied operator inventory group names, routes, labels, or notes that are not strings, preventing malformed runtime field values from surfacing generic string-operation errors.
+- Post-MVP shared supplied-inventory route-shape hardening: summaries and projections now fail before deriving local navigation from supplied operator inventory routes that are non-local, uppercase, query/hash-bearing, trailing-slash, double-slash, or dynamic-segment shaped, preventing malformed runtime routes from entering local navigation helpers.
 
 Demo-safe defaults remain mandatory:
 

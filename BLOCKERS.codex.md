@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 101
+Run number: 102
 
 No active blockers.
 
 ## Notes
 
+- Latest shared supplied-inventory route-shape hardening added a shared guard and unit coverage proving summaries and projections fail before deriving local navigation from supplied operator inventory routes that are non-local, uppercase, query/hash-bearing, trailing-slash, double-slash, or dynamic-segment shaped. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest shared supplied-inventory invalid-field-type hardening added a shared guard and unit coverage proving summaries and projections fail before deriving local navigation from supplied operator inventory group names, routes, labels, or notes that are not strings. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest shared supplied-inventory invalid-array hardening added a shared guard and unit coverage proving summaries and projections fail before deriving local navigation from supplied inventories that are not arrays. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest shared supplied-inventory invalid-link-object hardening added a shared guard and unit coverage proving summaries and projections fail before deriving local navigation from supplied inventory links that are not link objects. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

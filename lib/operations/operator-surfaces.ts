@@ -61,6 +61,24 @@ function assertNonBlankOperatorSurfaceField(fieldName: string, value: unknown) {
   }
 }
 
+function assertOperatorSurfaceRouteShape(href: string) {
+  const isCanonicalLocalRoute =
+    href === "/demo" ||
+    href === "/settings" ||
+    (href.startsWith("/settings/") &&
+      href === href.toLowerCase() &&
+      !href.endsWith("/") &&
+      !href.includes("?") &&
+      !href.includes("#") &&
+      !href.includes("[") &&
+      !href.includes("]") &&
+      !href.includes("//"));
+
+  if (!isCanonicalLocalRoute) {
+    throw new Error(`Invalid operator surface route shape ${href}`);
+  }
+}
+
 function assertOperatorSurfaceGroup(group: OperatorSurfaceGroup) {
   if (!group || typeof group !== "object" || Array.isArray(group)) {
     throw new Error("Invalid operator surface group");
@@ -113,6 +131,7 @@ function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) 
     assertNonBlankOperatorSurfaceField("route", link.href);
     assertNonBlankOperatorSurfaceField("label", link.label);
     assertNonBlankOperatorSurfaceField("note", link.note);
+    assertOperatorSurfaceRouteShape(link.href);
 
     if (seenRoutes.has(link.href)) {
       throw new Error(`Duplicate operator surface route ${link.href}`);

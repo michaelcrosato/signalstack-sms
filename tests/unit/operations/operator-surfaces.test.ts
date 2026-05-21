@@ -450,6 +450,44 @@ describe("operator surface inventory", () => {
     expect(() => getDemoOperationsLinks(invalidNoteGroups)).toThrow("Invalid operator surface note");
   });
 
+  it("rejects supplied operator inventories with invalid route shapes before projection", () => {
+    const groupsWithApiRoute = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [{ ...group.links[0], href: "/api/unsafe" }, ...group.links.slice(1)]
+          : group.links
+    }));
+    const groupsWithUppercaseRoute = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [{ ...group.links[0], href: "/settings/Unsafe" }, ...group.links.slice(1)]
+          : group.links
+    }));
+    const groupsWithDynamicRoute = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [{ ...group.links[0], href: "/settings/[unsafe]" }, ...group.links.slice(1)]
+          : group.links
+    }));
+    const groupsWithQueryRoute = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [{ ...group.links[0], href: "/settings/provider?unsafe=true" }, ...group.links.slice(1)]
+          : group.links
+    }));
+
+    expect(() => getOperatorSurfaceSummary(groupsWithApiRoute)).toThrow("Invalid operator surface route shape /api/unsafe");
+    expect(() => getLaunchDashboardLinks(groupsWithUppercaseRoute)).toThrow("Invalid operator surface route shape /settings/Unsafe");
+    expect(() => getSettingsNavigationLinks(groupsWithDynamicRoute)).toThrow("Invalid operator surface route shape /settings/[unsafe]");
+    expect(() => getDemoOperationsLinks(groupsWithQueryRoute)).toThrow(
+      "Invalid operator surface route shape /settings/provider?unsafe=true"
+    );
+  });
+
   it("keeps inventory copy whitespace-clean for projected navigation", () => {
     const copyFields = operatorSurfaceGroups.flatMap((group) => [
       group.name,

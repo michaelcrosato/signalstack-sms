@@ -735,3 +735,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 102  GREEN  supplied-inventory-route-shape-guard  2026-05-20 23:54
+Objective:    Fail supplied shared operator inventory routes with malformed local route shapes before projection.
+Changed:
+- Added a shared route-shape guard for supplied operator surface links before summaries or projections are derived.
+- Added unit coverage proving non-local, uppercase, query-bearing, and dynamic supplied routes fail before local navigation helpers can render them.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
