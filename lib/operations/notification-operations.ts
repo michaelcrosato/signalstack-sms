@@ -17,6 +17,7 @@ export type NotificationOperationsStatus = {
 };
 
 const notificationOperationChannelFields = ["name", "status", "boundary"] as const;
+const allowedNotificationOperationChannelNames = ["Email", "In-app", "SMS alerts", "Webhooks"] as const;
 const allowedNotificationOperationChannelStatuses = ["blocked", "not implemented", "inbound only"] as const;
 const requiredNotificationControlTerms = ["LIVE_MESSAGING_ENABLED", "LIVE_BILLING_ENABLED", "API keys", "worker", "local"] as const;
 const requiredNotificationBoundaryTerms = ["email", "SMS", "webhooks", "provider calls", "billing", "mutations"] as const;
@@ -87,6 +88,10 @@ function assertChannel(channel: NotificationOperationChannel) {
   assertNoCommandLikeMetadata(channel.name, `Command-like notification operation channel name for ${channel.name}`);
   assertNoCommandLikeMetadata(channel.status, `Command-like notification operation status for ${channel.name}`);
   assertNoCommandLikeMetadata(channel.boundary, `Command-like notification operation boundary for ${channel.name}`);
+
+  if (!allowedNotificationOperationChannelNames.includes(channel.name as (typeof allowedNotificationOperationChannelNames)[number])) {
+    throw new Error(`Unsupported notification operation channel ${channel.name}`);
+  }
 
   if (!allowedNotificationOperationChannelStatuses.includes(channel.status as (typeof allowedNotificationOperationChannelStatuses)[number])) {
     throw new Error(`Unsupported notification operation status for ${channel.name}`);

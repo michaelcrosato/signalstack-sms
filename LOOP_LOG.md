@@ -1254,3 +1254,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP operations hardening or safe read-only operator surface refinements.
+
+## Run 140  GREEN  notification-operations-channel-vocabulary  2026-05-21 02:43
+Objective:    Keep `/settings/notifications` channel names inside the supported local vocabulary.
+Changed:
+- Added an explicit channel-name allowlist for notification operations static metadata before the inventory freezes.
+- Added unit coverage pinning the supported email, in-app, SMS alert, and webhook channel vocabulary alongside existing no-send boundary checks.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP notification operations hardening or safe read-only operator surface refinements.

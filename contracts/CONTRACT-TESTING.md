@@ -184,7 +184,7 @@ Post-MVP security operations view:
 
 Post-MVP notification operations view:
 
-- Unit tests must verify that the static notification operations inventory keeps channel boundaries, no-send controls, safety-boundary copy, public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, no secret display, required no-send control terms, whitespace-clean copy, command-like literal rejection, and secret-like literal rejection stable before `/settings/notifications` renders them.
+- Unit tests must verify that the static notification operations inventory keeps channel names inside the supported local notification vocabulary, channel boundaries, no-send controls, safety-boundary copy, public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, no secret display, required no-send control terms, whitespace-clean copy, command-like literal rejection, and secret-like literal rejection stable before `/settings/notifications` renders them.
 
 Post-MVP API operations inventory:
 

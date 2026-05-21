@@ -88,6 +88,7 @@ describe("getNotificationOperationsStatus", () => {
   });
 
   it("keeps notification operation values inside documented no-send boundaries", () => {
+    expect(notificationOperationChannels.map((channel) => channel.name)).toEqual(["Email", "In-app", "SMS alerts", "Webhooks"]);
     expect(notificationOperationChannels.map((channel) => channel.status)).toEqual([
       "blocked",
       "not implemented",

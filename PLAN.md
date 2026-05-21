@@ -144,6 +144,7 @@ Post-MVP:
 - Local notification operations value-boundary hardening
 - Local notification operations whitespace-clean metadata hardening
 - Local notification operations command-literal metadata hardening
+- Local notification operations channel-vocabulary metadata hardening
 - Read-only local readiness audit operations view
 - Local operator runbook admin-link coverage refresh
 - Read-only local reporting index

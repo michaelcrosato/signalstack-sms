@@ -93,7 +93,7 @@ Billing operations review is available at `/settings/billing`. It renders existi
 
 AI operations review is available at `/settings/ai`. It renders selected AI provider state, fake-provider readiness, deterministic endpoint coverage, local AI usage totals, and recent AI usage metadata only; it does not submit prompts, call live AI, create paid model requests, mutate conversations, create billing artifacts, notify, call providers, send SMS, expose secrets, or enable live AI.
 
-Notification operations review is available at `/settings/notifications`. It renders email, in-app, SMS alert, and webhook notification no-send boundaries only; it does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, call live AI, notify, email, send SMS, mutate records, expose secrets, or enable live features.
+Notification operations review is available at `/settings/notifications`. It renders email, in-app, SMS alert, and webhook notification no-send boundaries only; it does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, call live AI, notify, email, send SMS, mutate records, expose secrets, or enable live features. Its static channel names are allowlisted before render so new notification surfaces require intentional metadata updates.
 
 Readiness audit review is available at `/settings/readiness-audit`. It renders tenant-scoped local go-live readiness audit events, filters, and bounded CSV export links; it does not mutate audit events, expose secrets, call providers, bill, call live AI, notify, email, send SMS, or enable live features.
 
