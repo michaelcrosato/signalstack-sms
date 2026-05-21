@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 30
+Run number: 31
 
 No active blockers.
 
 ## Notes
 
+- `/settings/integrations` is a read-only local integration operations view. It displays existing provider, provider-number, webhook, AI, billing, and notification boundaries; it does not call providers, submit prompts, call live AI, call Stripe, send notifications, send SMS or email, emit outbound webhooks, mutate records, enqueue jobs, create exports, expose secrets, or enable live features.
 - `/settings/reports` is a read-only local reporting index. It displays existing local reporting surfaces, tenant metrics, usage totals, readiness signals, and safety boundaries; it does not execute reports, create exports, mutate records, call providers, call Stripe, call live AI, send SMS, send email, send notifications, expose secrets, or enable live features.
 - `/settings/runbook` now links the current local admin surfaces, including queue operations, delivery operations, readiness audit, provider numbers, API operations, security operations, notifications, and provider details. It remains read-only and does not execute commands, mutate records, call providers, create billing records, send notifications, expose secrets, or enable live messaging.
 - `/settings/delivery` is a read-only local delivery operations view. It displays tenant-scoped message direction counts, delivery metadata, provider status labels, provider message ID presence, campaign/conversation context, recent idempotency keys, and safety boundaries; it does not send SMS, retry deliveries, replay webhooks, mutate messages, call providers, create billing records, send notifications, expose secrets, or enable live messaging.

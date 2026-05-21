@@ -75,6 +75,10 @@ Post-MVP reporting index view:
 
 - The seeded investor demo path must verify that `/settings/reports` renders a read-only local reporting index with report links, operational metrics, readiness signals, and safety-boundary text without executing reports, creating exports, mutating records, provider calls, billing, live AI, SMS, email, notifications, secret exposure, or live feature enablement.
 
+Post-MVP integration operations view:
+
+- The seeded investor demo path must verify that `/settings/integrations` renders read-only provider, AI, billing, webhook, and notification integration boundaries without provider calls, prompt submission, billing artifacts, notifications, mutations, secret exposure, enqueueing, exports, or live feature enablement.
+
 Post-MVP notification operations view:
 
 - The seeded investor demo path must verify that `/settings/notifications` renders read-only notification channel boundaries, no-send controls, runtime gates, and safety-boundary text without creating recipients, subscriptions, templates, jobs, sends, alerts, webhooks, provider calls, billing records, live AI calls, SMS, email, mutations, or notification delivery.

@@ -1,8 +1,17 @@
 # Codex Summary
 
-Run number: 30
+Run number: 31
 
 ## Completed
+
+- Advanced a post-MVP local integration operations checkpoint.
+- Added `/settings/integrations`, a read-only page that maps existing provider, provider-number, webhook, AI, billing, and notification boundaries.
+- Linked the integration operations view from the launch dashboard, demo console, go-live readiness, notification operations, and operator runbook views.
+- Extended seeded investor demo E2E coverage to prove the integration surface, runtime gates, safety boundary, and runbook link remain visible.
+- Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, and next-prompt handoff docs with the integration boundary.
+- Protected local gate, local migration check, demo seed, and seeded investor demo E2E passed.
+
+## Prior Completed
 
 - Advanced a post-MVP local reporting index checkpoint.
 - Added `/settings/reports`, a read-only page that maps existing local reporting surfaces, tenant metrics, usage totals, readiness signals, and safety boundaries.
@@ -10,8 +19,6 @@ Run number: 30
 - Extended smoke and seeded investor demo E2E coverage to prove the reporting index remains visible and read-only.
 - Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, and next-prompt handoff docs with the reporting boundary.
 - Protected local gate, local migration check, demo seed, and seeded investor demo E2E passed.
-
-## Prior Completed
 
 - Advanced a post-MVP local operator runbook navigation checkpoint.
 - Added current local admin surface links to `/settings/runbook`, including queue operations, delivery operations, readiness audit, provider numbers, API operations, security operations, notifications, and provider details.

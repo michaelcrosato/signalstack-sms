@@ -108,6 +108,11 @@ const launchLinks = [
     description: "Read-only email, alert, webhook, and SMS notification no-send boundary."
   },
   {
+    href: "/settings/integrations",
+    title: "Integration Operations",
+    description: "Read-only provider, AI, billing, webhook, and notification integration boundaries."
+  },
+  {
     href: "/settings/runbook",
     title: "Operator Runbook",
     description: "Local validation, seed, worker, export, and repair-loop commands with safety boundaries."

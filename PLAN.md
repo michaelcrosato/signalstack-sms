@@ -140,6 +140,7 @@ Post-MVP:
 - Read-only local readiness audit operations view
 - Local operator runbook admin-link coverage refresh
 - Read-only local reporting index
+- Read-only local integration operations view
 
 ## Next Milestone
 

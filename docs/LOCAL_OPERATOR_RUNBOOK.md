@@ -118,6 +118,19 @@ Use `/settings/reports` for read-only local report discovery before demos or rep
 
 The page is display-only. It must not execute reports, create exports, mutate records, expose secrets, call providers, call Stripe, call live AI, send notifications, send SMS, send email, or enable live features.
 
+## Integration Operations
+
+Use `/settings/integrations` for read-only integration boundary review before demos or integration repair work. It displays:
+
+- messaging provider metadata boundary
+- provider number metadata boundary
+- inbound webhook boundary
+- fake AI provider boundary
+- local billing ledger boundary
+- notification no-send boundary
+
+The page is display-only. It must not call providers, submit prompts, call live AI, call Stripe, send notifications, send SMS, send email, emit outbound webhooks, expose secrets, mutate records, enqueue jobs, create exports, or enable live features.
+
 ## Campaign Operations
 
 Use `/settings/campaigns` for read-only campaign and queue review before demos or worker repair work. It displays:

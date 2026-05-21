@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 031  GREEN  integration-operations  2026-05-20 17:43
+Objective:    Add a read-only local integration operations view for existing external-impact boundaries.
+Changed:
+- Added `/settings/integrations` with provider, provider-number, webhook, AI, billing, notification, runtime-gate, and safety-boundary metadata.
+- Linked the view from `/`, `/demo`, `/settings`, `/settings/notifications`, and `/settings/runbook`.
+- Extended the seeded investor demo E2E path to cover the integration view and runbook link.
+- Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only admin/reporting refinements without live external-impact actions.
+
 ## Run 030  GREEN  reporting-index  2026-05-20 17:40
 Objective:    Add a read-only local reporting index for existing demo-safe reporting surfaces.
 Changed:

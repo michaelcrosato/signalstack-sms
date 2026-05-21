@@ -24,6 +24,8 @@ The usage and analytics screen at `/settings/usage` displays local tenant-scoped
 
 The reporting index screen at `/settings/reports` displays existing local reporting surfaces, tenant-scoped analytics counts, local usage totals, recent readiness signals, and reporting safety boundaries. It is read-only and does not execute reports, create exports, mutate records, call providers, call Stripe, call live AI, send notifications, send SMS, email, expose secrets, or enable live features.
 
+The integration operations screen at `/settings/integrations` displays existing local provider, provider-number, webhook, AI, billing, and notification boundaries. It is read-only and does not call providers, submit prompts, call live AI, call Stripe, send notifications, send SMS, email, emit outbound webhooks, expose secrets, mutate records, enqueue jobs, create exports, or enable live features.
+
 The campaign operations screen at `/settings/campaigns` displays existing local campaign status, recipient counts, scheduled campaign metadata, and queue job status. It is read-only and does not schedule campaigns, run workers, mutate queue rows, call providers, create billing records, send notifications, send SMS, or enable live messaging.
 
 The queue operations screen at `/settings/queue` displays scheduled-campaign queue job counts, due/future timing, payload validity, idempotency keys, worker poll settings, queue backend metadata, and Redis presence. It is read-only and does not enqueue jobs, run workers, mutate queue rows, update campaigns, call Redis, call providers, create billing records, send notifications, send SMS, expose secrets, or enable live messaging.
