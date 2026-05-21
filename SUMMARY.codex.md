@@ -205,6 +205,7 @@ Run number: 62
 
 ## Validation
 
+- Latest shared operator inventory route-shape hardening added unit coverage that keeps every route canonical and static: lowercase, no trailing slash, no query/hash, no dynamic segment, no double slash, and limited to `/demo`, `/settings`, or `/settings/**`. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest provider/readiness/runtime shared-inventory hardening moved `/settings/provider`, `/settings/numbers`, `/settings/compliance`, `/settings/system`, `/settings/usage`, and `/settings/readiness-audit` header navigation into the shared local operator surface inventory. Unit and seeded browser coverage now verify labels, route targets, and backing `app/**/page.tsx` files without calling providers, provisioning numbers, mutating compliance or audit records, billing, notifying, sending SMS or email, exposing secrets, or enabling live features.
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - `npm run typecheck`

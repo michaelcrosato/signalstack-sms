@@ -56,3 +56,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 063  GREEN  inventory-route-shape  2026-05-20 21:08
+Objective:    Add a shared guard against malformed operator inventory routes.
+Changed:
+- Added unit coverage that keeps shared operator surface routes lowercase, static, query-free, hash-free, slash-normalized, and limited to `/demo`, `/settings`, or `/settings/**`.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.

@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 62
+Run number: 63
 
 No active blockers.
 
 ## Notes
 
+- Shared operator surface routes now have unit coverage for canonical static local app-page shape. The check rejects query/hash routes, trailing slashes, dynamic segments, double slashes, non-lowercase routes, and routes outside `/demo`, `/settings`, or `/settings/**`; it does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator surface group names, link labels, and link notes now have unit coverage for uniqueness. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Every shared per-page operator navigation projection now has unit coverage for unique route entries, shared-inventory resolution, and backing `app/**/page.tsx` files. The check is local filesystem validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `/settings/contacts`, `/settings/campaigns`, `/settings/audience`, `/settings/templates`, `/settings/inbox`, and `/settings/data` now project header navigation from the shared local operator surface inventory. Unit and seeded browser coverage verify labels, route targets, and backing `app/**/page.tsx` files without importing contacts, scheduling campaigns, changing audience labels, editing templates, mutating inbox threads, deleting data, calling providers, billing, notifying, sending SMS or email, exposing secrets, or enabling live features.

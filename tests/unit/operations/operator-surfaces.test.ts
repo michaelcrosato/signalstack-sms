@@ -96,6 +96,18 @@ describe("operator surface inventory", () => {
     expect(links.every((link) => link.label.length > 0 && link.note.length > 0)).toBe(true);
   });
 
+  it("keeps every listed route in canonical static app-page form", () => {
+    const links = operatorSurfaceGroups.flatMap((group) => group.links);
+    const routes = links.map((link) => link.href);
+
+    expect(routes.filter((route) => route !== route.toLowerCase())).toEqual([]);
+    expect(routes.filter((route) => route.length > 1 && route.endsWith("/"))).toEqual([]);
+    expect(routes.filter((route) => route.includes("?") || route.includes("#"))).toEqual([]);
+    expect(routes.filter((route) => route.includes("[") || route.includes("]"))).toEqual([]);
+    expect(routes.filter((route) => route.includes("//"))).toEqual([]);
+    expect(routes.filter((route) => route !== "/demo" && route !== "/settings" && !route.startsWith("/settings/"))).toEqual([]);
+  });
+
   it("keeps inventory group names, labels, and notes unambiguous", () => {
     const groupNames = operatorSurfaceGroups.map((group) => group.name);
     const links = operatorSurfaceGroups.flatMap((group) => group.links);
