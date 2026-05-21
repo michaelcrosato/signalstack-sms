@@ -1,5 +1,14 @@
 # Codex Summary
 
+- Advanced a post-MVP loop-log continuity repair checkpoint.
+- Verified recovered entries for runs 123-131 and 135-137 already exist in root `LOOP_LOG.md` and `docs/LOOP_LOG.md`.
+- Updated blockers to record that this was coordination-only.
+- Preserved product code, contracts, protected files, gate scripts, demo-safe defaults, live-action settings, secrets, providers, billing, notifications, SMS/email, live AI, and destructive database behavior unchanged.
+
+Run number: 139
+
+## Previous Run
+
 - Advanced a post-MVP notification operations command-literal checkpoint.
 - Added command-like metadata guards so `/settings/notifications` static channel, control, and safety-boundary copy rejects command snippets such as `npm run`, `npx`, PowerShell, curl, and `Invoke-WebRequest` before render.
 - Added unit coverage proving notification operation metadata stays command-free alongside existing public-field, frozen snapshot, order, value-boundary, whitespace-clean, and secret-like literal guards.
