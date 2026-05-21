@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 125  GREEN  security-operations-static-metadata  2026-05-21 01:38
+Objective:    Keep `/settings/security` static security metadata validated and immutable before rendering.
+Changed:
+- Moved security control inventory, validation command references, and safety-boundary copy into `lib/operations/security-operations.ts`.
+- Wired `/settings/security` to the shared security operations status instead of page-local arrays.
+- Added unit coverage for control metadata, validation references, public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, and no secret display.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP security operations hardening or safe read-only operator surface refinements.
+
 ## Run 124  GREEN  validation-operations-static-metadata  2026-05-21 01:36
 Objective:    Keep `/settings/validation` static gate metadata validated and immutable before rendering.
 Changed:

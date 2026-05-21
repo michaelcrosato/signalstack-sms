@@ -175,6 +175,10 @@ Post-MVP validation operations view:
 - The seeded investor demo path must verify that `/settings/validation` renders read-only local validation gate inventory, repair signals, and safety-boundary text without executing commands, inspecting logs, scanning files, mutating records, provider calls, billing records, live AI calls, SMS, email, notifications, secret exposure, or live feature enablement.
 - Unit tests must verify that the static validation operations inventory keeps gate command references, repair signals, public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, and no secret display stable before `/settings/validation` renders them.
 
+Post-MVP security operations view:
+
+- Unit tests must verify that the static security operations inventory keeps security controls, validation command references, safety boundaries, public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, and no secret display stable before `/settings/security` renders them.
+
 Post-MVP API operations inventory:
 
 - Unit tests must keep the static `/settings/api` route inventory aligned with implemented local API methods, including soft archive, draft update, inbox read endpoints, and billing usage reads.

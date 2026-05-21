@@ -2,36 +2,15 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getSecurityOperationLinks } from "@/lib/operations/operator-surfaces";
+import { getSecurityOperationsStatus } from "@/lib/operations/security-operations";
 import { getSystemStatus } from "@/lib/operations/system-status";
 
 export const dynamic = "force-dynamic";
 
-const securityControls = [
-  {
-    name: "Secret storage",
-    status: "local metadata only",
-    detail: "Provider credential screens store redacted metadata and token fingerprints only."
-  },
-  {
-    name: "External impact",
-    status: "blocked by default",
-    detail: "Live SMS, billing, notifications, provider calls, and live AI remain disabled by demo-safe defaults."
-  },
-  {
-    name: "API protection",
-    status: "rate limited",
-    detail: "Next middleware applies the local fixed-window policy to /api/:path*."
-  },
-  {
-    name: "Production gate",
-    status: "validation enforced",
-    detail: "npm run validate includes the production deployment gate and blocks unsafe live-impact production-like settings."
-  }
-];
-
 export default async function SecurityOperationsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
   const status = getSystemStatus(process.env);
+  const securityStatus = getSecurityOperationsStatus();
   const navigationLinks = getSecurityOperationLinks();
 
   return (
@@ -82,7 +61,7 @@ export default async function SecurityOperationsPage() {
 
       <Panel title="Control Inventory">
         <ul className="grid gap-3 text-sm">
-          {securityControls.map((control) => (
+          {securityStatus.controls.map((control) => (
             <li key={control.name} className="grid gap-1 border-b border-slate-100 pb-3 md:grid-cols-[12rem_10rem_1fr]">
               <span className="font-medium text-slate-950">{control.name}</span>
               <span className="text-slate-700">{control.status}</span>
@@ -92,12 +71,22 @@ export default async function SecurityOperationsPage() {
         </ul>
       </Panel>
 
+      <Panel title="Validation References">
+        <ul className="grid gap-3 text-sm">
+          {securityStatus.validationReferences.map((reference) => (
+            <li key={reference.command} className="grid gap-2 border-b border-slate-100 pb-3 md:grid-cols-[16rem_1fr]">
+              <span className="break-words font-mono text-xs font-semibold text-slate-950">{reference.command}</span>
+              <span className="text-slate-600">{reference.purpose}</span>
+            </li>
+          ))}
+        </ul>
+      </Panel>
+
       <Panel title="Safety Boundary">
         <ul className="grid gap-2 text-sm text-slate-700">
-          <li>This view does not read or display raw secrets, `.env.local`, provider tokens, or API keys.</li>
-          <li>Secret scanning remains an explicit validation command through `npm run secrets:scan`.</li>
-          <li>Production safety remains enforced through `npm run production:gate` inside `npm run validate`.</li>
-          <li>No provider calls, live AI calls, Stripe calls, SMS, email, notifications, mutations, or live feature enablement occur here.</li>
+          {securityStatus.safetyBoundaries.map((boundary) => (
+            <li key={boundary}>{boundary}</li>
+          ))}
         </ul>
       </Panel>
     </main>

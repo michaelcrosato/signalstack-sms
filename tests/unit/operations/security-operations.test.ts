@@ -1,0 +1,126 @@
+import { describe, expect, it } from "vitest";
+import {
+  getSecurityOperationsStatus,
+  securityOperationControls,
+  securityOperationSafetyBoundaries,
+  securityOperationValidationReferences
+} from "@/lib/operations/security-operations";
+
+const publicControlFields = ["name", "status", "detail"];
+const publicValidationReferenceFields = ["command", "purpose"];
+const publicStatusFields = [
+  "controlCount",
+  "validationReferenceCount",
+  "commandExecution",
+  "externalImpact",
+  "secretsDisplayed",
+  "controls",
+  "validationReferences",
+  "safetyBoundaries"
+];
+
+function sortedFields(value: object) {
+  return Object.keys(value).sort();
+}
+
+describe("getSecurityOperationsStatus", () => {
+  it("reports required security control inventory and read-only counts", () => {
+    const status = getSecurityOperationsStatus();
+
+    expect(status.controlCount).toBe(4);
+    expect(status.validationReferenceCount).toBe(4);
+    expect(status.commandExecution).toBe("none");
+    expect(status.externalImpact).toBe("none");
+    expect(status.secretsDisplayed).toBe(false);
+    expect(status.controls.map((control) => control.name)).toEqual([
+      "Secret storage",
+      "External impact",
+      "API protection",
+      "Production gate"
+    ]);
+    expect(status.validationReferences.map((reference) => reference.command)).toEqual([
+      "npm run validate",
+      "npm run production:gate",
+      "npm run secrets:scan",
+      "npm run compliance:check"
+    ]);
+  });
+
+  it("exposes only public security operations fields", () => {
+    const status = getSecurityOperationsStatus();
+    const expectedControlFields = [...publicControlFields].sort();
+    const expectedReferenceFields = [...publicValidationReferenceFields].sort();
+
+    expect(sortedFields(status)).toEqual([...publicStatusFields].sort());
+    expect(securityOperationControls.every((control) => sortedFields(control).join("|") === expectedControlFields.join("|"))).toBe(true);
+    expect(status.controls.every((control) => sortedFields(control).join("|") === expectedControlFields.join("|"))).toBe(true);
+    expect(
+      securityOperationValidationReferences.every(
+        (reference) => sortedFields(reference).join("|") === expectedReferenceFields.join("|")
+      )
+    ).toBe(true);
+    expect(status.validationReferences.every((reference) => sortedFields(reference).join("|") === expectedReferenceFields.join("|"))).toBe(true);
+  });
+
+  it("keeps exported and per-call security operations snapshots frozen", () => {
+    const firstStatus = getSecurityOperationsStatus();
+    const secondStatus = getSecurityOperationsStatus();
+    const firstControl = firstStatus.controls[0];
+
+    expect(Object.isFrozen(securityOperationControls)).toBe(true);
+    expect(securityOperationControls.every((control) => Object.isFrozen(control))).toBe(true);
+    expect(Object.isFrozen(securityOperationValidationReferences)).toBe(true);
+    expect(securityOperationValidationReferences.every((reference) => Object.isFrozen(reference))).toBe(true);
+    expect(Object.isFrozen(securityOperationSafetyBoundaries)).toBe(true);
+    expect(Object.isFrozen(firstStatus)).toBe(true);
+    expect(Object.isFrozen(firstStatus.controls)).toBe(true);
+    expect(Object.isFrozen(firstStatus.validationReferences)).toBe(true);
+    expect(Object.isFrozen(firstStatus.safetyBoundaries)).toBe(true);
+    expect(firstStatus.controls).not.toBe(secondStatus.controls);
+    expect(firstStatus.validationReferences).not.toBe(secondStatus.validationReferences);
+    expect(firstStatus.safetyBoundaries).not.toBe(secondStatus.safetyBoundaries);
+    expect(firstStatus.controls[0]).not.toBe(securityOperationControls[0]);
+    expect(() => (firstStatus.controls as unknown as Array<(typeof securityOperationControls)[number]>).pop()).toThrow(TypeError);
+    expect(() => ((firstControl as { status: string }).status = "unsafe")).toThrow(TypeError);
+    expect(getSecurityOperationsStatus().controls[0].status).toBe(securityOperationControls[0].status);
+  });
+
+  it("keeps security operation metadata in canonical local-only shape", () => {
+    expect(securityOperationControls.map((control) => control.name).filter((name) => name.trim().length === 0)).toEqual([]);
+    expect(securityOperationControls.map((control) => control.status).filter((status) => status.trim().length === 0)).toEqual([]);
+    expect(securityOperationControls.map((control) => control.detail).filter((detail) => detail.trim().length === 0)).toEqual([]);
+    expect(securityOperationValidationReferences.map((reference) => reference.command).filter((command) => !command.startsWith("npm run "))).toEqual([]);
+    expect(securityOperationValidationReferences.map((reference) => reference.purpose).filter((purpose) => purpose.trim().length === 0)).toEqual([]);
+    expect(securityOperationSafetyBoundaries.filter((boundary) => boundary.trim().length === 0)).toEqual([]);
+  });
+
+  it("keeps security operation inventory order stable for local review pages", () => {
+    expect(securityOperationControls.map((control) => control.name)).toEqual([
+      "Secret storage",
+      "External impact",
+      "API protection",
+      "Production gate"
+    ]);
+    expect(securityOperationValidationReferences.map((reference) => reference.command)).toEqual([
+      "npm run validate",
+      "npm run production:gate",
+      "npm run secrets:scan",
+      "npm run compliance:check"
+    ]);
+    expect(securityOperationSafetyBoundaries).toEqual([
+      "This view does not read or display raw secrets, `.env.local`, provider tokens, or API keys.",
+      "Secret scanning remains an explicit validation command through `npm run secrets:scan`.",
+      "Production safety remains enforced through `npm run production:gate` inside `npm run validate`.",
+      "No provider calls, live AI calls, Stripe calls, SMS, email, notifications, mutations, or live feature enablement occur here."
+    ]);
+  });
+
+  it("keeps security operation identifiers unique before local review pages render them", () => {
+    const controlNames = securityOperationControls.map((control) => control.name);
+    const validationCommands = securityOperationValidationReferences.map((reference) => reference.command);
+
+    expect(new Set(controlNames).size).toBe(controlNames.length);
+    expect(new Set(validationCommands).size).toBe(validationCommands.length);
+    expect(new Set(securityOperationSafetyBoundaries).size).toBe(securityOperationSafetyBoundaries.length);
+  });
+});

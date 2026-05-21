@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 124
+Run number: 125
 
 No active blockers.
 
 ## Notes
 
+- Latest security operations static-metadata hardening moves `/settings/security` control inventory, validation command references, and safety-boundary copy into a validated frozen operations module with unit coverage for public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, and no secret display. The check is local metadata validation only and does not scan files, inspect logs, read raw environment values, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.
 - Latest validation operations static-metadata hardening moves `/settings/validation` gate command and repair-signal metadata into a validated frozen operations module with unit coverage for public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, and no secret display. The check is local metadata validation only and does not execute commands, inspect logs, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.
 - Latest contract operations unique-identifier hardening rejects duplicate contract file names, contract file paths, validation commands, and drift-control text before `/settings/contracts` local metadata freezes. The check is local metadata validation only and does not read contract contents, execute commands, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.
 - Latest contract operations order-stability hardening fixes the contract file, validation command, and drift-control order used by `/settings/contracts` local review pages so accidental inventory churn fails in unit coverage. The check is local metadata validation only and does not read contract contents, execute commands, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.

@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP security operations static-metadata checkpoint.
+- Moved `/settings/security` control inventory, validation command references, and safety-boundary copy into a validated frozen operations module.
+- Added unit coverage proving security operations metadata keeps public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, and no secret display before local review pages render.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- Targeted security operations unit coverage, typecheck, lint, and protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 125
+
+## Previous Run
+
 - Advanced a post-MVP validation operations static-metadata checkpoint.
 - Moved `/settings/validation` gate command and repair-signal metadata into a validated frozen operations module.
 - Added unit coverage proving validation operations metadata keeps public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, and no secret display before local review pages render.
