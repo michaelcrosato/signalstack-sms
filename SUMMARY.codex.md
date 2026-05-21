@@ -1,8 +1,13 @@
 # Codex Summary
 
-Run number: 76
+Run number: 77
 
 ## Completed
+
+- Advanced a post-MVP broad operator projection supplied-inventory omission checkpoint.
+- Added unit coverage proving summary, launch, settings, runbook, and demo-console projections honor supplied inventory route omissions instead of reintroducing stale global routes.
+- Updated testing contract/docs, README, PLAN, BLOCKERS, and next-prompt handoff docs with the broad projection omission guard.
+- Targeted operator-surface unit coverage passed.
 
 - Advanced a post-MVP shared operator missing-route projection checkpoint.
 - Added unit coverage proving shared operator projections fail loudly with the missing route when the supplied inventory omits a referenced local operator surface.
@@ -265,6 +270,8 @@ Run number: 76
 
 ## Validation
 
+- Latest broad projection supplied-inventory omission hardening added unit coverage that removes `/settings/usage` from the supplied operator inventory and verifies broad summary, launch, settings, runbook, and demo-console projections do not reintroduce stale global routes. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
+- `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - Latest missing-route projection hardening added unit coverage that removes referenced routes from supplied operator inventories and verifies standard navigation, demo checkpoint, workflow, and integration projections throw route-specific missing-link errors. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - `npm install`

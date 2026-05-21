@@ -179,6 +179,7 @@ Post-MVP:
 - Local rich operator projection shared-inventory coverage
 - Local shared operator projection order-stability coverage
 - Local rich operator projection copy-boundary coverage
+- Local broad operator projection supplied-inventory omission coverage
 - Local shared operator focused-projection reachability coverage
 - Local shared operator missing-route failure coverage
 

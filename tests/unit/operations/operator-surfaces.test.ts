@@ -350,6 +350,27 @@ describe("operator surface inventory", () => {
     );
   });
 
+  it("keeps broad inventory projections scoped to the supplied inventory", () => {
+    const groups = withoutSurfaceRoute(operatorSurfaceGroups, "/settings/usage");
+    const expectedRoutes = groups.flatMap((group) => group.links.map((link) => link.href));
+    const broadProjectionRouteSets = [
+      { name: "summary", routes: getOperatorSurfaceSummary(groups).routes },
+      { name: "runbook", routes: getRunbookAdminLinks(groups).map((link) => link.href) },
+      { name: "settings", routes: getSettingsNavigationLinks(groups).map((link) => link.href) },
+      { name: "launch", routes: getLaunchDashboardLinks(groups).map((link) => link.href) },
+      { name: "demo console", routes: getDemoConsoleLinks(groups).map((link) => link.href) }
+    ];
+
+    expect(getOperatorSurfaceSummary(groups).surfaceCount).toBe(34);
+
+    for (const projection of broadProjectionRouteSets) {
+      expect(projection.routes, projection.name).not.toContain("/settings/usage");
+      expect(projection.routes.filter((route) => !expectedRoutes.includes(route)), projection.name).toEqual([]);
+    }
+
+    expect(getLaunchDashboardLinks(groups).map((link) => link.href)).toEqual(expectedRoutes);
+  });
+
   it("derives projected operator copy from the supplied inventory", () => {
     const groups = withCustomSurfaceCopy(operatorSurfaceGroups, "/settings/usage", {
       label: "Usage Review",

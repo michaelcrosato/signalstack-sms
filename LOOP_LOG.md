@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 077  GREEN  broad-projection-inventory-omission  2026-05-20 22:09
+Objective:    Guard broad operator inventory projections against stale global route fallback.
+Changed:
+- Added unit coverage that removes `/settings/usage` from a supplied operator inventory and verifies summary, launch, settings, runbook, and demo-console projections honor that omission.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs with the broad projection omission guard.
+- Preserved demo-safe behavior without adding routes, mutations, provider calls, billing, notifications, SMS, email, live AI, or live feature enablement.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 076  GREEN  projection-missing-route-failure  2026-05-20 22:02
 Objective:    Guard shared operator projections against silent missing-route inventory drift.
 Changed:
