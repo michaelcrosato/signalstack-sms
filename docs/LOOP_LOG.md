@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 113  GREEN  supplied-inventory-array-shape-guard  2026-05-21 00:43
+Objective:    Fail decorated or custom-prototype supplied operator inventory arrays before projection.
+Changed:
+- Tightened shared operator surface validation so supplied inventory arrays must be plain arrays without extra string or symbol fields.
+- Added unit coverage proving decorated and custom-prototype supplied inventory arrays fail before summaries or projections derive local navigation.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 112  GREEN  supplied-inventory-link-array-shape-guard  2026-05-21 00:40
 Objective:    Fail decorated or custom-prototype supplied operator link arrays before projection.
 Changed:

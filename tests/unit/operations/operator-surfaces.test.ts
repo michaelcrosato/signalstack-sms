@@ -311,6 +311,27 @@ describe("operator surface inventory", () => {
     expect(() => getDemoOperationsLinks(groupsAsNull)).toThrow("Invalid operator surface inventory");
   });
 
+  it("rejects supplied operator inventories with non-plain inventory arrays before projection", () => {
+    const symbolKey = Symbol("unsafe");
+    const groupsWithExtraStringField = cloneSurfaceGroups(operatorSurfaceGroups);
+    const groupsWithExtraSymbolField = cloneSurfaceGroups(operatorSurfaceGroups);
+    class CustomInventoryArray extends Array<OperatorSurfaceGroup> {}
+
+    (groupsWithExtraStringField as unknown as Record<string, string>).internalOwner = "unsafe-owner";
+    (groupsWithExtraSymbolField as unknown as Record<PropertyKey, string>)[symbolKey] = "unsafe-symbol";
+    const customPrototypeGroups = new CustomInventoryArray(...cloneSurfaceGroups(operatorSurfaceGroups));
+
+    expect(() => getOperatorSurfaceSummary(groupsWithExtraStringField)).toThrow(
+      "Invalid operator surface inventory array fields"
+    );
+    expect(() => getLaunchDashboardLinks(groupsWithExtraSymbolField)).toThrow(
+      "Invalid operator surface inventory array fields"
+    );
+    expect(() => getDemoOperationsLinks(customPrototypeGroups)).toThrow(
+      "Invalid operator surface inventory array prototype"
+    );
+  });
+
   it("rejects supplied operator inventories with invalid group link arrays before projection", () => {
     const invalidGroupName = operatorSurfaceGroups[1].name;
     const groups = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({

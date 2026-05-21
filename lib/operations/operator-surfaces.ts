@@ -107,6 +107,21 @@ function assertOperatorSurfaceLinkArray(links: readonly OperatorSurfaceLink[], g
   }
 }
 
+function assertOperatorSurfaceInventoryArray(groups: readonly OperatorSurfaceGroup[]) {
+  if (Object.getPrototypeOf(groups) !== Array.prototype) {
+    throw new Error("Invalid operator surface inventory array prototype");
+  }
+
+  const allowedKeys = new Set<PropertyKey>([
+    "length",
+    ...Array.from({ length: groups.length }, (_, index) => String(index))
+  ]);
+
+  if (Reflect.ownKeys(groups).some((key) => !allowedKeys.has(key))) {
+    throw new Error("Invalid operator surface inventory array fields");
+  }
+}
+
 function assertOperatorSurfaceGroup(group: OperatorSurfaceGroup) {
   if (!group || typeof group !== "object" || Array.isArray(group)) {
     throw new Error("Invalid operator surface group");
@@ -175,6 +190,8 @@ function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) 
   if (!Array.isArray(groups)) {
     throw new Error("Invalid operator surface inventory");
   }
+
+  assertOperatorSurfaceInventoryArray(groups);
 
   if (groups.length === 0) {
     throw new Error("Empty operator surface inventory");

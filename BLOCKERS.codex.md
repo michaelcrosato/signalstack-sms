@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 112
+Run number: 113
 
 No active blockers.
 
 ## Notes
 
+- Latest shared supplied-inventory inventory-array-shape hardening rejects supplied operator inventory arrays with custom prototypes or extra string/symbol fields before summaries or projections derive local navigation. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest shared supplied-inventory link-array-shape hardening rejects supplied operator group link arrays with custom prototypes or extra string/symbol fields before summaries or projections derive local navigation. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest shared supplied-inventory exact-field hardening rejects extra string or symbol fields on supplied operator inventory groups or links before summaries or projections derive local navigation. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest shared operator canonical pre-export validation hardening now runs the shared validator before freezing the built-in operator surface inventory and adds unit coverage aligning exported canonical routes with summary routes. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

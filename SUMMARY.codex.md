@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP shared operator supplied-inventory inventory-array-shape checkpoint.
+- Tightened the shared operator surface validator so supplied inventory arrays must be plain arrays with no extra string or symbol fields.
+- Added unit coverage proving custom-prototype and decorated supplied inventory arrays fail before summaries or projections derive local navigation.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 113
+
+## Previous Run
+
 - Advanced a post-MVP shared operator supplied-inventory link-array-shape checkpoint.
 - Tightened the shared operator surface validator so supplied group link arrays must be plain arrays with no extra string or symbol fields.
 - Added unit coverage proving custom-prototype and decorated supplied link arrays fail before summaries or projections derive local navigation.
