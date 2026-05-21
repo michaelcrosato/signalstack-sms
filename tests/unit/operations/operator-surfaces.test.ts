@@ -794,6 +794,26 @@ describe("operator surface inventory", () => {
     }
   });
 
+  it("keeps the operator surface summary limited to public aggregate fields", () => {
+    const groups = cloneSurfaceGroups(operatorSurfaceGroups).map((group) => ({
+      ...group,
+      internalOwner: `unsafe-${group.name}`,
+      links: group.links.map((link) => ({
+        ...link,
+        secretToken: `unsafe-${link.href}`
+      }))
+    })) as OperatorSurfaceGroup[];
+    const summary = getOperatorSurfaceSummary(groups);
+
+    expect(Object.keys(summary).sort()).toEqual(["groupCount", "routes", "surfaceCount"].sort());
+    expect(summary).not.toHaveProperty("internalOwner");
+    expect(summary).not.toHaveProperty("secretToken");
+    expect(summary.groupCount).toBe(groups.length);
+    expect(summary.surfaceCount).toBe(groups.flatMap((group) => group.links).length);
+    expect(summary.routes).toEqual(groups.flatMap((group) => group.links.map((link) => link.href)));
+    expect(summary.routes.some((route) => route.includes("unsafe-"))).toBe(false);
+  });
+
   it("keeps projected operator navigation route order stable", () => {
     const stableProjectionOrders = [
       {

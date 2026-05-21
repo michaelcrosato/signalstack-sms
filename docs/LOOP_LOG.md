@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 090  GREEN  summary-public-field-guard  2026-05-20 23:02
+Objective:    Guard shared operator surface summaries against leaking extra supplied-inventory fields.
+Changed:
+- Added unit coverage proving `getOperatorSurfaceSummary()` exposes only `groupCount`, `surfaceCount`, and `routes` when supplied inventories carry extra group or link properties.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs with the summary public-field guard.
+- Preserved local-only behavior without adding routes, mutations, provider calls, billing, notifications, SMS, email, live AI, or live feature enablement.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 089  GREEN  rich-projection-public-field-guard  2026-05-20 22:59
 Objective:    Guard rich operator projections against leaking extra supplied-inventory fields.
 Changed:

@@ -123,6 +123,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP shared inventory runtime-freeze hardening: the canonical shared operator surface inventory is frozen at runtime, and unit coverage verifies the exported group array, nested link arrays, and link objects reject accidental mutation.
 - Post-MVP shared projection detached-link hardening: unit coverage now verifies projected operator links are detached objects from supplied inventory links while preserving shared href, label, and note copy.
 - Post-MVP shared projection public-field hardening: projected operator links and rich projection objects now expose only public navigation fields, and unit coverage verifies injected extra runtime fields on supplied inventories cannot leak into regular navigation, demo checkpoint, workflow step, or integration projections.
+- Post-MVP shared summary public-field hardening: unit coverage now verifies shared operator surface summaries expose only public aggregate fields, preventing extra supplied inventory group or link fields from leaking into local operation counts or route lists.
 
 Demo-safe defaults remain mandatory:
 
