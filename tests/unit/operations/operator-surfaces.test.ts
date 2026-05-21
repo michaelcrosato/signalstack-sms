@@ -238,13 +238,46 @@ describe("operator surface inventory", () => {
     }
   });
 
+  it("keeps rich operator projections unique and backed by the shared inventory", () => {
+    const inventoryLinks = operatorSurfaceGroups.flatMap((group) => group.links);
+    const inventoryRoutes = new Set(inventoryLinks.map((link) => link.href));
+    const richProjections = [
+      {
+        name: "demo operations checkpoints",
+        entries: getDemoOperationsCheckpoints(),
+        labels: getDemoOperationsCheckpoints().map((checkpoint) => checkpoint.signal)
+      },
+      {
+        name: "workflow steps",
+        entries: getWorkflowOperationSteps(),
+        labels: getWorkflowOperationSteps().map((step) => step.owner)
+      },
+      {
+        name: "integration areas",
+        entries: getIntegrationOperationAreas(),
+        labels: getIntegrationOperationAreas().map((area) => area.label)
+      }
+    ];
+
+    for (const projection of richProjections) {
+      const routes = projection.entries.map((entry) => entry.href);
+
+      expect(new Set(routes).size, projection.name).toBe(routes.length);
+      expect(routes.filter((route) => !inventoryRoutes.has(route)), projection.name).toEqual([]);
+      expect(routes.filter((route) => !existsSync(routeToAppPagePath(route))), projection.name).toEqual([]);
+      expect(projection.labels, projection.name).toEqual(routes.map((route) => inventoryLinks.find((link) => link.href === route)?.label));
+    }
+  });
+
   it("keeps page-specific operator navigation from linking to the current page", () => {
     const pageSpecificProjections = [
       { route: "/demo", links: getDemoConsoleLinks() },
       { route: "/settings", links: getSettingsNavigationLinks() },
       { route: "/settings/demo", links: getDemoOperationsLinks() },
       { route: "/settings/reports", links: getReportingIndexLinks() },
+      { route: "/settings/workflows", links: getWorkflowOperationSteps() },
       { route: "/settings/releases", links: getReleaseOperationSurfaceLinks() },
+      { route: "/settings/integrations", links: getIntegrationOperationAreas() },
       { route: "/settings/security", links: getSecurityOperationLinks() },
       { route: "/settings/environment", links: getEnvironmentOperationLinks() },
       { route: "/settings/health", links: getHealthOperationLinks() },

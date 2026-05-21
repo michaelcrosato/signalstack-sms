@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 067  GREEN  rich-projection-inventory  2026-05-20 21:22
+Objective:    Add shared-inventory guard coverage for rich operator projections.
+Changed:
+- Added unit coverage for demo checkpoint, workflow step, and integration area projections.
+- Verified those rich projections keep unique route entries, resolve through the shared operator surface inventory, point at implemented app pages, and derive visible labels from shared inventory labels.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 065  GREEN  inventory-copy-shape  2026-05-20 21:16
 Objective:    Add a shared guard for operator inventory navigation-copy format.
 Changed:

@@ -1,15 +1,20 @@
 # Codex Summary
 
-Run number: 66
+Run number: 67
 
 ## Completed
+
+- Advanced a post-MVP rich operator projection shared-inventory checkpoint.
+- Added unit coverage that keeps demo checkpoint, workflow step, and integration area projections unique, backed by implemented app pages, and label-aligned with the shared local operator surface inventory.
+- Updated testing contract/docs, README, PLAN, BLOCKERS, and next-prompt handoff docs with the rich projection guard.
+- Targeted operator-surface unit coverage and protected local gate passed.
+
+## Prior Completed
 
 - Advanced a post-MVP shared operator inventory order-stability checkpoint.
 - Added unit coverage that pins shared operator surface group order and route order so projected navigation does not churn without an intentional inventory update.
 - Updated testing contract/docs, README, PLAN, BLOCKERS, and next-prompt handoff docs with the order-stability guard.
 - Protected local gate and targeted operator-surface unit coverage passed.
-
-## Prior Completed
 
 - Advanced a post-MVP shared operator inventory copy-shape checkpoint.
 - Added unit coverage that keeps shared operator surface group names and labels in stable Title Case navigation format, while notes remain short lower-case sentence fragments without terminal punctuation.
@@ -220,6 +225,12 @@ Run number: 66
 
 ## Validation
 
+- Latest rich projection shared-inventory hardening added unit coverage for demo checkpoint, workflow step, and integration area projections. The check validates unique route entries, backing `app/**/page.tsx` files, and labels derived from the shared local operator surface inventory; it does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
+- `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
+- `npm run typecheck`
+- `npm run lint`
+- `git diff --check`
+- `.\scripts\local-gate.ps1`
 - Latest shared operator inventory route-shape hardening added unit coverage that keeps every route canonical and static: lowercase, no trailing slash, no query/hash, no dynamic segment, no double slash, and limited to `/demo`, `/settings`, or `/settings/**`. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest provider/readiness/runtime shared-inventory hardening moved `/settings/provider`, `/settings/numbers`, `/settings/compliance`, `/settings/system`, `/settings/usage`, and `/settings/readiness-audit` header navigation into the shared local operator surface inventory. Unit and seeded browser coverage now verify labels, route targets, and backing `app/**/page.tsx` files without calling providers, provisioning numbers, mutating compliance or audit records, billing, notifying, sending SMS or email, exposing secrets, or enabling live features.
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
