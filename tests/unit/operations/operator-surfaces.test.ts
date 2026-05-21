@@ -201,6 +201,16 @@ describe("operator surface inventory", () => {
     expect(links.map((link) => link.note).filter((note) => note.endsWith(".") || note.includes("  "))).toEqual([]);
   });
 
+  it("keeps operator inventory copy concise and scannable", () => {
+    const links = operatorSurfaceGroups.flatMap((group) => group.links);
+    const allowedLabelSuffix = /(Console|Operations|Readiness|Index|Status|Details|Numbers|Detail|Audit|Exports|Analytics|Runbook)$/;
+
+    expect(operatorSurfaceGroups.map((group) => group.name).filter((name) => name.length > 32)).toEqual([]);
+    expect(links.map((link) => link.label).filter((label) => label.length > 32)).toEqual([]);
+    expect(links.map((link) => link.note).filter((note) => note.length > 40)).toEqual([]);
+    expect(links.map((link) => link.label).filter((label) => !allowedLabelSuffix.test(label))).toEqual([]);
+  });
+
   it("keeps every projected operator navigation set unique and backed by the shared inventory", () => {
     const inventoryLinks = operatorSurfaceGroups.flatMap((group) => group.links);
     const inventoryRoutes = new Set(inventoryLinks.map((link) => link.href));

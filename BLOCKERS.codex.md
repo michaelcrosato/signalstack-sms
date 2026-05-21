@@ -1,12 +1,13 @@
 # Codex Blockers
 
-Run number: 70
+Run number: 71
 
 No active blockers.
 
 ## Notes
 
 - Shared operator surface routes, group names, labels, and notes now have unit coverage for whitespace-clean copy. The check rejects leading/trailing whitespace, doubled spaces, and embedded newlines in the base shared inventory; it does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
+- Shared operator surface group names, labels, and notes now have unit coverage for concise operator-scannable copy. The check rejects oversized group names, labels, and notes plus unexpected label suffixes; it does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Rich shared operator projections for demo checkpoints, workflow steps, and integration areas now have unit coverage for unique, whitespace-clean, boundary-oriented copy. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator surface groups and route order now have unit coverage for stable projected navigation order. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Rich shared operator projections for demo checkpoints, workflow steps, and integration areas now have unit coverage for unique routes, backing app pages, and shared-inventory-derived visible labels. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

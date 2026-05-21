@@ -1,15 +1,20 @@
 # Codex Summary
 
-Run number: 70
+Run number: 71
 
 ## Completed
+
+- Advanced a post-MVP shared operator inventory concise-copy checkpoint.
+- Added unit coverage that keeps shared operator surface group names, labels, and notes short enough for operator scanning and keeps labels on predictable navigation suffixes.
+- Updated testing contract/docs, README, PLAN, BLOCKERS, loop logs, and next-prompt handoff docs with the concise-copy guard.
+- Targeted operator-surface unit coverage passed.
+
+## Prior Completed
 
 - Advanced a post-MVP shared operator inventory whitespace-clean checkpoint.
 - Added unit coverage that keeps shared operator surface routes, group names, labels, and notes free of leading/trailing whitespace, doubled spaces, and embedded newlines.
 - Updated testing contract/docs, README, PLAN, BLOCKERS, and next-prompt handoff docs with the whitespace-clean guard.
 - Targeted operator-surface unit coverage passed.
-
-## Prior Completed
 
 - Advanced a post-MVP rich operator projection copy-boundary checkpoint.
 - Added unit coverage that keeps demo checkpoint, workflow step, and integration area projection names, labels, states, and boundaries unique, whitespace-clean, and boundary-oriented.
