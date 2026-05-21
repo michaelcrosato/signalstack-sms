@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 118  GREEN  api-operations-public-fields  2026-05-21 01:06
+Objective:    Prevent API operations snapshots from exposing accidental extra runtime fields.
+Changed:
+- Changed API route snapshot freezing to emit only documented public route fields.
+- Added unit coverage proving exported route entries, returned status snapshots, rate-limit snapshots, and per-call route snapshots expose only public fields.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only inventory, navigation, route coverage, or admin surface hardening without live external-impact actions.
+
 ## Run 113  GREEN  supplied-inventory-array-shape-guard  2026-05-21 00:43
 Objective:    Fail decorated or custom-prototype supplied operator inventory arrays before projection.
 Changed:

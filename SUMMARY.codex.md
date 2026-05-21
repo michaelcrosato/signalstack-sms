@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP API operations public-field checkpoint.
+- Changed API route snapshot freezing to emit only documented public route fields.
+- Added unit coverage proving exported route entries, status snapshots, rate-limit snapshots, and per-call route snapshots expose only public fields.
+- Targeted API operations unit coverage passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 118
+
+## Previous Run
+
 - Advanced a post-MVP API operations inventory frozen-snapshot checkpoint.
 - Froze the exported static API route inventory and made `getApiOperationsStatus()` return fresh frozen route snapshots per call.
 - Added unit coverage proving caller-side array or route-object mutation is rejected and cannot leak into later local API inventory renders.

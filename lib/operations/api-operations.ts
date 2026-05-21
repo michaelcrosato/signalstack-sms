@@ -24,7 +24,14 @@ export type ApiOperationsStatus = {
 };
 
 function freezeApiOperationRoute(route: ApiOperationRoute) {
-  return Object.freeze({ ...route });
+  return Object.freeze({
+    method: route.method,
+    path: route.path,
+    area: route.area,
+    mutates: route.mutates,
+    externalImpact: route.externalImpact,
+    safety: route.safety
+  });
 }
 
 function freezeApiOperationRoutes(routes: ApiOperationRoute[]) {

@@ -3,6 +3,20 @@ import { join, relative, sep } from "node:path";
 import { describe, expect, it } from "vitest";
 import { apiOperationRoutes, getApiOperationsStatus } from "@/lib/operations/api-operations";
 
+const publicApiOperationRouteFields = ["method", "path", "area", "mutates", "externalImpact", "safety"];
+const publicApiOperationsStatusFields = [
+  "routeCount",
+  "mutatingRouteCount",
+  "externalImpactRouteCount",
+  "rateLimit",
+  "routes"
+];
+const publicApiRateLimitFields = ["enabled", "limit", "windowSeconds"];
+
+function sortedFields(value: object) {
+  return Object.keys(value).sort();
+}
+
 function apiPathToRouteFile(apiPath: string) {
   const routeSegments = apiPath.split("/").filter(Boolean);
   return join(process.cwd(), "app", ...routeSegments, "route.ts");
@@ -94,6 +108,12 @@ describe("getApiOperationsStatus", () => {
     expect(() => ((firstRoute as { path: string }).path = "/api/unsafe")).toThrow(TypeError);
   });
 
+  it("exposes only public API inventory route fields", () => {
+    const expectedFields = [...publicApiOperationRouteFields].sort();
+
+    expect(apiOperationRoutes.every((route) => sortedFields(route).join("|") === expectedFields.join("|"))).toBe(true);
+  });
+
   it("returns fresh frozen API route snapshots per status call", () => {
     const firstStatus = getApiOperationsStatus({});
     const secondStatus = getApiOperationsStatus({});
@@ -107,6 +127,15 @@ describe("getApiOperationsStatus", () => {
     expect(() => (firstStatus.routes as unknown as Array<(typeof apiOperationRoutes)[number]>).pop()).toThrow(TypeError);
     expect(() => ((firstRoute as { safety: string }).safety = "unsafe mutation")).toThrow(TypeError);
     expect(getApiOperationsStatus({}).routes[0].safety).toBe(apiOperationRoutes[0].safety);
+  });
+
+  it("exposes only public API status snapshot fields", () => {
+    const status = getApiOperationsStatus({});
+    const expectedRouteFields = [...publicApiOperationRouteFields].sort();
+
+    expect(sortedFields(status)).toEqual([...publicApiOperationsStatusFields].sort());
+    expect(sortedFields(status.rateLimit)).toEqual([...publicApiRateLimitFields].sort());
+    expect(status.routes.every((route) => sortedFields(route).join("|") === expectedRouteFields.join("|"))).toBe(true);
   });
 
   it("lists every implemented local API route method in the inventory", () => {

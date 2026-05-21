@@ -222,6 +222,7 @@ Post-MVP:
 - Local shared operator supplied-inventory link-array-shape coverage
 - Local shared operator supplied-inventory link-array-index-descriptor coverage
 - Local API operations inventory frozen-snapshot coverage
+- Local API operations inventory public-field coverage
 
 ## Next Milestone
 
