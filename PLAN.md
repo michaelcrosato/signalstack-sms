@@ -195,6 +195,7 @@ Post-MVP:
 - Local shared operator projection public-field coverage
 - Local rich operator projection public-field coverage
 - Local shared operator summary public-field coverage
+- Local shared operator summary fresh-route-array coverage
 
 ## Next Milestone
 

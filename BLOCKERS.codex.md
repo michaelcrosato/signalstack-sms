@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 90
+Run number: 91
 
 No active blockers.
 
 ## Notes
 
+- Shared operator surface summaries now have unit coverage proving each call returns a fresh frozen `routes` array, so caller-side route array changes cannot leak into later local operation counts or route lists. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Rich shared operator projections now have unit coverage proving demo checkpoint, workflow step, and integration area objects expose only public render fields when supplied inventories include extra runtime properties. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator surface summaries now have unit coverage proving only public aggregate fields are exposed when supplied inventories include extra group or link properties. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator projections now have unit coverage proving projected links are detached objects from supplied inventory links while preserving shared href, label, and note copy. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

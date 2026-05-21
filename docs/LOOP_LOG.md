@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 091  GREEN  summary-fresh-route-array  2026-05-20 23:05
+Objective:    Guard shared operator surface summaries against route-array aliasing across calls.
+Changed:
+- Added unit coverage proving `getOperatorSurfaceSummary()` returns a fresh frozen `routes` array per call.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs with the summary fresh-route-array guard.
+- Preserved local-only behavior without adding routes, mutations, provider calls, billing, notifications, SMS, email, live AI, or live feature enablement.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 090  GREEN  summary-public-field-guard  2026-05-20 23:02
 Objective:    Guard shared operator surface summaries against leaking extra supplied-inventory fields.
 Changed:

@@ -814,6 +814,19 @@ describe("operator surface inventory", () => {
     expect(summary.routes.some((route) => route.includes("unsafe-"))).toBe(false);
   });
 
+  it("keeps operator surface summary route arrays fresh per call", () => {
+    const first = getOperatorSurfaceSummary();
+    const second = getOperatorSurfaceSummary();
+    const firstRouteCount = first.routes.length;
+
+    expect(first).not.toBe(second);
+    expect(first.routes).not.toBe(second.routes);
+    expect(Object.isFrozen(first.routes)).toBe(true);
+    expect(() => (first.routes as string[]).pop()).toThrow(TypeError);
+    expect(second.routes).toHaveLength(firstRouteCount);
+    expect(getOperatorSurfaceSummary().routes).toHaveLength(firstRouteCount);
+  });
+
   it("keeps projected operator navigation route order stable", () => {
     const stableProjectionOrders = [
       {
