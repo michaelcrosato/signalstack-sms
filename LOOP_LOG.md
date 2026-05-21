@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 203  GREEN  product-dashboard-shell  2026-05-21 14:34
+Objective:    Add the first product-facing dashboard shell without weakening live-action gates.
+Changed:
+- Added `/dashboard` with tenant-scoped local counts for contacts, campaigns, inbox, templates, analytics signals, and compliance readiness.
+- Added frozen product navigation metadata, unit coverage, and a root launch link to the product dashboard.
+- Refreshed roadmap handoff docs so already-completed RBAC enforcement is no longer listed as pending.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Add product-demo E2E coverage, then build contacts/import UI on existing APIs.
+
 ## Run 192  GREEN  api-operations-detached-route-counts  2026-05-21 06:44
 Objective:    Keep `/settings/api` returned route snapshots detached while counts stay aligned.
 Changed:

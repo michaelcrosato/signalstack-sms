@@ -19,6 +19,15 @@ export default function HomePage() {
       </section>
 
       <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" aria-label="Local views">
+        <Link
+          className="rounded border border-teal-700 bg-white p-5 transition hover:border-slate-950"
+          href="/dashboard"
+        >
+          <span className="text-lg font-semibold text-slate-950">Product Dashboard</span>
+          <span className="mt-2 block text-sm leading-6 text-slate-600">
+            Work from the product-facing contacts, campaigns, inbox, analytics, and compliance shell.
+          </span>
+        </Link>
         {launchLinks.map((item) => (
           <Link
             key={item.href}

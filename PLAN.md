@@ -43,7 +43,7 @@ Goal: make the repo understandable in minutes and remove known correctness risks
 - Maintain this short plan plus `docs/CURRENT_STATE_MATRIX.md` as the current source of operational truth.
 - Keep the canonical implementation plan and contracts intact.
 - Stop adding new read-only operations surfaces unless they unblock product or release safety.
-- Fix mutating-route RBAC enforcement so role helpers are not only descriptive.
+- Keep mutating-route RBAC enforcement covered while production auth is still pending.
 - Keep contact consent rechecks at send time in worker/send paths.
 - Keep idempotency keys tenant-scoped where cross-tenant key reuse is legitimate.
 - Keep live SMS, billing, AI, secrets, destructive DB operations, and production side effects hard-gated.
@@ -84,8 +84,8 @@ Goal: turn the demo-safe product into a paid production SaaS.
 ## Next Concrete Work
 
 1. Keep `docs/CURRENT_STATE_MATRIX.md` current.
-2. Build the `/dashboard` product shell.
-3. Add product-demo E2E coverage.
-4. Fix RBAC enforcement on mutating routes.
-5. Add product-facing compliance readiness summary.
+2. Add product-demo E2E coverage for `/dashboard`.
+3. Build contacts list/import UI on existing APIs.
+4. Build campaign composer, preflight, schedule, and status UI.
+5. Add product-facing compliance readiness detail.
 6. Harden production worker policy before broader live sending.
