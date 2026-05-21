@@ -1,8 +1,8 @@
 # Codex Summary
 
-- Advanced a post-MVP notification operations runtime-frozen vocabulary checkpoint.
-- Runtime-froze the exported notification channel, status, command-execution, external-impact, and secrets-displayed vocabularies used by `/settings/notifications`.
-- Added unit coverage proving those exported vocabularies are frozen before local notification metadata renders.
+- Advanced a post-MVP readiness audit operations static-metadata checkpoint.
+- Moved `/settings/readiness-audit` action filters, subject filters, bounded CSV export limit, safety-boundary copy, and no-impact summary states into a validated frozen operations helper.
+- Added unit coverage proving those readiness audit metadata values stay public, frozen, ordered, unique, command-free, and secret-free before local readiness history renders.
 - Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
 - Focused notification operations unit coverage and typecheck passed; protected local gate passed.
 - No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
@@ -928,6 +928,9 @@ Run number: 95
 - `npm run lint`
 - `git diff --check`
 - `.\scripts\local-gate.ps1`
+- Latest readiness audit operations static-metadata hardening moved `/settings/readiness-audit` action filters, subject filters, bounded CSV export limit, safety-boundary copy, and no-impact summary states into a validated frozen helper. Unit coverage now pins public fields, stable order, unique identifiers, frozen snapshots, command-like literal rejection, and secret-like literal rejection before the page renders local readiness history metadata.
+- `npm run test -- readiness-audit-operations`
+- `npm run typecheck`
 - Latest validation operations package-script hardening added an explicit allowlist for `/settings/validation` gate command metadata and unit coverage proving each listed `npm run ...` command exists in `package.json`. The check is local static metadata validation only and does not execute commands, inspect logs, scan files, mutate records, call providers, bill, notify, send SMS or email, call live AI, expose secrets, or enable live features.
 - Latest validation operations value-boundary hardening added an allowlisted gate-area vocabulary plus required boundary terms for `/settings/validation` static metadata. Unit coverage now pins local-only gate areas and repair-signal terms before rendering validation inventory, without executing commands, inspecting logs, scanning files, mutating records, provider calls, billing, notifications, SMS, email, live AI, secrets, or live feature enablement.
 - Latest shared operator inventory route-shape hardening added unit coverage that keeps every route canonical and static: lowercase, no trailing slash, no query/hash, no dynamic segment, no double slash, and limited to `/demo`, `/settings`, or `/settings/**`. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

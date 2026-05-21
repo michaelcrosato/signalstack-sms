@@ -181,6 +181,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP notification operations status-vocabulary hardening: `/settings/notifications` static channel status values now stay inside the supported blocked, not-implemented, and inbound-only local vocabulary before rendering local notification metadata.
 - Post-MVP notification operations channel-boundary hardening: `/settings/notifications` static channel boundary copy now keeps channel-specific no-send terms for email, in-app, SMS alert, and webhook notification surfaces before rendering local notification metadata.
 - Post-MVP notification operations runtime-frozen vocabulary hardening: `/settings/notifications` exported channel, status, and no-impact summary vocabularies are frozen at runtime before rendering local notification metadata.
+- Post-MVP readiness audit operations static-metadata hardening: `/settings/readiness-audit` action filters, subject filters, bounded CSV export limit, safety-boundary copy, and no-impact summary states are validated, runtime-frozen, and covered by unit tests before rendering local readiness history metadata.
 
 Demo-safe defaults remain mandatory:
 

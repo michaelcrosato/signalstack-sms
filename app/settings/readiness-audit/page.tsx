@@ -3,18 +3,10 @@ import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
 import { getReadinessAuditOperationLinks } from "@/lib/operations/operator-surfaces";
+import { getReadinessAuditOperationsStatus } from "@/lib/operations/readiness-audit-operations";
 import { readinessAuditQuerySchema } from "@/lib/validation/readiness-audit";
 
 export const dynamic = "force-dynamic";
-
-const readinessAuditActions = [
-  "COMPLIANCE_PROFILE_UPDATED",
-  "PROVIDER_NUMBER_UPSERTED",
-  "PROVIDER_CREDENTIAL_METADATA_UPSERTED",
-  "PROVIDER_CREDENTIAL_METADATA_DELETED"
-];
-
-const readinessAuditSubjectTypes = ["ComplianceProfile", "ProviderPhoneNumber", "ProviderCredential"];
 
 type ReadinessAuditPageProps = {
   searchParams?: Promise<{
@@ -24,6 +16,7 @@ type ReadinessAuditPageProps = {
 };
 
 export default async function ReadinessAuditOperationsPage({ searchParams }: ReadinessAuditPageProps) {
+  const readinessAuditStatus = getReadinessAuditOperationsStatus();
   const params = await searchParams;
   const parsedQuery = readinessAuditQuerySchema.safeParse({
     action: params?.action,
@@ -36,7 +29,7 @@ export default async function ReadinessAuditOperationsPage({ searchParams }: Rea
     action: query.action,
     subjectType: query.subjectType
   });
-  const exportHref = `/api/settings/readiness-audit/export?limit=200${query.action ? `&action=${query.action}` : ""}${
+  const exportHref = `/api/settings/readiness-audit/export?limit=${readinessAuditStatus.exportLimit}${query.action ? `&action=${query.action}` : ""}${
     query.subjectType ? `&subjectType=${query.subjectType}` : ""
   }`;
   const operationLinks = getReadinessAuditOperationLinks();
@@ -64,14 +57,14 @@ export default async function ReadinessAuditOperationsPage({ searchParams }: Rea
         <Metric label="Recent events" value={String(auditEvents.length)} />
         <Metric label="Action filter" value={query.action ?? "all"} />
         <Metric label="Subject filter" value={query.subjectType ?? "all"} />
-        <Metric label="External impact" value="none" />
+        <Metric label="External impact" value={readinessAuditStatus.externalImpact} />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
         <Panel title="Action Filters">
           <nav aria-label="Readiness audit action filters" className="flex flex-wrap gap-2">
             <FilterLink href={query.subjectType ? `/settings/readiness-audit?subjectType=${query.subjectType}` : "/settings/readiness-audit"} label="All" active={!query.action} />
-            {readinessAuditActions.map((action) => (
+            {readinessAuditStatus.actions.map((action) => (
               <FilterLink
                 key={action}
                 href={`/settings/readiness-audit?action=${action}${query.subjectType ? `&subjectType=${query.subjectType}` : ""}`}
@@ -85,7 +78,7 @@ export default async function ReadinessAuditOperationsPage({ searchParams }: Rea
         <Panel title="Subject Filters">
           <nav aria-label="Readiness audit subject filters" className="flex flex-wrap gap-2">
             <FilterLink href={query.action ? `/settings/readiness-audit?action=${query.action}` : "/settings/readiness-audit"} label="All" active={!query.subjectType} />
-            {readinessAuditSubjectTypes.map((subjectType) => (
+            {readinessAuditStatus.subjectTypes.map((subjectType) => (
               <FilterLink
                 key={subjectType}
                 href={`/settings/readiness-audit?subjectType=${subjectType}${query.action ? `&action=${query.action}` : ""}`}
@@ -129,10 +122,9 @@ export default async function ReadinessAuditOperationsPage({ searchParams }: Rea
 
       <Panel title="Safety Boundary">
         <ul className="grid gap-2 text-sm text-slate-700">
-          <li>This view does not create, update, delete, replay, or export anything except by linking to the existing local CSV endpoint.</li>
-          <li>Audit events are tenant-scoped local records and do not trigger provider calls, billing events, notifications, email, SMS, or live AI.</li>
-          <li>CSV export links use bounded filters and do not expose raw credentials, token fingerprints, or secret environment values.</li>
-          <li>Future go-live enablement still requires explicit contracts, hard gates, tests, and demo-safe defaults first.</li>
+          {readinessAuditStatus.safetyBoundaries.map((boundary) => (
+            <li key={boundary}>{boundary}</li>
+          ))}
         </ul>
       </Panel>
     </main>
