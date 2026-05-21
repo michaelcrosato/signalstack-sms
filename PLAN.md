@@ -269,6 +269,7 @@ Post-MVP:
 - Local API operations no-impact summary-state hardening
 - Local API operations frozen status snapshot coverage
 - Local API operations detached route-count coverage
+- Local API operations rate-limit boundary coverage
 - Local contract operations inventory frozen static-metadata coverage
 - Local contract operations inventory order-stability coverage
 - Local contract operations inventory unique-identifier coverage

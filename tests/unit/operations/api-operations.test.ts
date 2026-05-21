@@ -357,4 +357,28 @@ describe("getApiOperationsStatus", () => {
       windowSeconds: 5
     });
   });
+
+  it("keeps API rate limit metadata clamped to local policy boundaries", () => {
+    const lowStatus = getApiOperationsStatus({
+      API_RATE_LIMIT_MAX: "-10",
+      API_RATE_LIMIT_WINDOW_MS: "500"
+    });
+    const highStatus = getApiOperationsStatus({
+      API_RATE_LIMIT_MAX: "25000",
+      API_RATE_LIMIT_WINDOW_MS: "9999999"
+    });
+
+    expect(lowStatus.rateLimit).toMatchObject({
+      enabled: true,
+      limit: 1,
+      windowSeconds: 1
+    });
+    expect(highStatus.rateLimit).toMatchObject({
+      enabled: true,
+      limit: 10000,
+      windowSeconds: 3600
+    });
+    expect(lowStatus.routeCount).toBe(lowStatus.routes.length);
+    expect(highStatus.routeCount).toBe(highStatus.routes.length);
+  });
 });

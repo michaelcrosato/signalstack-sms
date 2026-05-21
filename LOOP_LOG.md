@@ -1787,3 +1787,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP queue/readiness/notification operations hardening or safe read-only operator surface refinements.
+
+## Run 194  GREEN  api-operations-rate-limit-boundaries  2026-05-21 06:53
+Objective:    Keep `/settings/api` rate-limit metadata inside local policy clamp boundaries.
+Changed:
+- Added API operations unit coverage proving low/high rate-limit env values clamp to local minimum and maximum policy boundaries.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP API/contract/readiness operations hardening or safe read-only operator surface refinements.
