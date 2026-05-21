@@ -1,14 +1,19 @@
 import { expect, test } from "@playwright/test";
 import {
   getAiOperationLinks,
+  getAudienceOperationLinks,
   getBillingOperationLinks,
+  getCampaignOperationLinks,
+  getContactOperationLinks,
   getDemoOperationsCheckpoints,
   getDemoOperationsLinks,
   getDemoConsoleLinks,
   getContractOperationLinks,
+  getDataOperationLinks,
   getEnvironmentOperationLinks,
   getExportOperationLinks,
   getHealthOperationLinks,
+  getInboxOperationLinks,
   getIntegrationOperationAreas,
   getNotificationOperationLinks,
   getQueueOperationLinks,
@@ -17,6 +22,7 @@ import {
   getSecurityOperationLinks,
   getSettingsNavigationLinks,
   getTeamOperationLinks,
+  getTemplateOperationLinks,
   getValidationOperationLinks,
   getDeliveryOperationLinks,
   getWebhookOperationLinks,
@@ -39,6 +45,12 @@ const healthOperationLinks = getHealthOperationLinks();
 const contractOperationLinks = getContractOperationLinks();
 const validationOperationLinks = getValidationOperationLinks();
 const queueOperationLinks = getQueueOperationLinks();
+const contactOperationLinks = getContactOperationLinks();
+const campaignOperationLinks = getCampaignOperationLinks();
+const audienceOperationLinks = getAudienceOperationLinks();
+const templateOperationLinks = getTemplateOperationLinks();
+const inboxOperationLinks = getInboxOperationLinks();
+const dataOperationLinks = getDataOperationLinks();
 const notificationOperationLinks = getNotificationOperationLinks();
 const exportOperationLinks = getExportOperationLinks();
 const webhookOperationLinks = getWebhookOperationLinks();
@@ -256,6 +268,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Campaign Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Campaign Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Queue Status" })).toBeVisible();
+  for (const link of campaignOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Queue Operations" }).click();
   await expect(page.getByRole("heading", { name: "Queue Operations" })).toBeVisible();
@@ -272,12 +287,18 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Consent Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Import Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent Contacts" })).toBeVisible();
+  for (const link of contactOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Data Operations" }).click();
   await expect(page.getByRole("heading", { name: "Data Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Soft Archive" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Import Ledger" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Retention Signals" })).toBeVisible();
+  for (const link of dataOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Contact Operations" }).click();
   await page.getByRole("link", { name: "Audience Operations" }).click();
@@ -285,16 +306,25 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Tags" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Lists" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Saved Segments" })).toBeVisible();
+  for (const link of audienceOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Template Operations" }).click();
   await expect(page.getByRole("heading", { name: "Template Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Variable Coverage" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent Templates" })).toBeVisible();
+  for (const link of templateOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Inbox Operations" }).click();
   await expect(page.getByRole("heading", { name: "Inbox Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Conversation Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent Conversations" })).toBeVisible();
+  for (const link of inboxOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Webhook Operations" }).click();
   await expect(page.getByRole("heading", { name: "Webhook Operations" })).toBeVisible();

@@ -1,15 +1,20 @@
 # Codex Summary
 
-Run number: 58
+Run number: 59
 
 ## Completed
+
+- Advanced a post-MVP data/messaging shared-inventory hardening checkpoint.
+- Refactored `/settings/contacts`, `/settings/campaigns`, `/settings/audience`, `/settings/templates`, `/settings/inbox`, and `/settings/data` header navigation to project from the shared operator surface inventory.
+- Extended unit and seeded browser coverage for data/messaging navigation labels, route targets, and backing pages.
+- Protected local gate, demo seed, and seeded investor demo E2E passed.
+
+## Prior Completed
 
 - Advanced a post-MVP billing/AI shared-inventory hardening checkpoint.
 - Refactored `/settings/billing` and `/settings/ai` header navigation to project from the shared operator surface inventory.
 - Extended unit and seeded browser coverage for billing and AI navigation labels, route targets, and backing pages.
 - Protected local gate, local migration check, demo seed, and seeded investor demo E2E passed.
-
-## Prior Completed
 
 - Advanced a post-MVP webhook/delivery/team shared-inventory hardening checkpoint.
 - Refactored `/settings/webhooks`, `/settings/delivery`, and `/settings/team` header navigation to project from the shared operator surface inventory.
@@ -185,6 +190,13 @@ Run number: 58
 
 ## Validation
 
+- Latest data/messaging shared-inventory hardening moved `/settings/contacts`, `/settings/campaigns`, `/settings/audience`, `/settings/templates`, `/settings/inbox`, and `/settings/data` header navigation into the shared local operator surface inventory. Unit and seeded browser coverage now verify labels, route targets, and backing `app/**/page.tsx` files without importing contacts, scheduling campaigns, changing audience labels, editing templates, mutating inbox threads, deleting data, calling providers, billing, notifying, sending SMS or email, exposing secrets, or enabling live features.
+- `npm run typecheck`
+- `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
+- `npm run lint`
+- `.\scripts\local-gate.ps1`
+- `npm run demo:seed`
+- `npm run test:e2e:demo`
 - Latest billing/AI shared-inventory hardening moved `/settings/billing` and `/settings/ai` header navigation into the shared local operator surface inventory. Unit and seeded browser coverage now verify labels, route targets, and backing `app/**/page.tsx` files without calling Stripe, live AI, providers, creating billing artifacts, notifying, sending SMS or email, exposing secrets, mutating records, or enabling live billing or live AI.
 - `npm run typecheck`
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`

@@ -300,6 +300,70 @@ const queueOperationNavigationRoutes = [
   "/settings/releases"
 ] as const;
 
+const contactOperationNavigationRoutes = [
+  "/demo",
+  "/settings",
+  "/settings/campaigns",
+  "/settings/data",
+  "/settings/templates",
+  "/settings/audience",
+  "/settings/inbox",
+  "/settings/usage"
+] as const;
+
+const campaignOperationNavigationRoutes = [
+  "/demo",
+  "/settings",
+  "/settings/usage",
+  "/settings/queue",
+  "/settings/contacts",
+  "/settings/templates",
+  "/settings/audience",
+  "/settings/inbox",
+  "/settings/delivery",
+  "/settings/runbook"
+] as const;
+
+const audienceOperationNavigationRoutes = [
+  "/demo",
+  "/settings",
+  "/settings/contacts",
+  "/settings/templates",
+  "/settings/campaigns"
+] as const;
+
+const templateOperationNavigationRoutes = [
+  "/demo",
+  "/settings",
+  "/settings/contacts",
+  "/settings/audience",
+  "/settings/campaigns",
+  "/settings/inbox",
+  "/settings/runbook"
+] as const;
+
+const inboxOperationNavigationRoutes = [
+  "/demo",
+  "/settings",
+  "/settings/campaigns",
+  "/settings/contacts",
+  "/settings/templates",
+  "/settings/audience",
+  "/settings/usage",
+  "/settings/team",
+  "/settings/webhooks",
+  "/settings/delivery"
+] as const;
+
+const dataOperationNavigationRoutes = [
+  "/demo",
+  "/settings",
+  "/settings/contacts",
+  "/settings/exports",
+  "/settings/security",
+  "/settings/runbook"
+] as const;
+
 const notificationOperationNavigationRoutes = [
   "/settings",
   "/settings/security",
@@ -434,6 +498,30 @@ export function getValidationOperationLinks(groups: OperatorSurfaceGroup[] = ope
 
 export function getQueueOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return queueOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getContactOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return contactOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getCampaignOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return campaignOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getAudienceOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return audienceOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getTemplateOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return templateOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getInboxOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return inboxOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getDataOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return dataOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
 export function getNotificationOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {

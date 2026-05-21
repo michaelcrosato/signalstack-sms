@@ -30,6 +30,7 @@ Post-MVP local operations status:
 - Unit tests must verify that `/settings/exports` admin navigation is projected from the shared operations inventory and points at implemented `app/**/page.tsx` files.
 - Unit tests must verify that `/settings/webhooks`, `/settings/delivery`, and `/settings/team` header navigation is projected from the shared operations inventory and points at implemented `app/**/page.tsx` files.
 - Unit tests must verify that `/settings/billing` and `/settings/ai` header navigation is projected from the shared operations inventory and points at implemented `app/**/page.tsx` files.
+- Unit tests must verify that `/settings/contacts`, `/settings/campaigns`, `/settings/audience`, `/settings/templates`, `/settings/inbox`, and `/settings/data` header navigation is projected from the shared operations inventory and points at implemented `app/**/page.tsx` files.
 - The Playwright smoke test must verify the root launch dashboard's visible links from the same shared operations inventory instead of a duplicated hard-coded browser list.
 - The seeded investor demo path must verify that `/demo` renders visible console navigation from the same shared operations inventory instead of a duplicated hard-coded browser list.
 - The seeded investor demo path must verify that `/settings/operations` renders grouped local operator surfaces, visible links/routes from the shared operations inventory, and safety-boundary text without command execution, file inspection, API probes, mutations, exports, provider calls, billing records, notifications, live AI, SMS, email, secret exposure, or live feature enablement.
@@ -92,6 +93,7 @@ Post-MVP AI operations view:
 
 - The seeded investor demo path must verify that `/settings/ai` renders read-only fake-provider status, deterministic endpoint coverage, recent local AI usage metadata, and safety-boundary text without prompt submission, live AI calls, paid model requests, billing artifacts, notifications, provider calls, SMS, or live AI enablement.
 - The seeded investor demo path must verify that `/settings/billing` and `/settings/ai` header navigation labels and link targets are projected from the shared local operator surface inventory.
+- The seeded investor demo path must verify that `/settings/contacts`, `/settings/campaigns`, `/settings/audience`, `/settings/templates`, `/settings/inbox`, and `/settings/data` header navigation labels and link targets are projected from the shared local operator surface inventory.
 
 Post-MVP reporting index view:
 

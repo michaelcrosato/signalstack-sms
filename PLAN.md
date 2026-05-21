@@ -166,6 +166,7 @@ Post-MVP:
 - Local admin exports shared-inventory coverage
 - Local webhook, delivery, and team shared-inventory coverage
 - Local billing and AI shared-inventory coverage
+- Local data and messaging shared-inventory coverage
 
 ## Next Milestone
 

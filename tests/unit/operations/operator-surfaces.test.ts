@@ -3,14 +3,19 @@ import { join, relative, sep } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   getAiOperationLinks,
+  getAudienceOperationLinks,
   getBillingOperationLinks,
+  getCampaignOperationLinks,
+  getContactOperationLinks,
   getDemoOperationsCheckpoints,
   getDemoOperationsLinks,
   getDemoConsoleLinks,
   getContractOperationLinks,
+  getDataOperationLinks,
   getEnvironmentOperationLinks,
   getExportOperationLinks,
   getHealthOperationLinks,
+  getInboxOperationLinks,
   getIntegrationOperationAreas,
   getLaunchDashboardLinks,
   getNotificationOperationLinks,
@@ -22,6 +27,7 @@ import {
   getSecurityOperationLinks,
   getSettingsNavigationLinks,
   getTeamOperationLinks,
+  getTemplateOperationLinks,
   getValidationOperationLinks,
   getDeliveryOperationLinks,
   getWebhookOperationLinks,
@@ -362,6 +368,73 @@ describe("operator surface inventory", () => {
     ]);
     expect(notificationLinks).toEqual(notificationRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
     expect(notificationRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+  });
+
+  it("projects data and messaging operation links from the shared surface inventory", () => {
+    const inventoryLinks = operatorSurfaceGroups.flatMap((group) => group.links);
+    const contactLinks = getContactOperationLinks();
+    const campaignLinks = getCampaignOperationLinks();
+    const audienceLinks = getAudienceOperationLinks();
+    const templateLinks = getTemplateOperationLinks();
+    const inboxLinks = getInboxOperationLinks();
+    const dataLinks = getDataOperationLinks();
+    const contactRoutes = contactLinks.map((link) => link.href);
+    const campaignRoutes = campaignLinks.map((link) => link.href);
+    const audienceRoutes = audienceLinks.map((link) => link.href);
+    const templateRoutes = templateLinks.map((link) => link.href);
+    const inboxRoutes = inboxLinks.map((link) => link.href);
+    const dataRoutes = dataLinks.map((link) => link.href);
+
+    expect(contactRoutes).toEqual([
+      "/demo",
+      "/settings",
+      "/settings/campaigns",
+      "/settings/data",
+      "/settings/templates",
+      "/settings/audience",
+      "/settings/inbox",
+      "/settings/usage"
+    ]);
+    expect(campaignRoutes).toEqual([
+      "/demo",
+      "/settings",
+      "/settings/usage",
+      "/settings/queue",
+      "/settings/contacts",
+      "/settings/templates",
+      "/settings/audience",
+      "/settings/inbox",
+      "/settings/delivery",
+      "/settings/runbook"
+    ]);
+    expect(audienceRoutes).toEqual(["/demo", "/settings", "/settings/contacts", "/settings/templates", "/settings/campaigns"]);
+    expect(templateRoutes).toEqual([
+      "/demo",
+      "/settings",
+      "/settings/contacts",
+      "/settings/audience",
+      "/settings/campaigns",
+      "/settings/inbox",
+      "/settings/runbook"
+    ]);
+    expect(inboxRoutes).toEqual([
+      "/demo",
+      "/settings",
+      "/settings/campaigns",
+      "/settings/contacts",
+      "/settings/templates",
+      "/settings/audience",
+      "/settings/usage",
+      "/settings/team",
+      "/settings/webhooks",
+      "/settings/delivery"
+    ]);
+    expect(dataRoutes).toEqual(["/demo", "/settings", "/settings/contacts", "/settings/exports", "/settings/security", "/settings/runbook"]);
+
+    for (const routes of [contactRoutes, campaignRoutes, audienceRoutes, templateRoutes, inboxRoutes, dataRoutes]) {
+      expect(routes.map((route) => inventoryLinks.find((link) => link.href === route)?.href)).toEqual(routes);
+      expect(routes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+    }
   });
 
   it("projects admin export operation links from the shared surface inventory", () => {
