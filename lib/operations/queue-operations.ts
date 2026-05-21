@@ -49,6 +49,13 @@ const requiredSafetyBoundaryTerms = [
   "mutations",
   "campaign status"
 ] as const;
+const forbiddenCommandMetadataPatterns = [
+  /\bnpm\s+run\b/i,
+  /\bnpx\b/i,
+  /\bpowershell\b/i,
+  /\bcurl\b/i,
+  /\bInvoke-WebRequest\b/i
+] as const;
 const forbiddenSecretMetadataPatterns = [
   /\bsk_(?:live|test)_[A-Za-z0-9]+/,
   /\bpk_live_[A-Za-z0-9]+/,
@@ -89,6 +96,12 @@ function assertNoSecretLikeMetadata(value: string, errorMessage: string) {
   }
 }
 
+function assertNoCommandLikeMetadata(value: string, errorMessage: string) {
+  if (forbiddenCommandMetadataPatterns.some((pattern) => pattern.test(value))) {
+    throw new Error(errorMessage);
+  }
+}
+
 function assertUniqueValues(values: readonly string[], errorMessage: string) {
   if (new Set(values).size !== values.length) {
     throw new Error(errorMessage);
@@ -120,6 +133,8 @@ function assertWorkerCommand(command: QueueOperationWorkerCommand) {
   assertNoSecretLikeMetadata(command.command, `Secret-like queue operation command ${command.command}`);
   assertNoSecretLikeMetadata(command.mode, `Secret-like queue operation mode for ${command.command}`);
   assertNoSecretLikeMetadata(command.boundary, `Secret-like queue operation boundary for ${command.command}`);
+  assertNoCommandLikeMetadata(command.mode, `Command-like queue operation mode for ${command.command}`);
+  assertNoCommandLikeMetadata(command.boundary, `Command-like queue operation boundary for ${command.command}`);
 
   if (!allowedQueueOperationWorkerCommands.includes(command.command as QueueOperationSupportedWorkerCommand)) {
     throw new Error(`Unsupported queue operation worker command ${command.command}`);
@@ -167,6 +182,7 @@ function freezeSafetyBoundaries(boundaries: string[]) {
     assertNonblankString(boundary, "Invalid queue operation safety boundary");
     assertCleanCopy(boundary, "Whitespace-unsafe queue operation safety boundary");
     assertNoSecretLikeMetadata(boundary, "Secret-like queue operation safety boundary");
+    assertNoCommandLikeMetadata(boundary, "Command-like queue operation safety boundary");
   }
 
   assertUniqueValues(boundaries, "Duplicate queue operation safety boundaries");

@@ -1,5 +1,14 @@
 # Codex Summary
 
+- Advanced a post-MVP queue operations command-literal metadata hardening checkpoint.
+- Added queue operations validation and unit coverage so worker mode, worker boundary, and safety-boundary metadata reject command-like snippets while the worker command reference field remains explicitly allowlisted.
+- Updated README, PLAN, queue/testing contract docs, next-prompt handoff docs, blockers, and loop logs.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 172
+
+## Previous Run
+
 - Advanced a post-MVP notification operations no-impact summary rendering checkpoint.
 - Rendered the validated command-execution, external-impact, and secrets-displayed summary states on `/settings/notifications`.
 - Extended the seeded investor demo path to verify those read-only notification no-impact fields.

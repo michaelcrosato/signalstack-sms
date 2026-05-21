@@ -1554,3 +1554,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP queue/notification/readiness operations hardening or safe read-only operator surface refinements.
+## Run 172  GREEN  queue-operations-command-literal-metadata  2026-05-21 05:00
+Objective:    Keep `/settings/queue` non-command static metadata free of command-like snippets.
+Changed:
+- Added command-like literal validation for queue operation worker modes, worker boundaries, and safety boundaries while preserving allowlisted worker command references.
+- Added unit coverage proving non-command queue metadata stays free of command-like literals.
+- Updated queue/testing contracts, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP queue/notification/readiness operations hardening or safe read-only operator surface refinements.

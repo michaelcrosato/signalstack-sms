@@ -107,7 +107,7 @@ Post-MVP campaign operations view:
 Post-MVP queue operations view:
 
 - The seeded investor demo path must verify that `/settings/queue` renders read-only scheduled job timing, queue status, worker boundary, payload validity, and safety-boundary metadata without enqueueing jobs, running workers, calling Redis, calling providers, billing, sending notifications, mutating queue rows, updating campaigns, or enabling live messaging.
-- Unit tests must verify that `/settings/queue` uses static validated metadata for supported local worker command references, runtime-frozen worker mode vocabulary, safety-boundary copy, public fields, frozen snapshots, stable order, unique identifiers, package-script references, secret-like literal rejection, no command execution, no external impact, and no secret display before local queue metadata renders.
+- Unit tests must verify that `/settings/queue` uses static validated metadata for supported local worker command references, runtime-frozen worker mode vocabulary, safety-boundary copy, public fields, frozen snapshots, stable order, unique identifiers, package-script references, secret-like literal rejection, command-like literal rejection outside the allowlisted command reference field, no command execution, no external impact, and no secret display before local queue metadata renders.
 
 Post-MVP contact operations view:
 

@@ -235,4 +235,20 @@ describe("getQueueOperationsStatus", () => {
 
     expect(staticCopy.filter((copy) => secretLikePatterns.some((pattern) => pattern.test(copy)))).toEqual([]);
   });
+
+  it("keeps queue operation non-command metadata free of command-like literals", () => {
+    const nonCommandCopy = [
+      ...queueOperationWorkerCommands.flatMap((command) => [command.mode, command.boundary]),
+      ...queueOperationSafetyBoundaries
+    ];
+    const commandLikePatterns = [
+      /\bnpm\s+run\b/i,
+      /\bnpx\b/i,
+      /\bpowershell\b/i,
+      /\bcurl\b/i,
+      /\bInvoke-WebRequest\b/i
+    ];
+
+    expect(nonCommandCopy.filter((copy) => commandLikePatterns.some((pattern) => pattern.test(copy)))).toEqual([]);
+  });
 });
