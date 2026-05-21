@@ -105,6 +105,41 @@ describe("getApiOperationsStatus", () => {
     expect(new Set(routeKeys).size).toBe(routeKeys.length);
   });
 
+  it("keeps API inventory static metadata whitespace-clean", () => {
+    const staticCopy = apiOperationRoutes.flatMap((route) => [route.path, route.area, route.safety]);
+
+    expect(staticCopy.filter((copy) => copy.trim().length === 0)).toEqual([]);
+    expect(staticCopy.filter((copy) => copy !== copy.trim())).toEqual([]);
+    expect(staticCopy.filter((copy) => copy.includes("\n") || copy.includes("\r"))).toEqual([]);
+    expect(staticCopy.filter((copy) => copy.includes("  "))).toEqual([]);
+  });
+
+  it("keeps API inventory static metadata free of secret-like literals", () => {
+    const staticCopy = apiOperationRoutes.flatMap((route) => [route.path, route.area, route.safety]);
+    const secretLikePatterns = [
+      /\bsk_(?:live|test)_[A-Za-z0-9]+/,
+      /\bpk_live_[A-Za-z0-9]+/,
+      /\bAC[a-fA-F0-9]{32}\b/,
+      /\b(?:TWILIO_AUTH_TOKEN|STRIPE_SECRET_KEY|OPENAI_API_KEY|CLERK_SECRET_KEY)\s*=/,
+      /\bBearer\s+[A-Za-z0-9._-]{12,}/
+    ];
+
+    expect(staticCopy.filter((copy) => secretLikePatterns.some((pattern) => pattern.test(copy)))).toEqual([]);
+  });
+
+  it("keeps API inventory static metadata free of command-like literals", () => {
+    const staticCopy = apiOperationRoutes.flatMap((route) => [route.path, route.area, route.safety]);
+    const commandLikePatterns = [
+      /\bnpm\s+run\b/i,
+      /\bnpx\b/i,
+      /\bpowershell\b/i,
+      /\bcurl\b/i,
+      /\bInvoke-WebRequest\b/i
+    ];
+
+    expect(staticCopy.filter((copy) => commandLikePatterns.some((pattern) => pattern.test(copy)))).toEqual([]);
+  });
+
   it("keeps API inventory route order stable for local review pages", () => {
     expect(apiOperationRoutes.map((route) => `${route.method} ${route.path}`)).toEqual([
       "GET /api/health",

@@ -25,6 +25,20 @@ export type ApiOperationsStatus = {
 
 const apiOperationMethods = new Set<ApiOperationMethod>(["GET", "POST", "PATCH", "DELETE"]);
 const apiOperationRouteFields = ["method", "path", "area", "mutates", "externalImpact", "safety"] as const;
+const forbiddenApiOperationCommandPatterns = [
+  /\bnpm\s+run\b/i,
+  /\bnpx\b/i,
+  /\bpowershell\b/i,
+  /\bcurl\b/i,
+  /\bInvoke-WebRequest\b/i
+] as const;
+const forbiddenApiOperationSecretPatterns = [
+  /\bsk_(?:live|test)_[A-Za-z0-9]+/,
+  /\bpk_live_[A-Za-z0-9]+/,
+  /\bAC[a-fA-F0-9]{32}\b/,
+  /\b(?:TWILIO_AUTH_TOKEN|STRIPE_SECRET_KEY|OPENAI_API_KEY|CLERK_SECRET_KEY)\s*=/,
+  /\bBearer\s+[A-Za-z0-9._-]{12,}/
+] as const;
 
 function assertExactApiOperationRouteFields(route: ApiOperationRoute) {
   const actualKeys = Reflect.ownKeys(route);
@@ -65,6 +79,34 @@ function assertApiOperationRoute(route: ApiOperationRoute) {
 
   if (typeof route.safety !== "string" || route.safety.trim().length === 0) {
     throw new Error(`Invalid API operation safety for ${route.method} ${route.path}`);
+  }
+
+  for (const [label, value] of [
+    ["path", route.path],
+    ["area", route.area],
+    ["safety", route.safety]
+  ] as const) {
+    assertCleanApiOperationCopy(value, `Whitespace-unsafe API operation ${label} for ${route.method} ${route.path}`);
+    assertNoApiOperationSecretLikeCopy(value, `Secret-like API operation ${label} for ${route.method} ${route.path}`);
+    assertNoApiOperationCommandLikeCopy(value, `Command-like API operation ${label} for ${route.method} ${route.path}`);
+  }
+}
+
+function assertCleanApiOperationCopy(value: string, errorMessage: string) {
+  if (value !== value.trim() || value.includes("\n") || value.includes("\r") || value.includes("  ")) {
+    throw new Error(errorMessage);
+  }
+}
+
+function assertNoApiOperationSecretLikeCopy(value: string, errorMessage: string) {
+  if (forbiddenApiOperationSecretPatterns.some((pattern) => pattern.test(value))) {
+    throw new Error(errorMessage);
+  }
+}
+
+function assertNoApiOperationCommandLikeCopy(value: string, errorMessage: string) {
+  if (forbiddenApiOperationCommandPatterns.some((pattern) => pattern.test(value))) {
+    throw new Error(errorMessage);
   }
 }
 

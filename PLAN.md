@@ -242,6 +242,7 @@ Post-MVP:
 - Local API operations inventory public-field coverage
 - Local API operations inventory value-shape coverage
 - Local API operations inventory order-stability coverage
+- Local API operations secret/command literal coverage
 - Local contract operations inventory frozen static-metadata coverage
 - Local contract operations inventory order-stability coverage
 - Local contract operations inventory unique-identifier coverage

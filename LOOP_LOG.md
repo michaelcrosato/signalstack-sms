@@ -1336,6 +1336,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP readiness audit operations hardening or safe read-only operator surface refinements.
 
+## Run 150  GREEN  api-operations-secret-command-literals  2026-05-21 03:30
+Objective:    Keep `/settings/api` static route metadata free of command-like and secret-like literals before rendering.
+Changed:
+- Added whitespace-clean, command-like literal, and secret-like literal validation to API operations route metadata before the static inventory freezes.
+- Added unit coverage proving API operation path, area, and safety copy stays clean before `/settings/api` local inventory renders.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP API operations hardening or safe read-only operator surface refinements.
+
 ## Run 148  GREEN  readiness-audit-query-allowlist  2026-05-21 03:24
 Objective:    Keep readiness-audit JSON and CSV query filters constrained to supported local vocabularies.
 Changed:

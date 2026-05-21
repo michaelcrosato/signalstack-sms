@@ -200,6 +200,7 @@ Post-MVP API operations inventory:
 - Unit tests must verify that exported API route entries, returned status snapshots, rate-limit snapshots, and per-call route snapshots expose only their public documented fields.
 - Unit tests must verify that exported API route entries keep supported methods, canonical local `/api/` path shape, boolean mutation/external-impact flags, nonblank area/safety copy, and unique method/path rows before local API operations renders.
 - Unit tests must verify that the exported API operations inventory keeps stable route-method order so local `/settings/api` review pages do not churn without an intentional inventory update.
+- Unit tests must verify that static API operations path, area, and safety metadata remain whitespace-clean and free of command-like or secret-like literals before local `/settings/api` renders them.
 
 Post-MVP webhook operations view:
 
