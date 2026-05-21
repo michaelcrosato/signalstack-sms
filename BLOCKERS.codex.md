@@ -1,8 +1,8 @@
 # Codex Blockers
 
-Run number: 172
+Run number: 173
 
-- Latest queue operations command-literal metadata hardening rejects command-like snippets in `/settings/queue` worker mode, worker boundary, and safety-boundary metadata while preserving the explicit allowlisted worker command reference field. The check is local static metadata validation only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS/email, mutate queue rows, update campaigns, call live AI, expose secrets, or enable live features.
+- Latest notification operations secret-literal handoff checkpoint reconciles PLAN and next-prompt handoff docs with the existing `/settings/notifications` static metadata guard and unit coverage for common secret-like token patterns. The check is local documentation alignment only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 
 No active blockers.
 
