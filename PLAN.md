@@ -229,6 +229,7 @@ Post-MVP:
 - Local contract operations inventory frozen static-metadata coverage
 - Local contract operations inventory order-stability coverage
 - Local contract operations inventory unique-identifier coverage
+- Local validation operations inventory static-metadata coverage
 
 ## Next Milestone
 

@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 124  GREEN  validation-operations-static-metadata  2026-05-21 01:36
+Objective:    Keep `/settings/validation` static gate metadata validated and immutable before rendering.
+Changed:
+- Moved validation gate command and repair-signal metadata into `lib/operations/validation-operations.ts`.
+- Wired `/settings/validation` to the shared validation operations status instead of page-local arrays.
+- Added unit coverage for required gate command references, repair signals, public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, and no secret display.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP validation operations hardening or safe read-only operator surface refinements.
+
 ## Run 123  GREEN  contract-operations-unique-identifiers  2026-05-21 01:30
 Objective:    Keep `/settings/contracts` metadata identifiers unambiguous before rendering.
 Changed:

@@ -2,68 +2,14 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getValidationOperationLinks } from "@/lib/operations/operator-surfaces";
+import { getValidationOperationsStatus } from "@/lib/operations/validation-operations";
 
 export const dynamic = "force-dynamic";
-
-const gateCommands = [
-  {
-    command: "npm run validate",
-    area: "full local gate",
-    boundary: "Runs local checks only and must keep demo-safe defaults."
-  },
-  {
-    command: "npm run contracts:check",
-    area: "contracts",
-    boundary: "Checks required docs/contracts and API map coverage."
-  },
-  {
-    command: "npm run compliance:check",
-    area: "safety defaults",
-    boundary: "Verifies live messaging, billing, provider, and AI defaults stay blocked."
-  },
-  {
-    command: "npm run production:gate",
-    area: "deployment",
-    boundary: "Blocks unsafe production-like live-impact configuration without explicit future override."
-  },
-  {
-    command: "npm run observability:check",
-    area: "observability",
-    boundary: "Verifies demo-safe observability planning docs exist."
-  },
-  {
-    command: "npm run operator:check",
-    area: "runbook",
-    boundary: "Verifies the local operator runbook remains present and demo-safe."
-  },
-  {
-    command: "npm run platform:check",
-    area: "platform",
-    boundary: "Verifies demo-safe deployment platform notes exist."
-  },
-  {
-    command: "npm run secrets:scan",
-    area: "secrets",
-    boundary: "Scans committed files for secret-like values without displaying local env secrets."
-  },
-  {
-    command: "npm run test:e2e:demo",
-    area: "investor demo",
-    boundary: "Exercises the seeded demo path after explicit local database migration and seeding."
-  }
-];
-
-const validationSignals = [
-  "The page does not execute commands or inspect process output.",
-  "Database migration and demo seed still require an explicit local DATABASE_URL command.",
-  "Playwright coverage should expand when demo-visible admin pages are added.",
-  "Live provider, live billing, notification, and live AI settings must stay blocked in validation.",
-  "Failures should be repaired by rerunning the smallest failing command before the full gate."
-];
 
 export default async function ValidationOperationsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
   const operationLinks = getValidationOperationLinks();
+  const status = getValidationOperationsStatus();
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
@@ -85,15 +31,15 @@ export default async function ValidationOperationsPage() {
       </header>
 
       <section className="grid gap-3 md:grid-cols-4">
-        <Metric label="Gate commands" value={String(gateCommands.length)} />
-        <Metric label="Command execution" value="none" />
-        <Metric label="Live impact" value="blocked" />
-        <Metric label="Secrets displayed" value="false" />
+        <Metric label="Gate commands" value={String(status.gateCommandCount)} />
+        <Metric label="Command execution" value={status.commandExecution} />
+        <Metric label="External impact" value={status.externalImpact} />
+        <Metric label="Secrets displayed" value={String(status.secretsDisplayed)} />
       </section>
 
       <Panel title="Gate Inventory">
         <ul className="grid gap-3 text-sm">
-          {gateCommands.map((gate) => (
+          {status.gateCommands.map((gate) => (
             <li key={gate.command} className="grid gap-2 border-b border-slate-100 pb-3 lg:grid-cols-[16rem_10rem_1fr]">
               <span className="break-words font-mono text-xs font-semibold text-slate-950">{gate.command}</span>
               <span className="text-slate-700">{gate.area}</span>
@@ -106,7 +52,7 @@ export default async function ValidationOperationsPage() {
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
         <Panel title="Repair Signals">
           <ul className="grid gap-2 text-sm text-slate-700">
-            {validationSignals.map((signal) => (
+            {status.repairSignals.map((signal) => (
               <li key={signal}>{signal}</li>
             ))}
           </ul>

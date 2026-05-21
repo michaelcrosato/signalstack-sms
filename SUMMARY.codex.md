@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP validation operations static-metadata checkpoint.
+- Moved `/settings/validation` gate command and repair-signal metadata into a validated frozen operations module.
+- Added unit coverage proving validation operations metadata keeps public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, and no secret display before local review pages render.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- Targeted validation operations unit coverage and typecheck passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 124
+
+## Previous Run
+
 - Advanced a post-MVP contract operations unique-identifier checkpoint.
 - Added duplicate guards for contract operation file names, file paths, validation commands, and drift-control copy before the static inventory freezes.
 - Added unit coverage proving `/settings/contracts` metadata identifiers remain unique before local review pages render them.

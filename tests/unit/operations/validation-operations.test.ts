@@ -1,0 +1,109 @@
+import { describe, expect, it } from "vitest";
+import {
+  getValidationOperationsStatus,
+  validationOperationGateCommands,
+  validationOperationRepairSignals
+} from "@/lib/operations/validation-operations";
+
+const publicGateCommandFields = ["command", "area", "boundary"];
+const publicStatusFields = [
+  "gateCommandCount",
+  "repairSignalCount",
+  "commandExecution",
+  "externalImpact",
+  "secretsDisplayed",
+  "gateCommands",
+  "repairSignals"
+];
+
+function sortedFields(value: object) {
+  return Object.keys(value).sort();
+}
+
+describe("getValidationOperationsStatus", () => {
+  it("reports required validation gate inventory and read-only counts", () => {
+    const status = getValidationOperationsStatus();
+
+    expect(status.gateCommandCount).toBe(9);
+    expect(status.repairSignalCount).toBe(5);
+    expect(status.commandExecution).toBe("none");
+    expect(status.externalImpact).toBe("none");
+    expect(status.secretsDisplayed).toBe(false);
+    expect(status.gateCommands.map((gate) => gate.command)).toEqual([
+      "npm run validate",
+      "npm run contracts:check",
+      "npm run compliance:check",
+      "npm run production:gate",
+      "npm run observability:check",
+      "npm run operator:check",
+      "npm run platform:check",
+      "npm run secrets:scan",
+      "npm run test:e2e:demo"
+    ]);
+  });
+
+  it("exposes only public validation operations fields", () => {
+    const status = getValidationOperationsStatus();
+    const expectedGateFields = [...publicGateCommandFields].sort();
+
+    expect(sortedFields(status)).toEqual([...publicStatusFields].sort());
+    expect(validationOperationGateCommands.every((gate) => sortedFields(gate).join("|") === expectedGateFields.join("|"))).toBe(true);
+    expect(status.gateCommands.every((gate) => sortedFields(gate).join("|") === expectedGateFields.join("|"))).toBe(true);
+  });
+
+  it("keeps exported and per-call validation operations snapshots frozen", () => {
+    const firstStatus = getValidationOperationsStatus();
+    const secondStatus = getValidationOperationsStatus();
+    const firstGate = firstStatus.gateCommands[0];
+
+    expect(Object.isFrozen(validationOperationGateCommands)).toBe(true);
+    expect(validationOperationGateCommands.every((gate) => Object.isFrozen(gate))).toBe(true);
+    expect(Object.isFrozen(validationOperationRepairSignals)).toBe(true);
+    expect(Object.isFrozen(firstStatus)).toBe(true);
+    expect(Object.isFrozen(firstStatus.gateCommands)).toBe(true);
+    expect(Object.isFrozen(firstStatus.repairSignals)).toBe(true);
+    expect(firstStatus.gateCommands).not.toBe(secondStatus.gateCommands);
+    expect(firstStatus.repairSignals).not.toBe(secondStatus.repairSignals);
+    expect(firstStatus.gateCommands[0]).not.toBe(validationOperationGateCommands[0]);
+    expect(() => (firstStatus.gateCommands as unknown as Array<(typeof validationOperationGateCommands)[number]>).pop()).toThrow(TypeError);
+    expect(() => ((firstGate as { command: string }).command = "npm run unsafe")).toThrow(TypeError);
+    expect(getValidationOperationsStatus().gateCommands[0].command).toBe(validationOperationGateCommands[0].command);
+  });
+
+  it("keeps validation operation metadata in canonical local-only shape", () => {
+    expect(validationOperationGateCommands.map((gate) => gate.command).filter((command) => !command.startsWith("npm run "))).toEqual([]);
+    expect(validationOperationGateCommands.map((gate) => gate.area).filter((area) => area.trim().length === 0)).toEqual([]);
+    expect(validationOperationGateCommands.map((gate) => gate.boundary).filter((boundary) => boundary.trim().length === 0)).toEqual([]);
+    expect(validationOperationRepairSignals.filter((signal) => signal.trim().length === 0)).toEqual([]);
+  });
+
+  it("keeps validation operation inventory order stable for local review pages", () => {
+    expect(validationOperationGateCommands.map((gate) => gate.command)).toEqual([
+      "npm run validate",
+      "npm run contracts:check",
+      "npm run compliance:check",
+      "npm run production:gate",
+      "npm run observability:check",
+      "npm run operator:check",
+      "npm run platform:check",
+      "npm run secrets:scan",
+      "npm run test:e2e:demo"
+    ]);
+    expect(validationOperationRepairSignals).toEqual([
+      "The page does not execute commands or inspect process output.",
+      "Database migration and demo seed still require an explicit local DATABASE_URL command.",
+      "Playwright coverage should expand when demo-visible admin pages are added.",
+      "Live provider, live billing, notification, and live AI settings must stay blocked in validation.",
+      "Failures should be repaired by rerunning the smallest failing command before the full gate."
+    ]);
+  });
+
+  it("keeps validation operation identifiers unique before local review pages render them", () => {
+    const commands = validationOperationGateCommands.map((gate) => gate.command);
+    const areas = validationOperationGateCommands.map((gate) => gate.area);
+
+    expect(new Set(commands).size).toBe(commands.length);
+    expect(new Set(areas).size).toBe(areas.length);
+    expect(new Set(validationOperationRepairSignals).size).toBe(validationOperationRepairSignals.length);
+  });
+});
