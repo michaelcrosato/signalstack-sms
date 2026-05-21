@@ -97,6 +97,13 @@ function withRouteStampedSurfaceCopy(groups: OperatorSurfaceGroup[]): OperatorSu
   }));
 }
 
+function withoutSurfaceRoute(groups: OperatorSurfaceGroup[], href: string): OperatorSurfaceGroup[] {
+  return groups.map((group) => ({
+    ...group,
+    links: group.links.filter((link) => link.href !== href)
+  }));
+}
+
 describe("operator surface inventory", () => {
   it("keeps the operations index grouped around the current local-only surfaces", () => {
     const summary = getOperatorSurfaceSummary();
@@ -326,6 +333,21 @@ describe("operator surface inventory", () => {
     const focusedProjectedRouteSet = new Set(focusedProjectedRoutes);
 
     expect(inventoryRoutes.filter((route) => !focusedProjectedRouteSet.has(route))).toEqual([]);
+  });
+
+  it("fails loudly when a projection references a missing shared inventory route", () => {
+    expect(() => getReportingIndexLinks(withoutSurfaceRoute(operatorSurfaceGroups, "/settings/usage"))).toThrow(
+      "Missing operator surface link for /settings/usage"
+    );
+    expect(() => getDemoOperationsCheckpoints(withoutSurfaceRoute(operatorSurfaceGroups, "/settings/contacts"))).toThrow(
+      "Missing operator surface link for /settings/contacts"
+    );
+    expect(() => getWorkflowOperationSteps(withoutSurfaceRoute(operatorSurfaceGroups, "/settings/queue"))).toThrow(
+      "Missing operator surface link for /settings/queue"
+    );
+    expect(() => getIntegrationOperationAreas(withoutSurfaceRoute(operatorSurfaceGroups, "/settings/provider"))).toThrow(
+      "Missing operator surface link for /settings/provider"
+    );
   });
 
   it("derives projected operator copy from the supplied inventory", () => {

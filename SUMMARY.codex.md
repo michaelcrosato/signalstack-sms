@@ -1,8 +1,13 @@
 # Codex Summary
 
-Run number: 75
+Run number: 76
 
 ## Completed
+
+- Advanced a post-MVP shared operator missing-route projection checkpoint.
+- Added unit coverage proving shared operator projections fail loudly with the missing route when the supplied inventory omits a referenced local operator surface.
+- Updated testing contract/docs, README, PLAN, BLOCKERS, loop logs, and next-prompt handoff docs with the missing-route projection guard.
+- Targeted operator-surface unit coverage passed.
 
 - Advanced a post-MVP shared operator focused-projection reachability checkpoint.
 - Added unit coverage so every shared operator surface route must be reachable from at least one focused page-specific or rich projection outside the broad inventory views.
@@ -260,6 +265,16 @@ Run number: 75
 
 ## Validation
 
+- Latest missing-route projection hardening added unit coverage that removes referenced routes from supplied operator inventories and verifies standard navigation, demo checkpoint, workflow, and integration projections throw route-specific missing-link errors. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
+- `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
+- `npm install`
+- `npm run db:generate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `npm run validate`
+- `.\scripts\local-gate.ps1`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
+- `git diff --check`
 - Latest full shared projection supplied-inventory hardening added unit coverage that stamps custom labels/notes across the supplied local operator inventory and verifies every shared navigation projection plus rich demo/workflow/integration labels and notes use that supplied copy. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - Latest shared operator inventory whitespace-clean hardening added unit coverage that rejects leading/trailing whitespace, doubled spaces, and embedded newlines in shared operator surface routes, group names, labels, and notes. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

@@ -180,6 +180,7 @@ Post-MVP:
 - Local shared operator projection order-stability coverage
 - Local rich operator projection copy-boundary coverage
 - Local shared operator focused-projection reachability coverage
+- Local shared operator missing-route failure coverage
 
 ## Next Milestone
 

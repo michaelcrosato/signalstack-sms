@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 076  GREEN  projection-missing-route-failure  2026-05-20 22:02
+Objective:    Guard shared operator projections against silent missing-route inventory drift.
+Changed:
+- Added unit coverage that removes referenced routes from supplied operator inventories and verifies projections throw route-specific missing-link errors.
+- Covered standard navigation, demo checkpoint, workflow, and integration projections without adding routes, mutations, provider calls, billing, notifications, or live feature behavior.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 075  GREEN  projection-focused-reachability  2026-05-20 21:54
 Objective:    Guard shared operator surfaces against becoming orphaned from focused projections.
 Changed:
