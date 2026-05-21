@@ -479,12 +479,40 @@ describe("operator surface inventory", () => {
           ? [{ ...group.links[0], href: "/settings/provider?unsafe=true" }, ...group.links.slice(1)]
           : group.links
     }));
+    const groupsWithHashRoute = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [{ ...group.links[0], href: "/settings/provider#unsafe" }, ...group.links.slice(1)]
+          : group.links
+    }));
+    const groupsWithTrailingSlashRoute = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [{ ...group.links[0], href: "/settings/provider/" }, ...group.links.slice(1)]
+          : group.links
+    }));
+    const groupsWithDoubleSlashRoute = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [{ ...group.links[0], href: "/settings//provider" }, ...group.links.slice(1)]
+          : group.links
+    }));
 
     expect(() => getOperatorSurfaceSummary(groupsWithApiRoute)).toThrow("Invalid operator surface route shape /api/unsafe");
     expect(() => getLaunchDashboardLinks(groupsWithUppercaseRoute)).toThrow("Invalid operator surface route shape /settings/Unsafe");
     expect(() => getSettingsNavigationLinks(groupsWithDynamicRoute)).toThrow("Invalid operator surface route shape /settings/[unsafe]");
     expect(() => getDemoOperationsLinks(groupsWithQueryRoute)).toThrow(
       "Invalid operator surface route shape /settings/provider?unsafe=true"
+    );
+    expect(() => getRunbookAdminLinks(groupsWithHashRoute)).toThrow("Invalid operator surface route shape /settings/provider#unsafe");
+    expect(() => getDemoConsoleLinks(groupsWithTrailingSlashRoute)).toThrow(
+      "Invalid operator surface route shape /settings/provider/"
+    );
+    expect(() => getDemoOperationsCheckpoints(groupsWithDoubleSlashRoute)).toThrow(
+      "Invalid operator surface route shape /settings//provider"
     );
   });
 

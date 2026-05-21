@@ -1,5 +1,14 @@
 # Codex Summary
 
+- Advanced a post-MVP shared operator supplied-inventory route-shape variant checkpoint.
+- Expanded unit coverage so supplied inventory routes with hash fragments, trailing slashes, and double slashes fail before local navigation projections, alongside the existing non-local, uppercase, query, and dynamic-route cases.
+- Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 103
+
+## Previous Run
+
 - Advanced a post-MVP shared operator supplied-inventory route-shape checkpoint.
 - Added a shared guard so summaries and projections fail before deriving local navigation from supplied routes that are non-local, uppercase, query/hash-bearing, trailing-slash, double-slash, or dynamic-segment shaped.
 - Added unit coverage proving malformed supplied route shapes are rejected for summary, launch, settings, and demo operation projections.

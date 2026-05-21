@@ -745,3 +745,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 103  GREEN  supplied-inventory-route-shape-variants  2026-05-20 23:58
+Objective:    Explicitly cover every malformed supplied operator route-shape variant named by the contract.
+Changed:
+- Expanded supplied-inventory route-shape unit coverage to reject hash-bearing, trailing-slash, and double-slash routes alongside non-local, uppercase, query-bearing, and dynamic routes.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
