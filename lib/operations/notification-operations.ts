@@ -22,6 +22,12 @@ export type NotificationOperationsStatus = {
 
 const notificationOperationChannelFields = ["name", "status", "boundary"] as const;
 const allowedNotificationOperationChannelNames = ["Email", "In-app", "SMS alerts", "Webhooks"] as const;
+const requiredNotificationChannelBoundaryTerms = {
+  Email: ["email", "provider"],
+  "In-app": ["notification", "job"],
+  "SMS alerts": ["SMS", "hard gates"],
+  Webhooks: ["Webhook", "outbound notifications"]
+} as const satisfies Record<(typeof allowedNotificationOperationChannelNames)[number], readonly string[]>;
 const requiredNotificationControlTerms = ["LIVE_MESSAGING_ENABLED", "LIVE_BILLING_ENABLED", "API keys", "worker", "local"] as const;
 const requiredNotificationBoundaryTerms = ["email", "SMS", "webhooks", "provider calls", "billing", "mutations"] as const;
 const forbiddenCommandMetadataPatterns = [
@@ -98,6 +104,14 @@ function assertChannel(channel: NotificationOperationChannel) {
 
   if (!allowedNotificationOperationChannelStatuses.includes(channel.status as (typeof allowedNotificationOperationChannelStatuses)[number])) {
     throw new Error(`Unsupported notification operation status for ${channel.name}`);
+  }
+
+  const missingBoundaryTerms = requiredNotificationChannelBoundaryTerms[
+    channel.name as (typeof allowedNotificationOperationChannelNames)[number]
+  ].filter((term) => !channel.boundary.includes(term));
+
+  if (missingBoundaryTerms.length > 0) {
+    throw new Error(`Missing notification operation boundary terms for ${channel.name}: ${missingBoundaryTerms.join(", ")}`);
   }
 }
 

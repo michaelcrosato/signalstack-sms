@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP notification operations channel-boundary term checkpoint.
+- Added channel-specific required boundary terms for email, in-app, SMS alert, and webhook notification metadata before `/settings/notifications` can render.
+- Added unit coverage pinning the channel boundary copy to its no-send surface.
+- Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
+- Focused notification operations unit coverage, typecheck, `git diff --check`, and the protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 142
+
+## Previous Run
+
 - Advanced a post-MVP notification operations status-vocabulary checkpoint.
 - Typed notification operation channel statuses to the supported local vocabulary: blocked, not implemented, and inbound only.
 - Added unit coverage pinning exported notification status vocabulary before `/settings/notifications` metadata renders.

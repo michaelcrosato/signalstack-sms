@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 142  GREEN  notification-operations-channel-boundaries  2026-05-21 02:54
+Objective:    Keep `/settings/notifications` channel boundary copy aligned with each no-send surface.
+Changed:
+- Added channel-specific required boundary terms for email, in-app, SMS alert, and webhook notification operation metadata.
+- Added unit coverage pinning channel boundary copy before `/settings/notifications` can render stale no-send metadata.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP notification operations hardening or safe read-only operator surface refinements.
+
 ## Run 137  GREEN  notification-operations-whitespace-clean  2026-05-21 02:28
 Objective:    Keep `/settings/notifications` static metadata whitespace-clean before rendering.
 Changed:

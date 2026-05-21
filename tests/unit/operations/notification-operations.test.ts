@@ -118,6 +118,15 @@ describe("getNotificationOperationsStatus", () => {
     expect(notificationOperationChannels.map((channel) => channel.status).filter((status) => !allowedNotificationOperationChannelStatuses.includes(status))).toEqual([]);
   });
 
+  it("keeps notification operation channel boundaries aligned with their no-send surfaces", () => {
+    expect(Object.fromEntries(notificationOperationChannels.map((channel) => [channel.name, channel.boundary]))).toEqual({
+      Email: "No SMTP, transactional email, invite email, or alert email provider is configured or called.",
+      "In-app": "No live notification feed, browser push, or background notification job exists.",
+      "SMS alerts": "Operational alerts cannot send SMS; messaging remains campaign and inbox data only under hard gates.",
+      Webhooks: "Webhook routes receive provider events locally; they do not emit outbound notifications."
+    });
+  });
+
   it("keeps notification operation inventory order stable for local review pages", () => {
     expect(notificationOperationChannels.map((channel) => channel.name)).toEqual(["Email", "In-app", "SMS alerts", "Webhooks"]);
     expect(notificationOperationControls).toEqual([
