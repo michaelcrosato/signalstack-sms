@@ -305,3 +305,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP local-only inventory, navigation, or admin surface hardening without live external-impact actions.
+
+## Run 053  GREEN  runbook-header-inventory  2026-05-20 20:14
+Objective:    Remove duplicated operator runbook header navigation by projecting it from the shared surface inventory.
+Changed:
+- Refactored `/settings/runbook` header links to use `getRunbookAdminLinks()`, matching the existing Local Admin Views inventory projection.
+- Hardened the seeded demo E2E chained navigation by asserting intermediate page headings before subsequent link clicks.
+- Preserved the read-only runbook behavior and existing safety boundaries without adding routes, mutations, provider calls, billing, notifications, or live feature enablement.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only inventory, navigation, or admin surface hardening without live external-impact actions.

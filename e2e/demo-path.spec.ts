@@ -127,7 +127,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Contract Operations" }).click();
+  await expect(page.getByRole("heading", { name: "Contract Operations" })).toBeVisible();
   await page.getByRole("link", { name: "API Operations" }).click();
+  await expect(page.getByRole("heading", { name: "API Operations" })).toBeVisible();
   await page.getByRole("link", { name: "Security Operations" }).click();
   await expect(page.getByRole("heading", { name: "Security Operations" })).toBeVisible();
   for (const link of securityOperationLinks) {
@@ -177,8 +179,11 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Workflow Operations" }).first().click();
+  await expect(page.getByRole("heading", { name: "Workflow Operations" })).toBeVisible();
   await page.getByRole("link", { name: "Integration Operations" }).click();
+  await expect(page.getByRole("heading", { name: "Integration Operations" })).toBeVisible();
   await page.getByRole("link", { name: "Security Operations" }).click();
+  await expect(page.getByRole("heading", { name: "Security Operations" })).toBeVisible();
   await page.getByRole("link", { name: "Operator Runbook" }).click();
   await expect(page.getByRole("heading", { name: "Operator Runbook" })).toBeVisible();
   await expect(page.getByText("Daily Local Start")).toBeVisible();
