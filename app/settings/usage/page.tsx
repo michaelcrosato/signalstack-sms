@@ -51,6 +51,9 @@ export default async function UsageSettingsPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/billing">
           Billing Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/reports">
+          Reporting Index
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/ai">
           AI Operations
         </Link>

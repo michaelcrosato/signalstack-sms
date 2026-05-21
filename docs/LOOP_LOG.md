@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 030  GREEN  reporting-index  2026-05-20 17:40
+Objective:    Add a read-only local reporting index for existing demo-safe reporting surfaces.
+Changed:
+- Added `/settings/reports` with existing report links, tenant metrics, usage totals, readiness signals, and reporting safety-boundary text.
+- Linked the reporting index from `/`, `/demo`, `/settings`, `/settings/usage`, `/settings/billing`, `/settings/exports`, and `/settings/runbook`.
+- Extended smoke and seeded investor demo E2E coverage for the reporting index.
+- Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only admin/reporting refinements without live external-impact actions.
+
 ## Run 029  GREEN  runbook-navigation-refresh  2026-05-20 17:29
 Objective:    Refresh the read-only operator runbook admin-link coverage.
 Changed:

@@ -106,6 +106,18 @@ Use `/settings/usage` for read-only local metering review before demos or repair
 
 The page is display-only. It must not mutate records, call Stripe, create billing provider artifacts, expose secrets, call providers, send notifications, or enable live messaging.
 
+## Reporting Index
+
+Use `/settings/reports` for read-only local report discovery before demos or reporting repair work. It displays:
+
+- existing local reporting surfaces
+- tenant-scoped analytics counts
+- local usage totals
+- recent readiness audit signals
+- reporting safety boundaries
+
+The page is display-only. It must not execute reports, create exports, mutate records, expose secrets, call providers, call Stripe, call live AI, send notifications, send SMS, send email, or enable live features.
+
 ## Campaign Operations
 
 Use `/settings/campaigns` for read-only campaign and queue review before demos or worker repair work. It displays:

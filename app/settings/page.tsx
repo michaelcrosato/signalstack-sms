@@ -119,6 +119,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/settings/usage">
           Usage & Analytics
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/reports">
+          Reporting Index
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/billing">
           Billing Operations
         </Link>
@@ -311,6 +314,16 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <p className="text-sm leading-6 text-slate-700">
           Review local billing account status, live billing blockers, Stripe placeholder presence, and usage totals
           without Stripe calls, invoices, payment collection, charges, email, or live billing.
+        </p>
+      </Panel>
+
+      <Panel title="Reporting Index">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/reports">
+          Reporting Index
+        </Link>
+        <p className="text-sm leading-6 text-slate-700">
+          Review local reporting surfaces, tenant metrics, export links, and readiness signals without executing reports,
+          creating exports, mutating records, calling providers, billing, sending notifications, exposing secrets, or enabling live features.
         </p>
       </Panel>
 

@@ -118,6 +118,11 @@ const launchLinks = [
     description: "Tenant metrics, local usage totals, billing boundary, and recent usage events."
   },
   {
+    href: "/settings/reports",
+    title: "Reporting Index",
+    description: "Read-only map of local reporting surfaces, metrics, exports, and safety boundaries."
+  },
+  {
     href: "/settings/billing",
     title: "Billing Operations",
     description: "Read-only local billing account status, live billing blockers, and usage boundary."

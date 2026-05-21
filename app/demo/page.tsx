@@ -100,6 +100,9 @@ export default async function DemoPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/usage">
           Usage & Analytics
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/reports">
+          Reporting Index
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/billing">
           Billing Operations
         </Link>

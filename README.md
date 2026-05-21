@@ -43,6 +43,8 @@ Production observability planning is documented in `docs/PRODUCTION_OBSERVABILIT
 
 Local usage and analytics review is available at `/settings/usage`. It renders existing tenant-scoped metrics and usage events only; it does not call Stripe, create billing provider artifacts, call providers, send notifications, or enable live messaging.
 
+Reporting index review is available at `/settings/reports`. It renders existing local reporting surfaces, tenant metrics, export links, and readiness signals only; it does not execute reports, create exports, mutate records, call providers, bill, notify, expose secrets, or enable live features.
+
 Campaign operations review is available at `/settings/campaigns`. It renders existing campaign status, recipient counts, queue job state, and worker boundaries only; it does not schedule campaigns, run workers, mutate queue rows, call providers, bill, notify, send SMS, or enable live messaging.
 
 Queue operations review is available at `/settings/queue`. It renders scheduled job timing, due/future status, payload validity, worker settings, queue backend metadata, and idempotency keys only; it does not enqueue jobs, run workers, mutate queue rows, update campaigns, call Redis, call providers, bill, notify, send SMS, or enable live messaging.

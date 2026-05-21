@@ -1,16 +1,23 @@
 # Codex Summary
 
-Run number: 29
+Run number: 30
 
 ## Completed
+
+- Advanced a post-MVP local reporting index checkpoint.
+- Added `/settings/reports`, a read-only page that maps existing local reporting surfaces, tenant metrics, usage totals, readiness signals, and safety boundaries.
+- Linked the reporting index from the launch dashboard, demo console, go-live readiness, usage, billing, admin exports, and operator runbook views.
+- Extended smoke and seeded investor demo E2E coverage to prove the reporting index remains visible and read-only.
+- Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, and next-prompt handoff docs with the reporting boundary.
+- Protected local gate, local migration check, demo seed, and seeded investor demo E2E passed.
+
+## Prior Completed
 
 - Advanced a post-MVP local operator runbook navigation checkpoint.
 - Added current local admin surface links to `/settings/runbook`, including queue operations, delivery operations, readiness audit, provider numbers, API operations, security operations, notifications, and provider details.
 - Extended the seeded investor demo E2E path to prove the runbook keeps those current local admin links visible without command execution or external-impact side effects.
 - Updated API/testing contracts, API map, README, PLAN, testing docs, and next-prompt handoff docs with the runbook navigation coverage.
 - Protected local gate, local migration check, demo seed, and seeded investor demo E2E passed.
-
-## Prior Completed
 
 - Advanced a post-MVP local delivery operations checkpoint.
 - Added `/settings/delivery`, a read-only page that renders tenant-scoped message direction counts, delivery metadata, provider status labels, provider message ID presence, campaign/conversation context, and recent idempotency keys.

@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 29
+Run number: 30
 
 No active blockers.
 
 ## Notes
 
+- `/settings/reports` is a read-only local reporting index. It displays existing local reporting surfaces, tenant metrics, usage totals, readiness signals, and safety boundaries; it does not execute reports, create exports, mutate records, call providers, call Stripe, call live AI, send SMS, send email, send notifications, expose secrets, or enable live features.
 - `/settings/runbook` now links the current local admin surfaces, including queue operations, delivery operations, readiness audit, provider numbers, API operations, security operations, notifications, and provider details. It remains read-only and does not execute commands, mutate records, call providers, create billing records, send notifications, expose secrets, or enable live messaging.
 - `/settings/delivery` is a read-only local delivery operations view. It displays tenant-scoped message direction counts, delivery metadata, provider status labels, provider message ID presence, campaign/conversation context, recent idempotency keys, and safety boundaries; it does not send SMS, retry deliveries, replay webhooks, mutate messages, call providers, create billing records, send notifications, expose secrets, or enable live messaging.
 - `/settings/readiness-audit` is a read-only local readiness audit operations view. It displays tenant-scoped local audit events, action/subject filters, local metadata, actor IDs, timestamps, and bounded CSV export links; it does not mutate audit events, expose secrets, call providers, create billing records, call live AI, send notifications, SMS, email, or enable live features.

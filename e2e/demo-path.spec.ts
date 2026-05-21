@@ -53,7 +53,7 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("link", { name: "Delivery Operations" }).first()).toBeVisible();
   await expect(page.getByRole("link", { name: "Readiness Audit" }).first()).toBeVisible();
   await expect(page.getByRole("link", { name: "Provider Numbers" }).first()).toBeVisible();
-  await page.getByRole("link", { name: "Usage & Analytics" }).click();
+  await page.getByRole("link", { name: "Usage & Analytics" }).first().click();
   await expect(page.getByRole("heading", { name: "Usage & Analytics" })).toBeVisible();
   await expect(page.getByText("Local Usage Totals")).toBeVisible();
   await expect(page.getByText("Billing Boundary")).toBeVisible();
@@ -64,6 +64,14 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Local Usage Totals" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent Usage Events" })).toBeVisible();
   await expect(page.getByText("Safety Boundary")).toBeVisible();
+  await page.getByRole("link", { name: "Reporting Index" }).click();
+  await expect(page.getByRole("heading", { name: "Reporting Index" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Report Surfaces" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Operational Snapshot" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Recent Readiness Signals" })).toBeVisible();
+  await expect(page.getByText("Safety Boundary")).toBeVisible();
+  await page.getByRole("link", { name: "Usage & Analytics" }).first().click();
+  await expect(page.getByRole("heading", { name: "Usage & Analytics" })).toBeVisible();
   await page.getByRole("link", { name: "AI Operations" }).click();
   await expect(page.getByRole("heading", { name: "AI Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Provider Boundary" })).toBeVisible();

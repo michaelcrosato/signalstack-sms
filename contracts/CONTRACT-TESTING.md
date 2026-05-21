@@ -71,6 +71,10 @@ Post-MVP AI operations view:
 
 - The seeded investor demo path must verify that `/settings/ai` renders read-only fake-provider status, deterministic endpoint coverage, recent local AI usage metadata, and safety-boundary text without prompt submission, live AI calls, paid model requests, billing artifacts, notifications, provider calls, SMS, or live AI enablement.
 
+Post-MVP reporting index view:
+
+- The seeded investor demo path must verify that `/settings/reports` renders a read-only local reporting index with report links, operational metrics, readiness signals, and safety-boundary text without executing reports, creating exports, mutating records, provider calls, billing, live AI, SMS, email, notifications, secret exposure, or live feature enablement.
+
 Post-MVP notification operations view:
 
 - The seeded investor demo path must verify that `/settings/notifications` renders read-only notification channel boundaries, no-send controls, runtime gates, and safety-boundary text without creating recipients, subscriptions, templates, jobs, sends, alerts, webhooks, provider calls, billing records, live AI calls, SMS, email, mutations, or notification delivery.
