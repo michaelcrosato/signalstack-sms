@@ -53,13 +53,13 @@ Campaign recipients are selected only from contacts in the current organization.
 
 ## Milestone 4 Queue Foundation
 
-- `QueueJob`: tenant-scoped durable job record with unique `idempotencyKey`, JSON `payload`, `runAt`, and status.
+- `QueueJob`: tenant-scoped durable job record with tenant-unique `(orgId, idempotencyKey)`, JSON `payload`, `runAt`, and status.
 - Scheduled campaign jobs link to `Campaign` when applicable.
 
 ## Milestone 5 Shared Inbox Foundation
 
 - `Conversation`: tenant-scoped inbox thread with optional `contactId`, optional `assignedToUserId`, `status`, `lastMessageAt`, `assignedAt`, and `resolvedAt`.
-- `Message`: tenant-scoped message rows linked to a conversation/contact when available. Milestone 5 demo inbound rows use `direction: "INBOUND"` and never call a provider.
+- `Message`: tenant-scoped message rows linked to a conversation/contact when available, with tenant-unique `(orgId, idempotencyKey)` for provider/worker retries. Milestone 5 demo inbound rows use `direction: "INBOUND"` and never call a provider.
 - `InternalNote`: tenant-scoped note linked to a conversation and author user.
 
 Conversation assignment is limited to active members of the current organization. Resolve/reopen changes only local conversation state.
@@ -75,7 +75,7 @@ Compliance profile completion is required by the centralized messaging hard gate
 
 - `UsageEvent`: tenant-scoped local usage record with `type`, `quantity`, optional JSON metadata, and timestamp.
 - `BillingAccount`: one org-scoped billing metadata record with local status and live-billing flag.
-- `WebhookEvent`: org-scoped raw provider webhook record with provider, event type, unique idempotency key, raw payload, received timestamp, and processed timestamp.
+- `WebhookEvent`: org-scoped raw provider webhook record with provider, event type, tenant-unique `(orgId, idempotencyKey)`, raw payload, received timestamp, and processed timestamp.
 - `ProviderPhoneNumber`: org-scoped phone-number metadata with `phoneNumber`, provider name, local status, capabilities, and default-number marker.
 - `ProviderCredential`: org-scoped provider credential metadata with provider name, redacted Twilio account/from-number fields, auth-token fingerprint, configured flag, and source.
 - `ProviderCredentialRotation`: org-scoped local history of provider credential metadata configuration, rotation, and deletion events.

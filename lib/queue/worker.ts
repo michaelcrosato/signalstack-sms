@@ -226,7 +226,7 @@ async function processScheduledCampaignQueueJob(
     });
 
     await prisma.message.upsert({
-      where: { idempotencyKey },
+      where: { orgId_idempotencyKey: { orgId: job.orgId, idempotencyKey } },
       update: {},
       create: {
         orgId: job.orgId,

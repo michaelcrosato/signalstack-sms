@@ -9,7 +9,7 @@ export async function recordWebhookEvent(input: {
   rawPayload: Record<string, string>;
 }) {
   const existing = await prisma.webhookEvent.findUnique({
-    where: { idempotencyKey: input.idempotencyKey }
+    where: { orgId_idempotencyKey: { orgId: input.orgId, idempotencyKey: input.idempotencyKey } }
   });
   if (existing) {
     return { event: existing, duplicate: true };

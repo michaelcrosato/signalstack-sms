@@ -40,12 +40,12 @@ Preflight reads contacts and returns compliance reasons. It does not create mess
 
 ## Milestone 4 Queue Jobs
 
-`QueueJob` stores durable scheduled campaign jobs with idempotency keys. Scheduling creates a queued record after preflight. Cancelling marks queued jobs cancelled. Workers and provider sends remain gated future work.
+`QueueJob` stores durable scheduled campaign jobs with idempotency keys that are unique per organization. Scheduling creates a queued record after preflight. Cancelling marks queued jobs cancelled. Workers and provider sends remain gated future work.
 
 ## Milestone 5 Shared Inbox
 
 - `Conversation` now tracks contact ownership, optional assignee, open/resolved state, last message time, assignment time, and resolution time.
-- `Message` remains the tenant-scoped message ledger for demo inbound rows and future provider-backed sends.
+- `Message` remains the tenant-scoped message ledger for demo inbound rows and future provider-backed sends. Message idempotency keys are unique per organization so retry keys cannot collide across tenants.
 - `InternalNote` stores private team notes authored by organization users.
 
 STOP-class inbound keywords update local contact consent to `OPTED_OUT`. HELP is tracked without creating outbound provider activity.
@@ -63,7 +63,7 @@ These records do not trigger Stripe or any live billing provider behavior.
 
 ## Post-MVP Webhook Foundations
 
-`WebhookEvent` stores org-scoped raw provider webhook payloads with a unique idempotency key. It is used by Twilio inbound and status webhook foundations to preserve provider data without live external side effects.
+`WebhookEvent` stores org-scoped raw provider webhook payloads with an idempotency key unique within that organization. It is used by Twilio inbound and status webhook foundations to preserve provider data without live external side effects.
 
 ## Post-MVP Status Transition Processing
 

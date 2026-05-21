@@ -10,7 +10,7 @@ Queue job records are persisted in `QueueJob` before any worker/provider behavio
 
 - `type`: `SCHEDULED_CAMPAIGN`
 - `status`: `QUEUED`, `CANCELLED`, `COMPLETED`, `FAILED`
-- `idempotencyKey`: unique stable key for retries
+- `idempotencyKey`: stable retry key unique with `orgId`
 - `payload`: validated JSON payload
 - `runAt`: scheduled execution time
 
@@ -25,6 +25,7 @@ Milestone 4 does not call live providers.
 - The worker uses validated version-1 scheduled campaign payloads.
 - Invalid payloads or missing scheduled campaigns are marked `FAILED`.
 - Valid due jobs create idempotent outbound `Message` rows through the dummy provider.
+- Outbound message idempotency is scoped by `(orgId, idempotencyKey)` so retries cannot collide across tenants.
 - Completed jobs are marked `COMPLETED`; campaigns are marked `COMPLETED`.
 - The worker must not call Twilio or any live provider.
 

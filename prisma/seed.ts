@@ -242,7 +242,7 @@ async function main() {
   });
 
   await prisma.message.upsert({
-    where: { idempotencyKey: "demo-seed-inbound-ada-1" },
+    where: { orgId_idempotencyKey: { orgId: org.id, idempotencyKey: "demo-seed-inbound-ada-1" } },
     update: {},
     create: {
       orgId: org.id,

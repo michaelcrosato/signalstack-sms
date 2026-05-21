@@ -343,7 +343,7 @@ model QueueJob {
   campaignId     String?
   type           QueueJobType
   status         QueueJobStatus @default(QUEUED)
-  idempotencyKey String         @unique
+  idempotencyKey String
   payload        Json
   runAt          DateTime
   createdAt      DateTime       @default(now())
@@ -351,6 +351,7 @@ model QueueJob {
   org            Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
   campaign       Campaign?      @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
+  @@unique([orgId, idempotencyKey])
   @@index([orgId])
   @@index([orgId, status])
   @@index([campaignId])
@@ -369,13 +370,14 @@ model Message {
   providerErrorCode   String?
   deliveredAt         DateTime?
   failedAt            DateTime?
-  idempotencyKey      String        @unique
+  idempotencyKey      String
   createdAt           DateTime      @default(now())
   org                 Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
   contact             Contact?      @relation(fields: [contactId], references: [id], onDelete: SetNull)
   conversation        Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
   campaign            Campaign?     @relation(fields: [campaignId], references: [id], onDelete: SetNull)
 
+  @@unique([orgId, idempotencyKey])
   @@index([orgId])
   @@index([conversationId])
   @@index([contactId])
@@ -527,12 +529,13 @@ model WebhookEvent {
   orgId          String
   provider       String
   eventType      String
-  idempotencyKey String       @unique
+  idempotencyKey String
   rawPayload     Json
   receivedAt     DateTime     @default(now())
   processedAt    DateTime?
   org            Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
+  @@unique([orgId, idempotencyKey])
   @@index([orgId])
   @@index([orgId, provider, eventType])
   @@index([receivedAt])

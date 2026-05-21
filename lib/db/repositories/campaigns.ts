@@ -134,7 +134,7 @@ export async function scheduleCampaign(orgId: string, campaignId: string, schedu
     });
 
     return tx.queueJob.upsert({
-      where: { idempotencyKey },
+      where: { orgId_idempotencyKey: { orgId, idempotencyKey } },
       update: {
         status: QueueJobStatus.QUEUED,
         payload,

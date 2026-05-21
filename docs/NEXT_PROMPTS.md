@@ -27,8 +27,8 @@ This file is the handoff for the next automated loop. It should stay short enoug
 4. Build campaign composer, preflight, schedule, and status UI on existing campaign APIs.
 5. Build inbox list/thread UI on existing inbox APIs.
 6. Fix mutating-route RBAC enforcement.
-7. Add send-time consent recheck coverage and implementation before any broader live sending.
-8. Scope idempotency behavior by tenant where appropriate.
+7. Add product-facing compliance readiness summary.
+8. Harden production worker policy before broader live sending.
 
 ## Guardrails
 

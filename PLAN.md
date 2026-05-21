@@ -44,8 +44,8 @@ Goal: make the repo understandable in minutes and remove known correctness risks
 - Keep the canonical implementation plan and contracts intact.
 - Stop adding new read-only operations surfaces unless they unblock product or release safety.
 - Fix mutating-route RBAC enforcement so role helpers are not only descriptive.
-- Recheck contact consent at send time in worker/send paths.
-- Scope idempotency keys by tenant where cross-tenant reuse is legitimate.
+- Keep contact consent rechecks at send time in worker/send paths.
+- Keep idempotency keys tenant-scoped where cross-tenant key reuse is legitimate.
 - Keep live SMS, billing, AI, secrets, destructive DB operations, and production side effects hard-gated.
 - Keep `npm run validate` and the local gate green.
 
@@ -87,5 +87,5 @@ Goal: turn the demo-safe product into a paid production SaaS.
 2. Build the `/dashboard` product shell.
 3. Add product-demo E2E coverage.
 4. Fix RBAC enforcement on mutating routes.
-5. Add send-time consent recheck coverage.
-6. Add tenant-scoped idempotency behavior.
+5. Add product-facing compliance readiness summary.
+6. Harden production worker policy before broader live sending.

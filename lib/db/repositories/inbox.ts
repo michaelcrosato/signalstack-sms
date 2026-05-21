@@ -88,7 +88,7 @@ export async function createDemoInboundMessage(orgId: string, input: InboundMess
       `demo-inbound:${orgId}:${input.providerMessageId ?? `${contact.id}:${Date.now()}`}`;
 
     const message = await tx.message.upsert({
-      where: { idempotencyKey },
+      where: { orgId_idempotencyKey: { orgId, idempotencyKey } },
       update: {},
       create: {
         orgId,
@@ -144,7 +144,7 @@ export async function createConversationInboundMessage(
     const idempotencyKey =
       input.idempotencyKey ?? `demo-conversation-inbound:${orgId}:${conversationId}:${Date.now()}`;
     const message = await tx.message.upsert({
-      where: { idempotencyKey },
+      where: { orgId_idempotencyKey: { orgId, idempotencyKey } },
       update: {},
       create: {
         orgId,

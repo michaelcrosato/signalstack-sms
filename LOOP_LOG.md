@@ -1834,3 +1834,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue Phase 0 correctness hardening: RBAC enforcement on mutating routes or tenant-scoped idempotency behavior.
+
+## Run 201  GREEN  tenant-scoped-idempotency-keys  2026-05-21 13:46
+Objective:    Scope retry/idempotency keys by tenant for queue jobs, messages, and webhook events.
+Changed:
+- Changed `QueueJob`, `Message`, and `WebhookEvent` uniqueness to `(orgId, idempotencyKey)` with a forward migration.
+- Updated queue, inbox, webhook, worker, and seed upserts to use tenant-scoped idempotency selectors.
+- Added schema-level unit coverage and refreshed contracts, data-model docs, roadmap handoff, and schema changelog.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue Phase 0 correctness hardening: RBAC enforcement on mutating routes, then product shell work.

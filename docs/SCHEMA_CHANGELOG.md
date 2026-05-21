@@ -64,3 +64,8 @@
 ## Post-MVP Live Readiness Audit Foundation
 
 - Added `LiveReadinessAuditEvent` for org-scoped local go-live readiness audit events.
+
+## Post-MVP Tenant-Scoped Idempotency
+
+- Changed `QueueJob`, `Message`, and `WebhookEvent` idempotency uniqueness from global keys to tenant-scoped `(orgId, idempotencyKey)` keys.
+- Repository upserts and webhook duplicate detection now include `orgId` in idempotency lookups.
