@@ -87,14 +87,35 @@ export default async function DemoPage() {
       </section>
 
       <section className="grid gap-6 lg:grid-cols-3">
-        <Panel title="Latest Contacts" items={contacts.slice(0, 4).map((contact) => contact.displayName ?? contact.phone)} />
-        <Panel title="Campaigns" items={campaigns.slice(0, 4).map((campaign) => `${campaign.name} (${campaign.status})`)} />
-        <Panel title="Numbers" items={numbers.slice(0, 4).map((number) => `${number.phoneNumber} (${number.provider})`)} />
+        <Panel
+          title="Latest Contacts"
+          items={contacts.slice(0, 4).map((contact) => ({
+            id: contact.id,
+            label: contact.displayName ?? contact.phone
+          }))}
+        />
+        <Panel
+          title="Campaigns"
+          items={campaigns.slice(0, 4).map((campaign) => ({
+            id: campaign.id,
+            label: `${campaign.name} (${campaign.status})`
+          }))}
+        />
+        <Panel
+          title="Numbers"
+          items={numbers.slice(0, 4).map((number) => ({
+            id: number.id,
+            label: `${number.phoneNumber} (${number.provider})`
+          }))}
+        />
         <Panel
           title="Inbox"
           items={conversations.slice(0, 4).map((conversation) => {
             const contact = conversation.contact?.displayName ?? conversation.contact?.phone ?? "Unknown contact";
-            return `${contact} (${conversation.status})`;
+            return {
+              id: conversation.id,
+              label: `${contact} (${conversation.status})`
+            };
           })}
         />
       </section>
@@ -120,12 +141,12 @@ function StatusRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Panel({ title, items }: { title: string; items: string[] }) {
+function Panel({ title, items }: { title: string; items: { id: string; label: string }[] }) {
   return (
     <div className="rounded border border-slate-200 bg-white p-5">
       <h2 className="text-lg font-semibold text-slate-950">{title}</h2>
       <ul className="mt-4 space-y-2 text-sm text-slate-700">
-        {items.length > 0 ? items.map((item) => <li key={item}>{item}</li>) : <li>No demo records yet.</li>}
+        {items.length > 0 ? items.map((item) => <li key={item.id}>{item.label}</li>) : <li>No demo records yet.</li>}
       </ul>
     </div>
   );
