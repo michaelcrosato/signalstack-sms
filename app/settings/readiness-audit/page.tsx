@@ -4,7 +4,7 @@ import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
 import { getReadinessAuditOperationLinks } from "@/lib/operations/operator-surfaces";
 import { getReadinessAuditOperationsStatus } from "@/lib/operations/readiness-audit-operations";
-import { readinessAuditQuerySchema } from "@/lib/validation/readiness-audit";
+import { readinessAuditQueryLimitDefault, readinessAuditQuerySchema } from "@/lib/validation/readiness-audit";
 
 export const dynamic = "force-dynamic";
 
@@ -21,9 +21,9 @@ export default async function ReadinessAuditOperationsPage({ searchParams }: Rea
   const parsedQuery = readinessAuditQuerySchema.safeParse({
     action: params?.action,
     subjectType: params?.subjectType,
-    limit: 50
+    limit: readinessAuditStatus.defaultLimit
   });
-  const query = parsedQuery.success ? parsedQuery.data : { limit: 50 };
+  const query = parsedQuery.success ? parsedQuery.data : { limit: readinessAuditQueryLimitDefault };
   const currentOrg = await getOrCreateCurrentOrg();
   const auditEvents = await listLiveReadinessAuditEvents(currentOrg.orgId, query.limit, {
     action: query.action,

@@ -1315,6 +1315,17 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP readiness audit operations hardening or safe read-only operator surface refinements.
 
+## Run 154  GREEN  readiness-audit-default-query-limit-vocabulary  2026-05-21 03:49
+Objective:    Keep readiness-audit JSON/CSV default query limits tied to a frozen supported operations vocabulary.
+Changed:
+- Exported a runtime-frozen readiness-audit default-limit vocabulary and surfaced the default limit in read-only operations status.
+- Updated readiness-audit query validation and `/settings/readiness-audit` fallback parsing to use the exported default limit instead of hard-coded literals.
+- Added unit coverage proving the default-limit vocabulary is frozen, positive, inside the maximum export limit, and used by the query schema default.
+- Updated testing/compliance contract docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP readiness audit operations hardening or safe read-only operator surface refinements.
+
 ## Run 145  GREEN  notification-operations-frozen-vocabularies  2026-05-21 03:05
 Objective:    Keep `/settings/notifications` exported vocabularies frozen at runtime.
 Changed:

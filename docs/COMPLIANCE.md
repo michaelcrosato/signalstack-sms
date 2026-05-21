@@ -27,4 +27,4 @@ The compliance settings API stores go-live readiness metadata only. It does not 
 
 Compliance profile updates and provider number metadata changes write local live-readiness audit events. The audit ledger is for demo/admin visibility only and does not notify users, call providers, call billing systems, or enable live messaging.
 
-Readiness audit APIs support bounded local filters and a CSV export for admin review. The export is read-only, tenant-scoped, and contains local metadata only; it must not expose secrets or trigger provider, billing, notification, or messaging side effects.
+Readiness audit APIs support bounded local filters and a CSV export for admin review. The default JSON/CSV query limit and maximum CSV export limit are derived from the readiness-audit operations vocabularies. The export is read-only, tenant-scoped, and contains local metadata only; it must not expose secrets or trigger provider, billing, notification, or messaging side effects.

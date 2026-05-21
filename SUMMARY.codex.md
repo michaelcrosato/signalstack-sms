@@ -1,5 +1,17 @@
 # Codex Summary
 
+- Advanced a post-MVP readiness audit default query-limit vocabulary checkpoint.
+- Exported a runtime-frozen readiness-audit default-limit vocabulary and exposed the default limit through the read-only readiness-audit operations status.
+- Updated readiness-audit query validation and `/settings/readiness-audit` fallback parsing so the default limit comes from the operations vocabulary instead of a hard-coded literal.
+- Added unit coverage proving the default-limit vocabulary is positive, frozen, mutation-resistant, inside the maximum export limit, and used by the query schema default.
+- Updated testing/compliance contract docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
+- Focused readiness-audit operations/export unit coverage and typecheck passed; protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 154
+
+## Previous Run
+
 - Advanced a post-MVP readiness audit maximum export-limit ceiling checkpoint.
 - Updated readiness-audit query validation so the JSON/CSV limit ceiling is derived from the maximum supported export-limit vocabulary value instead of vocabulary position.
 - Added unit coverage proving readiness-audit export limits remain positive integers and that the maximum vocabulary limit is accepted while limit-plus-one is rejected.

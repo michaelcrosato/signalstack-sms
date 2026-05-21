@@ -15,6 +15,7 @@ export const allowedReadinessAuditOperationCommandExecutionStates = Object.freez
 export const allowedReadinessAuditOperationExternalImpactStates = Object.freeze(["none"] as const);
 export const allowedReadinessAuditOperationMutationStates = Object.freeze(["none"] as const);
 export const allowedReadinessAuditOperationSecretsDisplayedStates = Object.freeze([false] as const);
+export const allowedReadinessAuditOperationDefaultLimits = Object.freeze([50] as const);
 export const allowedReadinessAuditOperationExportLimits = Object.freeze([200] as const);
 
 export type ReadinessAuditOperationAction = (typeof allowedReadinessAuditOperationActions)[number];
@@ -26,12 +27,14 @@ export type ReadinessAuditOperationExternalImpactState =
 export type ReadinessAuditOperationMutationState = (typeof allowedReadinessAuditOperationMutationStates)[number];
 export type ReadinessAuditOperationSecretsDisplayedState =
   (typeof allowedReadinessAuditOperationSecretsDisplayedStates)[number];
+export type ReadinessAuditOperationDefaultLimit = (typeof allowedReadinessAuditOperationDefaultLimits)[number];
 export type ReadinessAuditOperationExportLimit = (typeof allowedReadinessAuditOperationExportLimits)[number];
 
 export type ReadinessAuditOperationsStatus = {
   actionCount: number;
   subjectTypeCount: number;
   safetyBoundaryCount: number;
+  defaultLimit: ReadinessAuditOperationDefaultLimit;
   exportLimit: ReadinessAuditOperationExportLimit;
   commandExecution: ReadinessAuditOperationCommandExecutionState;
   externalImpact: ReadinessAuditOperationExternalImpactState;
@@ -42,6 +45,7 @@ export type ReadinessAuditOperationsStatus = {
   safetyBoundaries: readonly string[];
 };
 
+const readinessAuditOperationDefaultLimit = 50 satisfies ReadinessAuditOperationDefaultLimit;
 const readinessAuditOperationExportLimit = 200 satisfies ReadinessAuditOperationExportLimit;
 const requiredReadinessAuditBoundaryTerms = [
   "audit events",
@@ -143,11 +147,21 @@ function freezeSafetyBoundaries(boundaries: string[]) {
 function assertStatusSummary(
   summary: Pick<
     ReadinessAuditOperationsStatus,
-    "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed" | "exportLimit"
+    "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed" | "defaultLimit" | "exportLimit"
   >
 ) {
+  if (!allowedReadinessAuditOperationDefaultLimits.includes(summary.defaultLimit)) {
+    throw new Error(`Unsupported readiness audit operation default limit: ${summary.defaultLimit}`);
+  }
+
   if (!allowedReadinessAuditOperationExportLimits.includes(summary.exportLimit)) {
     throw new Error(`Unsupported readiness audit operation export limit: ${summary.exportLimit}`);
+  }
+
+  if (summary.defaultLimit > summary.exportLimit) {
+    throw new Error(
+      `Readiness audit operation default limit exceeds export limit: ${summary.defaultLimit} > ${summary.exportLimit}`
+    );
   }
 
   if (!allowedReadinessAuditOperationCommandExecutionStates.includes(summary.commandExecution)) {
@@ -169,11 +183,12 @@ function assertStatusSummary(
 
 export function getReadinessAuditOperationsStatus(): ReadinessAuditOperationsStatus {
   const statusSummary = {
+    defaultLimit: readinessAuditOperationDefaultLimit,
     exportLimit: readinessAuditOperationExportLimit,
     ...readinessAuditOperationStatusSummary
   } satisfies Pick<
     ReadinessAuditOperationsStatus,
-    "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed" | "exportLimit"
+    "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed" | "defaultLimit" | "exportLimit"
   >;
 
   assertStatusSummary(statusSummary);
@@ -182,6 +197,7 @@ export function getReadinessAuditOperationsStatus(): ReadinessAuditOperationsSta
     actionCount: allowedReadinessAuditOperationActions.length,
     subjectTypeCount: allowedReadinessAuditOperationSubjectTypes.length,
     safetyBoundaryCount: readinessAuditOperationSafetyBoundaries.length,
+    defaultLimit: statusSummary.defaultLimit,
     exportLimit: statusSummary.exportLimit,
     commandExecution: statusSummary.commandExecution,
     externalImpact: statusSummary.externalImpact,

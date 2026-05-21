@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   allowedReadinessAuditOperationActions,
   allowedReadinessAuditOperationCommandExecutionStates,
+  allowedReadinessAuditOperationDefaultLimits,
   allowedReadinessAuditOperationExternalImpactStates,
   allowedReadinessAuditOperationExportLimits,
   allowedReadinessAuditOperationMutationStates,
@@ -15,6 +16,7 @@ const publicStatusFields = [
   "actionCount",
   "subjectTypeCount",
   "safetyBoundaryCount",
+  "defaultLimit",
   "exportLimit",
   "commandExecution",
   "externalImpact",
@@ -36,6 +38,7 @@ describe("getReadinessAuditOperationsStatus", () => {
     expect(status.actionCount).toBe(4);
     expect(status.subjectTypeCount).toBe(3);
     expect(status.safetyBoundaryCount).toBe(4);
+    expect(status.defaultLimit).toBe(50);
     expect(status.exportLimit).toBe(200);
     expect(status.commandExecution).toBe("none");
     expect(status.externalImpact).toBe("none");
@@ -62,6 +65,7 @@ describe("getReadinessAuditOperationsStatus", () => {
 
     expect(Object.isFrozen(allowedReadinessAuditOperationActions)).toBe(true);
     expect(Object.isFrozen(allowedReadinessAuditOperationSubjectTypes)).toBe(true);
+    expect(Object.isFrozen(allowedReadinessAuditOperationDefaultLimits)).toBe(true);
     expect(Object.isFrozen(allowedReadinessAuditOperationExportLimits)).toBe(true);
     expect(Object.isFrozen(allowedReadinessAuditOperationCommandExecutionStates)).toBe(true);
     expect(Object.isFrozen(readinessAuditOperationSafetyBoundaries)).toBe(true);
@@ -80,6 +84,7 @@ describe("getReadinessAuditOperationsStatus", () => {
     const vocabularies = [
       allowedReadinessAuditOperationActions,
       allowedReadinessAuditOperationSubjectTypes,
+      allowedReadinessAuditOperationDefaultLimits,
       allowedReadinessAuditOperationExportLimits,
       allowedReadinessAuditOperationCommandExecutionStates,
       allowedReadinessAuditOperationExternalImpactStates,
@@ -110,16 +115,23 @@ describe("getReadinessAuditOperationsStatus", () => {
     const status = getReadinessAuditOperationsStatus();
 
     expect(allowedReadinessAuditOperationExportLimits).toEqual([200]);
+    expect(allowedReadinessAuditOperationDefaultLimits).toEqual([50]);
+    expect(allowedReadinessAuditOperationDefaultLimits.every((limit) => Number.isInteger(limit) && limit > 0)).toBe(true);
     expect(allowedReadinessAuditOperationExportLimits.every((limit) => Number.isInteger(limit) && limit > 0)).toBe(true);
+    expect(Math.max(...allowedReadinessAuditOperationDefaultLimits)).toBeLessThanOrEqual(
+      Math.max(...allowedReadinessAuditOperationExportLimits)
+    );
     expect(allowedReadinessAuditOperationCommandExecutionStates).toEqual(["none"]);
     expect(allowedReadinessAuditOperationExternalImpactStates).toEqual(["none"]);
     expect(allowedReadinessAuditOperationMutationStates).toEqual(["none"]);
     expect(allowedReadinessAuditOperationSecretsDisplayedStates).toEqual([false]);
+    expect(Object.isFrozen(allowedReadinessAuditOperationDefaultLimits)).toBe(true);
     expect(Object.isFrozen(allowedReadinessAuditOperationExportLimits)).toBe(true);
     expect(Object.isFrozen(allowedReadinessAuditOperationCommandExecutionStates)).toBe(true);
     expect(Object.isFrozen(allowedReadinessAuditOperationExternalImpactStates)).toBe(true);
     expect(Object.isFrozen(allowedReadinessAuditOperationMutationStates)).toBe(true);
     expect(Object.isFrozen(allowedReadinessAuditOperationSecretsDisplayedStates)).toBe(true);
+    expect(allowedReadinessAuditOperationDefaultLimits).toContain(status.defaultLimit);
     expect(allowedReadinessAuditOperationExportLimits).toContain(status.exportLimit);
     expect(allowedReadinessAuditOperationCommandExecutionStates).toContain(status.commandExecution);
     expect(allowedReadinessAuditOperationExternalImpactStates).toContain(status.externalImpact);

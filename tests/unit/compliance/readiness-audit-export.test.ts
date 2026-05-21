@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { serializeReadinessAuditEventsCsv } from "@/lib/compliance/readiness-audit-export";
-import { allowedReadinessAuditOperationExportLimits } from "@/lib/operations/readiness-audit-operations";
-import { readinessAuditQueryLimitMax, readinessAuditQuerySchema } from "@/lib/validation/readiness-audit";
+import {
+  allowedReadinessAuditOperationDefaultLimits,
+  allowedReadinessAuditOperationExportLimits
+} from "@/lib/operations/readiness-audit-operations";
+import {
+  readinessAuditQueryLimitDefault,
+  readinessAuditQueryLimitMax,
+  readinessAuditQuerySchema
+} from "@/lib/validation/readiness-audit";
 
 describe("readiness audit export", () => {
   it("bounds readiness audit filters to local audit values", () => {
@@ -29,6 +36,13 @@ describe("readiness audit export", () => {
     expect(readinessAuditQueryLimitMax).toBe(Math.max(...allowedReadinessAuditOperationExportLimits));
     expect(readinessAuditQuerySchema.safeParse({ limit: String(readinessAuditQueryLimitMax) }).success).toBe(true);
     expect(readinessAuditQuerySchema.safeParse({ limit: String(readinessAuditQueryLimitMax + 1) }).success).toBe(false);
+  });
+
+  it("derives the query default limit from the readiness audit operations vocabulary", () => {
+    expect(allowedReadinessAuditOperationDefaultLimits.every((limit) => Number.isInteger(limit) && limit > 0)).toBe(true);
+    expect(readinessAuditQueryLimitDefault).toBe(allowedReadinessAuditOperationDefaultLimits[0]);
+    expect(readinessAuditQueryLimitDefault).toBeLessThanOrEqual(readinessAuditQueryLimitMax);
+    expect(readinessAuditQuerySchema.parse({})).toEqual({ limit: readinessAuditQueryLimitDefault });
   });
 
   it("serializes audit events as escaped CSV without mutating data", () => {
