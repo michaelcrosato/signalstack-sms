@@ -727,6 +727,61 @@ describe("operator surface inventory", () => {
     }
   });
 
+  it("keeps projected operator links limited to public navigation fields", () => {
+    const groups = cloneSurfaceGroups(operatorSurfaceGroups).map((group) => ({
+      ...group,
+      links: group.links.map((link) => ({
+        ...link,
+        secretToken: `unsafe-${link.href}`
+      }))
+    })) as OperatorSurfaceGroup[];
+    const projectedLinks = [
+      ...getRunbookAdminLinks(groups),
+      ...getSettingsNavigationLinks(groups),
+      ...getLaunchDashboardLinks(groups),
+      ...getDemoConsoleLinks(groups),
+      ...getDemoOperationsLinks(groups),
+      ...getReportingIndexLinks(groups),
+      ...getReleaseOperationSurfaceLinks(groups),
+      ...getSecurityOperationLinks(groups),
+      ...getEnvironmentOperationLinks(groups),
+      ...getHealthOperationLinks(groups),
+      ...getContractOperationLinks(groups),
+      ...getValidationOperationLinks(groups),
+      ...getQueueOperationLinks(groups),
+      ...getContactOperationLinks(groups),
+      ...getCampaignOperationLinks(groups),
+      ...getAudienceOperationLinks(groups),
+      ...getTemplateOperationLinks(groups),
+      ...getInboxOperationLinks(groups),
+      ...getDataOperationLinks(groups),
+      ...getNotificationOperationLinks(groups),
+      ...getExportOperationLinks(groups),
+      ...getWebhookOperationLinks(groups),
+      ...getDeliveryOperationLinks(groups),
+      ...getTeamOperationLinks(groups),
+      ...getBillingOperationLinks(groups),
+      ...getAiOperationLinks(groups),
+      ...getProviderOperationLinks(groups),
+      ...getNumberOperationLinks(groups),
+      ...getComplianceOperationLinks(groups),
+      ...getSystemOperationLinks(groups),
+      ...getUsageOperationLinks(groups),
+      ...getReadinessAuditOperationLinks(groups)
+    ];
+    const integrationAreas = getIntegrationOperationAreas(groups);
+
+    for (const projectedLink of projectedLinks) {
+      expect(Object.keys(projectedLink).sort(), projectedLink.href).toEqual(["href", "label", "note"].sort());
+      expect(projectedLink, projectedLink.href).not.toHaveProperty("secretToken");
+    }
+
+    for (const area of integrationAreas) {
+      expect(Object.keys(area).sort(), area.href).toEqual(["boundary", "href", "label", "note", "state"].sort());
+      expect(area, area.href).not.toHaveProperty("secretToken");
+    }
+  });
+
   it("keeps projected operator navigation route order stable", () => {
     const stableProjectionOrders = [
       {

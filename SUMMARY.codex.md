@@ -1,8 +1,14 @@
 # Codex Summary
 
-Run number: 87
+Run number: 88
 
 ## Completed
+
+- Advanced a post-MVP shared operator projection public-field checkpoint.
+- Updated shared operator projection link sanitization so projected links expose only `href`, `label`, and `note` even when supplied inventories carry extra runtime fields.
+- Added unit coverage proving regular navigation projections and rich integration projections do not leak injected extra fields.
+- Preserved local-only behavior without adding routes, mutations, provider calls, billing, notifications, SMS, email, live AI, or live feature enablement.
+- Targeted operator-surface unit coverage passed.
 
 - Advanced a post-MVP shared operator projection detached-link checkpoint.
 - Added unit coverage proving projected operator links are detached objects from supplied inventory links while preserving shared href, label, and note copy.
@@ -316,6 +322,8 @@ Run number: 87
 ## Validation
 
 - Latest route-copy alignment hardening added unit coverage that verifies shared operator surface labels and notes stay semantically aligned with route names, including singular/plural route segment variants. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
+- Latest public-field projection hardening sanitizes projected operator links to public navigation fields only and adds unit coverage proving injected extra fields on supplied inventories do not leak into regular navigation or rich integration projections. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
+- `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - Latest projection array-freeze hardening updated shared operator projection helpers to return frozen result arrays, including the summary route array, while preserving fresh results per call and frozen result objects. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest deep-result-freeze hardening expands the result-object freeze guard across every returned projection entry for shared navigation, demo checkpoints, workflow steps, and integration areas. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`

@@ -29,7 +29,11 @@ export type IntegrationOperationArea = OperatorSurfaceLink & {
 };
 
 function freezeOperatorSurfaceLink(link: OperatorSurfaceLink) {
-  return Object.freeze({ ...link });
+  return Object.freeze({
+    href: link.href,
+    label: link.label,
+    note: link.note
+  });
 }
 
 function freezeProjectionArray<T>(items: T[]) {

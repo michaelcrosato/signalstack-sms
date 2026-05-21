@@ -192,6 +192,7 @@ Post-MVP:
 - Local shared operator projection deep-result-freeze coverage
 - Local shared operator inventory runtime-freeze coverage
 - Local shared operator projection detached-link coverage
+- Local shared operator projection public-field coverage
 
 ## Next Milestone
 
