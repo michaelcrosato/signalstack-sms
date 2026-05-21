@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 129  GREEN  handoff-truth-repair  2026-05-21 01:54
+Objective:    Reconcile stale handoff files with the latest validated loop state.
+Changed:
+- Updated SUMMARY and BLOCKERS to report Runs 127-128 validation operations hardening instead of stale Run 126 state.
+- Preserved product code, contracts, protected gate scripts, demo-safe defaults, and live-action settings unchanged.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP validation operations hardening or safe read-only operator surface refinements.
+
 ## Run 128  GREEN  validation-operations-package-scripts  2026-05-21 01:50
 Objective:    Keep `/settings/validation` command references backed by local package scripts before rendering.
 Changed:

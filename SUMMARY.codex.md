@@ -1,5 +1,38 @@
 # Codex Summary
 
+- Advanced a post-MVP handoff truth repair checkpoint.
+- Reconciled stale handoff files so the latest validation operations package-script and value-boundary runs are visible at the top of `SUMMARY.codex.md` and `BLOCKERS.codex.md`.
+- Updated root and docs loop logs with this coordination-only Run 129 entry.
+- Preserved product code, contracts, protected gate scripts, demo-safe defaults, and live-action settings unchanged.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 129
+
+## Previous Run
+
+- Advanced a post-MVP validation operations package-script checkpoint.
+- Added an explicit allowlist for `/settings/validation` gate command metadata.
+- Added unit coverage proving each listed `npm run ...` validation command is backed by `package.json`.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- Targeted validation operations unit coverage passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 128
+
+## Previous Run
+
+- Advanced a post-MVP validation operations value-boundary checkpoint.
+- Added explicit allowed local-only area values for `/settings/validation` gate command metadata.
+- Added boundary validation requiring validation gate and repair-signal copy to keep naming local/demo-safe checks, blocked settings, secrets, command execution, `DATABASE_URL`, Playwright, live provider/AI boundaries, and smallest-command repair flow.
+- Added unit coverage proving those validation boundaries stay pinned before local review pages render.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- Targeted validation operations unit coverage passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 127
+
+## Previous Run
+
 - Advanced a post-MVP security operations value-boundary checkpoint.
 - Added explicit allowed local-only status vocabulary for `/settings/security` static controls.
 - Added safety-boundary validation requiring blocked secrets, provider calls, SMS, email, notifications, and mutations to remain named before render.
