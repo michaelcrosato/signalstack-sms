@@ -1691,6 +1691,15 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP security/validation/contract operations hardening or safe read-only operator surface refinements.
 
+## Run 189  GREEN  readiness-audit-export-link-limit-rejection  2026-05-21 06:34
+Objective:    Keep readiness-audit CSV export links constrained to the supported export-limit vocabulary.
+Changed:
+- Added unit coverage proving `buildReadinessAuditExportHref()` rejects unsupported export limits before local CSV links render.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP readiness/API/contract operations hardening or safe read-only operator surface refinements.
+
 ## Run 185  GREEN  api-operations-no-impact-summary  2026-05-21 06:11
 Objective:    Keep `/settings/api` no-impact summary state inside validated runtime-frozen metadata.
 Changed:

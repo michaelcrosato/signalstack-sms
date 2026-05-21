@@ -1,5 +1,14 @@
 # Codex Summary
 
+- Advanced a post-MVP readiness-audit export-link limit rejection checkpoint.
+- Added unit coverage proving `buildReadinessAuditExportHref()` rejects unsupported export limits before local CSV links render.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, worker execution, Redis calls, record mutations, or protected gate-script edits were used.
+
+Run number: 189
+
+## Previous Run
+
 - Advanced a post-MVP readiness-audit export-link vocabulary checkpoint.
 - Added a validated `buildReadinessAuditExportHref()` helper so readiness-audit CSV links use the bounded operations export-limit vocabulary and supported action/subject filters before render.
 - Refactored `/settings`, `/settings/readiness-audit`, `/settings/compliance`, and `/settings/exports` to build readiness-audit CSV links through the helper instead of local hard-coded limits.

@@ -1,7 +1,8 @@
 # Codex Blockers
 
-Run number: 188
+Run number: 189
 
+- Latest readiness-audit export-link limit rejection coverage pins the centralized local readiness-audit CSV link helper against unsupported limits before render. The check is local static metadata/link construction only and does not mutate audit events, expose secrets, call providers, bill, notify, send SMS/email, call live AI, execute workers, call Redis, or enable live features.
 - Latest readiness-audit export-link vocabulary hardening centralizes local readiness-audit CSV link construction in the operations helper so `/settings`, `/settings/readiness-audit`, `/settings/compliance`, and `/settings/exports` use the bounded export-limit vocabulary and supported action/subject filters before render. The check is local static metadata/link construction only and does not mutate audit events, expose secrets, call providers, bill, notify, send SMS/email, call live AI, execute workers, call Redis, or enable live features.
 - Latest API operations frozen status snapshot hardening returns a frozen API operations status object with fresh frozen rate-limit and route snapshots, preventing caller-side mutation from drifting later local API inventory renders. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, mutate records, expose secrets, or enable live features.
 - Latest API operations area-vocabulary hardening exports a runtime-frozen supported area vocabulary and validates `/settings/api` static route inventory rows against it before local metadata freezes. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, mutate records, expose secrets, or enable live features.

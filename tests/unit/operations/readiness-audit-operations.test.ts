@@ -255,5 +255,8 @@ describe("getReadinessAuditOperationsStatus", () => {
     expect(() => buildReadinessAuditExportHref({ subjectType: "../Secret" as never })).toThrow(
       "Unsupported readiness audit export subject type"
     );
+    expect(() => buildReadinessAuditExportHref({ limit: 50 as never })).toThrow(
+      "Unsupported readiness audit operation export limit"
+    );
   });
 });

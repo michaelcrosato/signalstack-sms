@@ -221,6 +221,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP readiness audit no-impact summary rendering coverage: the seeded investor demo path verifies `/settings/readiness-audit` displays command-execution, external-impact, mutation, and secrets-displayed no-impact labels without mutating audit events, exposing secrets, provider calls, billing, live AI, notifications, SMS, email, or live feature enablement.
 - Post-MVP readiness audit detached status-array count coverage: unit coverage verifies returned readiness-audit status arrays are detached from exported vocabularies and that rendered counts stay aligned with those returned arrays before local audit filters or CSV links render.
 - Post-MVP readiness audit export-link vocabulary hardening: readiness-audit CSV links on `/settings`, `/settings/readiness-audit`, `/settings/compliance`, and `/settings/exports` now use a validated operations helper tied to the bounded export-limit vocabulary and supported action/subject filters before render.
+- Post-MVP readiness audit export-link limit rejection coverage: unit coverage verifies the centralized readiness-audit CSV link helper rejects unsupported limits before local export links render.
 
 Demo-safe defaults remain mandatory:
 
