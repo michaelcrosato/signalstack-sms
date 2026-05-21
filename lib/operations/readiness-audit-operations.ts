@@ -14,6 +14,7 @@ export const allowedReadinessAuditOperationSubjectTypes = Object.freeze([
 export const allowedReadinessAuditOperationExternalImpactStates = Object.freeze(["none"] as const);
 export const allowedReadinessAuditOperationMutationStates = Object.freeze(["none"] as const);
 export const allowedReadinessAuditOperationSecretsDisplayedStates = Object.freeze([false] as const);
+export const allowedReadinessAuditOperationExportLimits = Object.freeze([200] as const);
 
 export type ReadinessAuditOperationAction = (typeof allowedReadinessAuditOperationActions)[number];
 export type ReadinessAuditOperationSubjectType = (typeof allowedReadinessAuditOperationSubjectTypes)[number];
@@ -22,12 +23,13 @@ export type ReadinessAuditOperationExternalImpactState =
 export type ReadinessAuditOperationMutationState = (typeof allowedReadinessAuditOperationMutationStates)[number];
 export type ReadinessAuditOperationSecretsDisplayedState =
   (typeof allowedReadinessAuditOperationSecretsDisplayedStates)[number];
+export type ReadinessAuditOperationExportLimit = (typeof allowedReadinessAuditOperationExportLimits)[number];
 
 export type ReadinessAuditOperationsStatus = {
   actionCount: number;
   subjectTypeCount: number;
   safetyBoundaryCount: number;
-  exportLimit: number;
+  exportLimit: ReadinessAuditOperationExportLimit;
   externalImpact: ReadinessAuditOperationExternalImpactState;
   mutation: ReadinessAuditOperationMutationState;
   secretsDisplayed: ReadinessAuditOperationSecretsDisplayedState;
@@ -36,7 +38,7 @@ export type ReadinessAuditOperationsStatus = {
   safetyBoundaries: readonly string[];
 };
 
-const readinessAuditOperationExportLimit = 200;
+const readinessAuditOperationExportLimit = 200 satisfies ReadinessAuditOperationExportLimit;
 const requiredReadinessAuditBoundaryTerms = [
   "audit events",
   "tenant-scoped",
@@ -134,8 +136,12 @@ function freezeSafetyBoundaries(boundaries: string[]) {
 }
 
 function assertStatusSummary(
-  summary: Pick<ReadinessAuditOperationsStatus, "externalImpact" | "mutation" | "secretsDisplayed">
+  summary: Pick<ReadinessAuditOperationsStatus, "externalImpact" | "mutation" | "secretsDisplayed" | "exportLimit">
 ) {
+  if (!allowedReadinessAuditOperationExportLimits.includes(summary.exportLimit)) {
+    throw new Error(`Unsupported readiness audit operation export limit: ${summary.exportLimit}`);
+  }
+
   if (!allowedReadinessAuditOperationExternalImpactStates.includes(summary.externalImpact)) {
     throw new Error(`Unsupported readiness audit operation external impact state: ${summary.externalImpact}`);
   }
@@ -150,16 +156,21 @@ function assertStatusSummary(
 }
 
 export function getReadinessAuditOperationsStatus(): ReadinessAuditOperationsStatus {
-  assertStatusSummary(readinessAuditOperationStatusSummary);
+  const statusSummary = {
+    exportLimit: readinessAuditOperationExportLimit,
+    ...readinessAuditOperationStatusSummary
+  } satisfies Pick<ReadinessAuditOperationsStatus, "externalImpact" | "mutation" | "secretsDisplayed" | "exportLimit">;
+
+  assertStatusSummary(statusSummary);
 
   return Object.freeze({
     actionCount: allowedReadinessAuditOperationActions.length,
     subjectTypeCount: allowedReadinessAuditOperationSubjectTypes.length,
     safetyBoundaryCount: readinessAuditOperationSafetyBoundaries.length,
-    exportLimit: readinessAuditOperationExportLimit,
-    externalImpact: readinessAuditOperationStatusSummary.externalImpact,
-    mutation: readinessAuditOperationStatusSummary.mutation,
-    secretsDisplayed: readinessAuditOperationStatusSummary.secretsDisplayed,
+    exportLimit: statusSummary.exportLimit,
+    externalImpact: statusSummary.externalImpact,
+    mutation: statusSummary.mutation,
+    secretsDisplayed: statusSummary.secretsDisplayed,
     actions: freezeVocabulary(allowedReadinessAuditOperationActions, "action"),
     subjectTypes: freezeVocabulary(allowedReadinessAuditOperationSubjectTypes, "subject type"),
     safetyBoundaries: freezeSafetyBoundaries([...readinessAuditOperationSafetyBoundaries])

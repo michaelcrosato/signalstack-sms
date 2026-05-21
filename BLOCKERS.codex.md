@@ -1,12 +1,13 @@
 # Codex Blockers
 
-Run number: 146
+Run number: 147
 
 No active blockers.
 
 ## Notes
 
 - Latest notification operations runtime-frozen vocabulary hardening keeps `/settings/notifications` exported channel, status, command-execution, external-impact, and secrets-displayed vocabularies frozen at runtime before render. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
+- Latest readiness audit operations export-limit vocabulary hardening keeps `/settings/readiness-audit` CSV export limits inside an exported runtime-frozen supported vocabulary before render. The check is local static metadata validation only and does not mutate audit events, expose secrets, call providers, bill, notify, send SMS/email, call live AI, or enable live features.
 - Latest readiness audit operations static-metadata hardening keeps `/settings/readiness-audit` action filters, subject filters, bounded CSV export limit, safety-boundary copy, and no-impact summary states in a validated frozen helper before render. The check is local static metadata validation only and does not mutate audit events, expose secrets, call providers, bill, notify, send SMS/email, call live AI, or enable live features.
 - Latest notification operations no-impact summary-state hardening keeps `/settings/notifications` command execution, external impact, and secrets-displayed summary states inside exported no-impact vocabularies before render. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 - Latest notification operations exported channel-vocabulary hardening keeps `/settings/notifications` static channel metadata typed from the exported supported email, in-app, SMS alert, and webhook vocabulary before render. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.

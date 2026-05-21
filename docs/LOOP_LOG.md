@@ -1305,3 +1305,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP operations hardening or safe read-only operator surface refinements.
+
+## Run 147  GREEN  readiness-audit-export-limit-vocabulary  2026-05-21 03:17
+Objective:    Keep `/settings/readiness-audit` CSV export limits inside a frozen supported vocabulary.
+Changed:
+- Exported the supported readiness-audit CSV export-limit vocabulary and typed the operations status limit from it.
+- Added unit coverage proving the export-limit vocabulary is runtime-frozen and contains the rendered status limit before CSV links render.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP readiness audit operations hardening or safe read-only operator surface refinements.

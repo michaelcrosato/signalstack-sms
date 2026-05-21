@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP readiness audit operations export-limit vocabulary checkpoint.
+- Exported the supported readiness-audit CSV export-limit vocabulary and typed the operations status limit from it.
+- Added unit coverage proving the export-limit vocabulary is runtime-frozen and contains the rendered status limit before `/settings/readiness-audit` renders CSV links.
+- Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
+- Focused readiness-audit operations unit coverage, typecheck, lint, `git diff --check`, and the protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 147
+
+## Previous Run
+
 - Advanced a post-MVP readiness audit operations static-metadata checkpoint.
 - Moved `/settings/readiness-audit` action filters, subject filters, bounded CSV export limit, safety-boundary copy, and no-impact summary states into a validated frozen operations helper.
 - Added unit coverage proving those readiness audit metadata values stay public, frozen, ordered, unique, command-free, and secret-free before local readiness history renders.

@@ -151,6 +151,7 @@ Post-MVP:
 - Local notification operations no-impact summary-state hardening
 - Local notification operations runtime-frozen vocabulary hardening
 - Local readiness audit operations static-metadata hardening
+- Local readiness audit operations export-limit vocabulary hardening
 - Read-only local readiness audit operations view
 - Local operator runbook admin-link coverage refresh
 - Read-only local reporting index

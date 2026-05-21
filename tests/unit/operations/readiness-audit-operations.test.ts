@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   allowedReadinessAuditOperationActions,
   allowedReadinessAuditOperationExternalImpactStates,
+  allowedReadinessAuditOperationExportLimits,
   allowedReadinessAuditOperationMutationStates,
   allowedReadinessAuditOperationSecretsDisplayedStates,
   allowedReadinessAuditOperationSubjectTypes,
@@ -58,6 +59,7 @@ describe("getReadinessAuditOperationsStatus", () => {
 
     expect(Object.isFrozen(allowedReadinessAuditOperationActions)).toBe(true);
     expect(Object.isFrozen(allowedReadinessAuditOperationSubjectTypes)).toBe(true);
+    expect(Object.isFrozen(allowedReadinessAuditOperationExportLimits)).toBe(true);
     expect(Object.isFrozen(readinessAuditOperationSafetyBoundaries)).toBe(true);
     expect(Object.isFrozen(firstStatus)).toBe(true);
     expect(Object.isFrozen(firstStatus.actions)).toBe(true);
@@ -86,12 +88,15 @@ describe("getReadinessAuditOperationsStatus", () => {
   it("keeps readiness audit values inside documented local-only vocabularies", () => {
     const status = getReadinessAuditOperationsStatus();
 
+    expect(allowedReadinessAuditOperationExportLimits).toEqual([200]);
     expect(allowedReadinessAuditOperationExternalImpactStates).toEqual(["none"]);
     expect(allowedReadinessAuditOperationMutationStates).toEqual(["none"]);
     expect(allowedReadinessAuditOperationSecretsDisplayedStates).toEqual([false]);
+    expect(Object.isFrozen(allowedReadinessAuditOperationExportLimits)).toBe(true);
     expect(Object.isFrozen(allowedReadinessAuditOperationExternalImpactStates)).toBe(true);
     expect(Object.isFrozen(allowedReadinessAuditOperationMutationStates)).toBe(true);
     expect(Object.isFrozen(allowedReadinessAuditOperationSecretsDisplayedStates)).toBe(true);
+    expect(allowedReadinessAuditOperationExportLimits).toContain(status.exportLimit);
     expect(allowedReadinessAuditOperationExternalImpactStates).toContain(status.externalImpact);
     expect(allowedReadinessAuditOperationMutationStates).toContain(status.mutation);
     expect(allowedReadinessAuditOperationSecretsDisplayedStates).toContain(status.secretsDisplayed);
