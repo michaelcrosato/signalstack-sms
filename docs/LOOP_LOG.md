@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 040  GREEN  api-inventory-route-coverage  2026-05-20 19:02
+Objective:    Add fast backing-route coverage for the local API operations inventory.
+Changed:
+- Extended the API operations inventory unit test to verify listed route-method rows are unique.
+- Added a backing `app/**/route.ts` file check for every unique listed API path.
+- Updated testing contract, README, demo-mode docs, local operator runbook, SUMMARY, BLOCKERS, PLAN, and next-prompt handoff docs with the API inventory drift check.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only admin/reporting/navigation hardening without live external-impact actions.
+
 ## Run 039  GREEN  operations-inventory-page-coverage  2026-05-20 18:45
 Objective:    Add fast backing-page coverage for the local operations index inventory.
 Changed:

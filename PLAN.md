@@ -149,6 +149,7 @@ Post-MVP:
 - Read-only local environment operations view
 - Local operations index inventory unit coverage
 - Local operations index backing page coverage
+- Local API operations inventory backing route coverage
 
 ## Next Milestone
 

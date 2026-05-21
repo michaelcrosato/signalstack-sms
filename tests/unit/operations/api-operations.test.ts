@@ -1,5 +1,12 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { getApiOperationsStatus } from "@/lib/operations/api-operations";
+import { apiOperationRoutes, getApiOperationsStatus } from "@/lib/operations/api-operations";
+
+function apiPathToRouteFile(apiPath: string) {
+  const routeSegments = apiPath.split("/").filter(Boolean);
+  return join(process.cwd(), "app", ...routeSegments, "route.ts");
+}
 
 describe("getApiOperationsStatus", () => {
   it("reports local API route inventory and keeps external impact at zero", () => {
@@ -25,6 +32,17 @@ describe("getApiOperationsStatus", () => {
       limit: 120,
       windowSeconds: 60
     });
+  });
+
+  it("keeps API inventory entries unique and backed by implemented route files", () => {
+    const routeKeys = apiOperationRoutes.map((route) => `${route.method} ${route.path}`);
+    const missingRouteFiles = apiOperationRoutes
+      .map((route) => route.path)
+      .filter((path, index, paths) => paths.indexOf(path) === index)
+      .filter((path) => !existsSync(apiPathToRouteFile(path)));
+
+    expect(new Set(routeKeys).size).toBe(routeKeys.length);
+    expect(missingRouteFiles).toEqual([]);
   });
 
   it("surfaces bounded API rate limit settings", () => {

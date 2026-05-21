@@ -1,14 +1,18 @@
 # Codex Summary
 
-Run number: 39
+Run number: 40
 
 ## Completed
+
+- Advanced a post-MVP local API operations inventory backing-route coverage checkpoint.
+- Extended the `/settings/api` inventory unit test to fail when listed API route-method rows are duplicated or a listed API path lacks a backing `app/**/route.ts`.
+- Updated testing contract, README, demo-mode docs, local operator runbook, PLAN, BLOCKERS, and next-prompt handoff docs with the API inventory drift check.
+
+## Prior Completed
 
 - Advanced a post-MVP local operations index backing-page coverage checkpoint.
 - Extended the shared `/settings/operations` inventory unit test to fail when any listed local operator surface does not have a corresponding `app/**/page.tsx`.
 - Updated testing contract, README, demo-mode docs, local operator runbook, PLAN, BLOCKERS, and next-prompt handoff docs with the backing-page drift check.
-
-## Prior Completed
 
 - Advanced a post-MVP local operations index inventory hardening checkpoint.
 - Moved the `/settings/operations` grouped local operator surface inventory into a shared module.
@@ -99,7 +103,7 @@ Run number: 39
 ## Validation
 
 - `npm run typecheck`
-- `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
+- `npm run test -- tests/unit/operations/api-operations.test.ts`
 - `npm run contracts:check`
 - `npm run lint`
 - `npm run build`
@@ -113,4 +117,4 @@ Run number: 39
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 
-Latest targeted operations inventory test and protected local gate passed.
+Latest targeted API operations inventory test and protected local gate passed.

@@ -191,6 +191,17 @@ The operations index inventory is backed by a unit test so route-count drift, du
 
 The page is display-only. It must not execute commands, inspect files, call APIs, mutate records, create exports, enqueue jobs, call Redis, expose secrets, call providers, call Stripe, call live AI, create billing records, send notifications, send SMS, send email, or enable live features.
 
+## API Operations Inventory
+
+Use `/settings/api` for read-only local API route inventory review before API or contract handoff work. Its unit coverage verifies:
+
+- unique route-method rows
+- backing `app/**/route.ts` files for listed API paths
+- current local route count
+- external-impact route count remains zero
+
+The page and inventory tests are local metadata checks only. They must not execute route handlers, mutate records, call providers, create billing records, send notifications, send SMS, send email, expose secrets, or enable live features.
+
 ## Release Operations
 
 Use `/settings/releases` for read-only local release readiness review before integration or handoff work. It displays:

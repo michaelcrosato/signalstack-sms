@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 39
+Run number: 40
 
 No active blockers.
 
 ## Notes
 
+- `/settings/api` inventory tests now verify listed API route-method rows are unique and each listed API path has a backing `app/**/route.ts`, catching stale API inventory before browser demo coverage. The check is local filesystem validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `/settings/operations` inventory tests now also verify that every listed local operator surface has a backing `app/**/page.tsx`, catching stale navigation before seeded browser coverage. The check is local filesystem validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `/settings/operations` now uses a shared local operator surface inventory with unit coverage for grouped app routes, duplicate route prevention, current surface count, and safety-sensitive operations links. The page remains read-only and still does not execute commands, inspect files, call APIs, mutate records, create exports, enqueue jobs, call Redis, call providers, call Stripe, call live AI, send notifications, send SMS or email, expose secrets, or enable live features.
 - `/settings/operations` is a read-only local operations index. It displays grouped links to existing local operator surfaces, static surface counts, route names, and safety boundaries; it does not execute commands, inspect files, call APIs, mutate records, create exports, enqueue jobs, call Redis, call providers, call Stripe, call live AI, send notifications, send SMS or email, expose secrets, or enable live features.
