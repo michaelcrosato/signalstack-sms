@@ -1,5 +1,5 @@
-import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, readdirSync } from "node:fs";
+import { join, relative, sep } from "node:path";
 import { describe, expect, it } from "vitest";
 import { getOperatorSurfaceSummary, getRunbookAdminLinks, operatorSurfaceGroups } from "@/lib/operations/operator-surfaces";
 
@@ -8,12 +8,34 @@ function routeToAppPagePath(route: string) {
   return join(process.cwd(), "app", ...routeSegments, "page.tsx");
 }
 
+function collectPageRoutes(root: string) {
+  const routes: string[] = [];
+
+  function walk(directory: string) {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const fullPath = join(directory, entry.name);
+
+      if (entry.isDirectory()) {
+        walk(fullPath);
+      } else if (entry.isFile() && entry.name === "page.tsx") {
+        const relativeDirectory = relative(join(process.cwd(), "app"), directory);
+        const route = `/${relativeDirectory.split(sep).filter(Boolean).join("/")}`;
+        routes.push(route === "/" ? "/" : route);
+      }
+    }
+  }
+
+  walk(root);
+
+  return routes.sort();
+}
+
 describe("operator surface inventory", () => {
   it("keeps the operations index grouped around the current local-only surfaces", () => {
     const summary = getOperatorSurfaceSummary();
 
     expect(summary.groupCount).toBe(4);
-    expect(summary.surfaceCount).toBe(34);
+    expect(summary.surfaceCount).toBe(35);
     expect(new Set(summary.routes).size).toBe(summary.surfaceCount);
     expect(summary.routes).toEqual(
       expect.arrayContaining([
@@ -43,6 +65,16 @@ describe("operator surface inventory", () => {
     expect(missingPages).toEqual([]);
   });
 
+  it("lists every implemented local operator page in the shared inventory", () => {
+    const inventoryRoutes = new Set(getOperatorSurfaceSummary().routes);
+    const implementedOperatorRoutes = [
+      ...collectPageRoutes(join(process.cwd(), "app", "settings")),
+      "/demo"
+    ].sort();
+
+    expect(implementedOperatorRoutes.filter((route) => !inventoryRoutes.has(route))).toEqual([]);
+  });
+
   it("projects runbook admin links from the shared settings surface inventory", () => {
     const sourceLinks = operatorSurfaceGroups.flatMap((group) => group.links);
     const runbookLinks = getRunbookAdminLinks();
@@ -50,7 +82,7 @@ describe("operator surface inventory", () => {
     const sourceSettingsLinks = sourceLinks.filter((link) => link.href === "/settings" || link.href.startsWith("/settings/"));
 
     expect(runbookLinks).toEqual(sourceSettingsLinks);
-    expect(runbookLinks).toHaveLength(33);
+    expect(runbookLinks).toHaveLength(34);
     expect(sourceLinks.filter((link) => !runbookRoutes.includes(link.href)).map((link) => link.href)).toEqual(["/demo"]);
     expect(runbookLinks.every((link) => link.label.length > 0 && link.note.length > 0)).toBe(true);
     expect(runbookRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);

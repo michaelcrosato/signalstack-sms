@@ -151,6 +151,7 @@ Post-MVP:
 - Local operations index backing page coverage
 - Local API operations inventory backing route coverage
 - Local operator runbook shared-inventory coverage
+- Local operations index reverse page inventory coverage
 
 ## Next Milestone
 

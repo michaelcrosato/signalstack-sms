@@ -1,6 +1,6 @@
 # Codex Blockers
 
-Run number: 41
+Run number: 42
 
 No active blockers.
 
@@ -8,6 +8,7 @@ No active blockers.
 
 - `/settings/api` inventory tests now verify listed API route-method rows are unique and each listed API path has a backing `app/**/route.ts`, catching stale API inventory before browser demo coverage. The check is local filesystem validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `/settings/runbook` now projects its local admin links from the shared local operator surface inventory. Unit coverage verifies label alignment, settings-only projection, backing `app/**/page.tsx` files, and the intentional `/demo` exclusion. The check is local filesystem validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
+- `/settings/operations` inventory tests now verify reverse page coverage: every implemented local operator page under `/settings` plus `/demo` must be listed in the shared inventory. The inventory now includes `/settings/operations` itself. The check is local filesystem validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `/settings/operations` inventory tests now also verify that every listed local operator surface has a backing `app/**/page.tsx`, catching stale navigation before seeded browser coverage. The check is local filesystem validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `/settings/operations` now uses a shared local operator surface inventory with unit coverage for grouped app routes, duplicate route prevention, current surface count, and safety-sensitive operations links. The page remains read-only and still does not execute commands, inspect files, call APIs, mutate records, create exports, enqueue jobs, call Redis, call providers, call Stripe, call live AI, send notifications, send SMS or email, expose secrets, or enable live features.
 - `/settings/operations` is a read-only local operations index. It displays grouped links to existing local operator surfaces, static surface counts, route names, and safety boundaries; it does not execute commands, inspect files, call APIs, mutate records, create exports, enqueue jobs, call Redis, call providers, call Stripe, call live AI, send notifications, send SMS or email, expose secrets, or enable live features.

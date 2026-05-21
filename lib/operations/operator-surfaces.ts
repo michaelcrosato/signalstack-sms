@@ -36,6 +36,7 @@ export const operatorSurfaceGroups = [
     name: "Safety And Runtime",
     links: [
       { href: "/settings", label: "Go-Live Readiness", note: "provider and compliance blockers" },
+      { href: "/settings/operations", label: "Operations Index", note: "grouped local operator surfaces" },
       { href: "/settings/system", label: "System Status", note: "runtime flags and queue backend" },
       { href: "/settings/environment", label: "Environment Operations", note: "safe config categories" },
       { href: "/settings/health", label: "Health Operations", note: "health contract and blockers" },

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 042  GREEN  operations-inventory-reverse-coverage  2026-05-20 19:01
+Objective:    Add reverse coverage so implemented local operator pages cannot be missing from the shared operations inventory.
+Changed:
+- Added a filesystem-backed unit check that every implemented local operator page under `/settings` plus `/demo` is present in the shared inventory.
+- Added `/settings/operations` to the shared inventory and updated the fixed surface/runbook counts.
+- Updated testing contract, README, demo-mode docs, local operator runbook, SUMMARY, BLOCKERS, PLAN, and next-prompt handoff docs with the reverse inventory drift check.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only admin/reporting/navigation hardening without live external-impact actions.
+
 ## Run 041  GREEN  runbook-inventory-projection  2026-05-20 18:55
 Objective:    Derive runbook admin links from the shared local operator surface inventory.
 Changed:

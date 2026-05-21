@@ -53,7 +53,7 @@ Demo operations review is available at `/settings/demo`. It renders seeded demo 
 
 Operations index review is available at `/settings/operations`. It renders grouped links to existing local operator surfaces and safety boundaries only; it does not execute commands, inspect files, call APIs, mutate records, create exports, call providers, bill, notify, expose secrets, or enable live features.
 
-The operations index route inventory is shared with unit tests so local surface counts, backing app pages, duplicate routes, and safety-sensitive links fail fast before browser demo coverage.
+The operations index route inventory is shared with unit tests so local surface counts, backing app pages, implemented operator pages, duplicate routes, and safety-sensitive links fail fast before browser demo coverage.
 
 The `/settings/runbook` admin links are projected from the same shared local operator surface inventory, with unit coverage for label alignment and backing app pages.
 

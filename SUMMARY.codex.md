@@ -1,15 +1,20 @@
 # Codex Summary
 
-Run number: 41
+Run number: 42
 
 ## Completed
+
+- Advanced a post-MVP local operations inventory reverse-coverage checkpoint.
+- Added unit coverage that fails when an implemented local operator page under `/settings` or `/demo` is missing from the shared operations inventory.
+- Added `/settings/operations` to the shared inventory it renders from, so the index is covered by the same operations/runbook projection.
+- Updated testing contract, README, demo-mode docs, local operator runbook, PLAN, BLOCKERS, and next-prompt handoff docs with the reverse inventory drift check.
+
+## Prior Completed
 
 - Advanced a post-MVP local operator runbook inventory hardening checkpoint.
 - Refactored `/settings/runbook` local admin links to project from the shared operator surface inventory instead of duplicating the list.
 - Added unit coverage for runbook link projection, label/note alignment, settings-only routing, backing app pages, and the intentional `/demo` exclusion.
 - Updated testing contract, README, demo-mode docs, local operator runbook, PLAN, BLOCKERS, and next-prompt handoff docs with the runbook inventory drift check.
-
-## Prior Completed
 
 - Advanced a post-MVP local API operations inventory backing-route coverage checkpoint.
 - Extended the `/settings/api` inventory unit test to fail when listed API route-method rows are duplicated or a listed API path lacks a backing `app/**/route.ts`.
