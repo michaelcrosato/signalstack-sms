@@ -18,6 +18,7 @@ Post-MVP local operations status:
 
 - Unit tests must verify that the system-status helper reports demo-safe defaults as external-impact blocked.
 - The seeded investor demo path must verify that `/settings/system` renders read-only safety, runtime, queue, and API protection metadata.
+- The seeded investor demo path must verify that `/settings/health` renders read-only health endpoint contract, demo-safe defaults, runtime boundary, operational links, and safety-boundary text without health probes, API calls, commands, mutations, provider calls, billing, notifications, secrets, or live feature enablement.
 - The seeded investor demo path must verify that `/settings/runbook` keeps current local admin surface links visible, including queue operations, delivery operations, readiness audit, and provider numbers, without executing commands or creating external-impact side effects.
 
 Post-MVP deployment platform notes:

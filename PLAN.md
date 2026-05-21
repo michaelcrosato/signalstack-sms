@@ -143,6 +143,7 @@ Post-MVP:
 - Read-only local integration operations view
 - Read-only local workflow operations view
 - Read-only local release operations view
+- Read-only local health operations view
 
 ## Next Milestone
 

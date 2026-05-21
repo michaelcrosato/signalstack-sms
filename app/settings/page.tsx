@@ -95,6 +95,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/settings/system">
           System Status
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/health">
+          Health Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/api">
           API Operations
         </Link>
@@ -180,6 +183,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
       </section>
 
       <Panel title="API Protection">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/health">
+          Health Operations
+        </Link>
         <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/api">
           API Operations
         </Link>
@@ -213,6 +219,16 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <p className="text-sm leading-6 text-slate-700">
           Review local gate commands, repair signals, and validation safety boundaries without executing commands,
           inspecting logs, scanning files, mutating records, exposing secrets, or enabling live features.
+        </p>
+      </Panel>
+
+      <Panel title="Health Operations">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/health">
+          Health Operations
+        </Link>
+        <p className="text-sm leading-6 text-slate-700">
+          Review the local health endpoint contract, demo-safe defaults, and runtime blockers without executing probes,
+          calling APIs, mutating records, exposing secrets, notifying, billing, sending, or enabling live features.
         </p>
       </Panel>
 

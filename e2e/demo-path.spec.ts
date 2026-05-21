@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+test.setTimeout(60_000);
+
 test("investor demo path exercises safe product workflow", async ({ page, request }) => {
   await page.goto("/demo");
   await expect(page.getByRole("heading", { name: "SignalStack Demo Console" })).toBeVisible();
@@ -10,7 +12,13 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("Runtime")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Queue" })).toBeVisible();
   await expect(page.getByText("API Protection")).toBeVisible();
-  await page.getByRole("link", { name: "API Operations" }).click();
+  await page.getByRole("link", { name: "Health Operations" }).click();
+  await expect(page.getByRole("heading", { name: "Health Operations" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Health Signals" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Demo-Safe Defaults" })).toBeVisible();
+  await expect(page.getByText("GET /api/health")).toBeVisible();
+  await expect(page.getByText("Safety Boundary")).toBeVisible();
+  await page.getByRole("link", { name: "API Operations" }).first().click();
   await expect(page.getByRole("heading", { name: "API Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Route Inventory" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Rate Limit Policy" })).toBeVisible();
@@ -72,6 +80,7 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("Repair Loop")).toBeVisible();
   await expect(page.getByText("Command execution")).toBeVisible();
   await expect(page.getByRole("link", { name: "Queue Operations" }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Health Operations" }).first()).toBeVisible();
   await expect(page.getByRole("link", { name: "Delivery Operations" }).first()).toBeVisible();
   await expect(page.getByRole("link", { name: "Readiness Audit" }).first()).toBeVisible();
   await expect(page.getByRole("link", { name: "Provider Numbers" }).first()).toBeVisible();

@@ -51,6 +51,8 @@ Workflow operations review is available at `/settings/workflows`. It renders exi
 
 Release operations review is available at `/settings/releases`. It renders local release checklist commands, protected gate expectations, seeded demo path, premerge metadata, and release surface links only; it does not execute commands, run migrations, launch tests or browsers, perform git operations, deploy, mutate records, call providers, bill, notify, expose logs, diffs, environment values, or secrets, or enable live features.
 
+Health operations review is available at `/settings/health`. It renders the local health endpoint contract, demo-safe defaults, runtime blockers, and operations links only; it does not execute probes, call APIs, run commands, mutate records, call providers, bill, notify, expose raw environment values or secrets, or enable live features.
+
 Campaign operations review is available at `/settings/campaigns`. It renders existing campaign status, recipient counts, queue job state, and worker boundaries only; it does not schedule campaigns, run workers, mutate queue rows, call providers, bill, notify, send SMS, or enable live messaging.
 
 Queue operations review is available at `/settings/queue`. It renders scheduled job timing, due/future status, payload validity, worker settings, queue backend metadata, and idempotency keys only; it does not enqueue jobs, run workers, mutate queue rows, update campaigns, call Redis, call providers, bill, notify, send SMS, or enable live messaging.

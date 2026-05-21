@@ -38,6 +38,7 @@ const releaseSurfaces = [
   { href: "/settings/contracts", label: "Contract Operations", scope: "contract inventory and drift controls" },
   { href: "/settings/security", label: "Security Operations", scope: "safety gates and secret boundaries" },
   { href: "/settings/system", label: "System Status", scope: "runtime defaults and queue metadata" },
+  { href: "/settings/health", label: "Health Operations", scope: "health endpoint contract and demo-safe defaults" },
   { href: "/settings/runbook", label: "Operator Runbook", scope: "local command checklist" },
   { href: "/settings/workflows", label: "Workflow Operations", scope: "demo path checkpoint map" }
 ];

@@ -84,6 +84,18 @@ Use `/settings/system` for a read-only local operations snapshot before demos or
 
 The page is display-only. It must not mutate records, expose secrets, call providers, send notifications, create billing records, or enable live messaging.
 
+## Health Operations
+
+Use `/settings/health` for a read-only local health checkpoint before demos or release work. It displays:
+
+- the existing `GET /api/health` endpoint contract
+- service identity
+- demo-safe defaults
+- runtime blockers
+- links to system, API, security, and validation operations
+
+The page is display-only. It must not execute probes, call APIs, run commands, mutate records, expose raw environment values or secrets, call providers, create billing records, send notifications, send SMS, send email, or enable live features.
+
 ## Provider Numbers
 
 Use `/settings/numbers` for read-only local number metadata review before demos or repair work. It displays:

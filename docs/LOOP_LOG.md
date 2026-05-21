@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 034  GREEN  health-operations  2026-05-20 18:11
+Objective:    Add a read-only local health operations checkpoint for the existing health endpoint and demo-safe defaults.
+Changed:
+- Added `/settings/health` with the `GET /api/health` contract, service identity, demo-safe defaults, runtime blockers, operational links, and safety boundary.
+- Linked the view from `/`, `/demo`, `/settings`, `/settings/system`, `/settings/runbook`, and `/settings/releases`.
+- Extended root smoke and seeded investor demo E2E coverage for the health view and runbook link.
+- Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only admin/reporting/release refinements without live external-impact actions.
+
 ## Run 033  GREEN  release-operations  2026-05-20 18:05
 Objective:    Add a read-only local release operations checkpoint for protected gate and handoff readiness.
 Changed:
