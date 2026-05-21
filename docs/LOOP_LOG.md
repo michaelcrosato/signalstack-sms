@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 068  GREEN  projection-order-stability  2026-05-20 21:24
+Objective:    Add a shared guard against unintentional operator projection route-order churn.
+Changed:
+- Added unit coverage that keeps every shared operator navigation projection in stable route order.
+- Covered page headers, launch links, demo links, and rich workflow/demo/integration projections without adding routes or product behavior.
+- Updated testing contract/docs, README, PLAN, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 067  GREEN  rich-projection-inventory  2026-05-20 21:22
 Objective:    Add shared-inventory guard coverage for rich operator projections.
 Changed:

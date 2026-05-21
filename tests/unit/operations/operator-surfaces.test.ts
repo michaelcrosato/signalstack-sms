@@ -238,6 +238,314 @@ describe("operator surface inventory", () => {
     }
   });
 
+  it("keeps projected operator navigation route order stable", () => {
+    const stableProjectionOrders = [
+      {
+        name: "runbook",
+        routes: getRunbookAdminLinks().map((link) => link.href),
+        expectedRoutes: operatorSurfaceGroups
+          .flatMap((group) => group.links)
+          .filter((link) => link.href === "/settings" || link.href.startsWith("/settings/"))
+          .map((link) => link.href)
+      },
+      {
+        name: "settings",
+        routes: getSettingsNavigationLinks().map((link) => link.href),
+        expectedRoutes: getRunbookAdminLinks()
+          .filter((link) => link.href !== "/settings")
+          .map((link) => link.href)
+      },
+      {
+        name: "launch",
+        routes: getLaunchDashboardLinks().map((link) => link.href),
+        expectedRoutes: getOperatorSurfaceSummary().routes
+      },
+      {
+        name: "demo console",
+        routes: getDemoConsoleLinks().map((link) => link.href),
+        expectedRoutes: getOperatorSurfaceSummary().routes.filter((route) => route !== "/demo")
+      },
+      {
+        name: "demo operations",
+        routes: getDemoOperationsLinks().map((link) => link.href),
+        expectedRoutes: ["/settings/workflows", "/settings/operations", "/settings/releases", "/settings/environment"]
+      },
+      {
+        name: "reporting",
+        routes: getReportingIndexLinks().map((link) => link.href),
+        expectedRoutes: [
+          "/settings/demo",
+          "/settings/operations",
+          "/settings/usage",
+          "/settings/exports",
+          "/settings/readiness-audit",
+          "/settings/campaigns",
+          "/settings/delivery",
+          "/settings/workflows",
+          "/settings/billing"
+        ]
+      },
+      {
+        name: "workflow",
+        routes: getWorkflowOperationSteps().map((step) => step.href),
+        expectedRoutes: [
+          "/settings/contacts",
+          "/settings/campaigns",
+          "/settings/queue",
+          "/settings/inbox",
+          "/settings/delivery",
+          "/settings/reports"
+        ]
+      },
+      {
+        name: "release",
+        routes: getReleaseOperationSurfaceLinks().map((link) => link.href),
+        expectedRoutes: [
+          "/settings/demo",
+          "/settings/validation",
+          "/settings/contracts",
+          "/settings/security",
+          "/settings/system",
+          "/settings/health",
+          "/settings/runbook",
+          "/settings/workflows"
+        ]
+      },
+      {
+        name: "integration",
+        routes: getIntegrationOperationAreas().map((area) => area.href),
+        expectedRoutes: [
+          "/settings/provider",
+          "/settings/numbers",
+          "/settings/webhooks",
+          "/settings/ai",
+          "/settings/billing",
+          "/settings/notifications"
+        ]
+      },
+      {
+        name: "security",
+        routes: getSecurityOperationLinks().map((link) => link.href),
+        expectedRoutes: [
+          "/demo",
+          "/settings",
+          "/settings/system",
+          "/settings/api",
+          "/settings/contracts",
+          "/settings/notifications",
+          "/settings/validation",
+          "/settings/runbook",
+          "/settings/releases"
+        ]
+      },
+      {
+        name: "environment",
+        routes: getEnvironmentOperationLinks().map((link) => link.href),
+        expectedRoutes: ["/settings/system", "/settings/health", "/settings/security", "/settings/validation", "/settings/releases"]
+      },
+      {
+        name: "health",
+        routes: getHealthOperationLinks().map((link) => link.href),
+        expectedRoutes: ["/settings/system", "/settings/api", "/settings/security", "/settings/validation"]
+      },
+      {
+        name: "contract",
+        routes: getContractOperationLinks().map((link) => link.href),
+        expectedRoutes: ["/demo", "/settings", "/settings/api", "/settings/security", "/settings/runbook", "/settings/validation"]
+      },
+      {
+        name: "validation",
+        routes: getValidationOperationLinks().map((link) => link.href),
+        expectedRoutes: ["/demo", "/settings", "/settings/contracts", "/settings/runbook", "/settings/security", "/settings/releases"]
+      },
+      {
+        name: "queue",
+        routes: getQueueOperationLinks().map((link) => link.href),
+        expectedRoutes: ["/settings", "/settings/campaigns", "/settings/system", "/settings/runbook", "/settings/workflows", "/settings/releases"]
+      },
+      {
+        name: "contacts",
+        routes: getContactOperationLinks().map((link) => link.href),
+        expectedRoutes: [
+          "/demo",
+          "/settings",
+          "/settings/campaigns",
+          "/settings/data",
+          "/settings/templates",
+          "/settings/audience",
+          "/settings/inbox",
+          "/settings/usage"
+        ]
+      },
+      {
+        name: "campaigns",
+        routes: getCampaignOperationLinks().map((link) => link.href),
+        expectedRoutes: [
+          "/demo",
+          "/settings",
+          "/settings/usage",
+          "/settings/queue",
+          "/settings/contacts",
+          "/settings/templates",
+          "/settings/audience",
+          "/settings/inbox",
+          "/settings/delivery",
+          "/settings/runbook"
+        ]
+      },
+      {
+        name: "audience",
+        routes: getAudienceOperationLinks().map((link) => link.href),
+        expectedRoutes: ["/demo", "/settings", "/settings/contacts", "/settings/templates", "/settings/campaigns"]
+      },
+      {
+        name: "templates",
+        routes: getTemplateOperationLinks().map((link) => link.href),
+        expectedRoutes: ["/demo", "/settings", "/settings/contacts", "/settings/audience", "/settings/campaigns", "/settings/inbox", "/settings/runbook"]
+      },
+      {
+        name: "inbox",
+        routes: getInboxOperationLinks().map((link) => link.href),
+        expectedRoutes: [
+          "/demo",
+          "/settings",
+          "/settings/campaigns",
+          "/settings/contacts",
+          "/settings/templates",
+          "/settings/audience",
+          "/settings/usage",
+          "/settings/team",
+          "/settings/webhooks",
+          "/settings/delivery"
+        ]
+      },
+      {
+        name: "data",
+        routes: getDataOperationLinks().map((link) => link.href),
+        expectedRoutes: ["/demo", "/settings", "/settings/contacts", "/settings/exports", "/settings/security", "/settings/runbook"]
+      },
+      {
+        name: "notifications",
+        routes: getNotificationOperationLinks().map((link) => link.href),
+        expectedRoutes: ["/settings", "/settings/security", "/settings/system", "/settings/integrations", "/settings/runbook", "/settings/releases"]
+      },
+      {
+        name: "exports",
+        routes: getExportOperationLinks().map((link) => link.href),
+        expectedRoutes: [
+          "/settings",
+          "/settings/compliance",
+          "/settings/readiness-audit",
+          "/settings/system",
+          "/settings/usage",
+          "/settings/reports",
+          "/settings/campaigns",
+          "/settings/contacts",
+          "/settings/templates",
+          "/settings/audience",
+          "/settings/inbox",
+          "/settings/runbook"
+        ]
+      },
+      {
+        name: "webhooks",
+        routes: getWebhookOperationLinks().map((link) => link.href),
+        expectedRoutes: ["/demo", "/settings", "/settings/system", "/settings/inbox", "/settings/delivery", "/settings/runbook"]
+      },
+      {
+        name: "delivery",
+        routes: getDeliveryOperationLinks().map((link) => link.href),
+        expectedRoutes: ["/demo", "/settings", "/settings/campaigns", "/settings/queue", "/settings/inbox", "/settings/webhooks"]
+      },
+      {
+        name: "team",
+        routes: getTeamOperationLinks().map((link) => link.href),
+        expectedRoutes: ["/demo", "/settings", "/settings/campaigns", "/settings/contacts", "/settings/inbox", "/settings/system", "/settings/runbook"]
+      },
+      {
+        name: "billing",
+        routes: getBillingOperationLinks().map((link) => link.href),
+        expectedRoutes: ["/demo", "/settings", "/settings/usage", "/settings/reports", "/settings/system", "/settings/runbook", "/settings/ai"]
+      },
+      {
+        name: "ai",
+        routes: getAiOperationLinks().map((link) => link.href),
+        expectedRoutes: ["/demo", "/settings", "/settings/usage", "/settings/billing", "/settings/runbook"]
+      },
+      {
+        name: "provider",
+        routes: getProviderOperationLinks().map((link) => link.href),
+        expectedRoutes: ["/settings", "/settings/integrations", "/settings/numbers", "/settings/compliance", "/settings/readiness-audit", "/settings/exports", "/settings/system"]
+      },
+      {
+        name: "numbers",
+        routes: getNumberOperationLinks().map((link) => link.href),
+        expectedRoutes: ["/settings", "/settings/provider", "/settings/compliance", "/settings/system"]
+      },
+      {
+        name: "compliance",
+        routes: getComplianceOperationLinks().map((link) => link.href),
+        expectedRoutes: [
+          "/settings",
+          "/settings/exports",
+          "/settings/readiness-audit",
+          "/settings/provider",
+          "/settings/numbers",
+          "/settings/system",
+          "/settings/contacts",
+          "/settings/templates",
+          "/settings/audience"
+        ]
+      },
+      {
+        name: "system",
+        routes: getSystemOperationLinks().map((link) => link.href),
+        expectedRoutes: [
+          "/settings",
+          "/settings/compliance",
+          "/settings/usage",
+          "/settings/queue",
+          "/settings/contacts",
+          "/settings/templates",
+          "/settings/audience",
+          "/settings/health",
+          "/settings/environment",
+          "/settings/api",
+          "/settings/security",
+          "/settings/notifications",
+          "/settings/runbook"
+        ]
+      },
+      {
+        name: "usage",
+        routes: getUsageOperationLinks().map((link) => link.href),
+        expectedRoutes: [
+          "/settings",
+          "/settings/compliance",
+          "/settings/system",
+          "/settings/campaigns",
+          "/settings/contacts",
+          "/settings/templates",
+          "/settings/audience",
+          "/settings/inbox",
+          "/settings/runbook",
+          "/settings/billing",
+          "/settings/reports",
+          "/settings/ai"
+        ]
+      },
+      {
+        name: "readiness audit",
+        routes: getReadinessAuditOperationLinks().map((link) => link.href),
+        expectedRoutes: ["/settings", "/settings/exports", "/settings/compliance", "/settings/provider"]
+      }
+    ];
+
+    for (const projection of stableProjectionOrders) {
+      expect(projection.routes, projection.name).toEqual(projection.expectedRoutes);
+    }
+  });
+
   it("keeps rich operator projections unique and backed by the shared inventory", () => {
     const inventoryLinks = operatorSurfaceGroups.flatMap((group) => group.links);
     const inventoryRoutes = new Set(inventoryLinks.map((link) => link.href));

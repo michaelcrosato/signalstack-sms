@@ -104,6 +104,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP shared inventory copy-shape hardening: unit coverage now verifies that shared operator surface group names and labels stay in stable Title Case navigation format, and notes stay short lower-case sentence fragments without terminal punctuation.
 - Post-MVP shared inventory order-stability hardening: unit coverage now verifies that shared operator surface groups and route order remain stable so projected navigation does not churn without an intentional inventory update.
 - Post-MVP rich projection shared-inventory hardening: unit coverage now verifies that demo checkpoint, workflow step, and integration area projections keep unique route entries, point at implemented app pages, and derive visible labels from the shared local operator surface inventory.
+- Post-MVP shared projection order-stability hardening: unit coverage now verifies that every shared operator navigation projection keeps route order stable, including page headers, launch links, demo links, and rich workflow/demo/integration projections.
 
 Demo-safe defaults remain mandatory:
 

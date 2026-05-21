@@ -175,6 +175,7 @@ Post-MVP:
 - Local shared operator inventory copy-shape coverage
 - Local shared operator inventory order-stability coverage
 - Local rich operator projection shared-inventory coverage
+- Local shared operator projection order-stability coverage
 
 ## Next Milestone
 
