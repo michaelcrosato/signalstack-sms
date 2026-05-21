@@ -113,6 +113,11 @@ const launchLinks = [
     description: "Read-only provider, AI, billing, webhook, and notification integration boundaries."
   },
   {
+    href: "/settings/workflows",
+    title: "Workflow Operations",
+    description: "Read-only demo workflow checkpoints across audience, campaigns, queue, inbox, delivery, AI, and reports."
+  },
+  {
     href: "/settings/runbook",
     title: "Operator Runbook",
     description: "Local validation, seed, worker, export, and repair-loop commands with safety boundaries."

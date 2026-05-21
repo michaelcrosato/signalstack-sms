@@ -131,6 +131,19 @@ Use `/settings/integrations` for read-only integration boundary review before de
 
 The page is display-only. It must not call providers, submit prompts, call live AI, call Stripe, send notifications, send SMS, send email, emit outbound webhooks, expose secrets, mutate records, enqueue jobs, create exports, or enable live features.
 
+## Workflow Operations
+
+Use `/settings/workflows` for read-only demo workflow review before demos or workflow repair work. It displays:
+
+- audience intake checkpoint
+- campaign readiness checkpoint
+- queue handoff checkpoint
+- inbox response checkpoint
+- delivery evidence checkpoint
+- fake AI, usage, and reporting checkpoint
+
+The page is display-only. It must not import contacts, schedule or cancel campaigns, run workers, create inbox replies, retry deliveries, submit prompts, execute reports, create exports, mutate records, enqueue jobs, call Redis, expose secrets, call providers, create billing records, send notifications, send SMS, send email, or enable live features.
+
 ## Campaign Operations
 
 Use `/settings/campaigns` for read-only campaign and queue review before demos or worker repair work. It displays:

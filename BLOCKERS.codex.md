@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 31
+Run number: 32
 
 No active blockers.
 
 ## Notes
 
+- `/settings/workflows` is a read-only local workflow operations view. It displays existing demo workflow checkpoints across audience intake, campaign readiness, queue handoff, inbox response, delivery evidence, AI, usage, and reporting; it does not import contacts, schedule campaigns, run workers, create inbox replies, retry deliveries, submit prompts, execute reports, create exports, mutate records, enqueue jobs, call Redis, call providers, create billing records, send notifications, send SMS or email, expose secrets, or enable live features.
 - `/settings/integrations` is a read-only local integration operations view. It displays existing provider, provider-number, webhook, AI, billing, and notification boundaries; it does not call providers, submit prompts, call live AI, call Stripe, send notifications, send SMS or email, emit outbound webhooks, mutate records, enqueue jobs, create exports, expose secrets, or enable live features.
 - `/settings/reports` is a read-only local reporting index. It displays existing local reporting surfaces, tenant metrics, usage totals, readiness signals, and safety boundaries; it does not execute reports, create exports, mutate records, call providers, call Stripe, call live AI, send SMS, send email, send notifications, expose secrets, or enable live features.
 - `/settings/runbook` now links the current local admin surfaces, including queue operations, delivery operations, readiness audit, provider numbers, API operations, security operations, notifications, and provider details. It remains read-only and does not execute commands, mutate records, call providers, create billing records, send notifications, expose secrets, or enable live messaging.

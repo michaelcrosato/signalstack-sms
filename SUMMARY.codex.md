@@ -1,8 +1,16 @@
 # Codex Summary
 
-Run number: 31
+Run number: 32
 
 ## Completed
+
+- Advanced a post-MVP local workflow operations checkpoint.
+- Added `/settings/workflows`, a read-only page that maps the existing demo workflow across audience intake, campaign readiness, queue handoff, inbox response, delivery evidence, AI, usage, and reporting.
+- Linked the workflow operations view from the launch dashboard, demo console, go-live readiness, integration operations, reporting index, and operator runbook views.
+- Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, and next-prompt handoff docs with the workflow boundary.
+- Protected local gate, local migration check, demo seed, and seeded investor demo E2E passed.
+
+## Prior Completed
 
 - Advanced a post-MVP local integration operations checkpoint.
 - Added `/settings/integrations`, a read-only page that maps existing provider, provider-number, webhook, AI, billing, and notification boundaries.
@@ -10,8 +18,6 @@ Run number: 31
 - Extended seeded investor demo E2E coverage to prove the integration surface, runtime gates, safety boundary, and runbook link remain visible.
 - Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, and next-prompt handoff docs with the integration boundary.
 - Protected local gate, local migration check, demo seed, and seeded investor demo E2E passed.
-
-## Prior Completed
 
 - Advanced a post-MVP local reporting index checkpoint.
 - Added `/settings/reports`, a read-only page that maps existing local reporting surfaces, tenant metrics, usage totals, readiness signals, and safety boundaries.
@@ -60,6 +66,10 @@ Run number: 31
 - `npm run typecheck`
 - `npm run contracts:check`
 - `npm run lint`
+- `npm install`
+- `npm run db:generate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `npm run test`
 - `.\scripts\local-gate.ps1`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`

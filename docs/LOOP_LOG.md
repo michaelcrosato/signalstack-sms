@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 032  GREEN  workflow-operations  2026-05-20 17:52
+Objective:    Add a read-only local workflow operations view for the existing demo-safe product path.
+Changed:
+- Added `/settings/workflows` with audience, campaign, queue, inbox, delivery, AI, usage, and reporting checkpoints plus runtime and safety boundaries.
+- Linked the view from `/`, `/demo`, `/settings`, `/settings/integrations`, `/settings/reports`, and `/settings/runbook`.
+- Extended root smoke and seeded investor demo E2E coverage for the workflow view.
+- Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only admin/reporting/workflow refinements without live external-impact actions.
+
 ## Run 031  GREEN  integration-operations  2026-05-20 17:43
 Objective:    Add a read-only local integration operations view for existing external-impact boundaries.
 Changed:

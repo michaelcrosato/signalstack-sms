@@ -66,6 +66,9 @@ export default async function IntegrationOperationsPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/notifications">
           Notification Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/workflows">
+          Workflow Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/security">
           Security Operations
         </Link>

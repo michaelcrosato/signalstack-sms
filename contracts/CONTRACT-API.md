@@ -280,6 +280,10 @@ Renders a read-only reporting index for the current organization. It may display
 
 Renders a read-only integration operations view for the current organization. It may display existing local integration surfaces for messaging provider metadata, provider numbers, inbound webhooks, fake AI, local billing, and notification no-send boundaries. The page must not call providers, submit prompts, call live AI, call Stripe, send SMS, send email, send notifications, emit outbound webhooks, expose secrets or token fingerprints, mutate records, enqueue jobs, create exports, or enable live messaging, live billing, or live AI.
 
+### `/settings/workflows`
+
+Renders a read-only workflow operations view for the current organization. It may display existing local demo workflow checkpoints across contacts, campaigns, queue, inbox, delivery, AI, usage, and reporting surfaces. The page must not import contacts, schedule or cancel campaigns, run workers, create inbox replies, retry deliveries, submit prompts, execute reports, create exports, mutate records, enqueue jobs, call Redis, call providers, call Stripe, call live AI, send SMS, send email, send notifications, expose secrets, or enable live messaging, live billing, or live AI.
+
 ### `/settings/ai`
 
 Renders a read-only AI operations view for the current organization. It may display the selected AI provider, fake-provider readiness, live-AI blocked state, deterministic AI endpoint coverage, local AI usage totals, recent local AI usage-event metadata, and AI safety-boundary text. The page must not submit prompts, mutate conversations, call live AI providers, create paid model requests, expose API keys, create billing provider artifacts, send notifications, call messaging providers, send SMS, or enable live AI.

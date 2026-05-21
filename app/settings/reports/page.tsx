@@ -17,6 +17,7 @@ const reportLinks = [
   { href: "/settings/readiness-audit", label: "Readiness Audit", scope: "go-live readiness history" },
   { href: "/settings/campaigns", label: "Campaign Operations", scope: "campaign and queue status" },
   { href: "/settings/delivery", label: "Delivery Operations", scope: "message delivery metadata" },
+  { href: "/settings/workflows", label: "Workflow Operations", scope: "demo path checkpoint map" },
   { href: "/settings/billing", label: "Billing Operations", scope: "local billing metadata" }
 ];
 
@@ -52,6 +53,9 @@ export default async function ReportsPage() {
         </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/readiness-audit">
           Readiness Audit
+        </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/workflows">
+          Workflow Operations
         </Link>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>

@@ -79,6 +79,10 @@ Post-MVP integration operations view:
 
 - The seeded investor demo path must verify that `/settings/integrations` renders read-only provider, AI, billing, webhook, and notification integration boundaries without provider calls, prompt submission, billing artifacts, notifications, mutations, secret exposure, enqueueing, exports, or live feature enablement.
 
+Post-MVP workflow operations view:
+
+- The seeded investor demo path must verify that `/settings/workflows` renders read-only workflow checkpoints, runtime boundaries, operational signals, and safety-boundary text without imports, campaign scheduling, worker execution, inbox replies, delivery retries, prompt submission, report execution, exports, mutations, provider calls, billing, notifications, or live feature enablement.
+
 Post-MVP notification operations view:
 
 - The seeded investor demo path must verify that `/settings/notifications` renders read-only notification channel boundaries, no-send controls, runtime gates, and safety-boundary text without creating recipients, subscriptions, templates, jobs, sends, alerts, webhooks, provider calls, billing records, live AI calls, SMS, email, mutations, or notification delivery.
