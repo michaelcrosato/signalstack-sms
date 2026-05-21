@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 082  GREEN  projection-fresh-array-guard  2026-05-20 22:28
+Objective:    Guard shared operator projection helpers against returning reusable result arrays.
+Changed:
+- Added unit coverage that calls every shared operator projection twice, mutates the first returned array, and verifies later calls keep their expected lengths.
+- Updated the testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs with the projection fresh-array guard.
+- Preserved local-only behavior without adding routes, mutations, provider calls, billing, notifications, SMS, email, live AI, or live feature enablement.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 081  GREEN  projection-immutability-guard  2026-05-20 22:25
 Objective:    Guard shared operator projection helpers against mutating supplied inventories.
 Changed:

@@ -532,6 +532,59 @@ describe("operator surface inventory", () => {
     expect(groups).toEqual(originalGroups);
   });
 
+  it("keeps operator projection result arrays fresh per call", () => {
+    const projectionFactories = [
+      { name: "runbook", build: () => getRunbookAdminLinks() },
+      { name: "settings", build: () => getSettingsNavigationLinks() },
+      { name: "launch", build: () => getLaunchDashboardLinks() },
+      { name: "demo console", build: () => getDemoConsoleLinks() },
+      { name: "demo operations", build: () => getDemoOperationsLinks() },
+      { name: "reporting", build: () => getReportingIndexLinks() },
+      { name: "release", build: () => getReleaseOperationSurfaceLinks() },
+      { name: "security", build: () => getSecurityOperationLinks() },
+      { name: "environment", build: () => getEnvironmentOperationLinks() },
+      { name: "health", build: () => getHealthOperationLinks() },
+      { name: "contract", build: () => getContractOperationLinks() },
+      { name: "validation", build: () => getValidationOperationLinks() },
+      { name: "queue", build: () => getQueueOperationLinks() },
+      { name: "contacts", build: () => getContactOperationLinks() },
+      { name: "campaigns", build: () => getCampaignOperationLinks() },
+      { name: "audience", build: () => getAudienceOperationLinks() },
+      { name: "templates", build: () => getTemplateOperationLinks() },
+      { name: "inbox", build: () => getInboxOperationLinks() },
+      { name: "data", build: () => getDataOperationLinks() },
+      { name: "notifications", build: () => getNotificationOperationLinks() },
+      { name: "exports", build: () => getExportOperationLinks() },
+      { name: "webhooks", build: () => getWebhookOperationLinks() },
+      { name: "delivery", build: () => getDeliveryOperationLinks() },
+      { name: "team", build: () => getTeamOperationLinks() },
+      { name: "billing", build: () => getBillingOperationLinks() },
+      { name: "ai", build: () => getAiOperationLinks() },
+      { name: "provider", build: () => getProviderOperationLinks() },
+      { name: "numbers", build: () => getNumberOperationLinks() },
+      { name: "compliance", build: () => getComplianceOperationLinks() },
+      { name: "system", build: () => getSystemOperationLinks() },
+      { name: "usage", build: () => getUsageOperationLinks() },
+      { name: "readiness audit", build: () => getReadinessAuditOperationLinks() },
+      { name: "demo checkpoints", build: () => getDemoOperationsCheckpoints() },
+      { name: "workflow steps", build: () => getWorkflowOperationSteps() },
+      { name: "integration areas", build: () => getIntegrationOperationAreas() }
+    ];
+
+    for (const projection of projectionFactories) {
+      const first = projection.build();
+      const second = projection.build();
+      const expectedLength = first.length;
+
+      expect(first, projection.name).not.toBe(second);
+
+      first.pop();
+
+      expect(second, projection.name).toHaveLength(expectedLength);
+      expect(projection.build(), projection.name).toHaveLength(expectedLength);
+    }
+  });
+
   it("keeps projected operator navigation route order stable", () => {
     const stableProjectionOrders = [
       {

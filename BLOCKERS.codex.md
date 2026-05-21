@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 81
+Run number: 82
 
 No active blockers.
 
 ## Notes
 
+- Shared operator projections now have unit coverage proving projection helpers return fresh result arrays per call, so caller-side array mutation cannot contaminate later local navigation projections. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Rich shared operator projections now have unit coverage proving demo checkpoint, workflow step, and integration area boundary text explicitly names external-impact exclusions such as provider calls, SMS, billing, mutations, exports, queue activity, or paid AI. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator projections now have unit coverage proving supplied inventory groups and links are not mutated while navigation, rich checkpoints, workflow steps, and integration areas are derived. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator surface copy now has unit coverage proving group names, labels, and notes stay action-neutral instead of drifting into command-style send/run/delete/enable/replay/mutate language. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

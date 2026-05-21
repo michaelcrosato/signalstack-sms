@@ -186,6 +186,7 @@ Post-MVP:
 - Local shared operator action-neutral copy coverage
 - Local rich operator boundary external-impact coverage
 - Local shared operator projection immutability coverage
+- Local shared operator projection fresh-array coverage
 
 ## Next Milestone
 

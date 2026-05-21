@@ -1,8 +1,13 @@
 # Codex Summary
 
-Run number: 81
+Run number: 82
 
 ## Completed
+
+- Advanced a post-MVP shared operator projection fresh-array checkpoint.
+- Added unit coverage proving shared operator projection helpers return fresh result arrays per call, so caller-side array mutation cannot contaminate later navigation, rich checkpoint, workflow, or integration projections.
+- Updated the testing contract/docs, README, PLAN, BLOCKERS, loop logs, and next-prompt handoff docs with the projection fresh-array guard.
+- Targeted operator-surface unit coverage passed.
 
 - Advanced a post-MVP shared operator projection immutability checkpoint.
 - Added unit coverage proving shared operator projection helpers leave supplied inventory groups and links unchanged while deriving navigation, rich checkpoints, workflow steps, and integration areas.
