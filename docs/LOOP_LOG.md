@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 188  GREEN  readiness-audit-export-link-vocabulary  2026-05-21 06:28
+Objective:    Keep readiness-audit CSV export links tied to the bounded operations vocabulary.
+Changed:
+- Added a validated readiness-audit CSV export-link helper using the bounded export-limit vocabulary and supported action/subject filters.
+- Refactored `/settings`, `/settings/readiness-audit`, `/settings/compliance`, and `/settings/exports` to use the helper instead of local hard-coded readiness-audit export limits.
+- Added unit coverage proving bounded export links render and unsupported filters are rejected.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP API/readiness/contract operations hardening or safe read-only operator surface refinements.
+
 ## Run 187  GREEN  api-operations-frozen-status-snapshot  2026-05-21 06:20
 Objective:    Keep API operations status snapshots frozen against caller mutation.
 Changed:

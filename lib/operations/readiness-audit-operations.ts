@@ -45,6 +45,12 @@ export type ReadinessAuditOperationsStatus = {
   safetyBoundaries: readonly string[];
 };
 
+export type ReadinessAuditExportHrefOptions = {
+  action?: ReadinessAuditOperationAction;
+  subjectType?: ReadinessAuditOperationSubjectType;
+  limit?: ReadinessAuditOperationExportLimit;
+};
+
 const readinessAuditOperationDefaultLimit = 50 satisfies ReadinessAuditOperationDefaultLimit;
 const readinessAuditOperationExportLimit = 200 satisfies ReadinessAuditOperationExportLimit;
 const requiredReadinessAuditBoundaryTerms = [
@@ -207,4 +213,34 @@ export function getReadinessAuditOperationsStatus(): ReadinessAuditOperationsSta
     subjectTypes: freezeVocabulary(allowedReadinessAuditOperationSubjectTypes, "subject type"),
     safetyBoundaries: freezeSafetyBoundaries([...readinessAuditOperationSafetyBoundaries])
   });
+}
+
+export function buildReadinessAuditExportHref(options: ReadinessAuditExportHrefOptions = {}) {
+  const limit = options.limit ?? readinessAuditOperationExportLimit;
+
+  assertStatusSummary({
+    defaultLimit: readinessAuditOperationDefaultLimit,
+    exportLimit: limit,
+    ...readinessAuditOperationStatusSummary
+  });
+
+  if (options.action && !allowedReadinessAuditOperationActions.includes(options.action)) {
+    throw new Error(`Unsupported readiness audit export action: ${options.action}`);
+  }
+
+  if (options.subjectType && !allowedReadinessAuditOperationSubjectTypes.includes(options.subjectType)) {
+    throw new Error(`Unsupported readiness audit export subject type: ${options.subjectType}`);
+  }
+
+  const params = new URLSearchParams({ limit: String(limit) });
+
+  if (options.action) {
+    params.set("action", options.action);
+  }
+
+  if (options.subjectType) {
+    params.set("subjectType", options.subjectType);
+  }
+
+  return `/api/settings/readiness-audit/export?${params.toString()}`;
 }

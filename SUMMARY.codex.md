@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP readiness-audit export-link vocabulary checkpoint.
+- Added a validated `buildReadinessAuditExportHref()` helper so readiness-audit CSV links use the bounded operations export-limit vocabulary and supported action/subject filters before render.
+- Refactored `/settings`, `/settings/readiness-audit`, `/settings/compliance`, and `/settings/exports` to build readiness-audit CSV links through the helper instead of local hard-coded limits.
+- Added unit coverage proving the helper emits bounded local export links and rejects unsupported filters.
+- Focused readiness-audit operations unit coverage, typecheck, lint, protected local gate, and seeded investor demo path passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, worker execution, Redis calls, record mutations, or protected gate-script edits were used.
+
+Run number: 188
+
+## Previous Run
+
 - Advanced a post-MVP API operations frozen status snapshot checkpoint.
 - Updated `getApiOperationsStatus()` to return a frozen status object with a fresh frozen rate-limit snapshot alongside fresh frozen route snapshots.
 - Added unit coverage proving caller-side mutation of the status object, rate-limit object, and route snapshots is rejected before local `/settings/api` metadata renders.

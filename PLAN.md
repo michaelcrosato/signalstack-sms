@@ -170,6 +170,7 @@ Post-MVP:
 - Local readiness audit default query-limit vocabulary hardening
 - Local readiness audit no-impact summary rendering coverage
 - Local readiness audit detached status-array count coverage
+- Local readiness audit export-link vocabulary hardening
 - Read-only local readiness audit operations view
 - Local operator runbook admin-link coverage refresh
 - Read-only local reporting index

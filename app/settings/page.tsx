@@ -7,18 +7,12 @@ import { listProviderPhoneNumbers } from "@/lib/db/repositories/provider-numbers
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
 import { getProviderSettings } from "@/lib/messaging/provider/settings";
 import { getSettingsNavigationLinks } from "@/lib/operations/operator-surfaces";
+import { buildReadinessAuditExportHref, getReadinessAuditOperationsStatus } from "@/lib/operations/readiness-audit-operations";
 import { getQueueBackend } from "@/lib/queue/bullmq";
 import { getApiRateLimitPolicy } from "@/lib/rate-limit/api-rate-limit";
 import { readinessAuditQuerySchema } from "@/lib/validation/readiness-audit";
 
 export const dynamic = "force-dynamic";
-
-const readinessAuditActions = [
-  "COMPLIANCE_PROFILE_UPDATED",
-  "PROVIDER_NUMBER_UPSERTED",
-  "PROVIDER_CREDENTIAL_METADATA_UPSERTED",
-  "PROVIDER_CREDENTIAL_METADATA_DELETED"
-];
 
 const settingsNavigationLinks = getSettingsNavigationLinks();
 
@@ -30,6 +24,7 @@ type SettingsPageProps = {
 
 export default async function SettingsPage({ searchParams }: SettingsPageProps) {
   const params = await searchParams;
+  const readinessAuditStatus = getReadinessAuditOperationsStatus();
   const auditActionFilter = readinessAuditQuerySchema.shape.action.safeParse(params?.auditAction);
   const selectedAuditAction = auditActionFilter.success ? auditActionFilter.data : undefined;
   const currentOrg = await getOrCreateCurrentOrg();
@@ -401,14 +396,11 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <nav aria-label="Readiness audit filters" className="flex flex-wrap gap-2">
             <FilterLink href="/settings" label="All" active={!selectedAuditAction} />
-            {readinessAuditActions.map((action) => (
+            {readinessAuditStatus.actions.map((action) => (
               <FilterLink key={action} href={`/settings?auditAction=${action}`} label={action} active={selectedAuditAction === action} />
             ))}
           </nav>
-          <Link
-            className="text-sm font-medium text-teal-700"
-            href={`/api/settings/readiness-audit/export?limit=200${selectedAuditAction ? `&action=${selectedAuditAction}` : ""}`}
-          >
+          <Link className="text-sm font-medium text-teal-700" href={buildReadinessAuditExportHref({ action: selectedAuditAction })}>
             Export CSV
           </Link>
         </div>

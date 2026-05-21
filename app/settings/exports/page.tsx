@@ -3,6 +3,7 @@ import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { listProviderCredentialRotations } from "@/lib/db/repositories/provider-credentials";
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
 import { getExportOperationLinks } from "@/lib/operations/operator-surfaces";
+import { buildReadinessAuditExportHref } from "@/lib/operations/readiness-audit-operations";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +37,7 @@ export default async function SettingsExportsPage() {
           title="Readiness Audit"
           count={auditEvents.length}
           description="Local go-live readiness audit events with action, subject, actor, timestamp, and metadata columns."
-          href="/api/settings/readiness-audit/export?limit=200"
+          href={buildReadinessAuditExportHref()}
           detailHref="/settings/readiness-audit"
         />
         <ExportPanel

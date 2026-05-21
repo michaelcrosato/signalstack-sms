@@ -5,6 +5,7 @@ import { complianceProfileIsComplete, evaluateMessagingHardGate } from "@/lib/co
 import { getOrCreateComplianceProfile } from "@/lib/db/repositories/compliance";
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
 import { getComplianceOperationLinks } from "@/lib/operations/operator-surfaces";
+import { buildReadinessAuditExportHref } from "@/lib/operations/readiness-audit-operations";
 
 export const dynamic = "force-dynamic";
 
@@ -89,7 +90,7 @@ export default async function ComplianceSettingsPage() {
           <p className="text-sm text-slate-600">Recent local readiness audit events for the compliance profile.</p>
           <Link
             className="text-sm font-medium text-teal-700"
-            href="/api/settings/readiness-audit/export?subjectType=ComplianceProfile&limit=100"
+            href={buildReadinessAuditExportHref({ subjectType: "ComplianceProfile" })}
           >
             Export Compliance CSV
           </Link>

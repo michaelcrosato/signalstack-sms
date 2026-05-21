@@ -8,6 +8,7 @@ import {
   allowedReadinessAuditOperationMutationStates,
   allowedReadinessAuditOperationSecretsDisplayedStates,
   allowedReadinessAuditOperationSubjectTypes,
+  buildReadinessAuditExportHref,
   getReadinessAuditOperationsStatus,
   readinessAuditOperationSafetyBoundaries
 } from "@/lib/operations/readiness-audit-operations";
@@ -227,5 +228,32 @@ describe("getReadinessAuditOperationsStatus", () => {
     ];
 
     expect(staticCopy.filter((copy) => commandLikePatterns.some((pattern) => pattern.test(copy)))).toEqual([]);
+  });
+
+  it("builds readiness audit CSV export links from the bounded operations vocabulary", () => {
+    expect(buildReadinessAuditExportHref()).toBe("/api/settings/readiness-audit/export?limit=200");
+    expect(buildReadinessAuditExportHref({ action: "COMPLIANCE_PROFILE_UPDATED" })).toBe(
+      "/api/settings/readiness-audit/export?limit=200&action=COMPLIANCE_PROFILE_UPDATED"
+    );
+    expect(buildReadinessAuditExportHref({ subjectType: "ComplianceProfile" })).toBe(
+      "/api/settings/readiness-audit/export?limit=200&subjectType=ComplianceProfile"
+    );
+    expect(
+      buildReadinessAuditExportHref({
+        action: "PROVIDER_CREDENTIAL_METADATA_DELETED",
+        subjectType: "ProviderCredential"
+      })
+    ).toBe(
+      "/api/settings/readiness-audit/export?limit=200&action=PROVIDER_CREDENTIAL_METADATA_DELETED&subjectType=ProviderCredential"
+    );
+  });
+
+  it("rejects unsupported readiness audit CSV export filters before links render", () => {
+    expect(() => buildReadinessAuditExportHref({ action: "provider:send" as never })).toThrow(
+      "Unsupported readiness audit export action"
+    );
+    expect(() => buildReadinessAuditExportHref({ subjectType: "../Secret" as never })).toThrow(
+      "Unsupported readiness audit export subject type"
+    );
   });
 });

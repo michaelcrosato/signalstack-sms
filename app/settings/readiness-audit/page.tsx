@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
 import { getReadinessAuditOperationLinks } from "@/lib/operations/operator-surfaces";
-import { getReadinessAuditOperationsStatus } from "@/lib/operations/readiness-audit-operations";
+import { buildReadinessAuditExportHref, getReadinessAuditOperationsStatus } from "@/lib/operations/readiness-audit-operations";
 import { readinessAuditQueryLimitDefault, readinessAuditQuerySchema } from "@/lib/validation/readiness-audit";
 
 export const dynamic = "force-dynamic";
@@ -29,9 +29,7 @@ export default async function ReadinessAuditOperationsPage({ searchParams }: Rea
     action: query.action,
     subjectType: query.subjectType
   });
-  const exportHref = `/api/settings/readiness-audit/export?limit=${readinessAuditStatus.exportLimit}${query.action ? `&action=${query.action}` : ""}${
-    query.subjectType ? `&subjectType=${query.subjectType}` : ""
-  }`;
+  const exportHref = buildReadinessAuditExportHref({ action: query.action, subjectType: query.subjectType });
   const operationLinks = getReadinessAuditOperationLinks();
 
   return (
