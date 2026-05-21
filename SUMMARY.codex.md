@@ -1,8 +1,13 @@
 # Codex Summary
 
-Run number: 73
+Run number: 74
 
 ## Completed
+
+- Advanced a post-MVP full shared operator projection supplied-inventory checkpoint.
+- Expanded unit coverage so every shared operator navigation projection, plus demo checkpoint signals, workflow owners, and integration labels/notes, is proven to derive visible copy from the supplied inventory instance.
+- Updated testing contract/docs, README, PLAN, BLOCKERS, loop logs, and next-prompt handoff docs with the full supplied-inventory projection guard.
+- Targeted operator-surface unit coverage passed.
 
 - Advanced a post-MVP shared operator projection supplied-inventory checkpoint.
 - Added unit coverage that proves shared operator navigation helpers derive labels and notes from the supplied inventory instance instead of falling back to stale global copy.
@@ -250,6 +255,8 @@ Run number: 73
 
 ## Validation
 
+- Latest full shared projection supplied-inventory hardening added unit coverage that stamps custom labels/notes across the supplied local operator inventory and verifies every shared navigation projection plus rich demo/workflow/integration labels and notes use that supplied copy. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
+- `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - Latest shared operator inventory whitespace-clean hardening added unit coverage that rejects leading/trailing whitespace, doubled spaces, and embedded newlines in shared operator surface routes, group names, labels, and notes. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - Latest rich projection copy-boundary hardening added unit coverage for demo checkpoint, workflow step, and integration area projection copy. The check validates unique names, labels, states, and boundaries; whitespace-clean copy; lowercase integration states; and explicit read-only/no-impact boundary phrasing. It does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

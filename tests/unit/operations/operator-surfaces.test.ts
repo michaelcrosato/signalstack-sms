@@ -80,6 +80,23 @@ function withCustomSurfaceCopy(
   }));
 }
 
+function withRouteStampedSurfaceCopy(groups: OperatorSurfaceGroup[]): OperatorSurfaceGroup[] {
+  let linkIndex = 0;
+
+  return groups.map((group, groupIndex) => ({
+    name: `Custom Group ${groupIndex + 1}`,
+    links: group.links.map((link) => {
+      linkIndex += 1;
+
+      return {
+        ...link,
+        label: `Custom Link ${linkIndex}`,
+        note: `custom note ${linkIndex}`
+      };
+    })
+  }));
+}
+
 describe("operator surface inventory", () => {
   it("keeps the operations index grouped around the current local-only surfaces", () => {
     const summary = getOperatorSurfaceSummary();
@@ -282,6 +299,63 @@ describe("operator surface inventory", () => {
     expect(getSettingsNavigationLinks(groups).find((link) => link.href === "/settings/usage")).toEqual(usageLink);
     expect(getReportingIndexLinks(groups).find((link) => link.href === "/settings/usage")).toEqual(usageLink);
     expect(getBillingOperationLinks(groups).find((link) => link.href === "/settings/usage")).toEqual(usageLink);
+  });
+
+  it("derives every operator projection link copy from the supplied inventory", () => {
+    const groups = withRouteStampedSurfaceCopy(operatorSurfaceGroups);
+    const inventoryLinks = groups.flatMap((group) => group.links);
+    const inventoryByRoute = new Map(inventoryLinks.map((link) => [link.href, link]));
+    const projectedLinkSets = [
+      { name: "runbook", links: getRunbookAdminLinks(groups) },
+      { name: "settings", links: getSettingsNavigationLinks(groups) },
+      { name: "launch", links: getLaunchDashboardLinks(groups) },
+      { name: "demo console", links: getDemoConsoleLinks(groups) },
+      { name: "demo operations", links: getDemoOperationsLinks(groups) },
+      { name: "reporting", links: getReportingIndexLinks(groups) },
+      { name: "release", links: getReleaseOperationSurfaceLinks(groups) },
+      { name: "security", links: getSecurityOperationLinks(groups) },
+      { name: "environment", links: getEnvironmentOperationLinks(groups) },
+      { name: "health", links: getHealthOperationLinks(groups) },
+      { name: "contract", links: getContractOperationLinks(groups) },
+      { name: "validation", links: getValidationOperationLinks(groups) },
+      { name: "queue", links: getQueueOperationLinks(groups) },
+      { name: "contacts", links: getContactOperationLinks(groups) },
+      { name: "campaigns", links: getCampaignOperationLinks(groups) },
+      { name: "audience", links: getAudienceOperationLinks(groups) },
+      { name: "templates", links: getTemplateOperationLinks(groups) },
+      { name: "inbox", links: getInboxOperationLinks(groups) },
+      { name: "data", links: getDataOperationLinks(groups) },
+      { name: "notifications", links: getNotificationOperationLinks(groups) },
+      { name: "exports", links: getExportOperationLinks(groups) },
+      { name: "webhooks", links: getWebhookOperationLinks(groups) },
+      { name: "delivery", links: getDeliveryOperationLinks(groups) },
+      { name: "team", links: getTeamOperationLinks(groups) },
+      { name: "billing", links: getBillingOperationLinks(groups) },
+      { name: "ai", links: getAiOperationLinks(groups) },
+      { name: "provider", links: getProviderOperationLinks(groups) },
+      { name: "numbers", links: getNumberOperationLinks(groups) },
+      { name: "compliance", links: getComplianceOperationLinks(groups) },
+      { name: "system", links: getSystemOperationLinks(groups) },
+      { name: "usage", links: getUsageOperationLinks(groups) },
+      { name: "readiness audit", links: getReadinessAuditOperationLinks(groups) }
+    ];
+
+    for (const projection of projectedLinkSets) {
+      expect(projection.links, projection.name).toEqual(projection.links.map((link) => inventoryByRoute.get(link.href)));
+    }
+
+    expect(getDemoOperationsCheckpoints(groups).map((checkpoint) => checkpoint.signal)).toEqual(
+      getDemoOperationsCheckpoints(groups).map((checkpoint) => inventoryByRoute.get(checkpoint.href)?.label)
+    );
+    expect(getWorkflowOperationSteps(groups).map((step) => step.owner)).toEqual(
+      getWorkflowOperationSteps(groups).map((step) => inventoryByRoute.get(step.href)?.label)
+    );
+    expect(getIntegrationOperationAreas(groups).map(({ href, label, note }) => ({ href, label, note }))).toEqual(
+      getIntegrationOperationAreas(groups).map((area) => {
+        const link = inventoryByRoute.get(area.href);
+        return { href: link?.href, label: link?.label, note: link?.note };
+      })
+    );
   });
 
   it("keeps projected operator navigation route order stable", () => {

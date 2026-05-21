@@ -108,7 +108,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP rich projection shared-inventory hardening: unit coverage now verifies that demo checkpoint, workflow step, and integration area projections keep unique route entries, point at implemented app pages, and derive visible labels from the shared local operator surface inventory.
 - Post-MVP shared projection order-stability hardening: unit coverage now verifies that every shared operator navigation projection keeps route order stable, including page headers, launch links, demo links, and rich workflow/demo/integration projections.
 - Post-MVP rich projection copy-boundary hardening: unit coverage now verifies that demo checkpoint, workflow step, and integration area projection names, labels, states, and boundaries stay unique, whitespace-clean, and explicit about read-only/no-impact boundaries.
-- Post-MVP shared projection supplied-inventory hardening: unit coverage now verifies that shared operator navigation helpers derive labels and notes from the supplied inventory instance instead of falling back to stale global copy.
+- Post-MVP shared projection supplied-inventory hardening: unit coverage now verifies that every shared operator navigation projection plus rich demo/workflow/integration projection labels and notes derive from the supplied inventory instance instead of falling back to stale global copy.
 
 Demo-safe defaults remain mandatory:
 
