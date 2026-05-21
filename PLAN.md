@@ -189,6 +189,7 @@ Post-MVP:
 - Local shared operator projection fresh-array coverage
 - Local shared operator projection array-freeze coverage
 - Local shared operator projection result-freeze coverage
+- Local shared operator projection deep-result-freeze coverage
 - Local shared operator inventory runtime-freeze coverage
 
 ## Next Milestone

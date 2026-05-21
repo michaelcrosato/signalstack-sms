@@ -609,7 +609,7 @@ describe("operator surface inventory", () => {
     expect(() => (summary.routes as string[]).pop()).toThrow(TypeError);
   });
 
-  it("keeps operator projection result objects frozen per call", () => {
+  it("keeps every operator projection result object frozen per call", () => {
     const groups = withCustomSurfaceCopy(operatorSurfaceGroups, "/settings/usage", {
       label: "Usage Review",
       note: "custom local usage note"
@@ -653,10 +653,14 @@ describe("operator surface inventory", () => {
     ];
 
     for (const projection of projectionFactories) {
-      const firstResult = projection.build()[0];
+      const results = projection.build();
 
-      expect(Object.isFrozen(firstResult), projection.name).toBe(true);
-      expect(() => ((firstResult as { href: string }).href = "/settings/unsafe")).toThrow(TypeError);
+      expect(results.length, projection.name).toBeGreaterThan(0);
+
+      for (const result of results) {
+        expect(Object.isFrozen(result), projection.name).toBe(true);
+        expect(() => ((result as { href: string }).href = "/settings/unsafe")).toThrow(TypeError);
+      }
     }
 
     const suppliedUsageLink = groups.flatMap((group) => group.links).find((link) => link.href === "/settings/usage");

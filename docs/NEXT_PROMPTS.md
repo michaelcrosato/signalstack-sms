@@ -119,6 +119,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP shared projection fresh-array hardening: unit coverage now verifies that shared operator projection helpers return fresh result arrays per call so caller-side array changes cannot leak into later projections.
 - Post-MVP shared projection array-freeze hardening: shared operator projection helpers now return frozen result arrays, and unit coverage verifies caller-side array mutation is rejected before projected navigation can drift.
 - Post-MVP shared projection result-freeze hardening: unit coverage now verifies that shared operator projection helpers return frozen link and rich-projection result objects so caller-side copy changes cannot mutate supplied inventory instances.
+- Post-MVP shared projection deep-result-freeze hardening: unit coverage now verifies every shared navigation, checkpoint, workflow, and integration projection result object is frozen instead of sampling only the first result.
 - Post-MVP shared inventory runtime-freeze hardening: the canonical shared operator surface inventory is frozen at runtime, and unit coverage verifies the exported group array, nested link arrays, and link objects reject accidental mutation.
 
 Demo-safe defaults remain mandatory:
