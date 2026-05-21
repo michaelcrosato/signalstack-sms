@@ -39,6 +39,7 @@ import {
   getWebhookOperationLinks,
   getWorkflowOperationSteps,
   operatorSurfaceGroups,
+  type OperatorSurfaceLink,
   type OperatorSurfaceGroup
 } from "@/lib/operations/operator-surfaces";
 
@@ -352,6 +353,30 @@ describe("operator surface inventory", () => {
     expect(() => getOperatorSurfaceSummary(groupsWithNullLink)).toThrow("Invalid operator surface link");
     expect(() => getLaunchDashboardLinks(groupsWithNullLink)).toThrow("Invalid operator surface link");
     expect(() => getDemoOperationsLinks(groupsWithArrayLink)).toThrow("Invalid operator surface link");
+  });
+
+  it("rejects supplied operator inventories with prototype-backed fields before projection", () => {
+    const prototypeBackedGroup = Object.create({
+      name: "Prototype Group",
+      links: operatorSurfaceGroups[1].links
+    }) as OperatorSurfaceGroup;
+    const groupsWithPrototypeBackedGroup = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) =>
+      groupIndex === 1 ? prototypeBackedGroup : group
+    );
+
+    const prototypeBackedLink = Object.create(operatorSurfaceGroups[1].links[0]) as OperatorSurfaceLink;
+    const groupsWithPrototypeBackedLink = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [prototypeBackedLink, ...group.links.slice(1)]
+          : group.links
+    }));
+
+    expect(() => getOperatorSurfaceSummary(groupsWithPrototypeBackedGroup)).toThrow("Invalid operator surface group fields");
+    expect(() => getLaunchDashboardLinks(groupsWithPrototypeBackedGroup)).toThrow("Invalid operator surface group fields");
+    expect(() => getSettingsNavigationLinks(groupsWithPrototypeBackedLink)).toThrow("Invalid operator surface link fields");
+    expect(() => getDemoOperationsLinks(groupsWithPrototypeBackedLink)).toThrow("Invalid operator surface link fields");
   });
 
   it("rejects supplied operator inventories with sparse link entries before projection", () => {

@@ -138,6 +138,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP shared supplied-inventory route-shape hardening: summaries and projections now fail before deriving local navigation from supplied operator inventory routes that are non-local, uppercase, query/hash-bearing, trailing-slash, double-slash, or dynamic-segment shaped, preventing malformed runtime routes from entering local navigation helpers.
 - Post-MVP shared supplied-inventory route-shape variant coverage: unit coverage now explicitly exercises non-local, uppercase, query, hash, trailing-slash, double-slash, and dynamic supplied routes before local navigation helpers can render them.
 - Post-MVP shared supplied-inventory sparse-link hardening: summaries and projections now fail before deriving local navigation from supplied operator inventory link arrays with sparse/missing entries, preventing malformed runtime link slots from being silently dropped.
+- Post-MVP shared supplied-inventory own-field hardening: summaries and projections now fail before deriving local navigation from prototype-backed supplied operator groups or links, requiring required navigation fields to be own properties.
 
 Demo-safe defaults remain mandatory:
 

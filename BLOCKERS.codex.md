@@ -1,11 +1,13 @@
 # Codex Blockers
 
-Run number: 103
+Run number: 105
 
 No active blockers.
 
 ## Notes
 
+- Latest shared supplied-inventory own-field hardening added a guard and unit coverage proving prototype-backed supplied operator groups or links fail before summaries or projections derive local navigation. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
+- Latest shared supplied-inventory sparse-link hardening changed the operator surface validator to walk each supplied link slot explicitly and added unit coverage proving sparse/missing link entries fail before summaries, launch links, or demo operation projections can silently drop malformed local navigation. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest shared supplied-inventory route-shape variant hardening expanded unit coverage so hash-bearing, trailing-slash, and double-slash supplied routes are explicitly rejected alongside non-local, uppercase, query-bearing, and dynamic route shapes before local navigation helpers can render them. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest shared supplied-inventory route-shape hardening added a shared guard and unit coverage proving summaries and projections fail before deriving local navigation from supplied operator inventory routes that are non-local, uppercase, query/hash-bearing, trailing-slash, double-slash, or dynamic-segment shaped. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest shared supplied-inventory invalid-field-type hardening added a shared guard and unit coverage proving summaries and projections fail before deriving local navigation from supplied operator inventory group names, routes, labels, or notes that are not strings. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

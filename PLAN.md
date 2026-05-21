@@ -209,6 +209,7 @@ Post-MVP:
 - Local shared operator supplied-inventory invalid-field-type failure coverage
 - Local shared operator supplied-inventory route-shape failure coverage
 - Local shared operator supplied-inventory route-shape variant coverage
+- Local shared operator supplied-inventory own-field failure coverage
 
 ## Next Milestone
 

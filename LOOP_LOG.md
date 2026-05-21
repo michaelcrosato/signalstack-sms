@@ -784,3 +784,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 105  GREEN  supplied-inventory-own-field-guard  2026-05-21 00:08
+Objective:    Fail prototype-backed supplied shared operator inventory fields before projection.
+Changed:
+- Added own-property guards for supplied operator surface group `name`/`links` and link `href`/`label`/`note` fields.
+- Added unit coverage proving prototype-backed supplied group/link records fail before local navigation can render them.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
