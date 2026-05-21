@@ -22,6 +22,13 @@ export type SecurityOperationsStatus = {
 
 const securityOperationControlFields = ["name", "status", "detail"] as const;
 const securityOperationValidationReferenceFields = ["command", "purpose"] as const;
+const allowedSecurityOperationControlStatuses = [
+  "local metadata only",
+  "blocked by default",
+  "rate limited",
+  "validation enforced"
+] as const;
+const requiredSafetyBoundaryTerms = ["secrets", "provider calls", "SMS", "email", "notifications", "mutations"] as const;
 
 function assertExactFields<T extends object>(value: T, fields: readonly string[], errorMessage: string) {
   const actualKeys = Reflect.ownKeys(value);
@@ -48,6 +55,10 @@ function assertSecurityControl(control: SecurityOperationControl) {
   assertNonblankString(control.name, "Invalid security operation control name");
   assertNonblankString(control.status, `Invalid security operation status for ${control.name}`);
   assertNonblankString(control.detail, `Invalid security operation detail for ${control.name}`);
+
+  if (!allowedSecurityOperationControlStatuses.includes(control.status as (typeof allowedSecurityOperationControlStatuses)[number])) {
+    throw new Error(`Unsupported security operation status for ${control.name}`);
+  }
 }
 
 function assertValidationReference(reference: SecurityOperationValidationReference) {
@@ -107,6 +118,13 @@ function freezeSafetyBoundaries(boundaries: string[]) {
   }
 
   assertUniqueValues(boundaries, "Duplicate security operation safety boundaries");
+
+  const joinedBoundaries = boundaries.join(" ");
+  const missingTerms = requiredSafetyBoundaryTerms.filter((term) => !joinedBoundaries.includes(term));
+
+  if (missingTerms.length > 0) {
+    throw new Error(`Missing security operation safety boundary terms: ${missingTerms.join(", ")}`);
+  }
 
   return Object.freeze([...boundaries]);
 }

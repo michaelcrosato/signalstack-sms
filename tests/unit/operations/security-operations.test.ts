@@ -94,6 +94,21 @@ describe("getSecurityOperationsStatus", () => {
     expect(securityOperationSafetyBoundaries.filter((boundary) => boundary.trim().length === 0)).toEqual([]);
   });
 
+  it("keeps security operation values inside documented local-only boundaries", () => {
+    expect(securityOperationControls.map((control) => control.status)).toEqual([
+      "local metadata only",
+      "blocked by default",
+      "rate limited",
+      "validation enforced"
+    ]);
+    expect(securityOperationSafetyBoundaries.join(" ")).toContain("secrets");
+    expect(securityOperationSafetyBoundaries.join(" ")).toContain("provider calls");
+    expect(securityOperationSafetyBoundaries.join(" ")).toContain("SMS");
+    expect(securityOperationSafetyBoundaries.join(" ")).toContain("email");
+    expect(securityOperationSafetyBoundaries.join(" ")).toContain("notifications");
+    expect(securityOperationSafetyBoundaries.join(" ")).toContain("mutations");
+  });
+
   it("keeps security operation inventory order stable for local review pages", () => {
     expect(securityOperationControls.map((control) => control.name)).toEqual([
       "Secret storage",

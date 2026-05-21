@@ -135,6 +135,7 @@ Post-MVP:
 - Local contract operations inventory static-metadata hardening
 - Read-only local validation operations view
 - Local security operations inventory static-metadata hardening
+- Local security operations value-boundary hardening
 - Read-only local security operations view
 - Read-only local data operations view
 - Read-only local queue operations view
