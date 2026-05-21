@@ -132,6 +132,7 @@ Post-MVP:
 - Read-only local AI operations view
 - Read-only local API operations view
 - Read-only local contract operations view
+- Local contract operations inventory static-metadata hardening
 - Read-only local validation operations view
 - Read-only local security operations view
 - Read-only local data operations view
@@ -225,6 +226,7 @@ Post-MVP:
 - Local API operations inventory public-field coverage
 - Local API operations inventory value-shape coverage
 - Local API operations inventory order-stability coverage
+- Local contract operations inventory frozen static-metadata coverage
 
 ## Next Milestone
 

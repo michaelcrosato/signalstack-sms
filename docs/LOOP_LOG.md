@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 121  GREEN  contract-operations-inventory-hardening  2026-05-21 01:20
+Objective:    Keep `/settings/contracts` static inventory validated and immutable before rendering.
+Changed:
+- Moved contract operation files, validation command references, drift controls, and counts into a validated frozen operations module.
+- Wired `/settings/contracts` to the shared contract operations status instead of page-local arrays.
+- Added unit coverage for required contract paths, command references, public fields, frozen snapshots, canonical local-only shape, and file presence without reading contract contents or executing commands.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP safe read-only operator surface refinements or local inventory hardening.
+
 ## Run 120  GREEN  api-operations-order-stability  2026-05-21 01:16
 Objective:    Keep API operations route-method order stable for local review pages.
 Changed:

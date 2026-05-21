@@ -93,7 +93,7 @@ Notification operations review is available at `/settings/notifications`. It ren
 
 Readiness audit review is available at `/settings/readiness-audit`. It renders tenant-scoped local go-live readiness audit events, filters, and bounded CSV export links; it does not mutate audit events, expose secrets, call providers, bill, call live AI, notify, email, send SMS, or enable live features.
 
-Contract operations review is available at `/settings/contracts`. It renders static contract inventory, validation command references, drift controls, and safety-boundary text only; it does not execute checks, scan files, mutate records, call providers, bill, call live AI, notify, email, send SMS, expose secrets, or enable live features.
+Contract operations review is available at `/settings/contracts`. It renders static contract inventory, validation command references, drift controls, and safety-boundary text only; it does not execute checks, scan files, mutate records, call providers, bill, call live AI, notify, email, send SMS, expose secrets, or enable live features. Its inventory is unit-tested for required contract paths, command references, public fields, frozen snapshots, and stable read-only counts.
 
 Validation operations review is available at `/settings/validation`. It renders static local gate inventory, repair signals, and validation safety-boundary text only; it does not execute commands, inspect logs, scan files, mutate records, call providers, bill, call live AI, notify, email, send SMS, expose secrets, or enable live features.
 

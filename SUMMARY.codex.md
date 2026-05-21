@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP contract operations inventory hardening checkpoint.
+- Moved `/settings/contracts` static inventory, validation command references, drift controls, and counts into a validated frozen operations module.
+- Added unit coverage for required contract paths, command references, public fields, frozen snapshots, canonical local-only shape, and file presence without reading contract contents or executing commands.
+- Targeted contract operations unit coverage and typecheck passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 121
+
+## Previous Run
+
 - Advanced a post-MVP API operations order-stability checkpoint.
 - Added unit coverage fixing the exported API route-method order used by `/settings/api` local review pages.
 - Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
