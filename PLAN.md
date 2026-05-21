@@ -196,6 +196,7 @@ Post-MVP:
 - Local rich operator projection public-field coverage
 - Local shared operator summary public-field coverage
 - Local shared operator summary fresh-route-array coverage
+- Local shared operator supplied-inventory duplicate-route failure coverage
 
 ## Next Milestone
 

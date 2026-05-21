@@ -51,6 +51,21 @@ function freezeOperatorSurfaceGroups(groups: OperatorSurfaceGroup[]) {
   );
 }
 
+function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) {
+  const links = groups.flatMap((group) => group.links);
+  const seenRoutes = new Set<string>();
+
+  for (const link of links) {
+    if (seenRoutes.has(link.href)) {
+      throw new Error(`Duplicate operator surface route ${link.href}`);
+    }
+
+    seenRoutes.add(link.href);
+  }
+
+  return links;
+}
+
 export const operatorSurfaceGroups = freezeOperatorSurfaceGroups([
   {
     name: "Demo And Workflow",
@@ -110,7 +125,7 @@ export const operatorSurfaceGroups = freezeOperatorSurfaceGroups([
 ] satisfies OperatorSurfaceGroup[]);
 
 export function getOperatorSurfaceSummary(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  const links = groups.flatMap((group) => group.links);
+  const links = getUniqueOperatorSurfaceLinks(groups);
 
   return Object.freeze({
     groupCount: groups.length,
@@ -121,8 +136,7 @@ export function getOperatorSurfaceSummary(groups: readonly OperatorSurfaceGroup[
 
 export function getRunbookAdminLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return freezeProjectionArray(
-    groups
-      .flatMap((group) => group.links)
+    getUniqueOperatorSurfaceLinks(groups)
       .filter((link) => link.href === "/settings" || link.href.startsWith("/settings/"))
       .map((link) => freezeOperatorSurfaceLink(link))
   );
@@ -133,7 +147,7 @@ export function getSettingsNavigationLinks(groups: readonly OperatorSurfaceGroup
 }
 
 export function getLaunchDashboardLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return freezeProjectionArray(groups.flatMap((group) => group.links).map((link) => freezeOperatorSurfaceLink(link)));
+  return freezeProjectionArray(getUniqueOperatorSurfaceLinks(groups).map((link) => freezeOperatorSurfaceLink(link)));
 }
 
 export function getDemoConsoleLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
@@ -141,7 +155,7 @@ export function getDemoConsoleLinks(groups: readonly OperatorSurfaceGroup[] = op
 }
 
 function findOperatorSurfaceLink(href: string, groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  const link = groups.flatMap((group) => group.links).find((item) => item.href === href);
+  const link = getUniqueOperatorSurfaceLinks(groups).find((item) => item.href === href);
 
   if (!link) {
     throw new Error(`Missing operator surface link for ${href}`);

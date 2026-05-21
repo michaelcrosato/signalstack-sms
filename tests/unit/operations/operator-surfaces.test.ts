@@ -264,6 +264,21 @@ describe("operator surface inventory", () => {
     expect(new Set(notes).size).toBe(notes.length);
   });
 
+  it("rejects supplied operator inventories with duplicate routes before projection", () => {
+    const duplicateRoute = operatorSurfaceGroups[0].links[0].href;
+    const groups = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [{ ...group.links[0], href: duplicateRoute }, ...group.links.slice(1)]
+          : group.links
+    }));
+
+    expect(() => getOperatorSurfaceSummary(groups)).toThrow(`Duplicate operator surface route ${duplicateRoute}`);
+    expect(() => getLaunchDashboardLinks(groups)).toThrow(`Duplicate operator surface route ${duplicateRoute}`);
+    expect(() => getDemoOperationsLinks(groups)).toThrow(`Duplicate operator surface route ${duplicateRoute}`);
+  });
+
   it("keeps inventory copy whitespace-clean for projected navigation", () => {
     const copyFields = operatorSurfaceGroups.flatMap((group) => [
       group.name,

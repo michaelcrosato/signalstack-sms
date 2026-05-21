@@ -1,8 +1,13 @@
 # Codex Summary
 
-Run number: 91
+Run number: 92
 
 ## Completed
+
+- Advanced a post-MVP shared operator supplied-inventory duplicate-route checkpoint.
+- Added a shared route uniqueness guard so summaries and projections fail before deriving local navigation from supplied operator inventories with duplicate route entries.
+- Added unit coverage for duplicate supplied route failures across summary, broad launch, and focused projection helpers.
+- Preserved the local-only operator inventory boundary without executing routes, API handlers, provider calls, billing, notifications, SMS, email, live AI, or other live features.
 
 - Advanced a post-MVP shared operator summary fresh-route-array checkpoint.
 - Added unit coverage proving `getOperatorSurfaceSummary()` returns a fresh frozen `routes` array per call, so caller-side route array changes cannot leak into later local operation counts or route lists.

@@ -125,6 +125,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP shared projection public-field hardening: projected operator links and rich projection objects now expose only public navigation fields, and unit coverage verifies injected extra runtime fields on supplied inventories cannot leak into regular navigation, demo checkpoint, workflow step, or integration projections.
 - Post-MVP shared summary public-field hardening: unit coverage now verifies shared operator surface summaries expose only public aggregate fields, preventing extra supplied inventory group or link fields from leaking into local operation counts or route lists.
 - Post-MVP shared summary fresh-route-array hardening: unit coverage now verifies shared operator surface summaries return a fresh frozen routes array per call, preventing caller-side route array changes from leaking into later local operation counts or route lists.
+- Post-MVP shared supplied-inventory duplicate-route hardening: summaries and projections now fail before deriving local navigation from supplied operator inventories with duplicate route entries, preventing silent route shadowing.
 
 Demo-safe defaults remain mandatory:
 

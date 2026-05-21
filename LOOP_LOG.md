@@ -655,3 +655,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 092  GREEN  supplied-inventory-duplicate-route-guard  2026-05-20 23:11
+Objective:    Fail supplied shared operator inventories with duplicate routes before deriving summaries or projections.
+Changed:
+- Added a shared route uniqueness guard for operator surface summary, broad navigation, and focused projection helpers.
+- Added unit coverage proving duplicate supplied routes fail before local navigation can silently shadow a route.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
