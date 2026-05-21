@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 67
+Run number: 69
 
 No active blockers.
 
 ## Notes
 
+- Rich shared operator projections for demo checkpoints, workflow steps, and integration areas now have unit coverage for unique, whitespace-clean, boundary-oriented copy. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator surface groups and route order now have unit coverage for stable projected navigation order. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Rich shared operator projections for demo checkpoints, workflow steps, and integration areas now have unit coverage for unique routes, backing app pages, and shared-inventory-derived visible labels. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator surface group names, link labels, and link notes now have unit coverage for copy shape: group names and labels must stay in Title Case navigation format, and notes must stay short lower-case sentence fragments without terminal punctuation. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

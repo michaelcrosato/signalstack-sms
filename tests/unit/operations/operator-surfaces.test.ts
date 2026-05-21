@@ -577,6 +577,37 @@ describe("operator surface inventory", () => {
     }
   });
 
+  it("keeps rich operator projection copy unambiguous and boundary-oriented", () => {
+    const checkpoints = getDemoOperationsCheckpoints();
+    const workflowSteps = getWorkflowOperationSteps();
+    const integrationAreas = getIntegrationOperationAreas();
+    const copySets = [
+      { name: "checkpoint names", values: checkpoints.map((checkpoint) => checkpoint.name) },
+      { name: "checkpoint signals", values: checkpoints.map((checkpoint) => checkpoint.signal) },
+      { name: "checkpoint boundaries", values: checkpoints.map((checkpoint) => checkpoint.boundary) },
+      { name: "workflow names", values: workflowSteps.map((step) => step.name) },
+      { name: "workflow owners", values: workflowSteps.map((step) => step.owner) },
+      { name: "workflow boundaries", values: workflowSteps.map((step) => step.boundary) },
+      { name: "integration labels", values: integrationAreas.map((area) => area.label) },
+      { name: "integration states", values: integrationAreas.map((area) => area.state) },
+      { name: "integration boundaries", values: integrationAreas.map((area) => area.boundary) }
+    ];
+
+    for (const copySet of copySets) {
+      expect(new Set(copySet.values).size, copySet.name).toBe(copySet.values.length);
+      expect(copySet.values.filter((value) => value.trim() !== value || value.includes("  ")), copySet.name).toEqual([]);
+    }
+
+    const allBoundaries = [
+      ...checkpoints.map((checkpoint) => checkpoint.boundary),
+      ...workflowSteps.map((step) => step.boundary),
+      ...integrationAreas.map((area) => area.boundary)
+    ];
+
+    expect(allBoundaries.filter((boundary) => !/\b(without|no|not|blocked)\b/i.test(boundary))).toEqual([]);
+    expect(integrationAreas.map((area) => area.state).filter((state) => state !== state.toLowerCase())).toEqual([]);
+  });
+
   it("keeps page-specific operator navigation from linking to the current page", () => {
     const pageSpecificProjections = [
       { route: "/demo", links: getDemoConsoleLinks() },

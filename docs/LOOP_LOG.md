@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 069  GREEN  rich-projection-copy-boundary  2026-05-20 21:31
+Objective:    Add a shared guard for rich operator projection copy uniqueness and no-impact boundary phrasing.
+Changed:
+- Added unit coverage that keeps demo checkpoint, workflow step, and integration area projection copy unique and whitespace-clean.
+- Verified rich projection boundary text remains explicit about read-only/no-impact behavior and integration states remain lowercase.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 068  GREEN  projection-order-stability  2026-05-20 21:24
 Objective:    Add a shared guard against unintentional operator projection route-order churn.
 Changed:

@@ -1,15 +1,20 @@
 # Codex Summary
 
-Run number: 67
+Run number: 69
 
 ## Completed
+
+- Advanced a post-MVP rich operator projection copy-boundary checkpoint.
+- Added unit coverage that keeps demo checkpoint, workflow step, and integration area projection names, labels, states, and boundaries unique, whitespace-clean, and boundary-oriented.
+- Updated testing contract/docs, README, PLAN, and next-prompt handoff docs with the rich projection copy-boundary guard.
+- Targeted operator-surface unit coverage passed.
+
+## Prior Completed
 
 - Advanced a post-MVP rich operator projection shared-inventory checkpoint.
 - Added unit coverage that keeps demo checkpoint, workflow step, and integration area projections unique, backed by implemented app pages, and label-aligned with the shared local operator surface inventory.
 - Updated testing contract/docs, README, PLAN, BLOCKERS, and next-prompt handoff docs with the rich projection guard.
 - Targeted operator-surface unit coverage and protected local gate passed.
-
-## Prior Completed
 
 - Advanced a post-MVP shared operator inventory order-stability checkpoint.
 - Added unit coverage that pins shared operator surface group order and route order so projected navigation does not churn without an intentional inventory update.
@@ -225,6 +230,13 @@ Run number: 67
 
 ## Validation
 
+- Latest rich projection copy-boundary hardening added unit coverage for demo checkpoint, workflow step, and integration area projection copy. The check validates unique names, labels, states, and boundaries; whitespace-clean copy; lowercase integration states; and explicit read-only/no-impact boundary phrasing. It does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
+- `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
+- `npm install`
+- `npm run db:generate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `.\scripts\local-gate.ps1`
 - Latest rich projection shared-inventory hardening added unit coverage for demo checkpoint, workflow step, and integration area projections. The check validates unique route entries, backing `app/**/page.tsx` files, and labels derived from the shared local operator surface inventory; it does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - `npm run typecheck`
