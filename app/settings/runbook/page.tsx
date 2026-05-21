@@ -59,6 +59,9 @@ export default function OperatorRunbookPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/campaigns">
           Campaign Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/queue">
+          Queue Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/contacts">
           Contact Operations
         </Link>
@@ -80,8 +83,17 @@ export default function OperatorRunbookPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/webhooks">
           Webhook Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/delivery">
+          Delivery Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/exports">
           Admin Exports
+        </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/provider">
+          Provider Details
+        </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/numbers">
+          Provider Numbers
         </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/billing">
           Billing Operations
@@ -94,6 +106,18 @@ export default function OperatorRunbookPage() {
         </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/validation">
           Validation Operations
+        </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/api">
+          API Operations
+        </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/security">
+          Security Operations
+        </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/notifications">
+          Notification Operations
+        </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/readiness-audit">
+          Readiness Audit
         </Link>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
@@ -151,20 +175,27 @@ export default function OperatorRunbookPage() {
           <AdminLink href="/settings/system" label="System Status" />
           <AdminLink href="/settings/compliance" label="Compliance Detail" />
           <AdminLink href="/settings/campaigns" label="Campaign Operations" />
+          <AdminLink href="/settings/queue" label="Queue Operations" />
           <AdminLink href="/settings/contacts" label="Contact Operations" />
           <AdminLink href="/settings/data" label="Data Operations" />
           <AdminLink href="/settings/audience" label="Audience Operations" />
           <AdminLink href="/settings/templates" label="Template Operations" />
           <AdminLink href="/settings/inbox" label="Inbox Operations" />
           <AdminLink href="/settings/webhooks" label="Webhook Operations" />
+          <AdminLink href="/settings/delivery" label="Delivery Operations" />
           <AdminLink href="/settings/team" label="Team Operations" />
           <AdminLink href="/settings/usage" label="Usage & Analytics" />
           <AdminLink href="/settings/billing" label="Billing Operations" />
           <AdminLink href="/settings/ai" label="AI Operations" />
           <AdminLink href="/settings/contracts" label="Contract Operations" />
           <AdminLink href="/settings/validation" label="Validation Operations" />
+          <AdminLink href="/settings/api" label="API Operations" />
+          <AdminLink href="/settings/security" label="Security Operations" />
+          <AdminLink href="/settings/notifications" label="Notification Operations" />
+          <AdminLink href="/settings/readiness-audit" label="Readiness Audit" />
           <AdminLink href="/settings/exports" label="Admin Exports" />
           <AdminLink href="/settings/provider" label="Provider Details" />
+          <AdminLink href="/settings/numbers" label="Provider Numbers" />
         </nav>
       </Panel>
     </main>

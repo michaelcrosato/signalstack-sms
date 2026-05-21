@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 029  GREEN  runbook-navigation-refresh  2026-05-20 17:29
+Objective:    Refresh the read-only operator runbook admin-link coverage.
+Changed:
+- Added current local admin surface links to `/settings/runbook`, including queue operations, delivery operations, readiness audit, provider numbers, API operations, security operations, notifications, and provider details.
+- Extended the seeded investor demo E2E path to prove those runbook links remain visible without command execution or external-impact side effects.
+- Updated API/testing contracts, API map, README, PLAN, testing docs, SUMMARY, BLOCKERS, and next-prompt handoff docs with the runbook navigation coverage.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only admin/reporting refinements without live external-impact actions.
+
 ## Run 028  GREEN  delivery-operations  2026-05-20 17:26
 Objective:    Add a focused read-only local delivery operations view.
 Changed:

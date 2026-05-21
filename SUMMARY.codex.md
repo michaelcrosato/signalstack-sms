@@ -1,8 +1,16 @@
 # Codex Summary
 
-Run number: 28
+Run number: 29
 
 ## Completed
+
+- Advanced a post-MVP local operator runbook navigation checkpoint.
+- Added current local admin surface links to `/settings/runbook`, including queue operations, delivery operations, readiness audit, provider numbers, API operations, security operations, notifications, and provider details.
+- Extended the seeded investor demo E2E path to prove the runbook keeps those current local admin links visible without command execution or external-impact side effects.
+- Updated API/testing contracts, API map, README, PLAN, testing docs, and next-prompt handoff docs with the runbook navigation coverage.
+- Protected local gate, local migration check, demo seed, and seeded investor demo E2E passed.
+
+## Prior Completed
 
 - Advanced a post-MVP local delivery operations checkpoint.
 - Added `/settings/delivery`, a read-only page that renders tenant-scoped message direction counts, delivery metadata, provider status labels, provider message ID presence, campaign/conversation context, and recent idempotency keys.
@@ -10,8 +18,6 @@ Run number: 28
 - Extended the seeded investor demo E2E path to cover delivery direction/status panels, recent messages, and safety boundary.
 - Updated API/testing contracts, API map, README, PLAN, and testing docs to document the delivery operations boundary.
 - Protected local gate, local migration check, demo seed, and seeded investor demo E2E passed.
-
-## Prior Completed
 
 - Advanced a post-MVP local readiness audit operations checkpoint.
 - Added `/settings/readiness-audit`, a read-only page that renders tenant-scoped local readiness audit events, action/subject filters, local metadata, and bounded CSV export links.

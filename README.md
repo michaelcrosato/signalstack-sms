@@ -85,6 +85,6 @@ The root route `/` is a local launch dashboard with demo-safe defaults and links
 
 Local operator procedures are documented in `docs/LOCAL_OPERATOR_RUNBOOK.md`; `npm run operator:check` verifies the runbook and is included in `npm run validate`.
 
-The same local-only operator checklist is visible at `/settings/runbook`. It displays commands and safety boundaries only; it does not execute commands or create side effects.
+The same local-only operator checklist is visible at `/settings/runbook`. It displays commands, safety boundaries, and links to current local admin views only; it does not execute commands or create side effects.
 
 The read-only `/settings/system` page summarizes local safety defaults, runtime markers, queue backend metadata, worker limits, and API rate-limit policy without mutations or external side effects.

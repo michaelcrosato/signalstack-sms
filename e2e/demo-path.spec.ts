@@ -49,6 +49,10 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("Daily Local Start")).toBeVisible();
   await expect(page.getByText("Repair Loop")).toBeVisible();
   await expect(page.getByText("Command execution")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Queue Operations" }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Delivery Operations" }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Readiness Audit" }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Provider Numbers" }).first()).toBeVisible();
   await page.getByRole("link", { name: "Usage & Analytics" }).click();
   await expect(page.getByRole("heading", { name: "Usage & Analytics" })).toBeVisible();
   await expect(page.getByText("Local Usage Totals")).toBeVisible();
