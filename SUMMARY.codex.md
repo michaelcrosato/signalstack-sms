@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP contract operations command-literal hardening checkpoint.
+- Added validation so `/settings/contracts` static file metadata, validation purposes, and drift-control copy reject command-like snippets outside the allowlisted validation-command field.
+- Added unit coverage proving non-command contract operations metadata remains command-literal-free before local contract metadata renders.
+- Focused contract operations unit coverage, typecheck, and the protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, worker execution, Redis calls, mutations, or protected gate-script edits were used.
+
+Run number: 179
+
+## Previous Run
+
 - Advanced a post-MVP readiness audit detached status-array count coverage checkpoint.
 - Added unit coverage proving `/settings/readiness-audit` status arrays are detached from exported vocabularies while keeping action, subject-type, and safety-boundary counts aligned with returned arrays.
 - Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.

@@ -56,6 +56,13 @@ const forbiddenSecretMetadataPatterns = [
   /\b(?:TWILIO_AUTH_TOKEN|STRIPE_SECRET_KEY|OPENAI_API_KEY|CLERK_SECRET_KEY)\s*=/,
   /\bBearer\s+[A-Za-z0-9._-]{12,}/
 ] as const;
+const forbiddenCommandMetadataPatterns = [
+  /\bnpm\s+run\b/i,
+  /\bnpx\b/i,
+  /\bpowershell\b/i,
+  /\bcurl\b/i,
+  /\bInvoke-WebRequest\b/i
+] as const;
 
 const contractOperationStatusSummary = Object.freeze({
   commandExecution: "none",
@@ -79,6 +86,12 @@ function assertUniqueValues(values: readonly string[], errorMessage: string) {
 
 function assertNoSecretLikeMetadata(value: string, errorMessage: string) {
   if (forbiddenSecretMetadataPatterns.some((pattern) => pattern.test(value))) {
+    throw new Error(errorMessage);
+  }
+}
+
+function assertNoCommandLikeMetadata(value: string, errorMessage: string) {
+  if (forbiddenCommandMetadataPatterns.some((pattern) => pattern.test(value))) {
     throw new Error(errorMessage);
   }
 }
@@ -111,6 +124,7 @@ function assertContractOperationFile(file: ContractOperationFile) {
   }
   assertCleanContractMetadata(file.name, `Whitespace-unsafe contract operation file name for ${file.path}`);
   assertNoSecretLikeMetadata(file.name, `Secret-like contract operation file name for ${file.path}`);
+  assertNoCommandLikeMetadata(file.name, `Command-like contract operation file name for ${file.path}`);
 
   if (
     typeof file.path !== "string" ||
@@ -133,6 +147,7 @@ function assertContractOperationFile(file: ContractOperationFile) {
   }
   assertCleanContractMetadata(file.boundary, `Whitespace-unsafe contract operation boundary for ${file.path}`);
   assertNoSecretLikeMetadata(file.boundary, `Secret-like contract operation boundary for ${file.path}`);
+  assertNoCommandLikeMetadata(file.boundary, `Command-like contract operation boundary for ${file.path}`);
 }
 
 function assertValidationCheck(check: ContractOperationValidationCheck) {
@@ -156,6 +171,7 @@ function assertValidationCheck(check: ContractOperationValidationCheck) {
   }
   assertCleanContractMetadata(check.purpose, `Whitespace-unsafe contract operation validation purpose for ${check.command}`);
   assertNoSecretLikeMetadata(check.purpose, `Secret-like contract operation validation purpose for ${check.command}`);
+  assertNoCommandLikeMetadata(check.purpose, `Command-like contract operation validation purpose for ${check.command}`);
 }
 
 function freezeContractOperationFiles(files: ContractOperationFile[]) {
@@ -195,6 +211,7 @@ function freezeDriftControls(controls: string[]) {
     }
     assertCleanContractMetadata(control, "Whitespace-unsafe contract operation drift control");
     assertNoSecretLikeMetadata(control, "Secret-like contract operation drift control");
+    assertNoCommandLikeMetadata(control, "Command-like contract operation drift control");
   }
 
   assertUniqueValues(controls, "Duplicate contract operation drift controls");

@@ -1640,3 +1640,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP readiness/queue/notification operations hardening or safe read-only operator surface refinements.
+
+## Run 179  GREEN  contract-operations-command-literal  2026-05-21 05:38
+Objective:    Keep `/settings/contracts` non-command static metadata free of command-like snippets.
+Changed:
+- Added command-like literal validation for contract operation file metadata, validation purposes, and drift controls while preserving allowlisted validation command references.
+- Added unit coverage proving non-command contract operations metadata stays free of command-like literals.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP contract/security/validation operations hardening or safe read-only operator surface refinements.

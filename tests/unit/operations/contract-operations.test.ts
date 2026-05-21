@@ -247,4 +247,21 @@ describe("getContractOperationsStatus", () => {
 
     expect(staticCopy.filter((copy) => secretLikePatterns.some((pattern) => pattern.test(copy)))).toEqual([]);
   });
+
+  it("keeps contract operation non-command metadata free of command-like literals", () => {
+    const nonCommandCopy = [
+      ...contractOperationFiles.flatMap((file) => [file.name, file.path, file.boundary]),
+      ...contractOperationValidationChecks.map((check) => check.purpose),
+      ...contractOperationDriftControls
+    ];
+    const commandLikePatterns = [
+      /\bnpm\s+run\b/i,
+      /\bnpx\b/i,
+      /\bpowershell\b/i,
+      /\bcurl\b/i,
+      /\bInvoke-WebRequest\b/i
+    ];
+
+    expect(nonCommandCopy.filter((copy) => commandLikePatterns.some((pattern) => pattern.test(copy)))).toEqual([]);
+  });
 });
