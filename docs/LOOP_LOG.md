@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 204  GREEN  product-contacts-list-import  2026-05-21 14:53
+Objective:    Build the first deeper product contacts workflow on existing local APIs.
+Changed:
+- Added `/dashboard/contacts` with tenant-scoped active contact rows, consent metrics, tags, lists, and source context.
+- Added a client CSV import form backed by `POST /api/contacts/imports` and product contact row helper coverage.
+- Updated product navigation, seeded product-demo coverage, contracts, roadmap, state matrix, and handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Build campaign composer, preflight, schedule, and status UI on existing campaign APIs.
+
 ## Run 203  GREEN  product-dashboard-shell  2026-05-21 14:34
 Objective:    Add the first product-facing dashboard shell without weakening live-action gates.
 Changed:

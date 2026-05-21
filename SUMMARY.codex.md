@@ -1,5 +1,14 @@
 # Codex Summary
 
+- Advanced Phase 1 product UI by adding `/dashboard/contacts`.
+- The contacts workspace renders tenant-scoped active contacts with consent, list, and tag context, and imports local CSV rows through the existing validated contacts import API.
+- Updated product navigation and seeded product-demo coverage so `/dashboard/contacts` is exercised after the dashboard.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, worker execution, Redis calls, or protected gate-script edits were used.
+
+Run number: 204
+
+## Previous Run
+
 - Advanced Phase 1 product UI by adding an initial `/dashboard` product shell.
 - The dashboard reads existing tenant-scoped demo-safe counts for contacts, campaigns, inbox, templates, and compliance readiness without adding mutations or live actions.
 - Added stable product navigation metadata and unit coverage, linked the dashboard from the root launch page, and refreshed roadmap handoff docs so RBAC is no longer listed as pending.

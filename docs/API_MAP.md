@@ -77,6 +77,7 @@ Post-MVP webhook foundation:
 Post-MVP provider settings foundation:
 
 - `/`: renders a static local launch dashboard with demo-safe defaults and links to existing local-only admin/demo views without database access, mutations, provider calls, billing artifacts, notifications, live messaging, or secrets.
+- `/dashboard/contacts`: renders a product-facing contacts workspace with tenant-scoped active contacts, consent/list/tag context, metrics, and a local CSV import form backed by `POST /api/contacts/imports` without provider calls, SMS, billing, live AI, secrets, hard deletion, validation bypasses, or live messaging enablement.
 - `/settings/demo`: renders a read-only local demo operations checkpoint with seeded demo readiness, shared-inventory workflow links, local metrics, usage totals, and runtime gates without imports, campaign scheduling, worker execution, inbox replies, report execution, exports, mutations, provider calls, billing records, notifications, live feature enablement, or secrets.
 - `/settings/operations`: renders a read-only local operations index with grouped existing operator surfaces, route names, static counts, and safety-boundary text without command execution, file inspection, API probes, mutations, exports, provider calls, billing records, notifications, live feature enablement, or secrets.
 - `GET /api/settings/provider`: returns secret-safe provider readiness, live messaging blockers, and Twilio credential presence booleans.

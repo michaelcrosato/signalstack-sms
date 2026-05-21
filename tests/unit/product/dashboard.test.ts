@@ -13,7 +13,7 @@ describe("product dashboard navigation", () => {
       "Settings"
     ]);
     expect(productNavigation.map((item) => item.href)).toEqual([
-      "#contacts",
+      "/dashboard/contacts",
       "#campaigns",
       "#inbox",
       "#templates",

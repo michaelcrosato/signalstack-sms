@@ -4,6 +4,8 @@ SignalStack SMS is a demo-safe SMB SMS/MMS SaaS repo. The current implementation
 
 The only intentional live external-impact path today is the isolated `/demo` live-test SMS form. It remains hard-gated by explicit Twilio credentials, live flags, a recipient allowlist, and the confirmation phrase. Live campaign sending, live billing, live AI, production auth, and production deployment are not enabled.
 
+The product workspace starts at `/dashboard`. The first deeper product route is `/dashboard/contacts`, which lists local tenant contacts and imports demo CSV rows through the existing validated contacts import API without SMS, provider, billing, or live-AI side effects.
+
 ## Current roadmap
 
 - `PLAN.md` is the short operational roadmap.
@@ -42,7 +44,7 @@ Investor demo path:
 npm run test:e2e -- e2e/demo-path.spec.ts --project=chromium
 ```
 
-Seeded product dashboard path:
+Seeded product dashboard and contacts path:
 
 ```bash
 npm run test:e2e:product-demo

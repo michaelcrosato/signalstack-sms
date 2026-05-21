@@ -340,6 +340,10 @@ Renders a read-only notification operations view for the current organization. I
 
 Renders a read-only local go-live readiness audit view for the current organization. It may display tenant-scoped audit events, allowlisted action/subject filters, local metadata, timestamps, actor IDs, and links to the existing bounded CSV export. The page must not create, update, delete, replay, or mutate audit events; expose secrets, raw provider credentials, token fingerprints, provider verification results, or environment values; call providers, Stripe, live AI, SMS, email, or notification services; create billing records; or enable live messaging, live billing, or live AI.
 
+### `/dashboard/contacts`
+
+Renders the product-facing contacts workspace for the current organization. It may display tenant-scoped active contacts, consent state, list/tag labels, contact metrics, and a local CSV import form that posts to the existing `POST /api/contacts/imports` endpoint. It must not send SMS, call providers, create billing records, call live AI, expose secrets, hard-delete contacts, bypass import validation, or enable live messaging.
+
 ### `/`
 
 Renders the local launch dashboard. It may display demo-safe runtime defaults and links to existing local-only demo, readiness, provider metadata, system, usage, and admin export views. The page must not require database access, mutate records, call providers, create billing artifacts, send notifications, expose secrets, or enable live messaging.

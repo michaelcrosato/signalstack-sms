@@ -64,3 +64,23 @@ test("product dashboard renders seeded owner workflow checkpoints", async ({ pag
   await expect(analytics.getByText("Scheduled work")).toBeVisible();
   await expect(analytics.getByText("Inbox load")).toBeVisible();
 });
+
+test("product contacts page lists seeded contacts and imports local CSV rows", async ({ page }) => {
+  await page.goto("/dashboard/contacts");
+
+  await expect(page.getByRole("heading", { name: "Audience workspace" })).toBeVisible();
+  await expect(page.getByLabel("Contact metrics").getByText("Active Contacts")).toBeVisible();
+  await expect(page.getByText("Ada Lovelace")).toBeVisible();
+  await expect(page.getByText("+15555550100")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "CSV import" })).toBeVisible();
+
+  await page.getByLabel("CSV rows").fill(`phone,email,first_name,last_name,consent_status,opt_in_source,tags,lists
++15555550156,jordan@example.com,Jordan,Lee,OPTED_IN,product_e2e,trial,Demo Leads`);
+  await page.getByRole("button", { name: "Import Contacts" }).click();
+
+  await expect(page.getByRole("status")).toContainText("Imported 1 of 1 rows");
+  const importedRow = page.getByRole("row").filter({ hasText: "Jordan Lee" });
+  await expect(importedRow).toBeVisible();
+  await expect(importedRow.getByText("+15555550156")).toBeVisible();
+  await expect(importedRow.getByText("trial")).toBeVisible();
+});
