@@ -168,7 +168,7 @@ Post-MVP readiness audit operations view:
 Post-MVP contract operations view:
 
 - The seeded investor demo path must verify that `/settings/contracts` renders read-only contract inventory, validation commands, drift controls, and safety-boundary text without reading contract file contents, executing checks, scanning files, mutating records, provider calls, billing records, live AI calls, SMS, email, notifications, secret exposure, or live feature enablement.
-- Unit tests must verify that the static contract operations inventory keeps required contract paths, validation command references backed by `package.json` scripts, runtime-frozen supported validation-command and no-impact vocabularies, drift controls, public fields, frozen snapshots, stable order, unique identifiers, whitespace-clean copy, secret-like literal rejection, and read-only counts stable before `/settings/contracts` renders them.
+- Unit tests must verify that the static contract operations inventory keeps required contract paths, runtime-frozen supported file-path, validation-command, and no-impact vocabularies, validation command references backed by `package.json` scripts, drift controls, public fields, frozen snapshots, stable order, unique identifiers, whitespace-clean copy, secret-like literal rejection, and read-only counts stable before `/settings/contracts` renders them.
 
 Post-MVP validation operations view:
 

@@ -23,6 +23,17 @@ export type ContractOperationsStatus = {
 
 const contractOperationFileFields = ["name", "path", "boundary"] as const;
 const contractOperationValidationCheckFields = ["command", "purpose"] as const;
+export const allowedContractOperationFilePaths = Object.freeze([
+  "contracts/CONTRACT-DB.md",
+  "contracts/CONTRACT-API.md",
+  "contracts/CONTRACT-WEBHOOKS.md",
+  "contracts/CONTRACT-PROVIDER-ADAPTER.md",
+  "contracts/CONTRACT-AI.md",
+  "contracts/CONTRACT-BILLING.md",
+  "contracts/CONTRACT-COMPLIANCE.md",
+  "contracts/CONTRACT-QUEUE.md",
+  "contracts/CONTRACT-TESTING.md"
+] as const);
 export const allowedContractOperationValidationCommands = Object.freeze([
   "npm run contracts:check",
   "npm run validate",
@@ -33,6 +44,7 @@ export const allowedContractOperationCommandExecutionStates = Object.freeze(["no
 export const allowedContractOperationExternalImpactStates = Object.freeze(["none"] as const);
 export const allowedContractOperationSecretsDisplayedStates = Object.freeze([false] as const);
 
+export type ContractOperationSupportedFilePath = (typeof allowedContractOperationFilePaths)[number];
 export type ContractOperationSupportedValidationCommand = (typeof allowedContractOperationValidationCommands)[number];
 export type ContractOperationCommandExecutionState = (typeof allowedContractOperationCommandExecutionStates)[number];
 export type ContractOperationExternalImpactState = (typeof allowedContractOperationExternalImpactStates)[number];
@@ -111,6 +123,10 @@ function assertContractOperationFile(file: ContractOperationFile) {
     throw new Error(`Invalid contract operation file path ${String(file.path)}`);
   }
   assertCleanContractMetadata(file.path, `Whitespace-unsafe contract operation file path ${file.path}`);
+
+  if (!allowedContractOperationFilePaths.includes(file.path as ContractOperationSupportedFilePath)) {
+    throw new Error(`Unsupported contract operation file path ${file.path}`);
+  }
 
   if (typeof file.boundary !== "string" || file.boundary.trim().length === 0) {
     throw new Error(`Invalid contract operation boundary for ${file.path}`);

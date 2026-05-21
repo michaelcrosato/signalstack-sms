@@ -1425,6 +1425,17 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP security/validation operations hardening or safe read-only operator surface refinements.
 
+## Run 167  GREEN  contract-operations-file-path-vocabulary  2026-05-21 04:38
+Objective:    Keep `/settings/contracts` contract inventory paths inside an exported runtime-frozen vocabulary.
+Changed:
+- Exported the supported contract operations file-path vocabulary.
+- Updated contract operations validation to reject static contract inventory paths outside the supported vocabulary before local metadata freezes.
+- Added unit coverage proving contract paths stay inside the vocabulary and exported contract operations vocabularies reject caller mutation.
+- Updated testing contract docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP contract operations hardening or safe read-only operator surface refinements.
+
 ## Run 150  GREEN  api-operations-secret-command-literals  2026-05-21 03:30
 Objective:    Keep `/settings/api` static route metadata free of command-like and secret-like literals before rendering.
 Changed:

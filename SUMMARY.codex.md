@@ -1,5 +1,17 @@
 # Codex Summary
 
+- Advanced a post-MVP contract operations file-path vocabulary checkpoint.
+- Exported a runtime-frozen `/settings/contracts` supported contract file-path vocabulary.
+- Updated contract operations validation to reject static contract inventory paths outside the supported vocabulary before local metadata freezes.
+- Added contract operations unit coverage proving static paths stay inside the vocabulary and exported vocabularies reject caller mutation.
+- Updated README, PLAN, testing contract docs, next-prompt handoff docs, blockers, and loop logs.
+- Focused contract operations unit coverage and typecheck passed; protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 167
+
+## Previous Run
+
 - Advanced a post-MVP contract operations no-impact summary-state checkpoint.
 - Exported runtime-frozen `/settings/contracts` command-execution, external-impact, and secrets-displayed vocabularies.
 - Added contract operations unit coverage proving rendered summary states stay inside those vocabularies and exported vocabularies reject caller mutation before local contract metadata renders.

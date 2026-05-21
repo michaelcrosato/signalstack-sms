@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   allowedContractOperationCommandExecutionStates,
   allowedContractOperationExternalImpactStates,
+  allowedContractOperationFilePaths,
   allowedContractOperationSecretsDisplayedStates,
   allowedContractOperationValidationCommands,
   contractOperationDriftControls,
@@ -111,7 +112,9 @@ describe("getContractOperationsStatus", () => {
   });
 
   it("keeps contract operation metadata in canonical local-only shape", () => {
-    expect(contractOperationFiles.map((file) => file.path).filter((path) => !path.startsWith("contracts/CONTRACT-"))).toEqual([]);
+    const allowedPaths = new Set<string>(allowedContractOperationFilePaths);
+
+    expect(contractOperationFiles.map((file) => file.path).filter((path) => !allowedPaths.has(path))).toEqual([]);
     expect(contractOperationFiles.map((file) => file.path).filter((path) => !path.endsWith(".md"))).toEqual([]);
     expect(contractOperationFiles.map((file) => file.path).filter((path) => path.includes("\\") || path.includes("?") || path.includes("#"))).toEqual([]);
     expect(contractOperationFiles.map((file) => file.name).filter((name) => name.trim().length === 0)).toEqual([]);
@@ -134,7 +137,7 @@ describe("getContractOperationsStatus", () => {
   });
 
   it("keeps contract operation inventory order stable for local review pages", () => {
-    expect(contractOperationFiles.map((file) => file.path)).toEqual([
+    expect(allowedContractOperationFilePaths).toEqual([
       "contracts/CONTRACT-DB.md",
       "contracts/CONTRACT-API.md",
       "contracts/CONTRACT-WEBHOOKS.md",
@@ -145,6 +148,7 @@ describe("getContractOperationsStatus", () => {
       "contracts/CONTRACT-QUEUE.md",
       "contracts/CONTRACT-TESTING.md"
     ]);
+    expect(contractOperationFiles.map((file) => file.path)).toEqual(allowedContractOperationFilePaths);
     expect(contractOperationValidationChecks.map((check) => check.command)).toEqual([
       "npm run contracts:check",
       "npm run validate",
@@ -212,8 +216,9 @@ describe("getContractOperationsStatus", () => {
     expect(allowedContractOperationSecretsDisplayedStates).toContain(status.secretsDisplayed);
   });
 
-  it("keeps exported contract operation no-impact vocabularies frozen against caller mutation", () => {
+  it("keeps exported contract operation vocabularies frozen against caller mutation", () => {
     const vocabularies = [
+      allowedContractOperationFilePaths,
       allowedContractOperationValidationCommands,
       allowedContractOperationCommandExecutionStates,
       allowedContractOperationExternalImpactStates,
