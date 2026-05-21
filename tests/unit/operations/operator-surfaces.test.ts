@@ -70,7 +70,7 @@ function collectPageRoutes(root: string) {
 }
 
 function withCustomSurfaceCopy(
-  groups: OperatorSurfaceGroup[],
+  groups: readonly OperatorSurfaceGroup[],
   href: string,
   copy: { label: string; note: string }
 ): OperatorSurfaceGroup[] {
@@ -80,7 +80,7 @@ function withCustomSurfaceCopy(
   }));
 }
 
-function withRouteStampedSurfaceCopy(groups: OperatorSurfaceGroup[]): OperatorSurfaceGroup[] {
+function withRouteStampedSurfaceCopy(groups: readonly OperatorSurfaceGroup[]): OperatorSurfaceGroup[] {
   let linkIndex = 0;
 
   return groups.map((group, groupIndex) => ({
@@ -97,14 +97,14 @@ function withRouteStampedSurfaceCopy(groups: OperatorSurfaceGroup[]): OperatorSu
   }));
 }
 
-function cloneSurfaceGroups(groups: OperatorSurfaceGroup[]): OperatorSurfaceGroup[] {
+function cloneSurfaceGroups(groups: readonly OperatorSurfaceGroup[]): OperatorSurfaceGroup[] {
   return groups.map((group) => ({
     ...group,
     links: group.links.map((link) => ({ ...link }))
   }));
 }
 
-function withoutSurfaceRoute(groups: OperatorSurfaceGroup[], href: string): OperatorSurfaceGroup[] {
+function withoutSurfaceRoute(groups: readonly OperatorSurfaceGroup[], href: string): OperatorSurfaceGroup[] {
   return groups.map((group) => ({
     ...group,
     links: group.links.filter((link) => link.href !== href)
@@ -137,6 +137,23 @@ describe("operator surface inventory", () => {
     expect(links.every((link) => link.href === "/" || link.href.startsWith("/"))).toBe(true);
     expect(links.every((link) => !link.href.startsWith("/api/"))).toBe(true);
     expect(links.every((link) => link.label.length > 0 && link.note.length > 0)).toBe(true);
+  });
+
+  it("keeps the canonical shared inventory frozen against runtime mutation", () => {
+    const firstGroup = operatorSurfaceGroups[0];
+    const firstLink = firstGroup.links[0];
+
+    expect(Object.isFrozen(operatorSurfaceGroups)).toBe(true);
+    expect(operatorSurfaceGroups.every((group) => Object.isFrozen(group) && Object.isFrozen(group.links))).toBe(true);
+    expect(operatorSurfaceGroups.flatMap((group) => group.links).every((link) => Object.isFrozen(link))).toBe(true);
+    expect(() =>
+      (operatorSurfaceGroups as unknown as OperatorSurfaceGroup[]).push({
+        name: "Unsafe Mutation",
+        links: []
+      })
+    ).toThrow(TypeError);
+    expect(() => (firstGroup.links as unknown as OperatorSurfaceGroup[]).pop()).toThrow(TypeError);
+    expect(() => ((firstLink as unknown as { label: string }).label = "Unsafe Mutation")).toThrow(TypeError);
   });
 
   it("keeps every listed route in canonical static app-page form", () => {

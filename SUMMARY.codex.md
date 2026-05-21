@@ -1,8 +1,13 @@
 # Codex Summary
 
-Run number: 82
+Run number: 83
 
 ## Completed
+
+- Advanced a post-MVP shared operator inventory runtime-freeze checkpoint.
+- Froze the canonical shared operator surface inventory at runtime while keeping projection helpers compatible with supplied inventory instances.
+- Added unit coverage proving the exported group array, nested link arrays, and link objects reject accidental mutation before local navigation projections can drift.
+- Targeted operator-surface unit coverage and typecheck passed.
 
 - Advanced a post-MVP shared operator projection fresh-array checkpoint.
 - Added unit coverage proving shared operator projection helpers return fresh result arrays per call, so caller-side array mutation cannot contaminate later navigation, rich checkpoint, workflow, or integration projections.

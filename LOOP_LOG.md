@@ -564,3 +564,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 083  GREEN  inventory-runtime-freeze  2026-05-20 22:33
+Objective:    Freeze the canonical shared operator surface inventory against runtime mutation.
+Changed:
+- Froze the exported shared operator surface group array, nested link arrays, and link objects while keeping projection helpers compatible with supplied inventory instances.
+- Added unit coverage proving accidental mutations are rejected before local navigation projection drift can leak into pages.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.

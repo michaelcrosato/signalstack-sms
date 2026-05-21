@@ -187,6 +187,7 @@ Post-MVP:
 - Local rich operator boundary external-impact coverage
 - Local shared operator projection immutability coverage
 - Local shared operator projection fresh-array coverage
+- Local shared operator inventory runtime-freeze coverage
 
 ## Next Milestone
 

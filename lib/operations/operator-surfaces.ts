@@ -1,12 +1,12 @@
 export type OperatorSurfaceLink = {
-  href: string;
-  label: string;
-  note: string;
+  readonly href: string;
+  readonly label: string;
+  readonly note: string;
 };
 
 export type OperatorSurfaceGroup = {
-  name: string;
-  links: OperatorSurfaceLink[];
+  readonly name: string;
+  readonly links: readonly OperatorSurfaceLink[];
 };
 
 export type DemoOperationsCheckpoint = {
@@ -28,7 +28,18 @@ export type IntegrationOperationArea = OperatorSurfaceLink & {
   boundary: string;
 };
 
-export const operatorSurfaceGroups = [
+function freezeOperatorSurfaceGroups(groups: OperatorSurfaceGroup[]) {
+  return Object.freeze(
+    groups.map((group) =>
+      Object.freeze({
+        ...group,
+        links: Object.freeze(group.links.map((link) => Object.freeze({ ...link })))
+      })
+    )
+  );
+}
+
+export const operatorSurfaceGroups = freezeOperatorSurfaceGroups([
   {
     name: "Demo And Workflow",
     links: [
@@ -84,9 +95,9 @@ export const operatorSurfaceGroups = [
       { href: "/settings/runbook", label: "Operator Runbook", note: "local commands as read-only text" }
     ]
   }
-] satisfies OperatorSurfaceGroup[];
+] satisfies OperatorSurfaceGroup[]);
 
-export function getOperatorSurfaceSummary(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getOperatorSurfaceSummary(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   const links = groups.flatMap((group) => group.links);
 
   return {
@@ -96,23 +107,23 @@ export function getOperatorSurfaceSummary(groups: OperatorSurfaceGroup[] = opera
   };
 }
 
-export function getRunbookAdminLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getRunbookAdminLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return groups.flatMap((group) => group.links).filter((link) => link.href === "/settings" || link.href.startsWith("/settings/"));
 }
 
-export function getSettingsNavigationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getSettingsNavigationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return getRunbookAdminLinks(groups).filter((link) => link.href !== "/settings");
 }
 
-export function getLaunchDashboardLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getLaunchDashboardLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return groups.flatMap((group) => group.links);
 }
 
-export function getDemoConsoleLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getDemoConsoleLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return getLaunchDashboardLinks(groups).filter((link) => link.href !== "/demo");
 }
 
-function findOperatorSurfaceLink(href: string, groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+function findOperatorSurfaceLink(href: string, groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   const link = groups.flatMap((group) => group.links).find((item) => item.href === href);
 
   if (!link) {
@@ -501,7 +512,7 @@ const readinessAuditOperationNavigationRoutes = [
   "/settings/provider"
 ] as const;
 
-export function getDemoOperationsCheckpoints(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups): DemoOperationsCheckpoint[] {
+export function getDemoOperationsCheckpoints(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups): DemoOperationsCheckpoint[] {
   return demoOperationsCheckpointDefinitions.map((checkpoint) => {
     const link = findOperatorSurfaceLink(checkpoint.href, groups);
 
@@ -512,15 +523,15 @@ export function getDemoOperationsCheckpoints(groups: OperatorSurfaceGroup[] = op
   });
 }
 
-export function getDemoOperationsLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getDemoOperationsLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return demoOperationsLinkRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getReportingIndexLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getReportingIndexLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return reportingIndexRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getWorkflowOperationSteps(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups): WorkflowOperationStep[] {
+export function getWorkflowOperationSteps(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups): WorkflowOperationStep[] {
   return workflowOperationStepDefinitions.map((step) => {
     const link = findOperatorSurfaceLink(step.href, groups);
 
@@ -531,11 +542,11 @@ export function getWorkflowOperationSteps(groups: OperatorSurfaceGroup[] = opera
   });
 }
 
-export function getReleaseOperationSurfaceLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getReleaseOperationSurfaceLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return releaseOperationSurfaceRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getIntegrationOperationAreas(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups): IntegrationOperationArea[] {
+export function getIntegrationOperationAreas(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups): IntegrationOperationArea[] {
   return integrationOperationAreaDefinitions.map((area) => ({
     ...findOperatorSurfaceLink(area.href, groups),
     state: area.state,
@@ -543,102 +554,102 @@ export function getIntegrationOperationAreas(groups: OperatorSurfaceGroup[] = op
   }));
 }
 
-export function getSecurityOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getSecurityOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return securityOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getEnvironmentOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getEnvironmentOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return environmentOperationLinkRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getHealthOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getHealthOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return healthOperationLinkRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getContractOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getContractOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return contractOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getValidationOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getValidationOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return validationOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getQueueOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getQueueOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return queueOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getContactOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getContactOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return contactOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getCampaignOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getCampaignOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return campaignOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getAudienceOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getAudienceOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return audienceOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getTemplateOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getTemplateOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return templateOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getInboxOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getInboxOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return inboxOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getDataOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getDataOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return dataOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getNotificationOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getNotificationOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return notificationOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getExportOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getExportOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return exportOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getWebhookOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getWebhookOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return webhookOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getDeliveryOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getDeliveryOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return deliveryOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getTeamOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getTeamOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return teamOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getBillingOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getBillingOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return billingOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getAiOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getAiOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return aiOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getProviderOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getProviderOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return providerOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getNumberOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getNumberOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return numberOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getComplianceOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getComplianceOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return complianceOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getSystemOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getSystemOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return systemOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getUsageOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getUsageOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return usageOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
 
-export function getReadinessAuditOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+export function getReadinessAuditOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return readinessAuditOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
