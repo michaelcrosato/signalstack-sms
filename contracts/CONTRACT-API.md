@@ -140,6 +140,14 @@ Resolves or reopens a conversation with `{ "resolved": true }` or `{ "resolved":
 
 Demo-only inbound entrypoint with the same behavior as `POST /api/inbox/conversations`.
 
+### `GET /api/demo/live-test-sms`
+
+Returns live test SMS readiness for the local investor demo: enabled state, redacted/secret-free blockers, configured from-number presence, and allowlisted recipients. It must not call Twilio, send SMS, mutate records, expose auth tokens, or enable campaign/live messaging by itself.
+
+### `POST /api/demo/live-test-sms`
+
+Sends exactly one Twilio-backed live test SMS only when `LIVE_TEST_SMS_ENABLED=true`, `LIVE_MESSAGING_ENABLED=true`, `MESSAGING_PROVIDER=twilio`, Twilio env credentials are configured, the recipient is in `LIVE_TEST_SMS_TO_ALLOWLIST`, and the request includes the exact confirmation phrase. It records a local outbound message and readiness audit event after Twilio accepts the message. This endpoint is the only live-send demo surface and does not enable bulk campaign sends, workers, billing, AI, notifications, or non-allowlisted recipients.
+
 ### `GET /api/settings/compliance`
 
 Returns the org-scoped compliance profile plus a checklist containing `complete`, `liveMessagingAllowed`, and `blockers`.

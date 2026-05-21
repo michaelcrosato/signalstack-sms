@@ -10,6 +10,14 @@ Milestone 6 central gate requirements:
 
 - Provider-backed send entrypoints must call `evaluateMessagingHardGate` before any external provider mutation.
 - `dummy` remains the default provider and is considered a blocker for live messaging readiness.
+
+Post-MVP live test SMS exception:
+
+- `/api/demo/live-test-sms` is a narrow investor-demo exception for one allowlisted Twilio test SMS.
+- It must require `LIVE_TEST_SMS_ENABLED=true`, `LIVE_MESSAGING_ENABLED=true`, `MESSAGING_PROVIDER=twilio`, complete Twilio environment credentials, an allowlisted recipient, and an exact confirmation phrase before any Twilio call.
+- It must not use locally stored provider credential metadata for live sends; raw Twilio credentials must come from environment variables only.
+- It must not enable campaign sends, queue workers, bulk sends, billing, live AI, notification delivery, non-allowlisted recipients, or provider credential display.
+- Successful sends must create local audit evidence without storing raw auth tokens.
 - A complete compliance profile and `APPROVED` A2P status are necessary but not sufficient; demo mode and live flags must also permit external impact.
 
 Post-MVP provider settings foundation:

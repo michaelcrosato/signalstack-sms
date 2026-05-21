@@ -44,6 +44,8 @@ Milestone 5:
 - `POST /api/inbox/conversations/:conversationId/notes`: creates an internal note.
 - `POST /api/inbox/conversations/:conversationId/resolve`: resolves or reopens a conversation.
 - `POST /api/demo/inbound`: creates a demo-safe inbound message.
+- `GET /api/demo/live-test-sms`: returns live test SMS readiness without sending or exposing secrets.
+- `POST /api/demo/live-test-sms`: sends one Twilio-backed allowlisted live test SMS only when explicit live-test gates and confirmation pass.
 
 Milestone 6:
 

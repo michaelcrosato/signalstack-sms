@@ -30,6 +30,9 @@ export function evaluateProductionDeploymentGate(
     if (env.LIVE_MESSAGING_ENABLED === "true") {
       blockers.push("LIVE_MESSAGING_ENABLED_TRUE");
     }
+    if (env.LIVE_TEST_SMS_ENABLED === "true") {
+      blockers.push("LIVE_TEST_SMS_ENABLED_TRUE");
+    }
     if (env.LIVE_BILLING_ENABLED === "true") {
       blockers.push("LIVE_BILLING_ENABLED_TRUE");
     }

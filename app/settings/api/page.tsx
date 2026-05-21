@@ -96,7 +96,7 @@ export default async function ApiOperationsPage() {
       <Panel title="Safety Boundary">
         <ul className="grid gap-2 text-sm text-slate-700">
           <li>The inventory is static local metadata and does not execute any API handler.</li>
-          <li>External impact routes must remain zero until future live SMS, billing, notification, and AI gates are designed and tested.</li>
+          <li>The live test SMS endpoint is the only external-impact route and remains behind explicit Twilio, allowlist, and confirmation gates.</li>
           <li>Mutating routes listed here are local database/demo operations and stay behind existing tenant, compliance, provider, and billing gates.</li>
           <li>No provider calls, live SMS, live AI, Stripe calls, notifications, secrets, or production-destructive operations are introduced by this view.</li>
         </ul>

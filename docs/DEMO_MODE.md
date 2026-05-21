@@ -86,7 +86,7 @@ The validation operations screen at `/settings/validation` displays static local
 
 The security operations screen at `/settings/security` displays static security controls, validation command references, no-impact summary states for command execution, external impact, mutation, and secret display, and security safety-boundary text. It is read-only and does not scan files, inspect environment values, mutate records, call providers, create billing records, call live AI, send notifications, SMS, email, expose secrets, or enable live features.
 
-The API operations inventory is unit-tested so listed local API route-method rows stay unique, point at implemented `app/**/route.ts` files, include every implemented local API route method, and keep external-impact classification at zero.
+The API operations inventory is unit-tested so listed local API route-method rows stay unique, point at implemented `app/**/route.ts` files, include every implemented local API route method, and keep live test SMS as the only external-impact route.
 
 The root route `/` is a static local launch dashboard. It shows the demo-safe runtime defaults and shared-inventory links to the existing demo, readiness, provider metadata, system status, usage, and admin export views without requiring database access or creating side effects.
 

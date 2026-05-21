@@ -30,6 +30,7 @@ describe("production deployment gate", () => {
       evaluateProductionDeploymentGate({
         NODE_ENV: "production",
         LIVE_MESSAGING_ENABLED: "true",
+        LIVE_TEST_SMS_ENABLED: "true",
         LIVE_BILLING_ENABLED: "true",
         MESSAGING_PROVIDER: "twilio",
         AI_PROVIDER: "openai",
@@ -38,6 +39,7 @@ describe("production deployment gate", () => {
       }).blockers
     ).toEqual([
       "LIVE_MESSAGING_ENABLED_TRUE",
+      "LIVE_TEST_SMS_ENABLED_TRUE",
       "LIVE_BILLING_ENABLED_TRUE",
       "LIVE_MESSAGING_PROVIDER_SELECTED",
       "LIVE_AI_PROVIDER_SELECTED",

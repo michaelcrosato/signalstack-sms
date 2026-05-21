@@ -232,6 +232,8 @@ export const apiOperationRoutes = freezeApiOperationRoutes([
   { method: "POST", path: "/api/inbox/conversations/[conversationId]/notes", area: "Inbox", mutates: true, externalImpact: false, safety: "local internal note only" },
   { method: "POST", path: "/api/inbox/conversations/[conversationId]/resolve", area: "Inbox", mutates: true, externalImpact: false, safety: "local status update only" },
   { method: "POST", path: "/api/demo/inbound", area: "Demo", mutates: true, externalImpact: false, safety: "local simulated inbound only" },
+  { method: "GET", path: "/api/demo/live-test-sms", area: "Demo", mutates: false, externalImpact: false, safety: "live test SMS readiness only" },
+  { method: "POST", path: "/api/demo/live-test-sms", area: "Demo", mutates: true, externalImpact: true, safety: "Twilio live test SMS behind explicit allowlist gates" },
   { method: "POST", path: "/api/ai/campaign-copy", area: "AI", mutates: false, externalImpact: false, safety: "fake provider by default" },
   { method: "POST", path: "/api/ai/reply-suggestion", area: "AI", mutates: false, externalImpact: false, safety: "fake provider by default" },
   { method: "POST", path: "/api/ai/conversation-summary", area: "AI", mutates: false, externalImpact: false, safety: "fake provider by default" },

@@ -208,7 +208,8 @@ Post-MVP API operations inventory:
 - Unit tests must keep the static `/settings/api` route inventory aligned with implemented local API methods, including soft archive, draft update, inbox read endpoints, and billing usage reads.
 - Unit tests must fail when a listed API route path has no backing `app/**/route.ts` file or when route-method rows are duplicated.
 - Unit tests must fail when an implemented local API route method under `app/api/**/route.ts` is missing from the static `/settings/api` inventory.
-- The inventory must continue to report zero external-impact routes until future live SMS, billing, notification, provider, or AI gates are designed and tested.
+- The inventory must report the live test SMS endpoint as the only external-impact route while all other routes remain no-external-impact until future live SMS, billing, notification, provider, or AI gates are designed and tested.
+- Unit tests must verify that live test SMS stays blocked by default and enables only with explicit Twilio environment credentials, live messaging, the live-test flag, allowlisted recipients, and the exact confirmation phrase.
 - Unit tests must verify that the exported API operations inventory and per-call status, rate-limit, and route snapshots are frozen, and that status calls return fresh rate-limit objects and route arrays so caller mutation cannot leak into later local API inventory renders.
 - Unit tests must verify that exported API route entries, returned status snapshots, rate-limit snapshots, and per-call route snapshots expose only their public documented fields.
 - Unit tests must verify that exported API route entries keep supported methods, canonical local `/api/` path shape, boolean mutation/external-impact flags, nonblank area/safety copy, and unique method/path rows before local API operations renders.

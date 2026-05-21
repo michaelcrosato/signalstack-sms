@@ -67,12 +67,12 @@ function collectImplementedApiRouteMethods(root: string) {
 }
 
 describe("getApiOperationsStatus", () => {
-  it("reports local API route inventory and keeps external impact at zero", () => {
+  it("reports local API route inventory and isolates live test SMS as external impact", () => {
     const status = getApiOperationsStatus({});
 
-    expect(status.routeCount).toBe(47);
+    expect(status.routeCount).toBe(49);
     expect(status.mutatingRouteCount).toBeGreaterThan(10);
-    expect(status.externalImpactRouteCount).toBe(0);
+    expect(status.externalImpactRouteCount).toBe(1);
     expect(status.commandExecution).toBe("none");
     expect(status.externalImpact).toBe("none");
     expect(status.mutation).toBe("none");
@@ -80,13 +80,18 @@ describe("getApiOperationsStatus", () => {
     expect(status.routes.every((route) => route.path.startsWith("/api/"))).toBe(true);
     expect(status.routes.some((route) => route.path === "/api/webhooks/twilio/inbound")).toBe(true);
     expect(status.routes.some((route) => route.path === "/api/settings/provider/rotations/export")).toBe(true);
+    expect(status.routes.filter((route) => route.externalImpact).map((route) => `${route.method} ${route.path}`)).toEqual([
+      "POST /api/demo/live-test-sms"
+    ]);
     expect(status.routes.map((route) => `${route.method} ${route.path}`)).toEqual(
       expect.arrayContaining([
         "DELETE /api/contacts/[contactId]",
         "PATCH /api/campaigns/[campaignId]",
         "GET /api/inbox/conversations/[conversationId]/messages",
         "GET /api/inbox/conversations/[conversationId]/notes",
-        "GET /api/billing/usage"
+        "GET /api/billing/usage",
+        "GET /api/demo/live-test-sms",
+        "POST /api/demo/live-test-sms"
       ])
     );
     expect(status.rateLimit).toMatchObject({
@@ -186,6 +191,8 @@ describe("getApiOperationsStatus", () => {
       "POST /api/inbox/conversations/[conversationId]/notes",
       "POST /api/inbox/conversations/[conversationId]/resolve",
       "POST /api/demo/inbound",
+      "GET /api/demo/live-test-sms",
+      "POST /api/demo/live-test-sms",
       "POST /api/ai/campaign-copy",
       "POST /api/ai/reply-suggestion",
       "POST /api/ai/conversation-summary",
@@ -340,7 +347,7 @@ describe("getApiOperationsStatus", () => {
     const inventoryRouteKeys = new Set(apiOperationRoutes.map((route) => `${route.method} ${route.path}`));
     const implementedRouteMethods = collectImplementedApiRouteMethods(join(process.cwd(), "app", "api"));
 
-    expect(implementedRouteMethods).toHaveLength(47);
+    expect(implementedRouteMethods).toHaveLength(49);
     expect(implementedRouteMethods.filter((routeMethod) => !inventoryRouteKeys.has(routeMethod))).toEqual([]);
   });
 

@@ -6,7 +6,9 @@ import { listCampaigns } from "@/lib/db/repositories/campaigns";
 import { listContacts } from "@/lib/db/repositories/contacts";
 import { listConversations } from "@/lib/db/repositories/inbox";
 import { listProviderPhoneNumbers } from "@/lib/db/repositories/provider-numbers";
+import { getLiveTestSmsStatus } from "@/lib/messaging/live-test-sms";
 import { getDemoConsoleLinks } from "@/lib/operations/operator-surfaces";
+import { LiveTestSmsForm } from "./live-test-sms-form";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +24,7 @@ export default async function DemoPage() {
     getAnalyticsOverview(currentOrg.orgId),
     getUsageSummary(currentOrg.orgId)
   ]);
+  const liveTestSmsStatus = getLiveTestSmsStatus();
 
   const steps = [
     "Import opted-in contacts from CSV",
@@ -56,6 +59,13 @@ export default async function DemoPage() {
         <Metric label="Messages" value={analytics.messages.total} />
         <Metric label="Numbers" value={numbers.length} />
       </section>
+
+      <LiveTestSmsForm
+        enabled={liveTestSmsStatus.enabled}
+        blockers={liveTestSmsStatus.blockers}
+        allowedRecipients={liveTestSmsStatus.allowedRecipients}
+        fromNumber={liveTestSmsStatus.fromNumber}
+      />
 
       <section className="border-y border-slate-200 py-5" aria-label="Demo console operations">
         <div className="mb-3 flex flex-col gap-1">
