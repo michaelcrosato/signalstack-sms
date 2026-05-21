@@ -157,6 +157,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP shared supplied-inventory exact-field hardening: summaries and projections now fail before deriving local navigation from supplied operator groups or links with extra string or symbol fields, requiring exact public record shapes.
 - Post-MVP shared canonical pre-export validation hardening: the built-in shared operator surface inventory now runs through the same validator before it is frozen and exported, with unit coverage aligning exported canonical routes with summary routes.
 - Post-MVP shared supplied-inventory link-array-shape hardening: summaries and projections now fail before deriving local navigation from supplied operator group link arrays with custom prototypes or extra string/symbol fields, requiring plain link arrays.
+- Post-MVP validation operations value-boundary hardening: `/settings/validation` static metadata now rejects unsupported gate areas and missing validation boundary terms before rendering local gate inventory or repair signals.
 
 Demo-safe defaults remain mandatory:
 

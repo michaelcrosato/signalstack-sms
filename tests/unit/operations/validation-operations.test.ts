@@ -77,6 +77,34 @@ describe("getValidationOperationsStatus", () => {
     expect(validationOperationRepairSignals.filter((signal) => signal.trim().length === 0)).toEqual([]);
   });
 
+  it("keeps validation operation values inside documented local-only boundaries", () => {
+    expect(validationOperationGateCommands.map((gate) => gate.area)).toEqual([
+      "full local gate",
+      "contracts",
+      "safety defaults",
+      "deployment",
+      "observability",
+      "runbook",
+      "platform",
+      "secrets",
+      "investor demo"
+    ]);
+
+    const gateBoundaries = validationOperationGateCommands.map((gate) => gate.boundary).join(" ");
+    const repairSignals = validationOperationRepairSignals.join(" ");
+
+    expect(gateBoundaries).toContain("local");
+    expect(gateBoundaries).toContain("demo-safe");
+    expect(gateBoundaries).toContain("blocked");
+    expect(gateBoundaries).toContain("secrets");
+    expect(repairSignals).toContain("does not execute commands");
+    expect(repairSignals).toContain("DATABASE_URL");
+    expect(repairSignals).toContain("Playwright");
+    expect(repairSignals).toContain("Live provider");
+    expect(repairSignals).toContain("live AI");
+    expect(repairSignals).toContain("smallest failing command");
+  });
+
   it("keeps validation operation inventory order stable for local review pages", () => {
     expect(validationOperationGateCommands.map((gate) => gate.command)).toEqual([
       "npm run validate",

@@ -232,6 +232,7 @@ Post-MVP:
 - Local contract operations inventory order-stability coverage
 - Local contract operations inventory unique-identifier coverage
 - Local validation operations inventory static-metadata coverage
+- Local validation operations value-boundary coverage
 
 ## Next Milestone
 

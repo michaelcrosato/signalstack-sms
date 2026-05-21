@@ -15,6 +15,26 @@ export type ValidationOperationsStatus = {
 };
 
 const validationOperationGateCommandFields = ["command", "area", "boundary"] as const;
+const allowedValidationOperationAreas = [
+  "full local gate",
+  "contracts",
+  "safety defaults",
+  "deployment",
+  "observability",
+  "runbook",
+  "platform",
+  "secrets",
+  "investor demo"
+] as const;
+const requiredGateBoundaryTerms = ["local", "demo-safe", "blocked", "secrets"] as const;
+const requiredRepairSignalTerms = [
+  "does not execute commands",
+  "DATABASE_URL",
+  "Playwright",
+  "Live provider",
+  "live AI",
+  "smallest failing command"
+] as const;
 
 function assertExactFields<T extends object>(value: T, fields: readonly string[], errorMessage: string) {
   const actualKeys = Reflect.ownKeys(value);
@@ -41,6 +61,10 @@ function assertGateCommand(command: ValidationOperationGateCommand) {
     throw new Error(`Invalid validation operation area for ${command.command}`);
   }
 
+  if (!allowedValidationOperationAreas.includes(command.area as (typeof allowedValidationOperationAreas)[number])) {
+    throw new Error(`Unsupported validation operation area for ${command.command}`);
+  }
+
   if (typeof command.boundary !== "string" || command.boundary.trim().length === 0) {
     throw new Error(`Invalid validation operation boundary for ${command.command}`);
   }
@@ -60,6 +84,13 @@ function freezeGateCommands(commands: ValidationOperationGateCommand[]) {
     "Duplicate validation operation areas"
   );
 
+  const joinedBoundaries = commands.map((command) => command.boundary).join(" ");
+  const missingBoundaryTerms = requiredGateBoundaryTerms.filter((term) => !joinedBoundaries.includes(term));
+
+  if (missingBoundaryTerms.length > 0) {
+    throw new Error(`Missing validation operation gate boundary terms: ${missingBoundaryTerms.join(", ")}`);
+  }
+
   return Object.freeze(
     commands.map((command) =>
       Object.freeze({ command: command.command, area: command.area, boundary: command.boundary })
@@ -75,6 +106,13 @@ function freezeRepairSignals(signals: string[]) {
   }
 
   assertUniqueValues(signals, "Duplicate validation operation repair signals");
+
+  const joinedSignals = signals.join(" ");
+  const missingSignalTerms = requiredRepairSignalTerms.filter((term) => !joinedSignals.includes(term));
+
+  if (missingSignalTerms.length > 0) {
+    throw new Error(`Missing validation operation repair signal terms: ${missingSignalTerms.join(", ")}`);
+  }
 
   return Object.freeze([...signals]);
 }

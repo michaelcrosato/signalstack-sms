@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 127  GREEN  validation-operations-value-boundaries  2026-05-21 01:47
+Objective:    Keep `/settings/validation` static values constrained to local-only gate boundaries before rendering.
+Changed:
+- Added an explicit allowlist for validation operation gate areas.
+- Required validation gate boundary and repair-signal copy to keep naming local/demo-safe checks, blocked settings, secrets, command execution, `DATABASE_URL`, Playwright, live provider/AI boundaries, and smallest-command repair flow.
+- Added unit coverage pinning validation operation area values and boundary terms.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP validation operations hardening or safe read-only operator surface refinements.
+
 ## Run 126  GREEN  security-operations-value-boundaries  2026-05-21 01:42
 Objective:    Keep `/settings/security` static values constrained to local-only safety boundaries before rendering.
 Changed:
