@@ -115,9 +115,11 @@ function withoutSurfaceRoute(groups: readonly OperatorSurfaceGroup[], href: stri
 describe("operator surface inventory", () => {
   it("keeps the operations index grouped around the current local-only surfaces", () => {
     const summary = getOperatorSurfaceSummary();
+    const exportedRoutes = operatorSurfaceGroups.flatMap((group) => group.links.map((link) => link.href));
 
     expect(summary.groupCount).toBe(4);
     expect(summary.surfaceCount).toBe(35);
+    expect(summary.routes).toEqual(exportedRoutes);
     expect(new Set(summary.routes).size).toBe(summary.surfaceCount);
     expect(summary.routes).toEqual(
       expect.arrayContaining([

@@ -41,6 +41,8 @@ function freezeProjectionArray<T>(items: T[]) {
 }
 
 function freezeOperatorSurfaceGroups(groups: OperatorSurfaceGroup[]) {
+  getUniqueOperatorSurfaceLinks(groups);
+
   return Object.freeze(
     groups.map((group) =>
       Object.freeze({

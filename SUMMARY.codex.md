@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP shared operator canonical pre-export validation checkpoint.
+- Reused the shared operator surface validator before freezing the canonical inventory, so malformed built-in groups or links fail during module initialization before projections can render.
+- Added unit coverage aligning the exported canonical routes with the summary routes.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 110
+
+## Previous Run
+
 - Advanced a post-MVP shared operator supplied-inventory plain-record checkpoint.
 - Added prototype guards and unit coverage proving custom-prototype supplied group/link records fail before summaries or projections derive local navigation.
 - Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.

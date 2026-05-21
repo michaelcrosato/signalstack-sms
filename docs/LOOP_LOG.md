@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 110  GREEN  canonical-operator-inventory-preexport-validation  2026-05-21 00:28
+Objective:    Validate the canonical shared operator inventory before export and freeze.
+Changed:
+- Reused the shared operator surface validator inside canonical inventory freezing so malformed built-in groups or links fail before projections render.
+- Added unit coverage aligning exported canonical routes with summary routes.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 109  GREEN  supplied-inventory-plain-record-guard  2026-05-21 00:24
 Objective:    Fail custom-prototype supplied shared operator inventory records before projection.
 Changed:
