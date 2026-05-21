@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP notification operations no-impact summary-state checkpoint.
+- Exported and validated the allowed no-command, no-external-impact, and no-secret-display summary states used by `/settings/notifications`.
+- Added unit coverage proving the summary states stay inside the no-impact vocabulary before local notification metadata renders.
+- Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
+- Focused notification operations unit coverage, typecheck, lint, `git diff --check`, and the protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 144
+
+## Previous Run
+
 - Advanced a post-MVP notification operations exported channel-vocabulary checkpoint.
 - Exported the supported notification channel-name vocabulary and typed notification channel metadata from it.
 - Added unit coverage proving the exported vocabulary stays aligned with the static notification channel inventory before `/settings/notifications` renders.

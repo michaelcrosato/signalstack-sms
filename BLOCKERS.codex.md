@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 143
+Run number: 144
 
 No active blockers.
 
 ## Notes
 
+- Latest notification operations no-impact summary-state hardening keeps `/settings/notifications` command execution, external impact, and secrets-displayed summary states inside exported no-impact vocabularies before render. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 - Latest notification operations exported channel-vocabulary hardening keeps `/settings/notifications` static channel metadata typed from the exported supported email, in-app, SMS alert, and webhook vocabulary before render. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 - Latest notification operations channel-boundary term hardening keeps `/settings/notifications` static email, in-app, SMS alert, and webhook boundary copy aligned with channel-specific no-send surfaces before render. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 - Latest notification operations status-vocabulary hardening keeps `/settings/notifications` static status values inside the supported blocked, not-implemented, and inbound-only local vocabulary before render. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.

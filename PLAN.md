@@ -148,6 +148,7 @@ Post-MVP:
 - Local notification operations exported channel-vocabulary hardening
 - Local notification operations status-vocabulary metadata hardening
 - Local notification operations channel-boundary term hardening
+- Local notification operations no-impact summary-state hardening
 - Read-only local readiness audit operations view
 - Local operator runbook admin-link coverage refresh
 - Read-only local reporting index

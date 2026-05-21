@@ -1294,3 +1294,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP notification operations hardening or safe read-only operator surface refinements.
+
+## Run 144  GREEN  notification-operations-summary-states  2026-05-21 02:59
+Objective:    Keep `/settings/notifications` summary states inside the no-impact vocabulary.
+Changed:
+- Exported and validated the allowed no-command, no-external-impact, and no-secret-display summary states.
+- Added unit coverage proving notification operation summary states stay no-impact before local metadata renders.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP notification operations hardening or safe read-only operator surface refinements.

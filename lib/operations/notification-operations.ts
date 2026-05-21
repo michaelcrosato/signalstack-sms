@@ -1,8 +1,17 @@
 export const allowedNotificationOperationChannelStatuses = ["blocked", "not implemented", "inbound only"] as const;
 export const allowedNotificationOperationChannelNames = ["Email", "In-app", "SMS alerts", "Webhooks"] as const;
+export const allowedNotificationOperationCommandExecutionStates = ["none"] as const;
+export const allowedNotificationOperationExternalImpactStates = ["none"] as const;
+export const allowedNotificationOperationSecretsDisplayedStates = [false] as const;
 
 export type NotificationOperationChannelStatus = (typeof allowedNotificationOperationChannelStatuses)[number];
 export type NotificationOperationChannelName = (typeof allowedNotificationOperationChannelNames)[number];
+export type NotificationOperationCommandExecutionState =
+  (typeof allowedNotificationOperationCommandExecutionStates)[number];
+export type NotificationOperationExternalImpactState =
+  (typeof allowedNotificationOperationExternalImpactStates)[number];
+export type NotificationOperationSecretsDisplayedState =
+  (typeof allowedNotificationOperationSecretsDisplayedStates)[number];
 
 export type NotificationOperationChannel = {
   name: NotificationOperationChannelName;
@@ -14,9 +23,9 @@ export type NotificationOperationsStatus = {
   channelCount: number;
   controlCount: number;
   safetyBoundaryCount: number;
-  commandExecution: "none";
-  externalImpact: "none";
-  secretsDisplayed: false;
+  commandExecution: NotificationOperationCommandExecutionState;
+  externalImpact: NotificationOperationExternalImpactState;
+  secretsDisplayed: NotificationOperationSecretsDisplayedState;
   channels: readonly NotificationOperationChannel[];
   controls: readonly string[];
   safetyBoundaries: readonly string[];
@@ -45,6 +54,12 @@ const forbiddenSecretMetadataPatterns = [
   /\b(?:TWILIO_AUTH_TOKEN|STRIPE_SECRET_KEY|OPENAI_API_KEY|CLERK_SECRET_KEY)\s*=/,
   /\bBearer\s+[A-Za-z0-9._-]{12,}/
 ] as const;
+
+const notificationOperationStatusSummary = Object.freeze({
+  commandExecution: "none",
+  externalImpact: "none",
+  secretsDisplayed: false
+} satisfies Pick<NotificationOperationsStatus, "commandExecution" | "externalImpact" | "secretsDisplayed">);
 
 function assertExactFields<T extends object>(value: T, fields: readonly string[], errorMessage: string) {
   const actualKeys = Reflect.ownKeys(value);
@@ -174,6 +189,20 @@ function freezeSafetyBoundaries(boundaries: string[]) {
   return frozenBoundaries;
 }
 
+function assertStatusSummary(summary: Pick<NotificationOperationsStatus, "commandExecution" | "externalImpact" | "secretsDisplayed">) {
+  if (!allowedNotificationOperationCommandExecutionStates.includes(summary.commandExecution)) {
+    throw new Error(`Unsupported notification operation command execution state: ${summary.commandExecution}`);
+  }
+
+  if (!allowedNotificationOperationExternalImpactStates.includes(summary.externalImpact)) {
+    throw new Error(`Unsupported notification operation external impact state: ${summary.externalImpact}`);
+  }
+
+  if (!allowedNotificationOperationSecretsDisplayedStates.includes(summary.secretsDisplayed)) {
+    throw new Error(`Unsupported notification operation secrets-displayed state: ${summary.secretsDisplayed}`);
+  }
+}
+
 export const notificationOperationChannels = freezeChannels([
   {
     name: "Email",
@@ -215,13 +244,15 @@ export const notificationOperationSafetyBoundaries = freezeSafetyBoundaries([
 ]);
 
 export function getNotificationOperationsStatus(): NotificationOperationsStatus {
+  assertStatusSummary(notificationOperationStatusSummary);
+
   return Object.freeze({
     channelCount: notificationOperationChannels.length,
     controlCount: notificationOperationControls.length,
     safetyBoundaryCount: notificationOperationSafetyBoundaries.length,
-    commandExecution: "none",
-    externalImpact: "none",
-    secretsDisplayed: false,
+    commandExecution: notificationOperationStatusSummary.commandExecution,
+    externalImpact: notificationOperationStatusSummary.externalImpact,
+    secretsDisplayed: notificationOperationStatusSummary.secretsDisplayed,
     channels: freezeChannels(notificationOperationChannels.map((channel) => ({ ...channel }))),
     controls: freezeControls([...notificationOperationControls]),
     safetyBoundaries: freezeSafetyBoundaries([...notificationOperationSafetyBoundaries])

@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   allowedNotificationOperationChannelNames,
   allowedNotificationOperationChannelStatuses,
+  allowedNotificationOperationCommandExecutionStates,
+  allowedNotificationOperationExternalImpactStates,
+  allowedNotificationOperationSecretsDisplayedStates,
   getNotificationOperationsStatus,
   notificationOperationChannels,
   notificationOperationControls,
@@ -122,6 +125,17 @@ describe("getNotificationOperationsStatus", () => {
   it("keeps notification operation channel names inside the exported supported vocabulary", () => {
     expect(allowedNotificationOperationChannelNames).toEqual(["Email", "In-app", "SMS alerts", "Webhooks"]);
     expect(notificationOperationChannels.map((channel) => channel.name)).toEqual([...allowedNotificationOperationChannelNames]);
+  });
+
+  it("keeps notification operation summary states inside the no-impact vocabulary", () => {
+    const status = getNotificationOperationsStatus();
+
+    expect(allowedNotificationOperationCommandExecutionStates).toEqual(["none"]);
+    expect(allowedNotificationOperationExternalImpactStates).toEqual(["none"]);
+    expect(allowedNotificationOperationSecretsDisplayedStates).toEqual([false]);
+    expect(allowedNotificationOperationCommandExecutionStates).toContain(status.commandExecution);
+    expect(allowedNotificationOperationExternalImpactStates).toContain(status.externalImpact);
+    expect(allowedNotificationOperationSecretsDisplayedStates).toContain(status.secretsDisplayed);
   });
 
   it("keeps notification operation channel boundaries aligned with their no-send surfaces", () => {
