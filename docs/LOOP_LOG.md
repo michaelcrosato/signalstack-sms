@@ -1691,6 +1691,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP security/validation/contract operations hardening or safe read-only operator surface refinements.
 
+## Run 190  GREEN  notification-operations-detached-status-counts  2026-05-21 06:34
+Objective:    Keep `/settings/notifications` returned status arrays detached while counts stay aligned.
+Changed:
+- Added notification operations unit coverage proving returned channels, controls, and safety-boundary arrays are detached from exported metadata.
+- Added count alignment coverage for returned notification operations status arrays before local notification metadata renders.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP notification/readiness/queue operations hardening or safe read-only operator surface refinements.
+
 ## Run 189  GREEN  readiness-audit-export-link-limit-rejection  2026-05-21 06:34
 Objective:    Keep readiness-audit CSV export links constrained to the supported export-limit vocabulary.
 Changed:

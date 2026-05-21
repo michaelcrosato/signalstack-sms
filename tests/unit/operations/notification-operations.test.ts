@@ -75,6 +75,20 @@ describe("getNotificationOperationsStatus", () => {
     expect(getNotificationOperationsStatus().channels[0].status).toBe(notificationOperationChannels[0].status);
   });
 
+  it("keeps notification operation counts aligned to detached returned arrays", () => {
+    const status = getNotificationOperationsStatus();
+
+    expect(status.channelCount).toBe(status.channels.length);
+    expect(status.controlCount).toBe(status.controls.length);
+    expect(status.safetyBoundaryCount).toBe(status.safetyBoundaries.length);
+    expect(status.channels).toEqual(notificationOperationChannels);
+    expect(status.controls).toEqual(notificationOperationControls);
+    expect(status.safetyBoundaries).toEqual(notificationOperationSafetyBoundaries);
+    expect(status.channels).not.toBe(notificationOperationChannels);
+    expect(status.controls).not.toBe(notificationOperationControls);
+    expect(status.safetyBoundaries).not.toBe(notificationOperationSafetyBoundaries);
+  });
+
   it("keeps notification operation metadata in canonical local-only shape", () => {
     expect(notificationOperationChannels.map((channel) => channel.name).filter((name) => name.trim().length === 0)).toEqual([]);
     expect(notificationOperationChannels.map((channel) => channel.status).filter((status) => status.trim().length === 0)).toEqual([]);

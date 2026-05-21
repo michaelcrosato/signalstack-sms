@@ -153,6 +153,7 @@ Post-MVP:
 - Local notification operations no-impact summary-state hardening
 - Local notification operations runtime-frozen vocabulary hardening
 - Local notification operations exported vocabulary mutation hardening
+- Local notification operations detached status-array count coverage
 - Local notification operations no-impact summary rendering coverage
 - Local notification operations mutation no-impact summary hardening
 - Local queue operations static-metadata hardening
@@ -300,6 +301,7 @@ Post-MVP:
 - Local notification operations channel-boundary term coverage
 - Local notification operations runtime-frozen vocabulary coverage
 - Local notification operations exported vocabulary mutation coverage
+- Local notification operations detached status-array count coverage
 
 ## Next Milestone
 

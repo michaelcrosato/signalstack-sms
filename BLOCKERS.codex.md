@@ -1,7 +1,8 @@
 # Codex Blockers
 
-Run number: 189
+Run number: 190
 
+- Latest notification operations detached status-array count coverage keeps returned `/settings/notifications` status arrays detached from exported metadata and keeps rendered counts aligned. The check is local static metadata coverage only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, execute workers, call Redis, or enable live features.
 - Latest readiness-audit export-link limit rejection coverage pins the centralized local readiness-audit CSV link helper against unsupported limits before render. The check is local static metadata/link construction only and does not mutate audit events, expose secrets, call providers, bill, notify, send SMS/email, call live AI, execute workers, call Redis, or enable live features.
 - Latest readiness-audit export-link vocabulary hardening centralizes local readiness-audit CSV link construction in the operations helper so `/settings`, `/settings/readiness-audit`, `/settings/compliance`, and `/settings/exports` use the bounded export-limit vocabulary and supported action/subject filters before render. The check is local static metadata/link construction only and does not mutate audit events, expose secrets, call providers, bill, notify, send SMS/email, call live AI, execute workers, call Redis, or enable live features.
 - Latest API operations frozen status snapshot hardening returns a frozen API operations status object with fresh frozen rate-limit and route snapshots, preventing caller-side mutation from drifting later local API inventory renders. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, mutate records, expose secrets, or enable live features.

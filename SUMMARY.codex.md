@@ -1,5 +1,14 @@
 # Codex Summary
 
+- Advanced a post-MVP notification operations detached status-array count checkpoint.
+- Added unit coverage proving `/settings/notifications` returned status arrays stay detached from exported metadata while rendered counts remain aligned.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, worker execution, Redis calls, record mutations, or protected gate-script edits were used.
+
+Run number: 190
+
+## Previous Run
+
 - Advanced a post-MVP readiness-audit export-link limit rejection checkpoint.
 - Added unit coverage proving `buildReadinessAuditExportHref()` rejects unsupported export limits before local CSV links render.
 - Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
