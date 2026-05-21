@@ -71,6 +71,8 @@ Use `/settings/exports` for read-only local CSV exports:
 - Readiness audit events: `/api/settings/readiness-audit/export`
 - Redacted provider credential rotation history: `/api/settings/provider/rotations/export`
 
+Its navigation links are projected from the shared local operator surface inventory.
+
 Exports are tenant-scoped local metadata only. They must not expose raw auth tokens, provider token fingerprints, customer secrets, provider verification results, full message bodies, live billing identifiers, or provider-side state. Export routes must not mutate records, call providers, create billing records, send notifications, or enable live messaging.
 
 ## System Status

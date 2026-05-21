@@ -5,6 +5,7 @@ import {
   getDemoConsoleLinks,
   getContractOperationLinks,
   getEnvironmentOperationLinks,
+  getExportOperationLinks,
   getHealthOperationLinks,
   getIntegrationOperationAreas,
   getNotificationOperationLinks,
@@ -34,6 +35,7 @@ const contractOperationLinks = getContractOperationLinks();
 const validationOperationLinks = getValidationOperationLinks();
 const queueOperationLinks = getQueueOperationLinks();
 const notificationOperationLinks = getNotificationOperationLinks();
+const exportOperationLinks = getExportOperationLinks();
 
 test.setTimeout(60_000);
 
@@ -325,6 +327,10 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await page.getByRole("link", { name: "Admin Exports" }).click();
   await expect(page.getByRole("heading", { name: "Admin Exports" })).toBeVisible();
   await expect(page.getByText("Export Safety Boundary")).toBeVisible();
+  for (const link of exportOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(page.getByText(link.note, { exact: true }).first()).toBeVisible();
+  }
   await expect(page.getByRole("link", { name: "Export CSV" })).toHaveCount(2);
   await page.getByRole("link", { name: "Review Events" }).click();
   await expect(page.getByRole("heading", { name: "Readiness Audit" })).toBeVisible();

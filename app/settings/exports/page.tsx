@@ -2,11 +2,13 @@ import Link from "next/link";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { listProviderCredentialRotations } from "@/lib/db/repositories/provider-credentials";
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
+import { getExportOperationLinks } from "@/lib/operations/operator-surfaces";
 
 export const dynamic = "force-dynamic";
 
 export default async function SettingsExportsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
+  const operationLinks = getExportOperationLinks();
   const [auditEvents, credentialRotations] = await Promise.all([
     listLiveReadinessAuditEvents(currentOrg.orgId, 5),
     listProviderCredentialRotations(currentOrg.orgId, "twilio", 5)
@@ -15,42 +17,14 @@ export default async function SettingsExportsPage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
-        <Link className="text-sm font-medium text-teal-700" href="/settings">
-          Go-Live Readiness
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/compliance">
-          Compliance Detail
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/readiness-audit">
-          Readiness Audit
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/system">
-          System Status
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/usage">
-          Usage & Analytics
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/reports">
-          Reporting Index
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/campaigns">
-          Campaign Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/contacts">
-          Contact Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/templates">
-          Template Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/audience">
-          Audience Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/inbox">
-          Inbox Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
-          Operator Runbook
-        </Link>
+        <nav aria-label="Admin export operations" className="grid gap-2 md:grid-cols-3">
+          {operationLinks.map((link) => (
+            <Link key={link.href} className="rounded border border-slate-200 p-3 text-sm font-medium text-teal-700" href={link.href}>
+              <span>{link.label}</span>
+              <span className="mt-1 block text-xs font-normal text-slate-600">{link.note}</span>
+            </Link>
+          ))}
+        </nav>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Admin Exports</h1>

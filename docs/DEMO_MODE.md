@@ -18,7 +18,7 @@ The go-live readiness screen can link to a local CSV export of readiness audit e
 
 The compliance detail screen at `/settings/compliance` displays the existing compliance profile, checklist completeness, A2P metadata status, and hard-gate blockers. It is read-only and does not verify registration with providers, update records, send notifications, create billing records, or enable live messaging.
 
-The admin exports screen consolidates local CSV links for readiness audit events and provider credential rotation history. It is read-only and does not create exports through a background job, call providers, expose raw secrets, send notifications, create billing records, or enable live messaging.
+The admin exports screen consolidates local CSV links for readiness audit events and provider credential rotation history. Its local admin navigation is projected from the shared local operator surface inventory so exports navigation stays aligned with `/`, `/demo`, `/settings`, `/settings/operations`, and `/settings/runbook`. It is read-only and does not create exports through a background job, call providers, expose raw secrets, send notifications, create billing records, or enable live messaging.
 
 The usage and analytics screen at `/settings/usage` displays local tenant-scoped metrics, billing boundary status, and recent usage events. It is read-only and does not call Stripe, create billing provider artifacts, send notifications, call providers, or enable live messaging.
 

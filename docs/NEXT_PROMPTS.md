@@ -92,6 +92,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP integration/security shared-inventory hardening: `/settings/integrations` now projects integration surface links from the shared operator surface inventory, `/settings/security` projects header navigation from the same inventory, and unit plus seeded browser coverage verify visible labels, route targets, states, boundaries, and backing pages.
 - Post-MVP safety/runtime shared-inventory hardening: `/settings/environment`, `/settings/health`, `/settings/contracts`, and `/settings/validation` now project operation links from the shared operator surface inventory, with unit plus seeded browser coverage for labels, notes, route targets, and backing pages.
 - Post-MVP queue/notification shared-inventory hardening: `/settings/queue` and `/settings/notifications` now project header navigation from the shared operator surface inventory, with unit plus seeded browser coverage for labels, route targets, and backing pages.
+- Post-MVP admin exports shared-inventory hardening: `/settings/exports` now projects admin navigation from the shared operator surface inventory, with unit plus seeded browser coverage for labels, notes, route targets, and backing pages.
 
 Demo-safe defaults remain mandatory:
 

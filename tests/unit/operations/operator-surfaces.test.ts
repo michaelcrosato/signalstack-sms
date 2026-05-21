@@ -7,6 +7,7 @@ import {
   getDemoConsoleLinks,
   getContractOperationLinks,
   getEnvironmentOperationLinks,
+  getExportOperationLinks,
   getHealthOperationLinks,
   getIntegrationOperationAreas,
   getLaunchDashboardLinks,
@@ -356,5 +357,28 @@ describe("operator surface inventory", () => {
     ]);
     expect(notificationLinks).toEqual(notificationRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
     expect(notificationRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+  });
+
+  it("projects admin export operation links from the shared surface inventory", () => {
+    const inventoryLinks = operatorSurfaceGroups.flatMap((group) => group.links);
+    const exportLinks = getExportOperationLinks();
+    const exportRoutes = exportLinks.map((link) => link.href);
+
+    expect(exportRoutes).toEqual([
+      "/settings",
+      "/settings/compliance",
+      "/settings/readiness-audit",
+      "/settings/system",
+      "/settings/usage",
+      "/settings/reports",
+      "/settings/campaigns",
+      "/settings/contacts",
+      "/settings/templates",
+      "/settings/audience",
+      "/settings/inbox",
+      "/settings/runbook"
+    ]);
+    expect(exportLinks).toEqual(exportRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
+    expect(exportRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
   });
 });

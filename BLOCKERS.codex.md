@@ -1,12 +1,13 @@
 # Codex Blockers
 
-Run number: 55
+Run number: 56
 
 No active blockers.
 
 ## Notes
 
 - `/settings/queue` and `/settings/notifications` now project their header navigation from the shared local operator surface inventory. Unit and seeded browser coverage verify labels, route targets, and backing `app/**/page.tsx` files without executing workers, enqueueing jobs, calling Redis/providers, billing, notifying, sending SMS or email, exposing secrets, mutating records, or enabling live features.
+- `/settings/exports` now projects admin navigation from the shared local operator surface inventory. Unit and seeded browser coverage verify labels, notes, route targets, and backing `app/**/page.tsx` files without creating exports, calling providers, billing, notifying, sending SMS or email, exposing secrets, mutating records, or enabling live features.
 - `/settings/integrations` now projects integration surface links from the shared local operator surface inventory, and `/settings/security` now projects its header navigation from the same inventory. Unit and seeded browser coverage verify labels, route targets, states, boundaries, and backing `app/**/page.tsx` files without executing commands, calling providers, billing, notifying, sending SMS or email, exposing secrets, mutating records, or enabling live features.
 - `/settings/environment`, `/settings/health`, `/settings/contracts`, and `/settings/validation` now project operation links from the shared local operator surface inventory. Unit and seeded browser coverage verify labels, notes, route targets, and backing `app/**/page.tsx` files without executing commands, scanning files, reading env files or logs, calling APIs/providers, billing, notifying, sending SMS or email, exposing secrets, mutating records, or enabling live features.
 - `/settings/reports`, `/settings/workflows`, and `/settings/releases` now project report links, workflow checkpoint owners, and release surface links from the shared local operator surface inventory. Unit and seeded browser coverage verify labels, notes, route targets, workflow boundaries, and backing `app/**/page.tsx` files without executing commands, reports, workflow actions, exports, provider calls, billing, notifications, SMS, email, secrets, or live features.

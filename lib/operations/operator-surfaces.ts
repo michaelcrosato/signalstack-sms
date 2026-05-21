@@ -309,6 +309,21 @@ const notificationOperationNavigationRoutes = [
   "/settings/releases"
 ] as const;
 
+const exportOperationNavigationRoutes = [
+  "/settings",
+  "/settings/compliance",
+  "/settings/readiness-audit",
+  "/settings/system",
+  "/settings/usage",
+  "/settings/reports",
+  "/settings/campaigns",
+  "/settings/contacts",
+  "/settings/templates",
+  "/settings/audience",
+  "/settings/inbox",
+  "/settings/runbook"
+] as const;
+
 export function getDemoOperationsCheckpoints(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups): DemoOperationsCheckpoint[] {
   return demoOperationsCheckpointDefinitions.map((checkpoint) => {
     const link = findOperatorSurfaceLink(checkpoint.href, groups);
@@ -377,4 +392,8 @@ export function getQueueOperationLinks(groups: OperatorSurfaceGroup[] = operator
 
 export function getNotificationOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return notificationOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getExportOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return exportOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
