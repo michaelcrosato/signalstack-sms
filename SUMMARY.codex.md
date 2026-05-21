@@ -1,5 +1,17 @@
 # Codex Summary
 
+- Advanced a post-MVP readiness audit command-execution vocabulary checkpoint.
+- Exported and validated the supported readiness-audit command-execution state of `none`.
+- Rendered the command-execution state on `/settings/readiness-audit` alongside local audit filter and impact metadata.
+- Added unit coverage proving the command-execution vocabulary is runtime-frozen and contains the rendered status before readiness audit filters or CSV links render.
+- Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
+- Focused readiness-audit operations unit coverage, typecheck, lint, `git diff --check`, and protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 149
+
+## Previous Run
+
 - Advanced a post-MVP readiness audit query allowlist checkpoint.
 - Tightened the readiness-audit JSON/CSV query schema so `action` and `subjectType` accept only the supported vocabularies exported by the readiness-audit operations helper.
 - Added unit coverage proving unsupported local-looking readiness-audit action and subject filters are rejected.

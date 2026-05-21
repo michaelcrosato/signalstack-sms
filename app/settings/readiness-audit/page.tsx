@@ -57,6 +57,7 @@ export default async function ReadinessAuditOperationsPage({ searchParams }: Rea
         <Metric label="Recent events" value={String(auditEvents.length)} />
         <Metric label="Action filter" value={query.action ?? "all"} />
         <Metric label="Subject filter" value={query.subjectType ?? "all"} />
+        <Metric label="Command execution" value={readinessAuditStatus.commandExecution} />
         <Metric label="External impact" value={readinessAuditStatus.externalImpact} />
       </section>
 

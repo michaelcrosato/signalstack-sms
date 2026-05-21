@@ -1345,3 +1345,14 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP readiness audit operations hardening or safe read-only operator surface refinements.
+
+## Run 149  GREEN  readiness-audit-command-execution-vocabulary  2026-05-21 03:26
+Objective:    Keep `/settings/readiness-audit` command execution inside a supported no-impact vocabulary.
+Changed:
+- Exported the supported readiness-audit command-execution vocabulary with only `none`.
+- Rendered command execution as read-only local metadata on `/settings/readiness-audit`.
+- Added unit coverage proving the vocabulary is runtime-frozen and contains the rendered status before readiness filters or CSV links render.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP readiness audit operations hardening or safe read-only operator surface refinements.

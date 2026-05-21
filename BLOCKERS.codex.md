@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 148
+Run number: 149
 
 No active blockers.
 
 ## Notes
 
+- Latest readiness audit command-execution vocabulary hardening keeps `/settings/readiness-audit` command execution inside an exported runtime-frozen `none` vocabulary before rendering local audit filters or CSV links. The check is local static metadata validation only and does not execute commands, mutate audit events, expose secrets, call providers, bill, notify, send SMS/email, call live AI, or enable live features.
 - Latest readiness audit query allowlist hardening keeps JSON and CSV readiness-audit filters constrained to the supported action and subject-type vocabularies exported by the readiness-audit operations helper. The check is local query validation only and does not mutate audit events, expose secrets, call providers, bill, notify, send SMS/email, call live AI, or enable live features.
 - Latest notification operations runtime-frozen vocabulary hardening keeps `/settings/notifications` exported channel, status, command-execution, external-impact, and secrets-displayed vocabularies frozen at runtime before render. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 - Latest readiness audit operations export-limit vocabulary hardening keeps `/settings/readiness-audit` CSV export limits inside an exported runtime-frozen supported vocabulary before render. The check is local static metadata validation only and does not mutate audit events, expose secrets, call providers, bill, notify, send SMS/email, call live AI, or enable live features.

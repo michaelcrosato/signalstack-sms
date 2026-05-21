@@ -11,6 +11,7 @@ export const allowedReadinessAuditOperationSubjectTypes = Object.freeze([
   "ProviderCredential"
 ] as const);
 
+export const allowedReadinessAuditOperationCommandExecutionStates = Object.freeze(["none"] as const);
 export const allowedReadinessAuditOperationExternalImpactStates = Object.freeze(["none"] as const);
 export const allowedReadinessAuditOperationMutationStates = Object.freeze(["none"] as const);
 export const allowedReadinessAuditOperationSecretsDisplayedStates = Object.freeze([false] as const);
@@ -18,6 +19,8 @@ export const allowedReadinessAuditOperationExportLimits = Object.freeze([200] as
 
 export type ReadinessAuditOperationAction = (typeof allowedReadinessAuditOperationActions)[number];
 export type ReadinessAuditOperationSubjectType = (typeof allowedReadinessAuditOperationSubjectTypes)[number];
+export type ReadinessAuditOperationCommandExecutionState =
+  (typeof allowedReadinessAuditOperationCommandExecutionStates)[number];
 export type ReadinessAuditOperationExternalImpactState =
   (typeof allowedReadinessAuditOperationExternalImpactStates)[number];
 export type ReadinessAuditOperationMutationState = (typeof allowedReadinessAuditOperationMutationStates)[number];
@@ -30,6 +33,7 @@ export type ReadinessAuditOperationsStatus = {
   subjectTypeCount: number;
   safetyBoundaryCount: number;
   exportLimit: ReadinessAuditOperationExportLimit;
+  commandExecution: ReadinessAuditOperationCommandExecutionState;
   externalImpact: ReadinessAuditOperationExternalImpactState;
   mutation: ReadinessAuditOperationMutationState;
   secretsDisplayed: ReadinessAuditOperationSecretsDisplayedState;
@@ -68,10 +72,11 @@ const forbiddenSecretMetadataPatterns = [
 ] as const;
 
 const readinessAuditOperationStatusSummary = Object.freeze({
+  commandExecution: "none",
   externalImpact: "none",
   mutation: "none",
   secretsDisplayed: false
-} satisfies Pick<ReadinessAuditOperationsStatus, "externalImpact" | "mutation" | "secretsDisplayed">);
+} satisfies Pick<ReadinessAuditOperationsStatus, "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed">);
 
 export const readinessAuditOperationSafetyBoundaries = freezeSafetyBoundaries([
   "This view reads tenant-scoped audit events and links to the existing bounded CSV export only.",
@@ -136,10 +141,17 @@ function freezeSafetyBoundaries(boundaries: string[]) {
 }
 
 function assertStatusSummary(
-  summary: Pick<ReadinessAuditOperationsStatus, "externalImpact" | "mutation" | "secretsDisplayed" | "exportLimit">
+  summary: Pick<
+    ReadinessAuditOperationsStatus,
+    "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed" | "exportLimit"
+  >
 ) {
   if (!allowedReadinessAuditOperationExportLimits.includes(summary.exportLimit)) {
     throw new Error(`Unsupported readiness audit operation export limit: ${summary.exportLimit}`);
+  }
+
+  if (!allowedReadinessAuditOperationCommandExecutionStates.includes(summary.commandExecution)) {
+    throw new Error(`Unsupported readiness audit operation command execution state: ${summary.commandExecution}`);
   }
 
   if (!allowedReadinessAuditOperationExternalImpactStates.includes(summary.externalImpact)) {
@@ -159,7 +171,10 @@ export function getReadinessAuditOperationsStatus(): ReadinessAuditOperationsSta
   const statusSummary = {
     exportLimit: readinessAuditOperationExportLimit,
     ...readinessAuditOperationStatusSummary
-  } satisfies Pick<ReadinessAuditOperationsStatus, "externalImpact" | "mutation" | "secretsDisplayed" | "exportLimit">;
+  } satisfies Pick<
+    ReadinessAuditOperationsStatus,
+    "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed" | "exportLimit"
+  >;
 
   assertStatusSummary(statusSummary);
 
@@ -168,6 +183,7 @@ export function getReadinessAuditOperationsStatus(): ReadinessAuditOperationsSta
     subjectTypeCount: allowedReadinessAuditOperationSubjectTypes.length,
     safetyBoundaryCount: readinessAuditOperationSafetyBoundaries.length,
     exportLimit: statusSummary.exportLimit,
+    commandExecution: statusSummary.commandExecution,
     externalImpact: statusSummary.externalImpact,
     mutation: statusSummary.mutation,
     secretsDisplayed: statusSummary.secretsDisplayed,

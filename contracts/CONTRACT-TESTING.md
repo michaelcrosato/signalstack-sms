@@ -188,7 +188,7 @@ Post-MVP notification operations view:
 
 Post-MVP readiness audit operations view:
 
-- Unit tests must verify that the static readiness audit operations inventory exports runtime-frozen supported action, subject-type, and bounded CSV export-limit vocabularies, keeps JSON/CSV readiness-audit query filters constrained to those supported vocabularies, keeps no-impact summary states inside the supported local vocabulary, pins bounded CSV export limits, safety-boundary copy, public fields, frozen snapshots, stable order, unique identifiers, whitespace-clean copy, command-like literal rejection, and secret-like literal rejection stable before `/settings/readiness-audit` renders filters or CSV links.
+- Unit tests must verify that the static readiness audit operations inventory exports runtime-frozen supported action, subject-type, bounded CSV export-limit, and command-execution vocabularies, keeps JSON/CSV readiness-audit query filters constrained to those supported vocabularies, keeps no-impact summary states inside the supported local vocabulary, pins bounded CSV export limits, safety-boundary copy, public fields, frozen snapshots, stable order, unique identifiers, whitespace-clean copy, command-like literal rejection, and secret-like literal rejection stable before `/settings/readiness-audit` renders filters or CSV links.
 
 Post-MVP API operations inventory:
 

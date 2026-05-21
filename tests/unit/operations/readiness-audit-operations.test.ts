@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   allowedReadinessAuditOperationActions,
+  allowedReadinessAuditOperationCommandExecutionStates,
   allowedReadinessAuditOperationExternalImpactStates,
   allowedReadinessAuditOperationExportLimits,
   allowedReadinessAuditOperationMutationStates,
@@ -15,6 +16,7 @@ const publicStatusFields = [
   "subjectTypeCount",
   "safetyBoundaryCount",
   "exportLimit",
+  "commandExecution",
   "externalImpact",
   "mutation",
   "secretsDisplayed",
@@ -35,6 +37,7 @@ describe("getReadinessAuditOperationsStatus", () => {
     expect(status.subjectTypeCount).toBe(3);
     expect(status.safetyBoundaryCount).toBe(4);
     expect(status.exportLimit).toBe(200);
+    expect(status.commandExecution).toBe("none");
     expect(status.externalImpact).toBe("none");
     expect(status.mutation).toBe("none");
     expect(status.secretsDisplayed).toBe(false);
@@ -60,6 +63,7 @@ describe("getReadinessAuditOperationsStatus", () => {
     expect(Object.isFrozen(allowedReadinessAuditOperationActions)).toBe(true);
     expect(Object.isFrozen(allowedReadinessAuditOperationSubjectTypes)).toBe(true);
     expect(Object.isFrozen(allowedReadinessAuditOperationExportLimits)).toBe(true);
+    expect(Object.isFrozen(allowedReadinessAuditOperationCommandExecutionStates)).toBe(true);
     expect(Object.isFrozen(readinessAuditOperationSafetyBoundaries)).toBe(true);
     expect(Object.isFrozen(firstStatus)).toBe(true);
     expect(Object.isFrozen(firstStatus.actions)).toBe(true);
@@ -89,14 +93,17 @@ describe("getReadinessAuditOperationsStatus", () => {
     const status = getReadinessAuditOperationsStatus();
 
     expect(allowedReadinessAuditOperationExportLimits).toEqual([200]);
+    expect(allowedReadinessAuditOperationCommandExecutionStates).toEqual(["none"]);
     expect(allowedReadinessAuditOperationExternalImpactStates).toEqual(["none"]);
     expect(allowedReadinessAuditOperationMutationStates).toEqual(["none"]);
     expect(allowedReadinessAuditOperationSecretsDisplayedStates).toEqual([false]);
     expect(Object.isFrozen(allowedReadinessAuditOperationExportLimits)).toBe(true);
+    expect(Object.isFrozen(allowedReadinessAuditOperationCommandExecutionStates)).toBe(true);
     expect(Object.isFrozen(allowedReadinessAuditOperationExternalImpactStates)).toBe(true);
     expect(Object.isFrozen(allowedReadinessAuditOperationMutationStates)).toBe(true);
     expect(Object.isFrozen(allowedReadinessAuditOperationSecretsDisplayedStates)).toBe(true);
     expect(allowedReadinessAuditOperationExportLimits).toContain(status.exportLimit);
+    expect(allowedReadinessAuditOperationCommandExecutionStates).toContain(status.commandExecution);
     expect(allowedReadinessAuditOperationExternalImpactStates).toContain(status.externalImpact);
     expect(allowedReadinessAuditOperationMutationStates).toContain(status.mutation);
     expect(allowedReadinessAuditOperationSecretsDisplayedStates).toContain(status.secretsDisplayed);
