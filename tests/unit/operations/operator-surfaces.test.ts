@@ -417,6 +417,39 @@ describe("operator surface inventory", () => {
     expect(() => getDemoOperationsLinks(blankNoteGroups)).toThrow("Blank operator surface note");
   });
 
+  it("rejects supplied operator inventories with non-string fields before projection", () => {
+    const invalidGroupNameGroups = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      name: groupIndex === 1 ? 123 : group.name
+    })) as unknown as OperatorSurfaceGroup[];
+    const invalidRouteGroups = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [{ ...group.links[0], href: false }, ...group.links.slice(1)]
+          : group.links
+    })) as unknown as OperatorSurfaceGroup[];
+    const invalidLabelGroups = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [{ ...group.links[0], label: 123 }, ...group.links.slice(1)]
+          : group.links
+    })) as unknown as OperatorSurfaceGroup[];
+    const invalidNoteGroups = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [{ ...group.links[0], note: null }, ...group.links.slice(1)]
+          : group.links
+    })) as unknown as OperatorSurfaceGroup[];
+
+    expect(() => getOperatorSurfaceSummary(invalidGroupNameGroups)).toThrow("Invalid operator surface group name");
+    expect(() => getLaunchDashboardLinks(invalidRouteGroups)).toThrow("Invalid operator surface route");
+    expect(() => getSettingsNavigationLinks(invalidLabelGroups)).toThrow("Invalid operator surface label");
+    expect(() => getDemoOperationsLinks(invalidNoteGroups)).toThrow("Invalid operator surface note");
+  });
+
   it("keeps inventory copy whitespace-clean for projected navigation", () => {
     const copyFields = operatorSurfaceGroups.flatMap((group) => [
       group.name,

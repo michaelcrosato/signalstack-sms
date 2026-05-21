@@ -725,3 +725,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 101  GREEN  supplied-inventory-invalid-field-type-guard  2026-05-20 23:52
+Objective:    Fail supplied shared operator inventory text fields that are not strings before projection.
+Changed:
+- Added an explicit shared field-type guard for operator surface group names, routes, labels, and notes.
+- Added unit coverage proving malformed supplied field values fail before summary, launch, settings, or focused demo projections can surface generic string-operation errors.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.

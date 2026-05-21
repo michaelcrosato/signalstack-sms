@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP shared operator supplied-inventory invalid-field-type checkpoint.
+- Added a shared guard so summaries and projections fail before deriving local navigation from supplied group names, routes, labels, or notes that are not strings.
+- Added unit coverage proving malformed supplied field values are rejected for summary, launch, settings, and demo operation projections.
+- Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop log.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 101
+
+## Previous Run
+
 - Advanced a post-MVP shared operator supplied-inventory invalid-array checkpoint.
 - Added a shared guard so summaries and projections fail before deriving local navigation from supplied inventories that are not arrays.
 - Added unit coverage proving malformed supplied inventory values are rejected for summary, launch, and demo operation projections.

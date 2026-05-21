@@ -51,7 +51,11 @@ function freezeOperatorSurfaceGroups(groups: OperatorSurfaceGroup[]) {
   );
 }
 
-function assertNonBlankOperatorSurfaceField(fieldName: string, value: string) {
+function assertNonBlankOperatorSurfaceField(fieldName: string, value: unknown) {
+  if (typeof value !== "string") {
+    throw new Error(`Invalid operator surface ${fieldName}`);
+  }
+
   if (value.trim().length === 0) {
     throw new Error(`Blank operator surface ${fieldName}`);
   }
