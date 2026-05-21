@@ -40,6 +40,7 @@ Continuous execution is opt-in and remains local/demo-safe:
 - `WORKER_MAX_JOBS_PER_POLL` caps due jobs processed per poll and is clamped between 1 and 100.
 - Every poll reuses the same dummy-only/live-disabled gate; blocked workers do not process or call providers.
 - Production-like runtime markers (`NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, or `APP_ENV` set to `production` or `prod`) block worker processing even when demo-safe provider defaults are set. Production worker execution requires a future explicit worker policy, not the general production external-impact override.
+- `docs/PRODUCTION_WORKER_POLICY.md` is the current planning gate for that future explicit policy. It does not authorize production worker execution or live campaign sends.
 
 ## Post-MVP BullMQ/Redis Enqueue Foundation
 

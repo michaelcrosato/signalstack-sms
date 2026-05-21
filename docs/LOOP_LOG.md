@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 215  GREEN  production-worker-policy-planning  2026-05-21 16:30
+Objective:    Specify the production worker policy planning gate before live provider worker design starts.
+Changed:
+- Added `docs/PRODUCTION_WORKER_POLICY.md` describing current local/demo worker allowances, production-like runtime blocks, and future live-worker requirements.
+- Linked the policy from go-live, deployment, queue/testing contracts, roadmap, README, current state, and next-prompt handoff docs.
+- Preserved current behavior: production-like scheduled campaign workers remain blocked and the isolated live-test SMS route remains separate from campaign workers.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Convert the worker policy into executable gates before any live provider campaign-worker implementation.
+
 ## Run 206  GREEN  product-compliance-readiness  2026-05-21 15:20
 Objective:    Add owner-facing compliance readiness detail to the product dashboard flow.
 Changed:

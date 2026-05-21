@@ -58,6 +58,8 @@ Scheduled campaign workers are also local/demo-only. The database worker and opt
 
 Production-like demo deployment is documented in `docs/PRODUCTION_GO_LIVE.md`. The current gate permits demo-safe production deployments only and keeps live SMS, billing, provider calls, and live AI blocked by default.
 
+Production worker policy is documented in `docs/PRODUCTION_WORKER_POLICY.md`. It is a future live-send planning gate only; current production-like demo deployments do not run scheduled campaign workers.
+
 Deployment platform notes are documented in `docs/DEPLOYMENT_PLATFORM_NOTES.md`; `npm run platform:check` verifies that demo-safe hosting boundaries remain documented and is included in `npm run validate`.
 
 Production observability planning is documented in `docs/PRODUCTION_OBSERVABILITY.md`. Current observability guidance is local/platform-only and does not add third-party telemetry, notifications, live providers, or billing side effects.

@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 215
+
+- No blocker from the production worker policy planning gate. The new document is non-executable guidance and does not authorize production worker execution, live campaign sends, live SMS, provider calls, billing, notifications, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits.
+
 Run number: 214
 
 - No blocker from the latest Playwright port isolation hardening. Browser checks now default to an isolated local test port with validated `PLAYWRIGHT_PORT` overrides and explicit existing-server reuse; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.

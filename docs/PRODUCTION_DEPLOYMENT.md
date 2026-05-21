@@ -89,6 +89,8 @@ Production observability planning is documented in `docs/PRODUCTION_OBSERVABILIT
 
 Platform-specific hosting notes are documented in `docs/DEPLOYMENT_PLATFORM_NOTES.md`. Current platform guidance covers demo-safe production-like hosting only and does not authorize live messaging, billing, AI, provider calls, notifications, third-party telemetry exports, real secrets, or destructive data operations.
 
+Production worker execution is separately blocked today. The planning gate for any future live worker deployment is documented in `docs/PRODUCTION_WORKER_POLICY.md`; the current deployment class does not run scheduled campaign workers in production-like runtimes.
+
 ## Rollback
 
 Rollback is the hosting platform's previous build plus database migration discipline:

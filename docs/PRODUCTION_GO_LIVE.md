@@ -44,6 +44,7 @@ A future live-send milestone must add and validate all of these before any live 
 - Complete compliance profile with approved A2P status.
 - Provider credential storage through a real secret manager, not raw database fields.
 - Provider number ownership/readiness verification.
+- A dedicated production worker policy gate as documented in `docs/PRODUCTION_WORKER_POLICY.md`.
 - Send-rate limits and queue backpressure appropriate for provider limits.
 - Billing live-enable gate and test coverage proving Stripe calls cannot happen in demo/CI.
 - Manual break-glass documentation for disabling live sends.

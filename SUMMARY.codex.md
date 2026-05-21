@@ -1,5 +1,13 @@
 # Codex Summary
 
+- Added `docs/PRODUCTION_WORKER_POLICY.md` as a planning gate for future live campaign worker deployment.
+- Linked the worker policy from go-live, deployment, queue/testing contracts, roadmap, README, current state, and next-prompt handoff docs while preserving the current production-like worker block.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+Run number: 215
+
+## Previous Run
+
 - Defaulted Playwright browser checks to `127.0.0.1:3100` so local E2E smoke does not collide with a normal dev server on port 3000.
 - Added fail-fast validation for `PLAYWRIGHT_PORT` and kept existing-server reuse opt-in with `PLAYWRIGHT_REUSE_EXISTING_SERVER=true`.
 - Updated README, testing docs, testing contract, and loop records.
