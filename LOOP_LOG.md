@@ -1305,6 +1305,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP notification operations hardening or safe read-only operator surface refinements.
 
+## Run 153  GREEN  readiness-audit-maximum-export-limit-ceiling  2026-05-21 03:44
+Objective:    Keep readiness-audit JSON/CSV query limits tied to the maximum supported bounded export-limit vocabulary value.
+Changed:
+- Updated readiness-audit query validation to derive its maximum limit from the maximum exported CSV export-limit vocabulary value instead of vocabulary position.
+- Added unit coverage proving readiness-audit export limits remain positive integers and the maximum vocabulary limit is accepted while limit-plus-one is rejected.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP readiness audit operations hardening or safe read-only operator surface refinements.
+
 ## Run 145  GREEN  notification-operations-frozen-vocabularies  2026-05-21 03:05
 Objective:    Keep `/settings/notifications` exported vocabularies frozen at runtime.
 Changed:

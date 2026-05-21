@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP readiness audit maximum export-limit ceiling checkpoint.
+- Updated readiness-audit query validation so the JSON/CSV limit ceiling is derived from the maximum supported export-limit vocabulary value instead of vocabulary position.
+- Added unit coverage proving readiness-audit export limits remain positive integers and that the maximum vocabulary limit is accepted while limit-plus-one is rejected.
+- Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
+- Focused readiness-audit operations/export unit coverage passed; protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 153
+
+## Previous Run
+
 - Advanced a post-MVP readiness audit query limit-ceiling checkpoint.
 - Updated the JSON/CSV readiness-audit query schema so its maximum accepted limit is derived from the exported bounded CSV export-limit vocabulary.
 - Added unit coverage proving the vocabulary limit is accepted and limit-plus-one is rejected before readiness audit JSON/CSV filters render.

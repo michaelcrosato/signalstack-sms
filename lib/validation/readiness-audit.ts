@@ -5,7 +5,7 @@ import {
   allowedReadinessAuditOperationSubjectTypes
 } from "@/lib/operations/readiness-audit-operations";
 
-export const readinessAuditQueryLimitMax = allowedReadinessAuditOperationExportLimits[0];
+export const readinessAuditQueryLimitMax = Math.max(...allowedReadinessAuditOperationExportLimits);
 
 export const readinessAuditQuerySchema = z.object({
   action: z.enum(allowedReadinessAuditOperationActions).optional(),

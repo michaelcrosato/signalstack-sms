@@ -110,6 +110,7 @@ describe("getReadinessAuditOperationsStatus", () => {
     const status = getReadinessAuditOperationsStatus();
 
     expect(allowedReadinessAuditOperationExportLimits).toEqual([200]);
+    expect(allowedReadinessAuditOperationExportLimits.every((limit) => Number.isInteger(limit) && limit > 0)).toBe(true);
     expect(allowedReadinessAuditOperationCommandExecutionStates).toEqual(["none"]);
     expect(allowedReadinessAuditOperationExternalImpactStates).toEqual(["none"]);
     expect(allowedReadinessAuditOperationMutationStates).toEqual(["none"]);

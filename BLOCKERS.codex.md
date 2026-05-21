@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 152
+Run number: 153
 
 No active blockers.
 
 ## Notes
 
+- Latest readiness audit maximum export-limit ceiling hardening derives the JSON/CSV readiness-audit query schema maximum limit from the largest exported bounded positive CSV export-limit vocabulary value and covers positive integer vocabulary shape in unit tests. The check is local query validation only and does not mutate audit events, expose secrets, call providers, bill, notify, send SMS/email, call live AI, or enable live features.
 - Latest readiness audit query limit-ceiling hardening derives the JSON/CSV readiness-audit query schema maximum limit from the exported bounded CSV export-limit vocabulary and covers the limit boundary in unit tests. The check is local query validation only and does not mutate audit events, expose secrets, call providers, bill, notify, send SMS/email, call live AI, or enable live features.
 - Latest readiness audit exported-vocabulary mutation hardening keeps every exported readiness-audit operations vocabulary runtime-frozen and covered against caller mutation before rendering local audit filters or CSV links. The check is local static metadata validation only and does not execute commands, mutate audit events, expose secrets, call providers, bill, notify, send SMS/email, call live AI, or enable live features.
 - Latest readiness audit command-execution vocabulary hardening keeps `/settings/readiness-audit` command execution inside an exported runtime-frozen `none` vocabulary before rendering local audit filters or CSV links. The check is local static metadata validation only and does not execute commands, mutate audit events, expose secrets, call providers, bill, notify, send SMS/email, call live AI, or enable live features.

@@ -25,7 +25,8 @@ describe("readiness audit export", () => {
   });
 
   it("derives the query limit ceiling from the readiness audit operations vocabulary", () => {
-    expect(readinessAuditQueryLimitMax).toBe(allowedReadinessAuditOperationExportLimits[0]);
+    expect(allowedReadinessAuditOperationExportLimits.every((limit) => Number.isInteger(limit) && limit > 0)).toBe(true);
+    expect(readinessAuditQueryLimitMax).toBe(Math.max(...allowedReadinessAuditOperationExportLimits));
     expect(readinessAuditQuerySchema.safeParse({ limit: String(readinessAuditQueryLimitMax) }).success).toBe(true);
     expect(readinessAuditQuerySchema.safeParse({ limit: String(readinessAuditQueryLimitMax + 1) }).success).toBe(false);
   });
