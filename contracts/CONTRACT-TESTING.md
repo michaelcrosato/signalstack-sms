@@ -37,6 +37,7 @@ Post-MVP local operations status:
 - Unit tests must verify that rich shared operator projection names, labels, states, and boundaries stay unambiguous, whitespace-clean, and explicit about read-only/no-impact boundaries.
 - Unit tests must verify that page-specific operator navigation projections exclude their own current route, while broader inventory views such as the runbook may intentionally list all local admin pages.
 - Unit tests must verify that the shared operator surface inventory keeps group names, link labels, and link notes unambiguous so projected navigation and browser checks cannot silently collide.
+- Unit tests must verify that shared operator surface routes, group names, labels, and notes remain whitespace-clean without leading/trailing whitespace, doubled spaces, or embedded newlines.
 - Unit tests must verify that shared operator surface group names and labels stay in stable Title Case navigation format, and notes stay short lower-case sentence fragments without terminal punctuation.
 - Unit tests must verify that every shared operator surface route remains a canonical static local app-page route: lowercase, no trailing slash, no query/hash, no dynamic segment, no double slash, and limited to `/demo`, `/settings`, or `/settings/**`.
 - Unit tests must verify that shared operator surface groups and route order stay stable so projected navigation does not churn without an intentional inventory update.

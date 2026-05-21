@@ -179,6 +179,17 @@ describe("operator surface inventory", () => {
     expect(new Set(notes).size).toBe(notes.length);
   });
 
+  it("keeps inventory copy whitespace-clean for projected navigation", () => {
+    const copyFields = operatorSurfaceGroups.flatMap((group) => [
+      group.name,
+      ...group.links.flatMap((link) => [link.href, link.label, link.note])
+    ]);
+
+    expect(copyFields.filter((value) => value.trim() !== value)).toEqual([]);
+    expect(copyFields.filter((value) => value.includes("  "))).toEqual([]);
+    expect(copyFields.filter((value) => value.includes("\n"))).toEqual([]);
+  });
+
   it("keeps operator inventory copy in a stable navigation format", () => {
     const titleCaseWords = /^[A-Z][A-Za-z0-9&-]*( (&|[A-Z][A-Za-z0-9&-]*))*$/;
     const noteFragment = /^[a-z0-9][A-Za-z0-9,& -]*$/;

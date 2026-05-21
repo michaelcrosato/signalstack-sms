@@ -1,15 +1,20 @@
 # Codex Summary
 
-Run number: 69
+Run number: 70
 
 ## Completed
+
+- Advanced a post-MVP shared operator inventory whitespace-clean checkpoint.
+- Added unit coverage that keeps shared operator surface routes, group names, labels, and notes free of leading/trailing whitespace, doubled spaces, and embedded newlines.
+- Updated testing contract/docs, README, PLAN, BLOCKERS, and next-prompt handoff docs with the whitespace-clean guard.
+- Targeted operator-surface unit coverage passed.
+
+## Prior Completed
 
 - Advanced a post-MVP rich operator projection copy-boundary checkpoint.
 - Added unit coverage that keeps demo checkpoint, workflow step, and integration area projection names, labels, states, and boundaries unique, whitespace-clean, and boundary-oriented.
 - Updated testing contract/docs, README, PLAN, and next-prompt handoff docs with the rich projection copy-boundary guard.
 - Targeted operator-surface unit coverage passed.
-
-## Prior Completed
 
 - Advanced a post-MVP rich operator projection shared-inventory checkpoint.
 - Added unit coverage that keeps demo checkpoint, workflow step, and integration area projections unique, backed by implemented app pages, and label-aligned with the shared local operator surface inventory.
@@ -230,6 +235,8 @@ Run number: 69
 
 ## Validation
 
+- Latest shared operator inventory whitespace-clean hardening added unit coverage that rejects leading/trailing whitespace, doubled spaces, and embedded newlines in shared operator surface routes, group names, labels, and notes. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
+- `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - Latest rich projection copy-boundary hardening added unit coverage for demo checkpoint, workflow step, and integration area projection copy. The check validates unique names, labels, states, and boundaries; whitespace-clean copy; lowercase integration states; and explicit read-only/no-impact boundary phrasing. It does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - `npm install`

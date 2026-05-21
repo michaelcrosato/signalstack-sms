@@ -172,6 +172,7 @@ Post-MVP:
 - Local shared operator inventory unique-copy coverage
 - Local shared operator inventory canonical-route-shape coverage
 - Local page-specific operator projection self-link coverage
+- Local shared operator inventory whitespace-clean coverage
 - Local shared operator inventory copy-shape coverage
 - Local shared operator inventory order-stability coverage
 - Local rich operator projection shared-inventory coverage
