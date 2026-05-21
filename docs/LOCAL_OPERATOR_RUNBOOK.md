@@ -171,7 +171,7 @@ The page is display-only. It must not import contacts, schedule or cancel campai
 
 ## Demo Operations
 
-Use `/settings/demo` for read-only seeded demo readiness review before demos or demo-path repair work. It displays:
+Use `/settings/demo` for read-only seeded demo readiness review before demos or demo-path repair work. Its readiness checkpoint signals and operational links are projected from the shared local operator surface inventory. It displays:
 
 - seeded workspace readiness checkpoints
 - workflow links for audience, campaigns, inbox, usage, and reporting

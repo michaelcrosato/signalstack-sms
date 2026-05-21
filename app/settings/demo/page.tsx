@@ -7,42 +7,13 @@ import { listCampaigns } from "@/lib/db/repositories/campaigns";
 import { listContacts } from "@/lib/db/repositories/contacts";
 import { listConversations } from "@/lib/db/repositories/inbox";
 import { listProviderPhoneNumbers } from "@/lib/db/repositories/provider-numbers";
+import { getDemoOperationsCheckpoints, getDemoOperationsLinks } from "@/lib/operations/operator-surfaces";
 import { getSystemStatus } from "@/lib/operations/system-status";
 
 export const dynamic = "force-dynamic";
 
-const demoCheckpoints = [
-  {
-    name: "Seeded workspace",
-    href: "/demo",
-    signal: "Demo Console",
-    boundary: "Shows local seed records and demo-safe workflow steps without calling providers or sending messages."
-  },
-  {
-    name: "Audience and consent",
-    href: "/settings/contacts",
-    signal: "Contact Operations",
-    boundary: "Reviews contact consent and import metadata without importing, mutating consent, or sending SMS."
-  },
-  {
-    name: "Campaign readiness",
-    href: "/settings/campaigns",
-    signal: "Campaign Operations",
-    boundary: "Reviews campaign and recipient state without scheduling, canceling, running workers, or sending."
-  },
-  {
-    name: "Inbox replies",
-    href: "/settings/inbox",
-    signal: "Inbox Operations",
-    boundary: "Reviews conversations and message metadata without creating replies, assigning threads, or mutating contacts."
-  },
-  {
-    name: "Usage and reporting",
-    href: "/settings/reports",
-    signal: "Reporting Index",
-    boundary: "Reviews local analytics, usage, and export links without executing reports or creating exports."
-  }
-];
+const demoCheckpoints = getDemoOperationsCheckpoints();
+const demoOperationsLinks = getDemoOperationsLinks();
 
 export default async function DemoOperationsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
@@ -147,10 +118,9 @@ export default async function DemoOperationsPage() {
 
         <Panel title="Operational Links">
           <ul className="grid gap-3 text-sm">
-            <OperationLink href="/settings/workflows" label="Workflow Operations" note="end-to-end local demo checkpoints" />
-            <OperationLink href="/settings/operations" label="Operations Index" note="grouped local operator surface map" />
-            <OperationLink href="/settings/releases" label="Release Operations" note="seeded demo path and gate expectations" />
-            <OperationLink href="/settings/environment" label="Environment Operations" note="demo-safe defaults and runtime categories" />
+            {demoOperationsLinks.map((link) => (
+              <OperationLink key={link.href} href={link.href} label={link.label} note={link.note} />
+            ))}
           </ul>
         </Panel>
       </section>

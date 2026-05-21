@@ -2,6 +2,8 @@ import { existsSync, readdirSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  getDemoOperationsCheckpoints,
+  getDemoOperationsLinks,
   getDemoConsoleLinks,
   getLaunchDashboardLinks,
   getOperatorSurfaceSummary,
@@ -140,5 +142,35 @@ describe("operator surface inventory", () => {
     expect(demoRoutes).toContain("/settings/exports");
     expect(demoRoutes).toContain("/settings");
     expect(demoRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+  });
+
+  it("projects demo operations checkpoints and links from the shared surface inventory", () => {
+    const inventoryLinks = operatorSurfaceGroups.flatMap((group) => group.links);
+    const checkpoints = getDemoOperationsCheckpoints();
+    const operationLinks = getDemoOperationsLinks();
+    const checkpointRoutes = checkpoints.map((checkpoint) => checkpoint.href);
+    const operationRoutes = operationLinks.map((link) => link.href);
+
+    expect(checkpoints).toHaveLength(5);
+    expect(checkpointRoutes).toEqual([
+      "/demo",
+      "/settings/contacts",
+      "/settings/campaigns",
+      "/settings/inbox",
+      "/settings/reports"
+    ]);
+    expect(checkpoints.map((checkpoint) => checkpoint.signal)).toEqual(
+      checkpointRoutes.map((route) => inventoryLinks.find((link) => link.href === route)?.label)
+    );
+    expect(checkpoints.every((checkpoint) => checkpoint.name.length > 0 && checkpoint.boundary.length > 0)).toBe(true);
+    expect(checkpointRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+
+    expect(operationLinks).toEqual([
+      inventoryLinks.find((link) => link.href === "/settings/workflows"),
+      inventoryLinks.find((link) => link.href === "/settings/operations"),
+      inventoryLinks.find((link) => link.href === "/settings/releases"),
+      inventoryLinks.find((link) => link.href === "/settings/environment")
+    ]);
+    expect(operationRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
   });
 });

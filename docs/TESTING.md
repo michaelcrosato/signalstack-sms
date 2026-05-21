@@ -24,6 +24,7 @@ Additional deterministic checks:
 - Operations index inventory tests verify grouped local operator routes, duplicate prevention, safety-sensitive links, and backing `app/**/page.tsx` files before browser demo coverage.
 - Operator runbook inventory tests verify that the runbook admin-link list is projected from the shared local operator surface inventory, keeps labels aligned, excludes only non-settings surfaces, and points every listed route at an implemented `app/**/page.tsx`.
 - Operations index inventory tests verify both directions of page coverage: every listed route has an implemented `app/**/page.tsx`, and every implemented local operator page is listed in the shared inventory.
+- Demo operations inventory tests verify that seeded readiness checkpoint signals and operational links are projected from the shared local operator surface inventory and point at implemented app pages.
 - The seeded investor demo path verifies `/settings/operations` as a read-only grouped local operator surface index and checks visible links/routes from the shared operations inventory without commands, file inspection, API probes, mutations, exports, provider calls, billing, notifications, live AI, SMS, email, secrets, or live feature enablement.
 - The seeded investor demo path verifies `/settings/compliance` as a read-only compliance detail surface without live provider verification or messaging enablement.
 - The seeded investor demo path verifies `/settings/usage` as a read-only local usage and analytics surface without live billing or provider configuration.

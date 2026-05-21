@@ -9,6 +9,13 @@ export type OperatorSurfaceGroup = {
   links: OperatorSurfaceLink[];
 };
 
+export type DemoOperationsCheckpoint = {
+  name: string;
+  href: string;
+  signal: string;
+  boundary: string;
+};
+
 export const operatorSurfaceGroups = [
   {
     name: "Demo And Workflow",
@@ -91,4 +98,64 @@ export function getLaunchDashboardLinks(groups: OperatorSurfaceGroup[] = operato
 
 export function getDemoConsoleLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return getLaunchDashboardLinks(groups).filter((link) => link.href !== "/demo");
+}
+
+function findOperatorSurfaceLink(href: string, groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  const link = groups.flatMap((group) => group.links).find((item) => item.href === href);
+
+  if (!link) {
+    throw new Error(`Missing operator surface link for ${href}`);
+  }
+
+  return link;
+}
+
+const demoOperationsCheckpointDefinitions = [
+  {
+    name: "Seeded workspace",
+    href: "/demo",
+    boundary: "Shows local seed records and demo-safe workflow steps without calling providers or sending messages."
+  },
+  {
+    name: "Audience and consent",
+    href: "/settings/contacts",
+    boundary: "Reviews contact consent and import metadata without importing, mutating consent, or sending SMS."
+  },
+  {
+    name: "Campaign readiness",
+    href: "/settings/campaigns",
+    boundary: "Reviews campaign and recipient state without scheduling, canceling, running workers, or sending."
+  },
+  {
+    name: "Inbox replies",
+    href: "/settings/inbox",
+    boundary: "Reviews conversations and message metadata without creating replies, assigning threads, or mutating contacts."
+  },
+  {
+    name: "Usage and reporting",
+    href: "/settings/reports",
+    boundary: "Reviews local analytics, usage, and export links without executing reports or creating exports."
+  }
+] as const;
+
+const demoOperationsLinkRoutes = [
+  "/settings/workflows",
+  "/settings/operations",
+  "/settings/releases",
+  "/settings/environment"
+] as const;
+
+export function getDemoOperationsCheckpoints(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups): DemoOperationsCheckpoint[] {
+  return demoOperationsCheckpointDefinitions.map((checkpoint) => {
+    const link = findOperatorSurfaceLink(checkpoint.href, groups);
+
+    return {
+      ...checkpoint,
+      signal: link.label
+    };
+  });
+}
+
+export function getDemoOperationsLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return demoOperationsLinkRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }

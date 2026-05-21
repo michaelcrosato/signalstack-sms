@@ -230,7 +230,7 @@ Renders a read-only local environment operations checkpoint. It may display demo
 
 ### `/settings/demo`
 
-Renders a read-only local demo operations checkpoint for the current organization. It may display seeded demo readiness, workflow links, local contact/campaign/conversation/message/number metrics, local usage totals, and derived runtime gates. The page must not import data, schedule or cancel campaigns, run workers, create inbox messages or replies, submit prompts, execute reports, create exports, mutate records, enqueue jobs, call Redis, call providers, call Stripe, call live AI, send SMS, send email, send notifications, expose secrets, expose full message bodies, or enable live messaging, live billing, live AI, or other live features.
+Renders a read-only local demo operations checkpoint for the current organization. It may display seeded demo readiness, workflow links projected from the shared operator surface inventory, local contact/campaign/conversation/message/number metrics, local usage totals, and derived runtime gates. The page must not import data, schedule or cancel campaigns, run workers, create inbox messages or replies, submit prompts, execute reports, create exports, mutate records, enqueue jobs, call Redis, call providers, call Stripe, call live AI, send SMS, send email, send notifications, expose secrets, expose full message bodies, or enable live messaging, live billing, live AI, or other live features.
 
 ### `/settings/operations`
 

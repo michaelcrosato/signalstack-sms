@@ -158,6 +158,7 @@ Post-MVP:
 - Local launch dashboard shared-inventory browser smoke coverage
 - Local operations index shared-inventory browser coverage
 - Local demo console shared-inventory navigation and browser coverage
+- Local demo operations shared-inventory checkpoint coverage
 
 ## Next Milestone
 
