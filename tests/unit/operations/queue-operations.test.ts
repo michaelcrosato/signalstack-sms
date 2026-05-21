@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   allowedQueueOperationCommandExecutionStates,
   allowedQueueOperationExternalImpactStates,
+  allowedQueueOperationModes,
   allowedQueueOperationSecretsDisplayedStates,
   allowedQueueOperationWorkerCommands,
   getQueueOperationsStatus,
@@ -124,6 +125,22 @@ describe("getQueueOperationsStatus", () => {
     expect(safetyCopy).toContain("campaign status");
   });
 
+  it("keeps queue operation worker modes inside the exported supported vocabulary", () => {
+    expect(allowedQueueOperationModes).toEqual([
+      "database one-shot",
+      "database continuous",
+      "bullmq worker",
+      "bullmq smoke"
+    ]);
+    expect(Object.isFrozen(allowedQueueOperationModes)).toBe(true);
+    expect(queueOperationWorkerCommands.map((command) => command.mode)).toEqual([...allowedQueueOperationModes]);
+    expect(
+      queueOperationWorkerCommands
+        .map((command) => command.mode)
+        .filter((mode) => !allowedQueueOperationModes.includes(mode))
+    ).toEqual([]);
+  });
+
   it("keeps queue operation summary states inside the no-impact vocabulary", () => {
     const status = getQueueOperationsStatus();
 
@@ -141,6 +158,7 @@ describe("getQueueOperationsStatus", () => {
   it("keeps exported queue operation vocabularies frozen against caller mutation", () => {
     const vocabularies = [
       allowedQueueOperationWorkerCommands,
+      allowedQueueOperationModes,
       allowedQueueOperationCommandExecutionStates,
       allowedQueueOperationExternalImpactStates,
       allowedQueueOperationSecretsDisplayedStates

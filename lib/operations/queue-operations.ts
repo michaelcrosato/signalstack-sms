@@ -4,18 +4,25 @@ export const allowedQueueOperationWorkerCommands = Object.freeze([
   "npm run worker:bullmq",
   "npm run queue:bullmq:smoke"
 ] as const);
+export const allowedQueueOperationModes = Object.freeze([
+  "database one-shot",
+  "database continuous",
+  "bullmq worker",
+  "bullmq smoke"
+] as const);
 export const allowedQueueOperationCommandExecutionStates = Object.freeze(["none"] as const);
 export const allowedQueueOperationExternalImpactStates = Object.freeze(["none"] as const);
 export const allowedQueueOperationSecretsDisplayedStates = Object.freeze([false] as const);
 
 export type QueueOperationSupportedWorkerCommand = (typeof allowedQueueOperationWorkerCommands)[number];
+export type QueueOperationMode = (typeof allowedQueueOperationModes)[number];
 export type QueueOperationCommandExecutionState = (typeof allowedQueueOperationCommandExecutionStates)[number];
 export type QueueOperationExternalImpactState = (typeof allowedQueueOperationExternalImpactStates)[number];
 export type QueueOperationSecretsDisplayedState = (typeof allowedQueueOperationSecretsDisplayedStates)[number];
 
 export type QueueOperationWorkerCommand = {
   command: QueueOperationSupportedWorkerCommand;
-  mode: string;
+  mode: QueueOperationMode;
   boundary: string;
 };
 
@@ -30,7 +37,6 @@ export type QueueOperationsStatus = {
 };
 
 const queueOperationWorkerCommandFields = ["command", "mode", "boundary"] as const;
-const allowedQueueOperationModes = ["database one-shot", "database continuous", "bullmq worker", "bullmq smoke"] as const;
 const requiredWorkerBoundaryTerms = ["local", "dummy", "live messaging", "QueueJob", "Redis"] as const;
 const requiredSafetyBoundaryTerms = [
   "enqueue",

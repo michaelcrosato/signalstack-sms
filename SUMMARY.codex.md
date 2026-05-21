@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP queue operations mode-vocabulary hardening checkpoint.
+- Exported a runtime-frozen `/settings/queue` worker mode vocabulary and typed worker command metadata against it.
+- Added queue operations unit coverage proving rendered worker modes stay aligned with the exported vocabulary and that the vocabulary rejects caller mutation.
+- Updated README, PLAN, queue/testing contract docs, next-prompt handoff docs, blockers, and loop logs.
+- Focused queue operations unit coverage and typecheck passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 169
+
+## Previous Run
+
 - Advanced a post-MVP queue operations static-metadata hardening checkpoint.
 - Added a validated frozen `/settings/queue` operations helper for supported worker command references, safety boundaries, and no-impact summary states.
 - Updated the queue operations page to render worker command references and safety boundaries from that helper instead of inline copy.

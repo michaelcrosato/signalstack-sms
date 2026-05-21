@@ -74,6 +74,7 @@ BullMQ workers may consume scheduled-campaign queue events only by referencing d
 `/settings/queue` may display local worker command references, but it must not execute them.
 
 - Supported command references are `npm run worker`, `npm run worker:watch`, `npm run worker:bullmq`, and `npm run queue:bullmq:smoke`.
+- Supported worker modes are `database one-shot`, `database continuous`, `bullmq worker`, and `bullmq smoke`; the mode vocabulary must be exported, runtime-frozen, and aligned with the rendered worker command metadata.
 - Command references must remain backed by `package.json` scripts.
 - Static queue operations metadata must be frozen, public-field only, secret-free, and explicit that command execution, external impact, and secret display are `none`.
 - Safety-boundary copy must continue to state that the page does not enqueue jobs, run workers, call Redis/providers, bill, notify, send SMS, mutate queue rows, or update campaign status.

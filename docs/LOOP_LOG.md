@@ -1525,3 +1525,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP queue/notification/readiness operations hardening or safe read-only operator surface refinements.
+
+## Run 169  GREEN  queue-operations-mode-vocabulary  2026-05-21 04:50
+Objective:    Keep `/settings/queue` worker modes inside an exported runtime-frozen vocabulary.
+Changed:
+- Exported the supported queue operation worker mode vocabulary and typed worker command metadata against it.
+- Added unit coverage proving rendered worker modes stay aligned with the exported vocabulary and exported queue vocabularies reject caller mutation.
+- Updated queue/testing contracts, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP queue/notification/readiness operations hardening or safe read-only operator surface refinements.
