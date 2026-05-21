@@ -58,6 +58,7 @@ Post-MVP local operations status:
 - Unit tests must verify the shared operator surface summary returns a fresh frozen routes array per call so caller-side route array mutation cannot contaminate later local operation counts or route lists.
 - Unit tests must verify that supplied shared operator inventories with duplicate route entries fail before summaries or projections are derived, preventing silent route shadowing in local navigation helpers.
 - Unit tests must verify that supplied shared operator inventories with duplicate group names, link labels, or link notes fail before summaries or projections are derived, preventing ambiguous local navigation copy from rendered operator helpers.
+- Unit tests must verify that empty supplied shared operator inventories fail before summaries or projections are derived, preventing blank local navigation surfaces from being treated as valid.
 - Unit tests must verify that every shared operator surface route is reachable from at least one focused page-specific or rich operator projection, outside the broad launch/settings/runbook inventory projections.
 - The Playwright smoke test must verify the root launch dashboard's visible links from the same shared operations inventory instead of a duplicated hard-coded browser list.
 - The seeded investor demo path must verify that `/demo` renders visible console navigation from the same shared operations inventory instead of a duplicated hard-coded browser list.

@@ -291,6 +291,14 @@ describe("operator surface inventory", () => {
     expect(() => getDemoOperationsLinks(groups)).toThrow(`Empty operator surface group ${emptyGroupName}`);
   });
 
+  it("rejects empty supplied operator inventories before projection", () => {
+    const groups: OperatorSurfaceGroup[] = [];
+
+    expect(() => getOperatorSurfaceSummary(groups)).toThrow("Empty operator surface inventory");
+    expect(() => getLaunchDashboardLinks(groups)).toThrow("Empty operator surface inventory");
+    expect(() => getDemoOperationsLinks(groups)).toThrow("Empty operator surface inventory");
+  });
+
   it("rejects supplied operator inventories with ambiguous copy before projection", () => {
     const duplicateGroupName = operatorSurfaceGroups[0].name;
     const duplicateLabel = operatorSurfaceGroups[0].links[0].label;

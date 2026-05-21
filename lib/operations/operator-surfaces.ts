@@ -52,6 +52,10 @@ function freezeOperatorSurfaceGroups(groups: OperatorSurfaceGroup[]) {
 }
 
 function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) {
+  if (groups.length === 0) {
+    throw new Error("Empty operator surface inventory");
+  }
+
   const links = groups.flatMap((group) => group.links);
   const seenGroupNames = new Set<string>();
   const seenRoutes = new Set<string>();
