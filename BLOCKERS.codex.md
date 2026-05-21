@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 165
+Run number: 166
 
 No active blockers.
 
 ## Notes
 
+- Latest contract operations no-impact summary-state hardening exports runtime-frozen command-execution, external-impact, and secrets-displayed vocabularies for `/settings/contracts`, renders command execution from validated status metadata, and covers caller-mutation rejection before local contract metadata renders. The check is local static metadata validation only and does not read contract contents, execute commands, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.
 - Latest contract operations whitespace-clean hardening keeps `/settings/contracts` static contract file names/paths/boundaries, validation commands/purposes, and drift-control copy free of leading/trailing whitespace, doubled spaces, and embedded newlines before render. The check is local static metadata validation only and does not read contract contents, execute commands, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.
 - Latest security operations exported vocabulary mutation coverage repair includes the exported validation-command vocabulary in caller-mutation rejection checks with the other `/settings/security` exported vocabularies. The check is local static metadata validation only and does not execute commands, scan files, read raw env values, mutate records, call providers, bill, notify, send SMS or email, call live AI, expose secrets, or enable live features.
 - Latest validation operations whitespace-clean hardening keeps `/settings/validation` static gate command, area, boundary, and repair-signal copy free of leading/trailing whitespace, doubled spaces, and embedded newlines before render. The check is local static metadata validation only and does not execute commands, inspect logs, scan files, mutate records, call providers, bill, notify, send SMS or email, call live AI, expose secrets, or enable live features.

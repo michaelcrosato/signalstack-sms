@@ -33,7 +33,7 @@ export default async function ContractOperationsPage() {
       <section className="grid gap-3 md:grid-cols-4">
         <Metric label="Contract files" value={String(status.contractFileCount)} />
         <Metric label="Validation checks" value={String(status.validationCheckCount)} />
-        <Metric label="Live SMS" value="blocked" />
+        <Metric label="Command execution" value={status.commandExecution} />
         <Metric label="External impact" value={status.externalImpact} />
       </section>
 

@@ -1,5 +1,17 @@
 # Codex Summary
 
+- Advanced a post-MVP contract operations no-impact summary-state checkpoint.
+- Exported runtime-frozen `/settings/contracts` command-execution, external-impact, and secrets-displayed vocabularies.
+- Added contract operations unit coverage proving rendered summary states stay inside those vocabularies and exported vocabularies reject caller mutation before local contract metadata renders.
+- Updated the contracts page to render command execution from the validated status summary.
+- Updated README, PLAN, testing contract docs, next-prompt handoff docs, blockers, and loop logs.
+- Focused contract operations unit coverage and typecheck passed; protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 166
+
+## Previous Run
+
 - Advanced a post-MVP contract operations whitespace-clean metadata checkpoint.
 - Added contract operations guards rejecting leading/trailing whitespace, doubled spaces, and embedded newlines in static contract file names/paths/boundaries, validation commands/purposes, and drift-control copy before render.
 - Added unit coverage proving `/settings/contracts` static metadata stays whitespace-clean before local contract metadata renders.

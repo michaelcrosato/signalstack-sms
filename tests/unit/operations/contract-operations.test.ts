@@ -2,6 +2,9 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  allowedContractOperationCommandExecutionStates,
+  allowedContractOperationExternalImpactStates,
+  allowedContractOperationSecretsDisplayedStates,
   allowedContractOperationValidationCommands,
   contractOperationDriftControls,
   contractOperationFiles,
@@ -15,7 +18,9 @@ const publicStatusFields = [
   "contractFileCount",
   "validationCheckCount",
   "driftControlCount",
+  "commandExecution",
   "externalImpact",
+  "secretsDisplayed",
   "contractFiles",
   "validationChecks",
   "driftControls"
@@ -40,7 +45,9 @@ describe("getContractOperationsStatus", () => {
     expect(status.contractFileCount).toBe(9);
     expect(status.validationCheckCount).toBe(4);
     expect(status.driftControlCount).toBe(5);
+    expect(status.commandExecution).toBe("none");
     expect(status.externalImpact).toBe("none");
+    expect(status.secretsDisplayed).toBe(false);
     expect(status.contractFiles.map((file) => file.path)).toEqual([
       "contracts/CONTRACT-DB.md",
       "contracts/CONTRACT-API.md",
@@ -189,6 +196,34 @@ describe("getContractOperationsStatus", () => {
     expect(() => (allowedContractOperationValidationCommands as unknown as string[]).push("npm run unsafe")).toThrow(
       TypeError
     );
+  });
+
+  it("keeps contract operation summary states inside the no-impact vocabulary", () => {
+    const status = getContractOperationsStatus();
+
+    expect(allowedContractOperationCommandExecutionStates).toEqual(["none"]);
+    expect(allowedContractOperationExternalImpactStates).toEqual(["none"]);
+    expect(allowedContractOperationSecretsDisplayedStates).toEqual([false]);
+    expect(Object.isFrozen(allowedContractOperationCommandExecutionStates)).toBe(true);
+    expect(Object.isFrozen(allowedContractOperationExternalImpactStates)).toBe(true);
+    expect(Object.isFrozen(allowedContractOperationSecretsDisplayedStates)).toBe(true);
+    expect(allowedContractOperationCommandExecutionStates).toContain(status.commandExecution);
+    expect(allowedContractOperationExternalImpactStates).toContain(status.externalImpact);
+    expect(allowedContractOperationSecretsDisplayedStates).toContain(status.secretsDisplayed);
+  });
+
+  it("keeps exported contract operation no-impact vocabularies frozen against caller mutation", () => {
+    const vocabularies = [
+      allowedContractOperationValidationCommands,
+      allowedContractOperationCommandExecutionStates,
+      allowedContractOperationExternalImpactStates,
+      allowedContractOperationSecretsDisplayedStates
+    ];
+
+    for (const vocabulary of vocabularies) {
+      expect(Object.isFrozen(vocabulary)).toBe(true);
+      expect(() => (vocabulary as unknown as unknown[]).push("unsafe")).toThrow(TypeError);
+    }
   });
 
   it("keeps contract operation static metadata free of secret-like literals", () => {

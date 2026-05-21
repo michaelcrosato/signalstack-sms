@@ -1494,3 +1494,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP contract operations hardening or safe read-only operator surface refinements.
+
+## Run 166  GREEN  contract-operations-no-impact-vocabulary  2026-05-21 04:35
+Objective:    Keep `/settings/contracts` no-impact summary states inside exported runtime-frozen vocabularies.
+Changed:
+- Exported contract operations command-execution, external-impact, and secrets-displayed vocabularies.
+- Added unit coverage proving rendered contract operation summary states stay inside those vocabularies and exported vocabularies reject caller mutation.
+- Rendered contract command execution from the validated status summary and updated README, PLAN, testing contract docs, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP contract operations hardening or safe read-only operator surface refinements.

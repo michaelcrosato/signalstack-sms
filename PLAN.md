@@ -133,6 +133,7 @@ Post-MVP:
 - Read-only local API operations view
 - Read-only local contract operations view
 - Local contract operations inventory static-metadata hardening
+- Local contract operations no-impact summary-state hardening
 - Read-only local validation operations view
 - Local security operations inventory static-metadata hardening
 - Local security operations value-boundary hardening
@@ -254,6 +255,7 @@ Post-MVP:
 - Local contract operations package-script coverage
 - Local contract operations whitespace-clean metadata coverage
 - Local contract operations secret-literal coverage
+- Local contract operations no-impact vocabulary coverage
 - Local security operations whitespace-clean coverage
 - Local validation operations inventory static-metadata coverage
 - Local validation operations value-boundary coverage

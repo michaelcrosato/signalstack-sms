@@ -13,7 +13,9 @@ export type ContractOperationsStatus = {
   contractFileCount: number;
   validationCheckCount: number;
   driftControlCount: number;
-  externalImpact: "none";
+  commandExecution: ContractOperationCommandExecutionState;
+  externalImpact: ContractOperationExternalImpactState;
+  secretsDisplayed: ContractOperationSecretsDisplayedState;
   contractFiles: readonly ContractOperationFile[];
   validationChecks: readonly ContractOperationValidationCheck[];
   driftControls: readonly string[];
@@ -27,8 +29,14 @@ export const allowedContractOperationValidationCommands = Object.freeze([
   "npm run test:e2e:demo",
   "npm run secrets:scan"
 ] as const);
+export const allowedContractOperationCommandExecutionStates = Object.freeze(["none"] as const);
+export const allowedContractOperationExternalImpactStates = Object.freeze(["none"] as const);
+export const allowedContractOperationSecretsDisplayedStates = Object.freeze([false] as const);
 
 export type ContractOperationSupportedValidationCommand = (typeof allowedContractOperationValidationCommands)[number];
+export type ContractOperationCommandExecutionState = (typeof allowedContractOperationCommandExecutionStates)[number];
+export type ContractOperationExternalImpactState = (typeof allowedContractOperationExternalImpactStates)[number];
+export type ContractOperationSecretsDisplayedState = (typeof allowedContractOperationSecretsDisplayedStates)[number];
 const forbiddenSecretMetadataPatterns = [
   /\bsk_(?:live|test)_[A-Za-z0-9]+/,
   /\bpk_live_[A-Za-z0-9]+/,
@@ -36,6 +44,12 @@ const forbiddenSecretMetadataPatterns = [
   /\b(?:TWILIO_AUTH_TOKEN|STRIPE_SECRET_KEY|OPENAI_API_KEY|CLERK_SECRET_KEY)\s*=/,
   /\bBearer\s+[A-Za-z0-9._-]{12,}/
 ] as const;
+
+const contractOperationStatusSummary = Object.freeze({
+  commandExecution: "none",
+  externalImpact: "none",
+  secretsDisplayed: false
+} satisfies Pick<ContractOperationsStatus, "commandExecution" | "externalImpact" | "secretsDisplayed">);
 
 function assertExactFields<T extends object>(value: T, fields: readonly string[], errorMessage: string) {
   const actualKeys = Reflect.ownKeys(value);
@@ -60,6 +74,20 @@ function assertNoSecretLikeMetadata(value: string, errorMessage: string) {
 function assertCleanContractMetadata(value: string, errorMessage: string) {
   if (value !== value.trim() || value.includes("\n") || value.includes("\r") || value.includes("  ")) {
     throw new Error(errorMessage);
+  }
+}
+
+function assertStatusSummary(summary: Pick<ContractOperationsStatus, "commandExecution" | "externalImpact" | "secretsDisplayed">) {
+  if (!allowedContractOperationCommandExecutionStates.includes(summary.commandExecution)) {
+    throw new Error(`Unsupported contract operation command execution state: ${summary.commandExecution}`);
+  }
+
+  if (!allowedContractOperationExternalImpactStates.includes(summary.externalImpact)) {
+    throw new Error(`Unsupported contract operation external impact state: ${summary.externalImpact}`);
+  }
+
+  if (!allowedContractOperationSecretsDisplayedStates.includes(summary.secretsDisplayed)) {
+    throw new Error(`Unsupported contract operation secrets-displayed state: ${summary.secretsDisplayed}`);
   }
 }
 
@@ -234,11 +262,15 @@ export const contractOperationDriftControls = freezeDriftControls([
 ]);
 
 export function getContractOperationsStatus(): ContractOperationsStatus {
+  assertStatusSummary(contractOperationStatusSummary);
+
   return Object.freeze({
     contractFileCount: contractOperationFiles.length,
     validationCheckCount: contractOperationValidationChecks.length,
     driftControlCount: contractOperationDriftControls.length,
-    externalImpact: "none",
+    commandExecution: contractOperationStatusSummary.commandExecution,
+    externalImpact: contractOperationStatusSummary.externalImpact,
+    secretsDisplayed: contractOperationStatusSummary.secretsDisplayed,
     contractFiles: freezeContractOperationFiles(contractOperationFiles.map((file) => ({ ...file }))),
     validationChecks: freezeValidationChecks(contractOperationValidationChecks.map((check) => ({ ...check }))),
     driftControls: freezeDriftControls([...contractOperationDriftControls])
