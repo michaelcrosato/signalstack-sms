@@ -32,13 +32,13 @@ The demo operations screen at `/settings/demo` displays seeded demo readiness, w
 
 The operations index screen at `/settings/operations` displays grouped links to existing local operator surfaces, static surface counts, and safety boundaries. It is read-only and does not execute commands, inspect files, call APIs, mutate records, create exports, enqueue jobs, call Redis, call providers, call Stripe, call live AI, send notifications, send SMS or email, expose secrets, or enable live features.
 
-The operations index inventory is shared with unit coverage so local operator surface counts, duplicate routes, backing app pages, reverse coverage for implemented operator pages, and safety-sensitive links are checked before the seeded browser demo path runs.
+The operations index inventory is shared with unit coverage so local operator surface counts, duplicate routes, backing app pages, reverse coverage for implemented operator pages, and safety-sensitive links are checked before the seeded browser demo path runs. The seeded browser path also verifies that `/settings/operations` renders visible labels and routes from the same shared inventory.
 
 The `/settings/runbook` admin-link list is derived from that same shared local operator surface inventory, excluding only non-settings surfaces, so runbook navigation stays aligned with `/settings/operations`.
 
 The `/settings` go-live readiness navigation is also projected from the shared local operator surface inventory, excluding the current page and non-settings surfaces, so readiness navigation stays aligned with operations and runbook surfaces.
 
-The root launch dashboard is projected from the full shared local operator surface inventory, including `/demo` and `/settings`, so new local operator surfaces appear in the launch view when they are added to the shared inventory. The root browser smoke test uses the same inventory to verify visible launch links without duplicating labels.
+The root launch dashboard is projected from the full shared local operator surface inventory, including `/demo` and `/settings`, so new local operator surfaces appear in the launch view when they are added to the shared inventory. The root browser smoke test and operations-index browser checks use the same inventory to verify visible links without duplicating labels.
 
 The release operations screen at `/settings/releases` displays local release checklist commands, protected gate expectations, seeded demo path, premerge metadata, release surface links, and runtime safety boundaries. It is read-only and does not execute commands, run migrations, launch tests or browsers, perform git operations, deploy, mutate records, enqueue jobs, call Redis, call providers, bill, notify, expose logs, diffs, environment values, or secrets, or enable live features.
 

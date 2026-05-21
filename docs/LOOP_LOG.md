@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 047  GREEN  operations-index-browser-inventory  2026-05-20 19:29
+Objective:    Verify `/settings/operations` browser-visible labels and routes from the shared operator surface inventory.
+Changed:
+- Refactored `e2e/demo-path.spec.ts` to iterate the shared operations inventory for operations-index link labels and route text.
+- Updated testing contract, README, demo-mode docs, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only navigation, inventory, or admin/reporting refinements without live external-impact actions.
+
 ## Run 046  GREEN  launch-dashboard-smoke-inventory  2026-05-20 19:28
 Objective:    Verify `/` launch dashboard browser smoke links from the shared operator surface inventory.
 Changed:

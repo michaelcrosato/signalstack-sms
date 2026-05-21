@@ -1,4 +1,7 @@
 import { expect, test } from "@playwright/test";
+import { operatorSurfaceGroups } from "@/lib/operations/operator-surfaces";
+
+const operationSurfaceLinks = operatorSurfaceGroups.flatMap((group) => group.links);
 
 test.setTimeout(60_000);
 
@@ -21,6 +24,10 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Data And Messaging" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Safety And Runtime" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Provider And Reporting" })).toBeVisible();
+  for (const link of operationSurfaceLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toBeVisible();
+    await expect(page.getByText(link.href, { exact: true }).first()).toBeVisible();
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Demo Operations" }).first().click();
   await expect(page.getByRole("heading", { name: "Demo Operations" })).toBeVisible();

@@ -1,14 +1,18 @@
 # Codex Summary
 
-Run number: 46
+Run number: 47
 
 ## Completed
+
+- Advanced a post-MVP local operations index browser hardening checkpoint.
+- Refactored `e2e/demo-path.spec.ts` to verify `/settings/operations` visible link labels and route text from the shared operator surface inventory.
+- Updated testing contract, README, demo-mode docs, PLAN, and next-prompt handoff docs with the operations-index browser drift check.
+
+## Prior Completed
 
 - Advanced a post-MVP local launch dashboard browser smoke hardening checkpoint.
 - Refactored `e2e/smoke.spec.ts` to verify visible root launch links from the shared operator surface inventory instead of a duplicated hard-coded label list.
 - Updated testing contract, README, demo-mode docs, local operator runbook, PLAN, BLOCKERS, and next-prompt handoff docs with the browser smoke drift check.
-
-## Prior Completed
 
 - Advanced a post-MVP local launch dashboard navigation hardening checkpoint.
 - Refactored `/` local launch links to project from the shared operator surface inventory instead of duplicating the list.
@@ -153,6 +157,4 @@ Run number: 46
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 
-Latest targeted operator-surface inventory test, protected local gate, and seeded investor demo path passed.
-
-Latest launch-dashboard smoke inventory test, protected local gate, and seeded investor demo path passed.
+Latest operations-index browser inventory hardening typecheck, targeted operator-surface inventory test, protected local gate, local migration check, demo seed, and seeded investor demo path passed.
