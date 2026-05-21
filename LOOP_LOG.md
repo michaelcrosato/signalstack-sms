@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 192  GREEN  api-operations-detached-route-counts  2026-05-21 06:44
+Objective:    Keep `/settings/api` returned route snapshots detached while counts stay aligned.
+Changed:
+- Added API operations unit coverage proving returned route snapshots are detached from exported metadata.
+- Added count alignment coverage for route, mutating-route, and external-impact counts before local API metadata renders.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP API/contract/security operations hardening or safe read-only operator surface refinements.
+
 ## Run 188  GREEN  readiness-audit-export-link-vocabulary  2026-05-21 06:28
 Objective:    Keep readiness-audit CSV export links tied to the bounded operations vocabulary.
 Changed:

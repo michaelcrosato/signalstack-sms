@@ -317,6 +317,16 @@ describe("getApiOperationsStatus", () => {
     expect(getApiOperationsStatus({}).routes[0].safety).toBe(apiOperationRoutes[0].safety);
   });
 
+  it("keeps API operation counts aligned to detached returned route arrays", () => {
+    const status = getApiOperationsStatus({});
+
+    expect(status.routeCount).toBe(status.routes.length);
+    expect(status.mutatingRouteCount).toBe(status.routes.filter((route) => route.mutates).length);
+    expect(status.externalImpactRouteCount).toBe(status.routes.filter((route) => route.externalImpact).length);
+    expect(status.routes).toEqual(apiOperationRoutes);
+    expect(status.routes).not.toBe(apiOperationRoutes);
+  });
+
   it("exposes only public API status snapshot fields", () => {
     const status = getApiOperationsStatus({});
     const expectedRouteFields = [...publicApiOperationRouteFields].sort();

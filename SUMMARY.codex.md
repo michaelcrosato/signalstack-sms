@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP API operations detached route-count checkpoint.
+- Added unit coverage proving `/settings/api` returned route snapshots stay detached from exported metadata while route, mutating-route, and external-impact counts remain aligned.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- Focused API operations unit coverage and protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, worker execution, Redis calls, record mutations, or protected gate-script edits were used.
+
+Run number: 192
+
+## Previous Run
+
 - Advanced a post-MVP notification operations detached status-array count checkpoint.
 - Added unit coverage proving `/settings/notifications` returned status arrays stay detached from exported metadata while rendered counts remain aligned.
 - Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
