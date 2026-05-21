@@ -59,6 +59,8 @@ Inbox operations review is available at `/settings/inbox`. It renders existing c
 
 Webhook operations review is available at `/settings/webhooks`. It renders Twilio webhook route coverage, stored local webhook counts, event-type summaries, recent idempotency keys, and webhook boundaries only; it does not replay payloads, create webhook events, mutate messages or contacts, call providers, bill, notify, send replies, send SMS, expose secrets, or enable live messaging.
 
+Delivery operations review is available at `/settings/delivery`. It renders existing message direction counts, delivery status metadata, provider status labels, provider message ID presence, campaign/conversation context, and recent idempotency keys only; it does not send SMS, retry deliveries, replay webhooks, mutate messages, call providers, bill, notify, expose secrets, or enable live messaging.
+
 Team operations review is available at `/settings/team`. It renders existing organization metadata, membership role/status counts, assigned conversation counts, authored note counts, and member metadata only; it does not invite users, change roles, suspend members, delete memberships, call Clerk, email, notify, call providers, bill, send SMS, or enable live messaging.
 
 Billing operations review is available at `/settings/billing`. It renders existing local billing account status, live billing blockers, Stripe placeholder presence, usage totals, and recent usage metadata only; it does not call Stripe, create subscriptions or invoices, collect payment methods, charge cards, email, notify, call providers, send SMS, or enable live billing.

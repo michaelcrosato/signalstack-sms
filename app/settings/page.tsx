@@ -83,6 +83,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/settings/webhooks">
           Webhook Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/delivery">
+          Delivery Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/team">
           Team Operations
         </Link>
@@ -278,6 +281,16 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <p className="text-sm leading-6 text-slate-700">
           Review Twilio webhook route coverage, stored local webhook metadata, and idempotency keys without replaying
           payloads, calling providers, sending replies, creating billing records, notifications, or enabling live messaging.
+        </p>
+      </Panel>
+
+      <Panel title="Delivery Operations">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/delivery">
+          Delivery Operations
+        </Link>
+        <p className="text-sm leading-6 text-slate-700">
+          Review existing message delivery metadata and provider status counts without sending SMS, retrying delivery,
+          replaying webhooks, mutating messages, billing, sending notifications, or enabling live messaging.
         </p>
       </Panel>
 

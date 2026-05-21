@@ -44,6 +44,9 @@ export default async function InboxOperationsPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/webhooks">
           Webhook Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/delivery">
+          Delivery Operations
+        </Link>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Inbox Operations</h1>

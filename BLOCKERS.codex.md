@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 27
+Run number: 28
 
 No active blockers.
 
 ## Notes
 
+- `/settings/delivery` is a read-only local delivery operations view. It displays tenant-scoped message direction counts, delivery metadata, provider status labels, provider message ID presence, campaign/conversation context, recent idempotency keys, and safety boundaries; it does not send SMS, retry deliveries, replay webhooks, mutate messages, call providers, create billing records, send notifications, expose secrets, or enable live messaging.
 - `/settings/readiness-audit` is a read-only local readiness audit operations view. It displays tenant-scoped local audit events, action/subject filters, local metadata, actor IDs, timestamps, and bounded CSV export links; it does not mutate audit events, expose secrets, call providers, create billing records, call live AI, send notifications, SMS, email, or enable live features.
 - `/settings/api` includes static inventory rows for all currently implemented local API methods: contact soft archive, campaign draft update, inbox message reads, inbox note reads, and billing usage reads.
 - The API operations unit test fixes the expected inventory count at 47 route-method entries and keeps external-impact routes at zero.

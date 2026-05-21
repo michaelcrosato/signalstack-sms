@@ -260,6 +260,10 @@ Renders a read-only inbox operations view for the current organization. It may d
 
 Renders a read-only webhook operations view for the current organization. It may display Twilio webhook route coverage, local stored webhook event counts, provider/event-type summaries, recent idempotency keys, received timestamps, and webhook safety-boundary text. The page must not replay webhooks, create webhook events, mutate messages or contacts, call Twilio, send automatic replies, send notifications, expose secrets, create billing records, send SMS, or enable live messaging.
 
+### `/settings/delivery`
+
+Renders a read-only delivery operations view for the current organization. It may display existing tenant-scoped message direction counts, delivery metadata, provider status labels, provider message ID presence, campaign/conversation context, idempotency keys, and delivery safety-boundary text. The page must not send SMS, retry deliveries, replay webhooks, mutate messages, mutate campaigns, call providers, create billing records, send notifications, expose secrets, or enable live messaging.
+
 ### `/settings/team`
 
 Renders a read-only team operations view for the current organization. It may display organization metadata, membership role/status counts, member display names, member emails, assigned conversation counts, authored internal-note counts, and local team safety-boundary text. The page must not invite users, create users, update roles, suspend members, delete memberships, call Clerk, send email, send notifications, expose secrets, create billing records, call messaging providers, send SMS, or enable live messaging.

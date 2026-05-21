@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 028  GREEN  delivery-operations  2026-05-20 17:26
+Objective:    Add a focused read-only local delivery operations view.
+Changed:
+- Added `/settings/delivery` with tenant-scoped message direction counts, delivery metadata, provider status labels, provider message ID presence, campaign/conversation context, and recent idempotency keys.
+- Linked the view from the launch dashboard, demo console, go-live readiness page, campaign operations, inbox operations, and webhook operations.
+- Updated API/testing contracts, API map, README, PLAN, testing docs, SUMMARY, and BLOCKERS with the local-only delivery boundary.
+- Extended the seeded investor demo E2E path to cover the delivery view, recent messages, and safety boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only admin/reporting refinements without live external-impact actions.
+
 ## Run 027  GREEN  readiness-audit-operations  2026-05-20 17:19
 Objective:    Add a focused read-only local readiness audit operations view.
 Changed:

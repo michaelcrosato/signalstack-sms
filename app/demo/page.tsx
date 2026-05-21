@@ -64,6 +64,9 @@ export default async function DemoPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/webhooks">
           Webhook Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/delivery">
+          Delivery Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/team">
           Team Operations
         </Link>

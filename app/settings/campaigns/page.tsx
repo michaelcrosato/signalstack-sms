@@ -53,6 +53,9 @@ export default async function CampaignOperationsPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/inbox">
           Inbox Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/delivery">
+          Delivery Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
           Operator Runbook
         </Link>

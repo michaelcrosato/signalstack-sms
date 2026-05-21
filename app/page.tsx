@@ -53,6 +53,11 @@ const launchLinks = [
     description: "Read-only Twilio webhook route coverage, idempotency metadata, and local event history."
   },
   {
+    href: "/settings/delivery",
+    title: "Delivery Operations",
+    description: "Read-only message delivery metadata, provider status counts, and no-retry safety boundary."
+  },
+  {
     href: "/settings/team",
     title: "Team Operations",
     description: "Read-only organization metadata, membership roles, assigned threads, and safety boundary."
