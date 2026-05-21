@@ -1,13 +1,25 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { describe, expect, it } from "vitest";
-import { allowedApiOperationMethods, apiOperationRoutes, getApiOperationsStatus } from "@/lib/operations/api-operations";
+import {
+  allowedApiOperationCommandExecutionStates,
+  allowedApiOperationExternalImpactStates,
+  allowedApiOperationMethods,
+  allowedApiOperationMutationStates,
+  allowedApiOperationSecretsDisplayedStates,
+  apiOperationRoutes,
+  getApiOperationsStatus
+} from "@/lib/operations/api-operations";
 
 const publicApiOperationRouteFields = ["method", "path", "area", "mutates", "externalImpact", "safety"];
 const publicApiOperationsStatusFields = [
   "routeCount",
   "mutatingRouteCount",
   "externalImpactRouteCount",
+  "commandExecution",
+  "externalImpact",
+  "mutation",
+  "secretsDisplayed",
   "rateLimit",
   "routes"
 ];
@@ -60,6 +72,10 @@ describe("getApiOperationsStatus", () => {
     expect(status.routeCount).toBe(47);
     expect(status.mutatingRouteCount).toBeGreaterThan(10);
     expect(status.externalImpactRouteCount).toBe(0);
+    expect(status.commandExecution).toBe("none");
+    expect(status.externalImpact).toBe("none");
+    expect(status.mutation).toBe("none");
+    expect(status.secretsDisplayed).toBe(false);
     expect(status.routes.every((route) => route.path.startsWith("/api/"))).toBe(true);
     expect(status.routes.some((route) => route.path === "/api/webhooks/twilio/inbound")).toBe(true);
     expect(status.routes.some((route) => route.path === "/api/settings/provider/rotations/export")).toBe(true);
@@ -216,6 +232,38 @@ describe("getApiOperationsStatus", () => {
     expect([...allowedApiOperationMethods].sort()).toEqual(["DELETE", "GET", "PATCH", "POST"]);
     expect(routeMethods).toEqual([...allowedApiOperationMethods].sort());
     expect(() => (allowedApiOperationMethods as unknown as string[]).push("PUT")).toThrow(TypeError);
+  });
+
+  it("keeps API operation summary states inside the no-impact vocabulary", () => {
+    const status = getApiOperationsStatus({});
+
+    expect(allowedApiOperationCommandExecutionStates).toEqual(["none"]);
+    expect(allowedApiOperationExternalImpactStates).toEqual(["none"]);
+    expect(allowedApiOperationMutationStates).toEqual(["none"]);
+    expect(allowedApiOperationSecretsDisplayedStates).toEqual([false]);
+    expect(Object.isFrozen(allowedApiOperationCommandExecutionStates)).toBe(true);
+    expect(Object.isFrozen(allowedApiOperationExternalImpactStates)).toBe(true);
+    expect(Object.isFrozen(allowedApiOperationMutationStates)).toBe(true);
+    expect(Object.isFrozen(allowedApiOperationSecretsDisplayedStates)).toBe(true);
+    expect(allowedApiOperationCommandExecutionStates).toContain(status.commandExecution);
+    expect(allowedApiOperationExternalImpactStates).toContain(status.externalImpact);
+    expect(allowedApiOperationMutationStates).toContain(status.mutation);
+    expect(allowedApiOperationSecretsDisplayedStates).toContain(status.secretsDisplayed);
+  });
+
+  it("keeps exported API operation vocabularies frozen against caller mutation", () => {
+    const vocabularies = [
+      allowedApiOperationMethods,
+      allowedApiOperationCommandExecutionStates,
+      allowedApiOperationExternalImpactStates,
+      allowedApiOperationMutationStates,
+      allowedApiOperationSecretsDisplayedStates
+    ];
+
+    for (const vocabulary of vocabularies) {
+      expect(Object.isFrozen(vocabulary)).toBe(true);
+      expect(() => (vocabulary as unknown as unknown[]).push("unsafe")).toThrow(TypeError);
+    }
   });
 
   it("exposes only public API inventory route fields", () => {

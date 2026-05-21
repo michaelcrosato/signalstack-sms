@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP API operations no-impact summary-state checkpoint.
+- Added runtime-frozen API operation command-execution, external-impact, mutation, and secrets-displayed vocabularies.
+- Rendered the API operations no-impact summary on `/settings/api` and pinned it in unit and seeded demo browser coverage.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- Focused API operations unit coverage, typecheck, lint, protected local gate, and seeded investor demo path passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, worker execution, Redis calls, record mutations, or protected gate-script edits were used.
+
+Run number: 185
+
+## Previous Run
+
 - Advanced a post-MVP validation operations command-literal metadata checkpoint.
 - Added command-like literal validation so `/settings/validation` static areas, boundaries, and repair-signal copy reject command snippets outside the allowlisted gate-command field.
 - Added unit coverage proving non-command validation operations metadata remains command-free before local validation metadata renders.

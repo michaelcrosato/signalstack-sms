@@ -1,8 +1,16 @@
 import { getApiRateLimitPolicy } from "@/lib/rate-limit/api-rate-limit";
 
 export const allowedApiOperationMethods = Object.freeze(["GET", "POST", "PATCH", "DELETE"] as const);
+export const allowedApiOperationCommandExecutionStates = Object.freeze(["none"] as const);
+export const allowedApiOperationExternalImpactStates = Object.freeze(["none"] as const);
+export const allowedApiOperationMutationStates = Object.freeze(["none"] as const);
+export const allowedApiOperationSecretsDisplayedStates = Object.freeze([false] as const);
 
 export type ApiOperationMethod = (typeof allowedApiOperationMethods)[number];
+export type ApiOperationCommandExecutionState = (typeof allowedApiOperationCommandExecutionStates)[number];
+export type ApiOperationExternalImpactState = (typeof allowedApiOperationExternalImpactStates)[number];
+export type ApiOperationMutationState = (typeof allowedApiOperationMutationStates)[number];
+export type ApiOperationSecretsDisplayedState = (typeof allowedApiOperationSecretsDisplayedStates)[number];
 
 export type ApiOperationRoute = {
   method: ApiOperationMethod;
@@ -17,6 +25,10 @@ export type ApiOperationsStatus = {
   routeCount: number;
   mutatingRouteCount: number;
   externalImpactRouteCount: number;
+  commandExecution: ApiOperationCommandExecutionState;
+  externalImpact: ApiOperationExternalImpactState;
+  mutation: ApiOperationMutationState;
+  secretsDisplayed: ApiOperationSecretsDisplayedState;
   rateLimit: {
     enabled: boolean;
     limit: number;
@@ -40,6 +52,13 @@ const forbiddenApiOperationSecretPatterns = [
   /\b(?:TWILIO_AUTH_TOKEN|STRIPE_SECRET_KEY|OPENAI_API_KEY|CLERK_SECRET_KEY)\s*=/,
   /\bBearer\s+[A-Za-z0-9._-]{12,}/
 ] as const;
+
+const apiOperationStatusSummary = Object.freeze({
+  commandExecution: "none",
+  externalImpact: "none",
+  mutation: "none",
+  secretsDisplayed: false
+} satisfies Pick<ApiOperationsStatus, "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed">);
 
 function assertExactApiOperationRouteFields(route: ApiOperationRoute) {
   const actualKeys = Reflect.ownKeys(route);
@@ -125,6 +144,26 @@ function assertUniqueApiOperationRoutes(routes: readonly ApiOperationRoute[]) {
   }
 }
 
+function assertApiOperationStatusSummary(
+  summary: Pick<ApiOperationsStatus, "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed">
+) {
+  if (!allowedApiOperationCommandExecutionStates.includes(summary.commandExecution)) {
+    throw new Error(`Unsupported API operation command execution state: ${summary.commandExecution}`);
+  }
+
+  if (!allowedApiOperationExternalImpactStates.includes(summary.externalImpact)) {
+    throw new Error(`Unsupported API operation external impact state: ${summary.externalImpact}`);
+  }
+
+  if (!allowedApiOperationMutationStates.includes(summary.mutation)) {
+    throw new Error(`Unsupported API operation mutation state: ${summary.mutation}`);
+  }
+
+  if (!allowedApiOperationSecretsDisplayedStates.includes(summary.secretsDisplayed)) {
+    throw new Error(`Unsupported API operation secrets-displayed state: ${summary.secretsDisplayed}`);
+  }
+}
+
 function freezeApiOperationRoute(route: ApiOperationRoute) {
   return Object.freeze({
     method: route.method,
@@ -197,12 +236,17 @@ export const apiOperationRoutes = freezeApiOperationRoutes([
 ]);
 
 export function getApiOperationsStatus(env: Record<string, string | undefined> = process.env): ApiOperationsStatus {
+  assertApiOperationStatusSummary(apiOperationStatusSummary);
   const rateLimit = getApiRateLimitPolicy(env);
 
   return {
     routeCount: apiOperationRoutes.length,
     mutatingRouteCount: apiOperationRoutes.filter((route) => route.mutates).length,
     externalImpactRouteCount: apiOperationRoutes.filter((route) => route.externalImpact).length,
+    commandExecution: apiOperationStatusSummary.commandExecution,
+    externalImpact: apiOperationStatusSummary.externalImpact,
+    mutation: apiOperationStatusSummary.mutation,
+    secretsDisplayed: apiOperationStatusSummary.secretsDisplayed,
     rateLimit: {
       enabled: rateLimit.enabled,
       limit: rateLimit.limit,

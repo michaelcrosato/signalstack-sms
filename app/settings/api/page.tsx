@@ -68,6 +68,15 @@ export default async function ApiOperationsPage() {
         </Panel>
       </section>
 
+      <Panel title="No-Impact Summary">
+        <dl className="grid gap-3 text-sm md:grid-cols-4">
+          <StatusRow label="Command execution" value={status.commandExecution} />
+          <StatusRow label="External impact" value={status.externalImpact} />
+          <StatusRow label="Mutation" value={status.mutation} />
+          <StatusRow label="Secrets displayed" value={String(status.secretsDisplayed)} />
+        </dl>
+      </Panel>
+
       <Panel title="Route Inventory">
         <ul className="grid gap-3 text-sm">
           {status.routes.map((route) => (

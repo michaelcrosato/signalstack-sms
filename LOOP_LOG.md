@@ -1680,6 +1680,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP security/validation/contract operations hardening or safe read-only operator surface refinements.
 
+## Run 185  GREEN  api-operations-no-impact-summary  2026-05-21 06:11
+Objective:    Keep `/settings/api` no-impact summary state inside validated runtime-frozen metadata.
+Changed:
+- Added exported API operation command-execution, external-impact, mutation, and secrets-displayed vocabularies.
+- Rendered the `/settings/api` No-Impact Summary from the API operations helper and covered it in unit and seeded demo checks.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP API/contract/security operations hardening or safe read-only operator surface refinements.
+
 ## Run 184  GREEN  validation-operations-command-literal  2026-05-21 06:05
 Objective:    Keep `/settings/validation` non-command static metadata free of command-like snippets.
 Changed:

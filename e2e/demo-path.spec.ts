@@ -148,6 +148,11 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Route Inventory" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Rate Limit Policy" })).toBeVisible();
   await expect(page.getByText("External impact routes", { exact: true })).toBeVisible();
+  const apiNoImpactSummary = page.locator("section").filter({ has: page.getByRole("heading", { name: "No-Impact Summary" }) });
+  await expect(apiNoImpactSummary.getByText("Command execution", { exact: true })).toBeVisible();
+  await expect(apiNoImpactSummary.getByText("External impact", { exact: true })).toBeVisible();
+  await expect(apiNoImpactSummary.getByText("Mutation", { exact: true })).toBeVisible();
+  await expect(apiNoImpactSummary.getByText("Secrets displayed", { exact: true })).toBeVisible();
   await expect(page.getByText("/api/webhooks/twilio/inbound")).toBeVisible();
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Contract Operations" }).click();
