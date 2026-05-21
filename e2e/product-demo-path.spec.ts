@@ -36,6 +36,7 @@ test("product dashboard renders seeded owner workflow checkpoints", async ({ pag
   await expect(compliance.getByText("A2P status")).toBeVisible();
   await expect(compliance.getByText("NOT_STARTED")).toBeVisible();
   await expect(compliance.getByText("blocked by default")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Compliance" }).first()).toHaveAttribute("href", "/dashboard/compliance");
 
   const campaigns = page.locator("#campaigns");
   await expect(campaigns.getByRole("heading", { name: "Campaigns" })).toBeVisible();
@@ -174,4 +175,28 @@ test("product templates page creates local reusable copy", async ({ page }) => {
   await expect(savedRow.getByRole("cell", { name: /^(company, firstName|firstName, company)$/ })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Safety Boundary" })).toBeVisible();
   await expect(page.getByText("No provider calls, SMS, live AI requests")).toBeVisible();
+});
+
+test("product compliance page explains readiness and hard-gate blockers", async ({ page }) => {
+  await page.goto("/dashboard/compliance");
+
+  await expect(page.getByRole("heading", { name: "Readiness workspace" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Compliance Settings" })).toHaveAttribute("href", "/settings/compliance");
+
+  const metrics = page.getByLabel("Compliance metrics");
+  await expect(metrics.getByText("Profile Fields")).toBeVisible();
+  await expect(metrics.getByText("5/5")).toBeVisible();
+  await expect(metrics.getByText("A2P Status")).toBeVisible();
+  await expect(metrics.getByText("NOT_STARTED")).toBeVisible();
+  await expect(metrics.getByText("Live Messaging")).toBeVisible();
+  await expect(metrics.getByText("blocked")).toBeVisible();
+
+  await expect(page.getByRole("heading", { name: "Profile Checklist" })).toBeVisible();
+  await expect(page.getByText("Business name")).toBeVisible();
+  await expect(page.getByText("Privacy policy URL")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Runtime Gates" })).toBeVisible();
+  await expect(page.getByText("Dummy provider is selected.")).toBeVisible();
+  await expect(page.getByText("A2P registration is not approved.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Safety Boundary" })).toBeVisible();
+  await expect(page.getByText("It does not register A2P campaigns, call providers, send SMS")).toBeVisible();
 });

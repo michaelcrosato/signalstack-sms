@@ -356,6 +356,10 @@ Renders the product-facing inbox workspace for the current organization. It may 
 
 Renders the product-facing template workspace for the current organization. It may list tenant-scoped message templates and create or update local reusable copy through `POST /api/templates`, including variable extraction from template placeholders. It must not render live outbound messages, schedule campaigns, send SMS, call providers, create billing records, call live AI, expose secrets, or enable live messaging.
 
+### `/dashboard/compliance`
+
+Renders the product-facing compliance readiness workspace for the current organization. It may display required compliance profile field status, A2P registration status, runtime hard-gate blockers, demo mode, live messaging flag state, and selected provider label. It must not register A2P campaigns, call providers, send SMS, schedule campaigns, create billing records, call live AI, expose secrets, mutate live feature flags, or enable live messaging.
+
 ### `/`
 
 Renders the local launch dashboard. It may display demo-safe runtime defaults and links to existing local-only demo, readiness, provider metadata, system, usage, and admin export views. The page must not require database access, mutate records, call providers, create billing artifacts, send notifications, expose secrets, or enable live messaging.

@@ -1,5 +1,14 @@
 # Codex Summary
 
+- Advanced Phase 1 product UI by adding `/dashboard/compliance`.
+- The compliance workspace reads the existing local compliance profile and hard-gate evaluator to show profile fields, A2P status, runtime blockers, and demo-safe live messaging state.
+- Updated product navigation, contracts, roadmap handoff docs, and seeded product-demo coverage so the owner readiness workflow is browser-visible.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, worker execution, Redis calls, or protected gate-script edits were used.
+
+Run number: 206
+
+## Previous Run
+
 - Advanced Phase 1 product UI by adding `/dashboard/templates`.
 - The template workspace creates local reusable SMS copy through the existing template API, previews detected variables, lists saved templates, and shows campaign usage counts.
 - Updated product navigation and seeded product-demo coverage so `/dashboard/templates` is exercised after dashboard, contacts, campaigns, and inbox flows.
