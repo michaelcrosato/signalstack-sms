@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { serializeReadinessAuditEventsCsv } from "@/lib/compliance/readiness-audit-export";
-import { readinessAuditQuerySchema } from "@/lib/validation/readiness-audit";
+import { allowedReadinessAuditOperationExportLimits } from "@/lib/operations/readiness-audit-operations";
+import { readinessAuditQueryLimitMax, readinessAuditQuerySchema } from "@/lib/validation/readiness-audit";
 
 describe("readiness audit export", () => {
   it("bounds readiness audit filters to local audit values", () => {
@@ -21,6 +22,12 @@ describe("readiness audit export", () => {
     expect(readinessAuditQuerySchema.safeParse({ subjectType: "../Secret", limit: "25" }).success).toBe(false);
     expect(readinessAuditQuerySchema.safeParse({ subjectType: "UnsupportedSubject", limit: "25" }).success).toBe(false);
     expect(readinessAuditQuerySchema.safeParse({ action: "PROVIDER_NUMBER_UPSERTED", limit: "5000" }).success).toBe(false);
+  });
+
+  it("derives the query limit ceiling from the readiness audit operations vocabulary", () => {
+    expect(readinessAuditQueryLimitMax).toBe(allowedReadinessAuditOperationExportLimits[0]);
+    expect(readinessAuditQuerySchema.safeParse({ limit: String(readinessAuditQueryLimitMax) }).success).toBe(true);
+    expect(readinessAuditQuerySchema.safeParse({ limit: String(readinessAuditQueryLimitMax + 1) }).success).toBe(false);
   });
 
   it("serializes audit events as escaped CSV without mutating data", () => {

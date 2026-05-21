@@ -155,6 +155,7 @@ Post-MVP:
 - Local readiness audit query allowlist hardening
 - Local readiness audit command-execution vocabulary hardening
 - Local readiness audit exported vocabulary mutation hardening
+- Local readiness audit query limit-ceiling vocabulary hardening
 - Read-only local readiness audit operations view
 - Local operator runbook admin-link coverage refresh
 - Read-only local reporting index

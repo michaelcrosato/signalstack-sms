@@ -1375,3 +1375,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP readiness audit operations hardening or safe read-only operator surface refinements.
+
+## Run 152  GREEN  readiness-audit-query-limit-ceiling  2026-05-21 03:45
+Objective:    Keep readiness-audit JSON/CSV query limits derived from the bounded export-limit vocabulary.
+Changed:
+- Updated the readiness-audit query schema to use the exported bounded CSV export-limit vocabulary for its maximum limit.
+- Added unit coverage proving the vocabulary limit is accepted and limit-plus-one is rejected.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP readiness audit operations hardening or safe read-only operator surface refinements.
