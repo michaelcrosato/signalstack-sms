@@ -189,6 +189,8 @@ Use `/settings/operations` for read-only local operator surface discovery before
 
 The operations index inventory is backed by a unit test so route-count drift, duplicate surface links, missing page implementations, and missing safety-sensitive surfaces are caught before the seeded browser demo path.
 
+The runbook admin-link list is projected from the same shared inventory, excluding only non-settings surfaces such as the demo console. Unit coverage keeps runbook labels and backing app pages aligned with the operations index.
+
 The page is display-only. It must not execute commands, inspect files, call APIs, mutate records, create exports, enqueue jobs, call Redis, expose secrets, call providers, call Stripe, call live AI, create billing records, send notifications, send SMS, send email, or enable live features.
 
 ## API Operations Inventory

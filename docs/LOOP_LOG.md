@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 041  GREEN  runbook-inventory-projection  2026-05-20 18:55
+Objective:    Derive runbook admin links from the shared local operator surface inventory.
+Changed:
+- Added a shared `getRunbookAdminLinks` projection for settings-only operator links.
+- Refactored `/settings/runbook` local admin links to use that projection instead of a duplicated hard-coded list.
+- Extended operator-surface unit coverage for runbook label alignment, settings-only projection, backing page files, and the intentional `/demo` exclusion.
+- Updated testing contract, README, demo-mode docs, local operator runbook, SUMMARY, BLOCKERS, PLAN, and next-prompt handoff docs with the runbook inventory drift check.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only admin/reporting/navigation hardening without live external-impact actions.
+
 ## Run 040  GREEN  api-inventory-route-coverage  2026-05-20 19:02
 Objective:    Add fast backing-route coverage for the local API operations inventory.
 Changed:

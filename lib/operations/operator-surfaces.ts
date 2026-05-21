@@ -75,3 +75,7 @@ export function getOperatorSurfaceSummary(groups: OperatorSurfaceGroup[] = opera
     routes: links.map((link) => link.href)
   };
 }
+
+export function getRunbookAdminLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return groups.flatMap((group) => group.links).filter((link) => link.href === "/settings" || link.href.startsWith("/settings/"));
+}

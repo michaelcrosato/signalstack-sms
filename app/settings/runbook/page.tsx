@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { getRunbookAdminLinks } from "@/lib/operations/operator-surfaces";
 
 const requiredDefaults = [
   ["DEMO_MODE", "true"],
@@ -42,6 +43,8 @@ const repairSteps = [
   "Rerun npm run validate.",
   "Rerun npm run test:e2e:demo when the seeded demo path is touched."
 ];
+
+const adminLinks = getRunbookAdminLinks();
 
 export default function OperatorRunbookPage() {
   return (
@@ -196,38 +199,9 @@ export default function OperatorRunbookPage() {
 
       <Panel title="Local Admin Views">
         <nav aria-label="Local admin views" className="grid gap-3 text-sm md:grid-cols-4">
-          <AdminLink href="/settings/system" label="System Status" />
-          <AdminLink href="/settings/operations" label="Operations Index" />
-          <AdminLink href="/settings/environment" label="Environment Operations" />
-          <AdminLink href="/settings/demo" label="Demo Operations" />
-          <AdminLink href="/settings/health" label="Health Operations" />
-          <AdminLink href="/settings/compliance" label="Compliance Detail" />
-          <AdminLink href="/settings/campaigns" label="Campaign Operations" />
-          <AdminLink href="/settings/queue" label="Queue Operations" />
-          <AdminLink href="/settings/contacts" label="Contact Operations" />
-          <AdminLink href="/settings/data" label="Data Operations" />
-          <AdminLink href="/settings/audience" label="Audience Operations" />
-          <AdminLink href="/settings/templates" label="Template Operations" />
-          <AdminLink href="/settings/inbox" label="Inbox Operations" />
-          <AdminLink href="/settings/webhooks" label="Webhook Operations" />
-          <AdminLink href="/settings/delivery" label="Delivery Operations" />
-          <AdminLink href="/settings/team" label="Team Operations" />
-          <AdminLink href="/settings/usage" label="Usage & Analytics" />
-          <AdminLink href="/settings/billing" label="Billing Operations" />
-          <AdminLink href="/settings/reports" label="Reporting Index" />
-          <AdminLink href="/settings/ai" label="AI Operations" />
-          <AdminLink href="/settings/contracts" label="Contract Operations" />
-          <AdminLink href="/settings/validation" label="Validation Operations" />
-          <AdminLink href="/settings/api" label="API Operations" />
-          <AdminLink href="/settings/security" label="Security Operations" />
-          <AdminLink href="/settings/notifications" label="Notification Operations" />
-          <AdminLink href="/settings/integrations" label="Integration Operations" />
-          <AdminLink href="/settings/workflows" label="Workflow Operations" />
-          <AdminLink href="/settings/releases" label="Release Operations" />
-          <AdminLink href="/settings/readiness-audit" label="Readiness Audit" />
-          <AdminLink href="/settings/exports" label="Admin Exports" />
-          <AdminLink href="/settings/provider" label="Provider Details" />
-          <AdminLink href="/settings/numbers" label="Provider Numbers" />
+          {adminLinks.map((link) => (
+            <AdminLink key={link.href} href={link.href} label={link.label} />
+          ))}
         </nav>
       </Panel>
     </main>

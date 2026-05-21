@@ -34,6 +34,8 @@ The operations index screen at `/settings/operations` displays grouped links to 
 
 The operations index inventory is shared with unit coverage so local operator surface counts, duplicate routes, backing app pages, and safety-sensitive links are checked before the seeded browser demo path runs.
 
+The `/settings/runbook` admin-link list is derived from that same shared local operator surface inventory, excluding only non-settings surfaces, so runbook navigation stays aligned with `/settings/operations`.
+
 The release operations screen at `/settings/releases` displays local release checklist commands, protected gate expectations, seeded demo path, premerge metadata, release surface links, and runtime safety boundaries. It is read-only and does not execute commands, run migrations, launch tests or browsers, perform git operations, deploy, mutate records, enqueue jobs, call Redis, call providers, bill, notify, expose logs, diffs, environment values, or secrets, or enable live features.
 
 The health operations screen at `/settings/health` displays the existing local health endpoint contract, demo-safe defaults, runtime blockers, and local operations links. It is read-only and does not execute probes, call APIs, run commands, mutate records, expose raw environment values or secrets, call providers, bill, notify, send SMS or email, or enable live features.

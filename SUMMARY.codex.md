@@ -1,14 +1,19 @@
 # Codex Summary
 
-Run number: 40
+Run number: 41
 
 ## Completed
+
+- Advanced a post-MVP local operator runbook inventory hardening checkpoint.
+- Refactored `/settings/runbook` local admin links to project from the shared operator surface inventory instead of duplicating the list.
+- Added unit coverage for runbook link projection, label/note alignment, settings-only routing, backing app pages, and the intentional `/demo` exclusion.
+- Updated testing contract, README, demo-mode docs, local operator runbook, PLAN, BLOCKERS, and next-prompt handoff docs with the runbook inventory drift check.
+
+## Prior Completed
 
 - Advanced a post-MVP local API operations inventory backing-route coverage checkpoint.
 - Extended the `/settings/api` inventory unit test to fail when listed API route-method rows are duplicated or a listed API path lacks a backing `app/**/route.ts`.
 - Updated testing contract, README, demo-mode docs, local operator runbook, PLAN, BLOCKERS, and next-prompt handoff docs with the API inventory drift check.
-
-## Prior Completed
 
 - Advanced a post-MVP local operations index backing-page coverage checkpoint.
 - Extended the shared `/settings/operations` inventory unit test to fail when any listed local operator surface does not have a corresponding `app/**/page.tsx`.
@@ -103,6 +108,13 @@ Run number: 40
 ## Validation
 
 - `npm run typecheck`
+- `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
+- `.\scripts\local-gate.ps1`
+- `npm install`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `npm run contracts:check`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 - `npm run test -- tests/unit/operations/api-operations.test.ts`
 - `npm run contracts:check`
 - `npm run lint`
@@ -117,4 +129,4 @@ Run number: 40
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 
-Latest targeted API operations inventory test and protected local gate passed.
+Latest targeted operator-surface inventory test, protected local gate, and seeded investor demo path passed.
