@@ -17,7 +17,7 @@ describe("product dashboard navigation", () => {
       "/dashboard/campaigns",
       "/dashboard/inbox",
       "/dashboard/templates",
-      "#analytics",
+      "/dashboard/analytics",
       "/dashboard/compliance",
       "/settings"
     ]);

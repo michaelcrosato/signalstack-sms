@@ -4,7 +4,7 @@ SignalStack SMS is a demo-safe SMB SMS/MMS SaaS repo. The current implementation
 
 The only intentional live external-impact path today is the isolated `/demo` live-test SMS form. It remains hard-gated by explicit Twilio credentials, live flags, a recipient allowlist, and the confirmation phrase. Live campaign sending, live billing, live AI, production auth, and production deployment are not enabled.
 
-The product workspace starts at `/dashboard`. Deeper product routes now include `/dashboard/contacts` for local audience review/import, `/dashboard/contacts/:contactId` for local profile and consent editing, `/dashboard/campaigns` for draft composition, recipient selection, compliance preflight, and local scheduling, `/dashboard/inbox` for local conversation review, demo inbound replies, notes, assignment, and resolve/reopen workflow, and `/dashboard/templates` for reusable local copy creation through existing APIs without SMS, provider, billing, or live-AI side effects.
+The product workspace starts at `/dashboard`. Deeper product routes now include `/dashboard/contacts` for local audience review/import, `/dashboard/contacts/:contactId` for local profile and consent editing, `/dashboard/campaigns` for draft composition, recipient selection, compliance preflight, and local scheduling, `/dashboard/inbox` for local conversation review, demo inbound replies, notes, assignment, and resolve/reopen workflow, `/dashboard/templates` for reusable local copy creation, `/dashboard/analytics` for local overview detail, and `/dashboard/compliance` for readiness review through existing APIs without SMS, provider, billing, or live-AI side effects.
 
 ## Current roadmap
 
@@ -44,7 +44,7 @@ Investor demo path:
 npm run test:e2e -- e2e/demo-path.spec.ts --project=chromium
 ```
 
-Seeded product dashboard, contacts, campaign, and inbox path:
+Seeded product dashboard, contacts, campaign, inbox, template, analytics, and compliance path:
 
 ```bash
 npm run test:e2e:product-demo

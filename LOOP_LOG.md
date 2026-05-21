@@ -1903,3 +1903,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Expand product-facing compliance readiness from the dashboard summary.
+
+## Run 208  GREEN  product-analytics-workspace  2026-05-21 15:01
+Objective:    Add an owner-facing analytics detail page on existing local analytics totals.
+Changed:
+- Added `/dashboard/analytics` with tenant-scoped contact, campaign, inbox, message, and usage totals projected from the existing analytics overview.
+- Updated product navigation to route Analytics to the new workspace and added product analytics unit coverage.
+- Extended seeded product-demo coverage and refreshed API/testing contracts, roadmap, state matrix, README, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Add contact restore/merge or campaign detail/edit only after the core product demo remains stable.

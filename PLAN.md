@@ -59,7 +59,7 @@ Goal: make SignalStack feel like usable SMS software, not only a system audit co
 - Inbox list/thread UI with demo inbound, assignment, notes, resolve/reopen, and STOP visibility is in place on existing APIs.
 - Template list/create UI and contact detail/edit UI are in place on existing APIs.
 - Keep the gated live-test SMS demo available but visually separated from normal campaign sending.
-- Add `e2e/product-demo-path.spec.ts` for the non-technical browser demo path.
+- `e2e/product-demo-path.spec.ts` covers the non-technical browser demo path across dashboard, contacts, campaigns, inbox, templates, analytics, and compliance.
 
 ### Phase 2: Controlled Live Readiness
 
@@ -84,6 +84,6 @@ Goal: turn the demo-safe product into a paid production SaaS.
 ## Next Concrete Work
 
 1. Keep `docs/CURRENT_STATE_MATRIX.md` current.
-2. Add product-facing analytics detail on existing local analytics APIs.
-3. Add contact restore/merge workflow after the core product demo remains stable.
-4. Harden production worker policy before broader live sending.
+2. Add contact restore/merge workflow after the core product demo remains stable.
+3. Harden production worker policy before broader live sending.
+4. Add separate template detail/edit only if needed after product demo review.

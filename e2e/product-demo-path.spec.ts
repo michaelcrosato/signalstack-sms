@@ -218,6 +218,30 @@ test("product templates page creates local reusable copy", async ({ page }) => {
   await expect(page.getByText("No provider calls, SMS, live AI requests")).toBeVisible();
 });
 
+test("product analytics page renders local overview detail", async ({ page }) => {
+  await page.goto("/dashboard/analytics");
+
+  await expect(page.getByRole("heading", { name: "Analytics workspace" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Dashboard" })).toHaveAttribute("href", "/dashboard");
+
+  const metrics = page.getByLabel("Analytics metrics");
+  await expect(metrics.getByText("Consent Coverage")).toBeVisible();
+  await expect(metrics.getByText("Campaigns")).toBeVisible();
+  await expect(metrics.getByText("Inbox Load")).toBeVisible();
+  await expect(metrics.getByText("Usage Events")).toBeVisible();
+
+  await expect(page.getByRole("heading", { name: "Audience Signals" })).toBeVisible();
+  await expect(page.getByText("Opt-out share")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Inbox Signals" })).toBeVisible();
+  await expect(page.getByText("Average messages per conversation")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Campaign Signals" })).toBeVisible();
+  await expect(page.getByText("Provider sends")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Usage Metering" })).toBeVisible();
+  await expect(page.getByRole("row").filter({ hasText: "Contacts imported" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Safety Boundary" })).toBeVisible();
+  await expect(page.getByText("It does not execute reports, create exports, mutate records")).toBeVisible();
+});
+
 test("product compliance page explains readiness and hard-gate blockers", async ({ page }) => {
   await page.goto("/dashboard/compliance");
 

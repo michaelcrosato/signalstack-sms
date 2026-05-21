@@ -360,6 +360,10 @@ Renders the product-facing inbox workspace for the current organization. It may 
 
 Renders the product-facing template workspace for the current organization. It may list tenant-scoped message templates and create or update local reusable copy through `POST /api/templates`, including variable extraction from template placeholders. It must not render live outbound messages, schedule campaigns, send SMS, call providers, create billing records, call live AI, expose secrets, or enable live messaging.
 
+### `/dashboard/analytics`
+
+Renders the product-facing analytics workspace for the current organization. It may display tenant-scoped contact, campaign, conversation, message, and local usage totals from the existing analytics overview. It must not execute reports, create exports, mutate records, call providers, call Stripe, create billing artifacts, send SMS, call live AI, expose secrets, or enable live messaging.
+
 ### `/dashboard/compliance`
 
 Renders the product-facing compliance readiness workspace for the current organization. It may display required compliance profile field status, A2P registration status, runtime hard-gate blockers, demo mode, live messaging flag state, and selected provider label. It must not register A2P campaigns, call providers, send SMS, schedule campaigns, create billing records, call live AI, expose secrets, mutate live feature flags, or enable live messaging.
