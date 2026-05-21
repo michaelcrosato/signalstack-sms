@@ -1,15 +1,20 @@
 # Codex Summary
 
-Run number: 62
+Run number: 64
 
 ## Completed
+
+- Advanced a post-MVP page-specific operator projection self-link checkpoint.
+- Added unit coverage that verifies page-specific operator navigation projections do not link back to their own current route, while preserving broader inventory projections such as the runbook.
+- Updated testing contract/docs, README, PLAN, BLOCKERS, and next-prompt handoff docs with the self-link guard.
+- Protected local gate and targeted operator-surface unit coverage passed.
+
+## Prior Completed
 
 - Advanced a post-MVP shared operator inventory copy-integrity checkpoint.
 - Added unit coverage that verifies shared operator surface group names, link labels, and link notes stay unique.
 - Updated testing contract/docs and README to document the unambiguous navigation-copy guard.
 - Protected local gate and targeted operator-surface unit coverage passed.
-
-## Prior Completed
 
 - Advanced a post-MVP shared operator projection integrity checkpoint.
 - Added unit coverage that verifies every shared per-page operator navigation projection has unique route entries, resolves only through the shared local operator surface inventory, and points at implemented `app/**/page.tsx` files.

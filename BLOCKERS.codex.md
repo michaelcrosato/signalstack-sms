@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 63
+Run number: 64
 
 No active blockers.
 
 ## Notes
 
+- Page-specific operator navigation projections now have unit coverage that rejects self-links to their own current route, while broader inventory projections such as the runbook may intentionally list all local admin pages. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator surface routes now have unit coverage for canonical static local app-page shape. The check rejects query/hash routes, trailing slashes, dynamic segments, double slashes, non-lowercase routes, and routes outside `/demo`, `/settings`, or `/settings/**`; it does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator surface group names, link labels, and link notes now have unit coverage for uniqueness. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Every shared per-page operator navigation projection now has unit coverage for unique route entries, shared-inventory resolution, and backing `app/**/page.tsx` files. The check is local filesystem validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

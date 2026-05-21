@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 064  GREEN  projection-self-link-guard  2026-05-20 21:10
+Objective:    Add a shared guard against page-specific operator navigation linking to the current page.
+Changed:
+- Added unit coverage that verifies page-specific operator navigation projections exclude their own current route.
+- Preserved broader inventory projections such as the runbook, which may intentionally list all local admin pages.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs with the self-link guard.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 058  GREEN  billing-ai-shared-inventory  2026-05-20 20:39
 Objective:    Project billing and AI operations navigation from the shared operator surface inventory.
 Changed:

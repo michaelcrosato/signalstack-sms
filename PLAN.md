@@ -171,6 +171,7 @@ Post-MVP:
 - Local shared operator projection unique-route coverage
 - Local shared operator inventory unique-copy coverage
 - Local shared operator inventory canonical-route-shape coverage
+- Local page-specific operator projection self-link coverage
 
 ## Next Milestone
 

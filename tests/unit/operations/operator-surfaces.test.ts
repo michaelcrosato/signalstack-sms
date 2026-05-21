@@ -167,6 +167,47 @@ describe("operator surface inventory", () => {
     }
   });
 
+  it("keeps page-specific operator navigation from linking to the current page", () => {
+    const pageSpecificProjections = [
+      { route: "/demo", links: getDemoConsoleLinks() },
+      { route: "/settings", links: getSettingsNavigationLinks() },
+      { route: "/settings/demo", links: getDemoOperationsLinks() },
+      { route: "/settings/reports", links: getReportingIndexLinks() },
+      { route: "/settings/releases", links: getReleaseOperationSurfaceLinks() },
+      { route: "/settings/security", links: getSecurityOperationLinks() },
+      { route: "/settings/environment", links: getEnvironmentOperationLinks() },
+      { route: "/settings/health", links: getHealthOperationLinks() },
+      { route: "/settings/contracts", links: getContractOperationLinks() },
+      { route: "/settings/validation", links: getValidationOperationLinks() },
+      { route: "/settings/queue", links: getQueueOperationLinks() },
+      { route: "/settings/contacts", links: getContactOperationLinks() },
+      { route: "/settings/campaigns", links: getCampaignOperationLinks() },
+      { route: "/settings/audience", links: getAudienceOperationLinks() },
+      { route: "/settings/templates", links: getTemplateOperationLinks() },
+      { route: "/settings/inbox", links: getInboxOperationLinks() },
+      { route: "/settings/data", links: getDataOperationLinks() },
+      { route: "/settings/notifications", links: getNotificationOperationLinks() },
+      { route: "/settings/exports", links: getExportOperationLinks() },
+      { route: "/settings/webhooks", links: getWebhookOperationLinks() },
+      { route: "/settings/delivery", links: getDeliveryOperationLinks() },
+      { route: "/settings/team", links: getTeamOperationLinks() },
+      { route: "/settings/billing", links: getBillingOperationLinks() },
+      { route: "/settings/ai", links: getAiOperationLinks() },
+      { route: "/settings/provider", links: getProviderOperationLinks() },
+      { route: "/settings/numbers", links: getNumberOperationLinks() },
+      { route: "/settings/compliance", links: getComplianceOperationLinks() },
+      { route: "/settings/system", links: getSystemOperationLinks() },
+      { route: "/settings/usage", links: getUsageOperationLinks() },
+      { route: "/settings/readiness-audit", links: getReadinessAuditOperationLinks() }
+    ];
+
+    for (const projection of pageSpecificProjections) {
+      const routes = projection.links.map((link) => link.href);
+
+      expect(routes, projection.route).not.toContain(projection.route);
+    }
+  });
+
   it("points every listed app surface at an implemented page", () => {
     const routes = getOperatorSurfaceSummary().routes;
     const missingPages = routes.filter((route) => !existsSync(routeToAppPagePath(route)));
