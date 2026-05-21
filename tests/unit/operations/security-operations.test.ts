@@ -103,6 +103,19 @@ describe("getSecurityOperationsStatus", () => {
     expect(getSecurityOperationsStatus().controls[0].status).toBe(securityOperationControls[0].status);
   });
 
+  it("keeps security operation returned arrays detached while counts stay aligned", () => {
+    const status = getSecurityOperationsStatus();
+
+    expect(status.controlCount).toBe(status.controls.length);
+    expect(status.validationReferenceCount).toBe(status.validationReferences.length);
+    expect(status.controls).toEqual(securityOperationControls);
+    expect(status.validationReferences).toEqual(securityOperationValidationReferences);
+    expect(status.safetyBoundaries).toEqual(securityOperationSafetyBoundaries);
+    expect(status.controls).not.toBe(securityOperationControls);
+    expect(status.validationReferences).not.toBe(securityOperationValidationReferences);
+    expect(status.safetyBoundaries).not.toBe(securityOperationSafetyBoundaries);
+  });
+
   it("keeps security operation metadata in canonical local-only shape", () => {
     expect(securityOperationControls.map((control) => control.name).filter((name) => name.trim().length === 0)).toEqual([]);
     expect(securityOperationControls.map((control) => control.status).filter((status) => status.trim().length === 0)).toEqual([]);

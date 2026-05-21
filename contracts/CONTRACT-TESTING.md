@@ -188,6 +188,7 @@ Post-MVP security operations view:
 - Unit tests must verify that the static security operations inventory exports runtime-frozen supported control-status, command-execution, external-impact, mutation, and secrets-displayed vocabularies before `/settings/security` renders metadata.
 - Unit tests must verify that the static security operations exported vocabularies reject caller mutation before `/settings/security` renders metadata.
 - Unit tests must verify that the static security operations inventory keeps validation command references inside the runtime-frozen supported command allowlist and backed by `package.json` scripts before `/settings/security` renders them.
+- Unit tests must verify that `/settings/security` returned control, validation-reference, and safety-boundary arrays are detached from exported metadata while read-only counts stay aligned before local security metadata renders.
 - Unit tests must verify that the static security operations inventory keeps controls, validation references, and safety boundaries whitespace-clean before `/settings/security` renders metadata.
 - Unit tests must verify that the static security operations inventory rejects secret-like literals before `/settings/security` renders metadata.
 - Unit tests must verify that the static security operations inventory rejects command-like literals outside the allowlisted validation-command field before `/settings/security` renders metadata.

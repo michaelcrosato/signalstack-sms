@@ -1805,3 +1805,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP contract/security/validation operations hardening or safe read-only operator surface refinements.
+
+## Run 196  GREEN  security-operations-detached-counts  2026-05-21 07:01
+Objective:    Keep `/settings/security` returned arrays detached while read-only counts stay aligned.
+Changed:
+- Added security operations unit coverage proving returned control, validation-reference, and safety-boundary arrays are detached from exported metadata.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP security/validation/contract operations hardening or safe read-only operator surface refinements.

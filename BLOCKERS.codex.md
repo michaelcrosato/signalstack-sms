@@ -1,7 +1,9 @@
 # Codex Blockers
 
-Run number: 194
+Run number: 196
 
+- No blocker from the latest security operations detached status-array count coverage. The change pins returned `/settings/security` controls, validation references, and safety boundaries as detached static metadata while keeping read-only counts aligned; it does not execute commands, scan files, inspect raw environment values, mutate records, expose secrets, call providers, bill, notify, send SMS/email, call live AI, execute workers, call Redis, or enable live features.
+- No blocker from the latest contract operations detached-count coverage. Focused contract operations unit coverage is local static metadata only and does not read contract contents, execute commands, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, execute workers, call Redis, or enable live features.
 - No blocker from the latest API operations rate-limit boundary coverage. The change pins local `/settings/api` rate-limit metadata to the documented clamp boundaries while keeping route counts aligned; it does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, mutate records, expose secrets, execute workers, call Redis, or enable live features.
 - No blocker from the latest queue operations worker-command vocabulary handoff. The change reconciles docs with existing local static metadata coverage for the runtime-frozen worker command allowlist and caller-mutation rejection; it does not execute workers, enqueue jobs, call Redis, call providers, bill, notify, send SMS/email, mutate records, expose secrets, or enable live features.
 - No blocker from the latest API operations detached route-count coverage. Focused API operations unit coverage was added for local static metadata only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, mutate records, expose secrets, execute workers, call Redis, or enable live features.
