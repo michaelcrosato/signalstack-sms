@@ -5,6 +5,7 @@ import {
   allowedValidationOperationCommandExecutionStates,
   allowedValidationOperationExternalImpactStates,
   allowedValidationOperationGateCommands,
+  allowedValidationOperationMutationStates,
   allowedValidationOperationSecretsDisplayedStates,
   getValidationOperationsStatus,
   validationOperationGateCommands,
@@ -17,6 +18,7 @@ const publicStatusFields = [
   "repairSignalCount",
   "commandExecution",
   "externalImpact",
+  "mutation",
   "secretsDisplayed",
   "gateCommands",
   "repairSignals"
@@ -42,6 +44,7 @@ describe("getValidationOperationsStatus", () => {
     expect(status.repairSignalCount).toBe(5);
     expect(status.commandExecution).toBe("none");
     expect(status.externalImpact).toBe("none");
+    expect(status.mutation).toBe("none");
     expect(status.secretsDisplayed).toBe(false);
     expect(status.gateCommands.map((gate) => gate.command)).toEqual([
       "npm run validate",
@@ -135,12 +138,15 @@ describe("getValidationOperationsStatus", () => {
 
     expect(allowedValidationOperationCommandExecutionStates).toEqual(["none"]);
     expect(allowedValidationOperationExternalImpactStates).toEqual(["none"]);
+    expect(allowedValidationOperationMutationStates).toEqual(["none"]);
     expect(allowedValidationOperationSecretsDisplayedStates).toEqual([false]);
     expect(Object.isFrozen(allowedValidationOperationCommandExecutionStates)).toBe(true);
     expect(Object.isFrozen(allowedValidationOperationExternalImpactStates)).toBe(true);
+    expect(Object.isFrozen(allowedValidationOperationMutationStates)).toBe(true);
     expect(Object.isFrozen(allowedValidationOperationSecretsDisplayedStates)).toBe(true);
     expect(allowedValidationOperationCommandExecutionStates).toContain(status.commandExecution);
     expect(allowedValidationOperationExternalImpactStates).toContain(status.externalImpact);
+    expect(allowedValidationOperationMutationStates).toContain(status.mutation);
     expect(allowedValidationOperationSecretsDisplayedStates).toContain(status.secretsDisplayed);
   });
 
@@ -149,6 +155,7 @@ describe("getValidationOperationsStatus", () => {
       allowedValidationOperationGateCommands,
       allowedValidationOperationCommandExecutionStates,
       allowedValidationOperationExternalImpactStates,
+      allowedValidationOperationMutationStates,
       allowedValidationOperationSecretsDisplayedStates
     ];
 

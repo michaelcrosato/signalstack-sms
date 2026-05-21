@@ -318,7 +318,7 @@ Renders a read-only contract operations view for the current organization. It ma
 
 ### `/settings/validation`
 
-Renders a read-only validation operations view for the current organization. It may display static local validation gate inventory, repair signals, and validation safety-boundary text. The page may display the current demo organization name, but must not execute commands, inspect logs or test reports, scan files, read `.env.local`, create or mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, expose secrets, disable rate limits, or enable live messaging, live billing, or live AI.
+Renders a read-only validation operations view for the current organization. It may display static local validation gate inventory, repair signals, no-impact summary states, and validation safety-boundary text. The page may display the current demo organization name, but must not execute commands, inspect logs or test reports, scan files, read `.env.local`, create or mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, expose secrets, disable rate limits, or enable live messaging, live billing, or live AI.
 
 ### `/settings/security`
 

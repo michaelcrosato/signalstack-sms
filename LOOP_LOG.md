@@ -1660,3 +1660,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP contract/security/validation operations hardening or safe read-only operator surface refinements.
+
+## Run 181  GREEN  validation-operations-mutation-no-impact  2026-05-21 05:47
+Objective:    Keep `/settings/validation` mutation state inside validated no-impact metadata.
+Changed:
+- Added an exported runtime-frozen validation operations mutation vocabulary and validated status field.
+- Rendered the validation operations Mutation label from the operations helper and covered it in unit and seeded demo checks.
+- Updated API/testing contracts, README, PLAN, demo/API docs, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP validation/security operations hardening or safe read-only operator surface refinements.

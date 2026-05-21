@@ -9,6 +9,7 @@ export type ValidationOperationsStatus = {
   repairSignalCount: number;
   commandExecution: ValidationOperationCommandExecutionState;
   externalImpact: ValidationOperationExternalImpactState;
+  mutation: ValidationOperationMutationState;
   secretsDisplayed: ValidationOperationSecretsDisplayedState;
   gateCommands: readonly ValidationOperationGateCommand[];
   repairSignals: readonly string[];
@@ -27,11 +28,13 @@ export const allowedValidationOperationGateCommands = Object.freeze([
 ] as const);
 export const allowedValidationOperationCommandExecutionStates = Object.freeze(["none"] as const);
 export const allowedValidationOperationExternalImpactStates = Object.freeze(["none"] as const);
+export const allowedValidationOperationMutationStates = Object.freeze(["none"] as const);
 export const allowedValidationOperationSecretsDisplayedStates = Object.freeze([false] as const);
 
 export type ValidationOperationSupportedGateCommand = (typeof allowedValidationOperationGateCommands)[number];
 export type ValidationOperationCommandExecutionState = (typeof allowedValidationOperationCommandExecutionStates)[number];
 export type ValidationOperationExternalImpactState = (typeof allowedValidationOperationExternalImpactStates)[number];
+export type ValidationOperationMutationState = (typeof allowedValidationOperationMutationStates)[number];
 export type ValidationOperationSecretsDisplayedState = (typeof allowedValidationOperationSecretsDisplayedStates)[number];
 
 const validationOperationGateCommandFields = ["command", "area", "boundary"] as const;
@@ -66,8 +69,9 @@ const forbiddenSecretMetadataPatterns = [
 const validationOperationStatusSummary = Object.freeze({
   commandExecution: "none",
   externalImpact: "none",
+  mutation: "none",
   secretsDisplayed: false
-} satisfies Pick<ValidationOperationsStatus, "commandExecution" | "externalImpact" | "secretsDisplayed">);
+} satisfies Pick<ValidationOperationsStatus, "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed">);
 
 function assertExactFields<T extends object>(value: T, fields: readonly string[], errorMessage: string) {
   const actualKeys = Reflect.ownKeys(value);
@@ -95,13 +99,19 @@ function assertCleanValidationMetadata(value: string, errorMessage: string) {
   }
 }
 
-function assertStatusSummary(summary: Pick<ValidationOperationsStatus, "commandExecution" | "externalImpact" | "secretsDisplayed">) {
+function assertStatusSummary(
+  summary: Pick<ValidationOperationsStatus, "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed">
+) {
   if (!allowedValidationOperationCommandExecutionStates.includes(summary.commandExecution)) {
     throw new Error(`Unsupported validation operation command execution state: ${summary.commandExecution}`);
   }
 
   if (!allowedValidationOperationExternalImpactStates.includes(summary.externalImpact)) {
     throw new Error(`Unsupported validation operation external impact state: ${summary.externalImpact}`);
+  }
+
+  if (!allowedValidationOperationMutationStates.includes(summary.mutation)) {
+    throw new Error(`Unsupported validation operation mutation state: ${summary.mutation}`);
   }
 
   if (!allowedValidationOperationSecretsDisplayedStates.includes(summary.secretsDisplayed)) {
@@ -251,6 +261,7 @@ export function getValidationOperationsStatus(): ValidationOperationsStatus {
     repairSignalCount: validationOperationRepairSignals.length,
     commandExecution: validationOperationStatusSummary.commandExecution,
     externalImpact: validationOperationStatusSummary.externalImpact,
+    mutation: validationOperationStatusSummary.mutation,
     secretsDisplayed: validationOperationStatusSummary.secretsDisplayed,
     gateCommands: freezeGateCommands(validationOperationGateCommands.map((command) => ({ ...command }))),
     repairSignals: freezeRepairSignals([...validationOperationRepairSignals])

@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP validation operations mutation no-impact summary checkpoint.
+- Added a runtime-frozen validation mutation vocabulary and status field, rendered the Mutation label on `/settings/validation`, and pinned it in validation operations unit coverage plus the seeded investor demo path.
+- Updated API/testing contracts, README, PLAN, demo/API docs, next-prompt handoff docs, blockers, and loop logs.
+- Protected local gate and seeded investor demo path passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, worker execution, Redis calls, record mutations beyond local demo seed, or protected gate-script edits were used.
+
+Run number: 181
+
+## Previous Run
+
 - Advanced a post-MVP contract operations mutation no-impact summary checkpoint.
 - Added a runtime-frozen contract mutation vocabulary and status field, rendered the Mutation label on `/settings/contracts`, and pinned it in contract operations unit coverage plus the seeded investor demo path.
 - Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.

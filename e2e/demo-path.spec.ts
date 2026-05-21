@@ -167,6 +167,10 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Validation Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Gate Inventory" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Repair Signals" })).toBeVisible();
+  await expect(page.getByText("Command execution", { exact: true })).toBeVisible();
+  await expect(page.getByText("External impact", { exact: true })).toBeVisible();
+  await expect(page.getByText("Mutation", { exact: true })).toBeVisible();
+  await expect(page.getByText("Secrets displayed", { exact: true })).toBeVisible();
   await expect(page.getByText("npm run validate")).toBeVisible();
   for (const link of validationOperationLinks) {
     await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);

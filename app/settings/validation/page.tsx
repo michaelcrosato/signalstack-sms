@@ -30,10 +30,11 @@ export default async function ValidationOperationsPage() {
         </div>
       </header>
 
-      <section className="grid gap-3 md:grid-cols-4">
+      <section className="grid gap-3 md:grid-cols-5">
         <Metric label="Gate commands" value={String(status.gateCommandCount)} />
         <Metric label="Command execution" value={status.commandExecution} />
         <Metric label="External impact" value={status.externalImpact} />
+        <Metric label="Mutation" value={status.mutation} />
         <Metric label="Secrets displayed" value={String(status.secretsDisplayed)} />
       </section>
 
