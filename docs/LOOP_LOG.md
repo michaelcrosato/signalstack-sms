@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 087  GREEN  projection-detached-link-guard  2026-05-20 22:53
+Objective:    Guard shared operator projection links against aliasing supplied inventory link objects.
+Changed:
+- Added unit coverage proving projected operator links are detached objects from supplied inventory links while preserving shared href, label, and note copy.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs with the detached-link projection guard.
+- Preserved local-only behavior without adding routes, mutations, provider calls, billing, notifications, SMS, email, live AI, or live feature enablement.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 086  GREEN  projection-deep-result-freeze  2026-05-20 22:48
 Objective:    Verify every shared operator projection result object is frozen.
 Changed:

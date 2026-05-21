@@ -1,8 +1,13 @@
 # Codex Summary
 
-Run number: 85
+Run number: 87
 
 ## Completed
+
+- Advanced a post-MVP shared operator projection detached-link checkpoint.
+- Added unit coverage proving projected operator links are detached objects from supplied inventory links while preserving shared href, label, and note copy.
+- Preserved local-only behavior without adding routes, mutations, provider calls, billing, notifications, SMS, email, live AI, or live feature enablement.
+- Targeted operator-surface unit coverage passed.
 
 - Advanced a post-MVP shared operator projection deep-result-freeze checkpoint.
 - Expanded unit coverage so every navigation, demo checkpoint, workflow step, and integration area projection result object is verified frozen, not only the first result in each projection.

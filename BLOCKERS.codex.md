@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 85
+Run number: 87
 
 No active blockers.
 
 ## Notes
 
+- Shared operator projections now have unit coverage proving projected links are detached objects from supplied inventory links while preserving shared href, label, and note copy. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator projections now have unit coverage proving every returned navigation, demo checkpoint, workflow step, and integration area object is frozen, not just a sampled first result. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator projections now return frozen result arrays, including the summary route array, with unit coverage proving caller-side array mutation is rejected before local navigation projections can drift. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator projections now return frozen link and rich-projection result objects, with unit coverage proving caller-side mutation is rejected and mutable supplied inventory link copy remains unchanged. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

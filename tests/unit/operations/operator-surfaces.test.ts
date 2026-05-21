@@ -673,6 +673,60 @@ describe("operator surface inventory", () => {
     expect(getLaunchDashboardLinks(groups).find((link) => link.href === "/settings/usage")).toEqual(suppliedUsageLink);
   });
 
+  it("keeps projected operator links detached from supplied inventory objects", () => {
+    const groups = cloneSurfaceGroups(operatorSurfaceGroups);
+    const inventoryLinks = groups.flatMap((group) => group.links);
+    const projectedLinks = [
+      ...getRunbookAdminLinks(groups),
+      ...getSettingsNavigationLinks(groups),
+      ...getLaunchDashboardLinks(groups),
+      ...getDemoConsoleLinks(groups),
+      ...getDemoOperationsLinks(groups),
+      ...getReportingIndexLinks(groups),
+      ...getReleaseOperationSurfaceLinks(groups),
+      ...getSecurityOperationLinks(groups),
+      ...getEnvironmentOperationLinks(groups),
+      ...getHealthOperationLinks(groups),
+      ...getContractOperationLinks(groups),
+      ...getValidationOperationLinks(groups),
+      ...getQueueOperationLinks(groups),
+      ...getContactOperationLinks(groups),
+      ...getCampaignOperationLinks(groups),
+      ...getAudienceOperationLinks(groups),
+      ...getTemplateOperationLinks(groups),
+      ...getInboxOperationLinks(groups),
+      ...getDataOperationLinks(groups),
+      ...getNotificationOperationLinks(groups),
+      ...getExportOperationLinks(groups),
+      ...getWebhookOperationLinks(groups),
+      ...getDeliveryOperationLinks(groups),
+      ...getTeamOperationLinks(groups),
+      ...getBillingOperationLinks(groups),
+      ...getAiOperationLinks(groups),
+      ...getProviderOperationLinks(groups),
+      ...getNumberOperationLinks(groups),
+      ...getComplianceOperationLinks(groups),
+      ...getSystemOperationLinks(groups),
+      ...getUsageOperationLinks(groups),
+      ...getReadinessAuditOperationLinks(groups),
+      ...getIntegrationOperationAreas(groups)
+    ];
+
+    for (const projectedLink of projectedLinks) {
+      const sourceLink = inventoryLinks.find((link) => link.href === projectedLink.href);
+
+      expect(
+        {
+          href: projectedLink.href,
+          label: projectedLink.label,
+          note: projectedLink.note
+        },
+        projectedLink.href
+      ).toEqual(sourceLink);
+      expect(projectedLink, projectedLink.href).not.toBe(sourceLink);
+    }
+  });
+
   it("keeps projected operator navigation route order stable", () => {
     const stableProjectionOrders = [
       {

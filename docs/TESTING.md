@@ -55,6 +55,7 @@ Additional deterministic checks:
 - Unit coverage verifies that shared operator projection helpers return fresh and frozen result arrays per call, so consumer-side array changes cannot leak into later navigation projections.
 - Unit coverage verifies that every shared operator projection result object is frozen across navigation, demo checkpoint, workflow, and integration projections, so no later entry can be mutated by callers.
 - Unit coverage verifies that the canonical shared operator surface inventory is frozen at runtime, including the exported group array, nested link arrays, and link objects, so accidental mutation fails before local navigation projections drift.
+- Unit coverage verifies that shared operator projection links are detached objects from supplied inventory links while preserving the shared href, label, and note copy.
 - Unit coverage verifies that shared operator projections fail loudly with the missing route when a projection references a route absent from the supplied inventory.
 - Unit coverage verifies that shared operator surface labels and notes remain aligned with their route names, including singular/plural route segment variants.
 - Unit coverage verifies that rich shared operator projections for demo checkpoints, workflow steps, and integration areas have unique route entries, point at implemented app pages, and derive their visible labels from the shared local operator surface inventory.
