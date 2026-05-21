@@ -182,6 +182,10 @@ Post-MVP security operations view:
 - Unit tests must verify that the static security operations inventory keeps validation command references inside the supported command allowlist and backed by `package.json` scripts before `/settings/security` renders them.
 - Unit tests must verify that the static security operations inventory rejects secret-like literals before `/settings/security` renders metadata.
 
+Post-MVP notification operations view:
+
+- Unit tests must verify that the static notification operations inventory keeps channel boundaries, no-send controls, safety-boundary copy, public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, no secret display, and secret-like literal rejection stable before `/settings/notifications` renders them.
+
 Post-MVP API operations inventory:
 
 - Unit tests must keep the static `/settings/api` route inventory aligned with implemented local API methods, including soft archive, draft update, inbox read endpoints, and billing usage reads.

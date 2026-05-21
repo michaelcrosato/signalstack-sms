@@ -1,45 +1,16 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { getNotificationOperationsStatus } from "@/lib/operations/notification-operations";
 import { getNotificationOperationLinks } from "@/lib/operations/operator-surfaces";
 import { getSystemStatus } from "@/lib/operations/system-status";
 
 export const dynamic = "force-dynamic";
 
-const notificationChannels = [
-  {
-    name: "Email",
-    status: "blocked",
-    boundary: "No SMTP, transactional email, invite email, or alert email provider is configured or called."
-  },
-  {
-    name: "In-app",
-    status: "not implemented",
-    boundary: "No live notification feed, browser push, or background notification job exists."
-  },
-  {
-    name: "SMS alerts",
-    status: "blocked",
-    boundary: "Operational alerts cannot send SMS; messaging remains campaign/inbox data only under hard gates."
-  },
-  {
-    name: "Webhooks",
-    status: "inbound only",
-    boundary: "Webhook routes receive provider events locally; they do not emit outbound notifications."
-  }
-];
-
-const notificationControls = [
-  "LIVE_MESSAGING_ENABLED must remain false for local validation.",
-  "LIVE_BILLING_ENABLED must remain false for local validation.",
-  "No notification provider API keys are required for demo mode.",
-  "No background notification worker is part of the current local gate.",
-  "Operator review is limited to existing local pages and CSV links."
-];
-
 export default async function NotificationOperationsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
   const status = getSystemStatus(process.env);
+  const notificationStatus = getNotificationOperationsStatus();
   const operationLinks = getNotificationOperationLinks();
 
   return (
@@ -69,7 +40,7 @@ export default async function NotificationOperationsPage() {
 
       <Panel title="Channel Boundaries">
         <ul className="grid gap-3 text-sm">
-          {notificationChannels.map((channel) => (
+          {notificationStatus.channels.map((channel) => (
             <li key={channel.name} className="grid gap-2 border-b border-slate-100 pb-3 md:grid-cols-[180px_140px_1fr]">
               <span className="font-medium text-slate-950">{channel.name}</span>
               <span className="text-slate-600">{channel.status}</span>
@@ -91,7 +62,7 @@ export default async function NotificationOperationsPage() {
 
         <Panel title="No-Send Controls">
           <ul className="grid gap-2 text-sm text-slate-700">
-            {notificationControls.map((control) => (
+            {notificationStatus.controls.map((control) => (
               <li key={control}>{control}</li>
             ))}
           </ul>
@@ -100,10 +71,9 @@ export default async function NotificationOperationsPage() {
 
       <Panel title="Safety Boundary">
         <ul className="grid gap-2 text-sm text-slate-700">
-          <li>This view does not create notification subscriptions, recipients, templates, jobs, or audit sends.</li>
-          <li>Existing webhook routes are inbound persistence surfaces only and do not create automatic outbound replies.</li>
-          <li>Existing billing and provider metadata pages do not send email, SMS, or live operational alerts.</li>
-          <li>Future notification providers require explicit contracts, hard gates, tests, and demo-safe defaults first.</li>
+          {notificationStatus.safetyBoundaries.map((boundary) => (
+            <li key={boundary}>{boundary}</li>
+          ))}
         </ul>
       </Panel>
     </main>

@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 134
+Run number: 135
 
 No active blockers.
 
 ## Notes
 
+- Latest notification operations static-metadata hardening moves `/settings/notifications` channel boundaries, no-send controls, and safety-boundary copy into a validated frozen operations module with unit coverage for public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, no secret display, required no-send boundary terms, and secret-like literal rejection before render. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 - Latest validation operations secret-literal hardening keeps `/settings/validation` static gate area, boundary, and repair-signal metadata free of common secret-like token patterns before render. The check is local static metadata validation only and does not execute commands, inspect logs, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.
 - Latest contract operations secret-literal hardening keeps `/settings/contracts` static contract file metadata, validation purposes, and drift-control copy free of common secret-like token patterns before render. The check is local static metadata validation only and does not read contract contents, execute commands, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.
 - Latest security operations secret-literal hardening keeps `/settings/security` static control details, validation purposes, and safety-boundary copy free of common secret-like token patterns before render. The check is local static metadata validation only and does not scan files, inspect logs, read raw environment values, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.

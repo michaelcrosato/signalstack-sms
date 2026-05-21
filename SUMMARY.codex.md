@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP notification operations static-metadata checkpoint.
+- Moved `/settings/notifications` channel boundaries, no-send controls, and safety-boundary copy into a validated frozen operations module.
+- Added unit coverage proving public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, no secret display, required no-send boundary terms, and secret-like literal rejection before render.
+- Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
+- Focused notification operations unit coverage, typecheck, `git diff --check`, and the protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 135
+
+## Previous Run
+
 - Advanced a post-MVP validation operations secret-literal checkpoint.
 - Added metadata guards so `/settings/validation` static gate area, boundary, and repair-signal copy reject common secret-like token patterns before render.
 - Added unit coverage proving API key, provider token, account SID, env assignment, and bearer-token patterns are absent from validation operation metadata.

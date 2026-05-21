@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 135  GREEN  notification-operations-static-metadata  2026-05-21 02:22
+Objective:    Keep `/settings/notifications` static no-send metadata validated and immutable before rendering.
+Changed:
+- Moved notification channel boundaries, no-send controls, and safety-boundary copy into `lib/operations/notification-operations.ts`.
+- Wired `/settings/notifications` to the shared notification operations status instead of page-local arrays.
+- Added unit coverage for public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, no secret display, required no-send boundary terms, and secret-like literal rejection.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP notification operations hardening or safe read-only operator surface refinements.
+
 ## Run 131  GREEN  security-operations-secret-literals  2026-05-21 02:06
 Objective:    Keep `/settings/security` static metadata free of secret-like literals before rendering.
 Changed:
