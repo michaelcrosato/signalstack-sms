@@ -183,6 +183,7 @@ Post-MVP:
 - Local shared operator focused-projection reachability coverage
 - Local shared operator missing-route failure coverage
 - Local shared operator route-copy alignment coverage
+- Local shared operator action-neutral copy coverage
 
 ## Next Milestone
 

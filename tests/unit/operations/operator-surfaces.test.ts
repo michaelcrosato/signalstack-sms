@@ -272,6 +272,21 @@ describe("operator surface inventory", () => {
     expect(links.map((link) => link.label).filter((label) => !allowedLabelSuffix.test(label))).toEqual([]);
   });
 
+  it("keeps shared operator navigation copy action-neutral", () => {
+    const forbiddenActionWords =
+      /\b((?<!no-)send|sending|sent|create|creating|delete|deleting|run|running|execute|executing|schedule|scheduling|provision|provisioning|charge|charging|invite|inviting|enable|enabling|configure|configuring|verify|verifying|replay|replaying|retry|retrying|submit|submitting|mutate|mutating)\b/i;
+    const copyFields = operatorSurfaceGroups.flatMap((group) => [
+      { route: group.name, copy: group.name },
+      ...group.links.flatMap((link) => [
+        { route: link.href, copy: link.label },
+        { route: link.href, copy: link.note }
+      ])
+    ]);
+    const actionCopy = copyFields.filter((field) => forbiddenActionWords.test(field.copy));
+
+    expect(actionCopy).toEqual([]);
+  });
+
   it("keeps every projected operator navigation set unique and backed by the shared inventory", () => {
     const inventoryLinks = operatorSurfaceGroups.flatMap((group) => group.links);
     const inventoryRoutes = new Set(inventoryLinks.map((link) => link.href));

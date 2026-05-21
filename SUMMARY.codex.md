@@ -289,6 +289,15 @@ Run number: 78
 - `.\scripts\local-gate.ps1`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 - `git diff --check`
+- Latest shared operator action-neutral copy hardening added unit coverage that rejects command-style action words in shared operator surface group names, labels, and notes while preserving existing read-only boundary copy such as local import metadata and no-send notification boundaries. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
+- `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
+- `git diff --check`
+- `.\scripts\local-gate.ps1`
+- `npm install`
+- `npm run db:generate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 - Latest full shared projection supplied-inventory hardening added unit coverage that stamps custom labels/notes across the supplied local operator inventory and verifies every shared navigation projection plus rich demo/workflow/integration labels and notes use that supplied copy. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - Latest shared operator inventory whitespace-clean hardening added unit coverage that rejects leading/trailing whitespace, doubled spaces, and embedded newlines in shared operator surface routes, group names, labels, and notes. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

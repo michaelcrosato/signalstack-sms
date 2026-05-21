@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 78
+Run number: 79
 
 No active blockers.
 
 ## Notes
 
+- Shared operator surface copy now has unit coverage proving group names, labels, and notes stay action-neutral instead of drifting into command-style send/run/delete/enable/replay/mutate language. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Broad shared operator projections now have unit coverage proving summary, launch, settings, runbook, and demo-console helpers honor supplied inventory route omissions instead of reintroducing stale global routes. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator surface copy now has unit coverage proving labels and notes stay aligned with route names, including singular/plural route segment variants. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator projections now have unit coverage proving they fail loudly with the missing route when a supplied inventory omits a referenced local operator surface. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

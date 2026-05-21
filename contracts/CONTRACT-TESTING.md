@@ -40,6 +40,7 @@ Post-MVP local operations status:
 - Unit tests must verify that shared operator surface routes, group names, labels, and notes remain whitespace-clean without leading/trailing whitespace, doubled spaces, or embedded newlines.
 - Unit tests must verify that shared operator surface group names and labels stay in stable Title Case navigation format, and notes stay short lower-case sentence fragments without terminal punctuation.
 - Unit tests must verify that shared operator surface group names, labels, and notes stay concise for operator scanning, and labels keep predictable navigation suffixes.
+- Unit tests must verify that shared operator surface group names, labels, and notes stay action-neutral, avoiding command-style copy such as send, run, delete, enable, replay, or mutate.
 - Unit tests must verify that every shared operator surface route remains a canonical static local app-page route: lowercase, no trailing slash, no query/hash, no dynamic segment, no double slash, and limited to `/demo`, `/settings`, or `/settings/**`.
 - Unit tests must verify that shared operator surface groups and route order stay stable so projected navigation does not churn without an intentional inventory update.
 - Unit tests must verify that every shared operator navigation projection keeps its route order stable so page headers, launch links, demo links, and rich workflow/demo/integration projections do not churn without an intentional inventory update.
