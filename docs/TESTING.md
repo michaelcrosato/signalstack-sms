@@ -72,6 +72,7 @@ Additional deterministic checks:
 - Unit coverage verifies that supplied shared operator inventories with accessor-backed group or link fields fail before summaries or projections are derived, so local navigation helpers only read plain data fields.
 - Unit coverage verifies that supplied shared operator inventories with custom-prototype group or link records fail before summaries or projections are derived, so local navigation helpers only accept ordinary object records.
 - Unit coverage verifies that supplied shared operator inventories with extra string or symbol fields on groups or links fail before summaries or projections are derived, so local navigation helpers only accept exact public record shapes.
+- Unit coverage verifies that supplied shared operator inventory link arrays with custom prototypes or extra string/symbol fields fail before summaries or projections are derived, so local navigation helpers only accept plain link arrays.
 - Unit coverage verifies that shared operator projections fail loudly with the missing route when a projection references a route absent from the supplied inventory.
 - Unit coverage verifies that shared operator surface labels and notes remain aligned with their route names, including singular/plural route segment variants.
 - Unit coverage verifies that rich shared operator projections for demo checkpoints, workflow steps, and integration areas have unique route entries, point at implemented app pages, and derive their visible labels from the shared local operator surface inventory.

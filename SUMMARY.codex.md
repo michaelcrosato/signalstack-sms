@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP shared operator supplied-inventory link-array-shape checkpoint.
+- Tightened the shared operator surface validator so supplied group link arrays must be plain arrays with no extra string or symbol fields.
+- Added unit coverage proving custom-prototype and decorated supplied link arrays fail before summaries or projections derive local navigation.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 112
+
+## Previous Run
+
 - Advanced a post-MVP shared operator supplied-inventory exact-field checkpoint.
 - Tightened the shared operator surface validator so supplied groups and links must expose only exact public fields, rejecting extra string or symbol fields before summaries or projections derive local navigation.
 - Added unit coverage proving extra supplied group/link fields fail before projection.

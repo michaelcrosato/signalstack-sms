@@ -574,6 +574,40 @@ describe("operator surface inventory", () => {
     expect(() => getDemoOperationsLinks(groupsWithExtraSymbolLinkField)).toThrow("Invalid operator surface link fields");
   });
 
+  it("rejects supplied operator inventories with non-plain link arrays before projection", () => {
+    const symbolKey = Symbol("unsafe");
+    const linkArrayWithExtraStringField = [...operatorSurfaceGroups[1].links];
+    const linkArrayWithExtraSymbolField = [...operatorSurfaceGroups[1].links];
+    class CustomLinkArray extends Array<OperatorSurfaceLink> {}
+
+    (linkArrayWithExtraStringField as unknown as Record<string, string>).internalOwner = "unsafe-owner";
+    (linkArrayWithExtraSymbolField as unknown as Record<PropertyKey, string>)[symbolKey] = "unsafe-symbol";
+    const customPrototypeLinks = new CustomLinkArray(...operatorSurfaceGroups[1].links);
+
+    const groupsWithExtraStringLinkArrayField = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links: groupIndex === 1 ? linkArrayWithExtraStringField : group.links
+    }));
+    const groupsWithExtraSymbolLinkArrayField = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links: groupIndex === 1 ? linkArrayWithExtraSymbolField : group.links
+    }));
+    const groupsWithCustomPrototypeLinkArray = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links: groupIndex === 1 ? customPrototypeLinks : group.links
+    }));
+
+    expect(() => getOperatorSurfaceSummary(groupsWithExtraStringLinkArrayField)).toThrow(
+      `Invalid operator surface link array fields for group ${operatorSurfaceGroups[1].name}`
+    );
+    expect(() => getLaunchDashboardLinks(groupsWithExtraSymbolLinkArrayField)).toThrow(
+      `Invalid operator surface link array fields for group ${operatorSurfaceGroups[1].name}`
+    );
+    expect(() => getDemoOperationsLinks(groupsWithCustomPrototypeLinkArray)).toThrow(
+      `Invalid operator surface link array prototype for group ${operatorSurfaceGroups[1].name}`
+    );
+  });
+
   it("rejects supplied operator inventories with sparse link entries before projection", () => {
     const sparseLinks = [...operatorSurfaceGroups[1].links];
     delete sparseLinks[0];

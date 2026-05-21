@@ -92,6 +92,21 @@ function assertExactOperatorSurfaceFields(record: object, expectedKeys: readonly
   }
 }
 
+function assertOperatorSurfaceLinkArray(links: readonly OperatorSurfaceLink[], groupName: string) {
+  if (Object.getPrototypeOf(links) !== Array.prototype) {
+    throw new Error(`Invalid operator surface link array prototype for group ${groupName}`);
+  }
+
+  const allowedKeys = new Set<PropertyKey>([
+    "length",
+    ...Array.from({ length: links.length }, (_, index) => String(index))
+  ]);
+
+  if (Reflect.ownKeys(links).some((key) => !allowedKeys.has(key))) {
+    throw new Error(`Invalid operator surface link array fields for group ${groupName}`);
+  }
+}
+
 function assertOperatorSurfaceGroup(group: OperatorSurfaceGroup) {
   if (!group || typeof group !== "object" || Array.isArray(group)) {
     throw new Error("Invalid operator surface group");
@@ -177,6 +192,8 @@ function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) 
     if (!Array.isArray(group.links)) {
       throw new Error(`Invalid operator surface links for group ${group.name}`);
     }
+
+    assertOperatorSurfaceLinkArray(group.links, group.name);
 
     if (group.links.length === 0) {
       throw new Error(`Empty operator surface group ${group.name}`);

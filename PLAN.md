@@ -216,6 +216,7 @@ Post-MVP:
 - Local shared operator supplied-inventory plain-record failure coverage
 - Local shared operator supplied-inventory exact-field failure coverage
 - Local shared operator canonical pre-export validation coverage
+- Local shared operator supplied-inventory link-array-shape coverage
 
 ## Next Milestone
 
