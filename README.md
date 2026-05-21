@@ -1,6 +1,15 @@
 # SignalStack SMS
 
-SignalStack SMS is a 100% AI-coded SMB SMS/MMS SaaS repo. The current implementation is demo-safe through Milestone 9 foundations: contacts, consent, CSV import, campaigns, preflight/scheduling records, shared inbox, compliance gates, fake AI, local analytics/billing records, and an investor demo path.
+SignalStack SMS is a demo-safe SMB SMS/MMS SaaS repo. The current implementation has strong backend, contract, validation, seed, worker, provider metadata, and operations foundations. The next major product priority is a polished browser workflow for contacts, campaigns, inbox, templates, analytics, and compliance.
+
+The only intentional live external-impact path today is the isolated `/demo` live-test SMS form. It remains hard-gated by explicit Twilio credentials, live flags, a recipient allowlist, and the confirmation phrase. Live campaign sending, live billing, live AI, production auth, and production deployment are not enabled.
+
+## Current roadmap
+
+- `PLAN.md` is the short operational roadmap.
+- `docs/CURRENT_STATE_MATRIX.md` is the quick reality check by product area.
+- `planning/CONSENSUS-2026-05-21.md` summarizes Claude, Gemini, Grok, and Codex planning input.
+- `docs/CANONICAL_IMPLEMENTATION_PLAN.md` remains the governing implementation contract.
 
 ## Demo-safe defaults
 

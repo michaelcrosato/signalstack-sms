@@ -1,319 +1,91 @@
 # Plan
 
-This repo follows `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
+This repo follows `docs/CANONICAL_IMPLEMENTATION_PLAN.md`. That canonical plan remains the governing implementation contract; this file is the short operational roadmap.
 
-## Completed Milestones
+## Current Reality
 
-Milestone 0:
+As of 2026-05-21:
 
-- Repo skeleton
-- Source-of-truth docs
-- Contract stubs
-- Demo-safe env defaults
-- Minimal Prisma schema
-- Minimal Next app
-- Smoke tests
-- CI and validation skeleton
+- The repo has strong demo-safe foundations: data model, tenant boundaries, contracts, validation gates, seed data, local worker paths, Twilio webhook foundations, read-only operations surfaces, and automated tests.
+- The browser experience is still mostly an operator/admin console. A non-technical user cannot yet run the core SMS SaaS workflow from a polished product UI.
+- Live messaging remains blocked by default. The only intentional live external-impact path is the isolated `/demo` live-test SMS surface, which requires explicit Twilio credentials, live flags, a recipient allowlist, and the confirmation phrase.
+- Live campaign sending, live AI, live billing, real auth, production secret management, production Redis/rate-limit infrastructure, and production deployment are not complete.
+- Planning inputs from Claude, Gemini, Grok, and Codex are captured under `planning/`; the current consensus is summarized in `planning/CONSENSUS-2026-05-21.md`.
 
-Milestone 1:
+## Completed Foundations
 
-- Database/auth/organization foundations
-- Deterministic demo current user and organization
-- Tenant helper guardrails
-- `GET /api/orgs/current`
+- Milestone 0: repo skeleton, source-of-truth docs, contract stubs, demo-safe env defaults, Prisma/Next foundations, smoke tests, CI/validation skeleton.
+- Milestone 1: organization/auth foundations, deterministic demo current user, tenant helper guardrails, `GET /api/orgs/current`.
+- Milestone 2: contacts, consent fields, tags/lists/segments schema, CSV import parser, demo-safe import endpoint, tenant-scoped repositories and tests.
+- Milestone 3: templates, draft campaigns, campaign recipients, preflight contract, no live SMS sending.
+- Milestone 4: durable queue job records, schedule/cancel API foundations, hard gates before provider behavior.
+- Milestone 5: shared inbox APIs, demo inbound creation, assignment, notes, resolve/reopen, STOP/HELP local parsing.
+- Milestone 6: centralized messaging hard gate, compliance profile/checklist APIs, live-message blocker tests.
+- Milestone 7: deterministic fake AI provider and local AI endpoints with live AI blocked by default.
+- Milestone 8: local usage/billing records, analytics overview, billing usage APIs, live billing blocked by default.
+- Milestone 9: `/demo` investor console and deterministic Playwright demo path.
+- Milestone 10: contract drift gate, tenant invariant checks, named seeded demo E2E script, local-gate documentation.
+- Post-MVP foundations: Twilio webhook ingestion/status updates, provider metadata, readiness audit, optional BullMQ/Redis queue path, production gate, rate limiting, operations inventory, local validation runner, weekend loop fuse default, and gated live-test SMS.
 
-Milestone 2:
+## Planning Consensus
 
-- Contacts CRUD foundations
-- Consent status and opt-out fields
-- Tags/lists/segments schema foundations
-- CSV import parser and demo-safe import endpoint
-- Tenant-scoped contact repositories and tests
+- Claude's useful warning: stabilize the product boundary before adding more breadth. Fix latent production defects such as RBAC enforcement, send-time consent rechecks, idempotency scoping, and test balance.
+- Gemini's useful warning: real provider proof matters. The gated live-test SMS path now covers that immediate investor proof; broader live provider work should stay behind explicit gates.
+- Grok's useful warning: the repo is over-indexed on operations surfaces. The next visible value is a product-first workflow that an investor or owner can drive in the browser.
+- Codex judgment: keep the hard gates, preserve the backend foundation, and make the next roadmap phase about a concise product UI plus a few high-risk backend correctness fixes.
 
-Milestone 3:
+## Active Roadmap
 
-- Templates and campaign draft foundations
-- Campaign preflight contract before send behavior
-- No live SMS sending
+### Phase 0: Truth And Stabilization
 
-Milestone 4:
+Goal: make the repo understandable in minutes and remove known correctness risks before expanding live behavior.
 
-- Queue/scheduling/send pipeline foundations
-- Durable scheduled campaign job records
-- Schedule/cancel API foundations
-- Hard gates before any live provider behavior
+- Maintain this short plan plus `docs/CURRENT_STATE_MATRIX.md` as the current source of operational truth.
+- Keep the canonical implementation plan and contracts intact.
+- Stop adding new read-only operations surfaces unless they unblock product or release safety.
+- Fix mutating-route RBAC enforcement so role helpers are not only descriptive.
+- Recheck contact consent at send time in worker/send paths.
+- Scope idempotency keys by tenant where cross-tenant reuse is legitimate.
+- Keep live SMS, billing, AI, secrets, destructive DB operations, and production side effects hard-gated.
+- Keep `npm run validate` and the local gate green.
 
-Milestone 5:
+### Phase 1: Product UI Investor Demo
 
-- Shared inbox conversation/message API foundations
-- Demo-safe inbound message creation
-- Conversation assignment, internal notes, and resolve/reopen APIs
-- STOP/HELP parsing foundations with local-only consent updates
+Goal: make SignalStack feel like usable SMS software, not only a system audit console.
 
-Milestone 6:
+- Add a real product shell at `/dashboard` with primary navigation for contacts, campaigns, inbox, templates, analytics, compliance, and settings.
+- Build contacts list/import UI on existing APIs.
+- Build campaign composer, recipient selection, preflight, schedule, and status UI on existing APIs.
+- Build inbox thread UI with demo inbound, reply drafting, assignment, notes, resolve/reopen, and STOP/HELP visibility.
+- Build template list/detail UI for existing template APIs.
+- Keep the gated live-test SMS demo available but visually separated from normal campaign sending.
+- Add `e2e/product-demo-path.spec.ts` for the non-technical browser demo path.
 
-- Centralized messaging hard gate
-- Compliance profile/checklist API foundations
-- Demo seed compliance readiness metadata
-- Hard-gate tests for live messaging, provider readiness, A2P status, and consent
+### Phase 2: Controlled Live Readiness
 
-Milestone 7:
+Goal: prepare for real customer pilots without weakening safety boundaries.
 
-- Deterministic fake AI provider functions
-- Campaign copy, reply suggestion, conversation summary, and lead qualification APIs
-- Tenant-scoped conversation message context for AI endpoints
-- Tests proving fake AI behavior and live AI blocking
+- Harden Twilio provider adapter work beyond the isolated live-test SMS path.
+- Add production secret storage discipline and redact-only configuration surfaces.
+- Add real auth/RBAC, likely Clerk-backed, with route-level enforcement.
+- Move rate limiting and queue execution to production-grade infrastructure when configured.
+- Add production observability without logging secrets, message bodies beyond intended records, or provider credentials.
+- Document A2P, opt-out, HELP, quiet-hours, and audit requirements before live campaign sending.
 
-Milestone 8:
+### Phase 3: Billing, Live AI, And Scale
 
-- Local usage event and billing account data model
-- Analytics overview API
-- Billing usage API with local-only recording
-- Tests proving local metering and live billing defaults
+Goal: turn the demo-safe product into a paid production SaaS.
 
-Milestone 9:
+- Add Stripe billing only behind explicit live billing gates.
+- Add live AI only behind explicit provider, cost, and data-use controls.
+- Complete A2P/provider registration workflows and compliance evidence.
+- Expand multi-provider strategy only after Twilio pilot paths are production-safe.
 
-- `/demo` investor demo console
-- Deterministic Playwright demo path for import, campaign preflight/schedule, inbound STOP/HELP, fake AI, analytics, and usage
-- Demo mode documentation for the end-to-end flow
+## Next Concrete Work
 
-Milestone 10:
-
-- Hardening
-- Contract/test expansion and CI repair
-- API documentation drift gate
-- Tenant `orgId` invariant gate
-- Named seeded investor-demo E2E script
-
-## Active Milestone
-
-Post-MVP:
-
-- Webhook foundations for Twilio inbound/status callbacks
-- Read-only provider settings readiness endpoint
-- Local dummy-provider scheduled campaign worker
-- Local provider phone-number metadata API and demo seed
-- Local live-readiness audit trail for configuration changes
-- Local worker jobs-per-poll rate limit
-- Optional BullMQ/Redis smoke command
-- UI expansion
-- Production deployment gates
-- Production go-live gate design documentation
-- API rate limiting
-- Provider credential metadata management
-- Provider credential metadata deletion
-- Provider credential rotation history
-- Read-only provider settings detail UI
-- Provider credential metadata UI/forms
-- Safe provider metadata form refinements
-- Production-like demo deployment runbook
-- Provider credential rotation-history filtering
-- Read-only readiness audit filtering and CSV export
-- Production observability planning and local doc gate
-- Provider credential rotation-history CSV export
-- Read-only admin exports view
-- Local operator runbook and validation check
-- Read-only local system status view
-- Deployment platform notes and validation check
-- Read-only local usage and analytics view
-- Static local launch dashboard links to demo-safe admin/reporting views
-- Read-only local operator runbook app view
-- Read-only local compliance detail view
-- Read-only local provider numbers view
-- Read-only local campaign operations view
-- Read-only local contact operations view
-- Read-only local audience operations view
-- Read-only local template operations view
-- Read-only local inbox operations view
-- Read-only local webhook operations view
-- Read-only local delivery operations view
-- Read-only local team operations view
-- Read-only local billing operations view
-- Read-only local AI operations view
-- Read-only local API operations view
-- Read-only local contract operations view
-- Local contract operations inventory static-metadata hardening
-- Local contract operations no-impact summary-state hardening
-- Read-only local validation operations view
-- Local security operations inventory static-metadata hardening
-- Local security operations value-boundary hardening
-- Read-only local security operations view
-- Read-only local data operations view
-- Read-only local queue operations view
-- Read-only local notification operations view
-- Local notification operations inventory static-metadata hardening
-- Local notification operations value-boundary hardening
-- Local notification operations whitespace-clean metadata hardening
-- Local notification operations command-literal metadata hardening
-- Local notification operations secret-literal metadata hardening
-- Local notification operations channel-vocabulary metadata hardening
-- Local notification operations exported channel-vocabulary hardening
-- Local notification operations status-vocabulary metadata hardening
-- Local notification operations channel-boundary term hardening
-- Local notification operations no-impact summary-state hardening
-- Local notification operations runtime-frozen vocabulary hardening
-- Local notification operations exported vocabulary mutation hardening
-- Local notification operations detached status-array count coverage
-- Local notification operations no-impact summary rendering coverage
-- Local notification operations mutation no-impact summary hardening
-- Local queue operations static-metadata hardening
-- Local queue operations mode-vocabulary hardening
-- Local queue operations worker-command vocabulary handoff
-- Local queue operations command-literal metadata hardening
-- Local queue operations no-impact summary rendering coverage
-- Local queue operations mutation no-impact summary hardening
-- Local queue operations detached status-array count coverage
-- Local readiness audit operations static-metadata hardening
-- Local readiness audit operations export-limit vocabulary hardening
-- Local readiness audit query allowlist hardening
-- Local readiness audit command-execution vocabulary hardening
-- Local readiness audit exported vocabulary mutation hardening
-- Local readiness audit query limit-ceiling vocabulary hardening
-- Local readiness audit maximum export-limit ceiling hardening
-- Local readiness audit default query-limit vocabulary hardening
-- Local readiness audit no-impact summary rendering coverage
-- Local readiness audit detached status-array count coverage
-- Local readiness audit export-link vocabulary hardening
-- Local readiness audit export-link limit rejection coverage
-- Read-only local readiness audit operations view
-- Local operator runbook admin-link coverage refresh
-- Read-only local reporting index
-- Read-only local integration operations view
-- Read-only local workflow operations view
-- Read-only local demo operations view
-- Read-only local operations index
-- Read-only local release operations view
-- Read-only local health operations view
-- Read-only local environment operations view
-- Local operations index inventory unit coverage
-- Local operations index backing page coverage
-- Local API operations inventory backing route coverage
-- Local API operations inventory reverse route-method coverage
-- Local operator runbook shared-inventory coverage
-- Local operations index reverse page inventory coverage
-- Local go-live readiness shared-navigation coverage
-- Local go-live readiness shared-navigation browser coverage
-- Local launch dashboard shared-inventory coverage
-- Local launch dashboard shared-inventory browser smoke coverage
-- Local operations index shared-inventory browser coverage
-- Local demo console shared-inventory navigation and browser coverage
-- Local demo operations shared-inventory checkpoint coverage
-- Local demo operations shared-inventory browser checkpoint coverage
-- Local integration and security shared-inventory coverage
-- Local environment, health, contract, and validation shared-inventory coverage
-- Local admin exports shared-inventory coverage
-- Local webhook, delivery, and team shared-inventory coverage
-- Local billing and AI shared-inventory coverage
-- Local data and messaging shared-inventory coverage
-- Local provider, readiness, and runtime shared-inventory coverage
-- Local shared operator projection unique-route coverage
-- Local shared operator inventory unique-copy coverage
-- Local shared operator inventory canonical-route-shape coverage
-- Local page-specific operator projection self-link coverage
-- Local shared operator inventory whitespace-clean coverage
-- Local shared operator inventory copy-shape coverage
-- Local shared operator inventory concise-copy coverage
-- Local shared operator inventory order-stability coverage
-- Local rich operator projection shared-inventory coverage
-- Local shared operator projection order-stability coverage
-- Local rich operator projection copy-boundary coverage
-- Local broad operator projection supplied-inventory omission coverage
-- Local shared operator focused-projection reachability coverage
-- Local shared operator missing-route failure coverage
-- Local shared operator route-copy alignment coverage
-- Local shared operator action-neutral copy coverage
-- Local rich operator boundary external-impact coverage
-- Local shared operator projection immutability coverage
-- Local shared operator projection fresh-array coverage
-- Local shared operator projection array-freeze coverage
-- Local shared operator projection result-freeze coverage
-- Local shared operator projection deep-result-freeze coverage
-- Local shared operator inventory runtime-freeze coverage
-- Local shared operator projection detached-link coverage
-- Local shared operator projection public-field coverage
-- Local rich operator projection public-field coverage
-- Local shared operator summary public-field coverage
-- Local shared operator summary fresh-route-array coverage
-- Local shared operator supplied-inventory duplicate-route failure coverage
-- Local shared operator supplied-inventory empty-group failure coverage
-- Local shared operator supplied-inventory duplicate-copy failure coverage
-- Local shared operator supplied-inventory invalid-inventory-array failure coverage
-- Local shared operator supplied-inventory inventory-array-shape coverage
-- Local shared operator supplied-inventory array-index-descriptor coverage
-- Local shared operator supplied-inventory sparse-index-descriptor coverage
-- Local shared operator supplied-inventory empty-inventory failure coverage
-- Local shared operator supplied-inventory blank-field failure coverage
-- Local shared operator supplied-inventory invalid-link-array failure coverage
-- Local shared operator supplied-inventory invalid-group-object failure coverage
-- Local shared operator supplied-inventory invalid-link-object failure coverage
-- Local shared operator supplied-inventory sparse-group failure coverage
-- Local shared operator supplied-inventory sparse-link failure coverage
-- Local shared operator supplied-inventory invalid-field-type failure coverage
-- Local shared operator supplied-inventory route-shape failure coverage
-- Local shared operator supplied-inventory route-shape variant coverage
-- Local shared operator supplied-inventory own-field failure coverage
-- Local shared operator supplied-inventory data-field failure coverage
-- Local shared operator supplied-inventory enumerable-field failure coverage
-- Local shared operator supplied-inventory plain-record failure coverage
-- Local shared operator supplied-inventory exact-field failure coverage
-- Local shared operator canonical pre-export validation coverage
-- Local shared operator supplied-inventory link-array-shape coverage
-- Local shared operator supplied-inventory link-array-index-descriptor coverage
-- Local API operations inventory frozen-snapshot coverage
-- Local API operations inventory public-field coverage
-- Local API operations inventory value-shape coverage
-- Local API operations inventory order-stability coverage
-- Local API operations secret/command literal coverage
-- Local API operations method-vocabulary coverage
-- Local API operations area-vocabulary coverage
-- Local API operations no-impact summary-state hardening
-- Local API operations frozen status snapshot coverage
-- Local API operations detached route-count coverage
-- Local API operations rate-limit boundary coverage
-- Local contract operations inventory frozen static-metadata coverage
-- Local contract operations inventory order-stability coverage
-- Local contract operations inventory unique-identifier coverage
-- Local contract operations file-path vocabulary coverage
-- Local contract operations package-script coverage
-- Local contract operations whitespace-clean metadata coverage
-- Local contract operations secret-literal coverage
-- Local contract operations command-literal coverage
-- Local contract operations no-impact vocabulary coverage
-- Local contract operations mutation no-impact summary coverage
-- Local contract operations detached count coverage
-- Local security operations whitespace-clean coverage
-- Local validation operations inventory static-metadata coverage
-- Local validation operations value-boundary coverage
-- Local validation operations package-script coverage
-- Local validation operations secret-literal coverage
-- Local validation operations runtime-frozen vocabulary coverage
-- Local validation operations gate-command vocabulary coverage
-- Local validation operations area-vocabulary coverage
-- Local validation operations whitespace-clean metadata coverage
-- Local validation operations command-literal metadata coverage
-- Local validation operations mutation no-impact summary coverage
-- Local validation operations detached status-array count coverage
-- Local security operations package-script coverage
-- Local security operations secret-literal coverage
-- Local security operations command-literal metadata coverage
-- Local security operations runtime-frozen vocabulary coverage
-- Local security operations exported vocabulary mutation coverage
-- Local security operations validation-command vocabulary coverage
-- Local security operations mutation no-impact summary coverage
-- Local security operations detached status-array count coverage
-- Local notification operations whitespace-clean coverage
-- Local notification operations command-literal coverage
-- Local notification operations secret-literal coverage
-- Local notification operations exported channel-vocabulary coverage
-- Local notification operations status-vocabulary coverage
-- Local notification operations channel-boundary term coverage
-- Local notification operations runtime-frozen vocabulary coverage
-- Local notification operations exported vocabulary mutation coverage
-- Local notification operations detached status-array count coverage
-- Local queue operations detached status-array count coverage
-
-## Next Milestone
-
-Post-MVP:
-
-- Additional read-only admin views, safe dashboard refinements, local operator runbook expansion, route inventory refinements, shared navigation hardening, or deeper links from existing local-only reports and release surfaces into demo-safe operational workflows
+1. Keep `docs/CURRENT_STATE_MATRIX.md` current.
+2. Build the `/dashboard` product shell.
+3. Add product-demo E2E coverage.
+4. Fix RBAC enforcement on mutating routes.
+5. Add send-time consent recheck coverage.
+6. Add tenant-scoped idempotency behavior.
