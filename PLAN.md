@@ -259,6 +259,7 @@ Post-MVP:
 - Local validation operations secret-literal coverage
 - Local security operations package-script coverage
 - Local security operations secret-literal coverage
+- Local security operations runtime-frozen vocabulary coverage
 - Local notification operations whitespace-clean coverage
 - Local notification operations command-literal coverage
 - Local notification operations exported channel-vocabulary coverage

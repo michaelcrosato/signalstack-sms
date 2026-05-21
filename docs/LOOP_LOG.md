@@ -61,6 +61,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP security operations hardening or safe read-only operator surface refinements.
 
+## Run 156  GREEN  security-operations-runtime-frozen-vocabularies  2026-05-21 03:55
+Objective:    Keep `/settings/security` supported local-only and no-impact vocabularies frozen at runtime.
+Changed:
+- Exported runtime-frozen security control-status, command-execution, external-impact, and secrets-displayed vocabularies.
+- Added unit coverage proving `/settings/security` summary states stay inside those vocabularies before local metadata renders.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP security operations hardening or safe read-only operator surface refinements.
+
 ## Run 130  GREEN  security-operations-package-scripts  2026-05-21 01:58
 Objective:    Keep `/settings/security` validation references backed by local package scripts before rendering.
 Changed:

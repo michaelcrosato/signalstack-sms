@@ -2,6 +2,10 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  allowedSecurityOperationCommandExecutionStates,
+  allowedSecurityOperationControlStatuses,
+  allowedSecurityOperationExternalImpactStates,
+  allowedSecurityOperationSecretsDisplayedStates,
   getSecurityOperationsStatus,
   securityOperationControls,
   securityOperationSafetyBoundaries,
@@ -117,6 +121,13 @@ describe("getSecurityOperationsStatus", () => {
   });
 
   it("keeps security operation values inside documented local-only boundaries", () => {
+    expect(allowedSecurityOperationControlStatuses).toEqual([
+      "local metadata only",
+      "blocked by default",
+      "rate limited",
+      "validation enforced"
+    ]);
+    expect(Object.isFrozen(allowedSecurityOperationControlStatuses)).toBe(true);
     expect(securityOperationControls.map((control) => control.status)).toEqual([
       "local metadata only",
       "blocked by default",
@@ -129,6 +140,20 @@ describe("getSecurityOperationsStatus", () => {
     expect(securityOperationSafetyBoundaries.join(" ")).toContain("email");
     expect(securityOperationSafetyBoundaries.join(" ")).toContain("notifications");
     expect(securityOperationSafetyBoundaries.join(" ")).toContain("mutations");
+  });
+
+  it("keeps security operation summary states inside the no-impact vocabulary", () => {
+    const status = getSecurityOperationsStatus();
+
+    expect(allowedSecurityOperationCommandExecutionStates).toEqual(["none"]);
+    expect(allowedSecurityOperationExternalImpactStates).toEqual(["none"]);
+    expect(allowedSecurityOperationSecretsDisplayedStates).toEqual([false]);
+    expect(Object.isFrozen(allowedSecurityOperationCommandExecutionStates)).toBe(true);
+    expect(Object.isFrozen(allowedSecurityOperationExternalImpactStates)).toBe(true);
+    expect(Object.isFrozen(allowedSecurityOperationSecretsDisplayedStates)).toBe(true);
+    expect(allowedSecurityOperationCommandExecutionStates).toContain(status.commandExecution);
+    expect(allowedSecurityOperationExternalImpactStates).toContain(status.externalImpact);
+    expect(allowedSecurityOperationSecretsDisplayedStates).toContain(status.secretsDisplayed);
   });
 
   it("keeps security operation validation references inside the supported command allowlist", () => {

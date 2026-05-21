@@ -1,6 +1,6 @@
 export type SecurityOperationControl = {
   name: string;
-  status: string;
+  status: SecurityOperationControlStatus;
   detail: string;
 };
 
@@ -12,13 +12,28 @@ export type SecurityOperationValidationReference = {
 export type SecurityOperationsStatus = {
   controlCount: number;
   validationReferenceCount: number;
-  commandExecution: "none";
-  externalImpact: "none";
-  secretsDisplayed: false;
+  commandExecution: SecurityOperationCommandExecutionState;
+  externalImpact: SecurityOperationExternalImpactState;
+  secretsDisplayed: SecurityOperationSecretsDisplayedState;
   controls: readonly SecurityOperationControl[];
   validationReferences: readonly SecurityOperationValidationReference[];
   safetyBoundaries: readonly string[];
 };
+
+export const allowedSecurityOperationControlStatuses = Object.freeze([
+  "local metadata only",
+  "blocked by default",
+  "rate limited",
+  "validation enforced"
+] as const);
+export const allowedSecurityOperationCommandExecutionStates = Object.freeze(["none"] as const);
+export const allowedSecurityOperationExternalImpactStates = Object.freeze(["none"] as const);
+export const allowedSecurityOperationSecretsDisplayedStates = Object.freeze([false] as const);
+
+export type SecurityOperationControlStatus = (typeof allowedSecurityOperationControlStatuses)[number];
+export type SecurityOperationCommandExecutionState = (typeof allowedSecurityOperationCommandExecutionStates)[number];
+export type SecurityOperationExternalImpactState = (typeof allowedSecurityOperationExternalImpactStates)[number];
+export type SecurityOperationSecretsDisplayedState = (typeof allowedSecurityOperationSecretsDisplayedStates)[number];
 
 const securityOperationControlFields = ["name", "status", "detail"] as const;
 const securityOperationValidationReferenceFields = ["command", "purpose"] as const;
@@ -28,12 +43,6 @@ const allowedSecurityOperationValidationCommands = [
   "npm run secrets:scan",
   "npm run compliance:check"
 ] as const;
-const allowedSecurityOperationControlStatuses = [
-  "local metadata only",
-  "blocked by default",
-  "rate limited",
-  "validation enforced"
-] as const;
 const requiredSafetyBoundaryTerms = ["secrets", "provider calls", "SMS", "email", "notifications", "mutations"] as const;
 const forbiddenSecretMetadataPatterns = [
   /\bsk_(?:live|test)_[A-Za-z0-9]+/,
@@ -42,6 +51,12 @@ const forbiddenSecretMetadataPatterns = [
   /\b(?:TWILIO_AUTH_TOKEN|STRIPE_SECRET_KEY|OPENAI_API_KEY|CLERK_SECRET_KEY)\s*=/,
   /\bBearer\s+[A-Za-z0-9._-]{12,}/
 ] as const;
+
+const securityOperationStatusSummary = Object.freeze({
+  commandExecution: "none",
+  externalImpact: "none",
+  secretsDisplayed: false
+} satisfies Pick<SecurityOperationsStatus, "commandExecution" | "externalImpact" | "secretsDisplayed">);
 
 function assertExactFields<T extends object>(value: T, fields: readonly string[], errorMessage: string) {
   const actualKeys = Reflect.ownKeys(value);
@@ -66,6 +81,20 @@ function assertNonblankString(value: unknown, errorMessage: string) {
 function assertNoSecretLikeMetadata(value: string, errorMessage: string) {
   if (forbiddenSecretMetadataPatterns.some((pattern) => pattern.test(value))) {
     throw new Error(errorMessage);
+  }
+}
+
+function assertStatusSummary(summary: Pick<SecurityOperationsStatus, "commandExecution" | "externalImpact" | "secretsDisplayed">) {
+  if (!allowedSecurityOperationCommandExecutionStates.includes(summary.commandExecution)) {
+    throw new Error(`Unsupported security operation command execution state: ${summary.commandExecution}`);
+  }
+
+  if (!allowedSecurityOperationExternalImpactStates.includes(summary.externalImpact)) {
+    throw new Error(`Unsupported security operation external impact state: ${summary.externalImpact}`);
+  }
+
+  if (!allowedSecurityOperationSecretsDisplayedStates.includes(summary.secretsDisplayed)) {
+    throw new Error(`Unsupported security operation secrets-displayed state: ${summary.secretsDisplayed}`);
   }
 }
 
@@ -221,12 +250,14 @@ export const securityOperationSafetyBoundaries = freezeSafetyBoundaries([
 ]);
 
 export function getSecurityOperationsStatus(): SecurityOperationsStatus {
+  assertStatusSummary(securityOperationStatusSummary);
+
   return Object.freeze({
     controlCount: securityOperationControls.length,
     validationReferenceCount: securityOperationValidationReferences.length,
-    commandExecution: "none",
-    externalImpact: "none",
-    secretsDisplayed: false,
+    commandExecution: securityOperationStatusSummary.commandExecution,
+    externalImpact: securityOperationStatusSummary.externalImpact,
+    secretsDisplayed: securityOperationStatusSummary.secretsDisplayed,
     controls: freezeSecurityControls(securityOperationControls.map((control) => ({ ...control }))),
     validationReferences: freezeValidationReferences(securityOperationValidationReferences.map((reference) => ({ ...reference }))),
     safetyBoundaries: freezeSafetyBoundaries([...securityOperationSafetyBoundaries])
