@@ -3,7 +3,10 @@ import {
   getDemoOperationsCheckpoints,
   getDemoOperationsLinks,
   getDemoConsoleLinks,
+  getReleaseOperationSurfaceLinks,
+  getReportingIndexLinks,
   getSettingsNavigationLinks,
+  getWorkflowOperationSteps,
   operatorSurfaceGroups
 } from "@/lib/operations/operator-surfaces";
 
@@ -12,6 +15,9 @@ const demoConsoleLinks = getDemoConsoleLinks();
 const demoOperationsCheckpoints = getDemoOperationsCheckpoints();
 const demoOperationsLinks = getDemoOperationsLinks();
 const settingsNavigationLinks = getSettingsNavigationLinks();
+const reportingIndexLinks = getReportingIndexLinks();
+const workflowOperationSteps = getWorkflowOperationSteps();
+const releaseOperationSurfaceLinks = getReleaseOperationSurfaceLinks();
 
 test.setTimeout(60_000);
 
@@ -118,7 +124,12 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Workflow Checkpoints" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Runtime Boundary" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Audience Signal" })).toBeVisible();
-  await expect(page.getByText("Queue handoff")).toBeVisible();
+  const workflowCheckpointList = page.locator("ol");
+  for (const step of workflowOperationSteps) {
+    await expect(page.getByRole("link", { name: step.name })).toHaveAttribute("href", step.href);
+    await expect(workflowCheckpointList.getByText(step.owner, { exact: true })).toBeVisible();
+    await expect(page.getByText(step.boundary)).toBeVisible();
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Release Operations" }).click();
   await expect(page.getByRole("heading", { name: "Release Operations" })).toBeVisible();
@@ -126,6 +137,10 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Runtime Boundary" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Release Surfaces" })).toBeVisible();
   await expect(page.getByText("npm run premerge")).toBeVisible();
+  for (const link of releaseOperationSurfaceLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(page.getByText(link.note, { exact: true })).toBeVisible();
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Workflow Operations" }).first().click();
   await page.getByRole("link", { name: "Integration Operations" }).click();
@@ -159,6 +174,10 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Report Surfaces" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Operational Snapshot" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent Readiness Signals" })).toBeVisible();
+  for (const link of reportingIndexLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(page.getByText(link.note, { exact: true }).first()).toBeVisible();
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Usage & Analytics" }).first().click();
   await expect(page.getByRole("heading", { name: "Usage & Analytics" })).toBeVisible();

@@ -6,48 +6,10 @@ import { getUsageSummary } from "@/lib/billing/metering";
 import { listCampaigns } from "@/lib/db/repositories/campaigns";
 import { listContacts } from "@/lib/db/repositories/contacts";
 import { listConversations } from "@/lib/db/repositories/inbox";
+import { getWorkflowOperationSteps } from "@/lib/operations/operator-surfaces";
 import { getSystemStatus } from "@/lib/operations/system-status";
 
 export const dynamic = "force-dynamic";
-
-const workflowSteps = [
-  {
-    name: "Audience intake",
-    href: "/settings/contacts",
-    owner: "Contacts",
-    boundary: "CSV import and consent state remain local records; no labels, consent, or provider sends are changed here."
-  },
-  {
-    name: "Campaign readiness",
-    href: "/settings/campaigns",
-    owner: "Campaigns",
-    boundary: "Draft, preflight, and scheduled metadata are reviewed without scheduling, canceling, or sending messages."
-  },
-  {
-    name: "Queue handoff",
-    href: "/settings/queue",
-    owner: "Queue",
-    boundary: "Durable job state and worker limits are displayed without enqueueing, polling, Redis calls, or queue mutation."
-  },
-  {
-    name: "Inbox response",
-    href: "/settings/inbox",
-    owner: "Inbox",
-    boundary: "Conversation and note metadata are visible without creating replies, assigning threads, or changing consent."
-  },
-  {
-    name: "Delivery evidence",
-    href: "/settings/delivery",
-    owner: "Delivery",
-    boundary: "Existing message status metadata is reviewed without retries, webhook replay, provider calls, or SMS sends."
-  },
-  {
-    name: "AI and reporting",
-    href: "/settings/reports",
-    owner: "Reporting",
-    boundary: "Fake AI, usage, analytics, and report links are summarized without prompts, exports, paid AI, or billing artifacts."
-  }
-];
 
 export default async function WorkflowOperationsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
@@ -62,6 +24,7 @@ export default async function WorkflowOperationsPage() {
   const scheduledCampaigns = campaigns.filter((campaign) => campaign.status === "SCHEDULED").length;
   const openConversations = conversations.filter((conversation) => conversation.status === "OPEN").length;
   const usageTotal = Object.values(usage.totals).reduce((total, quantity) => total + quantity, 0);
+  const workflowSteps = getWorkflowOperationSteps();
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">

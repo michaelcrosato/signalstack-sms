@@ -7,8 +7,11 @@ import {
   getDemoConsoleLinks,
   getLaunchDashboardLinks,
   getOperatorSurfaceSummary,
+  getReleaseOperationSurfaceLinks,
+  getReportingIndexLinks,
   getRunbookAdminLinks,
   getSettingsNavigationLinks,
+  getWorkflowOperationSteps,
   operatorSurfaceGroups
 } from "@/lib/operations/operator-surfaces";
 
@@ -172,5 +175,56 @@ describe("operator surface inventory", () => {
       inventoryLinks.find((link) => link.href === "/settings/environment")
     ]);
     expect(operationRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+  });
+
+  it("projects reporting, workflow, and release links from the shared surface inventory", () => {
+    const inventoryLinks = operatorSurfaceGroups.flatMap((group) => group.links);
+    const reportingLinks = getReportingIndexLinks();
+    const workflowSteps = getWorkflowOperationSteps();
+    const releaseLinks = getReleaseOperationSurfaceLinks();
+    const reportingRoutes = reportingLinks.map((link) => link.href);
+    const workflowRoutes = workflowSteps.map((step) => step.href);
+    const releaseRoutes = releaseLinks.map((link) => link.href);
+
+    expect(reportingRoutes).toEqual([
+      "/settings/demo",
+      "/settings/operations",
+      "/settings/usage",
+      "/settings/exports",
+      "/settings/readiness-audit",
+      "/settings/campaigns",
+      "/settings/delivery",
+      "/settings/workflows",
+      "/settings/billing"
+    ]);
+    expect(reportingLinks).toEqual(reportingRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
+    expect(reportingRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+
+    expect(workflowRoutes).toEqual([
+      "/settings/contacts",
+      "/settings/campaigns",
+      "/settings/queue",
+      "/settings/inbox",
+      "/settings/delivery",
+      "/settings/reports"
+    ]);
+    expect(workflowSteps.map((step) => step.owner)).toEqual(
+      workflowRoutes.map((route) => inventoryLinks.find((link) => link.href === route)?.label)
+    );
+    expect(workflowSteps.every((step) => step.name.length > 0 && step.boundary.length > 0)).toBe(true);
+    expect(workflowRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+
+    expect(releaseRoutes).toEqual([
+      "/settings/demo",
+      "/settings/validation",
+      "/settings/contracts",
+      "/settings/security",
+      "/settings/system",
+      "/settings/health",
+      "/settings/runbook",
+      "/settings/workflows"
+    ]);
+    expect(releaseLinks).toEqual(releaseRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
+    expect(releaseRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
   });
 });

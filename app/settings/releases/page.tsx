@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { getReleaseOperationSurfaceLinks } from "@/lib/operations/operator-surfaces";
 import { getSystemStatus } from "@/lib/operations/system-status";
 
 export const dynamic = "force-dynamic";
@@ -33,20 +34,10 @@ const releaseChecks = [
   }
 ];
 
-const releaseSurfaces = [
-  { href: "/settings/demo", label: "Demo Operations", scope: "seeded demo readiness and runtime gates" },
-  { href: "/settings/validation", label: "Validation Operations", scope: "gate inventory and repair signals" },
-  { href: "/settings/contracts", label: "Contract Operations", scope: "contract inventory and drift controls" },
-  { href: "/settings/security", label: "Security Operations", scope: "safety gates and secret boundaries" },
-  { href: "/settings/system", label: "System Status", scope: "runtime defaults and queue metadata" },
-  { href: "/settings/health", label: "Health Operations", scope: "health endpoint contract and demo-safe defaults" },
-  { href: "/settings/runbook", label: "Operator Runbook", scope: "local command checklist" },
-  { href: "/settings/workflows", label: "Workflow Operations", scope: "demo path checkpoint map" }
-];
-
 export default async function ReleaseOperationsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
   const status = getSystemStatus(process.env);
+  const releaseSurfaces = getReleaseOperationSurfaceLinks();
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
@@ -118,7 +109,7 @@ export default async function ReleaseOperationsPage() {
               <Link className="font-semibold text-teal-700" href={surface.href}>
                 {surface.label}
               </Link>
-              <p className="mt-2 text-slate-600">{surface.scope}</p>
+              <p className="mt-2 text-slate-600">{surface.note}</p>
             </li>
           ))}
         </ul>

@@ -8,20 +8,9 @@ import { listContacts } from "@/lib/db/repositories/contacts";
 import { listConversations } from "@/lib/db/repositories/inbox";
 import { listProviderPhoneNumbers } from "@/lib/db/repositories/provider-numbers";
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
+import { getReportingIndexLinks } from "@/lib/operations/operator-surfaces";
 
 export const dynamic = "force-dynamic";
-
-const reportLinks = [
-  { href: "/settings/demo", label: "Demo Operations", scope: "seeded demo readiness and runtime gates" },
-  { href: "/settings/operations", label: "Operations Index", scope: "grouped local operator surface map" },
-  { href: "/settings/usage", label: "Usage & Analytics", scope: "tenant metrics and local usage" },
-  { href: "/settings/exports", label: "Admin Exports", scope: "bounded local CSV links" },
-  { href: "/settings/readiness-audit", label: "Readiness Audit", scope: "go-live readiness history" },
-  { href: "/settings/campaigns", label: "Campaign Operations", scope: "campaign and queue status" },
-  { href: "/settings/delivery", label: "Delivery Operations", scope: "message delivery metadata" },
-  { href: "/settings/workflows", label: "Workflow Operations", scope: "demo path checkpoint map" },
-  { href: "/settings/billing", label: "Billing Operations", scope: "local billing metadata" }
-];
 
 export default async function ReportsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
@@ -40,6 +29,7 @@ export default async function ReportsPage() {
   const optedInContacts = contacts.filter((contact) => contact.consentStatus === "OPTED_IN").length;
   const defaultNumbers = numbers.filter((number) => number.isDefault).length;
   const totalUsageQuantity = Object.values(usage.totals).reduce((total, quantity) => total + quantity, 0);
+  const reportLinks = getReportingIndexLinks();
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
@@ -91,7 +81,7 @@ export default async function ReportsPage() {
                   <Link className="font-semibold text-teal-700" href={item.href}>
                     {item.label}
                   </Link>
-                  <p className="mt-1 text-slate-600">{item.scope}</p>
+                  <p className="mt-1 text-slate-600">{item.note}</p>
                 </div>
                 <span className="shrink-0 rounded border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-600">
                   local

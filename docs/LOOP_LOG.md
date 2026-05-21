@@ -272,3 +272,14 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP local-only admin/navigation, route inventory, or reporting refinements without live external-impact actions.
+
+## Run 052  GREEN  reporting-workflow-release-inventory  2026-05-20 19:54
+Objective:    Project reporting, workflow, and release surface links from the shared local operator inventory.
+Changed:
+- Added shared projections for `/settings/reports`, `/settings/workflows`, and `/settings/releases` links/checkpoints.
+- Refactored those pages to consume the shared inventory instead of duplicated local route lists.
+- Extended unit and seeded browser coverage for labels, notes, workflow owners, boundaries, route targets, and backing pages.
+- Updated testing docs, README, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only inventory, navigation, or admin surface hardening without live external-impact actions.

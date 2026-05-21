@@ -16,6 +16,13 @@ export type DemoOperationsCheckpoint = {
   boundary: string;
 };
 
+export type WorkflowOperationStep = {
+  name: string;
+  href: string;
+  owner: string;
+  boundary: string;
+};
+
 export const operatorSurfaceGroups = [
   {
     name: "Demo And Workflow",
@@ -145,6 +152,62 @@ const demoOperationsLinkRoutes = [
   "/settings/environment"
 ] as const;
 
+const reportingIndexRoutes = [
+  "/settings/demo",
+  "/settings/operations",
+  "/settings/usage",
+  "/settings/exports",
+  "/settings/readiness-audit",
+  "/settings/campaigns",
+  "/settings/delivery",
+  "/settings/workflows",
+  "/settings/billing"
+] as const;
+
+const workflowOperationStepDefinitions = [
+  {
+    name: "Audience intake",
+    href: "/settings/contacts",
+    boundary: "CSV import and consent state remain local records; no labels, consent, or provider sends are changed here."
+  },
+  {
+    name: "Campaign readiness",
+    href: "/settings/campaigns",
+    boundary: "Draft, preflight, and scheduled metadata are reviewed without scheduling, canceling, or sending messages."
+  },
+  {
+    name: "Queue handoff",
+    href: "/settings/queue",
+    boundary: "Durable job state and worker limits are displayed without enqueueing, polling, Redis calls, or queue mutation."
+  },
+  {
+    name: "Inbox response",
+    href: "/settings/inbox",
+    boundary: "Conversation and note metadata are visible without creating replies, assigning threads, or changing consent."
+  },
+  {
+    name: "Delivery evidence",
+    href: "/settings/delivery",
+    boundary: "Existing message status metadata is reviewed without retries, webhook replay, provider calls, or SMS sends."
+  },
+  {
+    name: "AI and reporting",
+    href: "/settings/reports",
+    boundary: "Fake AI, usage, analytics, and report links are summarized without prompts, exports, paid AI, or billing artifacts."
+  }
+] as const;
+
+const releaseOperationSurfaceRoutes = [
+  "/settings/demo",
+  "/settings/validation",
+  "/settings/contracts",
+  "/settings/security",
+  "/settings/system",
+  "/settings/health",
+  "/settings/runbook",
+  "/settings/workflows"
+] as const;
+
 export function getDemoOperationsCheckpoints(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups): DemoOperationsCheckpoint[] {
   return demoOperationsCheckpointDefinitions.map((checkpoint) => {
     const link = findOperatorSurfaceLink(checkpoint.href, groups);
@@ -158,4 +221,23 @@ export function getDemoOperationsCheckpoints(groups: OperatorSurfaceGroup[] = op
 
 export function getDemoOperationsLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return demoOperationsLinkRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getReportingIndexLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return reportingIndexRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getWorkflowOperationSteps(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups): WorkflowOperationStep[] {
+  return workflowOperationStepDefinitions.map((step) => {
+    const link = findOperatorSurfaceLink(step.href, groups);
+
+    return {
+      ...step,
+      owner: link.label
+    };
+  });
+}
+
+export function getReleaseOperationSurfaceLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return releaseOperationSurfaceRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }
