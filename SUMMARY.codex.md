@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP notification operations whitespace-clean checkpoint.
+- Added whitespace-clean validation so `/settings/notifications` static channel, control, and safety-boundary copy rejects leading/trailing whitespace, doubled spaces, and embedded newlines before render.
+- Added unit coverage proving notification operation metadata remains whitespace-clean alongside existing public-field, frozen snapshot, order, value-boundary, and secret-like literal guards.
+- Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
+- Focused notification operations unit coverage, typecheck, `git diff --check`, and the protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 137
+
+## Previous Run
+
 - Advanced a post-MVP notification operations value-boundary checkpoint.
 - Added required no-send control terms so `/settings/notifications` static control copy must continue naming live messaging, live billing, API keys, worker boundaries, and local-only review before render.
 - Added unit coverage proving those no-send control terms stay pinned alongside the existing notification safety-boundary terms.

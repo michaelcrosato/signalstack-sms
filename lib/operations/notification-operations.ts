@@ -42,6 +42,12 @@ function assertNonblankString(value: unknown, errorMessage: string) {
   }
 }
 
+function assertCleanCopy(value: string, errorMessage: string) {
+  if (value !== value.trim() || value.includes("\n") || value.includes("\r") || value.includes("  ")) {
+    throw new Error(errorMessage);
+  }
+}
+
 function assertUniqueValues(values: readonly string[], errorMessage: string) {
   if (new Set(values).size !== values.length) {
     throw new Error(errorMessage);
@@ -59,6 +65,9 @@ function assertChannel(channel: NotificationOperationChannel) {
   assertNonblankString(channel.name, "Invalid notification operation channel name");
   assertNonblankString(channel.status, `Invalid notification operation status for ${channel.name}`);
   assertNonblankString(channel.boundary, `Invalid notification operation boundary for ${channel.name}`);
+  assertCleanCopy(channel.name, `Whitespace-unsafe notification operation channel name for ${channel.name}`);
+  assertCleanCopy(channel.status, `Whitespace-unsafe notification operation status for ${channel.name}`);
+  assertCleanCopy(channel.boundary, `Whitespace-unsafe notification operation boundary for ${channel.name}`);
   assertNoSecretLikeMetadata(channel.name, `Secret-like notification operation channel name for ${channel.name}`);
   assertNoSecretLikeMetadata(channel.boundary, `Secret-like notification operation boundary for ${channel.name}`);
 
@@ -91,6 +100,7 @@ function freezeChannels(channels: NotificationOperationChannel[]) {
 function freezeCopyList(values: string[], label: string) {
   for (const value of values) {
     assertNonblankString(value, `Invalid notification operation ${label}`);
+    assertCleanCopy(value, `Whitespace-unsafe notification operation ${label}`);
     assertNoSecretLikeMetadata(value, `Secret-like notification operation ${label}`);
   }
 

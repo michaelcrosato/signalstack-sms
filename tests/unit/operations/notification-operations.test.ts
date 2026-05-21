@@ -75,6 +75,18 @@ describe("getNotificationOperationsStatus", () => {
     expect(notificationOperationSafetyBoundaries.filter((boundary) => boundary.trim().length === 0)).toEqual([]);
   });
 
+  it("keeps notification operation metadata whitespace-clean", () => {
+    const staticCopy = [
+      ...notificationOperationChannels.flatMap((channel) => [channel.name, channel.status, channel.boundary]),
+      ...notificationOperationControls,
+      ...notificationOperationSafetyBoundaries
+    ];
+
+    expect(staticCopy.filter((copy) => copy !== copy.trim())).toEqual([]);
+    expect(staticCopy.filter((copy) => copy.includes("\n") || copy.includes("\r"))).toEqual([]);
+    expect(staticCopy.filter((copy) => copy.includes("  "))).toEqual([]);
+  });
+
   it("keeps notification operation values inside documented no-send boundaries", () => {
     expect(notificationOperationChannels.map((channel) => channel.status)).toEqual([
       "blocked",

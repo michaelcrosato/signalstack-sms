@@ -142,6 +142,7 @@ Post-MVP:
 - Read-only local notification operations view
 - Local notification operations inventory static-metadata hardening
 - Local notification operations value-boundary hardening
+- Local notification operations whitespace-clean metadata hardening
 - Read-only local readiness audit operations view
 - Local operator runbook admin-link coverage refresh
 - Read-only local reporting index
@@ -241,6 +242,7 @@ Post-MVP:
 - Local validation operations secret-literal coverage
 - Local security operations package-script coverage
 - Local security operations secret-literal coverage
+- Local notification operations whitespace-clean coverage
 
 ## Next Milestone
 

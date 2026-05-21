@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 136
+Run number: 137
 
 No active blockers.
 
 ## Notes
 
+- Latest notification operations whitespace-clean hardening keeps `/settings/notifications` static channel, control, and safety-boundary copy free of leading/trailing whitespace, doubled spaces, and embedded newlines before render. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 - Latest notification operations value-boundary hardening keeps `/settings/notifications` static no-send controls pinned to live messaging, live billing, API key, worker, and local-only terms before render. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 - Latest notification operations static-metadata hardening moves `/settings/notifications` channel boundaries, no-send controls, and safety-boundary copy into a validated frozen operations module with unit coverage for public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, no secret display, required no-send boundary terms, and secret-like literal rejection before render. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 - Latest validation operations secret-literal hardening keeps `/settings/validation` static gate area, boundary, and repair-signal metadata free of common secret-like token patterns before render. The check is local static metadata validation only and does not execute commands, inspect logs, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.

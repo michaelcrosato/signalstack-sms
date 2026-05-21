@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 137  GREEN  notification-operations-whitespace-clean  2026-05-21 02:28
+Objective:    Keep `/settings/notifications` static metadata whitespace-clean before rendering.
+Changed:
+- Added whitespace-clean guards for notification operation channel, control, and safety-boundary copy.
+- Added unit coverage proving notification operation metadata has no leading/trailing whitespace, doubled spaces, or embedded newlines.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP notification operations hardening or safe read-only operator surface refinements.
+
 ## Run 136  GREEN  notification-operations-value-boundaries  2026-05-21 02:24
 Objective:    Keep `/settings/notifications` no-send controls pinned to local blocked-delivery terms.
 Changed:
