@@ -158,6 +158,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP shared canonical pre-export validation hardening: the built-in shared operator surface inventory now runs through the same validator before it is frozen and exported, with unit coverage aligning exported canonical routes with summary routes.
 - Post-MVP shared supplied-inventory link-array-shape hardening: summaries and projections now fail before deriving local navigation from supplied operator group link arrays with custom prototypes or extra string/symbol fields, requiring plain link arrays.
 - Post-MVP validation operations value-boundary hardening: `/settings/validation` static metadata now rejects unsupported gate areas and missing validation boundary terms before rendering local gate inventory or repair signals.
+- Post-MVP validation operations package-script hardening: `/settings/validation` static gate command metadata now rejects unsupported command references, and unit coverage verifies every listed `npm run ...` command is backed by `package.json` before rendering local validation inventory.
 
 Demo-safe defaults remain mandatory:
 

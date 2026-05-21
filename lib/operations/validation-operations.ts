@@ -15,6 +15,17 @@ export type ValidationOperationsStatus = {
 };
 
 const validationOperationGateCommandFields = ["command", "area", "boundary"] as const;
+const allowedValidationOperationCommands = [
+  "npm run validate",
+  "npm run contracts:check",
+  "npm run compliance:check",
+  "npm run production:gate",
+  "npm run observability:check",
+  "npm run operator:check",
+  "npm run platform:check",
+  "npm run secrets:scan",
+  "npm run test:e2e:demo"
+] as const;
 const allowedValidationOperationAreas = [
   "full local gate",
   "contracts",
@@ -55,6 +66,10 @@ function assertGateCommand(command: ValidationOperationGateCommand) {
 
   if (typeof command.command !== "string" || !command.command.startsWith("npm run ")) {
     throw new Error(`Invalid validation operation command ${String(command.command)}`);
+  }
+
+  if (!allowedValidationOperationCommands.includes(command.command as (typeof allowedValidationOperationCommands)[number])) {
+    throw new Error(`Unsupported validation operation command ${command.command}`);
   }
 
   if (typeof command.area !== "string" || command.area.trim().length === 0) {

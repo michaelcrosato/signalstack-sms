@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   getValidationOperationsStatus,
@@ -18,6 +20,14 @@ const publicStatusFields = [
 
 function sortedFields(value: object) {
   return Object.keys(value).sort();
+}
+
+function packageScripts() {
+  const packageJson = JSON.parse(readFileSync(join(process.cwd(), "package.json"), "utf8")) as {
+    scripts?: Record<string, string>;
+  };
+
+  return packageJson.scripts ?? {};
 }
 
 describe("getValidationOperationsStatus", () => {
@@ -133,5 +143,14 @@ describe("getValidationOperationsStatus", () => {
     expect(new Set(commands).size).toBe(commands.length);
     expect(new Set(areas).size).toBe(areas.length);
     expect(new Set(validationOperationRepairSignals).size).toBe(validationOperationRepairSignals.length);
+  });
+
+  it("keeps validation operation command references backed by package scripts", () => {
+    const scripts = packageScripts();
+    const missingScripts = validationOperationGateCommands
+      .map((gate) => gate.command.replace("npm run ", ""))
+      .filter((scriptName) => !Object.prototype.hasOwnProperty.call(scripts, scriptName));
+
+    expect(missingScripts).toEqual([]);
   });
 });

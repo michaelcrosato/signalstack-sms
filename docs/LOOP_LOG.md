@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 128  GREEN  validation-operations-package-scripts  2026-05-21 01:50
+Objective:    Keep `/settings/validation` command references backed by local package scripts before rendering.
+Changed:
+- Added an explicit allowlist for validation operation gate commands.
+- Added unit coverage proving each listed `npm run ...` validation command exists in `package.json`.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP validation operations hardening or safe read-only operator surface refinements.
+
 ## Run 127  GREEN  validation-operations-value-boundaries  2026-05-21 01:47
 Objective:    Keep `/settings/validation` static values constrained to local-only gate boundaries before rendering.
 Changed:
