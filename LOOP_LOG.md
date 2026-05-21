@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 081  GREEN  projection-immutability-guard  2026-05-20 22:25
+Objective:    Guard shared operator projection helpers against mutating supplied inventories.
+Changed:
+- Added unit coverage that runs every shared operator projection against a copied inventory and verifies the supplied groups and links remain unchanged.
+- Updated the testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs with the projection immutability guard.
+- Preserved local-only behavior without adding routes, mutations, provider calls, billing, notifications, SMS, email, live AI, or live feature enablement.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 080  GREEN  rich-boundary-external-impact  2026-05-20 22:23
 Objective:    Guard rich operator boundary text against vague external-impact exclusions.
 Changed:

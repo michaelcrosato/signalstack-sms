@@ -115,6 +115,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP shared route-copy alignment hardening: unit coverage now verifies that shared operator surface labels and notes stay semantically aligned with their route names, including singular/plural route segment variants.
 - Post-MVP shared action-neutral copy hardening: unit coverage now verifies that shared operator surface group names, labels, and notes avoid command-style action copy while preserving read-only boundary language.
 - Post-MVP rich boundary external-impact hardening: unit coverage now verifies that demo checkpoint, workflow step, and integration area boundary text explicitly names external-impact exclusions such as provider calls, SMS, billing, mutations, exports, queue activity, or paid AI.
+- Post-MVP shared projection immutability hardening: unit coverage now verifies that shared operator projection helpers leave supplied inventory groups and links unchanged while deriving navigation, rich checkpoints, workflow steps, and integration areas.
 
 Demo-safe defaults remain mandatory:
 

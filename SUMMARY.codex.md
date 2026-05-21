@@ -1,8 +1,13 @@
 # Codex Summary
 
-Run number: 80
+Run number: 81
 
 ## Completed
+
+- Advanced a post-MVP shared operator projection immutability checkpoint.
+- Added unit coverage proving shared operator projection helpers leave supplied inventory groups and links unchanged while deriving navigation, rich checkpoints, workflow steps, and integration areas.
+- Updated the testing contract/docs, README, PLAN, BLOCKERS, loop logs, and next-prompt handoff docs with the projection immutability guard.
+- Targeted operator-surface unit coverage passed.
 
 - Advanced a post-MVP rich operator boundary external-impact checkpoint.
 - Added unit coverage proving demo checkpoint, workflow step, and integration area boundary text explicitly names external-impact exclusions such as provider calls, SMS, billing, mutations, exports, queue activity, or paid AI.
@@ -281,6 +286,8 @@ Run number: 80
 ## Validation
 
 - Latest route-copy alignment hardening added unit coverage that verifies shared operator surface labels and notes stay semantically aligned with route names, including singular/plural route segment variants. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
+- `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
+- Latest projection immutability hardening added unit coverage that verifies shared operator projection helpers leave supplied inventory groups and links unchanged while deriving navigation, rich checkpoints, workflow steps, and integration areas. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - Latest broad projection supplied-inventory omission hardening added unit coverage that removes `/settings/usage` from the supplied operator inventory and verifies broad summary, launch, settings, runbook, and demo-console projections do not reintroduce stale global routes. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`

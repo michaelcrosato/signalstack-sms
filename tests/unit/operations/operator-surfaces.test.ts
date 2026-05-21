@@ -97,6 +97,13 @@ function withRouteStampedSurfaceCopy(groups: OperatorSurfaceGroup[]): OperatorSu
   }));
 }
 
+function cloneSurfaceGroups(groups: OperatorSurfaceGroup[]): OperatorSurfaceGroup[] {
+  return groups.map((group) => ({
+    ...group,
+    links: group.links.map((link) => ({ ...link }))
+  }));
+}
+
 function withoutSurfaceRoute(groups: OperatorSurfaceGroup[], href: string): OperatorSurfaceGroup[] {
   return groups.map((group) => ({
     ...group,
@@ -479,6 +486,50 @@ describe("operator surface inventory", () => {
         return { href: link?.href, label: link?.label, note: link?.note };
       })
     );
+  });
+
+  it("keeps operator projections from mutating supplied inventories", () => {
+    const groups = cloneSurfaceGroups(operatorSurfaceGroups);
+    const originalGroups = cloneSurfaceGroups(groups);
+
+    getOperatorSurfaceSummary(groups);
+    getRunbookAdminLinks(groups);
+    getSettingsNavigationLinks(groups);
+    getLaunchDashboardLinks(groups);
+    getDemoConsoleLinks(groups);
+    getDemoOperationsCheckpoints(groups);
+    getDemoOperationsLinks(groups);
+    getReportingIndexLinks(groups);
+    getWorkflowOperationSteps(groups);
+    getReleaseOperationSurfaceLinks(groups);
+    getIntegrationOperationAreas(groups);
+    getSecurityOperationLinks(groups);
+    getEnvironmentOperationLinks(groups);
+    getHealthOperationLinks(groups);
+    getContractOperationLinks(groups);
+    getValidationOperationLinks(groups);
+    getQueueOperationLinks(groups);
+    getContactOperationLinks(groups);
+    getCampaignOperationLinks(groups);
+    getAudienceOperationLinks(groups);
+    getTemplateOperationLinks(groups);
+    getInboxOperationLinks(groups);
+    getDataOperationLinks(groups);
+    getNotificationOperationLinks(groups);
+    getExportOperationLinks(groups);
+    getWebhookOperationLinks(groups);
+    getDeliveryOperationLinks(groups);
+    getTeamOperationLinks(groups);
+    getBillingOperationLinks(groups);
+    getAiOperationLinks(groups);
+    getProviderOperationLinks(groups);
+    getNumberOperationLinks(groups);
+    getComplianceOperationLinks(groups);
+    getSystemOperationLinks(groups);
+    getUsageOperationLinks(groups);
+    getReadinessAuditOperationLinks(groups);
+
+    expect(groups).toEqual(originalGroups);
   });
 
   it("keeps projected operator navigation route order stable", () => {

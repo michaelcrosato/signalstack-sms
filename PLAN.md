@@ -185,6 +185,7 @@ Post-MVP:
 - Local shared operator route-copy alignment coverage
 - Local shared operator action-neutral copy coverage
 - Local rich operator boundary external-impact coverage
+- Local shared operator projection immutability coverage
 
 ## Next Milestone
 

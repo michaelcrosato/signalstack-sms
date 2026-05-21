@@ -47,6 +47,7 @@ Post-MVP local operations status:
 - Unit tests must verify that every shared operator navigation projection keeps its route order stable so page headers, launch links, demo links, and rich workflow/demo/integration projections do not churn without an intentional inventory update.
 - Unit tests must verify that every shared operator navigation projection, plus rich demo/workflow/integration projection labels and notes, derives visible copy from the supplied inventory instance instead of stale global copy.
 - Unit tests must verify that broad shared operator inventory projections honor the supplied inventory instance when routes are omitted instead of reintroducing stale global routes.
+- Unit tests must verify that shared operator inventory projection helpers do not mutate supplied inventory groups or links while deriving navigation, rich checkpoints, workflow steps, or integration areas.
 - Unit tests must verify that every shared operator surface route is reachable from at least one focused page-specific or rich operator projection, outside the broad launch/settings/runbook inventory projections.
 - The Playwright smoke test must verify the root launch dashboard's visible links from the same shared operations inventory instead of a duplicated hard-coded browser list.
 - The seeded investor demo path must verify that `/demo` renders visible console navigation from the same shared operations inventory instead of a duplicated hard-coded browser list.
