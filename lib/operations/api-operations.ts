@@ -258,7 +258,7 @@ export function getApiOperationsStatus(env: Record<string, string | undefined> =
   assertApiOperationStatusSummary(apiOperationStatusSummary);
   const rateLimit = getApiRateLimitPolicy(env);
 
-  return {
+  return Object.freeze({
     routeCount: apiOperationRoutes.length,
     mutatingRouteCount: apiOperationRoutes.filter((route) => route.mutates).length,
     externalImpactRouteCount: apiOperationRoutes.filter((route) => route.externalImpact).length,
@@ -266,11 +266,11 @@ export function getApiOperationsStatus(env: Record<string, string | undefined> =
     externalImpact: apiOperationStatusSummary.externalImpact,
     mutation: apiOperationStatusSummary.mutation,
     secretsDisplayed: apiOperationStatusSummary.secretsDisplayed,
-    rateLimit: {
+    rateLimit: Object.freeze({
       enabled: rateLimit.enabled,
       limit: rateLimit.limit,
       windowSeconds: rateLimit.windowMs / 1000
-    },
+    }),
     routes: freezeApiOperationRoutes(apiOperationRoutes.map((route) => ({ ...route })))
-  };
+  });
 }

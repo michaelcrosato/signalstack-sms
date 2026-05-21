@@ -262,6 +262,7 @@ Post-MVP:
 - Local API operations method-vocabulary coverage
 - Local API operations area-vocabulary coverage
 - Local API operations no-impact summary-state hardening
+- Local API operations frozen status snapshot coverage
 - Local contract operations inventory frozen static-metadata coverage
 - Local contract operations inventory order-stability coverage
 - Local contract operations inventory unique-identifier coverage

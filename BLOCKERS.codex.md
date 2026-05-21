@@ -1,7 +1,8 @@
 # Codex Blockers
 
-Run number: 186
+Run number: 187
 
+- Latest API operations frozen status snapshot hardening returns a frozen API operations status object with fresh frozen rate-limit and route snapshots, preventing caller-side mutation from drifting later local API inventory renders. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, mutate records, expose secrets, or enable live features.
 - Latest API operations area-vocabulary hardening exports a runtime-frozen supported area vocabulary and validates `/settings/api` static route inventory rows against it before local metadata freezes. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, mutate records, expose secrets, or enable live features.
 - Latest API operations no-impact summary-state hardening keeps `/settings/api` command-execution, external-impact, mutation, and secrets-displayed states inside runtime-frozen local vocabularies. The check is local static metadata and read-only rendering/browser coverage only and does not execute handlers, inspect logs, scan files, read raw environment values, mutate records, expose secrets, call providers, bill, notify, send SMS/email, call live AI, execute workers, call Redis, or enable live features.
 

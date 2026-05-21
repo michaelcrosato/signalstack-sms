@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP API operations frozen status snapshot checkpoint.
+- Updated `getApiOperationsStatus()` to return a frozen status object with a fresh frozen rate-limit snapshot alongside fresh frozen route snapshots.
+- Added unit coverage proving caller-side mutation of the status object, rate-limit object, and route snapshots is rejected before local `/settings/api` metadata renders.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- Focused API operations unit coverage, typecheck, and protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, worker execution, Redis calls, record mutations, or protected gate-script edits were used.
+
+Run number: 187
+
+## Previous Run
+
 - Advanced a post-MVP API operations area-vocabulary checkpoint.
 - Exported a runtime-frozen supported API area vocabulary and validated static API route inventory rows against it before local `/settings/api` metadata freezes.
 - Added unit coverage proving route areas stay aligned to the exported vocabulary and reject caller mutation.

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 187  GREEN  api-operations-frozen-status-snapshot  2026-05-21 06:20
+Objective:    Keep API operations status snapshots frozen against caller mutation.
+Changed:
+- Froze the `getApiOperationsStatus()` status object and nested rate-limit snapshot.
+- Added unit coverage proving status, rate-limit, and route snapshots are fresh and frozen before `/settings/api` renders local metadata.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP API operations hardening or safe read-only operator surface refinements.
+
 ## Run 186  GREEN  api-operations-area-vocabulary  2026-05-21 06:13
 Objective:    Keep API operations route areas aligned with an exported frozen vocabulary.
 Changed:

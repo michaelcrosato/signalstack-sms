@@ -297,16 +297,21 @@ describe("getApiOperationsStatus", () => {
     expect(apiOperationRoutes.every((route) => sortedFields(route).join("|") === expectedFields.join("|"))).toBe(true);
   });
 
-  it("returns fresh frozen API route snapshots per status call", () => {
+  it("returns fresh frozen API status snapshots per status call", () => {
     const firstStatus = getApiOperationsStatus({});
     const secondStatus = getApiOperationsStatus({});
     const firstRoute = firstStatus.routes[0];
 
+    expect(Object.isFrozen(firstStatus)).toBe(true);
+    expect(Object.isFrozen(firstStatus.rateLimit)).toBe(true);
     expect(Object.isFrozen(firstStatus.routes)).toBe(true);
     expect(firstStatus.routes.every((route) => Object.isFrozen(route))).toBe(true);
+    expect(firstStatus.rateLimit).not.toBe(secondStatus.rateLimit);
     expect(firstStatus.routes).not.toBe(secondStatus.routes);
     expect(firstStatus.routes[0]).not.toBe(apiOperationRoutes[0]);
     expect(firstStatus.routes).toEqual(secondStatus.routes);
+    expect(() => ((firstStatus as { routeCount: number }).routeCount = 0)).toThrow(TypeError);
+    expect(() => ((firstStatus.rateLimit as { limit: number }).limit = 1)).toThrow(TypeError);
     expect(() => (firstStatus.routes as unknown as Array<(typeof apiOperationRoutes)[number]>).pop()).toThrow(TypeError);
     expect(() => ((firstRoute as { safety: string }).safety = "unsafe mutation")).toThrow(TypeError);
     expect(getApiOperationsStatus({}).routes[0].safety).toBe(apiOperationRoutes[0].safety);
