@@ -769,11 +769,23 @@ describe("operator surface inventory", () => {
       ...getUsageOperationLinks(groups),
       ...getReadinessAuditOperationLinks(groups)
     ];
+    const demoCheckpoints = getDemoOperationsCheckpoints(groups);
+    const workflowSteps = getWorkflowOperationSteps(groups);
     const integrationAreas = getIntegrationOperationAreas(groups);
 
     for (const projectedLink of projectedLinks) {
       expect(Object.keys(projectedLink).sort(), projectedLink.href).toEqual(["href", "label", "note"].sort());
       expect(projectedLink, projectedLink.href).not.toHaveProperty("secretToken");
+    }
+
+    for (const checkpoint of demoCheckpoints) {
+      expect(Object.keys(checkpoint).sort(), checkpoint.href).toEqual(["boundary", "href", "name", "signal"].sort());
+      expect(checkpoint, checkpoint.href).not.toHaveProperty("secretToken");
+    }
+
+    for (const step of workflowSteps) {
+      expect(Object.keys(step).sort(), step.href).toEqual(["boundary", "href", "name", "owner"].sort());
+      expect(step, step.href).not.toHaveProperty("secretToken");
     }
 
     for (const area of integrationAreas) {

@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 88
+Run number: 89
 
 No active blockers.
 
 ## Notes
 
+- Rich shared operator projections now have unit coverage proving demo checkpoint, workflow step, and integration area objects expose only public render fields when supplied inventories include extra runtime properties. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator projections now have unit coverage proving projected links are detached objects from supplied inventory links while preserving shared href, label, and note copy. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator projections now sanitize links to public navigation fields only, with unit coverage proving injected extra fields on supplied inventories do not leak into regular navigation or rich integration projections. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator projections now have unit coverage proving every returned navigation, demo checkpoint, workflow step, and integration area object is frozen, not just a sampled first result. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

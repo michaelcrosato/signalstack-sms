@@ -1,8 +1,13 @@
 # Codex Summary
 
-Run number: 88
+Run number: 89
 
 ## Completed
+
+- Advanced a post-MVP rich operator projection public-field checkpoint.
+- Extended unit coverage so demo checkpoint, workflow step, and integration area projections expose only their public render fields when supplied inventories carry extra runtime fields.
+- Preserved local-only behavior without adding routes, mutations, provider calls, billing, notifications, SMS, email, live AI, or live feature enablement.
+- Targeted operator-surface unit coverage passed.
 
 - Advanced a post-MVP shared operator projection public-field checkpoint.
 - Updated shared operator projection link sanitization so projected links expose only `href`, `label`, and `note` even when supplied inventories carry extra runtime fields.
