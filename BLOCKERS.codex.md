@@ -1,13 +1,14 @@
 # Codex Blockers
 
-Run number: 177
+Run number: 178
 
-- Latest notification operations mutation no-impact summary hardening displays the validated Mutation label on `/settings/notifications` and keeps it inside a runtime-frozen local no-mutation vocabulary. The check is local static metadata and read-only rendering/browser coverage only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
+- Latest readiness audit detached status-array count hardening keeps returned `/settings/readiness-audit` status arrays detached from exported vocabularies and keeps rendered counts aligned with returned arrays. The check is local static metadata coverage only and does not mutate audit events, expose secrets, call providers, bill, notify, send SMS/email, call live AI, execute workers, call Redis, or enable live features.
 
 No active blockers.
 
 ## Notes
 
+- Latest notification operations mutation no-impact summary hardening displays the validated Mutation label on `/settings/notifications` and keeps it inside a runtime-frozen local no-mutation vocabulary. The check is local static metadata and read-only rendering/browser coverage only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 - Latest queue operations mutation no-impact summary hardening displays the validated Mutation label on `/settings/queue` and keeps it inside a runtime-frozen local no-mutation vocabulary. The check is local static metadata and read-only rendering/browser coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS/email, mutate queue rows, update campaigns, call live AI, expose secrets, or enable live features.
 - Latest readiness audit no-impact summary rendering coverage displays the validated command-execution, external-impact, mutation, and secrets-displayed labels on `/settings/readiness-audit` and pins them in the seeded investor demo path. The check is local read-only rendering/browser coverage only and does not mutate audit events, expose secrets, call providers, bill, notify, send SMS/email, call live AI, create worker or Redis activity, or enable live features.
 - Latest queue operations no-impact summary rendering coverage pins the validated command-execution, external-impact, and secrets-displayed summary labels on `/settings/queue` in the seeded investor demo path. The check is local read-only rendering/browser coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS/email, mutate queue rows, update campaigns, call live AI, expose secrets, or enable live features.

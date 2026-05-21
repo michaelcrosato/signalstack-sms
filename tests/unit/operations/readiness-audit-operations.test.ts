@@ -76,8 +76,22 @@ describe("getReadinessAuditOperationsStatus", () => {
     expect(firstStatus.actions).not.toBe(secondStatus.actions);
     expect(firstStatus.subjectTypes).not.toBe(secondStatus.subjectTypes);
     expect(firstStatus.safetyBoundaries).not.toBe(secondStatus.safetyBoundaries);
+    expect(firstStatus.actions).not.toBe(allowedReadinessAuditOperationActions);
+    expect(firstStatus.subjectTypes).not.toBe(allowedReadinessAuditOperationSubjectTypes);
+    expect(firstStatus.safetyBoundaries).not.toBe(readinessAuditOperationSafetyBoundaries);
     expect(() => (firstStatus.actions as unknown as string[]).pop()).toThrow(TypeError);
     expect(() => (firstStatus.safetyBoundaries as unknown as string[]).push("unsafe")).toThrow(TypeError);
+  });
+
+  it("keeps readiness audit counts aligned to detached returned arrays", () => {
+    const status = getReadinessAuditOperationsStatus();
+
+    expect(status.actionCount).toBe(status.actions.length);
+    expect(status.subjectTypeCount).toBe(status.subjectTypes.length);
+    expect(status.safetyBoundaryCount).toBe(status.safetyBoundaries.length);
+    expect(status.actions).toEqual(allowedReadinessAuditOperationActions);
+    expect(status.subjectTypes).toEqual(allowedReadinessAuditOperationSubjectTypes);
+    expect(status.safetyBoundaries).toEqual(readinessAuditOperationSafetyBoundaries);
   });
 
   it("keeps every exported readiness audit vocabulary frozen against caller mutation", () => {

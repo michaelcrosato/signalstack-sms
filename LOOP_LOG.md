@@ -1630,3 +1630,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP notification/readiness/queue operations hardening or safe read-only operator surface refinements.
+
+## Run 178  GREEN  readiness-audit-detached-status-counts  2026-05-21 05:37
+Objective:    Keep `/settings/readiness-audit` returned status arrays detached while counts stay aligned.
+Changed:
+- Added readiness-audit operations unit coverage proving returned action, subject-type, and safety-boundary arrays are fresh detached snapshots from exported vocabularies.
+- Added count alignment coverage for returned readiness-audit status arrays before local audit filters or CSV links render.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP readiness/queue/notification operations hardening or safe read-only operator surface refinements.
