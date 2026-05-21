@@ -735,3 +735,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 100  GREEN  supplied-inventory-invalid-array-guard  2026-05-20 23:45
+Objective:    Fail supplied shared operator inventories that are not arrays before projection.
+Changed:
+- Added a shared invalid-array guard before reading supplied operator surface inventory entries.
+- Added unit coverage proving malformed supplied inventory values fail before summary, broad launch, or focused demo projections can surface generic runtime errors.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.

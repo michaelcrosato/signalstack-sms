@@ -61,6 +61,7 @@ Additional deterministic checks:
 - Unit coverage verifies that supplied shared operator inventories with duplicate route entries fail before summaries or projections are derived, so local navigation helpers cannot silently shadow a route.
 - Unit coverage verifies that supplied shared operator inventories with empty groups fail before summaries or projections are derived, so local navigation helpers cannot render group headings with no reachable local surface.
 - Unit coverage verifies that supplied shared operator inventories with duplicate group names, link labels, or link notes fail before summaries or projections are derived, so local navigation helpers cannot silently render ambiguous copy.
+- Unit coverage verifies that supplied shared operator inventories that are not arrays fail before summaries or projections are derived, so malformed runtime inventory values cannot surface generic errors.
 - Unit coverage verifies that empty supplied shared operator inventories fail before summaries or projections are derived, so blank local navigation surfaces cannot be treated as valid.
 - Unit coverage verifies that supplied shared operator inventories with blank group names, routes, labels, or notes fail before summaries or projections are derived, so whitespace-only local navigation fields cannot be treated as valid.
 - Unit coverage verifies that supplied shared operator inventories with invalid group objects fail before summaries or projections are derived, so malformed runtime inventory entries cannot surface generic errors.

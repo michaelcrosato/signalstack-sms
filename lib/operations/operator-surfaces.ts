@@ -70,6 +70,10 @@ function assertOperatorSurfaceLink(link: OperatorSurfaceLink) {
 }
 
 function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) {
+  if (!Array.isArray(groups)) {
+    throw new Error("Invalid operator surface inventory");
+  }
+
   if (groups.length === 0) {
     throw new Error("Empty operator surface inventory");
   }
