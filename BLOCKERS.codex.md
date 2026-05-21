@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 121
+Run number: 122
 
 No active blockers.
 
 ## Notes
 
+- Latest contract operations order-stability hardening fixes the contract file, validation command, and drift-control order used by `/settings/contracts` local review pages so accidental inventory churn fails in unit coverage. The check is local metadata validation only and does not read contract contents, execute commands, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.
 - Latest contract operations inventory hardening moves `/settings/contracts` static contract files, validation commands, drift controls, and counts into a validated frozen operations module with unit coverage for required paths, public fields, snapshots, and local-only shape. The check is local metadata validation only and does not read contract contents, execute commands, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.
 - Latest API operations value-shape hardening validates API inventory entries before export and adds unit coverage for supported methods, local `/api/` path shape, boolean flags, nonblank public copy, and unique method/path rows. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Latest API operations order-stability hardening fixes the exported route-method order used by `/settings/api` local review pages so accidental inventory reordering fails in unit coverage. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

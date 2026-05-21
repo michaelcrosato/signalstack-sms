@@ -104,4 +104,31 @@ describe("getContractOperationsStatus", () => {
     expect(contractOperationValidationChecks.map((check) => check.purpose).filter((purpose) => purpose.trim().length === 0)).toEqual([]);
     expect(contractOperationDriftControls.filter((control) => control.trim().length === 0)).toEqual([]);
   });
+
+  it("keeps contract operation inventory order stable for local review pages", () => {
+    expect(contractOperationFiles.map((file) => file.path)).toEqual([
+      "contracts/CONTRACT-DB.md",
+      "contracts/CONTRACT-API.md",
+      "contracts/CONTRACT-WEBHOOKS.md",
+      "contracts/CONTRACT-PROVIDER-ADAPTER.md",
+      "contracts/CONTRACT-AI.md",
+      "contracts/CONTRACT-BILLING.md",
+      "contracts/CONTRACT-COMPLIANCE.md",
+      "contracts/CONTRACT-QUEUE.md",
+      "contracts/CONTRACT-TESTING.md"
+    ]);
+    expect(contractOperationValidationChecks.map((check) => check.command)).toEqual([
+      "npm run contracts:check",
+      "npm run validate",
+      "npm run test:e2e:demo",
+      "npm run secrets:scan"
+    ]);
+    expect(contractOperationDriftControls).toEqual([
+      "Product API routes must be documented in contracts and docs before or with implementation.",
+      "Read-only settings pages must state the actions they do not perform.",
+      "Live SMS, billing, notifications, provider calls, and live AI remain blocked by defaults.",
+      "Tenant-scoped data access must preserve the orgId invariant and avoid cross-tenant reads.",
+      "Seeded demo path coverage must expand when demo-visible operational routes are added."
+    ]);
+  });
 });

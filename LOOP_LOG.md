@@ -1053,3 +1053,30 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP API operations hardening or safe read-only operator surface refinements.
+
+## Run 120  GREEN  api-operations-order-stability  2026-05-21 01:20
+Objective:    Keep API operations route-method order stable for local review pages.
+Changed:
+- Added unit coverage fixing the exported API route-method order used by `/settings/api`.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: b9f8bc6
+Next:         Continue post-MVP API operations hardening or safe read-only operator surface refinements.
+
+## Run 121  GREEN  contract-operations-static-metadata  2026-05-21 01:22
+Objective:    Move contract operations static metadata behind validated frozen inventory.
+Changed:
+- Moved `/settings/contracts` contract file inventory, validation commands, drift controls, and counts into `lib/operations/contract-operations.ts`.
+- Added unit coverage for required paths, public fields, frozen snapshots, canonical local-only shape, and file presence without reading contract contents.
+Gate:         passed
+Commit/Saved: 8516ddf
+Next:         Continue post-MVP contract operations hardening or safe read-only operator surface refinements.
+
+## Run 122  GREEN  contract-operations-order-stability  2026-05-21 01:24
+Objective:    Keep contract operations metadata order stable for local review pages.
+Changed:
+- Added unit coverage fixing contract file, validation command, and drift-control order used by `/settings/contracts`.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP contract operations hardening or safe read-only operator surface refinements.
