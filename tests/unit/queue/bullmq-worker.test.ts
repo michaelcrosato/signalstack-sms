@@ -22,6 +22,16 @@ describe("BullMQ worker foundation", () => {
       bullMqWorkerCanStart({
         QUEUE_BACKEND: "bullmq",
         REDIS_URL: "redis://localhost:6379",
+        WORKER_DEPLOYMENT_CLASS: "production-live",
+        LIVE_MESSAGING_ENABLED: "false",
+        MESSAGING_PROVIDER: "dummy"
+      })
+    ).toEqual({ allowed: false, reason: "production-worker-blocked" });
+    expect(
+      bullMqWorkerCanStart({
+        QUEUE_BACKEND: "bullmq",
+        REDIS_URL: "redis://localhost:6379",
+        WORKER_DEPLOYMENT_CLASS: "local-demo",
         LIVE_MESSAGING_ENABLED: "true",
         MESSAGING_PROVIDER: "dummy"
       })

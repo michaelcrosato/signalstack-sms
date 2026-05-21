@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 218  GREEN  worker-deployment-class-guard  2026-05-21 16:50
+Objective:    Add an executable worker deployment-class guard before live-worker design proceeds.
+Changed:
+- Added `WORKER_DEPLOYMENT_CLASS` readiness handling for database and BullMQ scheduled campaign workers.
+- Exported the current supported worker deployment class vocabulary as `local-demo` only and covered caller mutation plus non-`local-demo` blocking in unit tests.
+- Updated the production worker policy check, queue/testing contracts, roadmap/state/handoff docs, summary, and blockers.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live campaign workers blocked; specify reviewed live-worker controls before adding any production/live deployment class.
+
 ## Run 217  GREEN  handoff-truth-repair  2026-05-21 16:42
 Objective:    Reconcile Codex handoff files with the latest committed production worker policy validation run.
 Changed:

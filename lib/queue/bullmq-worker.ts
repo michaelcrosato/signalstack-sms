@@ -21,6 +21,7 @@ export function bullMqWorkerCanStart(env: Record<string, string | undefined> = p
   const readiness = localWorkerReadiness({
     liveMessagingEnabled: env.LIVE_MESSAGING_ENABLED,
     messagingProvider: env.MESSAGING_PROVIDER,
+    workerDeploymentClass: env.WORKER_DEPLOYMENT_CLASS,
     nodeEnv: env.NODE_ENV,
     vercelEnv: env.VERCEL_ENV,
     deploymentEnv: env.DEPLOYMENT_ENV,

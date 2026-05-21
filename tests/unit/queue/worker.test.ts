@@ -5,7 +5,9 @@ import {
   localWorkerProviderIsAllowed,
   localWorkerReadiness,
   parseWorkerRuntimeOptions,
-  scheduledCampaignSendIsAllowed
+  scheduledCampaignSendIsAllowed,
+  supportedWorkerDeploymentClasses,
+  workerDeploymentClassIsAllowed
 } from "@/lib/queue/worker";
 
 describe("local queue worker", () => {
@@ -37,6 +39,21 @@ describe("local queue worker", () => {
         messagingProvider: "dummy"
       })
     ).toEqual({ allowed: true });
+  });
+
+  it("allows only the current local-demo worker deployment class", () => {
+    expect(supportedWorkerDeploymentClasses).toEqual(["local-demo"]);
+    expect(() => ((supportedWorkerDeploymentClasses as unknown as string[]).push("production-live"))).toThrow();
+    expect(workerDeploymentClassIsAllowed({})).toBe(true);
+    expect(workerDeploymentClassIsAllowed({ workerDeploymentClass: "local-demo" })).toBe(true);
+    expect(workerDeploymentClassIsAllowed({ workerDeploymentClass: "production-live" })).toBe(false);
+    expect(
+      localWorkerReadiness({
+        workerDeploymentClass: "production-live",
+        liveMessagingEnabled: "false",
+        messagingProvider: "dummy"
+      })
+    ).toEqual({ allowed: false, reason: "production-worker-blocked" });
   });
 
   it("builds campaign template values without leaking nulls", () => {

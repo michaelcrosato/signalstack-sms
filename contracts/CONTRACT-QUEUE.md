@@ -21,6 +21,7 @@ Milestone 4 does not call live providers.
 ## Post-MVP Local Worker Foundation
 
 `npm run worker` processes due `SCHEDULED_CAMPAIGN` jobs only in local/demo runtimes when `MESSAGING_PROVIDER=dummy`, `LIVE_MESSAGING_ENABLED` is not `true`, and no production-like runtime marker is present.
+`WORKER_DEPLOYMENT_CLASS` may be unset or `local-demo` only. Any other deployment class is treated as a production worker attempt and is blocked before jobs are processed.
 
 - The worker uses validated version-1 scheduled campaign payloads.
 - Invalid payloads or missing scheduled campaigns are marked `FAILED`.
@@ -39,7 +40,7 @@ Continuous execution is opt-in and remains local/demo-safe:
 - `WORKER_MAX_ITERATIONS` may cap local/test loops.
 - `WORKER_MAX_JOBS_PER_POLL` caps due jobs processed per poll and is clamped between 1 and 100.
 - Every poll reuses the same dummy-only/live-disabled gate; blocked workers do not process or call providers.
-- Production-like runtime markers (`NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, or `APP_ENV` set to `production` or `prod`) block worker processing even when demo-safe provider defaults are set. Production worker execution requires a future explicit worker policy, not the general production external-impact override.
+- Production-like runtime markers (`NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, or `APP_ENV` set to `production` or `prod`) and non-`local-demo` `WORKER_DEPLOYMENT_CLASS` values block worker processing even when demo-safe provider defaults are set. Production worker execution requires a future explicit worker policy, not the general production external-impact override.
 - `docs/PRODUCTION_WORKER_POLICY.md` is the current planning gate for that future explicit policy. It does not authorize production worker execution or live campaign sends.
 
 ## Post-MVP BullMQ/Redis Enqueue Foundation
@@ -61,6 +62,7 @@ BullMQ workers may consume scheduled-campaign queue events only by referencing d
 - The BullMQ worker must reload and process the matching `QueueJob` row from the database.
 - Cancelled, completed, missing, invalid, or early jobs must be skipped or failed locally without provider calls.
 - Worker startup is blocked unless `QUEUE_BACKEND=bullmq`, `REDIS_URL` is configured, `MESSAGING_PROVIDER=dummy`, `LIVE_MESSAGING_ENABLED` is not `true`, and no production-like runtime marker is present.
+- BullMQ worker startup also rejects any `WORKER_DEPLOYMENT_CLASS` other than `local-demo`.
 - The BullMQ worker must use the same dummy-only send path and idempotent `Message` rows as the database polling worker.
 
 ## Post-MVP BullMQ/Redis Smoke

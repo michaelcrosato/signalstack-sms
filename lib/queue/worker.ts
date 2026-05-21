@@ -10,6 +10,7 @@ import { scheduledCampaignJobSchema } from "@/lib/queue/jobs";
 export type WorkerSafetyInput = {
   liveMessagingEnabled?: string;
   messagingProvider?: string;
+  workerDeploymentClass?: string;
   nodeEnv?: string;
   vercelEnv?: string;
   deploymentEnv?: string;
@@ -61,9 +62,14 @@ const MIN_WORKER_POLL_INTERVAL_MS = 1000;
 const DEFAULT_WORKER_MAX_JOBS_PER_POLL = 25;
 const MIN_WORKER_MAX_JOBS_PER_POLL = 1;
 const MAX_WORKER_MAX_JOBS_PER_POLL = 100;
+export const supportedWorkerDeploymentClasses = Object.freeze(["local-demo"] as const);
 
 export function localWorkerProviderIsAllowed(input: WorkerSafetyInput) {
   return input.liveMessagingEnabled !== "true" && (input.messagingProvider ?? "dummy") === "dummy";
+}
+
+export function workerDeploymentClassIsAllowed(input: WorkerSafetyInput) {
+  return !input.workerDeploymentClass || supportedWorkerDeploymentClasses.includes(input.workerDeploymentClass as "local-demo");
 }
 
 export function localWorkerReadiness(input: WorkerSafetyInput): WorkerReadinessResult {
@@ -78,6 +84,10 @@ export function localWorkerReadiness(input: WorkerSafetyInput): WorkerReadinessR
     return { allowed: false, reason: "production-worker-blocked" };
   }
 
+  if (!workerDeploymentClassIsAllowed(input)) {
+    return { allowed: false, reason: "production-worker-blocked" };
+  }
+
   if (!localWorkerProviderIsAllowed(input)) {
     return { allowed: false, reason: "provider-blocked" };
   }
@@ -89,6 +99,7 @@ function currentWorkerReadiness() {
   return localWorkerReadiness({
     liveMessagingEnabled: process.env.LIVE_MESSAGING_ENABLED,
     messagingProvider: process.env.MESSAGING_PROVIDER,
+    workerDeploymentClass: process.env.WORKER_DEPLOYMENT_CLASS,
     nodeEnv: process.env.NODE_ENV,
     vercelEnv: process.env.VERCEL_ENV,
     deploymentEnv: process.env.DEPLOYMENT_ENV,

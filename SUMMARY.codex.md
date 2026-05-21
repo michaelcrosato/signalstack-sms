@@ -1,7 +1,16 @@
 # Codex Summary
 
-- Repaired the Codex handoff truth after Run 216 so the summary and blockers reflect the latest committed production worker policy validation state.
-- Latest repo truth: `npm run production-worker:check` is wired into validation and verifies the local/demo-only worker boundary across policy docs, worker source, BullMQ source, queue tests, and package scripts.
+- Added an executable `WORKER_DEPLOYMENT_CLASS` worker readiness guard for Run 218.
+- Latest repo truth: database and BullMQ scheduled campaign workers accept only an unset worker deployment class or `local-demo`; any production/live class is blocked before worker processing.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+Run number: 218
+
+## Previous Run
+
+- Added `supportedWorkerDeploymentClasses` with the current runtime-frozen `local-demo` class.
+- Passed `WORKER_DEPLOYMENT_CLASS` through database and BullMQ worker readiness so non-`local-demo` classes return `production-worker-blocked`.
+- Updated queue worker tests, BullMQ worker tests, the production worker policy check, queue/testing contracts, and handoff docs.
 - No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
 
 Run number: 217

@@ -58,7 +58,7 @@ Scheduled campaign workers are also local/demo-only. The database worker and opt
 
 Production-like demo deployment is documented in `docs/PRODUCTION_GO_LIVE.md`. The current gate permits demo-safe production deployments only and keeps live SMS, billing, provider calls, and live AI blocked by default.
 
-Production worker policy is documented in `docs/PRODUCTION_WORKER_POLICY.md`. It is a future live-send planning gate only; current production-like demo deployments do not run scheduled campaign workers.
+Production worker policy is documented in `docs/PRODUCTION_WORKER_POLICY.md`. It is a future live-send planning gate only; current production-like demo deployments do not run scheduled campaign workers. Worker readiness accepts only an unset `WORKER_DEPLOYMENT_CLASS` or `WORKER_DEPLOYMENT_CLASS=local-demo`; any production/live class remains blocked.
 
 Deployment platform notes are documented in `docs/DEPLOYMENT_PLATFORM_NOTES.md`; `npm run platform:check` verifies that demo-safe hosting boundaries remain documented and is included in `npm run validate`.
 

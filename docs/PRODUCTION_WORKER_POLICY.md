@@ -11,13 +11,15 @@ The current supported worker posture is local/demo only:
 - `npm run worker:bullmq` may consume BullMQ jobs only when `QUEUE_BACKEND=bullmq`, `REDIS_URL` is configured, the runtime is not production-like, `MESSAGING_PROVIDER=dummy`, and `LIVE_MESSAGING_ENABLED` is not `true`.
 - `npm run queue:bullmq:smoke` is an optional local Redis smoke check and must not touch campaign jobs, provider calls, billing, notifications, or live messaging flags.
 
+`WORKER_DEPLOYMENT_CLASS` may be unset or `local-demo` only. Any other value, including future-looking names such as `production-live`, blocks scheduled-campaign worker startup until a later milestone adds reviewed live-worker controls.
+
 Production-like runtime markers are `NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, or `APP_ENV` set to `production` or `prod`. These markers block scheduled-campaign worker execution today, even with demo-safe provider defaults.
 
 ## Future Live Worker Requirements
 
 A future production worker milestone must satisfy all of these before any live campaign send path can run:
 
-- A separate reviewed worker deployment class with explicit environment names, process ownership, and rollback steps.
+- A separate reviewed worker deployment class beyond `local-demo`, with explicit environment names, process ownership, and rollback steps.
 - Org-level live messaging enablement separate from environment flags and separate from the isolated live-test SMS route.
 - Centralized messaging hard-gate enforcement immediately before each provider mutation.
 - Send-time contact consent, archive state, opt-out state, and compliance-profile rechecks for every recipient.

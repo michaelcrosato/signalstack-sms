@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 218  GREEN  worker-deployment-class-guard  2026-05-21 16:50
+Objective:    Add an executable worker deployment-class guard before live-worker design proceeds.
+Changed:
+- Added `WORKER_DEPLOYMENT_CLASS` readiness handling for database and BullMQ scheduled campaign workers.
+- Exported the current supported worker deployment class vocabulary as `local-demo` only and covered caller mutation plus non-`local-demo` blocking in unit tests.
+- Updated the production worker policy check, queue/testing contracts, roadmap/state/handoff docs, summary, and blockers.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live campaign workers blocked; specify reviewed live-worker controls before adding any production/live deployment class.
+
 ## Run 212  GREEN  product-campaign-detail-workflow  2026-05-21 15:28
 Objective:    Add owner-facing campaign detail, draft edit, and local cancel lifecycle controls.
 Changed:

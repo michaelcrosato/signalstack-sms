@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 218
+
+- No blocker from the worker deployment class guard. Database and BullMQ scheduled campaign workers now reject non-`local-demo` `WORKER_DEPLOYMENT_CLASS` values before processing jobs; the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.
+
 Run number: 217
 
 - No blocker from the latest handoff truth repair. The update reconciles Codex summary/blocker files with the already committed Run 216 production worker policy validation state; it does not change product behavior, validation scripts, protected gate files, live SMS, provider calls, billing, notifications, live AI, secrets, database data, worker execution, Redis, hard deletion, or live feature flags.

@@ -20,6 +20,10 @@ const requiredTexts: RequiredText[] = [
   },
   {
     file: "docs/PRODUCTION_WORKER_POLICY.md",
+    text: "`WORKER_DEPLOYMENT_CLASS` may be unset or `local-demo` only"
+  },
+  {
+    file: "docs/PRODUCTION_WORKER_POLICY.md",
     text: "The isolated `/demo` live-test SMS path remains separate from campaign workers"
   },
   {
@@ -31,16 +35,24 @@ const requiredTexts: RequiredText[] = [
     text: "environmentIsProductionLike"
   },
   {
+    file: "lib/queue/worker.ts",
+    text: "supportedWorkerDeploymentClasses"
+  },
+  {
     file: "lib/queue/bullmq-worker.ts",
-    text: "production-worker-blocked"
+    text: "WORKER_DEPLOYMENT_CLASS"
   },
   {
     file: "tests/unit/queue/worker.test.ts",
     text: "blocks worker processing in production-like runtimes"
   },
   {
+    file: "tests/unit/queue/worker.test.ts",
+    text: "allows only the current local-demo worker deployment class"
+  },
+  {
     file: "tests/unit/queue/bullmq-worker.test.ts",
-    text: "production-worker-blocked"
+    text: "WORKER_DEPLOYMENT_CLASS"
   },
   {
     file: "package.json",
