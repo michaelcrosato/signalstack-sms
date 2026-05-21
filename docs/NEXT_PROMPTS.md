@@ -132,6 +132,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP shared supplied-inventory blank-field hardening: summaries and projections now fail before deriving local navigation from supplied operator inventories with blank group names, routes, labels, or notes, preventing whitespace-only rendered navigation copy.
 - Post-MVP shared supplied-inventory invalid-link-array hardening: summaries and projections now fail before deriving local navigation from supplied operator inventory groups with invalid link arrays, preventing malformed runtime inventory objects from surfacing generic projection errors.
 - Post-MVP shared supplied-inventory invalid-group-object hardening: summaries and projections now fail before deriving local navigation from supplied operator inventory entries that are not group objects, preventing malformed runtime inventory entries from surfacing generic errors.
+- Post-MVP shared supplied-inventory invalid-link-object hardening: summaries and projections now fail before deriving local navigation from supplied operator inventory links that are not link objects, preventing malformed runtime link entries from surfacing generic errors.
 
 Demo-safe defaults remain mandatory:
 

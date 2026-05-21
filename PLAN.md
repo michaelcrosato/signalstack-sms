@@ -203,6 +203,7 @@ Post-MVP:
 - Local shared operator supplied-inventory blank-field failure coverage
 - Local shared operator supplied-inventory invalid-link-array failure coverage
 - Local shared operator supplied-inventory invalid-group-object failure coverage
+- Local shared operator supplied-inventory invalid-link-object failure coverage
 
 ## Next Milestone
 

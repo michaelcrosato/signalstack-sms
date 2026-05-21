@@ -63,6 +63,12 @@ function assertOperatorSurfaceGroup(group: OperatorSurfaceGroup) {
   }
 }
 
+function assertOperatorSurfaceLink(link: OperatorSurfaceLink) {
+  if (!link || typeof link !== "object" || Array.isArray(link)) {
+    throw new Error("Invalid operator surface link");
+  }
+}
+
 function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) {
   if (groups.length === 0) {
     throw new Error("Empty operator surface inventory");
@@ -95,6 +101,7 @@ function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) 
   const links = groups.flatMap((group) => group.links);
 
   for (const link of links) {
+    assertOperatorSurfaceLink(link);
     assertNonBlankOperatorSurfaceField("route", link.href);
     assertNonBlankOperatorSurfaceField("label", link.label);
     assertNonBlankOperatorSurfaceField("note", link.note);

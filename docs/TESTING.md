@@ -64,6 +64,7 @@ Additional deterministic checks:
 - Unit coverage verifies that empty supplied shared operator inventories fail before summaries or projections are derived, so blank local navigation surfaces cannot be treated as valid.
 - Unit coverage verifies that supplied shared operator inventories with blank group names, routes, labels, or notes fail before summaries or projections are derived, so whitespace-only local navigation fields cannot be treated as valid.
 - Unit coverage verifies that supplied shared operator inventories with invalid group objects fail before summaries or projections are derived, so malformed runtime inventory entries cannot surface generic errors.
+- Unit coverage verifies that supplied shared operator inventories with invalid link objects fail before summaries or projections are derived, so malformed runtime link entries cannot surface generic errors.
 - Unit coverage verifies that shared operator projections fail loudly with the missing route when a projection references a route absent from the supplied inventory.
 - Unit coverage verifies that shared operator surface labels and notes remain aligned with their route names, including singular/plural route segment variants.
 - Unit coverage verifies that rich shared operator projections for demo checkpoints, workflow steps, and integration areas have unique route entries, point at implemented app pages, and derive their visible labels from the shared local operator surface inventory.

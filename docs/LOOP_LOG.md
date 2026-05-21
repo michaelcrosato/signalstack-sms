@@ -705,3 +705,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 099  GREEN  supplied-inventory-invalid-link-object-guard  2026-05-20 23:43
+Objective:    Fail supplied shared operator inventory links that are not link objects before projection.
+Changed:
+- Added a shared invalid-link-object guard before reading supplied operator surface link fields.
+- Added unit coverage proving malformed supplied link entries fail before summary, broad launch, or focused demo projections can surface generic runtime errors.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
