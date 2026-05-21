@@ -161,6 +161,7 @@ Post-MVP:
 - Local queue operations command-literal metadata hardening
 - Local queue operations no-impact summary rendering coverage
 - Local queue operations mutation no-impact summary hardening
+- Local queue operations detached status-array count coverage
 - Local readiness audit operations static-metadata hardening
 - Local readiness audit operations export-limit vocabulary hardening
 - Local readiness audit query allowlist hardening
@@ -302,6 +303,7 @@ Post-MVP:
 - Local notification operations runtime-frozen vocabulary coverage
 - Local notification operations exported vocabulary mutation coverage
 - Local notification operations detached status-array count coverage
+- Local queue operations detached status-array count coverage
 
 ## Next Milestone
 

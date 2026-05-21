@@ -1711,6 +1711,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP security/validation/contract operations hardening or safe read-only operator surface refinements.
 
+## Run 191  GREEN  queue-operations-detached-status-counts  2026-05-21 06:42
+Objective:    Keep `/settings/queue` returned status arrays detached while counts stay aligned.
+Changed:
+- Added queue operations unit coverage proving returned worker-command and safety-boundary arrays are detached from exported metadata.
+- Added count alignment coverage for returned queue operations status arrays before local queue metadata renders.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP queue/readiness/notification operations hardening or safe read-only operator surface refinements.
+
 ## Run 190  GREEN  notification-operations-detached-status-counts  2026-05-21 06:34
 Objective:    Keep `/settings/notifications` returned status arrays detached while counts stay aligned.
 Changed:

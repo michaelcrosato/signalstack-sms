@@ -83,6 +83,17 @@ describe("getQueueOperationsStatus", () => {
     expect(getQueueOperationsStatus().workerCommands[0].mode).toBe(queueOperationWorkerCommands[0].mode);
   });
 
+  it("keeps queue operation counts aligned to detached returned arrays", () => {
+    const status = getQueueOperationsStatus();
+
+    expect(status.workerCommandCount).toBe(status.workerCommands.length);
+    expect(status.safetyBoundaryCount).toBe(status.safetyBoundaries.length);
+    expect(status.workerCommands).toEqual(queueOperationWorkerCommands);
+    expect(status.safetyBoundaries).toEqual(queueOperationSafetyBoundaries);
+    expect(status.workerCommands).not.toBe(queueOperationWorkerCommands);
+    expect(status.safetyBoundaries).not.toBe(queueOperationSafetyBoundaries);
+  });
+
   it("keeps queue operation metadata in canonical local-only shape", () => {
     expect(queueOperationWorkerCommands.map((command) => command.command).filter((command) => !command.startsWith("npm run "))).toEqual([]);
     expect(queueOperationWorkerCommands.map((command) => command.mode).filter((mode) => mode.trim().length === 0)).toEqual([]);
