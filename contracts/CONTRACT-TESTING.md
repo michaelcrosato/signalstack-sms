@@ -190,7 +190,7 @@ Post-MVP security operations view:
 
 Post-MVP notification operations view:
 
-- Unit tests must verify that the static notification operations inventory exports runtime-frozen supported vocabularies, keeps channel names, channel status values, and no-impact summary states inside the supported local notification vocabulary, channel-specific boundary terms, channel boundaries, no-send controls, safety-boundary copy, public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, no secret display, required no-send control terms, whitespace-clean copy, command-like literal rejection, and secret-like literal rejection stable before `/settings/notifications` renders them.
+- Unit tests must verify that the static notification operations inventory exports runtime-frozen supported vocabularies with caller-mutation rejection, keeps channel names, channel status values, and no-impact summary states inside the supported local notification vocabulary, channel-specific boundary terms, channel boundaries, no-send controls, safety-boundary copy, public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, no secret display, required no-send control terms, whitespace-clean copy, command-like literal rejection, and secret-like literal rejection stable before `/settings/notifications` renders them.
 
 Post-MVP readiness audit operations view:
 

@@ -1,5 +1,14 @@
 # Codex Summary
 
+- Advanced a post-MVP notification operations exported-vocabulary mutation checkpoint.
+- Added unit coverage proving every exported `/settings/notifications` supported vocabulary rejects caller mutation before local notification metadata renders.
+- Updated README, PLAN, testing contract/docs, next-prompt handoff docs, blockers, and loop logs.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 170
+
+## Previous Run
+
 - Advanced a post-MVP queue operations mode-vocabulary hardening checkpoint.
 - Exported a runtime-frozen `/settings/queue` worker mode vocabulary and typed worker command metadata against it.
 - Added queue operations unit coverage proving rendered worker modes stay aligned with the exported vocabulary and that the vocabulary rejects caller mutation.

@@ -1,6 +1,8 @@
 # Codex Blockers
 
-Run number: 169
+Run number: 170
+
+- Latest notification operations exported vocabulary mutation hardening adds unit coverage proving every exported `/settings/notifications` supported vocabulary rejects caller mutation before local notification metadata renders. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 
 No active blockers.
 

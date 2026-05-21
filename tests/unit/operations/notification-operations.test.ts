@@ -143,6 +143,21 @@ describe("getNotificationOperationsStatus", () => {
     expect(allowedNotificationOperationSecretsDisplayedStates).toContain(status.secretsDisplayed);
   });
 
+  it("keeps exported notification operation vocabularies frozen against caller mutation", () => {
+    const vocabularies = [
+      allowedNotificationOperationChannelNames,
+      allowedNotificationOperationChannelStatuses,
+      allowedNotificationOperationCommandExecutionStates,
+      allowedNotificationOperationExternalImpactStates,
+      allowedNotificationOperationSecretsDisplayedStates
+    ];
+
+    for (const vocabulary of vocabularies) {
+      expect(Object.isFrozen(vocabulary)).toBe(true);
+      expect(() => (vocabulary as unknown as unknown[]).push("unsafe")).toThrow(TypeError);
+    }
+  });
+
   it("keeps notification operation channel boundaries aligned with their no-send surfaces", () => {
     expect(Object.fromEntries(notificationOperationChannels.map((channel) => [channel.name, channel.boundary]))).toEqual({
       Email: "No SMTP, transactional email, invite email, or alert email provider is configured or called.",

@@ -1435,6 +1435,15 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP operations hardening or safe read-only operator surface refinements.
 
+## Run 170  GREEN  notification-operations-exported-vocabulary-mutation  2026-05-21 05:05
+Objective:    Keep exported `/settings/notifications` supported vocabularies frozen against caller mutation.
+Changed:
+- Added unit coverage proving notification operation channel, status, command-execution, external-impact, and secrets-displayed vocabularies reject caller mutation.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP notification/queue/readiness operations hardening or safe read-only operator surface refinements.
+
 ## Run 147  GREEN  readiness-audit-export-limit-vocabulary  2026-05-21 03:17
 Objective:    Keep `/settings/readiness-audit` CSV export limits inside a frozen supported vocabulary.
 Changed:
