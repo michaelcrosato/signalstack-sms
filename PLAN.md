@@ -154,6 +154,7 @@ Post-MVP:
 - Local operator runbook shared-inventory coverage
 - Local operations index reverse page inventory coverage
 - Local go-live readiness shared-navigation coverage
+- Local go-live readiness shared-navigation browser coverage
 - Local launch dashboard shared-inventory coverage
 - Local launch dashboard shared-inventory browser smoke coverage
 - Local operations index shared-inventory browser coverage

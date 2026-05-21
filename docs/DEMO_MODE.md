@@ -36,7 +36,7 @@ The operations index inventory is shared with unit coverage so local operator su
 
 The `/settings/runbook` admin-link list is derived from that same shared local operator surface inventory, excluding only non-settings surfaces, so runbook navigation stays aligned with `/settings/operations`.
 
-The `/settings` go-live readiness navigation is also projected from the shared local operator surface inventory, excluding the current page and non-settings surfaces, so readiness navigation stays aligned with operations and runbook surfaces.
+The `/settings` go-live readiness navigation is also projected from the shared local operator surface inventory, excluding the current page and non-settings surfaces, so readiness navigation stays aligned with operations and runbook surfaces. The seeded investor demo path verifies those browser-visible labels and link targets from the same inventory.
 
 The root launch dashboard is projected from the full shared local operator surface inventory, including `/demo` and `/settings`, so new local operator surfaces appear in the launch view when they are added to the shared inventory. The `/demo` console navigation is projected from the same inventory while excluding only the current `/demo` self-link, so admin export and future local operator surfaces stay visible in the demo console. The root browser smoke test plus seeded demo-console, demo-operations, and operations-index browser checks use the same inventory to verify visible links without duplicating labels.
 

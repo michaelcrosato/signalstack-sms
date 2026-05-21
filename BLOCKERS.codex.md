@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 50
+Run number: 51
 
 No active blockers.
 
 ## Notes
 
+- `/settings` go-live readiness browser coverage now reads the shared local operator surface inventory and verifies visible navigation labels and link targets. The check renders local readiness navigation only and does not execute commands, mutate records, create exports, call providers, bill, notify, send SMS or email, expose secrets, or enable live features.
 - `/demo` now projects its console navigation from the shared local operator surface inventory, excluding only its own self-link. Unit and browser coverage verify the projected links, including Admin Exports, without executing commands, mutating records, creating exports, calling providers, billing, notifying, sending SMS or email, exposing secrets, or enabling live features.
 - `/settings/demo` seeded browser coverage now reads the shared local operator surface inventory and verifies visible checkpoint names, shared signal labels, boundaries, operational link labels, and link targets. The check renders the local demo operations page only and does not import data, schedule campaigns, run workers, create inbox replies, execute reports, create exports, mutate records, call providers, bill, notify, send SMS or email, expose secrets, or enable live features.
 - `/settings/demo` now projects its readiness checkpoint signals and operational links from the shared local operator surface inventory. Unit coverage verifies projected routes, shared labels, operational links, and backing `app/**/page.tsx` files without executing routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

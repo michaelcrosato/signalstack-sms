@@ -1,13 +1,16 @@
 # Codex Summary
 
-Run number: 50
+Run number: 51
 
 ## Completed
 
-- Advanced a post-MVP local demo operations browser hardening checkpoint.
-- Extended the seeded investor demo path to verify `/settings/demo` visible checkpoint names, shared signal labels, boundaries, operational link labels, and link targets from the shared operator surface inventory.
+- Advanced a post-MVP go-live readiness browser navigation hardening checkpoint.
+- Extended the seeded investor demo path to verify `/settings` visible navigation labels and link targets from the shared operator surface inventory.
 
 ## Prior Completed
+
+- Advanced a post-MVP local demo operations browser hardening checkpoint.
+- Extended the seeded investor demo path to verify `/settings/demo` visible checkpoint names, shared signal labels, boundaries, operational link labels, and link targets from the shared operator surface inventory.
 
 - Advanced a post-MVP local demo operations inventory hardening checkpoint.
 - Refactored `/settings/demo` readiness checkpoint signals and operational links to project from the shared operator surface inventory.

@@ -3,6 +3,7 @@ import {
   getDemoOperationsCheckpoints,
   getDemoOperationsLinks,
   getDemoConsoleLinks,
+  getSettingsNavigationLinks,
   operatorSurfaceGroups
 } from "@/lib/operations/operator-surfaces";
 
@@ -10,6 +11,7 @@ const operationSurfaceLinks = operatorSurfaceGroups.flatMap((group) => group.lin
 const demoConsoleLinks = getDemoConsoleLinks();
 const demoOperationsCheckpoints = getDemoOperationsCheckpoints();
 const demoOperationsLinks = getDemoOperationsLinks();
+const settingsNavigationLinks = getSettingsNavigationLinks();
 
 test.setTimeout(60_000);
 
@@ -229,6 +231,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Go-Live Readiness" }).click();
   await expect(page.getByRole("heading", { name: "Go-Live Readiness" })).toBeVisible();
+  for (const link of settingsNavigationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await expect(page.getByText("Twilio Readiness")).toBeVisible();
   await expect(page.getByText("API Protection")).toBeVisible();
   await expect(page.getByText("Credential Rotation History")).toBeVisible();
