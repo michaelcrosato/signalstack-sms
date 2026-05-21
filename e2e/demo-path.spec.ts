@@ -187,6 +187,11 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   }
   await expect(page.getByRole("heading", { name: "Safety Gates" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Runtime Controls" })).toBeVisible();
+  const securityNoImpactSummary = page.locator("section").filter({ has: page.getByRole("heading", { name: "No-Impact Summary" }) });
+  await expect(securityNoImpactSummary.getByText("Command execution", { exact: true })).toBeVisible();
+  await expect(securityNoImpactSummary.getByText("External impact", { exact: true })).toBeVisible();
+  await expect(securityNoImpactSummary.getByText("Mutation", { exact: true })).toBeVisible();
+  await expect(securityNoImpactSummary.getByText("Secrets displayed", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Control Inventory" })).toBeVisible();
   await expect(page.getByText("Secret scanning remains")).toBeVisible();
   await page.getByRole("link", { name: "Notification Operations" }).click();

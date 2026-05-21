@@ -284,6 +284,7 @@ Post-MVP:
 - Local security operations runtime-frozen vocabulary coverage
 - Local security operations exported vocabulary mutation coverage
 - Local security operations validation-command vocabulary coverage
+- Local security operations mutation no-impact summary coverage
 - Local notification operations whitespace-clean coverage
 - Local notification operations command-literal coverage
 - Local notification operations secret-literal coverage

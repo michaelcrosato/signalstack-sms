@@ -59,6 +59,15 @@ export default async function SecurityOperationsPage() {
         </Panel>
       </section>
 
+      <Panel title="No-Impact Summary">
+        <dl className="grid gap-3 text-sm md:grid-cols-4">
+          <StatusRow label="Command execution" value={securityStatus.commandExecution} />
+          <StatusRow label="External impact" value={securityStatus.externalImpact} />
+          <StatusRow label="Mutation" value={securityStatus.mutation} />
+          <StatusRow label="Secrets displayed" value={String(securityStatus.secretsDisplayed)} />
+        </dl>
+      </Panel>
+
       <Panel title="Control Inventory">
         <ul className="grid gap-3 text-sm">
           {securityStatus.controls.map((control) => (

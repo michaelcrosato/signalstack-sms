@@ -14,6 +14,7 @@ export type SecurityOperationsStatus = {
   validationReferenceCount: number;
   commandExecution: SecurityOperationCommandExecutionState;
   externalImpact: SecurityOperationExternalImpactState;
+  mutation: SecurityOperationMutationState;
   secretsDisplayed: SecurityOperationSecretsDisplayedState;
   controls: readonly SecurityOperationControl[];
   validationReferences: readonly SecurityOperationValidationReference[];
@@ -34,12 +35,14 @@ export const allowedSecurityOperationValidationCommands = Object.freeze([
 ] as const);
 export const allowedSecurityOperationCommandExecutionStates = Object.freeze(["none"] as const);
 export const allowedSecurityOperationExternalImpactStates = Object.freeze(["none"] as const);
+export const allowedSecurityOperationMutationStates = Object.freeze(["none"] as const);
 export const allowedSecurityOperationSecretsDisplayedStates = Object.freeze([false] as const);
 
 export type SecurityOperationControlStatus = (typeof allowedSecurityOperationControlStatuses)[number];
 export type SecurityOperationValidationCommand = (typeof allowedSecurityOperationValidationCommands)[number];
 export type SecurityOperationCommandExecutionState = (typeof allowedSecurityOperationCommandExecutionStates)[number];
 export type SecurityOperationExternalImpactState = (typeof allowedSecurityOperationExternalImpactStates)[number];
+export type SecurityOperationMutationState = (typeof allowedSecurityOperationMutationStates)[number];
 export type SecurityOperationSecretsDisplayedState = (typeof allowedSecurityOperationSecretsDisplayedStates)[number];
 
 const securityOperationControlFields = ["name", "status", "detail"] as const;
@@ -56,8 +59,9 @@ const forbiddenSecretMetadataPatterns = [
 const securityOperationStatusSummary = Object.freeze({
   commandExecution: "none",
   externalImpact: "none",
+  mutation: "none",
   secretsDisplayed: false
-} satisfies Pick<SecurityOperationsStatus, "commandExecution" | "externalImpact" | "secretsDisplayed">);
+} satisfies Pick<SecurityOperationsStatus, "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed">);
 
 function assertExactFields<T extends object>(value: T, fields: readonly string[], errorMessage: string) {
   const actualKeys = Reflect.ownKeys(value);
@@ -85,13 +89,19 @@ function assertNoSecretLikeMetadata(value: string, errorMessage: string) {
   }
 }
 
-function assertStatusSummary(summary: Pick<SecurityOperationsStatus, "commandExecution" | "externalImpact" | "secretsDisplayed">) {
+function assertStatusSummary(
+  summary: Pick<SecurityOperationsStatus, "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed">
+) {
   if (!allowedSecurityOperationCommandExecutionStates.includes(summary.commandExecution)) {
     throw new Error(`Unsupported security operation command execution state: ${summary.commandExecution}`);
   }
 
   if (!allowedSecurityOperationExternalImpactStates.includes(summary.externalImpact)) {
     throw new Error(`Unsupported security operation external impact state: ${summary.externalImpact}`);
+  }
+
+  if (!allowedSecurityOperationMutationStates.includes(summary.mutation)) {
+    throw new Error(`Unsupported security operation mutation state: ${summary.mutation}`);
   }
 
   if (!allowedSecurityOperationSecretsDisplayedStates.includes(summary.secretsDisplayed)) {
@@ -258,6 +268,7 @@ export function getSecurityOperationsStatus(): SecurityOperationsStatus {
     validationReferenceCount: securityOperationValidationReferences.length,
     commandExecution: securityOperationStatusSummary.commandExecution,
     externalImpact: securityOperationStatusSummary.externalImpact,
+    mutation: securityOperationStatusSummary.mutation,
     secretsDisplayed: securityOperationStatusSummary.secretsDisplayed,
     controls: freezeSecurityControls(securityOperationControls.map((control) => ({ ...control }))),
     validationReferences: freezeValidationReferences(securityOperationValidationReferences.map((reference) => ({ ...reference }))),

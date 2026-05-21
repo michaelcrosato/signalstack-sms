@@ -5,6 +5,7 @@ import {
   allowedSecurityOperationCommandExecutionStates,
   allowedSecurityOperationControlStatuses,
   allowedSecurityOperationExternalImpactStates,
+  allowedSecurityOperationMutationStates,
   allowedSecurityOperationSecretsDisplayedStates,
   allowedSecurityOperationValidationCommands,
   getSecurityOperationsStatus,
@@ -20,6 +21,7 @@ const publicStatusFields = [
   "validationReferenceCount",
   "commandExecution",
   "externalImpact",
+  "mutation",
   "secretsDisplayed",
   "controls",
   "validationReferences",
@@ -46,6 +48,7 @@ describe("getSecurityOperationsStatus", () => {
     expect(status.validationReferenceCount).toBe(4);
     expect(status.commandExecution).toBe("none");
     expect(status.externalImpact).toBe("none");
+    expect(status.mutation).toBe("none");
     expect(status.secretsDisplayed).toBe(false);
     expect(status.controls.map((control) => control.name)).toEqual([
       "Secret storage",
@@ -148,12 +151,15 @@ describe("getSecurityOperationsStatus", () => {
 
     expect(allowedSecurityOperationCommandExecutionStates).toEqual(["none"]);
     expect(allowedSecurityOperationExternalImpactStates).toEqual(["none"]);
+    expect(allowedSecurityOperationMutationStates).toEqual(["none"]);
     expect(allowedSecurityOperationSecretsDisplayedStates).toEqual([false]);
     expect(Object.isFrozen(allowedSecurityOperationCommandExecutionStates)).toBe(true);
     expect(Object.isFrozen(allowedSecurityOperationExternalImpactStates)).toBe(true);
+    expect(Object.isFrozen(allowedSecurityOperationMutationStates)).toBe(true);
     expect(Object.isFrozen(allowedSecurityOperationSecretsDisplayedStates)).toBe(true);
     expect(allowedSecurityOperationCommandExecutionStates).toContain(status.commandExecution);
     expect(allowedSecurityOperationExternalImpactStates).toContain(status.externalImpact);
+    expect(allowedSecurityOperationMutationStates).toContain(status.mutation);
     expect(allowedSecurityOperationSecretsDisplayedStates).toContain(status.secretsDisplayed);
   });
 
@@ -163,6 +169,7 @@ describe("getSecurityOperationsStatus", () => {
       allowedSecurityOperationValidationCommands,
       allowedSecurityOperationCommandExecutionStates,
       allowedSecurityOperationExternalImpactStates,
+      allowedSecurityOperationMutationStates,
       allowedSecurityOperationSecretsDisplayedStates
     ];
 

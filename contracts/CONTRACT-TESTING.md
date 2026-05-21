@@ -184,11 +184,12 @@ Post-MVP security operations view:
 
 - Unit tests must verify that the static security operations inventory keeps security controls, validation command references, safety boundaries, public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, and no secret display stable before `/settings/security` renders them.
 - Unit tests must verify that the static security operations inventory keeps control status values inside the documented local-only vocabulary and safety boundaries explicitly name blocked secrets, provider calls, SMS, email, notifications, and mutations before `/settings/security` renders them.
-- Unit tests must verify that the static security operations inventory exports runtime-frozen supported control-status, command-execution, external-impact, and secrets-displayed vocabularies before `/settings/security` renders metadata.
+- Unit tests must verify that the static security operations inventory exports runtime-frozen supported control-status, command-execution, external-impact, mutation, and secrets-displayed vocabularies before `/settings/security` renders metadata.
 - Unit tests must verify that the static security operations exported vocabularies reject caller mutation before `/settings/security` renders metadata.
 - Unit tests must verify that the static security operations inventory keeps validation command references inside the runtime-frozen supported command allowlist and backed by `package.json` scripts before `/settings/security` renders them.
 - Unit tests must verify that the static security operations inventory keeps controls, validation references, and safety boundaries whitespace-clean before `/settings/security` renders metadata.
 - Unit tests must verify that the static security operations inventory rejects secret-like literals before `/settings/security` renders metadata.
+- The seeded investor demo path must verify that `/settings/security` renders command-execution, external-impact, mutation, and secrets-displayed no-impact labels without scanning files, exposing raw env values, mutating records, provider calls, billing records, live AI, SMS, email, notifications, or live feature enablement.
 
 Post-MVP notification operations view:
 
