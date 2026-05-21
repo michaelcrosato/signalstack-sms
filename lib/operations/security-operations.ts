@@ -35,6 +35,13 @@ const allowedSecurityOperationControlStatuses = [
   "validation enforced"
 ] as const;
 const requiredSafetyBoundaryTerms = ["secrets", "provider calls", "SMS", "email", "notifications", "mutations"] as const;
+const forbiddenSecretMetadataPatterns = [
+  /\bsk_(?:live|test)_[A-Za-z0-9]+/,
+  /\bpk_live_[A-Za-z0-9]+/,
+  /\bAC[a-fA-F0-9]{32}\b/,
+  /\b(?:TWILIO_AUTH_TOKEN|STRIPE_SECRET_KEY|OPENAI_API_KEY|CLERK_SECRET_KEY)\s*=/,
+  /\bBearer\s+[A-Za-z0-9._-]{12,}/
+] as const;
 
 function assertExactFields<T extends object>(value: T, fields: readonly string[], errorMessage: string) {
   const actualKeys = Reflect.ownKeys(value);
@@ -56,11 +63,18 @@ function assertNonblankString(value: unknown, errorMessage: string) {
   }
 }
 
+function assertNoSecretLikeMetadata(value: string, errorMessage: string) {
+  if (forbiddenSecretMetadataPatterns.some((pattern) => pattern.test(value))) {
+    throw new Error(errorMessage);
+  }
+}
+
 function assertSecurityControl(control: SecurityOperationControl) {
   assertExactFields(control, securityOperationControlFields, "Invalid security operation control fields");
   assertNonblankString(control.name, "Invalid security operation control name");
   assertNonblankString(control.status, `Invalid security operation status for ${control.name}`);
   assertNonblankString(control.detail, `Invalid security operation detail for ${control.name}`);
+  assertNoSecretLikeMetadata(control.detail, `Secret-like security operation detail for ${control.name}`);
 
   if (!allowedSecurityOperationControlStatuses.includes(control.status as (typeof allowedSecurityOperationControlStatuses)[number])) {
     throw new Error(`Unsupported security operation status for ${control.name}`);
@@ -83,6 +97,7 @@ function assertValidationReference(reference: SecurityOperationValidationReferen
   }
 
   assertNonblankString(reference.purpose, `Invalid security operation validation purpose for ${reference.command}`);
+  assertNoSecretLikeMetadata(reference.purpose, `Secret-like security operation validation purpose for ${reference.command}`);
 }
 
 function freezeSecurityControls(controls: SecurityOperationControl[]) {
@@ -129,6 +144,7 @@ function freezeValidationReferences(references: SecurityOperationValidationRefer
 function freezeSafetyBoundaries(boundaries: string[]) {
   for (const boundary of boundaries) {
     assertNonblankString(boundary, "Invalid security operation safety boundary");
+    assertNoSecretLikeMetadata(boundary, "Secret-like security operation safety boundary");
   }
 
   assertUniqueValues(boundaries, "Duplicate security operation safety boundaries");

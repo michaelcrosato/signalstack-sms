@@ -49,7 +49,7 @@ Admin exports review is available at `/settings/exports`. Its navigation is proj
 
 Integration operations review is available at `/settings/integrations`. It renders existing provider, number, webhook, AI, billing, and notification boundaries only; it does not call providers, submit prompts, call live AI, call Stripe, notify, send SMS or email, mutate records, enqueue jobs, expose secrets, export data, or enable live features.
 
-Security operations review is available at `/settings/security`. Its control inventory, validation command references, supported package-script references, local-only status values, and safety boundaries are validated static metadata before render; it does not scan files, read raw environment values, reveal secrets, mutate records, call providers, call live AI, call Stripe, send SMS, email, or notifications, disable rate limits, or enable live features.
+Security operations review is available at `/settings/security`. Its control inventory, validation command references, supported package-script references, local-only status values, safety boundaries, and secret-like literal guard are validated static metadata before render; it does not scan files, read raw environment values, reveal secrets, mutate records, call providers, call live AI, call Stripe, send SMS, email, or notifications, disable rate limits, or enable live features.
 
 Workflow operations review is available at `/settings/workflows`. It renders existing demo workflow checkpoints across audience, campaigns, queue, inbox, delivery, AI, usage, and reporting only; it does not import, schedule, run workers, reply, retry, prompt, execute reports, export, mutate records, call providers, bill, notify, expose secrets, or enable live features.
 

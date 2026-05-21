@@ -235,6 +235,7 @@ Post-MVP:
 - Local validation operations value-boundary coverage
 - Local validation operations package-script coverage
 - Local security operations package-script coverage
+- Local security operations secret-literal coverage
 
 ## Next Milestone
 

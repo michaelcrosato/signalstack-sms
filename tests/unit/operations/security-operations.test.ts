@@ -166,4 +166,21 @@ describe("getSecurityOperationsStatus", () => {
 
     expect(missingScripts).toEqual([]);
   });
+
+  it("keeps security operation static metadata free of secret-like literals", () => {
+    const staticCopy = [
+      ...securityOperationControls.flatMap((control) => [control.name, control.status, control.detail]),
+      ...securityOperationValidationReferences.flatMap((reference) => [reference.command, reference.purpose]),
+      ...securityOperationSafetyBoundaries
+    ];
+    const secretLikePatterns = [
+      /\bsk_(?:live|test)_[A-Za-z0-9]+/,
+      /\bpk_live_[A-Za-z0-9]+/,
+      /\bAC[a-fA-F0-9]{32}\b/,
+      /\b(?:TWILIO_AUTH_TOKEN|STRIPE_SECRET_KEY|OPENAI_API_KEY|CLERK_SECRET_KEY)\s*=/,
+      /\bBearer\s+[A-Za-z0-9._-]{12,}/
+    ];
+
+    expect(staticCopy.filter((copy) => secretLikePatterns.some((pattern) => pattern.test(copy)))).toEqual([]);
+  });
 });
