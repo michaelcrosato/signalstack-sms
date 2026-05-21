@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 157  GREEN  security-operations-exported-vocabulary-mutation  2026-05-21 04:00
+Objective:    Keep exported `/settings/security` supported vocabularies frozen against caller mutation.
+Changed:
+- Added unit coverage proving every exported security operation vocabulary is runtime-frozen and rejects caller mutation.
+- Updated README, PLAN, testing contract docs, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP security operations hardening or safe read-only operator surface refinements.
+
 ## Run 143  GREEN  notification-operations-exported-channel-vocabulary  2026-05-21 02:57
 Objective:    Keep notification operation channel metadata typed from the exported supported vocabulary.
 Changed:

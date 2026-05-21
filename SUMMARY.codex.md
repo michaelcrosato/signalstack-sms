@@ -1,14 +1,23 @@
 # Codex Summary
 
-- Advanced a post-MVP readiness audit default query-limit vocabulary checkpoint.
-- Exported a runtime-frozen readiness-audit default-limit vocabulary and exposed the default limit through the read-only readiness-audit operations status.
-- Updated readiness-audit query validation and `/settings/readiness-audit` fallback parsing so the default limit comes from the operations vocabulary instead of a hard-coded literal.
-- Added unit coverage proving the default-limit vocabulary is positive, frozen, mutation-resistant, inside the maximum export limit, and used by the query schema default.
-- Updated testing/compliance contract docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
-- Focused readiness-audit operations/export unit coverage and typecheck passed; protected local gate passed.
+- Advanced a post-MVP security operations exported vocabulary mutation checkpoint.
+- Added unit coverage proving every exported `/settings/security` supported vocabulary is runtime-frozen and rejects caller mutation before local security metadata renders.
+- Updated README, PLAN, testing contract docs, next-prompt handoff docs, blockers, and loop logs.
+- Focused security operations unit coverage passed; protected local gate passed.
 - No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
 
-Run number: 154
+Run number: 157
+
+## Previous Run
+
+- Advanced a post-MVP security operations runtime-frozen vocabulary checkpoint.
+- Exported and validated supported security control-status, command-execution, external-impact, and secrets-displayed vocabularies before local security metadata renders.
+- Added unit coverage proving `/settings/security` summary states stay inside those vocabularies.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+- Focused security operations unit coverage passed; protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 156
 
 ## Previous Run
 

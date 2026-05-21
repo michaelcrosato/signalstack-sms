@@ -260,6 +260,7 @@ Post-MVP:
 - Local security operations package-script coverage
 - Local security operations secret-literal coverage
 - Local security operations runtime-frozen vocabulary coverage
+- Local security operations exported vocabulary mutation coverage
 - Local notification operations whitespace-clean coverage
 - Local notification operations command-literal coverage
 - Local notification operations exported channel-vocabulary coverage

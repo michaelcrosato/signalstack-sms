@@ -156,6 +156,20 @@ describe("getSecurityOperationsStatus", () => {
     expect(allowedSecurityOperationSecretsDisplayedStates).toContain(status.secretsDisplayed);
   });
 
+  it("keeps exported security operation vocabularies frozen against caller mutation", () => {
+    const vocabularies = [
+      allowedSecurityOperationControlStatuses,
+      allowedSecurityOperationCommandExecutionStates,
+      allowedSecurityOperationExternalImpactStates,
+      allowedSecurityOperationSecretsDisplayedStates
+    ];
+
+    for (const vocabulary of vocabularies) {
+      expect(Object.isFrozen(vocabulary)).toBe(true);
+      expect(() => ((vocabulary as unknown) as unknown[]).push("unsafe")).toThrow(TypeError);
+    }
+  });
+
   it("keeps security operation validation references inside the supported command allowlist", () => {
     expect(securityOperationValidationReferences.map((reference) => reference.command)).toEqual([
       "npm run validate",
