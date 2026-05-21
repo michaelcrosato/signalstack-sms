@@ -86,6 +86,8 @@ test("product contacts page lists seeded contacts and imports local CSV rows", a
 });
 
 test("product campaigns page creates, preflights, and schedules a local campaign", async ({ page }) => {
+  const campaignName = `Product E2E campaign ${Date.now()}`;
+
   await page.goto("/dashboard/campaigns");
 
   await expect(page.getByRole("heading", { name: "Campaign workspace" })).toBeVisible();
@@ -94,7 +96,7 @@ test("product campaigns page creates, preflights, and schedules a local campaign
   await expect(page.getByRole("heading", { name: "Campaign status" })).toBeVisible();
   await expect(page.getByText("Demo intro campaign")).toBeVisible();
 
-  await page.getByLabel("Campaign name").fill("Product E2E campaign");
+  await page.getByLabel("Campaign name").fill(campaignName);
   await page.getByRole("button", { name: "Save Draft And Preflight" }).click();
 
   await expect(page.getByRole("status")).toContainText("Draft saved");
@@ -104,5 +106,38 @@ test("product campaigns page creates, preflights, and schedules a local campaign
 
   await page.getByRole("button", { name: "Schedule Locally" }).click();
   await expect(page.getByRole("status")).toContainText("Campaign scheduled locally");
-  await expect(page.getByRole("row").filter({ hasText: "Product E2E campaign" }).getByText("SCHEDULED")).toBeVisible();
+  await expect(page.getByRole("row").filter({ hasText: campaignName }).getByText("SCHEDULED")).toBeVisible();
+});
+
+test("product inbox page manages a local conversation thread", async ({ page }) => {
+  const noteBody = `Product E2E note ${Date.now()}: STOP should remain local and update consent.`;
+
+  await page.goto("/dashboard/inbox");
+
+  await expect(page.getByRole("heading", { name: "Inbox workspace" })).toBeVisible();
+  await expect(page.getByLabel("Inbox metrics").getByText("Open Threads")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Conversation list" })).toBeVisible();
+  await expect(page.getByText("Ada Lovelace")).toBeVisible();
+  await expect(page.getByText("Can you send pricing?")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Thread" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Demo inbound" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Internal note" })).toBeVisible();
+
+  await page.getByLabel("Reply body").fill("STOP");
+  await page.getByRole("button", { name: "Add Local Reply" }).click();
+  await expect(page.getByRole("status")).toContainText("Local inbound reply added");
+  await expect(page.getByText("STOP").first()).toBeVisible();
+
+  await page.getByLabel("Note body").fill(noteBody);
+  await page.getByRole("button", { name: "Add Note" }).click();
+  await expect(page.getByRole("status")).toContainText("Internal note added");
+  await expect(page.getByRole("article").filter({ hasText: noteBody })).toBeVisible();
+
+  await page.getByRole("button", { name: "Resolve" }).click();
+  await expect(page.getByRole("status")).toContainText("Conversation resolved");
+  await expect(page.getByText("RESOLVED").first()).toBeVisible();
+
+  await page.getByRole("button", { name: "Reopen" }).click();
+  await expect(page.getByRole("status")).toContainText("Conversation reopened");
+  await expect(page.getByText("OPEN").first()).toBeVisible();
 });

@@ -1883,3 +1883,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Build inbox list/thread UI on existing inbox APIs.
+
+## Run 204  GREEN  product-inbox-workspace  2026-05-21 14:27
+Objective:    Add an owner-facing inbox list/thread workflow on existing local inbox APIs.
+Changed:
+- Added `/dashboard/inbox` with conversation list/thread rendering, local demo inbound replies, notes, assign-to-me, and resolve/reopen controls.
+- Added product inbox data adapter and unit coverage for summaries, rows, selected messages, and notes.
+- Extended seeded product E2E to cover inbox local reply, note, resolve, and reopen actions without live external impact.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Build template list/detail UI on existing template APIs.
