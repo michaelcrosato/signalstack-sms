@@ -1787,3 +1787,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP contract/security/validation operations hardening or safe read-only operator surface refinements.
+
+## Run 199  GREEN  api-operations-method-scan-vocabulary  2026-05-21 07:18
+Objective:    Keep API route-method reverse coverage aligned to the exported supported method vocabulary.
+Changed:
+- Updated implemented API route-method scanning in API operations tests to derive from `allowedApiOperationMethods`.
+- Updated testing contract/docs, README, SUMMARY, and BLOCKERS.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP API/contract/validation operations hardening or safe read-only operator surface refinements.

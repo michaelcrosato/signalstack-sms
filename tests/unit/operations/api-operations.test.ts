@@ -37,7 +37,6 @@ function apiPathToRouteFile(apiPath: string) {
 
 function collectImplementedApiRouteMethods(root: string) {
   const routeMethods: string[] = [];
-  const supportedMethods = ["GET", "POST", "PATCH", "DELETE"] as const;
 
   function walk(directory: string) {
     for (const entry of readdirSync(directory, { withFileTypes: true })) {
@@ -50,7 +49,7 @@ function collectImplementedApiRouteMethods(root: string) {
         const relativeRoute = relative(join(process.cwd(), "app"), fullPath).split(sep).join("/").replace(/\/route\.ts$/, "");
         const routePath = `/${relativeRoute}`;
 
-        for (const method of supportedMethods) {
+        for (const method of allowedApiOperationMethods) {
           const methodExportPattern = new RegExp(`export\\s+(?:async\\s+)?function\\s+${method}\\b|export\\s+const\\s+${method}\\b`);
 
           if (methodExportPattern.test(source)) {

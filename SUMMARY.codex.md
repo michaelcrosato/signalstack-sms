@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP API operations method-scan vocabulary checkpoint.
+- Updated API operations reverse route-method coverage so implemented-route scanning derives from the exported runtime-frozen method vocabulary instead of a duplicated test-local method list.
+- Updated testing contract/docs, README, blockers, and loop logs.
+- No product behavior changed; the slice is local API inventory coverage only.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, worker execution, Redis calls, record mutations, or protected gate-script edits were used.
+
+Run number: 199
+
+## Previous Run
+
 - Advanced a post-MVP validation operations detached status-array count checkpoint.
 - Added unit coverage proving `/settings/validation` returned gate-command and repair-signal arrays stay detached from exported metadata while read-only counts remain aligned.
 - Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
