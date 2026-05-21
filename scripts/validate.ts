@@ -6,6 +6,7 @@ const scripts = [
   "secrets:scan",
   "compliance:check",
   "production:gate",
+  "production-worker:check",
   "observability:check",
   "operator:check",
   "platform:check",

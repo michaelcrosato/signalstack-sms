@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 216  GREEN  production-worker-policy-validation  2026-05-21 16:40
+Objective:    Make the production worker policy an executable validation check before live-provider worker design.
+Changed:
+- Added `npm run production-worker:check` to verify the local/demo-only worker boundary remains present in policy docs, worker source, BullMQ source, queue tests, and worker package scripts.
+- Wired the worker policy check into `npm run validate`.
+- Updated local gate, state matrix, and next-prompt handoff docs to reflect that worker policy validation is now executable while live worker execution remains unauthorized.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Specify a dedicated production worker deployment class before any live campaign worker implementation.
+
 ## Run 215  GREEN  production-worker-policy-planning  2026-05-21 16:30
 Objective:    Specify the production worker policy planning gate before live provider worker design starts.
 Changed:

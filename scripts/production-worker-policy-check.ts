@@ -1,0 +1,68 @@
+import { readFileSync } from "node:fs";
+
+type RequiredText = {
+  file: string;
+  text: string;
+};
+
+const requiredTexts: RequiredText[] = [
+  {
+    file: "docs/PRODUCTION_WORKER_POLICY.md",
+    text: "does not authorize production worker execution"
+  },
+  {
+    file: "docs/PRODUCTION_WORKER_POLICY.md",
+    text: "Production-like runtime markers are `NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, or `APP_ENV`"
+  },
+  {
+    file: "docs/PRODUCTION_WORKER_POLICY.md",
+    text: "Tests proving production-like worker startup remains blocked"
+  },
+  {
+    file: "docs/PRODUCTION_WORKER_POLICY.md",
+    text: "The isolated `/demo` live-test SMS path remains separate from campaign workers"
+  },
+  {
+    file: "lib/queue/worker.ts",
+    text: "reason: \"production-worker-blocked\""
+  },
+  {
+    file: "lib/queue/worker.ts",
+    text: "environmentIsProductionLike"
+  },
+  {
+    file: "lib/queue/bullmq-worker.ts",
+    text: "production-worker-blocked"
+  },
+  {
+    file: "tests/unit/queue/worker.test.ts",
+    text: "blocks worker processing in production-like runtimes"
+  },
+  {
+    file: "tests/unit/queue/bullmq-worker.test.ts",
+    text: "production-worker-blocked"
+  },
+  {
+    file: "package.json",
+    text: "\"worker\": \"tsx workers/index.ts\""
+  },
+  {
+    file: "package.json",
+    text: "\"worker:bullmq\": \"tsx workers/bullmq.ts\""
+  }
+];
+
+const failures = requiredTexts.flatMap(({ file, text }) => {
+  const contents = readFileSync(file, "utf8");
+  return contents.includes(text) ? [] : [`${file} is missing required production worker policy text: ${text}`];
+});
+
+if (failures.length > 0) {
+  console.error("Production worker policy check failed:");
+  for (const failure of failures) {
+    console.error(`- ${failure}`);
+  }
+  process.exit(1);
+}
+
+console.log("Production worker policy check passed.");

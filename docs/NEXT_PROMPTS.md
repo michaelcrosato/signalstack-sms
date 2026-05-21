@@ -18,13 +18,13 @@ This file is the handoff for the next automated loop. It should stay short enoug
 - The browser product now has an initial `/dashboard` shell, `/dashboard/contacts` list/import workflow with archived restore links, `/dashboard/contacts/:contactId` local detail/edit/archive/restore/merge workflow, `/dashboard/campaigns` compose/preflight/local schedule workflow, `/dashboard/campaigns/:campaignId` local draft edit and queued cancel workflow, `/dashboard/inbox` local thread workflow, `/dashboard/templates` local template create/list workflow, `/dashboard/templates/:templateId` local detail/edit workflow, `/dashboard/analytics` local overview detail, and `/dashboard/compliance` local readiness detail.
 - The only live external-impact route is the isolated gated live-test SMS demo path.
 - Local database and BullMQ workers now block production-like runtime markers even with dummy/demo-safe provider defaults.
-- `docs/PRODUCTION_WORKER_POLICY.md` now defines the future production worker planning gate; it does not authorize live worker execution.
+- `docs/PRODUCTION_WORKER_POLICY.md` now defines the future production worker planning gate, and `npm run production-worker:check` keeps the current local/demo-only worker boundary present in docs/source/tests; it does not authorize live worker execution.
 - Live campaign sending, live billing, live AI, production auth, production secrets, and production deployment remain blocked.
 
 ## Next Best Work
 
 1. Keep the product demo path stable while collecting review feedback.
-2. Start live-provider design only after the production worker policy becomes executable validation and runtime gates.
+2. Start live-provider design only after a dedicated production worker deployment class and live-worker controls are specified.
 
 ## Guardrails
 
