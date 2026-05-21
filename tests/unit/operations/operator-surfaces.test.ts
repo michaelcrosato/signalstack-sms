@@ -119,6 +119,17 @@ describe("operator surface inventory", () => {
     expect(new Set(notes).size).toBe(notes.length);
   });
 
+  it("keeps operator inventory copy in a stable navigation format", () => {
+    const titleCaseWords = /^[A-Z][A-Za-z0-9&-]*( (&|[A-Z][A-Za-z0-9&-]*))*$/;
+    const noteFragment = /^[a-z0-9][A-Za-z0-9,& -]*$/;
+    const links = operatorSurfaceGroups.flatMap((group) => group.links);
+
+    expect(operatorSurfaceGroups.map((group) => group.name).filter((name) => !titleCaseWords.test(name))).toEqual([]);
+    expect(links.map((link) => link.label).filter((label) => !titleCaseWords.test(label))).toEqual([]);
+    expect(links.map((link) => link.note).filter((note) => !noteFragment.test(note))).toEqual([]);
+    expect(links.map((link) => link.note).filter((note) => note.endsWith(".") || note.includes("  "))).toEqual([]);
+  });
+
   it("keeps every projected operator navigation set unique and backed by the shared inventory", () => {
     const inventoryLinks = operatorSurfaceGroups.flatMap((group) => group.links);
     const inventoryRoutes = new Set(inventoryLinks.map((link) => link.href));

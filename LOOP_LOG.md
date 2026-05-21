@@ -1,3 +1,13 @@
+## Run 065  GREEN  inventory-copy-shape  2026-05-20 21:16
+Objective:    Add a shared guard for operator inventory navigation-copy format.
+Changed:
+- Added unit coverage that keeps shared operator surface group names and labels in stable Title Case navigation format.
+- Added unit coverage that keeps operator surface notes as short lower-case sentence fragments without terminal punctuation.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 058  GREEN  billing-ai-shared-inventory  2026-05-20 20:39
 Objective:    Project billing and AI operations navigation from the shared operator surface inventory.
 Changed:

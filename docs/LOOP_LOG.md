@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 065  GREEN  inventory-copy-shape  2026-05-20 21:16
+Objective:    Add a shared guard for operator inventory navigation-copy format.
+Changed:
+- Added unit coverage that keeps shared operator surface group names and labels in stable Title Case navigation format.
+- Added unit coverage that keeps operator surface notes as short lower-case sentence fragments without terminal punctuation.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 064  GREEN  projection-self-link-guard  2026-05-20 21:10
 Objective:    Add a shared guard against page-specific operator navigation linking to the current page.
 Changed:

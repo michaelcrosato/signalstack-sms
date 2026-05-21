@@ -35,6 +35,7 @@ Post-MVP local operations status:
 - Unit tests must verify that every shared per-page operator navigation projection has unique route entries, points at implemented `app/**/page.tsx` files, and resolves only through the shared operations inventory.
 - Unit tests must verify that page-specific operator navigation projections exclude their own current route, while broader inventory views such as the runbook may intentionally list all local admin pages.
 - Unit tests must verify that the shared operator surface inventory keeps group names, link labels, and link notes unambiguous so projected navigation and browser checks cannot silently collide.
+- Unit tests must verify that shared operator surface group names and labels stay in stable Title Case navigation format, and notes stay short lower-case sentence fragments without terminal punctuation.
 - Unit tests must verify that every shared operator surface route remains a canonical static local app-page route: lowercase, no trailing slash, no query/hash, no dynamic segment, no double slash, and limited to `/demo`, `/settings`, or `/settings/**`.
 - The Playwright smoke test must verify the root launch dashboard's visible links from the same shared operations inventory instead of a duplicated hard-coded browser list.
 - The seeded investor demo path must verify that `/demo` renders visible console navigation from the same shared operations inventory instead of a duplicated hard-coded browser list.

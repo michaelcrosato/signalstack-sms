@@ -1,15 +1,20 @@
 # Codex Summary
 
-Run number: 64
+Run number: 65
 
 ## Completed
+
+- Advanced a post-MVP shared operator inventory copy-shape checkpoint.
+- Added unit coverage that keeps shared operator surface group names and labels in stable Title Case navigation format, while notes remain short lower-case sentence fragments without terminal punctuation.
+- Updated testing contract/docs, README, PLAN, BLOCKERS, and next-prompt handoff docs with the copy-shape guard.
+- Protected local gate and targeted operator-surface unit coverage passed.
+
+## Prior Completed
 
 - Advanced a post-MVP page-specific operator projection self-link checkpoint.
 - Added unit coverage that verifies page-specific operator navigation projections do not link back to their own current route, while preserving broader inventory projections such as the runbook.
 - Updated testing contract/docs, README, PLAN, BLOCKERS, and next-prompt handoff docs with the self-link guard.
 - Protected local gate and targeted operator-surface unit coverage passed.
-
-## Prior Completed
 
 - Advanced a post-MVP shared operator inventory copy-integrity checkpoint.
 - Added unit coverage that verifies shared operator surface group names, link labels, and link notes stay unique.
