@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP notification operations mutation no-impact summary checkpoint.
+- Added a runtime-frozen notification mutation vocabulary and status field, rendered the Mutation label on `/settings/notifications`, and pinned it in notification unit coverage plus the seeded investor demo path.
+- Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
+- Protected local gate and seeded investor demo path passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, worker execution, Redis calls, mutations, or protected gate-script edits were used.
+
+Run number: 177
+
+## Previous Run
+
 - Advanced a post-MVP queue operations mutation no-impact summary checkpoint.
 - Added a runtime-frozen queue mutation vocabulary and status field, rendered the Mutation label on `/settings/queue`, and pinned it in queue unit coverage plus the seeded investor demo path.
 - Updated queue/testing contracts, README, PLAN, next-prompt handoff docs, blockers, and loop logs.

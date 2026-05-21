@@ -2,6 +2,7 @@ export const allowedNotificationOperationChannelStatuses = Object.freeze(["block
 export const allowedNotificationOperationChannelNames = Object.freeze(["Email", "In-app", "SMS alerts", "Webhooks"] as const);
 export const allowedNotificationOperationCommandExecutionStates = Object.freeze(["none"] as const);
 export const allowedNotificationOperationExternalImpactStates = Object.freeze(["none"] as const);
+export const allowedNotificationOperationMutationStates = Object.freeze(["none"] as const);
 export const allowedNotificationOperationSecretsDisplayedStates = Object.freeze([false] as const);
 
 export type NotificationOperationChannelStatus = (typeof allowedNotificationOperationChannelStatuses)[number];
@@ -10,6 +11,7 @@ export type NotificationOperationCommandExecutionState =
   (typeof allowedNotificationOperationCommandExecutionStates)[number];
 export type NotificationOperationExternalImpactState =
   (typeof allowedNotificationOperationExternalImpactStates)[number];
+export type NotificationOperationMutationState = (typeof allowedNotificationOperationMutationStates)[number];
 export type NotificationOperationSecretsDisplayedState =
   (typeof allowedNotificationOperationSecretsDisplayedStates)[number];
 
@@ -25,6 +27,7 @@ export type NotificationOperationsStatus = {
   safetyBoundaryCount: number;
   commandExecution: NotificationOperationCommandExecutionState;
   externalImpact: NotificationOperationExternalImpactState;
+  mutation: NotificationOperationMutationState;
   secretsDisplayed: NotificationOperationSecretsDisplayedState;
   channels: readonly NotificationOperationChannel[];
   controls: readonly string[];
@@ -58,8 +61,9 @@ const forbiddenSecretMetadataPatterns = [
 const notificationOperationStatusSummary = Object.freeze({
   commandExecution: "none",
   externalImpact: "none",
+  mutation: "none",
   secretsDisplayed: false
-} satisfies Pick<NotificationOperationsStatus, "commandExecution" | "externalImpact" | "secretsDisplayed">);
+} satisfies Pick<NotificationOperationsStatus, "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed">);
 
 function assertExactFields<T extends object>(value: T, fields: readonly string[], errorMessage: string) {
   const actualKeys = Reflect.ownKeys(value);
@@ -189,13 +193,19 @@ function freezeSafetyBoundaries(boundaries: string[]) {
   return frozenBoundaries;
 }
 
-function assertStatusSummary(summary: Pick<NotificationOperationsStatus, "commandExecution" | "externalImpact" | "secretsDisplayed">) {
+function assertStatusSummary(
+  summary: Pick<NotificationOperationsStatus, "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed">
+) {
   if (!allowedNotificationOperationCommandExecutionStates.includes(summary.commandExecution)) {
     throw new Error(`Unsupported notification operation command execution state: ${summary.commandExecution}`);
   }
 
   if (!allowedNotificationOperationExternalImpactStates.includes(summary.externalImpact)) {
     throw new Error(`Unsupported notification operation external impact state: ${summary.externalImpact}`);
+  }
+
+  if (!allowedNotificationOperationMutationStates.includes(summary.mutation)) {
+    throw new Error(`Unsupported notification operation mutation state: ${summary.mutation}`);
   }
 
   if (!allowedNotificationOperationSecretsDisplayedStates.includes(summary.secretsDisplayed)) {
@@ -252,6 +262,7 @@ export function getNotificationOperationsStatus(): NotificationOperationsStatus 
     safetyBoundaryCount: notificationOperationSafetyBoundaries.length,
     commandExecution: notificationOperationStatusSummary.commandExecution,
     externalImpact: notificationOperationStatusSummary.externalImpact,
+    mutation: notificationOperationStatusSummary.mutation,
     secretsDisplayed: notificationOperationStatusSummary.secretsDisplayed,
     channels: freezeChannels(notificationOperationChannels.map((channel) => ({ ...channel }))),
     controls: freezeControls([...notificationOperationControls]),

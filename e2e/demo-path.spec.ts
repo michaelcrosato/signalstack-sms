@@ -187,6 +187,7 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Channel Boundaries" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Runtime Controls" })).toBeVisible();
   await expect(page.getByText("Command execution")).toBeVisible();
+  await expect(page.getByText("Mutation", { exact: true })).toBeVisible();
   await expect(page.getByText("Secrets displayed")).toBeVisible();
   await expect(page.getByRole("heading", { name: "No-Send Controls" })).toBeVisible();
   for (const link of notificationOperationLinks) {

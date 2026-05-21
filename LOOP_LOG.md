@@ -1620,3 +1620,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP queue/notification/readiness operations hardening or safe read-only operator surface refinements.
+
+## Run 177  GREEN  notification-operations-mutation-no-impact  2026-05-21 05:27
+Objective:    Keep `/settings/notifications` mutation state inside validated no-impact metadata.
+Changed:
+- Added an exported runtime-frozen notification mutation vocabulary and validated status field.
+- Rendered the notification Mutation label from the operations helper and covered it in unit and seeded demo checks.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP notification/readiness/queue operations hardening or safe read-only operator surface refinements.

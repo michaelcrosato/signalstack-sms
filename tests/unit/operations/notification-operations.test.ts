@@ -4,6 +4,7 @@ import {
   allowedNotificationOperationChannelStatuses,
   allowedNotificationOperationCommandExecutionStates,
   allowedNotificationOperationExternalImpactStates,
+  allowedNotificationOperationMutationStates,
   allowedNotificationOperationSecretsDisplayedStates,
   getNotificationOperationsStatus,
   notificationOperationChannels,
@@ -18,6 +19,7 @@ const publicStatusFields = [
   "safetyBoundaryCount",
   "commandExecution",
   "externalImpact",
+  "mutation",
   "secretsDisplayed",
   "channels",
   "controls",
@@ -37,6 +39,7 @@ describe("getNotificationOperationsStatus", () => {
     expect(status.safetyBoundaryCount).toBe(4);
     expect(status.commandExecution).toBe("none");
     expect(status.externalImpact).toBe("none");
+    expect(status.mutation).toBe("none");
     expect(status.secretsDisplayed).toBe(false);
     expect(status.channels.map((channel) => channel.name)).toEqual(["Email", "In-app", "SMS alerts", "Webhooks"]);
   });
@@ -134,12 +137,15 @@ describe("getNotificationOperationsStatus", () => {
 
     expect(allowedNotificationOperationCommandExecutionStates).toEqual(["none"]);
     expect(allowedNotificationOperationExternalImpactStates).toEqual(["none"]);
+    expect(allowedNotificationOperationMutationStates).toEqual(["none"]);
     expect(allowedNotificationOperationSecretsDisplayedStates).toEqual([false]);
     expect(Object.isFrozen(allowedNotificationOperationCommandExecutionStates)).toBe(true);
     expect(Object.isFrozen(allowedNotificationOperationExternalImpactStates)).toBe(true);
+    expect(Object.isFrozen(allowedNotificationOperationMutationStates)).toBe(true);
     expect(Object.isFrozen(allowedNotificationOperationSecretsDisplayedStates)).toBe(true);
     expect(allowedNotificationOperationCommandExecutionStates).toContain(status.commandExecution);
     expect(allowedNotificationOperationExternalImpactStates).toContain(status.externalImpact);
+    expect(allowedNotificationOperationMutationStates).toContain(status.mutation);
     expect(allowedNotificationOperationSecretsDisplayedStates).toContain(status.secretsDisplayed);
   });
 
@@ -149,6 +155,7 @@ describe("getNotificationOperationsStatus", () => {
       allowedNotificationOperationChannelStatuses,
       allowedNotificationOperationCommandExecutionStates,
       allowedNotificationOperationExternalImpactStates,
+      allowedNotificationOperationMutationStates,
       allowedNotificationOperationSecretsDisplayedStates
     ];
 
