@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP notification operations value-boundary checkpoint.
+- Added required no-send control terms so `/settings/notifications` static control copy must continue naming live messaging, live billing, API keys, worker boundaries, and local-only review before render.
+- Added unit coverage proving those no-send control terms stay pinned alongside the existing notification safety-boundary terms.
+- Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
+- Focused notification operations unit coverage, typecheck, `git diff --check`, and the protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 136
+
+## Previous Run
+
 - Advanced a post-MVP notification operations static-metadata checkpoint.
 - Moved `/settings/notifications` channel boundaries, no-send controls, and safety-boundary copy into a validated frozen operations module.
 - Added unit coverage proving public fields, frozen snapshots, stable order, unique identifiers, no command execution, no external impact, no secret display, required no-send boundary terms, and secret-like literal rejection before render.

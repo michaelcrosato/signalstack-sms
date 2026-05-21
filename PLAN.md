@@ -141,6 +141,7 @@ Post-MVP:
 - Read-only local queue operations view
 - Read-only local notification operations view
 - Local notification operations inventory static-metadata hardening
+- Local notification operations value-boundary hardening
 - Read-only local readiness audit operations view
 - Local operator runbook admin-link coverage refresh
 - Read-only local reporting index

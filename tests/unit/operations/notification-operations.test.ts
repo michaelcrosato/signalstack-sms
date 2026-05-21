@@ -83,8 +83,14 @@ describe("getNotificationOperationsStatus", () => {
       "inbound only"
     ]);
 
+    const controlCopy = notificationOperationControls.join(" ");
     const safetyCopy = notificationOperationSafetyBoundaries.join(" ");
 
+    expect(controlCopy).toContain("LIVE_MESSAGING_ENABLED");
+    expect(controlCopy).toContain("LIVE_BILLING_ENABLED");
+    expect(controlCopy).toContain("API keys");
+    expect(controlCopy).toContain("worker");
+    expect(controlCopy).toContain("local");
     expect(safetyCopy).toContain("email");
     expect(safetyCopy).toContain("SMS");
     expect(safetyCopy).toContain("webhooks");

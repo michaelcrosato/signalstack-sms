@@ -18,6 +18,7 @@ export type NotificationOperationsStatus = {
 
 const notificationOperationChannelFields = ["name", "status", "boundary"] as const;
 const allowedNotificationOperationChannelStatuses = ["blocked", "not implemented", "inbound only"] as const;
+const requiredNotificationControlTerms = ["LIVE_MESSAGING_ENABLED", "LIVE_BILLING_ENABLED", "API keys", "worker", "local"] as const;
 const requiredNotificationBoundaryTerms = ["email", "SMS", "webhooks", "provider calls", "billing", "mutations"] as const;
 const forbiddenSecretMetadataPatterns = [
   /\bsk_(?:live|test)_[A-Za-z0-9]+/,
@@ -98,6 +99,18 @@ function freezeCopyList(values: string[], label: string) {
   return Object.freeze([...values]);
 }
 
+function freezeControls(controls: string[]) {
+  const frozenControls = freezeCopyList(controls, "control");
+  const joinedControls = frozenControls.join(" ");
+  const missingControlTerms = requiredNotificationControlTerms.filter((term) => !joinedControls.includes(term));
+
+  if (missingControlTerms.length > 0) {
+    throw new Error(`Missing notification operation control terms: ${missingControlTerms.join(", ")}`);
+  }
+
+  return frozenControls;
+}
+
 function freezeSafetyBoundaries(boundaries: string[]) {
   const frozenBoundaries = freezeCopyList(boundaries, "safety boundary");
   const joinedBoundaries = frozenBoundaries.join(" ");
@@ -133,15 +146,14 @@ export const notificationOperationChannels = freezeChannels([
   }
 ]);
 
-export const notificationOperationControls = freezeCopyList(
+export const notificationOperationControls = freezeControls(
   [
     "LIVE_MESSAGING_ENABLED must remain false for local validation.",
     "LIVE_BILLING_ENABLED must remain false for local validation.",
     "No notification provider API keys are required for demo mode.",
     "No background notification worker is part of the current local gate.",
     "Operator review is limited to existing local pages and CSV links."
-  ],
-  "control"
+  ]
 );
 
 export const notificationOperationSafetyBoundaries = freezeSafetyBoundaries([
@@ -160,7 +172,7 @@ export function getNotificationOperationsStatus(): NotificationOperationsStatus 
     externalImpact: "none",
     secretsDisplayed: false,
     channels: freezeChannels(notificationOperationChannels.map((channel) => ({ ...channel }))),
-    controls: freezeCopyList([...notificationOperationControls], "control"),
+    controls: freezeControls([...notificationOperationControls]),
     safetyBoundaries: freezeSafetyBoundaries([...notificationOperationSafetyBoundaries])
   });
 }

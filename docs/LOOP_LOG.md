@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 136  GREEN  notification-operations-value-boundaries  2026-05-21 02:24
+Objective:    Keep `/settings/notifications` no-send controls pinned to local blocked-delivery terms.
+Changed:
+- Added required control-term validation for notification operations no-send controls.
+- Added unit coverage proving live messaging, live billing, API keys, worker boundaries, and local-only review remain named before `/settings/notifications` renders metadata.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP notification operations hardening or safe read-only operator surface refinements.
+
 ## Run 135  GREEN  notification-operations-static-metadata  2026-05-21 02:22
 Objective:    Keep `/settings/notifications` static no-send metadata validated and immutable before rendering.
 Changed:
