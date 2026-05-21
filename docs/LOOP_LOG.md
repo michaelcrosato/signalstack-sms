@@ -1345,6 +1345,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP notification operations hardening or safe read-only operator surface refinements.
 
+## Run 159  GREEN  validation-operations-runtime-vocabulary  2026-05-21 04:07
+Objective:    Keep `/settings/validation` no-impact summary states inside exported runtime-frozen vocabularies.
+Changed:
+- Exported validation operations command-execution, external-impact, and secrets-displayed vocabularies.
+- Added unit coverage proving the rendered validation summary values stay inside those vocabularies and exported vocabularies reject caller mutation.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP validation/security operations hardening or safe read-only operator surface refinements.
+
 ## Run 146  GREEN  readiness-audit-operations-static-metadata  2026-05-21 03:12
 Objective:    Keep `/settings/readiness-audit` static metadata validated before rendering local readiness history.
 Changed:

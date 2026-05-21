@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP validation operations runtime-frozen vocabulary checkpoint.
+- Exported `/settings/validation` command-execution, external-impact, and secrets-displayed no-impact vocabularies.
+- Added unit coverage proving validation summary values stay inside those vocabularies and that exported vocabularies reject caller mutation before local validation metadata renders.
+- Updated README, PLAN, testing contract docs, next-prompt handoff docs, blockers, and loop logs.
+- Focused validation operations unit coverage passed; protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 159
+
+## Previous Run
+
 - Advanced a post-MVP API operations method-vocabulary checkpoint.
 - Exported a runtime-frozen supported API method vocabulary and aligned API route validation to it.
 - Added unit coverage proving the method vocabulary is frozen, rejects caller mutation, and matches the static `/settings/api` route inventory before local API metadata renders.

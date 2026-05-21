@@ -2,6 +2,9 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  allowedValidationOperationCommandExecutionStates,
+  allowedValidationOperationExternalImpactStates,
+  allowedValidationOperationSecretsDisplayedStates,
   getValidationOperationsStatus,
   validationOperationGateCommands,
   validationOperationRepairSignals
@@ -113,6 +116,33 @@ describe("getValidationOperationsStatus", () => {
     expect(repairSignals).toContain("Live provider");
     expect(repairSignals).toContain("live AI");
     expect(repairSignals).toContain("smallest failing command");
+  });
+
+  it("keeps validation operation summary states inside the no-impact vocabulary", () => {
+    const status = getValidationOperationsStatus();
+
+    expect(allowedValidationOperationCommandExecutionStates).toEqual(["none"]);
+    expect(allowedValidationOperationExternalImpactStates).toEqual(["none"]);
+    expect(allowedValidationOperationSecretsDisplayedStates).toEqual([false]);
+    expect(Object.isFrozen(allowedValidationOperationCommandExecutionStates)).toBe(true);
+    expect(Object.isFrozen(allowedValidationOperationExternalImpactStates)).toBe(true);
+    expect(Object.isFrozen(allowedValidationOperationSecretsDisplayedStates)).toBe(true);
+    expect(allowedValidationOperationCommandExecutionStates).toContain(status.commandExecution);
+    expect(allowedValidationOperationExternalImpactStates).toContain(status.externalImpact);
+    expect(allowedValidationOperationSecretsDisplayedStates).toContain(status.secretsDisplayed);
+  });
+
+  it("keeps exported validation operation vocabularies frozen against caller mutation", () => {
+    const vocabularies = [
+      allowedValidationOperationCommandExecutionStates,
+      allowedValidationOperationExternalImpactStates,
+      allowedValidationOperationSecretsDisplayedStates
+    ];
+
+    for (const vocabulary of vocabularies) {
+      expect(Object.isFrozen(vocabulary)).toBe(true);
+      expect(() => (vocabulary as unknown as unknown[]).push("unsafe")).toThrow(TypeError);
+    }
   });
 
   it("keeps validation operation inventory order stable for local review pages", () => {
