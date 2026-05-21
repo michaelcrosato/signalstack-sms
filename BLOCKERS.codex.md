@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 167
+Run number: 168
 
 No active blockers.
 
 ## Notes
 
+- Latest queue operations static-metadata hardening moves `/settings/queue` worker command references and safety-boundary copy into validated frozen metadata, renders the page from that helper, and covers public fields, frozen snapshots, stable order, package-script references, allowlisted commands, no-impact summary states, and secret-like literal rejection before local queue metadata renders. The check is local static metadata validation only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS/email, mutate queue rows, update campaigns, call live AI, expose secrets, or enable live features.
 - Latest contract operations file-path vocabulary hardening exports a runtime-frozen supported contract file-path vocabulary for `/settings/contracts`, rejects static contract inventory paths outside that vocabulary before local metadata freezes, and covers caller-mutation rejection alongside the other exported contract operations vocabularies. The check is local static metadata validation only and does not read contract contents, execute commands, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.
 - Latest contract operations no-impact summary-state hardening exports runtime-frozen command-execution, external-impact, and secrets-displayed vocabularies for `/settings/contracts`, renders command execution from validated status metadata, and covers caller-mutation rejection before local contract metadata renders. The check is local static metadata validation only and does not read contract contents, execute commands, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.
 - Latest contract operations whitespace-clean hardening keeps `/settings/contracts` static contract file names/paths/boundaries, validation commands/purposes, and drift-control copy free of leading/trailing whitespace, doubled spaces, and embedded newlines before render. The check is local static metadata validation only and does not read contract contents, execute commands, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.

@@ -1,5 +1,17 @@
 # Codex Summary
 
+- Advanced a post-MVP queue operations static-metadata hardening checkpoint.
+- Added a validated frozen `/settings/queue` operations helper for supported worker command references, safety boundaries, and no-impact summary states.
+- Updated the queue operations page to render worker command references and safety boundaries from that helper instead of inline copy.
+- Added queue operations unit coverage for public fields, frozen snapshots, stable order, package-script references, allowlisted commands, secret-like literal rejection, and no command execution/external impact/secret display.
+- Updated README, PLAN, queue/testing contract docs, next-prompt handoff docs, blockers, and loop logs.
+- Focused queue operations unit coverage, typecheck, lint, and protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 168
+
+## Previous Run
+
 - Advanced a post-MVP contract operations file-path vocabulary checkpoint.
 - Exported a runtime-frozen `/settings/contracts` supported contract file-path vocabulary.
 - Updated contract operations validation to reject static contract inventory paths outside the supported vocabulary before local metadata freezes.

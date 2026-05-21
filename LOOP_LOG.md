@@ -1535,3 +1535,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP contract operations hardening or safe read-only operator surface refinements.
+## Run 168  GREEN  queue-operations-static-metadata  2026-05-21 04:45
+Objective:    Keep `/settings/queue` worker command references and safety boundaries in validated frozen metadata.
+Changed:
+- Added a queue operations helper with supported worker command references, safety-boundary copy, and no-impact summary states.
+- Updated `/settings/queue` to render worker command references and safety boundaries from the helper.
+- Added unit coverage for public fields, frozen snapshots, stable order, package-script references, allowlisted commands, no-impact states, and secret-like literal rejection.
+- Updated queue/testing contracts, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP queue/notification/readiness operations hardening or safe read-only operator surface refinements.

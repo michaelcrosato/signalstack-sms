@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { prisma } from "@/lib/db/prisma";
 import { getQueueOperationLinks } from "@/lib/operations/operator-surfaces";
+import { getQueueOperationsStatus } from "@/lib/operations/queue-operations";
 import { getSystemStatus } from "@/lib/operations/system-status";
 import { scheduledCampaignJobSchema } from "@/lib/queue/jobs";
 
@@ -36,6 +37,7 @@ export default async function QueueOperationsPage() {
   const futureJobs = queuedJobs.filter((job) => job.runAt.getTime() > now.getTime());
   const invalidPayloadJobs = queueJobs.filter((job) => !scheduledCampaignJobSchema.safeParse(job.payload).success);
   const operationLinks = getQueueOperationLinks();
+  const queueOperationsStatus = getQueueOperationsStatus();
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
@@ -80,10 +82,24 @@ export default async function QueueOperationsPage() {
             <StatusRow label="Messaging provider" value={status.safety.messagingProvider} />
             <StatusRow label="Redis configured" value={String(status.queue.redisConfigured)} />
             <StatusRow label="Campaigns" value={String(campaignCount)} />
-            <StatusRow label="Execution" value="manual local command only" />
+            <StatusRow label="Command execution" value={queueOperationsStatus.commandExecution} />
+            <StatusRow label="External impact" value={queueOperationsStatus.externalImpact} />
+            <StatusRow label="Secrets displayed" value={String(queueOperationsStatus.secretsDisplayed)} />
           </dl>
         </Panel>
       </section>
+
+      <Panel title="Worker Command References">
+        <ul className="grid gap-3 text-sm">
+          {queueOperationsStatus.workerCommands.map((command) => (
+            <li key={command.command} className="border-b border-slate-100 pb-3">
+              <p className="font-medium text-slate-950">{command.command}</p>
+              <p className="mt-1 text-xs uppercase text-slate-500">{command.mode}</p>
+              <p className="mt-1 text-slate-700">{command.boundary}</p>
+            </li>
+          ))}
+        </ul>
+      </Panel>
 
       <Panel title="Scheduled Timing">
         <dl className="grid gap-3 text-sm md:grid-cols-3">
@@ -120,10 +136,9 @@ export default async function QueueOperationsPage() {
 
       <Panel title="Safety Boundary">
         <ul className="grid gap-2 text-sm text-slate-700">
-          <li>Use `npm run worker` or `npm run worker:watch` from the local runbook when explicit worker execution is needed.</li>
-          <li>BullMQ remains optional and requires explicit local `QUEUE_BACKEND=bullmq` plus `REDIS_URL` configuration.</li>
-          <li>Queue review never changes job status, campaign status, provider metadata, usage records, or contacts.</li>
-          <li>Dummy-provider and live-disabled gates remain the only supported local worker execution boundary.</li>
+          {queueOperationsStatus.safetyBoundaries.map((boundary) => (
+            <li key={boundary}>{boundary}</li>
+          ))}
         </ul>
       </Panel>
     </main>

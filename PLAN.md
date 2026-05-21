@@ -151,6 +151,7 @@ Post-MVP:
 - Local notification operations channel-boundary term hardening
 - Local notification operations no-impact summary-state hardening
 - Local notification operations runtime-frozen vocabulary hardening
+- Local queue operations static-metadata hardening
 - Local readiness audit operations static-metadata hardening
 - Local readiness audit operations export-limit vocabulary hardening
 - Local readiness audit query allowlist hardening

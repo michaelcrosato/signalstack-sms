@@ -68,3 +68,12 @@ BullMQ workers may consume scheduled-campaign queue events only by referencing d
 - When enabled, it writes and removes one job in the dedicated `signalstack-bullmq-smoke` queue.
 - It must not touch scheduled campaign queues, database `QueueJob` rows, providers, SMS sends, billing, secrets, or live messaging flags.
 - The default validation gate must not require Redis.
+
+## Post-MVP Queue Operations Metadata
+
+`/settings/queue` may display local worker command references, but it must not execute them.
+
+- Supported command references are `npm run worker`, `npm run worker:watch`, `npm run worker:bullmq`, and `npm run queue:bullmq:smoke`.
+- Command references must remain backed by `package.json` scripts.
+- Static queue operations metadata must be frozen, public-field only, secret-free, and explicit that command execution, external impact, and secret display are `none`.
+- Safety-boundary copy must continue to state that the page does not enqueue jobs, run workers, call Redis/providers, bill, notify, send SMS, mutate queue rows, or update campaign status.
