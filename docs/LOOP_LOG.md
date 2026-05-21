@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 050  GREEN  demo-operations-browser-inventory  2026-05-20 19:46
+Objective:    Verify `/settings/demo` browser-visible checkpoints and operational links from the shared operator surface inventory.
+Changed:
+- Extended the seeded investor demo path to iterate `getDemoOperationsCheckpoints()` and `getDemoOperationsLinks()`.
+- Added browser assertions for checkpoint link targets, shared signal labels, boundary text, operational link targets, and shared link notes.
+- Updated testing contract, README, demo-mode docs, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only navigation, inventory, route coverage, or admin/reporting refinements without live external-impact actions.
+
 ## Run 049  GREEN  demo-operations-shared-inventory  2026-05-20 19:38
 Objective:    Project `/settings/demo` readiness checkpoints and operational links from the shared operator surface inventory.
 Changed:

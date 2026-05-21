@@ -1,14 +1,17 @@
 # Codex Summary
 
-Run number: 49
+Run number: 50
 
 ## Completed
+
+- Advanced a post-MVP local demo operations browser hardening checkpoint.
+- Extended the seeded investor demo path to verify `/settings/demo` visible checkpoint names, shared signal labels, boundaries, operational link labels, and link targets from the shared operator surface inventory.
+
+## Prior Completed
 
 - Advanced a post-MVP local demo operations inventory hardening checkpoint.
 - Refactored `/settings/demo` readiness checkpoint signals and operational links to project from the shared operator surface inventory.
 - Added unit coverage for demo operations checkpoint routes, shared labels, operational links, and backing app pages.
-
-## Prior Completed
 
 - Advanced a post-MVP local demo console navigation hardening checkpoint.
 - Refactored `/demo` console navigation to project from the shared operator surface inventory instead of a duplicated hard-coded list.
@@ -166,4 +169,4 @@ Run number: 49
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 
-Latest demo-operations shared-inventory hardening typecheck, targeted operator-surface inventory test, protected local gate, local migration check, demo seed, and seeded investor demo path passed.
+Latest demo-operations browser inventory hardening targeted demo E2E, protected local gate, local migration check, demo seed, and seeded investor demo path passed.

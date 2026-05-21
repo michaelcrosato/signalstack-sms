@@ -159,6 +159,7 @@ Post-MVP:
 - Local operations index shared-inventory browser coverage
 - Local demo console shared-inventory navigation and browser coverage
 - Local demo operations shared-inventory checkpoint coverage
+- Local demo operations shared-inventory browser checkpoint coverage
 
 ## Next Milestone
 

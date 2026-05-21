@@ -86,6 +86,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP local operations index browser hardening: the seeded investor demo path now verifies `/settings/operations` visible link labels and route text from the same shared operator surface inventory instead of relying only on static group headings.
 - Post-MVP local demo console navigation hardening: `/demo` now projects console navigation from the shared operator surface inventory, excludes only its own `/demo` self-link, includes Admin Exports, and the seeded investor demo path verifies visible links from the same inventory.
 - Post-MVP local demo operations inventory hardening: `/settings/demo` now projects seeded readiness checkpoint signals and operational links from the shared operator surface inventory, with unit coverage for backing app pages.
+- Post-MVP local demo operations browser hardening: the seeded investor demo path now verifies `/settings/demo` visible checkpoint names, shared signal labels, boundaries, operational link labels, and link targets from the same shared operator surface inventory.
 
 Demo-safe defaults remain mandatory:
 

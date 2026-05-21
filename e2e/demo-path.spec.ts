@@ -1,8 +1,15 @@
 import { expect, test } from "@playwright/test";
-import { getDemoConsoleLinks, operatorSurfaceGroups } from "@/lib/operations/operator-surfaces";
+import {
+  getDemoOperationsCheckpoints,
+  getDemoOperationsLinks,
+  getDemoConsoleLinks,
+  operatorSurfaceGroups
+} from "@/lib/operations/operator-surfaces";
 
 const operationSurfaceLinks = operatorSurfaceGroups.flatMap((group) => group.links);
 const demoConsoleLinks = getDemoConsoleLinks();
+const demoOperationsCheckpoints = getDemoOperationsCheckpoints();
+const demoOperationsLinks = getDemoOperationsLinks();
 
 test.setTimeout(60_000);
 
@@ -19,6 +26,16 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Runtime Gates" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Seed Signals" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Scenario Signals" })).toBeVisible();
+  const demoReadinessList = page.locator("ol");
+  for (const checkpoint of demoOperationsCheckpoints) {
+    await expect(page.getByRole("link", { name: checkpoint.name })).toHaveAttribute("href", checkpoint.href);
+    await expect(demoReadinessList.getByText(checkpoint.signal, { exact: true })).toBeVisible();
+    await expect(demoReadinessList.getByText(checkpoint.boundary)).toBeVisible();
+  }
+  for (const link of demoOperationsLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(page.getByText(link.note, { exact: true })).toBeVisible();
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Demo Console" }).click();
   await expect(page.getByRole("heading", { name: "SignalStack Demo Console" })).toBeVisible();
