@@ -5,6 +5,7 @@ import {
   allowedQueueOperationCommandExecutionStates,
   allowedQueueOperationExternalImpactStates,
   allowedQueueOperationModes,
+  allowedQueueOperationMutationStates,
   allowedQueueOperationSecretsDisplayedStates,
   allowedQueueOperationWorkerCommands,
   getQueueOperationsStatus,
@@ -18,6 +19,7 @@ const publicStatusFields = [
   "safetyBoundaryCount",
   "commandExecution",
   "externalImpact",
+  "mutation",
   "secretsDisplayed",
   "workerCommands",
   "safetyBoundaries"
@@ -43,6 +45,7 @@ describe("getQueueOperationsStatus", () => {
     expect(status.safetyBoundaryCount).toBe(5);
     expect(status.commandExecution).toBe("none");
     expect(status.externalImpact).toBe("none");
+    expect(status.mutation).toBe("none");
     expect(status.secretsDisplayed).toBe(false);
     expect(status.workerCommands.map((command) => command.command)).toEqual([
       "npm run worker",
@@ -146,12 +149,15 @@ describe("getQueueOperationsStatus", () => {
 
     expect(allowedQueueOperationCommandExecutionStates).toEqual(["none"]);
     expect(allowedQueueOperationExternalImpactStates).toEqual(["none"]);
+    expect(allowedQueueOperationMutationStates).toEqual(["none"]);
     expect(allowedQueueOperationSecretsDisplayedStates).toEqual([false]);
     expect(Object.isFrozen(allowedQueueOperationCommandExecutionStates)).toBe(true);
     expect(Object.isFrozen(allowedQueueOperationExternalImpactStates)).toBe(true);
+    expect(Object.isFrozen(allowedQueueOperationMutationStates)).toBe(true);
     expect(Object.isFrozen(allowedQueueOperationSecretsDisplayedStates)).toBe(true);
     expect(allowedQueueOperationCommandExecutionStates).toContain(status.commandExecution);
     expect(allowedQueueOperationExternalImpactStates).toContain(status.externalImpact);
+    expect(allowedQueueOperationMutationStates).toContain(status.mutation);
     expect(allowedQueueOperationSecretsDisplayedStates).toContain(status.secretsDisplayed);
   });
 
@@ -161,6 +167,7 @@ describe("getQueueOperationsStatus", () => {
       allowedQueueOperationModes,
       allowedQueueOperationCommandExecutionStates,
       allowedQueueOperationExternalImpactStates,
+      allowedQueueOperationMutationStates,
       allowedQueueOperationSecretsDisplayedStates
     ];
 

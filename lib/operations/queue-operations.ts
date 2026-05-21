@@ -12,12 +12,14 @@ export const allowedQueueOperationModes = Object.freeze([
 ] as const);
 export const allowedQueueOperationCommandExecutionStates = Object.freeze(["none"] as const);
 export const allowedQueueOperationExternalImpactStates = Object.freeze(["none"] as const);
+export const allowedQueueOperationMutationStates = Object.freeze(["none"] as const);
 export const allowedQueueOperationSecretsDisplayedStates = Object.freeze([false] as const);
 
 export type QueueOperationSupportedWorkerCommand = (typeof allowedQueueOperationWorkerCommands)[number];
 export type QueueOperationMode = (typeof allowedQueueOperationModes)[number];
 export type QueueOperationCommandExecutionState = (typeof allowedQueueOperationCommandExecutionStates)[number];
 export type QueueOperationExternalImpactState = (typeof allowedQueueOperationExternalImpactStates)[number];
+export type QueueOperationMutationState = (typeof allowedQueueOperationMutationStates)[number];
 export type QueueOperationSecretsDisplayedState = (typeof allowedQueueOperationSecretsDisplayedStates)[number];
 
 export type QueueOperationWorkerCommand = {
@@ -31,6 +33,7 @@ export type QueueOperationsStatus = {
   safetyBoundaryCount: number;
   commandExecution: QueueOperationCommandExecutionState;
   externalImpact: QueueOperationExternalImpactState;
+  mutation: QueueOperationMutationState;
   secretsDisplayed: QueueOperationSecretsDisplayedState;
   workerCommands: readonly QueueOperationWorkerCommand[];
   safetyBoundaries: readonly string[];
@@ -67,8 +70,9 @@ const forbiddenSecretMetadataPatterns = [
 const queueOperationStatusSummary = Object.freeze({
   commandExecution: "none",
   externalImpact: "none",
+  mutation: "none",
   secretsDisplayed: false
-} satisfies Pick<QueueOperationsStatus, "commandExecution" | "externalImpact" | "secretsDisplayed">);
+} satisfies Pick<QueueOperationsStatus, "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed">);
 
 function assertExactFields<T extends object>(value: T, fields: readonly string[], errorMessage: string) {
   const actualKeys = Reflect.ownKeys(value);
@@ -108,13 +112,19 @@ function assertUniqueValues(values: readonly string[], errorMessage: string) {
   }
 }
 
-function assertStatusSummary(summary: Pick<QueueOperationsStatus, "commandExecution" | "externalImpact" | "secretsDisplayed">) {
+function assertStatusSummary(
+  summary: Pick<QueueOperationsStatus, "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed">
+) {
   if (!allowedQueueOperationCommandExecutionStates.includes(summary.commandExecution)) {
     throw new Error(`Unsupported queue operation command execution state: ${summary.commandExecution}`);
   }
 
   if (!allowedQueueOperationExternalImpactStates.includes(summary.externalImpact)) {
     throw new Error(`Unsupported queue operation external impact state: ${summary.externalImpact}`);
+  }
+
+  if (!allowedQueueOperationMutationStates.includes(summary.mutation)) {
+    throw new Error(`Unsupported queue operation mutation state: ${summary.mutation}`);
   }
 
   if (!allowedQueueOperationSecretsDisplayedStates.includes(summary.secretsDisplayed)) {
@@ -236,6 +246,7 @@ export function getQueueOperationsStatus(): QueueOperationsStatus {
     safetyBoundaryCount: queueOperationSafetyBoundaries.length,
     commandExecution: queueOperationStatusSummary.commandExecution,
     externalImpact: queueOperationStatusSummary.externalImpact,
+    mutation: queueOperationStatusSummary.mutation,
     secretsDisplayed: queueOperationStatusSummary.secretsDisplayed,
     workerCommands: freezeWorkerCommands(queueOperationWorkerCommands.map((command) => ({ ...command }))),
     safetyBoundaries: freezeSafetyBoundaries([...queueOperationSafetyBoundaries])

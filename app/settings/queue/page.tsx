@@ -84,6 +84,7 @@ export default async function QueueOperationsPage() {
             <StatusRow label="Campaigns" value={String(campaignCount)} />
             <StatusRow label="Command execution" value={queueOperationsStatus.commandExecution} />
             <StatusRow label="External impact" value={queueOperationsStatus.externalImpact} />
+            <StatusRow label="Mutation" value={queueOperationsStatus.mutation} />
             <StatusRow label="Secrets displayed" value={String(queueOperationsStatus.secretsDisplayed)} />
           </dl>
         </Panel>
