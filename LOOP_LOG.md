@@ -5,5 +5,5 @@ Changed:
 - Updated `/settings/queue` and `/settings/notifications` to render header links from the shared inventory.
 - Added unit and seeded browser coverage for projected labels, route targets, and backing pages.
 Gate:         passed
-Commit/Saved: 90c275f
+Commit/Saved: f228366
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
