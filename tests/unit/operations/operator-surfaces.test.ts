@@ -96,6 +96,54 @@ describe("operator surface inventory", () => {
     expect(links.every((link) => link.label.length > 0 && link.note.length > 0)).toBe(true);
   });
 
+  it("keeps every projected operator navigation set unique and backed by the shared inventory", () => {
+    const inventoryLinks = operatorSurfaceGroups.flatMap((group) => group.links);
+    const inventoryRoutes = new Set(inventoryLinks.map((link) => link.href));
+    const projectedLinkSets = [
+      { name: "runbook", links: getRunbookAdminLinks() },
+      { name: "settings", links: getSettingsNavigationLinks() },
+      { name: "launch", links: getLaunchDashboardLinks() },
+      { name: "demo console", links: getDemoConsoleLinks() },
+      { name: "demo operations", links: getDemoOperationsLinks() },
+      { name: "reporting", links: getReportingIndexLinks() },
+      { name: "release", links: getReleaseOperationSurfaceLinks() },
+      { name: "security", links: getSecurityOperationLinks() },
+      { name: "environment", links: getEnvironmentOperationLinks() },
+      { name: "health", links: getHealthOperationLinks() },
+      { name: "contract", links: getContractOperationLinks() },
+      { name: "validation", links: getValidationOperationLinks() },
+      { name: "queue", links: getQueueOperationLinks() },
+      { name: "contacts", links: getContactOperationLinks() },
+      { name: "campaigns", links: getCampaignOperationLinks() },
+      { name: "audience", links: getAudienceOperationLinks() },
+      { name: "templates", links: getTemplateOperationLinks() },
+      { name: "inbox", links: getInboxOperationLinks() },
+      { name: "data", links: getDataOperationLinks() },
+      { name: "notifications", links: getNotificationOperationLinks() },
+      { name: "exports", links: getExportOperationLinks() },
+      { name: "webhooks", links: getWebhookOperationLinks() },
+      { name: "delivery", links: getDeliveryOperationLinks() },
+      { name: "team", links: getTeamOperationLinks() },
+      { name: "billing", links: getBillingOperationLinks() },
+      { name: "ai", links: getAiOperationLinks() },
+      { name: "provider", links: getProviderOperationLinks() },
+      { name: "numbers", links: getNumberOperationLinks() },
+      { name: "compliance", links: getComplianceOperationLinks() },
+      { name: "system", links: getSystemOperationLinks() },
+      { name: "usage", links: getUsageOperationLinks() },
+      { name: "readiness audit", links: getReadinessAuditOperationLinks() }
+    ];
+
+    for (const projection of projectedLinkSets) {
+      const routes = projection.links.map((link) => link.href);
+
+      expect(new Set(routes).size, projection.name).toBe(routes.length);
+      expect(routes.filter((route) => !inventoryRoutes.has(route)), projection.name).toEqual([]);
+      expect(routes.filter((route) => !existsSync(routeToAppPagePath(route))), projection.name).toEqual([]);
+      expect(projection.links, projection.name).toEqual(routes.map((route) => inventoryLinks.find((link) => link.href === route)));
+    }
+  });
+
   it("points every listed app surface at an implemented page", () => {
     const routes = getOperatorSurfaceSummary().routes;
     const missingPages = routes.filter((route) => !existsSync(routeToAppPagePath(route)));

@@ -168,6 +168,7 @@ Post-MVP:
 - Local billing and AI shared-inventory coverage
 - Local data and messaging shared-inventory coverage
 - Local provider, readiness, and runtime shared-inventory coverage
+- Local shared operator projection unique-route coverage
 
 ## Next Milestone
 

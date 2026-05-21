@@ -1,15 +1,20 @@
 # Codex Summary
 
-Run number: 60
+Run number: 61
 
 ## Completed
+
+- Advanced a post-MVP shared operator projection integrity checkpoint.
+- Added unit coverage that verifies every shared per-page operator navigation projection has unique route entries, resolves only through the shared local operator surface inventory, and points at implemented `app/**/page.tsx` files.
+- Updated testing contract/docs and README to document the projection uniqueness guard.
+- Protected local gate, local migration check, demo seed, and seeded investor demo E2E passed.
+
+## Prior Completed
 
 - Advanced a post-MVP provider/readiness/runtime shared-inventory hardening checkpoint.
 - Refactored `/settings/provider`, `/settings/numbers`, `/settings/compliance`, `/settings/system`, `/settings/usage`, and `/settings/readiness-audit` header navigation to project from the shared operator surface inventory.
 - Extended unit and seeded browser coverage for provider/readiness/runtime navigation labels, route targets, and backing pages.
 - Protected local gate, demo seed, and seeded investor demo E2E passed.
-
-## Prior Completed
 
 - Advanced a post-MVP data/messaging shared-inventory hardening checkpoint.
 - Refactored `/settings/contacts`, `/settings/campaigns`, `/settings/audience`, `/settings/templates`, `/settings/inbox`, and `/settings/data` header navigation to project from the shared operator surface inventory.

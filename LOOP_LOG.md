@@ -37,3 +37,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 061  GREEN  projection-unique-route-guard  2026-05-20 21:00
+Objective:    Add a shared guard against duplicate routes in per-page operator navigation projections.
+Changed:
+- Added unit coverage that checks every shared per-page operator navigation projection has unique route entries.
+- Verified each projected route resolves through the shared operator surface inventory and has a backing app page.
+- Updated testing contract/docs, README, SUMMARY, BLOCKERS, PLAN, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
