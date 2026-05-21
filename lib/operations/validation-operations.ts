@@ -89,6 +89,12 @@ function assertNoSecretLikeMetadata(value: string, errorMessage: string) {
   }
 }
 
+function assertCleanValidationMetadata(value: string, errorMessage: string) {
+  if (value !== value.trim() || value.includes("\n") || value.includes("\r") || value.includes("  ")) {
+    throw new Error(errorMessage);
+  }
+}
+
 function assertStatusSummary(summary: Pick<ValidationOperationsStatus, "commandExecution" | "externalImpact" | "secretsDisplayed">) {
   if (!allowedValidationOperationCommandExecutionStates.includes(summary.commandExecution)) {
     throw new Error(`Unsupported validation operation command execution state: ${summary.commandExecution}`);
@@ -109,6 +115,7 @@ function assertGateCommand(command: ValidationOperationGateCommand) {
   if (typeof command.command !== "string" || !command.command.startsWith("npm run ")) {
     throw new Error(`Invalid validation operation command ${String(command.command)}`);
   }
+  assertCleanValidationMetadata(command.command, `Whitespace-unsafe validation operation command ${command.command}`);
 
   if (!allowedValidationOperationGateCommands.includes(command.command as ValidationOperationSupportedGateCommand)) {
     throw new Error(`Unsupported validation operation command ${command.command}`);
@@ -117,6 +124,7 @@ function assertGateCommand(command: ValidationOperationGateCommand) {
   if (typeof command.area !== "string" || command.area.trim().length === 0) {
     throw new Error(`Invalid validation operation area for ${command.command}`);
   }
+  assertCleanValidationMetadata(command.area, `Whitespace-unsafe validation operation area for ${command.command}`);
 
   if (!allowedValidationOperationAreas.includes(command.area as (typeof allowedValidationOperationAreas)[number])) {
     throw new Error(`Unsupported validation operation area for ${command.command}`);
@@ -126,6 +134,7 @@ function assertGateCommand(command: ValidationOperationGateCommand) {
   if (typeof command.boundary !== "string" || command.boundary.trim().length === 0) {
     throw new Error(`Invalid validation operation boundary for ${command.command}`);
   }
+  assertCleanValidationMetadata(command.boundary, `Whitespace-unsafe validation operation boundary for ${command.command}`);
   assertNoSecretLikeMetadata(command.boundary, `Secret-like validation operation boundary for ${command.command}`);
 }
 
@@ -162,6 +171,7 @@ function freezeRepairSignals(signals: string[]) {
     if (typeof signal !== "string" || signal.trim().length === 0) {
       throw new Error("Invalid validation operation repair signal");
     }
+    assertCleanValidationMetadata(signal, "Whitespace-unsafe validation operation repair signal");
     assertNoSecretLikeMetadata(signal, "Secret-like validation operation repair signal");
   }
 

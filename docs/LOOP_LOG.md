@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 162  GREEN  validation-operations-whitespace-clean  2026-05-21 04:18
+Objective:    Keep `/settings/validation` static metadata whitespace-clean before rendering local validation inventory.
+Changed:
+- Added validation operations guards rejecting leading/trailing whitespace, doubled spaces, and embedded newlines in gate command, area, boundary, and repair-signal copy.
+- Added unit coverage proving validation operations static metadata stays whitespace-clean before `/settings/validation` renders it.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP validation/security operations hardening or safe read-only operator surface refinements.
+
 ## Run 161  GREEN  validation-gate-command-vocabulary  2026-05-21 04:14
 Objective:    Keep `/settings/validation` gate command references tied to an exported runtime-frozen vocabulary.
 Changed:

@@ -173,7 +173,7 @@ Post-MVP contract operations view:
 Post-MVP validation operations view:
 
 - The seeded investor demo path must verify that `/settings/validation` renders read-only local validation gate inventory, repair signals, and safety-boundary text without executing commands, inspecting logs, scanning files, mutating records, provider calls, billing records, live AI calls, SMS, email, notifications, secret exposure, or live feature enablement.
-- Unit tests must verify that the static validation operations inventory keeps gate command references backed by `package.json` scripts, repair signals, public fields, frozen snapshots, stable order, unique identifiers, local-only area values, required boundary terms, secret-like literal rejection, no command execution, no external impact, and no secret display stable before `/settings/validation` renders them.
+- Unit tests must verify that the static validation operations inventory keeps gate command references backed by `package.json` scripts, repair signals, public fields, frozen snapshots, stable order, unique identifiers, local-only area values, required boundary terms, whitespace-clean copy, secret-like literal rejection, no command execution, no external impact, and no secret display stable before `/settings/validation` renders them.
 - Unit tests must verify that validation operations export runtime-frozen supported command-execution, external-impact, and secrets-displayed vocabularies before `/settings/validation` renders no-impact metadata.
 - Unit tests must verify that validation operations keep gate command references inside the runtime-frozen supported command allowlist before `/settings/validation` renders local gate metadata.
 

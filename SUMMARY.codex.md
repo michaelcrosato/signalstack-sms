@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP validation operations whitespace-clean metadata checkpoint.
+- Added validation operations guards rejecting leading/trailing whitespace, doubled spaces, and embedded newlines in static gate command, area, boundary, and repair-signal copy before render.
+- Added unit coverage proving `/settings/validation` static metadata stays whitespace-clean before local validation metadata renders.
+- Updated README, PLAN, testing contract docs, next-prompt handoff docs, blockers, and loop logs.
+- Focused validation operations unit coverage passed; protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 162
+
+## Previous Run
+
 - Advanced a post-MVP validation operations gate-command vocabulary checkpoint.
 - Exported `/settings/validation` supported gate command references as a runtime-frozen vocabulary.
 - Added unit coverage proving static validation gate commands stay inside that vocabulary and reject caller mutation before local validation metadata renders.

@@ -91,6 +91,17 @@ describe("getValidationOperationsStatus", () => {
     expect(validationOperationRepairSignals.filter((signal) => signal.trim().length === 0)).toEqual([]);
   });
 
+  it("keeps validation operation static metadata whitespace-clean", () => {
+    const staticCopy = [
+      ...validationOperationGateCommands.flatMap((gate) => [gate.command, gate.area, gate.boundary]),
+      ...validationOperationRepairSignals
+    ];
+
+    expect(staticCopy.filter((copy) => copy !== copy.trim())).toEqual([]);
+    expect(staticCopy.filter((copy) => copy.includes("\n") || copy.includes("\r"))).toEqual([]);
+    expect(staticCopy.filter((copy) => copy.includes("  "))).toEqual([]);
+  });
+
   it("keeps validation operation values inside documented local-only boundaries", () => {
     expect(validationOperationGateCommands.map((gate) => gate.area)).toEqual([
       "full local gate",
