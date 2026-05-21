@@ -166,6 +166,7 @@ Post-MVP notification operations view:
 Post-MVP readiness audit operations view:
 
 - The seeded investor demo path must verify that `/settings/readiness-audit` renders tenant-scoped local readiness audit events, action/subject filters, a bounded CSV export link, and safety-boundary text without mutating audit events, exposing secrets, calling providers, billing, live AI, SMS, email, notifications, or enabling live features.
+- The seeded investor demo path must verify that `/settings/readiness-audit` renders command-execution, external-impact, mutation, and secrets-displayed no-impact summary states without mutating audit events, exposing secrets, calling providers, billing, live AI, SMS, email, notifications, or enabling live features.
 
 Post-MVP contract operations view:
 

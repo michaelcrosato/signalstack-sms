@@ -1,13 +1,14 @@
 # Codex Blockers
 
-Run number: 174
+Run number: 175
 
-- Latest queue operations no-impact summary rendering coverage pins the validated command-execution, external-impact, and secrets-displayed summary labels on `/settings/queue` in the seeded investor demo path. The check is local read-only rendering/browser coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS/email, mutate queue rows, update campaigns, call live AI, expose secrets, or enable live features.
+- Latest readiness audit no-impact summary rendering coverage displays the validated command-execution, external-impact, mutation, and secrets-displayed labels on `/settings/readiness-audit` and pins them in the seeded investor demo path. The check is local read-only rendering/browser coverage only and does not mutate audit events, expose secrets, call providers, bill, notify, send SMS/email, call live AI, create worker or Redis activity, or enable live features.
 
 No active blockers.
 
 ## Notes
 
+- Latest queue operations no-impact summary rendering coverage pins the validated command-execution, external-impact, and secrets-displayed summary labels on `/settings/queue` in the seeded investor demo path. The check is local read-only rendering/browser coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS/email, mutate queue rows, update campaigns, call live AI, expose secrets, or enable live features.
 - Latest notification operations secret-literal handoff checkpoint reconciles PLAN and next-prompt handoff docs with the existing `/settings/notifications` static metadata guard and unit coverage for common secret-like token patterns. The check is local documentation alignment only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 - Latest notification operations no-impact summary rendering coverage displays the validated command-execution, external-impact, and secrets-displayed summary states on `/settings/notifications` and pins them in the seeded investor demo path. The check is local read-only rendering/browser coverage only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 - Latest notification operations exported vocabulary mutation hardening adds unit coverage proving every exported `/settings/notifications` supported vocabulary rejects caller mutation before local notification metadata renders. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.

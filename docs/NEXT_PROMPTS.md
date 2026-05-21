@@ -210,6 +210,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP readiness audit exported vocabulary mutation hardening: unit coverage now verifies every exported readiness-audit operations vocabulary rejects caller mutation before local readiness filters or CSV links render.
 - Post-MVP readiness audit query limit-ceiling hardening: the JSON/CSV readiness-audit query schema now derives its maximum accepted limit from the exported bounded positive CSV export-limit vocabulary, with unit coverage proving the maximum vocabulary limit is accepted and limit-plus-one is rejected.
 - Post-MVP readiness audit default query-limit vocabulary hardening: the JSON/CSV readiness-audit query schema now derives its default limit from an exported runtime-frozen bounded positive default-limit vocabulary, with unit coverage proving the schema default stays inside the maximum export limit before readiness filters or CSV links render.
+- Post-MVP readiness audit no-impact summary rendering coverage: the seeded investor demo path verifies `/settings/readiness-audit` displays command-execution, external-impact, mutation, and secrets-displayed no-impact labels without mutating audit events, exposing secrets, provider calls, billing, live AI, notifications, SMS, email, or live feature enablement.
 
 Demo-safe defaults remain mandatory:
 

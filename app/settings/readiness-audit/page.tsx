@@ -59,6 +59,8 @@ export default async function ReadinessAuditOperationsPage({ searchParams }: Rea
         <Metric label="Subject filter" value={query.subjectType ?? "all"} />
         <Metric label="Command execution" value={readinessAuditStatus.commandExecution} />
         <Metric label="External impact" value={readinessAuditStatus.externalImpact} />
+        <Metric label="Mutation" value={readinessAuditStatus.mutation} />
+        <Metric label="Secrets displayed" value={String(readinessAuditStatus.secretsDisplayed)} />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
