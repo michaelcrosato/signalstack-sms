@@ -1,8 +1,13 @@
 # Codex Summary
 
-Run number: 92
+Run number: 93
 
 ## Completed
+
+- Advanced a post-MVP shared operator supplied-inventory duplicate-copy checkpoint.
+- Added a shared copy uniqueness guard so summaries and projections fail before deriving local navigation from supplied operator inventories with duplicate group names, labels, or notes.
+- Added unit coverage for duplicate supplied group-name, label, and note failures across summary, broad launch, and focused projection helpers.
+- Preserved the local-only operator inventory boundary without executing routes, API handlers, provider calls, billing, notifications, SMS, email, live AI, or other live features.
 
 - Advanced a post-MVP shared operator supplied-inventory duplicate-route checkpoint.
 - Added a shared route uniqueness guard so summaries and projections fail before deriving local navigation from supplied operator inventories with duplicate route entries.

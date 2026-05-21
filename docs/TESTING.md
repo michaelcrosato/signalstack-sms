@@ -59,6 +59,7 @@ Additional deterministic checks:
 - Unit coverage verifies that the shared operator surface summary exposes only public aggregate fields, so extra supplied inventory group or link properties cannot leak into local operation counts or route lists.
 - Unit coverage verifies that the shared operator surface summary returns a fresh frozen routes array per call, so caller-side route array changes cannot leak into later local operation counts or route lists.
 - Unit coverage verifies that supplied shared operator inventories with duplicate route entries fail before summaries or projections are derived, so local navigation helpers cannot silently shadow a route.
+- Unit coverage verifies that supplied shared operator inventories with duplicate group names, link labels, or link notes fail before summaries or projections are derived, so local navigation helpers cannot silently render ambiguous copy.
 - Unit coverage verifies that shared operator projections fail loudly with the missing route when a projection references a route absent from the supplied inventory.
 - Unit coverage verifies that shared operator surface labels and notes remain aligned with their route names, including singular/plural route segment variants.
 - Unit coverage verifies that rich shared operator projections for demo checkpoints, workflow steps, and integration areas have unique route entries, point at implemented app pages, and derive their visible labels from the shared local operator surface inventory.

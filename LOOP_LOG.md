@@ -665,3 +665,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 093  GREEN  supplied-inventory-duplicate-copy-guard  2026-05-20 23:18
+Objective:    Fail supplied shared operator inventories with duplicate group names, labels, or notes before projection.
+Changed:
+- Added shared copy uniqueness checks for supplied operator surface group names, link labels, and link notes.
+- Added unit coverage proving duplicate supplied group names, labels, and notes fail before local navigation can render ambiguous copy.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.

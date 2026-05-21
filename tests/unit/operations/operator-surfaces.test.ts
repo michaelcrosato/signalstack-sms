@@ -279,6 +279,36 @@ describe("operator surface inventory", () => {
     expect(() => getDemoOperationsLinks(groups)).toThrow(`Duplicate operator surface route ${duplicateRoute}`);
   });
 
+  it("rejects supplied operator inventories with ambiguous copy before projection", () => {
+    const duplicateGroupName = operatorSurfaceGroups[0].name;
+    const duplicateLabel = operatorSurfaceGroups[0].links[0].label;
+    const duplicateNote = operatorSurfaceGroups[0].links[0].note;
+    const duplicateGroupNameGroups = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      name: groupIndex === 1 ? duplicateGroupName : group.name
+    }));
+    const duplicateLabelGroups = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [{ ...group.links[0], label: duplicateLabel }, ...group.links.slice(1)]
+          : group.links
+    }));
+    const duplicateNoteGroups = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [{ ...group.links[0], note: duplicateNote }, ...group.links.slice(1)]
+          : group.links
+    }));
+
+    expect(() => getOperatorSurfaceSummary(duplicateGroupNameGroups)).toThrow(
+      `Duplicate operator surface group name ${duplicateGroupName}`
+    );
+    expect(() => getLaunchDashboardLinks(duplicateLabelGroups)).toThrow(`Duplicate operator surface label ${duplicateLabel}`);
+    expect(() => getDemoOperationsLinks(duplicateNoteGroups)).toThrow(`Duplicate operator surface note ${duplicateNote}`);
+  });
+
   it("keeps inventory copy whitespace-clean for projected navigation", () => {
     const copyFields = operatorSurfaceGroups.flatMap((group) => [
       group.name,

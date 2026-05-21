@@ -53,14 +53,35 @@ function freezeOperatorSurfaceGroups(groups: OperatorSurfaceGroup[]) {
 
 function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) {
   const links = groups.flatMap((group) => group.links);
+  const seenGroupNames = new Set<string>();
   const seenRoutes = new Set<string>();
+  const seenLabels = new Set<string>();
+  const seenNotes = new Set<string>();
+
+  for (const group of groups) {
+    if (seenGroupNames.has(group.name)) {
+      throw new Error(`Duplicate operator surface group name ${group.name}`);
+    }
+
+    seenGroupNames.add(group.name);
+  }
 
   for (const link of links) {
     if (seenRoutes.has(link.href)) {
       throw new Error(`Duplicate operator surface route ${link.href}`);
     }
 
+    if (seenLabels.has(link.label)) {
+      throw new Error(`Duplicate operator surface label ${link.label}`);
+    }
+
+    if (seenNotes.has(link.note)) {
+      throw new Error(`Duplicate operator surface note ${link.note}`);
+    }
+
     seenRoutes.add(link.href);
+    seenLabels.add(link.label);
+    seenNotes.add(link.note);
   }
 
   return links;
