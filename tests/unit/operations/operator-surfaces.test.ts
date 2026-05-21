@@ -329,6 +329,39 @@ describe("operator surface inventory", () => {
     expect(() => getDemoOperationsLinks(duplicateNoteGroups)).toThrow(`Duplicate operator surface note ${duplicateNote}`);
   });
 
+  it("rejects supplied operator inventories with blank copy before projection", () => {
+    const blankGroupNameGroups = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      name: groupIndex === 1 ? "   " : group.name
+    }));
+    const blankRouteGroups = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [{ ...group.links[0], href: "   " }, ...group.links.slice(1)]
+          : group.links
+    }));
+    const blankLabelGroups = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [{ ...group.links[0], label: "   " }, ...group.links.slice(1)]
+          : group.links
+    }));
+    const blankNoteGroups = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [{ ...group.links[0], note: "   " }, ...group.links.slice(1)]
+          : group.links
+    }));
+
+    expect(() => getOperatorSurfaceSummary(blankGroupNameGroups)).toThrow("Blank operator surface group name");
+    expect(() => getLaunchDashboardLinks(blankRouteGroups)).toThrow("Blank operator surface route");
+    expect(() => getSettingsNavigationLinks(blankLabelGroups)).toThrow("Blank operator surface label");
+    expect(() => getDemoOperationsLinks(blankNoteGroups)).toThrow("Blank operator surface note");
+  });
+
   it("keeps inventory copy whitespace-clean for projected navigation", () => {
     const copyFields = operatorSurfaceGroups.flatMap((group) => [
       group.name,

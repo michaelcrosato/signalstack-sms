@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP shared operator supplied-inventory blank-field checkpoint.
+- Added a shared guard so summaries and projections fail before deriving local navigation from supplied inventories with blank group names, routes, labels, or notes.
+- Added unit coverage proving blank supplied fields are rejected for summary, broad launch/settings, and focused demo operation projections.
+- Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop log.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 96
+
+## Previous Run
+
 - Advanced a post-MVP shared operator supplied-inventory empty-inventory checkpoint.
 - Added a shared guard so summaries and projections fail before deriving local navigation from an empty supplied operator inventory.
 - Added unit coverage proving empty supplied inventories are rejected for summaries, launch projection, and demo operations projection.

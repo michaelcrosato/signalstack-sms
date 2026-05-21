@@ -51,6 +51,12 @@ function freezeOperatorSurfaceGroups(groups: OperatorSurfaceGroup[]) {
   );
 }
 
+function assertNonBlankOperatorSurfaceField(fieldName: string, value: string) {
+  if (value.trim().length === 0) {
+    throw new Error(`Blank operator surface ${fieldName}`);
+  }
+}
+
 function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) {
   if (groups.length === 0) {
     throw new Error("Empty operator surface inventory");
@@ -63,6 +69,8 @@ function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) 
   const seenNotes = new Set<string>();
 
   for (const group of groups) {
+    assertNonBlankOperatorSurfaceField("group name", group.name);
+
     if (group.links.length === 0) {
       throw new Error(`Empty operator surface group ${group.name}`);
     }
@@ -75,6 +83,10 @@ function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) 
   }
 
   for (const link of links) {
+    assertNonBlankOperatorSurfaceField("route", link.href);
+    assertNonBlankOperatorSurfaceField("label", link.label);
+    assertNonBlankOperatorSurfaceField("note", link.note);
+
     if (seenRoutes.has(link.href)) {
       throw new Error(`Duplicate operator surface route ${link.href}`);
     }

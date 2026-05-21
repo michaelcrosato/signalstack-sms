@@ -695,3 +695,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 096  GREEN  supplied-inventory-blank-field-guard  2026-05-20 23:30
+Objective:    Fail supplied shared operator inventories with blank navigation fields before projection.
+Changed:
+- Added a shared blank-field guard for supplied operator surface group names, routes, labels, and notes.
+- Added unit coverage proving blank supplied fields fail before summaries, broad navigation, or focused projections can render whitespace-only local navigation.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
