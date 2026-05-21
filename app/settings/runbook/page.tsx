@@ -62,6 +62,9 @@ export default function OperatorRunbookPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/demo">
           Demo Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/operations">
+          Operations Index
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/health">
           Health Operations
         </Link>
@@ -194,6 +197,7 @@ export default function OperatorRunbookPage() {
       <Panel title="Local Admin Views">
         <nav aria-label="Local admin views" className="grid gap-3 text-sm md:grid-cols-4">
           <AdminLink href="/settings/system" label="System Status" />
+          <AdminLink href="/settings/operations" label="Operations Index" />
           <AdminLink href="/settings/environment" label="Environment Operations" />
           <AdminLink href="/settings/demo" label="Demo Operations" />
           <AdminLink href="/settings/health" label="Health Operations" />

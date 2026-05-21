@@ -13,6 +13,7 @@ export const dynamic = "force-dynamic";
 
 const reportLinks = [
   { href: "/settings/demo", label: "Demo Operations", scope: "seeded demo readiness and runtime gates" },
+  { href: "/settings/operations", label: "Operations Index", scope: "grouped local operator surface map" },
   { href: "/settings/usage", label: "Usage & Analytics", scope: "tenant metrics and local usage" },
   { href: "/settings/exports", label: "Admin Exports", scope: "bounded local CSV links" },
   { href: "/settings/readiness-audit", label: "Readiness Audit", scope: "go-live readiness history" },
@@ -48,6 +49,9 @@ export default async function ReportsPage() {
         </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/usage">
           Usage & Analytics
+        </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/operations">
+          Operations Index
         </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/exports">
           Admin Exports

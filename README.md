@@ -51,6 +51,8 @@ Workflow operations review is available at `/settings/workflows`. It renders exi
 
 Demo operations review is available at `/settings/demo`. It renders seeded demo readiness, workflow links, local metrics, usage totals, and runtime gates only; it does not import data, schedule campaigns, run workers, create inbox replies, execute reports, export data, mutate records, call providers, bill, notify, expose secrets, or enable live features.
 
+Operations index review is available at `/settings/operations`. It renders grouped links to existing local operator surfaces and safety boundaries only; it does not execute commands, inspect files, call APIs, mutate records, create exports, call providers, bill, notify, expose secrets, or enable live features.
+
 Release operations review is available at `/settings/releases`. It renders local release checklist commands, protected gate expectations, seeded demo path, premerge metadata, and release surface links only; it does not execute commands, run migrations, launch tests or browsers, perform git operations, deploy, mutate records, call providers, bill, notify, expose logs, diffs, environment values, or secrets, or enable live features.
 
 Health operations review is available at `/settings/health`. It renders the local health endpoint contract, demo-safe defaults, runtime blockers, and operations links only; it does not execute probes, call APIs, run commands, mutate records, call providers, bill, notify, expose raw environment values or secrets, or enable live features.

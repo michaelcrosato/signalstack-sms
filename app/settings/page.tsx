@@ -56,6 +56,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/settings/demo">
           Demo Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/operations">
+          Operations Index
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/exports">
           Admin Exports
         </Link>
@@ -167,6 +170,16 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
           Review seeded demo readiness, workflow links, local metrics, and runtime gates without importing data,
           scheduling campaigns, creating messages, executing reports, calling providers, billing, notifying, exposing
           secrets, or enabling live features.
+        </p>
+      </Panel>
+
+      <Panel title="Operations Index">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/operations">
+          Operations Index
+        </Link>
+        <p className="text-sm leading-6 text-slate-700">
+          Review grouped local operator surfaces and safety boundaries without executing commands, inspecting files,
+          calling APIs, mutating records, creating exports, calling providers, billing, notifying, exposing secrets, or enabling live features.
         </p>
       </Panel>
 

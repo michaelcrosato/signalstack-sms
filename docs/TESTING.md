@@ -21,6 +21,7 @@ Additional deterministic checks:
 - Production deployment gate tests verify that production-like environments cannot enable external-impact settings without an explicit future override.
 - API rate limiting helpers are unit-tested with deterministic clocks and isolated stores. Local validation keeps the middleware defaults generous enough for smoke and demo paths.
 - API operations inventory tests verify that the read-only `/settings/api` route list includes implemented local methods such as contact soft archive, campaign draft update, inbox message/note reads, and billing usage reads while keeping external-impact routes at zero.
+- The seeded investor demo path verifies `/settings/operations` as a read-only grouped local operator surface index without commands, file inspection, API probes, mutations, exports, provider calls, billing, notifications, live AI, SMS, email, secrets, or live feature enablement.
 - The seeded investor demo path verifies `/settings/compliance` as a read-only compliance detail surface without live provider verification or messaging enablement.
 - The seeded investor demo path verifies `/settings/usage` as a read-only local usage and analytics surface without live billing or provider configuration.
 - The seeded investor demo path verifies `/settings/numbers` as a read-only local provider-number metadata surface without provisioning, provider calls, or messaging enablement.

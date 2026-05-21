@@ -178,6 +178,17 @@ Use `/settings/demo` for read-only seeded demo readiness review before demos or 
 
 The page is display-only. It must not import contacts, schedule or cancel campaigns, run workers, create inbox replies, submit prompts, execute reports, create exports, mutate records, enqueue jobs, call Redis, expose secrets, call providers, create billing records, send notifications, send SMS, send email, or enable live features.
 
+## Operations Index
+
+Use `/settings/operations` for read-only local operator surface discovery before demos, repair work, or handoff. It displays:
+
+- grouped links to existing local operator views
+- static local surface counts
+- route names for current demo-safe pages
+- safety boundaries for the index itself
+
+The page is display-only. It must not execute commands, inspect files, call APIs, mutate records, create exports, enqueue jobs, call Redis, expose secrets, call providers, call Stripe, call live AI, create billing records, send notifications, send SMS, send email, or enable live features.
+
 ## Release Operations
 
 Use `/settings/releases` for read-only local release readiness review before integration or handoff work. It displays:

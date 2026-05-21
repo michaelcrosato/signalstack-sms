@@ -17,6 +17,7 @@ Milestone 10 hardening:
 Post-MVP local operations status:
 
 - Unit tests must verify that the system-status helper reports demo-safe defaults as external-impact blocked.
+- The seeded investor demo path must verify that `/settings/operations` renders grouped local operator surfaces and safety-boundary text without command execution, file inspection, API probes, mutations, exports, provider calls, billing records, notifications, live AI, SMS, email, secret exposure, or live feature enablement.
 - The seeded investor demo path must verify that `/settings/demo` renders seeded demo readiness, runtime gates, local seed/scenario signals, and safety-boundary text without imports, campaign scheduling, worker execution, inbox replies, report execution, exports, mutations, provider calls, billing records, notifications, live feature enablement, or secrets.
 - The seeded investor demo path must verify that `/settings/system` renders read-only safety, runtime, queue, and API protection metadata.
 - The seeded investor demo path must verify that `/settings/health` renders read-only health endpoint contract, demo-safe defaults, runtime boundary, operational links, and safety-boundary text without health probes, API calls, commands, mutations, provider calls, billing, notifications, secrets, or live feature enablement.

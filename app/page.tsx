@@ -13,6 +13,11 @@ const launchLinks = [
     description: "Read-only seeded demo readiness, workflow links, local metrics, and runtime gates."
   },
   {
+    href: "/settings/operations",
+    title: "Operations Index",
+    description: "Read-only grouped index of local operator surfaces and safety boundaries."
+  },
+  {
     href: "/settings",
     title: "Go-Live Readiness",
     description: "Compliance, provider blockers, readiness audit, numbers, queue, and API protection."

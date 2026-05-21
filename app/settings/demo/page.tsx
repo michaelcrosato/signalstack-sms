@@ -68,6 +68,9 @@ export default async function DemoOperationsPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings">
           Go-Live Readiness
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/operations">
+          Operations Index
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/workflows">
           Workflow Operations
         </Link>
@@ -145,6 +148,7 @@ export default async function DemoOperationsPage() {
         <Panel title="Operational Links">
           <ul className="grid gap-3 text-sm">
             <OperationLink href="/settings/workflows" label="Workflow Operations" note="end-to-end local demo checkpoints" />
+            <OperationLink href="/settings/operations" label="Operations Index" note="grouped local operator surface map" />
             <OperationLink href="/settings/releases" label="Release Operations" note="seeded demo path and gate expectations" />
             <OperationLink href="/settings/environment" label="Environment Operations" note="demo-safe defaults and runtime categories" />
           </ul>

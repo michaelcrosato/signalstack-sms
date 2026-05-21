@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 037  GREEN  operations-index  2026-05-20 18:37
+Objective:    Add a read-only local operations index for existing operator surfaces and safety boundaries.
+Changed:
+- Added `/settings/operations` with grouped local operator links, static surface counts, route names, and safety-boundary text.
+- Linked the view from `/`, `/demo`, `/settings`, `/settings/demo`, `/settings/reports`, and `/settings/runbook`.
+- Extended root smoke and seeded investor demo E2E coverage for the operations index.
+- Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only admin/reporting/navigation refinements without live external-impact actions.
+
 ## Run 036  GREEN  demo-operations  2026-05-20 18:31
 Objective:    Add a read-only local demo operations checkpoint for seeded demo readiness and runtime gates.
 Changed:

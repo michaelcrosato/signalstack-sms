@@ -40,6 +40,9 @@ export default async function DemoPage() {
         <Link className="text-sm font-medium text-teal-700" href="/settings/demo">
           Demo Operations
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/operations">
+          Operations Index
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/compliance">
           Compliance Detail
         </Link>

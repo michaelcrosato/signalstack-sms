@@ -1,15 +1,20 @@
 # Codex Summary
 
-Run number: 36
+Run number: 37
 
 ## Completed
+
+- Advanced a post-MVP local operations index checkpoint.
+- Added `/settings/operations`, a read-only grouped index of existing local operator surfaces, route names, static surface counts, and safety boundaries.
+- Linked the operations index from the launch dashboard, go-live readiness, demo operations, reporting index, and operator runbook views.
+- Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, next-prompt handoff docs, and seeded demo E2E coverage with the operations index boundary.
+
+## Prior Completed
 
 - Advanced a post-MVP local demo operations checkpoint.
 - Added `/settings/demo`, a read-only page that maps seeded demo readiness, workflow links, local metrics, usage totals, runtime gates, and safety boundaries.
 - Linked the demo operations view from the launch dashboard, demo console, go-live readiness, workflow operations, reporting index, release operations, and operator runbook views.
 - Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, next-prompt handoff docs, and seeded demo E2E coverage with the demo operations boundary.
-
-## Prior Completed
 
 - Advanced a post-MVP local environment operations checkpoint.
 - Added `/settings/environment`, a read-only page that maps demo-safe defaults, allowlisted configuration categories, derived runtime status, operational links, and environment safety boundaries.

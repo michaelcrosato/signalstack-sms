@@ -232,6 +232,10 @@ Renders a read-only local environment operations checkpoint. It may display demo
 
 Renders a read-only local demo operations checkpoint for the current organization. It may display seeded demo readiness, workflow links, local contact/campaign/conversation/message/number metrics, local usage totals, and derived runtime gates. The page must not import data, schedule or cancel campaigns, run workers, create inbox messages or replies, submit prompts, execute reports, create exports, mutate records, enqueue jobs, call Redis, call providers, call Stripe, call live AI, send SMS, send email, send notifications, expose secrets, expose full message bodies, or enable live messaging, live billing, live AI, or other live features.
 
+### `/settings/operations`
+
+Renders a read-only local operations index for existing operator surfaces. It may display grouped links, local route names, static surface counts, and safety-boundary text. The page must not execute commands, inspect files, call APIs, mutate records, create exports, enqueue jobs, call Redis, call providers, call Stripe, call live AI, send SMS, send email, send notifications, expose secrets, expose raw environment values, or enable live messaging, live billing, live AI, or other live features.
+
 ### `/settings/runbook`
 
 Renders a read-only local operator checklist based on `docs/LOCAL_OPERATOR_RUNBOOK.md`. It may display local validation, database migration/seed, worker, BullMQ smoke, admin export, and repair-loop commands. The page must not execute commands, mutate records, expose secrets, call providers, send notifications, create billing records, or enable live messaging.
