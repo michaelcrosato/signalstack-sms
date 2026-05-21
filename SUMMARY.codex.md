@@ -1,5 +1,14 @@
 # Codex Summary
 
+- Advanced a post-MVP contract operations mutation no-impact summary checkpoint.
+- Added a runtime-frozen contract mutation vocabulary and status field, rendered the Mutation label on `/settings/contracts`, and pinned it in contract operations unit coverage plus the seeded investor demo path.
+- Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, worker execution, Redis calls, mutations, or protected gate-script edits were used.
+
+Run number: 180
+
+## Previous Run
+
 - Advanced a post-MVP contract operations command-literal hardening checkpoint.
 - Added validation so `/settings/contracts` static file metadata, validation purposes, and drift-control copy reject command-like snippets outside the allowlisted validation-command field.
 - Added unit coverage proving non-command contract operations metadata remains command-literal-free before local contract metadata renders.

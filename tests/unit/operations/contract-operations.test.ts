@@ -5,6 +5,7 @@ import {
   allowedContractOperationCommandExecutionStates,
   allowedContractOperationExternalImpactStates,
   allowedContractOperationFilePaths,
+  allowedContractOperationMutationStates,
   allowedContractOperationSecretsDisplayedStates,
   allowedContractOperationValidationCommands,
   contractOperationDriftControls,
@@ -21,6 +22,7 @@ const publicStatusFields = [
   "driftControlCount",
   "commandExecution",
   "externalImpact",
+  "mutation",
   "secretsDisplayed",
   "contractFiles",
   "validationChecks",
@@ -48,6 +50,7 @@ describe("getContractOperationsStatus", () => {
     expect(status.driftControlCount).toBe(5);
     expect(status.commandExecution).toBe("none");
     expect(status.externalImpact).toBe("none");
+    expect(status.mutation).toBe("none");
     expect(status.secretsDisplayed).toBe(false);
     expect(status.contractFiles.map((file) => file.path)).toEqual([
       "contracts/CONTRACT-DB.md",
@@ -207,12 +210,15 @@ describe("getContractOperationsStatus", () => {
 
     expect(allowedContractOperationCommandExecutionStates).toEqual(["none"]);
     expect(allowedContractOperationExternalImpactStates).toEqual(["none"]);
+    expect(allowedContractOperationMutationStates).toEqual(["none"]);
     expect(allowedContractOperationSecretsDisplayedStates).toEqual([false]);
     expect(Object.isFrozen(allowedContractOperationCommandExecutionStates)).toBe(true);
     expect(Object.isFrozen(allowedContractOperationExternalImpactStates)).toBe(true);
+    expect(Object.isFrozen(allowedContractOperationMutationStates)).toBe(true);
     expect(Object.isFrozen(allowedContractOperationSecretsDisplayedStates)).toBe(true);
     expect(allowedContractOperationCommandExecutionStates).toContain(status.commandExecution);
     expect(allowedContractOperationExternalImpactStates).toContain(status.externalImpact);
+    expect(allowedContractOperationMutationStates).toContain(status.mutation);
     expect(allowedContractOperationSecretsDisplayedStates).toContain(status.secretsDisplayed);
   });
 
@@ -222,6 +228,7 @@ describe("getContractOperationsStatus", () => {
       allowedContractOperationValidationCommands,
       allowedContractOperationCommandExecutionStates,
       allowedContractOperationExternalImpactStates,
+      allowedContractOperationMutationStates,
       allowedContractOperationSecretsDisplayedStates
     ];
 

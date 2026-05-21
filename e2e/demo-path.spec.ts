@@ -155,6 +155,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Contract Inventory" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Validation Commands" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Drift Controls" })).toBeVisible();
+  await expect(page.getByText("Command execution", { exact: true })).toBeVisible();
+  await expect(page.getByText("External impact", { exact: true })).toBeVisible();
+  await expect(page.getByText("Mutation", { exact: true })).toBeVisible();
   await expect(page.getByText("contracts/CONTRACT-API.md")).toBeVisible();
   for (const link of contractOperationLinks) {
     await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);

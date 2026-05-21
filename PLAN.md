@@ -269,6 +269,7 @@ Post-MVP:
 - Local contract operations secret-literal coverage
 - Local contract operations command-literal coverage
 - Local contract operations no-impact vocabulary coverage
+- Local contract operations mutation no-impact summary coverage
 - Local security operations whitespace-clean coverage
 - Local validation operations inventory static-metadata coverage
 - Local validation operations value-boundary coverage

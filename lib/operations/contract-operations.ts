@@ -15,6 +15,7 @@ export type ContractOperationsStatus = {
   driftControlCount: number;
   commandExecution: ContractOperationCommandExecutionState;
   externalImpact: ContractOperationExternalImpactState;
+  mutation: ContractOperationMutationState;
   secretsDisplayed: ContractOperationSecretsDisplayedState;
   contractFiles: readonly ContractOperationFile[];
   validationChecks: readonly ContractOperationValidationCheck[];
@@ -42,12 +43,14 @@ export const allowedContractOperationValidationCommands = Object.freeze([
 ] as const);
 export const allowedContractOperationCommandExecutionStates = Object.freeze(["none"] as const);
 export const allowedContractOperationExternalImpactStates = Object.freeze(["none"] as const);
+export const allowedContractOperationMutationStates = Object.freeze(["none"] as const);
 export const allowedContractOperationSecretsDisplayedStates = Object.freeze([false] as const);
 
 export type ContractOperationSupportedFilePath = (typeof allowedContractOperationFilePaths)[number];
 export type ContractOperationSupportedValidationCommand = (typeof allowedContractOperationValidationCommands)[number];
 export type ContractOperationCommandExecutionState = (typeof allowedContractOperationCommandExecutionStates)[number];
 export type ContractOperationExternalImpactState = (typeof allowedContractOperationExternalImpactStates)[number];
+export type ContractOperationMutationState = (typeof allowedContractOperationMutationStates)[number];
 export type ContractOperationSecretsDisplayedState = (typeof allowedContractOperationSecretsDisplayedStates)[number];
 const forbiddenSecretMetadataPatterns = [
   /\bsk_(?:live|test)_[A-Za-z0-9]+/,
@@ -67,8 +70,9 @@ const forbiddenCommandMetadataPatterns = [
 const contractOperationStatusSummary = Object.freeze({
   commandExecution: "none",
   externalImpact: "none",
+  mutation: "none",
   secretsDisplayed: false
-} satisfies Pick<ContractOperationsStatus, "commandExecution" | "externalImpact" | "secretsDisplayed">);
+} satisfies Pick<ContractOperationsStatus, "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed">);
 
 function assertExactFields<T extends object>(value: T, fields: readonly string[], errorMessage: string) {
   const actualKeys = Reflect.ownKeys(value);
@@ -102,13 +106,19 @@ function assertCleanContractMetadata(value: string, errorMessage: string) {
   }
 }
 
-function assertStatusSummary(summary: Pick<ContractOperationsStatus, "commandExecution" | "externalImpact" | "secretsDisplayed">) {
+function assertStatusSummary(
+  summary: Pick<ContractOperationsStatus, "commandExecution" | "externalImpact" | "mutation" | "secretsDisplayed">
+) {
   if (!allowedContractOperationCommandExecutionStates.includes(summary.commandExecution)) {
     throw new Error(`Unsupported contract operation command execution state: ${summary.commandExecution}`);
   }
 
   if (!allowedContractOperationExternalImpactStates.includes(summary.externalImpact)) {
     throw new Error(`Unsupported contract operation external impact state: ${summary.externalImpact}`);
+  }
+
+  if (!allowedContractOperationMutationStates.includes(summary.mutation)) {
+    throw new Error(`Unsupported contract operation mutation state: ${summary.mutation}`);
   }
 
   if (!allowedContractOperationSecretsDisplayedStates.includes(summary.secretsDisplayed)) {
@@ -303,6 +313,7 @@ export function getContractOperationsStatus(): ContractOperationsStatus {
     driftControlCount: contractOperationDriftControls.length,
     commandExecution: contractOperationStatusSummary.commandExecution,
     externalImpact: contractOperationStatusSummary.externalImpact,
+    mutation: contractOperationStatusSummary.mutation,
     secretsDisplayed: contractOperationStatusSummary.secretsDisplayed,
     contractFiles: freezeContractOperationFiles(contractOperationFiles.map((file) => ({ ...file }))),
     validationChecks: freezeValidationChecks(contractOperationValidationChecks.map((check) => ({ ...check }))),
