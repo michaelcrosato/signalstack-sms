@@ -17,7 +17,9 @@ describe("readiness audit export", () => {
     });
 
     expect(readinessAuditQuerySchema.safeParse({ action: "provider:send", limit: "25" }).success).toBe(false);
+    expect(readinessAuditQuerySchema.safeParse({ action: "UNSUPPORTED_LOCAL_ACTION", limit: "25" }).success).toBe(false);
     expect(readinessAuditQuerySchema.safeParse({ subjectType: "../Secret", limit: "25" }).success).toBe(false);
+    expect(readinessAuditQuerySchema.safeParse({ subjectType: "UnsupportedSubject", limit: "25" }).success).toBe(false);
     expect(readinessAuditQuerySchema.safeParse({ action: "PROVIDER_NUMBER_UPSERTED", limit: "5000" }).success).toBe(false);
   });
 

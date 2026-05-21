@@ -1335,3 +1335,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP readiness audit operations hardening or safe read-only operator surface refinements.
+
+## Run 148  GREEN  readiness-audit-query-allowlist  2026-05-21 03:24
+Objective:    Keep readiness-audit JSON and CSV query filters constrained to supported local vocabularies.
+Changed:
+- Tightened the readiness-audit query schema to use the exported supported action and subject-type vocabularies.
+- Added unit coverage proving unsupported local-looking readiness-audit action and subject filters are rejected.
+- Updated API/testing contracts, API map, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP readiness audit operations hardening or safe read-only operator surface refinements.

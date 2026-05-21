@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP readiness audit query allowlist checkpoint.
+- Tightened the readiness-audit JSON/CSV query schema so `action` and `subjectType` accept only the supported vocabularies exported by the readiness-audit operations helper.
+- Added unit coverage proving unsupported local-looking readiness-audit action and subject filters are rejected.
+- Updated API/testing contracts, API map, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
+- Focused readiness-audit query/export unit coverage, typecheck, lint, `git diff --check`, protected local gate, and seeded demo E2E passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 148
+
+## Previous Run
+
 - Advanced a post-MVP readiness audit operations export-limit vocabulary checkpoint.
 - Exported the supported readiness-audit CSV export-limit vocabulary and typed the operations status limit from it.
 - Added unit coverage proving the export-limit vocabulary is runtime-frozen and contains the rendered status limit before `/settings/readiness-audit` renders CSV links.
