@@ -1,15 +1,19 @@
 # Codex Summary
 
-Run number: 42
+Run number: 43
 
 ## Completed
+
+- Advanced a post-MVP local API operations inventory reverse-coverage checkpoint.
+- Added unit coverage that fails when an implemented local API route method under `app/api/**/route.ts` is missing from the static `/settings/api` inventory.
+- Updated testing contract, README, demo-mode docs, local operator runbook, PLAN, BLOCKERS, and next-prompt handoff docs with the reverse API inventory drift check.
+
+## Prior Completed
 
 - Advanced a post-MVP local operations inventory reverse-coverage checkpoint.
 - Added unit coverage that fails when an implemented local operator page under `/settings` or `/demo` is missing from the shared operations inventory.
 - Added `/settings/operations` to the shared inventory it renders from, so the index is covered by the same operations/runbook projection.
 - Updated testing contract, README, demo-mode docs, local operator runbook, PLAN, BLOCKERS, and next-prompt handoff docs with the reverse inventory drift check.
-
-## Prior Completed
 
 - Advanced a post-MVP local operator runbook inventory hardening checkpoint.
 - Refactored `/settings/runbook` local admin links to project from the shared operator surface inventory instead of duplicating the list.

@@ -199,6 +199,7 @@ Use `/settings/api` for read-only local API route inventory review before API or
 
 - unique route-method rows
 - backing `app/**/route.ts` files for listed API paths
+- reverse coverage for implemented local API route methods
 - current local route count
 - external-impact route count remains zero
 

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 043  GREEN  api-inventory-reverse-coverage  2026-05-20 19:04
+Objective:    Add reverse coverage so implemented local API route methods cannot be missing from the static API operations inventory.
+Changed:
+- Added a filesystem-backed unit check that every implemented local API route method under `app/api/**/route.ts` is present in `/settings/api` inventory.
+- Kept the API inventory fixed at 47 local route-method entries with external-impact routes at zero.
+- Updated testing contract, README, demo-mode docs, local operator runbook, SUMMARY, BLOCKERS, PLAN, and next-prompt handoff docs with the reverse API inventory drift check.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only admin/reporting/navigation hardening without live external-impact actions.
+
 ## Run 042  GREEN  operations-inventory-reverse-coverage  2026-05-20 19:01
 Objective:    Add reverse coverage so implemented local operator pages cannot be missing from the shared operations inventory.
 Changed:

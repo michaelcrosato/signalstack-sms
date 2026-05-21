@@ -1,11 +1,42 @@
-import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join, relative, sep } from "node:path";
 import { describe, expect, it } from "vitest";
 import { apiOperationRoutes, getApiOperationsStatus } from "@/lib/operations/api-operations";
 
 function apiPathToRouteFile(apiPath: string) {
   const routeSegments = apiPath.split("/").filter(Boolean);
   return join(process.cwd(), "app", ...routeSegments, "route.ts");
+}
+
+function collectImplementedApiRouteMethods(root: string) {
+  const routeMethods: string[] = [];
+  const supportedMethods = ["GET", "POST", "PATCH", "DELETE"] as const;
+
+  function walk(directory: string) {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const fullPath = join(directory, entry.name);
+
+      if (entry.isDirectory()) {
+        walk(fullPath);
+      } else if (entry.isFile() && entry.name === "route.ts") {
+        const source = readFileSync(fullPath, "utf8");
+        const relativeRoute = relative(join(process.cwd(), "app"), fullPath).split(sep).join("/").replace(/\/route\.ts$/, "");
+        const routePath = `/${relativeRoute}`;
+
+        for (const method of supportedMethods) {
+          const methodExportPattern = new RegExp(`export\\s+(?:async\\s+)?function\\s+${method}\\b|export\\s+const\\s+${method}\\b`);
+
+          if (methodExportPattern.test(source)) {
+            routeMethods.push(`${method} ${routePath}`);
+          }
+        }
+      }
+    }
+  }
+
+  walk(root);
+
+  return routeMethods.sort();
 }
 
 describe("getApiOperationsStatus", () => {
@@ -43,6 +74,14 @@ describe("getApiOperationsStatus", () => {
 
     expect(new Set(routeKeys).size).toBe(routeKeys.length);
     expect(missingRouteFiles).toEqual([]);
+  });
+
+  it("lists every implemented local API route method in the inventory", () => {
+    const inventoryRouteKeys = new Set(apiOperationRoutes.map((route) => `${route.method} ${route.path}`));
+    const implementedRouteMethods = collectImplementedApiRouteMethods(join(process.cwd(), "app", "api"));
+
+    expect(implementedRouteMethods).toHaveLength(47);
+    expect(implementedRouteMethods.filter((routeMethod) => !inventoryRouteKeys.has(routeMethod))).toEqual([]);
   });
 
   it("surfaces bounded API rate limit settings", () => {
