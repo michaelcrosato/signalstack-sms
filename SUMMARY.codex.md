@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced Phase 1 product UI by adding a local duplicate-contact merge workflow to `/dashboard/contacts/:contactId`.
+- Added `POST /api/contacts/:contactId/merge`, which keeps the target contact, unions local labels, fills blank target profile fields from the source, moves safe local message/conversation links, and soft-archives the source contact.
+- Updated API contracts/map, operations inventory, product contact projections, unit coverage, seeded product-demo coverage, and roadmap handoff docs.
+- Focused typecheck, contract check, unit tests, seeded product-demo coverage, `git diff --check`, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, worker execution, Redis calls, hard deletion, or protected gate-script edits were used.
+
+Run number: 210
+
+## Previous Run
+
 - Advanced Phase 1 product UI by adding `/dashboard/contacts/:contactId`.
 - The contact detail workspace reads a tenant-scoped contact, updates local profile, consent, notes, tags, and lists through existing contact APIs, and exposes only soft archive for removal.
 - Updated contracts, API map, roadmap handoff docs, unit coverage, and seeded product-demo coverage so the owner contact edit workflow is browser-visible.

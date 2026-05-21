@@ -1923,3 +1923,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Add contact merge workflow or campaign detail/edit only after the core product demo remains stable.
+
+## Run 210  GREEN  product-contact-merge-workflow  2026-05-21 15:15
+Objective:    Add an owner-facing local duplicate-contact merge workflow.
+Changed:
+- Added `POST /api/contacts/:contactId/merge` with role-gated tenant scoping, label union, conservative consent handling, safe local message/conversation relinking, and source soft archive.
+- Added `/dashboard/contacts/:contactId` merge controls and candidate projection from existing active contacts.
+- Updated API contracts/map, API operations inventory, testing contract, roadmap/state/handoff docs, README, SUMMARY, BLOCKERS, and seeded product-demo coverage.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Harden production worker policy before broader live sending, or add campaign detail/edit only if product demo review needs deeper lifecycle control.

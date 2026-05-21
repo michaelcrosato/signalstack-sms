@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 210
+
+- No blocker from the latest product contact merge workflow. `/dashboard/contacts/:contactId` can merge another local active contact into the current tenant-scoped contact through `POST /api/contacts/:contactId/merge`; the source contact is soft-archived and no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
 Run number: 207
 
 - No blocker from the latest product contact detail workspace. `/dashboard/contacts/:contactId` reads and updates local tenant contact profile, consent, notes, tags, and lists through existing contact APIs, and soft-archives contacts only through the existing delete endpoint without live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits.

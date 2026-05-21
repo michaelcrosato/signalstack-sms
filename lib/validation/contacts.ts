@@ -23,6 +23,10 @@ export const contactUpdateSchema = contactCreateSchema.partial().extend({
   archived: z.boolean().optional()
 });
 
+export const contactMergeSchema = z.object({
+  sourceContactId: z.string().trim().min(1).max(120)
+});
+
 export const contactImportRequestSchema = z.object({
   filename: z.string().trim().max(255).optional(),
   csv: z.string().min(1).max(1_000_000)
@@ -30,4 +34,5 @@ export const contactImportRequestSchema = z.object({
 
 export type ContactCreateInput = z.infer<typeof contactCreateSchema>;
 export type ContactUpdateInput = z.infer<typeof contactUpdateSchema>;
+export type ContactMergeInput = z.infer<typeof contactMergeSchema>;
 export type ContactImportRequest = z.infer<typeof contactImportRequestSchema>;

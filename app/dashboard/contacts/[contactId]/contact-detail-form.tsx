@@ -19,6 +19,14 @@ type ContactDetailFormProps = {
     tags: string[];
     lists: string[];
     archived: boolean;
+    mergeCandidates: Array<{
+      id: string;
+      displayName: string;
+      phone: string;
+      consentStatus: ConsentStatus;
+      tags: string[];
+      lists: string[];
+    }>;
   };
 };
 
@@ -34,6 +42,7 @@ export function ContactDetailForm({ contact }: ContactDetailFormProps) {
   const [notes, setNotes] = useState(contact.notes);
   const [tagNames, setTagNames] = useState(contact.tags.join(", "));
   const [listNames, setListNames] = useState(contact.lists.join(", "));
+  const [sourceContactId, setSourceContactId] = useState(contact.mergeCandidates[0]?.id ?? "");
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -110,6 +119,34 @@ export function ContactDetailForm({ contact }: ContactDetailFormProps) {
     }
 
     setStatus("Contact restored locally. Campaign sends still require consent and preflight.");
+    setPending(false);
+    router.refresh();
+  }
+
+  async function mergeContact() {
+    if (!sourceContactId) {
+      setError("Choose a source contact to merge.");
+      return;
+    }
+
+    setPending(true);
+    setStatus(null);
+    setError(null);
+
+    const response = await fetch(`/api/contacts/${contact.id}/merge`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sourceContactId })
+    });
+    const payload = await response.json();
+
+    if (!response.ok) {
+      setError(payload.error ?? "Contacts could not be merged.");
+      setPending(false);
+      return;
+    }
+
+    setStatus("Contacts merged locally. The source contact was soft-archived.");
     setPending(false);
     router.refresh();
   }
@@ -246,6 +283,46 @@ export function ContactDetailForm({ contact }: ContactDetailFormProps) {
           {error}
         </div>
       ) : null}
+
+      <section className="grid gap-3 border-t border-slate-200 pt-5">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-950">Merge duplicate</h3>
+          <p className="mt-1 text-sm text-slate-600">
+            Merge another active contact into this one. The source contact is soft-archived and no SMS, billing, AI, or
+            provider work runs.
+          </p>
+        </div>
+        {contact.mergeCandidates.length > 0 ? (
+          <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-end">
+            <label className="grid gap-2 text-sm font-medium text-slate-700">
+              Source contact
+              <select
+                className="rounded border border-slate-300 px-3 py-2 text-slate-950"
+                onChange={(event) => setSourceContactId(event.target.value)}
+                value={sourceContactId}
+              >
+                {contact.mergeCandidates.map((candidate) => (
+                  <option key={candidate.id} value={candidate.id}>
+                    {candidate.displayName} - {candidate.phone} - {candidate.consentStatus}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              className="rounded border border-amber-300 px-4 py-2 text-sm font-semibold text-amber-800 disabled:cursor-not-allowed disabled:text-slate-400"
+              disabled={pending}
+              onClick={mergeContact}
+              type="button"
+            >
+              Merge Into This Contact
+            </button>
+          </div>
+        ) : (
+          <p className="rounded border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+            No other active contacts are available to merge.
+          </p>
+        )}
+      </section>
     </form>
   );
 }

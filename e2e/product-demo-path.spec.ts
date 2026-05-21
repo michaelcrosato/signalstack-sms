@@ -132,10 +132,59 @@ test("product contact detail page updates local profile and consent metadata", a
   await expect(page.getByRole("row").filter({ hasText: updatedName })).toBeVisible();
   await page.getByRole("link", { name: `Restore ${updatedName}` }).click();
   await expect(page.getByRole("heading", { name: updatedName })).toBeVisible();
-  await expect(page.getByText("Archived").locator("..")).toContainText("yes");
+  await expect(page.getByLabel("Contact status").getByText("Archived").locator("..")).toContainText("yes");
   await page.getByRole("button", { name: "Restore Contact" }).click();
   await expect(page.getByRole("status")).toContainText("Contact restored locally");
-  await expect(page.getByText("Archived").locator("..")).toContainText("no");
+  await expect(page.getByLabel("Contact status").getByText("Archived").locator("..")).toContainText("no");
+});
+
+test("product contact detail page merges a duplicate contact locally", async ({ page }) => {
+  const uniqueSuffix = Date.now().toString().slice(-7);
+  const targetPhone = `+1666${uniqueSuffix}`;
+  const sourcePhone = `+1777${uniqueSuffix}`;
+  const targetName = `Merge Target ${uniqueSuffix}`;
+  const sourceName = `Merge Source ${uniqueSuffix}`;
+
+  const targetResponse = await page.request.post("/api/contacts", {
+    data: {
+      phone: targetPhone,
+      email: `merge-target-${uniqueSuffix}@example.com`,
+      displayName: targetName,
+      consentStatus: "UNKNOWN",
+      tagNames: ["target-tag"],
+      listNames: ["Target List"]
+    }
+  });
+  const sourceResponse = await page.request.post("/api/contacts", {
+    data: {
+      phone: sourcePhone,
+      email: `merge-source-${uniqueSuffix}@example.com`,
+      displayName: sourceName,
+      consentStatus: "OPTED_IN",
+      optInSource: "merge_e2e",
+      notes: "Duplicate profile has the newest consent evidence.",
+      tagNames: ["source-tag"],
+      listNames: ["Source List"]
+    }
+  });
+  const targetPayload = await targetResponse.json();
+  const sourcePayload = await sourceResponse.json();
+
+  await page.goto(`/dashboard/contacts/${targetPayload.contact.id}`);
+
+  await expect(page.getByRole("heading", { name: "Merge duplicate" })).toBeVisible();
+  await page.getByLabel("Source contact").selectOption(sourcePayload.contact.id);
+  await page.getByRole("button", { name: "Merge Into This Contact" }).click();
+
+  await expect(page.getByRole("status")).toContainText("Contacts merged locally");
+  await expect(page.getByText("Local metadata only. No provider calls")).toBeVisible();
+
+  await page.goto("/dashboard/contacts");
+  await expect(page.getByRole("row").filter({ hasText: targetName }).getByText("source-tag, target-tag")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Archived contacts" })).toBeVisible();
+  await expect(page.getByRole("row").filter({ hasText: sourceName })).toBeVisible();
+
+  expect(sourceResponse.ok()).toBe(true);
 });
 
 test("product campaigns page creates, preflights, and schedules a local campaign", async ({ page }) => {

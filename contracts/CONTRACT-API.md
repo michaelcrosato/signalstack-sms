@@ -60,6 +60,10 @@ Updates contact profile, consent, tags/lists, or archive state only when the con
 
 Soft-archives the contact by setting `archivedAt`. It does not hard-delete rows.
 
+### `POST /api/contacts/:contactId/merge`
+
+Merges another tenant-scoped contact into the target contact from `{ "sourceContactId": "..." }`. The merge preserves the target contact, fills blank target profile fields from the source, unions local tags and lists, moves local conversation/message contact links where safe, and soft-archives the source contact. It must not hard-delete contacts, send SMS, call providers, create billing records, call live AI, bypass campaign preflight, expose secrets, or enable live messaging.
+
 ### `POST /api/contacts/imports`
 
 Accepts JSON `{ "filename": "contacts.csv", "csv": "..." }`, parses demo-safe CSV locally, upserts valid contacts, and stores an org-scoped `ContactImport` audit record. Invalid rows are returned with row numbers.
@@ -346,7 +350,7 @@ Renders the product-facing contacts workspace for the current organization. It m
 
 ### `/dashboard/contacts/:contactId`
 
-Renders the product-facing contact detail workspace for a tenant-scoped contact. It may update local profile fields, consent status/evidence, notes, tags, and lists through `PATCH /api/contacts/:contactId`, restore a soft-archived contact through `PATCH /api/contacts/:contactId`, and may soft-archive through `DELETE /api/contacts/:contactId`. It must not send SMS, call providers, create billing records, call live AI, expose secrets, hard-delete contacts, bypass consent/preflight checks, or enable live messaging.
+Renders the product-facing contact detail workspace for a tenant-scoped contact. It may update local profile fields, consent status/evidence, notes, tags, and lists through `PATCH /api/contacts/:contactId`, restore a soft-archived contact through `PATCH /api/contacts/:contactId`, soft-archive through `DELETE /api/contacts/:contactId`, and merge another active local contact into the current contact through `POST /api/contacts/:contactId/merge`. It must not send SMS, call providers, create billing records, call live AI, expose secrets, hard-delete contacts, bypass consent/preflight checks, or enable live messaging.
 
 ### `/dashboard/campaigns`
 

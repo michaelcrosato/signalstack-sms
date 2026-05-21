@@ -76,6 +76,85 @@ export async function archiveContact(orgId: string, contactId: string) {
   return updateContact(orgId, contactId, { archived: true });
 }
 
+export async function mergeContacts(orgId: string, targetContactId: string, sourceContactId: string) {
+  if (targetContactId === sourceContactId) {
+    return null;
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const [target, source] = await Promise.all([
+      tx.contact.findFirst({ where: orgWhere(orgId, { id: targetContactId }), include: contactInclude }),
+      tx.contact.findFirst({ where: orgWhere(orgId, { id: sourceContactId }), include: contactInclude })
+    ]);
+
+    if (!target || !source) {
+      return null;
+    }
+
+    const mergedConsent = mergedConsentData(target, source);
+    const mergedNotes = mergeContactNotes(target.notes, source.notes, source.displayName ?? source.phone);
+
+    await tx.contact.update({
+      where: { id: target.id },
+      data: {
+        email: target.email ?? source.email,
+        firstName: target.firstName ?? source.firstName,
+        lastName: target.lastName ?? source.lastName,
+        displayName: target.displayName ?? source.displayName,
+        optInSource: target.optInSource ?? source.optInSource,
+        source: target.source ?? source.source,
+        notes: mergedNotes,
+        ...mergedConsent
+      }
+    });
+
+    await mergeContactLabels(tx, orgId, target.id, [
+      ...target.tagLinks.map((link) => link.tag.name),
+      ...source.tagLinks.map((link) => link.tag.name)
+    ], [
+      ...target.listLinks.map((link) => link.list.name),
+      ...source.listLinks.map((link) => link.list.name)
+    ]);
+
+    const targetCampaignIds = new Set(
+      (await tx.campaignRecipient.findMany({
+        where: { orgId, contactId: target.id },
+        select: { campaignId: true }
+      })).map((recipient) => recipient.campaignId)
+    );
+    const sourceCampaignRecipients = await tx.campaignRecipient.findMany({
+      where: { orgId, contactId: source.id },
+      select: { id: true, campaignId: true }
+    });
+
+    for (const recipient of sourceCampaignRecipients) {
+      if (targetCampaignIds.has(recipient.campaignId)) {
+        await tx.campaignRecipient.update({
+          where: { id: recipient.id },
+          data: { status: "BLOCKED", blockReason: `Merged into contact ${target.id}` }
+        });
+      } else {
+        await tx.campaignRecipient.update({
+          where: { id: recipient.id },
+          data: { contactId: target.id }
+        });
+      }
+    }
+
+    await tx.conversation.updateMany({ where: { orgId, contactId: source.id }, data: { contactId: target.id } });
+    await tx.message.updateMany({ where: { orgId, contactId: source.id }, data: { contactId: target.id } });
+    await tx.contact.update({
+      where: { id: source.id },
+      data: {
+        archivedAt: source.archivedAt ?? new Date(),
+        notes: mergeSourceArchiveNote(source.notes, target.displayName ?? target.phone, target.id)
+      }
+    });
+
+    return tx.contact.findUniqueOrThrow({ where: { id: target.id }, include: contactInclude });
+  });
+}
+
 export async function importContacts(
   orgId: string,
   parsed: ParsedContactImport,
@@ -163,6 +242,84 @@ async function syncContactLabels(
     });
     await tx.contactListMember.create({ data: { orgId, contactId, listId: list.id } });
   }
+}
+
+async function mergeContactLabels(
+  tx: Prisma.TransactionClient,
+  orgId: string,
+  contactId: string,
+  tagNames: string[],
+  listNames: string[]
+) {
+  for (const name of uniqueNames(tagNames)) {
+    const tag = await tx.tag.upsert({
+      where: { orgId_name: { orgId, name } },
+      update: {},
+      create: { orgId, name }
+    });
+    await tx.contactTag.upsert({
+      where: { contactId_tagId: { contactId, tagId: tag.id } },
+      update: {},
+      create: { orgId, contactId, tagId: tag.id }
+    });
+  }
+
+  for (const name of uniqueNames(listNames)) {
+    const list = await tx.contactList.upsert({
+      where: { orgId_name: { orgId, name } },
+      update: {},
+      create: { orgId, name }
+    });
+    await tx.contactListMember.upsert({
+      where: { listId_contactId: { listId: list.id, contactId } },
+      update: {},
+      create: { orgId, listId: list.id, contactId }
+    });
+  }
+}
+
+function mergedConsentData(
+  target: { consentStatus: ConsentStatus; optInAt: Date | null; optedOutAt: Date | null },
+  source: { consentStatus: ConsentStatus; optInAt: Date | null; optedOutAt: Date | null }
+) {
+  if (target.consentStatus === ConsentStatus.OPTED_OUT || source.consentStatus === ConsentStatus.OPTED_OUT) {
+    return {
+      consentStatus: ConsentStatus.OPTED_OUT,
+      optInAt: null,
+      optedOutAt: target.optedOutAt ?? source.optedOutAt ?? new Date()
+    };
+  }
+
+  if (target.consentStatus === ConsentStatus.UNKNOWN && source.consentStatus === ConsentStatus.OPTED_IN) {
+    return {
+      consentStatus: ConsentStatus.OPTED_IN,
+      optInAt: target.optInAt ?? source.optInAt ?? new Date(),
+      optedOutAt: null
+    };
+  }
+
+  return {};
+}
+
+function mergeContactNotes(targetNotes: string | null, sourceNotes: string | null, sourceLabel: string) {
+  if (!sourceNotes) {
+    return targetNotes;
+  }
+
+  if (!targetNotes) {
+    return sourceNotes;
+  }
+
+  if (targetNotes.includes(sourceNotes)) {
+    return targetNotes;
+  }
+
+  return `${targetNotes}\n\nMerged from ${sourceLabel}: ${sourceNotes}`;
+}
+
+function mergeSourceArchiveNote(sourceNotes: string | null, targetLabel: string, targetId: string) {
+  const note = `Merged into ${targetLabel} (${targetId}).`;
+  return sourceNotes ? `${sourceNotes}\n\n${note}` : note;
 }
 
 function uniqueNames(names: string[]) {

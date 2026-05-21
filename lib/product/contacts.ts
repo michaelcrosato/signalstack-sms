@@ -19,7 +19,7 @@ export async function getProductContacts(orgId: string) {
 }
 
 export async function getProductContactDetail(orgId: string, contactId: string) {
-  const contact = await getContact(orgId, contactId);
+  const [contact, activeContacts] = await Promise.all([getContact(orgId, contactId), listContacts(orgId)]);
 
   if (!contact) {
     return null;
@@ -39,7 +39,10 @@ export async function getProductContactDetail(orgId: string, contactId: string) 
     tags: contact.tagLinks.map((link) => link.tag.name).sort(),
     lists: contact.listLinks.map((link) => link.list.name).sort(),
     archived: Boolean(contact.archivedAt),
-    updatedAt: contact.updatedAt
+    updatedAt: contact.updatedAt,
+    mergeCandidates: activeContacts
+      .filter((candidate) => candidate.id !== contact.id)
+      .map(contactListRow)
   };
 }
 

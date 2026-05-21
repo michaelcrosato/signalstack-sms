@@ -128,7 +128,14 @@ describe("getProductContacts", () => {
       notes: "Prefers morning reminders.",
       tags: ["alpha", "vip"],
       lists: ["Customers"],
-      archived: false
+      archived: false,
+      mergeCandidates: expect.arrayContaining([
+        expect.objectContaining({
+          id: "contact_2",
+          displayName: "Grace Hopper",
+          phone: "+15555550102"
+        })
+      ])
     });
   });
 

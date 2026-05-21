@@ -212,6 +212,7 @@ export const apiOperationRoutes = freezeApiOperationRoutes([
   { method: "GET", path: "/api/contacts/[contactId]", area: "Contacts", mutates: false, externalImpact: false, safety: "tenant-scoped local record" },
   { method: "PATCH", path: "/api/contacts/[contactId]", area: "Contacts", mutates: true, externalImpact: false, safety: "local contact write only" },
   { method: "DELETE", path: "/api/contacts/[contactId]", area: "Contacts", mutates: true, externalImpact: false, safety: "local soft archive only" },
+  { method: "POST", path: "/api/contacts/[contactId]/merge", area: "Contacts", mutates: true, externalImpact: false, safety: "local contact merge only" },
   { method: "POST", path: "/api/contacts/imports", area: "Contacts", mutates: true, externalImpact: false, safety: "local CSV import only" },
   { method: "GET", path: "/api/templates", area: "Templates", mutates: false, externalImpact: false, safety: "tenant-scoped local records" },
   { method: "POST", path: "/api/templates", area: "Templates", mutates: true, externalImpact: false, safety: "local template write only" },
