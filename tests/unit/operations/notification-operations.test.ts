@@ -119,11 +119,13 @@ describe("getNotificationOperationsStatus", () => {
 
   it("keeps notification operation statuses inside the supported local vocabulary", () => {
     expect(allowedNotificationOperationChannelStatuses).toEqual(["blocked", "not implemented", "inbound only"]);
+    expect(Object.isFrozen(allowedNotificationOperationChannelStatuses)).toBe(true);
     expect(notificationOperationChannels.map((channel) => channel.status).filter((status) => !allowedNotificationOperationChannelStatuses.includes(status))).toEqual([]);
   });
 
   it("keeps notification operation channel names inside the exported supported vocabulary", () => {
     expect(allowedNotificationOperationChannelNames).toEqual(["Email", "In-app", "SMS alerts", "Webhooks"]);
+    expect(Object.isFrozen(allowedNotificationOperationChannelNames)).toBe(true);
     expect(notificationOperationChannels.map((channel) => channel.name)).toEqual([...allowedNotificationOperationChannelNames]);
   });
 
@@ -133,6 +135,9 @@ describe("getNotificationOperationsStatus", () => {
     expect(allowedNotificationOperationCommandExecutionStates).toEqual(["none"]);
     expect(allowedNotificationOperationExternalImpactStates).toEqual(["none"]);
     expect(allowedNotificationOperationSecretsDisplayedStates).toEqual([false]);
+    expect(Object.isFrozen(allowedNotificationOperationCommandExecutionStates)).toBe(true);
+    expect(Object.isFrozen(allowedNotificationOperationExternalImpactStates)).toBe(true);
+    expect(Object.isFrozen(allowedNotificationOperationSecretsDisplayedStates)).toBe(true);
     expect(allowedNotificationOperationCommandExecutionStates).toContain(status.commandExecution);
     expect(allowedNotificationOperationExternalImpactStates).toContain(status.externalImpact);
     expect(allowedNotificationOperationSecretsDisplayedStates).toContain(status.secretsDisplayed);

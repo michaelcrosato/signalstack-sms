@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP notification operations runtime-frozen vocabulary checkpoint.
+- Runtime-froze the exported notification channel, status, command-execution, external-impact, and secrets-displayed vocabularies used by `/settings/notifications`.
+- Added unit coverage proving those exported vocabularies are frozen before local notification metadata renders.
+- Updated testing contract/docs, README, PLAN, next-prompt handoff docs, blockers, and loop logs.
+- Focused notification operations unit coverage and typecheck passed; protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 145
+
+## Previous Run
+
 - Advanced a post-MVP notification operations no-impact summary-state checkpoint.
 - Exported and validated the allowed no-command, no-external-impact, and no-secret-display summary states used by `/settings/notifications`.
 - Added unit coverage proving the summary states stay inside the no-impact vocabulary before local notification metadata renders.

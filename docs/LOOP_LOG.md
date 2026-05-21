@@ -1284,3 +1284,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP notification operations hardening or safe read-only operator surface refinements.
+
+## Run 145  GREEN  notification-operations-frozen-vocabularies  2026-05-21 03:05
+Objective:    Keep `/settings/notifications` exported vocabularies frozen at runtime.
+Changed:
+- Runtime-froze exported notification channel, status, command-execution, external-impact, and secrets-displayed vocabularies.
+- Added unit coverage proving those exported vocabularies are frozen before local notification metadata renders.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP notification operations hardening or safe read-only operator surface refinements.

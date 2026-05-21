@@ -1,8 +1,8 @@
-export const allowedNotificationOperationChannelStatuses = ["blocked", "not implemented", "inbound only"] as const;
-export const allowedNotificationOperationChannelNames = ["Email", "In-app", "SMS alerts", "Webhooks"] as const;
-export const allowedNotificationOperationCommandExecutionStates = ["none"] as const;
-export const allowedNotificationOperationExternalImpactStates = ["none"] as const;
-export const allowedNotificationOperationSecretsDisplayedStates = [false] as const;
+export const allowedNotificationOperationChannelStatuses = Object.freeze(["blocked", "not implemented", "inbound only"] as const);
+export const allowedNotificationOperationChannelNames = Object.freeze(["Email", "In-app", "SMS alerts", "Webhooks"] as const);
+export const allowedNotificationOperationCommandExecutionStates = Object.freeze(["none"] as const);
+export const allowedNotificationOperationExternalImpactStates = Object.freeze(["none"] as const);
+export const allowedNotificationOperationSecretsDisplayedStates = Object.freeze([false] as const);
 
 export type NotificationOperationChannelStatus = (typeof allowedNotificationOperationChannelStatuses)[number];
 export type NotificationOperationChannelName = (typeof allowedNotificationOperationChannelNames)[number];
