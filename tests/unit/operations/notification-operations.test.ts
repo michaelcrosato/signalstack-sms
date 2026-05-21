@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  allowedNotificationOperationChannelStatuses,
   getNotificationOperationsStatus,
   notificationOperationChannels,
   notificationOperationControls,
@@ -110,6 +111,11 @@ describe("getNotificationOperationsStatus", () => {
     expect(safetyCopy).toContain("provider calls");
     expect(safetyCopy).toContain("billing");
     expect(safetyCopy).toContain("mutations");
+  });
+
+  it("keeps notification operation statuses inside the supported local vocabulary", () => {
+    expect(allowedNotificationOperationChannelStatuses).toEqual(["blocked", "not implemented", "inbound only"]);
+    expect(notificationOperationChannels.map((channel) => channel.status).filter((status) => !allowedNotificationOperationChannelStatuses.includes(status))).toEqual([]);
   });
 
   it("keeps notification operation inventory order stable for local review pages", () => {

@@ -1,6 +1,10 @@
+export const allowedNotificationOperationChannelStatuses = ["blocked", "not implemented", "inbound only"] as const;
+
+export type NotificationOperationChannelStatus = (typeof allowedNotificationOperationChannelStatuses)[number];
+
 export type NotificationOperationChannel = {
   name: string;
-  status: string;
+  status: NotificationOperationChannelStatus;
   boundary: string;
 };
 
@@ -18,7 +22,6 @@ export type NotificationOperationsStatus = {
 
 const notificationOperationChannelFields = ["name", "status", "boundary"] as const;
 const allowedNotificationOperationChannelNames = ["Email", "In-app", "SMS alerts", "Webhooks"] as const;
-const allowedNotificationOperationChannelStatuses = ["blocked", "not implemented", "inbound only"] as const;
 const requiredNotificationControlTerms = ["LIVE_MESSAGING_ENABLED", "LIVE_BILLING_ENABLED", "API keys", "worker", "local"] as const;
 const requiredNotificationBoundaryTerms = ["email", "SMS", "webhooks", "provider calls", "billing", "mutations"] as const;
 const forbiddenCommandMetadataPatterns = [

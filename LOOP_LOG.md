@@ -1264,3 +1264,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP notification operations hardening or safe read-only operator surface refinements.
+
+## Run 141  GREEN  notification-operations-status-vocabulary  2026-05-21 02:46
+Objective:    Keep `/settings/notifications` status values inside the supported local vocabulary.
+Changed:
+- Typed notification operation channel statuses to the supported blocked, not-implemented, and inbound-only local vocabulary.
+- Added unit coverage pinning exported notification status vocabulary before `/settings/notifications` metadata renders.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP notification operations hardening or safe read-only operator surface refinements.

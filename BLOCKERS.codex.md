@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 140
+Run number: 141
 
 No active blockers.
 
 ## Notes
 
+- Latest notification operations status-vocabulary hardening keeps `/settings/notifications` static status values inside the supported blocked, not-implemented, and inbound-only local vocabulary before render. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 - Latest notification operations channel-vocabulary hardening keeps `/settings/notifications` static channel names inside the supported local notification vocabulary before render. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 - Latest loop-log continuity repair verified recovered entries for runs 123-131 and 135-137 already exist in root `LOOP_LOG.md` and `docs/LOOP_LOG.md`, then recorded the current coordination-only run. This does not change product code, contracts, protected files, gate scripts, demo-safe defaults, live-action settings, secrets, providers, billing, notifications, SMS/email, live AI, or destructive database behavior.
 - Latest notification operations command-literal hardening keeps `/settings/notifications` static channel, control, and safety-boundary copy free of command-like snippets before render. The check is local static metadata validation only and does not execute commands, create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
