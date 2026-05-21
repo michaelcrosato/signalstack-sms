@@ -114,6 +114,18 @@ describe("getContractOperationsStatus", () => {
     expect(contractOperationDriftControls.filter((control) => control.trim().length === 0)).toEqual([]);
   });
 
+  it("keeps contract operation static metadata whitespace-clean", () => {
+    const staticCopy = [
+      ...contractOperationFiles.flatMap((file) => [file.name, file.path, file.boundary]),
+      ...contractOperationValidationChecks.flatMap((check) => [check.command, check.purpose]),
+      ...contractOperationDriftControls
+    ];
+
+    expect(staticCopy.filter((copy) => copy !== copy.trim())).toEqual([]);
+    expect(staticCopy.filter((copy) => copy.includes("\n") || copy.includes("\r"))).toEqual([]);
+    expect(staticCopy.filter((copy) => copy.includes("  "))).toEqual([]);
+  });
+
   it("keeps contract operation inventory order stable for local review pages", () => {
     expect(contractOperationFiles.map((file) => file.path)).toEqual([
       "contracts/CONTRACT-DB.md",

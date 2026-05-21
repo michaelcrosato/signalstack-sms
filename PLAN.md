@@ -252,6 +252,7 @@ Post-MVP:
 - Local contract operations inventory order-stability coverage
 - Local contract operations inventory unique-identifier coverage
 - Local contract operations package-script coverage
+- Local contract operations whitespace-clean metadata coverage
 - Local contract operations secret-literal coverage
 - Local security operations whitespace-clean coverage
 - Local validation operations inventory static-metadata coverage

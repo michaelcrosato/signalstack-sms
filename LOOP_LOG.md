@@ -1504,3 +1504,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP security operations hardening or safe read-only operator surface refinements.
+
+## Run 165  GREEN  contract-operations-whitespace-clean  2026-05-21 04:29
+Objective:    Keep `/settings/contracts` static metadata whitespace-clean before rendering.
+Changed:
+- Added whitespace-clean validation for contract operation file names/paths/boundaries, validation commands/purposes, and drift controls before the static inventory freezes.
+- Added unit coverage proving contract operation static metadata has no leading/trailing whitespace, doubled spaces, or embedded newlines.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP contract operations hardening or safe read-only operator surface refinements.

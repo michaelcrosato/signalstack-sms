@@ -57,12 +57,19 @@ function assertNoSecretLikeMetadata(value: string, errorMessage: string) {
   }
 }
 
+function assertCleanContractMetadata(value: string, errorMessage: string) {
+  if (value !== value.trim() || value.includes("\n") || value.includes("\r") || value.includes("  ")) {
+    throw new Error(errorMessage);
+  }
+}
+
 function assertContractOperationFile(file: ContractOperationFile) {
   assertExactFields(file, contractOperationFileFields, "Invalid contract operation file fields");
 
   if (typeof file.name !== "string" || file.name.trim().length === 0) {
     throw new Error("Invalid contract operation file name");
   }
+  assertCleanContractMetadata(file.name, `Whitespace-unsafe contract operation file name for ${file.path}`);
   assertNoSecretLikeMetadata(file.name, `Secret-like contract operation file name for ${file.path}`);
 
   if (
@@ -75,10 +82,12 @@ function assertContractOperationFile(file: ContractOperationFile) {
   ) {
     throw new Error(`Invalid contract operation file path ${String(file.path)}`);
   }
+  assertCleanContractMetadata(file.path, `Whitespace-unsafe contract operation file path ${file.path}`);
 
   if (typeof file.boundary !== "string" || file.boundary.trim().length === 0) {
     throw new Error(`Invalid contract operation boundary for ${file.path}`);
   }
+  assertCleanContractMetadata(file.boundary, `Whitespace-unsafe contract operation boundary for ${file.path}`);
   assertNoSecretLikeMetadata(file.boundary, `Secret-like contract operation boundary for ${file.path}`);
 }
 
@@ -88,6 +97,7 @@ function assertValidationCheck(check: ContractOperationValidationCheck) {
   if (typeof check.command !== "string" || !check.command.startsWith("npm run ")) {
     throw new Error(`Invalid contract operation validation command ${String(check.command)}`);
   }
+  assertCleanContractMetadata(check.command, `Whitespace-unsafe contract operation validation command ${check.command}`);
 
   if (
     !allowedContractOperationValidationCommands.includes(
@@ -100,6 +110,7 @@ function assertValidationCheck(check: ContractOperationValidationCheck) {
   if (typeof check.purpose !== "string" || check.purpose.trim().length === 0) {
     throw new Error(`Invalid contract operation validation purpose for ${check.command}`);
   }
+  assertCleanContractMetadata(check.purpose, `Whitespace-unsafe contract operation validation purpose for ${check.command}`);
   assertNoSecretLikeMetadata(check.purpose, `Secret-like contract operation validation purpose for ${check.command}`);
 }
 
@@ -138,6 +149,7 @@ function freezeDriftControls(controls: string[]) {
     if (typeof control !== "string" || control.trim().length === 0) {
       throw new Error("Invalid contract operation drift control");
     }
+    assertCleanContractMetadata(control, "Whitespace-unsafe contract operation drift control");
     assertNoSecretLikeMetadata(control, "Secret-like contract operation drift control");
   }
 
