@@ -3,6 +3,7 @@ import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getOrCreateComplianceProfile } from "@/lib/db/repositories/compliance";
 import { getProviderCredential, listProviderCredentialRotations } from "@/lib/db/repositories/provider-credentials";
 import { getProviderSettings } from "@/lib/messaging/provider/settings";
+import { getProviderOperationLinks } from "@/lib/operations/operator-surfaces";
 import { providerCredentialRotationActionSchema, type ProviderCredentialRotationAction } from "@/lib/validation/provider";
 import { ProviderCredentialForm } from "./provider-credential-form";
 
@@ -34,22 +35,16 @@ export default async function ProviderSettingsPage({ searchParams }: ProviderSet
     providerCredential,
     env: process.env
   });
+  const operationLinks = getProviderOperationLinks();
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
-        <Link className="text-sm font-medium text-teal-700" href="/settings">
-          Go-Live Readiness
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/exports">
-          Admin Exports
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/numbers">
-          Provider Numbers
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/system">
-          System Status
-        </Link>
+        {operationLinks.map((link) => (
+          <Link key={link.href} className="text-sm font-medium text-teal-700" href={link.href}>
+            {link.label}
+          </Link>
+        ))}
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Provider Details</h1>

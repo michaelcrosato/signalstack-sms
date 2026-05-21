@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getAnalyticsOverview } from "@/lib/analytics/overview";
 import { getUsageSummary } from "@/lib/billing/metering";
+import { getUsageOperationLinks } from "@/lib/operations/operator-surfaces";
 
 export const dynamic = "force-dynamic";
 
@@ -17,46 +18,16 @@ const usageTypes = [
 export default async function UsageSettingsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
   const [analytics, usage] = await Promise.all([getAnalyticsOverview(currentOrg.orgId), getUsageSummary(currentOrg.orgId)]);
+  const operationLinks = getUsageOperationLinks();
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
-        <Link className="text-sm font-medium text-teal-700" href="/settings">
-          Go-Live Readiness
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/compliance">
-          Compliance Detail
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/system">
-          System Status
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/campaigns">
-          Campaign Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/contacts">
-          Contact Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/templates">
-          Template Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/audience">
-          Audience Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/inbox">
-          Inbox Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
-          Operator Runbook
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/billing">
-          Billing Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/reports">
-          Reporting Index
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/ai">
-          AI Operations
-        </Link>
+        {operationLinks.map((link) => (
+          <Link key={link.href} className="text-sm font-medium text-teal-700" href={link.href}>
+            {link.label}
+          </Link>
+        ))}
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Usage & Analytics</h1>

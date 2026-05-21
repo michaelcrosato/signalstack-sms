@@ -16,15 +16,21 @@ import {
   getInboxOperationLinks,
   getIntegrationOperationAreas,
   getNotificationOperationLinks,
+  getNumberOperationLinks,
+  getProviderOperationLinks,
   getQueueOperationLinks,
+  getReadinessAuditOperationLinks,
   getReleaseOperationSurfaceLinks,
   getReportingIndexLinks,
   getSecurityOperationLinks,
   getSettingsNavigationLinks,
+  getSystemOperationLinks,
   getTeamOperationLinks,
   getTemplateOperationLinks,
+  getUsageOperationLinks,
   getValidationOperationLinks,
   getDeliveryOperationLinks,
+  getComplianceOperationLinks,
   getWebhookOperationLinks,
   getWorkflowOperationSteps,
   operatorSurfaceGroups
@@ -58,6 +64,12 @@ const deliveryOperationLinks = getDeliveryOperationLinks();
 const teamOperationLinks = getTeamOperationLinks();
 const billingOperationLinks = getBillingOperationLinks();
 const aiOperationLinks = getAiOperationLinks();
+const providerOperationLinks = getProviderOperationLinks();
+const numberOperationLinks = getNumberOperationLinks();
+const complianceOperationLinks = getComplianceOperationLinks();
+const systemOperationLinks = getSystemOperationLinks();
+const usageOperationLinks = getUsageOperationLinks();
+const readinessAuditOperationLinks = getReadinessAuditOperationLinks();
 
 test.setTimeout(60_000);
 
@@ -108,6 +120,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("Runtime")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Queue" })).toBeVisible();
   await expect(page.getByText("API Protection")).toBeVisible();
+  for (const link of systemOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await page.getByRole("link", { name: "Environment Operations" }).click();
   await expect(page.getByRole("heading", { name: "Environment Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Demo-Safe Defaults" })).toBeVisible();
@@ -233,6 +248,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("Local Usage Totals")).toBeVisible();
   await expect(page.getByText("Billing Boundary")).toBeVisible();
   await expect(page.getByText("Recent Usage Events")).toBeVisible();
+  for (const link of usageOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await page.getByRole("link", { name: "Billing Operations" }).click();
   await expect(page.getByRole("heading", { name: "Billing Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Billing Account" })).toBeVisible();
@@ -369,6 +387,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Hard Gate" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Compliance Audit" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Export Compliance CSV" })).toBeVisible();
+  for (const link of complianceOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   const complianceAuditExportResponse = await request.get("/api/settings/readiness-audit/export?subjectType=ComplianceProfile&limit=5");
   expect(complianceAuditExportResponse.ok()).toBeTruthy();
   await expect(complianceAuditExportResponse.text()).resolves.toContain("id,action,subjectType,subjectId,actorUserId,createdAt,metadata");
@@ -378,6 +399,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Number Metadata" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Safety Boundary" })).toBeVisible();
   await expect(page.getByText("+15555550199").first()).toBeVisible();
+  for (const link of numberOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await page.getByRole("link", { name: "Go-Live Readiness" }).click();
   await page.getByRole("link", { name: "Admin Exports" }).click();
   await expect(page.getByRole("heading", { name: "Admin Exports" })).toBeVisible();
@@ -393,6 +417,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Subject Filters" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Audit Events" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Export Audit CSV" })).toBeVisible();
+  for (const link of readinessAuditOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await page.getByRole("link", { name: "COMPLIANCE_PROFILE_UPDATED" }).click();
   await expect(page.getByText("Action filter", { exact: true })).toBeVisible();
   const filteredReadinessAuditExportResponse = await request.get("/api/settings/readiness-audit/export?action=COMPLIANCE_PROFILE_UPDATED&limit=5");
@@ -405,6 +432,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await page.getByRole("link", { name: "Provider Details" }).first().click();
   await expect(page.getByRole("heading", { name: "Provider Details" })).toBeVisible();
   await expect(page.getByText("Twilio Metadata")).toBeVisible();
+  for (const link of providerOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await page.getByLabel("Account SID").fill("AC111122223333");
   await page.getByLabel("Auth token").fill("demo_token_value_10");
   await page.getByLabel("From number").fill("+15555550198");

@@ -1,12 +1,13 @@
 # Codex Blockers
 
-Run number: 59
+Run number: 60
 
 No active blockers.
 
 ## Notes
 
 - `/settings/contacts`, `/settings/campaigns`, `/settings/audience`, `/settings/templates`, `/settings/inbox`, and `/settings/data` now project header navigation from the shared local operator surface inventory. Unit and seeded browser coverage verify labels, route targets, and backing `app/**/page.tsx` files without importing contacts, scheduling campaigns, changing audience labels, editing templates, mutating inbox threads, deleting data, calling providers, billing, notifying, sending SMS or email, exposing secrets, or enabling live features.
+- `/settings/provider`, `/settings/numbers`, `/settings/compliance`, `/settings/system`, `/settings/usage`, and `/settings/readiness-audit` now project header navigation from the shared local operator surface inventory. Unit and seeded browser coverage verify labels, route targets, and backing `app/**/page.tsx` files without calling providers, provisioning numbers, mutating compliance or audit records, billing, notifying, sending SMS or email, exposing secrets, or enabling live features.
 - `/settings/billing` and `/settings/ai` now project header navigation from the shared local operator surface inventory. Unit and seeded browser coverage verify labels, route targets, and backing `app/**/page.tsx` files without calling Stripe, live AI, providers, creating billing artifacts, notifying, sending SMS or email, exposing secrets, mutating records, or enabling live billing or live AI.
 - `/settings/webhooks`, `/settings/delivery`, and `/settings/team` now project header navigation from the shared local operator surface inventory. Unit and seeded browser coverage verify labels, route targets, and backing `app/**/page.tsx` files without replaying webhooks, retrying deliveries, inviting users, mutating records, calling providers, billing, notifying, sending SMS or email, exposing secrets, or enabling live features.
 - `/settings/queue` and `/settings/notifications` now project their header navigation from the shared local operator surface inventory. Unit and seeded browser coverage verify labels, route targets, and backing `app/**/page.tsx` files without executing workers, enqueueing jobs, calling Redis/providers, billing, notifying, sending SMS or email, exposing secrets, mutating records, or enabling live features.

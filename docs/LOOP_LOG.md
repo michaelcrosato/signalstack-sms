@@ -358,3 +358,14 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 060  GREEN  provider-readiness-runtime-inventory  2026-05-20 20:55
+Objective:    Project provider, readiness, runtime, usage, and audit navigation from the shared operator surface inventory.
+Changed:
+- Added shared inventory projections for provider, provider numbers, compliance, system, usage, and readiness-audit header navigation.
+- Refactored those six read-only settings pages to consume shared projected links instead of local duplicated navigation lists.
+- Extended unit and seeded browser coverage for projected labels, route targets, and backing pages.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.

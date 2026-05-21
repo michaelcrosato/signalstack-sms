@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
+import { getReadinessAuditOperationLinks } from "@/lib/operations/operator-surfaces";
 import { readinessAuditQuerySchema } from "@/lib/validation/readiness-audit";
 
 export const dynamic = "force-dynamic";
@@ -38,22 +39,16 @@ export default async function ReadinessAuditOperationsPage({ searchParams }: Rea
   const exportHref = `/api/settings/readiness-audit/export?limit=200${query.action ? `&action=${query.action}` : ""}${
     query.subjectType ? `&subjectType=${query.subjectType}` : ""
   }`;
+  const operationLinks = getReadinessAuditOperationLinks();
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
-        <Link className="text-sm font-medium text-teal-700" href="/settings">
-          Go-Live Readiness
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/exports">
-          Admin Exports
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/compliance">
-          Compliance Detail
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/provider">
-          Provider Details
-        </Link>
+        {operationLinks.map((link) => (
+          <Link key={link.href} className="text-sm font-medium text-teal-700" href={link.href}>
+            {link.label}
+          </Link>
+        ))}
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Readiness Audit</h1>

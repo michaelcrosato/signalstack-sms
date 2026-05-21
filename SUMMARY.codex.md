@@ -1,15 +1,20 @@
 # Codex Summary
 
-Run number: 59
+Run number: 60
 
 ## Completed
+
+- Advanced a post-MVP provider/readiness/runtime shared-inventory hardening checkpoint.
+- Refactored `/settings/provider`, `/settings/numbers`, `/settings/compliance`, `/settings/system`, `/settings/usage`, and `/settings/readiness-audit` header navigation to project from the shared operator surface inventory.
+- Extended unit and seeded browser coverage for provider/readiness/runtime navigation labels, route targets, and backing pages.
+- Protected local gate, demo seed, and seeded investor demo E2E passed.
+
+## Prior Completed
 
 - Advanced a post-MVP data/messaging shared-inventory hardening checkpoint.
 - Refactored `/settings/contacts`, `/settings/campaigns`, `/settings/audience`, `/settings/templates`, `/settings/inbox`, and `/settings/data` header navigation to project from the shared operator surface inventory.
 - Extended unit and seeded browser coverage for data/messaging navigation labels, route targets, and backing pages.
 - Protected local gate, demo seed, and seeded investor demo E2E passed.
-
-## Prior Completed
 
 - Advanced a post-MVP billing/AI shared-inventory hardening checkpoint.
 - Refactored `/settings/billing` and `/settings/ai` header navigation to project from the shared operator surface inventory.
@@ -190,6 +195,13 @@ Run number: 59
 
 ## Validation
 
+- Latest provider/readiness/runtime shared-inventory hardening moved `/settings/provider`, `/settings/numbers`, `/settings/compliance`, `/settings/system`, `/settings/usage`, and `/settings/readiness-audit` header navigation into the shared local operator surface inventory. Unit and seeded browser coverage now verify labels, route targets, and backing `app/**/page.tsx` files without calling providers, provisioning numbers, mutating compliance or audit records, billing, notifying, sending SMS or email, exposing secrets, or enabling live features.
+- `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
+- `npm run typecheck`
+- `npm run lint`
+- `git diff --check`
+- `.\scripts\local-gate.ps1`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed; npm run test:e2e:demo`
 - Latest data/messaging shared-inventory hardening moved `/settings/contacts`, `/settings/campaigns`, `/settings/audience`, `/settings/templates`, `/settings/inbox`, and `/settings/data` header navigation into the shared local operator surface inventory. Unit and seeded browser coverage now verify labels, route targets, and backing `app/**/page.tsx` files without importing contacts, scheduling campaigns, changing audience labels, editing templates, mutating inbox threads, deleting data, calling providers, billing, notifying, sending SMS or email, exposing secrets, or enabling live features.
 - `npm run typecheck`
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`

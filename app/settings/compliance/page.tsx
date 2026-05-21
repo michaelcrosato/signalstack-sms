@@ -4,6 +4,7 @@ import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { complianceProfileIsComplete, evaluateMessagingHardGate } from "@/lib/compliance/gates";
 import { getOrCreateComplianceProfile } from "@/lib/db/repositories/compliance";
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
+import { getComplianceOperationLinks } from "@/lib/operations/operator-surfaces";
 
 export const dynamic = "force-dynamic";
 
@@ -28,28 +29,16 @@ export default async function ComplianceSettingsPage() {
     complianceProfile: profile
   });
   const complete = complianceProfileIsComplete(profile);
+  const operationLinks = getComplianceOperationLinks();
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
-        <Link className="text-sm font-medium text-teal-700" href="/settings">
-          Go-Live Readiness
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/exports">
-          Admin Exports
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/system">
-          System Status
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/contacts">
-          Contact Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/templates">
-          Template Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/audience">
-          Audience Operations
-        </Link>
+        {operationLinks.map((link) => (
+          <Link key={link.href} className="text-sm font-medium text-teal-700" href={link.href}>
+            {link.label}
+          </Link>
+        ))}
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Compliance Detail</h1>

@@ -19,17 +19,23 @@ import {
   getIntegrationOperationAreas,
   getLaunchDashboardLinks,
   getNotificationOperationLinks,
+  getNumberOperationLinks,
   getOperatorSurfaceSummary,
+  getProviderOperationLinks,
   getQueueOperationLinks,
+  getReadinessAuditOperationLinks,
   getReleaseOperationSurfaceLinks,
   getReportingIndexLinks,
   getRunbookAdminLinks,
   getSecurityOperationLinks,
   getSettingsNavigationLinks,
+  getSystemOperationLinks,
   getTeamOperationLinks,
   getTemplateOperationLinks,
+  getUsageOperationLinks,
   getValidationOperationLinks,
   getDeliveryOperationLinks,
+  getComplianceOperationLinks,
   getWebhookOperationLinks,
   getWorkflowOperationSteps,
   operatorSurfaceGroups
@@ -532,5 +538,78 @@ describe("operator surface inventory", () => {
     ]);
     expect(aiLinks).toEqual(aiRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
     expect(aiRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+  });
+
+  it("projects provider, compliance, runtime, and audit operation links from the shared surface inventory", () => {
+    const inventoryLinks = operatorSurfaceGroups.flatMap((group) => group.links);
+    const providerLinks = getProviderOperationLinks();
+    const numberLinks = getNumberOperationLinks();
+    const complianceLinks = getComplianceOperationLinks();
+    const systemLinks = getSystemOperationLinks();
+    const usageLinks = getUsageOperationLinks();
+    const readinessAuditLinks = getReadinessAuditOperationLinks();
+    const providerRoutes = providerLinks.map((link) => link.href);
+    const numberRoutes = numberLinks.map((link) => link.href);
+    const complianceRoutes = complianceLinks.map((link) => link.href);
+    const systemRoutes = systemLinks.map((link) => link.href);
+    const usageRoutes = usageLinks.map((link) => link.href);
+    const readinessAuditRoutes = readinessAuditLinks.map((link) => link.href);
+
+    expect(providerRoutes).toEqual([
+      "/settings",
+      "/settings/integrations",
+      "/settings/numbers",
+      "/settings/compliance",
+      "/settings/readiness-audit",
+      "/settings/exports",
+      "/settings/system"
+    ]);
+    expect(numberRoutes).toEqual(["/settings", "/settings/provider", "/settings/compliance", "/settings/system"]);
+    expect(complianceRoutes).toEqual([
+      "/settings",
+      "/settings/exports",
+      "/settings/readiness-audit",
+      "/settings/provider",
+      "/settings/numbers",
+      "/settings/system",
+      "/settings/contacts",
+      "/settings/templates",
+      "/settings/audience"
+    ]);
+    expect(systemRoutes).toEqual([
+      "/settings",
+      "/settings/compliance",
+      "/settings/usage",
+      "/settings/queue",
+      "/settings/contacts",
+      "/settings/templates",
+      "/settings/audience",
+      "/settings/health",
+      "/settings/environment",
+      "/settings/api",
+      "/settings/security",
+      "/settings/notifications",
+      "/settings/runbook"
+    ]);
+    expect(usageRoutes).toEqual([
+      "/settings",
+      "/settings/compliance",
+      "/settings/system",
+      "/settings/campaigns",
+      "/settings/contacts",
+      "/settings/templates",
+      "/settings/audience",
+      "/settings/inbox",
+      "/settings/runbook",
+      "/settings/billing",
+      "/settings/reports",
+      "/settings/ai"
+    ]);
+    expect(readinessAuditRoutes).toEqual(["/settings", "/settings/exports", "/settings/compliance", "/settings/provider"]);
+
+    for (const routes of [providerRoutes, numberRoutes, complianceRoutes, systemRoutes, usageRoutes, readinessAuditRoutes]) {
+      expect(routes.map((route) => inventoryLinks.find((link) => link.href === route)?.href)).toEqual(routes);
+      expect(routes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+    }
   });
 });

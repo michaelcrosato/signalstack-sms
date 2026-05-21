@@ -167,6 +167,7 @@ Post-MVP:
 - Local webhook, delivery, and team shared-inventory coverage
 - Local billing and AI shared-inventory coverage
 - Local data and messaging shared-inventory coverage
+- Local provider, readiness, and runtime shared-inventory coverage
 
 ## Next Milestone
 

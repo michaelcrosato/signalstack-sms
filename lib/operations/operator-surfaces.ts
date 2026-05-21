@@ -434,6 +434,73 @@ const aiOperationNavigationRoutes = [
   "/settings/runbook"
 ] as const;
 
+const providerOperationNavigationRoutes = [
+  "/settings",
+  "/settings/integrations",
+  "/settings/numbers",
+  "/settings/compliance",
+  "/settings/readiness-audit",
+  "/settings/exports",
+  "/settings/system"
+] as const;
+
+const numberOperationNavigationRoutes = [
+  "/settings",
+  "/settings/provider",
+  "/settings/compliance",
+  "/settings/system"
+] as const;
+
+const complianceOperationNavigationRoutes = [
+  "/settings",
+  "/settings/exports",
+  "/settings/readiness-audit",
+  "/settings/provider",
+  "/settings/numbers",
+  "/settings/system",
+  "/settings/contacts",
+  "/settings/templates",
+  "/settings/audience"
+] as const;
+
+const systemOperationNavigationRoutes = [
+  "/settings",
+  "/settings/compliance",
+  "/settings/usage",
+  "/settings/queue",
+  "/settings/contacts",
+  "/settings/templates",
+  "/settings/audience",
+  "/settings/health",
+  "/settings/environment",
+  "/settings/api",
+  "/settings/security",
+  "/settings/notifications",
+  "/settings/runbook"
+] as const;
+
+const usageOperationNavigationRoutes = [
+  "/settings",
+  "/settings/compliance",
+  "/settings/system",
+  "/settings/campaigns",
+  "/settings/contacts",
+  "/settings/templates",
+  "/settings/audience",
+  "/settings/inbox",
+  "/settings/runbook",
+  "/settings/billing",
+  "/settings/reports",
+  "/settings/ai"
+] as const;
+
+const readinessAuditOperationNavigationRoutes = [
+  "/settings",
+  "/settings/exports",
+  "/settings/compliance",
+  "/settings/provider"
+] as const;
+
 export function getDemoOperationsCheckpoints(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups): DemoOperationsCheckpoint[] {
   return demoOperationsCheckpointDefinitions.map((checkpoint) => {
     const link = findOperatorSurfaceLink(checkpoint.href, groups);
@@ -550,4 +617,28 @@ export function getBillingOperationLinks(groups: OperatorSurfaceGroup[] = operat
 
 export function getAiOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return aiOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getProviderOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return providerOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getNumberOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return numberOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getComplianceOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return complianceOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getSystemOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return systemOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getUsageOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return usageOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
+}
+
+export function getReadinessAuditOperationLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return readinessAuditOperationNavigationRoutes.map((href) => findOperatorSurfaceLink(href, groups));
 }

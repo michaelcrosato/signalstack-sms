@@ -96,6 +96,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP webhook/delivery/team shared-inventory hardening: `/settings/webhooks`, `/settings/delivery`, and `/settings/team` now project header navigation from the shared operator surface inventory, with unit plus seeded browser coverage for labels, route targets, and backing pages.
 - Post-MVP billing/AI shared-inventory hardening: `/settings/billing` and `/settings/ai` now project header navigation from the shared operator surface inventory, with unit plus seeded browser coverage for labels, route targets, and backing pages.
 - Post-MVP data/messaging shared-inventory hardening: `/settings/contacts`, `/settings/campaigns`, `/settings/audience`, `/settings/templates`, `/settings/inbox`, and `/settings/data` now project header navigation from the shared operator surface inventory, with unit plus seeded browser coverage for labels, route targets, and backing pages.
+- Post-MVP provider/readiness/runtime shared-inventory hardening: `/settings/provider`, `/settings/numbers`, `/settings/compliance`, `/settings/system`, `/settings/usage`, and `/settings/readiness-audit` now project header navigation from the shared operator surface inventory, with unit plus seeded browser coverage for labels, route targets, and backing pages.
 
 Demo-safe defaults remain mandatory:
 

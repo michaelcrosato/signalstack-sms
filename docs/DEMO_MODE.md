@@ -76,6 +76,8 @@ The AI operations screen at `/settings/ai` displays the selected AI provider, fa
 
 Billing and AI operations navigation links are projected from the shared local operator surface inventory so those pages stay aligned with the demo console, readiness, usage, reporting, system, runbook, and each other without duplicating route lists.
 
+Provider, number, compliance, system, usage, and readiness-audit operation navigation links are projected from the shared local operator surface inventory so those pages stay aligned with readiness, exports, integration, runtime, and reporting surfaces without duplicating route lists. Unit and seeded browser coverage verify labels and route targets without provider calls, provisioning, compliance mutation, audit mutation, billing, notifications, SMS, email, secrets, or live feature enablement.
+
 The notification operations screen at `/settings/notifications` displays email, in-app, SMS alert, and webhook notification boundaries plus no-send controls and runtime gate status. It is read-only and does not create recipients, subscriptions, templates, jobs, sends, alerts, webhooks, provider calls, billing records, live AI calls, notifications, SMS, email, mutations, expose secrets, or enable live features.
 
 The contract operations screen at `/settings/contracts` displays static contract inventory, drift controls, validation command references, and safety-boundary text. It is read-only and does not read contract file contents, execute checks, scan files, mutate records, call providers, create billing records, call live AI, send notifications, SMS, email, expose secrets, or enable live features.
