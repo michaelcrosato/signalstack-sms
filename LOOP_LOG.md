@@ -1963,3 +1963,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Harden production worker policy before broader live sending, or add campaign detail/edit only if product demo review needs deeper lifecycle control.
+
+## Run 214  GREEN  playwright-port-isolation  2026-05-21 16:32
+Objective:    Keep Playwright browser checks isolated from the normal dev port and explicit about server reuse.
+Changed:
+- Defaulted Playwright browser checks to `127.0.0.1:3100` with `PLAYWRIGHT_PORT` override validation.
+- Kept existing-server reuse explicit through `PLAYWRIGHT_REUSE_EXISTING_SERVER=true`.
+- Documented the local browser port contract in README, testing docs, and the testing contract.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep the product demo path stable while collecting review feedback; defer live-provider work until production worker policy is specified.

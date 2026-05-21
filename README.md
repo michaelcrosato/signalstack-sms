@@ -38,6 +38,8 @@ npx playwright install chromium
 npm run test:e2e:smoke
 ```
 
+Playwright uses `127.0.0.1:3100` by default so browser checks do not collide with a normal `npm run dev` session on port 3000. Override with `PLAYWRIGHT_PORT=<port>` when needed; reuse of an already running server is explicit with `PLAYWRIGHT_REUSE_EXISTING_SERVER=true`.
+
 Investor demo path:
 
 ```bash

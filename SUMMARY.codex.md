@@ -1,5 +1,14 @@
 # Codex Summary
 
+- Defaulted Playwright browser checks to `127.0.0.1:3100` so local E2E smoke does not collide with a normal dev server on port 3000.
+- Added fail-fast validation for `PLAYWRIGHT_PORT` and kept existing-server reuse opt-in with `PLAYWRIGHT_REUSE_EXISTING_SERVER=true`.
+- Updated README, testing docs, testing contract, and loop records.
+- Focused checks and the protected local gate passed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+Run number: 214
+
+## Previous Run
+
 - Added `/dashboard/templates/:templateId` for owner-facing local template detail/edit.
 - Added tenant-scoped `GET/PATCH /api/templates/:templateId` and product template detail projection coverage.
 - Linked saved templates to detail pages, extended seeded product-demo coverage, and refreshed API/testing contracts, roadmap, state matrix, README, and handoff docs.
