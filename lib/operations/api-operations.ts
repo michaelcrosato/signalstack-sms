@@ -20,10 +20,18 @@ export type ApiOperationsStatus = {
     limit: number;
     windowSeconds: number;
   };
-  routes: ApiOperationRoute[];
+  routes: readonly ApiOperationRoute[];
 };
 
-export const apiOperationRoutes: ApiOperationRoute[] = [
+function freezeApiOperationRoute(route: ApiOperationRoute) {
+  return Object.freeze({ ...route });
+}
+
+function freezeApiOperationRoutes(routes: ApiOperationRoute[]) {
+  return Object.freeze(routes.map((route) => freezeApiOperationRoute(route)));
+}
+
+export const apiOperationRoutes = freezeApiOperationRoutes([
   { method: "GET", path: "/api/health", area: "System", mutates: false, externalImpact: false, safety: "local health metadata only" },
   { method: "GET", path: "/api/orgs/current", area: "Tenant", mutates: true, externalImpact: false, safety: "demo org bootstrap only" },
   { method: "GET", path: "/api/contacts", area: "Contacts", mutates: false, externalImpact: false, safety: "tenant-scoped local records" },
@@ -71,7 +79,7 @@ export const apiOperationRoutes: ApiOperationRoute[] = [
   { method: "GET", path: "/api/settings/readiness-audit/export", area: "Settings", mutates: false, externalImpact: false, safety: "local audit CSV" },
   { method: "POST", path: "/api/webhooks/twilio/inbound", area: "Webhooks", mutates: true, externalImpact: false, safety: "idempotent local inbound handling" },
   { method: "POST", path: "/api/webhooks/twilio/status", area: "Webhooks", mutates: true, externalImpact: false, safety: "idempotent local status handling" }
-];
+]);
 
 export function getApiOperationsStatus(env: Record<string, string | undefined> = process.env): ApiOperationsStatus {
   const rateLimit = getApiRateLimitPolicy(env);
@@ -85,6 +93,6 @@ export function getApiOperationsStatus(env: Record<string, string | undefined> =
       limit: rateLimit.limit,
       windowSeconds: rateLimit.windowMs / 1000
     },
-    routes: apiOperationRoutes
+    routes: freezeApiOperationRoutes(apiOperationRoutes.map((route) => ({ ...route })))
   };
 }

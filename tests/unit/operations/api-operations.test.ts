@@ -76,6 +76,39 @@ describe("getApiOperationsStatus", () => {
     expect(missingRouteFiles).toEqual([]);
   });
 
+  it("keeps the exported API inventory frozen against runtime mutation", () => {
+    const firstRoute = apiOperationRoutes[0];
+
+    expect(Object.isFrozen(apiOperationRoutes)).toBe(true);
+    expect(apiOperationRoutes.every((route) => Object.isFrozen(route))).toBe(true);
+    expect(() =>
+      (apiOperationRoutes as unknown as typeof apiOperationRoutes[number][]).push({
+        method: "GET",
+        path: "/api/unsafe",
+        area: "Unsafe",
+        mutates: false,
+        externalImpact: false,
+        safety: "unsafe mutation"
+      })
+    ).toThrow(TypeError);
+    expect(() => ((firstRoute as { path: string }).path = "/api/unsafe")).toThrow(TypeError);
+  });
+
+  it("returns fresh frozen API route snapshots per status call", () => {
+    const firstStatus = getApiOperationsStatus({});
+    const secondStatus = getApiOperationsStatus({});
+    const firstRoute = firstStatus.routes[0];
+
+    expect(Object.isFrozen(firstStatus.routes)).toBe(true);
+    expect(firstStatus.routes.every((route) => Object.isFrozen(route))).toBe(true);
+    expect(firstStatus.routes).not.toBe(secondStatus.routes);
+    expect(firstStatus.routes[0]).not.toBe(apiOperationRoutes[0]);
+    expect(firstStatus.routes).toEqual(secondStatus.routes);
+    expect(() => (firstStatus.routes as unknown as Array<(typeof apiOperationRoutes)[number]>).pop()).toThrow(TypeError);
+    expect(() => ((firstRoute as { safety: string }).safety = "unsafe mutation")).toThrow(TypeError);
+    expect(getApiOperationsStatus({}).routes[0].safety).toBe(apiOperationRoutes[0].safety);
+  });
+
   it("lists every implemented local API route method in the inventory", () => {
     const inventoryRouteKeys = new Set(apiOperationRoutes.map((route) => `${route.method} ${route.path}`));
     const implementedRouteMethods = collectImplementedApiRouteMethods(join(process.cwd(), "app", "api"));

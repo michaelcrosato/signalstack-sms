@@ -883,6 +883,16 @@ Gate:         passed
 Commit/Saved: 39bf20f
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
 
+## Run 117  GREEN  api-operations-frozen-snapshot  2026-05-21 01:06
+Objective:    Prevent API operations inventory mutation from drifting local API renders.
+Changed:
+- Froze the exported static API route inventory and individual route records.
+- Made `getApiOperationsStatus()` return fresh frozen route snapshots per call.
+- Added unit coverage for exported inventory and per-call status snapshot immutability, and updated testing docs/contracts, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only inventory, navigation, route coverage, or admin surface hardening without live external-impact actions.
+
 ## Run 109  GREEN  supplied-inventory-plain-record-guard  2026-05-21 00:26
 Objective:    Fail custom-prototype supplied shared operator inventory records before projection.
 Changed:

@@ -179,6 +179,7 @@ Post-MVP API operations inventory:
 - Unit tests must fail when a listed API route path has no backing `app/**/route.ts` file or when route-method rows are duplicated.
 - Unit tests must fail when an implemented local API route method under `app/api/**/route.ts` is missing from the static `/settings/api` inventory.
 - The inventory must continue to report zero external-impact routes until future live SMS, billing, notification, provider, or AI gates are designed and tested.
+- Unit tests must verify that the exported API operations inventory and per-call status route snapshots are frozen, and that status calls return fresh route arrays so caller mutation cannot leak into later local API inventory renders.
 
 Post-MVP webhook operations view:
 

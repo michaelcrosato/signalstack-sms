@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 117  GREEN  api-operations-frozen-snapshot  2026-05-21 01:06
+Objective:    Prevent API operations inventory mutation from drifting local API renders.
+Changed:
+- Froze the exported static API route inventory and individual route records.
+- Made `getApiOperationsStatus()` return fresh frozen route snapshots per call.
+- Added unit coverage for exported inventory and per-call status snapshot immutability, and updated testing docs/contracts, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only inventory, navigation, route coverage, or admin surface hardening without live external-impact actions.
+
 ## Run 113  GREEN  supplied-inventory-array-shape-guard  2026-05-21 00:43
 Objective:    Fail decorated or custom-prototype supplied operator inventory arrays before projection.
 Changed:

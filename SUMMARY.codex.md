@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP API operations inventory frozen-snapshot checkpoint.
+- Froze the exported static API route inventory and made `getApiOperationsStatus()` return fresh frozen route snapshots per call.
+- Added unit coverage proving caller-side array or route-object mutation is rejected and cannot leak into later local API inventory renders.
+- Protected local gate passed for the local-only inventory hardening.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 117
+
+## Previous Run
+
 - Advanced a post-MVP shared operator supplied-inventory sparse-index descriptor checkpoint.
 - Tightened supplied operator inventory and group link array validation so missing indexed slots fail as descriptor errors before summaries or projections read local navigation entries.
 - Updated unit coverage and docs/contracts so sparse group/link entries are treated at the same array descriptor boundary as accessor-backed or hidden slots.
