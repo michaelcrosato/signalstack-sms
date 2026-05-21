@@ -55,7 +55,7 @@ Operations index review is available at `/settings/operations`. It renders group
 
 The operations index route inventory is shared with unit tests so local surface counts, backing app pages, implemented operator pages, duplicate routes, and safety-sensitive links fail fast before browser demo coverage.
 
-The `/settings/runbook` admin links are projected from the same shared local operator surface inventory, with unit coverage for label alignment and backing app pages.
+The `/settings/runbook` admin links and `/settings` go-live readiness navigation are projected from the same shared local operator surface inventory, with unit coverage for label alignment, current-page exclusion, and backing app pages.
 
 Release operations review is available at `/settings/releases`. It renders local release checklist commands, protected gate expectations, seeded demo path, premerge metadata, and release surface links only; it does not execute commands, run migrations, launch tests or browsers, perform git operations, deploy, mutate records, call providers, bill, notify, expose logs, diffs, environment values, or secrets, or enable live features.
 

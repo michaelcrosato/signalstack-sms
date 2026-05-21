@@ -1,5 +1,17 @@
 # LOOP_LOG
 
+## Run 044  GREEN  go-live-readiness-navigation  2026-05-20 19:13
+Objective:    Project `/settings` local admin navigation from the shared operator surface inventory.
+Changed:
+- Added `getSettingsNavigationLinks` to the shared local operator surface inventory, excluding `/settings` and non-settings surfaces.
+- Refactored `/settings` header navigation to use the shared projection instead of a duplicated hard-coded list.
+- Added unit coverage for readiness navigation projection, current-page exclusion, non-settings exclusion, expected surfaces, and backing app pages.
+- Updated seeded demo E2E to target the first Provider Details link now that shared header navigation intentionally adds the same route.
+- Updated testing contract, README, demo-mode docs, local operator runbook, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only navigation, inventory, or admin/reporting refinements without live external-impact actions.
+
 ## Run 043  GREEN  api-inventory-reverse-coverage  2026-05-20 19:04
 Objective:    Add reverse coverage so implemented local API route methods cannot be missing from the static API operations inventory.
 Changed:

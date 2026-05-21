@@ -1,7 +1,12 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { describe, expect, it } from "vitest";
-import { getOperatorSurfaceSummary, getRunbookAdminLinks, operatorSurfaceGroups } from "@/lib/operations/operator-surfaces";
+import {
+  getOperatorSurfaceSummary,
+  getRunbookAdminLinks,
+  getSettingsNavigationLinks,
+  operatorSurfaceGroups
+} from "@/lib/operations/operator-surfaces";
 
 function routeToAppPagePath(route: string) {
   const routeSegments = route === "/" ? [] : route.split("/").filter(Boolean);
@@ -86,5 +91,26 @@ describe("operator surface inventory", () => {
     expect(sourceLinks.filter((link) => !runbookRoutes.includes(link.href)).map((link) => link.href)).toEqual(["/demo"]);
     expect(runbookLinks.every((link) => link.label.length > 0 && link.note.length > 0)).toBe(true);
     expect(runbookRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+  });
+
+  it("projects go-live readiness navigation from the shared settings surface inventory", () => {
+    const runbookLinks = getRunbookAdminLinks();
+    const navigationLinks = getSettingsNavigationLinks();
+    const navigationRoutes = navigationLinks.map((link) => link.href);
+
+    expect(navigationLinks).toEqual(runbookLinks.filter((link) => link.href !== "/settings"));
+    expect(navigationLinks).toHaveLength(33);
+    expect(navigationRoutes).not.toContain("/settings");
+    expect(navigationRoutes).not.toContain("/demo");
+    expect(navigationRoutes).toEqual(
+      expect.arrayContaining([
+        "/settings/demo",
+        "/settings/operations",
+        "/settings/provider",
+        "/settings/readiness-audit",
+        "/settings/runbook"
+      ])
+    );
+    expect(navigationRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
   });
 });

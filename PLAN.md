@@ -153,9 +153,10 @@ Post-MVP:
 - Local API operations inventory reverse route-method coverage
 - Local operator runbook shared-inventory coverage
 - Local operations index reverse page inventory coverage
+- Local go-live readiness shared-navigation coverage
 
 ## Next Milestone
 
 Post-MVP:
 
-- Additional read-only admin views, safe dashboard refinements, local operator runbook expansion, route inventory refinements, or deeper links from existing local-only reports and release surfaces into demo-safe operational workflows
+- Additional read-only admin views, safe dashboard refinements, local operator runbook expansion, route inventory refinements, shared navigation hardening, or deeper links from existing local-only reports and release surfaces into demo-safe operational workflows

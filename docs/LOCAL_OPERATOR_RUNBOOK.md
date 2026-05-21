@@ -191,6 +191,8 @@ The operations index inventory is backed by a unit test so route-count drift, du
 
 The runbook admin-link list is projected from the same shared inventory, excluding only non-settings surfaces such as the demo console. Unit coverage keeps runbook labels and backing app pages aligned with the operations index.
 
+The go-live readiness page navigation is also projected from the shared inventory, excluding the current `/settings` page and non-settings surfaces. Unit coverage keeps readiness navigation, runbook navigation, and the operations index aligned before browser demo coverage.
+
 The page is display-only. It must not execute commands, inspect files, call APIs, mutate records, create exports, enqueue jobs, call Redis, expose secrets, call providers, call Stripe, call live AI, create billing records, send notifications, send SMS, send email, or enable live features.
 
 ## API Operations Inventory

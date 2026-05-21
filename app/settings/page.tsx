@@ -6,6 +6,7 @@ import { getProviderCredential, listProviderCredentialRotations } from "@/lib/db
 import { listProviderPhoneNumbers } from "@/lib/db/repositories/provider-numbers";
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
 import { getProviderSettings } from "@/lib/messaging/provider/settings";
+import { getSettingsNavigationLinks } from "@/lib/operations/operator-surfaces";
 import { getQueueBackend } from "@/lib/queue/bullmq";
 import { getApiRateLimitPolicy } from "@/lib/rate-limit/api-rate-limit";
 import { readinessAuditQuerySchema } from "@/lib/validation/readiness-audit";
@@ -18,6 +19,8 @@ const readinessAuditActions = [
   "PROVIDER_CREDENTIAL_METADATA_UPSERTED",
   "PROVIDER_CREDENTIAL_METADATA_DELETED"
 ];
+
+const settingsNavigationLinks = getSettingsNavigationLinks();
 
 type SettingsPageProps = {
   searchParams?: Promise<{
@@ -53,102 +56,11 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/demo">
           Demo Console
         </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/demo">
-          Demo Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/operations">
-          Operations Index
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/exports">
-          Admin Exports
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/compliance">
-          Compliance Detail
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/campaigns">
-          Campaign Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/queue">
-          Queue Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/contacts">
-          Contact Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/data">
-          Data Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/audience">
-          Audience Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/templates">
-          Template Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/inbox">
-          Inbox Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/webhooks">
-          Webhook Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/delivery">
-          Delivery Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/team">
-          Team Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/numbers">
-          Provider Numbers
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/system">
-          System Status
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/environment">
-          Environment Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/health">
-          Health Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/api">
-          API Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/contracts">
-          Contract Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/validation">
-          Validation Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/security">
-          Security Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/notifications">
-          Notification Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/integrations">
-          Integration Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/workflows">
-          Workflow Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/releases">
-          Release Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/readiness-audit">
-          Readiness Audit
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
-          Operator Runbook
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/usage">
-          Usage & Analytics
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/reports">
-          Reporting Index
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/billing">
-          Billing Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/ai">
-          AI Operations
-        </Link>
+        {settingsNavigationLinks.map((link) => (
+          <Link key={link.href} className="text-sm font-medium text-teal-700" href={link.href}>
+            {link.label}
+          </Link>
+        ))}
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Go-Live Readiness</h1>

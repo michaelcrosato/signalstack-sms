@@ -80,6 +80,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP local operations inventory hardening: `/settings/operations` now uses a shared local operator surface inventory with unit coverage for grouped app routes, duplicate route prevention, backing `app/**/page.tsx` files, reverse coverage for implemented local operator pages, current surface counts, and safety-sensitive operations links before seeded browser coverage.
 - Post-MVP local API operations inventory hardening: `/settings/api` route inventory unit coverage now verifies unique route-method rows, backing `app/**/route.ts` files for listed API paths, reverse coverage for implemented local API route methods, current local route count, and zero external-impact routes before browser demo coverage.
 - Post-MVP local runbook inventory hardening: `/settings/runbook` now projects its local admin links from the shared operator surface inventory, while unit coverage verifies label alignment, settings-only projection, backing `app/**/page.tsx` files, and the intentional `/demo` exclusion before browser demo coverage.
+- Post-MVP go-live readiness navigation hardening: `/settings` now projects its local admin navigation from the shared operator surface inventory, while unit coverage verifies current-page exclusion, non-settings exclusion, expected local surfaces, and backing `app/**/page.tsx` files before browser demo coverage.
 
 Demo-safe defaults remain mandatory:
 

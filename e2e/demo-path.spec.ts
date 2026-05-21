@@ -240,7 +240,7 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   const readinessAuditExportResponse = await request.get("/api/settings/readiness-audit/export?limit=5");
   expect(readinessAuditExportResponse.ok()).toBeTruthy();
   await expect(readinessAuditExportResponse.text()).resolves.toContain("id,action,subjectType,subjectId,actorUserId,createdAt,metadata");
-  await page.getByRole("link", { name: "Provider Details" }).click();
+  await page.getByRole("link", { name: "Provider Details" }).first().click();
   await expect(page.getByRole("heading", { name: "Provider Details" })).toBeVisible();
   await expect(page.getByText("Twilio Metadata")).toBeVisible();
   await page.getByLabel("Account SID").fill("AC111122223333");
