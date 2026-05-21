@@ -53,6 +53,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Link className="text-sm font-medium text-teal-700" href="/demo">
           Demo Console
         </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/demo">
+          Demo Operations
+        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/exports">
           Admin Exports
         </Link>
@@ -155,6 +158,17 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <Metric label="Numbers" value={String(numbers.length)} />
         <Metric label="Queue" value={getQueueBackend(process.env)} />
       </section>
+
+      <Panel title="Demo Operations">
+        <Link className="mb-4 inline-flex text-sm font-medium text-teal-700" href="/settings/demo">
+          Demo Operations
+        </Link>
+        <p className="text-sm leading-6 text-slate-700">
+          Review seeded demo readiness, workflow links, local metrics, and runtime gates without importing data,
+          scheduling campaigns, creating messages, executing reports, calling providers, billing, notifying, exposing
+          secrets, or enabling live features.
+        </p>
+      </Panel>
 
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
         <Panel title="Compliance">

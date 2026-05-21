@@ -6,6 +6,15 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await page.goto("/demo");
   await expect(page.getByRole("heading", { name: "SignalStack Demo Console" })).toBeVisible();
   await expect(page.getByText("Live messaging, live billing, and live AI remain blocked.")).toBeVisible();
+  await page.getByRole("link", { name: "Demo Operations" }).click();
+  await expect(page.getByRole("heading", { name: "Demo Operations" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Demo Readiness" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Runtime Gates" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Seed Signals" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Scenario Signals" })).toBeVisible();
+  await expect(page.getByText("Safety Boundary")).toBeVisible();
+  await page.getByRole("link", { name: "Demo Console" }).click();
+  await expect(page.getByRole("heading", { name: "SignalStack Demo Console" })).toBeVisible();
   await page.getByRole("link", { name: "System Status" }).click();
   await expect(page.getByRole("heading", { name: "System Status" })).toBeVisible();
   await expect(page.getByText("Safety Defaults")).toBeVisible();

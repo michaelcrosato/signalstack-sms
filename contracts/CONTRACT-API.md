@@ -228,6 +228,10 @@ Renders a read-only local health operations checkpoint. It may display the exist
 
 Renders a read-only local environment operations checkpoint. It may display demo-safe defaults, allowlisted configuration category names, derived runtime status, and links to local system/security/validation/release surfaces. The page must not read environment files, display `.env.local` contents, expose raw environment values, expose credentials or token fingerprints, mutate configuration, write files, execute commands, call APIs, call Redis, call providers, call Stripe, call live AI, send SMS, send email, send notifications, create billing records, deploy, or enable live features.
 
+### `/settings/demo`
+
+Renders a read-only local demo operations checkpoint for the current organization. It may display seeded demo readiness, workflow links, local contact/campaign/conversation/message/number metrics, local usage totals, and derived runtime gates. The page must not import data, schedule or cancel campaigns, run workers, create inbox messages or replies, submit prompts, execute reports, create exports, mutate records, enqueue jobs, call Redis, call providers, call Stripe, call live AI, send SMS, send email, send notifications, expose secrets, expose full message bodies, or enable live messaging, live billing, live AI, or other live features.
+
 ### `/settings/runbook`
 
 Renders a read-only local operator checklist based on `docs/LOCAL_OPERATOR_RUNBOOK.md`. It may display local validation, database migration/seed, worker, BullMQ smoke, admin export, and repair-loop commands. The page must not execute commands, mutate records, expose secrets, call providers, send notifications, create billing records, or enable live messaging.

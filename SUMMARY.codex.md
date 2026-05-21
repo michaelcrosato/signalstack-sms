@@ -1,15 +1,20 @@
 # Codex Summary
 
-Run number: 35
+Run number: 36
 
 ## Completed
+
+- Advanced a post-MVP local demo operations checkpoint.
+- Added `/settings/demo`, a read-only page that maps seeded demo readiness, workflow links, local metrics, usage totals, runtime gates, and safety boundaries.
+- Linked the demo operations view from the launch dashboard, demo console, go-live readiness, workflow operations, reporting index, release operations, and operator runbook views.
+- Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, next-prompt handoff docs, and seeded demo E2E coverage with the demo operations boundary.
+
+## Prior Completed
 
 - Advanced a post-MVP local environment operations checkpoint.
 - Added `/settings/environment`, a read-only page that maps demo-safe defaults, allowlisted configuration categories, derived runtime status, operational links, and environment safety boundaries.
 - Linked the environment operations view from the launch dashboard, demo console, go-live readiness, and operator runbook views.
 - Updated API contract/map docs, README, PLAN, demo-mode docs, local operator runbook, and next-prompt handoff docs with the environment boundary.
-
-## Prior Completed
 
 - Advanced a post-MVP local health operations checkpoint.
 - Added `/settings/health`, a read-only page that maps the existing health endpoint contract, demo-safe defaults, runtime blockers, operations links, and safety boundary.
@@ -75,7 +80,7 @@ Run number: 35
 - Updated API/testing contracts, API map, demo-mode docs, local operator runbook, README, PLAN, and next prompt handoff docs.
 
 - Completed Milestones 0-10.
-- Added post-MVP webhook foundations, provider settings/readiness, local workers, BullMQ optional smoke/worker foundations, readiness UI, production gates/runbooks, API rate limiting, provider credential metadata management, local admin exports, system status, health operations, environment operations, usage/analytics, launch dashboard, operator runbook app view, compliance detail, provider numbers, campaign operations, contact operations, audience operations, template operations, inbox operations, delivery operations, team operations, billing operations, AI operations, API operations, security operations, webhook operations, data operations, queue operations, notification operations, readiness audit operations, contract operations, and validation operations.
+- Added post-MVP webhook foundations, provider settings/readiness, local workers, BullMQ optional smoke/worker foundations, readiness UI, production gates/runbooks, API rate limiting, provider credential metadata management, local admin exports, system status, health operations, environment operations, demo operations, usage/analytics, launch dashboard, operator runbook app view, compliance detail, provider numbers, campaign operations, contact operations, audience operations, template operations, inbox operations, delivery operations, team operations, billing operations, AI operations, API operations, security operations, webhook operations, data operations, queue operations, notification operations, readiness audit operations, contract operations, and validation operations.
 
 ## Validation
 

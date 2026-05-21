@@ -12,6 +12,7 @@ import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-au
 export const dynamic = "force-dynamic";
 
 const reportLinks = [
+  { href: "/settings/demo", label: "Demo Operations", scope: "seeded demo readiness and runtime gates" },
   { href: "/settings/usage", label: "Usage & Analytics", scope: "tenant metrics and local usage" },
   { href: "/settings/exports", label: "Admin Exports", scope: "bounded local CSV links" },
   { href: "/settings/readiness-audit", label: "Readiness Audit", scope: "go-live readiness history" },
@@ -56,6 +57,9 @@ export default async function ReportsPage() {
         </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/workflows">
           Workflow Operations
+        </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/demo">
+          Demo Operations
         </Link>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>

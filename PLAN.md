@@ -142,6 +142,7 @@ Post-MVP:
 - Read-only local reporting index
 - Read-only local integration operations view
 - Read-only local workflow operations view
+- Read-only local demo operations view
 - Read-only local release operations view
 - Read-only local health operations view
 - Read-only local environment operations view

@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 036  GREEN  demo-operations  2026-05-20 18:31
+Objective:    Add a read-only local demo operations checkpoint for seeded demo readiness and runtime gates.
+Changed:
+- Added `/settings/demo` with seeded demo readiness, workflow links, local metrics, usage totals, runtime gates, operational links, and safety boundary.
+- Linked the view from `/`, `/demo`, `/settings`, `/settings/workflows`, `/settings/reports`, `/settings/releases`, and `/settings/runbook`.
+- Extended root smoke and seeded investor demo E2E coverage for the demo operations view.
+- Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only admin/reporting/demo refinements without live external-impact actions.
+
 ## Run 035  GREEN  environment-operations  2026-05-20 18:20
 Objective:    Add a read-only local environment operations checkpoint for demo-safe defaults and runtime configuration boundaries.
 Changed:

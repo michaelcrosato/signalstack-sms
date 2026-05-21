@@ -8,6 +8,11 @@ const launchLinks = [
     description: "Seeded investor path for imports, campaigns, inbox, AI, analytics, and usage."
   },
   {
+    href: "/settings/demo",
+    title: "Demo Operations",
+    description: "Read-only seeded demo readiness, workflow links, local metrics, and runtime gates."
+  },
+  {
     href: "/settings",
     title: "Go-Live Readiness",
     description: "Compliance, provider blockers, readiness audit, numbers, queue, and API protection."

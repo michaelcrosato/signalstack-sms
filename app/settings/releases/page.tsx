@@ -34,6 +34,7 @@ const releaseChecks = [
 ];
 
 const releaseSurfaces = [
+  { href: "/settings/demo", label: "Demo Operations", scope: "seeded demo readiness and runtime gates" },
   { href: "/settings/validation", label: "Validation Operations", scope: "gate inventory and repair signals" },
   { href: "/settings/contracts", label: "Contract Operations", scope: "contract inventory and drift controls" },
   { href: "/settings/security", label: "Security Operations", scope: "safety gates and secret boundaries" },
@@ -61,6 +62,9 @@ export default async function ReleaseOperationsPage() {
         </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
           Operator Runbook
+        </Link>
+        <Link className="text-sm font-medium text-teal-700" href="/settings/demo">
+          Demo Operations
         </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/workflows">
           Workflow Operations

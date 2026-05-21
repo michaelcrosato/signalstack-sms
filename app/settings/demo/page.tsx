@@ -1,60 +1,56 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getAnalyticsOverview } from "@/lib/analytics/overview";
+import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getUsageSummary } from "@/lib/billing/metering";
 import { listCampaigns } from "@/lib/db/repositories/campaigns";
 import { listContacts } from "@/lib/db/repositories/contacts";
 import { listConversations } from "@/lib/db/repositories/inbox";
+import { listProviderPhoneNumbers } from "@/lib/db/repositories/provider-numbers";
 import { getSystemStatus } from "@/lib/operations/system-status";
 
 export const dynamic = "force-dynamic";
 
-const workflowSteps = [
+const demoCheckpoints = [
   {
-    name: "Audience intake",
+    name: "Seeded workspace",
+    href: "/demo",
+    signal: "Demo Console",
+    boundary: "Shows local seed records and demo-safe workflow steps without calling providers or sending messages."
+  },
+  {
+    name: "Audience and consent",
     href: "/settings/contacts",
-    owner: "Contacts",
-    boundary: "CSV import and consent state remain local records; no labels, consent, or provider sends are changed here."
+    signal: "Contact Operations",
+    boundary: "Reviews contact consent and import metadata without importing, mutating consent, or sending SMS."
   },
   {
     name: "Campaign readiness",
     href: "/settings/campaigns",
-    owner: "Campaigns",
-    boundary: "Draft, preflight, and scheduled metadata are reviewed without scheduling, canceling, or sending messages."
+    signal: "Campaign Operations",
+    boundary: "Reviews campaign and recipient state without scheduling, canceling, running workers, or sending."
   },
   {
-    name: "Queue handoff",
-    href: "/settings/queue",
-    owner: "Queue",
-    boundary: "Durable job state and worker limits are displayed without enqueueing, polling, Redis calls, or queue mutation."
-  },
-  {
-    name: "Inbox response",
+    name: "Inbox replies",
     href: "/settings/inbox",
-    owner: "Inbox",
-    boundary: "Conversation and note metadata are visible without creating replies, assigning threads, or changing consent."
+    signal: "Inbox Operations",
+    boundary: "Reviews conversations and message metadata without creating replies, assigning threads, or mutating contacts."
   },
   {
-    name: "Delivery evidence",
-    href: "/settings/delivery",
-    owner: "Delivery",
-    boundary: "Existing message status metadata is reviewed without retries, webhook replay, provider calls, or SMS sends."
-  },
-  {
-    name: "AI and reporting",
+    name: "Usage and reporting",
     href: "/settings/reports",
-    owner: "Reporting",
-    boundary: "Fake AI, usage, analytics, and report links are summarized without prompts, exports, paid AI, or billing artifacts."
+    signal: "Reporting Index",
+    boundary: "Reviews local analytics, usage, and export links without executing reports or creating exports."
   }
 ];
 
-export default async function WorkflowOperationsPage() {
+export default async function DemoOperationsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
-  const [contacts, campaigns, conversations, analytics, usage] = await Promise.all([
+  const [contacts, campaigns, conversations, numbers, analytics, usage] = await Promise.all([
     listContacts(currentOrg.orgId),
     listCampaigns(currentOrg.orgId),
     listConversations(currentOrg.orgId),
+    listProviderPhoneNumbers(currentOrg.orgId),
     getAnalyticsOverview(currentOrg.orgId),
     getUsageSummary(currentOrg.orgId)
   ]);
@@ -66,31 +62,29 @@ export default async function WorkflowOperationsPage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
-        <Link className="text-sm font-medium text-teal-700" href="/settings">
-          Go-Live Readiness
-        </Link>
         <Link className="text-sm font-medium text-teal-700" href="/demo">
           Demo Console
         </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/demo">
-          Demo Operations
+        <Link className="text-sm font-medium text-teal-700" href="/settings">
+          Go-Live Readiness
         </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/integrations">
-          Integration Operations
+        <Link className="text-sm font-medium text-teal-700" href="/settings/workflows">
+          Workflow Operations
         </Link>
         <Link className="text-sm font-medium text-teal-700" href="/settings/reports">
           Reporting Index
         </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/releases">
-          Release Operations
+        <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
+          Operator Runbook
         </Link>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
-          <h1 className="text-4xl font-semibold text-slate-950">Workflow Operations</h1>
+          <h1 className="text-4xl font-semibold text-slate-950">Demo Operations</h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-            Read-only workflow checkpoint for {currentOrg.orgName}. This view connects the local demo path across
-            audience, campaign, queue, inbox, delivery, AI, usage, and reporting surfaces without executing workflow
-            steps, mutating records, exporting data, calling providers, billing, notifying, or enabling live features.
+            Read-only local demo checkpoint for {currentOrg.orgName}. This view summarizes seeded demo readiness,
+            workflow links, local metrics, and external-impact gates without importing data, scheduling campaigns,
+            creating messages, executing reports, calling providers, billing, notifying, exposing secrets, or enabling
+            live features.
           </p>
         </div>
       </header>
@@ -100,28 +94,29 @@ export default async function WorkflowOperationsPage() {
         <Metric label="Campaigns" value={String(campaigns.length)} />
         <Metric label="Scheduled" value={String(scheduledCampaigns)} />
         <Metric label="Open inbox" value={String(openConversations)} />
-        <Metric label="Usage events" value={String(usage.recentEvents.length)} />
+        <Metric label="Numbers" value={String(numbers.length)} />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <Panel title="Workflow Checkpoints">
+        <Panel title="Demo Readiness">
           <ol className="grid gap-3 text-sm">
-            {workflowSteps.map((step, index) => (
-              <li key={step.name} className="grid gap-2 border-b border-slate-100 pb-3 md:grid-cols-[42px_170px_120px_1fr]">
+            {demoCheckpoints.map((checkpoint, index) => (
+              <li key={checkpoint.name} className="grid gap-2 border-b border-slate-100 pb-3 md:grid-cols-[42px_170px_140px_1fr]">
                 <span className="font-semibold text-slate-500">{index + 1}</span>
-                <Link className="font-semibold text-teal-700" href={step.href}>
-                  {step.name}
+                <Link className="font-semibold text-teal-700" href={checkpoint.href}>
+                  {checkpoint.name}
                 </Link>
-                <span className="text-slate-600">{step.owner}</span>
-                <span className="text-slate-700">{step.boundary}</span>
+                <span className="text-slate-600">{checkpoint.signal}</span>
+                <span className="text-slate-700">{checkpoint.boundary}</span>
               </li>
             ))}
           </ol>
         </Panel>
 
-        <Panel title="Runtime Boundary">
+        <Panel title="Runtime Gates">
           <dl className="grid gap-3 text-sm">
             <StatusRow label="External impact" value={status.safety.externalImpactBlocked ? "blocked" : "review"} />
+            <StatusRow label="Demo mode" value={String(status.safety.demoMode)} />
             <StatusRow label="Messaging provider" value={status.safety.messagingProvider} />
             <StatusRow label="AI provider" value={status.safety.aiProvider} />
             <StatusRow label="Live messaging" value={String(status.safety.liveMessagingEnabled)} />
@@ -131,37 +126,37 @@ export default async function WorkflowOperationsPage() {
       </section>
 
       <section className="grid gap-6 lg:grid-cols-3">
-        <Panel title="Audience Signal">
+        <Panel title="Seed Signals">
           <dl className="grid gap-3 text-sm">
-            <StatusRow label="Contacts" value={String(analytics.contacts.total)} />
             <StatusRow label="Opted in" value={String(analytics.contacts.optedIn)} />
             <StatusRow label="Opted out" value={String(analytics.contacts.optedOut)} />
+            <StatusRow label="Messages" value={String(analytics.messages.total)} />
           </dl>
         </Panel>
 
-        <Panel title="Campaign Signal">
+        <Panel title="Scenario Signals">
           <dl className="grid gap-3 text-sm">
             <StatusRow label="Campaigns" value={String(analytics.campaigns.total)} />
-            <StatusRow label="Messages" value={String(analytics.messages.total)} />
+            <StatusRow label="Conversations" value={String(analytics.conversations.total)} />
             <StatusRow label="Usage total" value={String(usageTotal)} />
           </dl>
         </Panel>
 
-        <Panel title="Inbox Signal">
-          <dl className="grid gap-3 text-sm">
-            <StatusRow label="Conversations" value={String(analytics.conversations.total)} />
-            <StatusRow label="Open" value={String(openConversations)} />
-            <StatusRow label="Recent usage" value={String(usage.recentEvents.length)} />
-          </dl>
+        <Panel title="Operational Links">
+          <ul className="grid gap-3 text-sm">
+            <OperationLink href="/settings/workflows" label="Workflow Operations" note="end-to-end local demo checkpoints" />
+            <OperationLink href="/settings/releases" label="Release Operations" note="seeded demo path and gate expectations" />
+            <OperationLink href="/settings/environment" label="Environment Operations" note="demo-safe defaults and runtime categories" />
+          </ul>
         </Panel>
       </section>
 
       <Panel title="Safety Boundary">
         <ul className="grid gap-2 text-sm text-slate-700">
-          <li>No workflow actions are executed: no imports, campaign scheduling, worker runs, inbox replies, delivery retries, prompts, reports, exports, or billing events.</li>
-          <li>No provider APIs, live AI providers, Stripe APIs, notification services, Redis queues, or outbound webhooks are called.</li>
-          <li>No records are created, updated, deleted, enqueued, exported, replayed, charged, sent, notified, or verified from this view.</li>
-          <li>No credentials, token fingerprints, raw environment values, provider verification results, or secret-like values are displayed.</li>
+          <li>No demo workflow action is executed: no imports, campaign scheduling, worker runs, inbox replies, AI prompts, reports, exports, or billing events.</li>
+          <li>No records are created, updated, deleted, enqueued, exported, replayed, charged, sent, notified, or provider-verified from this view.</li>
+          <li>No provider APIs, live AI providers, Stripe APIs, notification services, Redis queues, email systems, SMS sends, or outbound webhooks are called.</li>
+          <li>No raw environment values, credentials, token fingerprints, provider verification results, full message bodies, or secret-like values are displayed.</li>
         </ul>
       </Panel>
     </main>
@@ -174,6 +169,17 @@ function Metric({ label, value }: { label: string; value: string }) {
       <p className="text-sm text-slate-500">{label}</p>
       <p className="mt-2 text-2xl font-semibold text-slate-950">{value}</p>
     </div>
+  );
+}
+
+function OperationLink({ href, label, note }: { href: string; label: string; note: string }) {
+  return (
+    <li className="rounded border border-slate-200 p-4">
+      <Link className="font-semibold text-teal-700" href={href}>
+        {label}
+      </Link>
+      <p className="mt-2 text-slate-600">{note}</p>
+    </li>
   );
 }
 
@@ -190,7 +196,7 @@ function StatusRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-2">
       <dt className="text-slate-600">{label}</dt>
-      <dd className="font-medium text-slate-950">{value}</dd>
+      <dd className="text-right font-medium text-slate-950">{value}</dd>
     </div>
   );
 }
