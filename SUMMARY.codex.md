@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP shared operator supplied-inventory array-index descriptor checkpoint.
+- Tightened supplied operator inventory and group link array validation so accessor-backed or non-enumerable index slots fail before summaries or projections read local navigation entries.
+- Added unit coverage proving accessor-backed array slots are rejected without reading their getters, and hidden array slots fail before projection.
+- Protected local gate passed for the local-only validator hardening.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 115
+
+## Previous Run
+
 - Advanced a post-MVP loop-log truth repair checkpoint.
 - Synchronized root and docs loop logs with runs 106-113 from the existing commit history and current handoff summaries.
 - Preserved the local-only operator hardening history without changing product code, contracts, protected gate scripts, or live-action settings.

@@ -201,6 +201,7 @@ Post-MVP:
 - Local shared operator supplied-inventory duplicate-copy failure coverage
 - Local shared operator supplied-inventory invalid-inventory-array failure coverage
 - Local shared operator supplied-inventory inventory-array-shape coverage
+- Local shared operator supplied-inventory array-index-descriptor coverage
 - Local shared operator supplied-inventory empty-inventory failure coverage
 - Local shared operator supplied-inventory blank-field failure coverage
 - Local shared operator supplied-inventory invalid-link-array failure coverage
@@ -218,6 +219,7 @@ Post-MVP:
 - Local shared operator supplied-inventory exact-field failure coverage
 - Local shared operator canonical pre-export validation coverage
 - Local shared operator supplied-inventory link-array-shape coverage
+- Local shared operator supplied-inventory link-array-index-descriptor coverage
 
 ## Next Milestone
 

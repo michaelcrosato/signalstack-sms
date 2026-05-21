@@ -332,6 +332,32 @@ describe("operator surface inventory", () => {
     );
   });
 
+  it("rejects supplied operator inventories with unsafe inventory array index descriptors before projection", () => {
+    let getterWasRead = false;
+    const groupsWithAccessorIndex = cloneSurfaceGroups(operatorSurfaceGroups);
+    Object.defineProperty(groupsWithAccessorIndex, "1", {
+      enumerable: true,
+      get: () => {
+        getterWasRead = true;
+        return operatorSurfaceGroups[1];
+      }
+    });
+
+    const groupsWithHiddenIndex = cloneSurfaceGroups(operatorSurfaceGroups);
+    Object.defineProperty(groupsWithHiddenIndex, "1", {
+      value: operatorSurfaceGroups[1],
+      enumerable: false
+    });
+
+    expect(() => getOperatorSurfaceSummary(groupsWithAccessorIndex)).toThrow(
+      "Invalid operator surface inventory array field descriptors"
+    );
+    expect(getterWasRead).toBe(false);
+    expect(() => getLaunchDashboardLinks(groupsWithHiddenIndex)).toThrow(
+      "Invalid operator surface inventory array field descriptors"
+    );
+  });
+
   it("rejects supplied operator inventories with invalid group link arrays before projection", () => {
     const invalidGroupName = operatorSurfaceGroups[1].name;
     const groups = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
@@ -626,6 +652,41 @@ describe("operator surface inventory", () => {
     );
     expect(() => getDemoOperationsLinks(groupsWithCustomPrototypeLinkArray)).toThrow(
       `Invalid operator surface link array prototype for group ${operatorSurfaceGroups[1].name}`
+    );
+  });
+
+  it("rejects supplied operator inventories with unsafe link array index descriptors before projection", () => {
+    let getterWasRead = false;
+    const linkArrayWithAccessorIndex = [...operatorSurfaceGroups[1].links];
+    Object.defineProperty(linkArrayWithAccessorIndex, "0", {
+      enumerable: true,
+      get: () => {
+        getterWasRead = true;
+        return operatorSurfaceGroups[1].links[0];
+      }
+    });
+
+    const linkArrayWithHiddenIndex = [...operatorSurfaceGroups[1].links];
+    Object.defineProperty(linkArrayWithHiddenIndex, "0", {
+      value: operatorSurfaceGroups[1].links[0],
+      enumerable: false
+    });
+
+    const groupsWithAccessorIndex = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links: groupIndex === 1 ? linkArrayWithAccessorIndex : group.links
+    }));
+    const groupsWithHiddenIndex = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links: groupIndex === 1 ? linkArrayWithHiddenIndex : group.links
+    }));
+
+    expect(() => getSettingsNavigationLinks(groupsWithAccessorIndex)).toThrow(
+      `Invalid operator surface link array field descriptors for group ${operatorSurfaceGroups[1].name}`
+    );
+    expect(getterWasRead).toBe(false);
+    expect(() => getDemoOperationsLinks(groupsWithHiddenIndex)).toThrow(
+      `Invalid operator surface link array field descriptors for group ${operatorSurfaceGroups[1].name}`
     );
   });
 

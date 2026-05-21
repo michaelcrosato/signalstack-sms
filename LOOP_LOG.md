@@ -962,3 +962,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 115  GREEN  supplied-inventory-array-index-descriptor  2026-05-21 00:53
+Objective:    Fail accessor-backed or hidden supplied shared operator inventory array slots before projection.
+Changed:
+- Added descriptor guards for supplied inventory array indexes and supplied group link array indexes.
+- Added unit coverage proving accessor-backed array slots are rejected without reading their getters, and non-enumerable array slots fail before summaries or projections derive local navigation.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
