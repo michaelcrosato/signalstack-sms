@@ -1,7 +1,8 @@
 # Codex Blockers
 
-Run number: 185
+Run number: 186
 
+- Latest API operations area-vocabulary hardening exports a runtime-frozen supported area vocabulary and validates `/settings/api` static route inventory rows against it before local metadata freezes. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, mutate records, expose secrets, or enable live features.
 - Latest API operations no-impact summary-state hardening keeps `/settings/api` command-execution, external-impact, mutation, and secrets-displayed states inside runtime-frozen local vocabularies. The check is local static metadata and read-only rendering/browser coverage only and does not execute handlers, inspect logs, scan files, read raw environment values, mutate records, expose secrets, call providers, bill, notify, send SMS/email, call live AI, execute workers, call Redis, or enable live features.
 
 No active blockers.

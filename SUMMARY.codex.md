@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP API operations area-vocabulary checkpoint.
+- Exported a runtime-frozen supported API area vocabulary and validated static API route inventory rows against it before local `/settings/api` metadata freezes.
+- Added unit coverage proving route areas stay aligned to the exported vocabulary and reject caller mutation.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- Focused API operations unit coverage, typecheck, protected local gate, and seeded investor demo path passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, worker execution, Redis calls, record mutations, or protected gate-script edits were used.
+
+Run number: 186
+
+## Previous Run
+
 - Advanced a post-MVP API operations no-impact summary-state checkpoint.
 - Added runtime-frozen API operation command-execution, external-impact, mutation, and secrets-displayed vocabularies.
 - Rendered the API operations no-impact summary on `/settings/api` and pinned it in unit and seeded demo browser coverage.

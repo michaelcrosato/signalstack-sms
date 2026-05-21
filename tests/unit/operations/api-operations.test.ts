@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  allowedApiOperationAreas,
   allowedApiOperationCommandExecutionStates,
   allowedApiOperationExternalImpactStates,
   allowedApiOperationMethods,
@@ -108,13 +109,14 @@ describe("getApiOperationsStatus", () => {
 
   it("keeps API inventory values in a canonical local route shape", () => {
     const routeKeys = apiOperationRoutes.map((route) => `${route.method} ${route.path}`);
+    const allowedAreas = new Set<string>(allowedApiOperationAreas);
 
     expect(apiOperationRoutes.every((route) => allowedApiOperationMethods.includes(route.method))).toBe(true);
     expect(apiOperationRoutes.map((route) => route.path).filter((path) => !path.startsWith("/api/"))).toEqual([]);
     expect(apiOperationRoutes.map((route) => route.path).filter((path) => path.endsWith("/"))).toEqual([]);
     expect(apiOperationRoutes.map((route) => route.path).filter((path) => path.includes("?") || path.includes("#"))).toEqual([]);
     expect(apiOperationRoutes.map((route) => route.path).filter((path) => path.includes("//"))).toEqual([]);
-    expect(apiOperationRoutes.map((route) => route.area).filter((area) => area.trim().length === 0)).toEqual([]);
+    expect(apiOperationRoutes.map((route) => route.area).filter((area) => !allowedAreas.has(area))).toEqual([]);
     expect(apiOperationRoutes.map((route) => route.safety).filter((safety) => safety.trim().length === 0)).toEqual([]);
     expect(apiOperationRoutes.filter((route) => typeof route.mutates !== "boolean" || typeof route.externalImpact !== "boolean")).toEqual([]);
     expect(new Set(routeKeys).size).toBe(routeKeys.length);
@@ -216,7 +218,7 @@ describe("getApiOperationsStatus", () => {
       (apiOperationRoutes as unknown as typeof apiOperationRoutes[number][]).push({
         method: "GET",
         path: "/api/unsafe",
-        area: "Unsafe",
+        area: "AI",
         mutates: false,
         externalImpact: false,
         safety: "unsafe mutation"
@@ -232,6 +234,28 @@ describe("getApiOperationsStatus", () => {
     expect([...allowedApiOperationMethods].sort()).toEqual(["DELETE", "GET", "PATCH", "POST"]);
     expect(routeMethods).toEqual([...allowedApiOperationMethods].sort());
     expect(() => (allowedApiOperationMethods as unknown as string[]).push("PUT")).toThrow(TypeError);
+  });
+
+  it("exports a frozen supported API area vocabulary aligned with the route inventory", () => {
+    const routeAreas = Array.from(new Set(apiOperationRoutes.map((route) => route.area))).sort();
+
+    expect(Object.isFrozen(allowedApiOperationAreas)).toBe(true);
+    expect([...allowedApiOperationAreas]).toEqual([
+      "AI",
+      "Analytics",
+      "Billing",
+      "Campaigns",
+      "Contacts",
+      "Demo",
+      "Inbox",
+      "Settings",
+      "System",
+      "Templates",
+      "Tenant",
+      "Webhooks"
+    ]);
+    expect(routeAreas).toEqual([...allowedApiOperationAreas].sort());
+    expect(() => (allowedApiOperationAreas as unknown as unknown[]).push("Unsafe")).toThrow(TypeError);
   });
 
   it("keeps API operation summary states inside the no-impact vocabulary", () => {
@@ -254,6 +278,7 @@ describe("getApiOperationsStatus", () => {
   it("keeps exported API operation vocabularies frozen against caller mutation", () => {
     const vocabularies = [
       allowedApiOperationMethods,
+      allowedApiOperationAreas,
       allowedApiOperationCommandExecutionStates,
       allowedApiOperationExternalImpactStates,
       allowedApiOperationMutationStates,

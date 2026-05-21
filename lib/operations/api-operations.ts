@@ -1,12 +1,27 @@
 import { getApiRateLimitPolicy } from "@/lib/rate-limit/api-rate-limit";
 
 export const allowedApiOperationMethods = Object.freeze(["GET", "POST", "PATCH", "DELETE"] as const);
+export const allowedApiOperationAreas = Object.freeze([
+  "AI",
+  "Analytics",
+  "Billing",
+  "Campaigns",
+  "Contacts",
+  "Demo",
+  "Inbox",
+  "Settings",
+  "System",
+  "Templates",
+  "Tenant",
+  "Webhooks"
+] as const);
 export const allowedApiOperationCommandExecutionStates = Object.freeze(["none"] as const);
 export const allowedApiOperationExternalImpactStates = Object.freeze(["none"] as const);
 export const allowedApiOperationMutationStates = Object.freeze(["none"] as const);
 export const allowedApiOperationSecretsDisplayedStates = Object.freeze([false] as const);
 
 export type ApiOperationMethod = (typeof allowedApiOperationMethods)[number];
+export type ApiOperationArea = (typeof allowedApiOperationAreas)[number];
 export type ApiOperationCommandExecutionState = (typeof allowedApiOperationCommandExecutionStates)[number];
 export type ApiOperationExternalImpactState = (typeof allowedApiOperationExternalImpactStates)[number];
 export type ApiOperationMutationState = (typeof allowedApiOperationMutationStates)[number];
@@ -15,7 +30,7 @@ export type ApiOperationSecretsDisplayedState = (typeof allowedApiOperationSecre
 export type ApiOperationRoute = {
   method: ApiOperationMethod;
   path: string;
-  area: string;
+  area: ApiOperationArea;
   mutates: boolean;
   externalImpact: boolean;
   safety: string;
@@ -89,7 +104,11 @@ function assertApiOperationRoute(route: ApiOperationRoute) {
     throw new Error(`Invalid API operation path ${String(route.path)}`);
   }
 
-  if (typeof route.area !== "string" || route.area.trim().length === 0) {
+  if (
+    typeof route.area !== "string" ||
+    route.area.trim().length === 0 ||
+    !allowedApiOperationAreas.includes(route.area as ApiOperationArea)
+  ) {
     throw new Error("Invalid API operation area");
   }
 
