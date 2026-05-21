@@ -230,3 +230,14 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP local-only operations refinements or route inventory hardening without live external-impact actions.
+## Run 048  GREEN  demo-console-shared-navigation  2026-05-20 19:33
+Objective:    Project `/demo` console navigation from the shared local operator surface inventory.
+Changed:
+- Added `getDemoConsoleLinks()` to reuse the shared operator surface inventory while excluding the `/demo` self-link.
+- Refactored `/demo` console navigation away from a duplicated hard-coded list, adding Admin Exports coverage through the shared inventory.
+- Added unit coverage for demo console projection, self-link exclusion, Admin Exports inclusion, and backing app pages.
+- Extended the seeded investor demo path to verify visible `/demo` console links from the shared inventory.
+- Updated testing contract, README, demo-mode docs, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only admin/navigation, route inventory, or reporting refinements without live external-impact actions.

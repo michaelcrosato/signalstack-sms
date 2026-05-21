@@ -6,8 +6,11 @@ import { listCampaigns } from "@/lib/db/repositories/campaigns";
 import { listContacts } from "@/lib/db/repositories/contacts";
 import { listConversations } from "@/lib/db/repositories/inbox";
 import { listProviderPhoneNumbers } from "@/lib/db/repositories/provider-numbers";
+import { getDemoConsoleLinks } from "@/lib/operations/operator-surfaces";
 
 export const dynamic = "force-dynamic";
+
+const demoConsoleLinks = getDemoConsoleLinks();
 
 export default async function DemoPage() {
   const currentOrg = await getOrCreateCurrentOrg();
@@ -34,102 +37,11 @@ export default async function DemoPage() {
         <Link className="text-sm font-medium text-teal-700" href="/">
           SignalStack SMS
         </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings">
-          Go-Live Readiness
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/demo">
-          Demo Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/operations">
-          Operations Index
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/compliance">
-          Compliance Detail
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/campaigns">
-          Campaign Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/queue">
-          Queue Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/contacts">
-          Contact Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/data">
-          Data Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/audience">
-          Audience Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/templates">
-          Template Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/inbox">
-          Inbox Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/webhooks">
-          Webhook Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/delivery">
-          Delivery Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/team">
-          Team Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/numbers">
-          Provider Numbers
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/system">
-          System Status
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/environment">
-          Environment Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/health">
-          Health Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/api">
-          API Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/contracts">
-          Contract Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/validation">
-          Validation Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/security">
-          Security Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/notifications">
-          Notification Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/integrations">
-          Integration Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/workflows">
-          Workflow Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/releases">
-          Release Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/readiness-audit">
-          Readiness Audit
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
-          Operator Runbook
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/usage">
-          Usage & Analytics
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/reports">
-          Reporting Index
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/billing">
-          Billing Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/ai">
-          AI Operations
-        </Link>
+        {demoConsoleLinks.map((link) => (
+          <Link key={link.href} className="text-sm font-medium text-teal-700" href={link.href}>
+            {link.label}
+          </Link>
+        ))}
         <div className="flex flex-col gap-2">
           <p className="text-sm font-semibold uppercase text-slate-500">Investor Demo</p>
           <h1 className="text-4xl font-semibold text-slate-950">SignalStack Demo Console</h1>

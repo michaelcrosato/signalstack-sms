@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 47
+Run number: 48
 
 No active blockers.
 
 ## Notes
 
+- `/demo` now projects its console navigation from the shared local operator surface inventory, excluding only its own self-link. Unit and browser coverage verify the projected links, including Admin Exports, without executing commands, mutating records, creating exports, calling providers, billing, notifying, sending SMS or email, exposing secrets, or enabling live features.
 - `/` now projects its local launch dashboard links from the shared local operator surface inventory. Unit coverage verifies full shared-route alignment, `/demo` and `/settings` inclusion, and backing `app/**/page.tsx` files. The check is local filesystem validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `/settings/operations` browser coverage now reads the shared local operator surface inventory and verifies visible link labels and route text in the seeded investor demo path. The check renders the local operations page only and does not execute commands, mutate records, call APIs, create exports, call providers, bill, notify, send SMS or email, expose secrets, or enable live features.
 - The root Playwright smoke test now reads the shared local operator surface inventory for visible launch-link checks instead of duplicating the label list. The browser check renders `/` only and does not execute commands, mutate records, call providers, bill, notify, send SMS or email, expose secrets, or enable live features.

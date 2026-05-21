@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { operatorSurfaceGroups } from "@/lib/operations/operator-surfaces";
+import { getDemoConsoleLinks, operatorSurfaceGroups } from "@/lib/operations/operator-surfaces";
 
 const operationSurfaceLinks = operatorSurfaceGroups.flatMap((group) => group.links);
+const demoConsoleLinks = getDemoConsoleLinks();
 
 test.setTimeout(60_000);
 
@@ -9,6 +10,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await page.goto("/demo");
   await expect(page.getByRole("heading", { name: "SignalStack Demo Console" })).toBeVisible();
   await expect(page.getByText("Live messaging, live billing, and live AI remain blocked.")).toBeVisible();
+  for (const link of demoConsoleLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toBeVisible();
+  }
   await page.getByRole("link", { name: "Demo Operations" }).first().click();
   await expect(page.getByRole("heading", { name: "Demo Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Demo Readiness" })).toBeVisible();

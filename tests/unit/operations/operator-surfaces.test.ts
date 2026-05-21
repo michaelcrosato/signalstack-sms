@@ -2,6 +2,7 @@ import { existsSync, readdirSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  getDemoConsoleLinks,
   getLaunchDashboardLinks,
   getOperatorSurfaceSummary,
   getRunbookAdminLinks,
@@ -126,5 +127,18 @@ describe("operator surface inventory", () => {
     expect(launchRoutes).toContain("/demo");
     expect(launchRoutes).toContain("/settings");
     expect(launchRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+  });
+
+  it("projects demo console links from the shared surface inventory without a self-link", () => {
+    const launchLinks = getLaunchDashboardLinks();
+    const demoLinks = getDemoConsoleLinks();
+    const demoRoutes = demoLinks.map((link) => link.href);
+
+    expect(demoLinks).toEqual(launchLinks.filter((link) => link.href !== "/demo"));
+    expect(demoLinks).toHaveLength(34);
+    expect(demoRoutes).not.toContain("/demo");
+    expect(demoRoutes).toContain("/settings/exports");
+    expect(demoRoutes).toContain("/settings");
+    expect(demoRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
   });
 });

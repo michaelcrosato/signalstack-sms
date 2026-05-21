@@ -88,3 +88,7 @@ export function getSettingsNavigationLinks(groups: OperatorSurfaceGroup[] = oper
 export function getLaunchDashboardLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
   return groups.flatMap((group) => group.links);
 }
+
+export function getDemoConsoleLinks(groups: OperatorSurfaceGroup[] = operatorSurfaceGroups) {
+  return getLaunchDashboardLinks(groups).filter((link) => link.href !== "/demo");
+}
