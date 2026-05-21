@@ -104,6 +104,18 @@ describe("getSecurityOperationsStatus", () => {
     expect(securityOperationSafetyBoundaries.filter((boundary) => boundary.trim().length === 0)).toEqual([]);
   });
 
+  it("keeps security operation static metadata whitespace-clean", () => {
+    const staticCopy = [
+      ...securityOperationControls.flatMap((control) => [control.name, control.status, control.detail]),
+      ...securityOperationValidationReferences.flatMap((reference) => [reference.command, reference.purpose]),
+      ...securityOperationSafetyBoundaries
+    ];
+
+    expect(staticCopy.filter((copy) => copy !== copy.trim())).toEqual([]);
+    expect(staticCopy.filter((copy) => copy.includes("\n") || copy.includes("\r"))).toEqual([]);
+    expect(staticCopy.filter((copy) => copy.includes("  "))).toEqual([]);
+  });
+
   it("keeps security operation values inside documented local-only boundaries", () => {
     expect(securityOperationControls.map((control) => control.status)).toEqual([
       "local metadata only",

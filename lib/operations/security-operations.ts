@@ -69,11 +69,20 @@ function assertNoSecretLikeMetadata(value: string, errorMessage: string) {
   }
 }
 
+function assertCleanSecurityMetadata(value: string, errorMessage: string) {
+  if (value !== value.trim() || value.includes("\n") || value.includes("\r") || value.includes("  ")) {
+    throw new Error(errorMessage);
+  }
+}
+
 function assertSecurityControl(control: SecurityOperationControl) {
   assertExactFields(control, securityOperationControlFields, "Invalid security operation control fields");
   assertNonblankString(control.name, "Invalid security operation control name");
   assertNonblankString(control.status, `Invalid security operation status for ${control.name}`);
   assertNonblankString(control.detail, `Invalid security operation detail for ${control.name}`);
+  assertCleanSecurityMetadata(control.name, `Whitespace-unsafe security operation control name for ${control.name}`);
+  assertCleanSecurityMetadata(control.status, `Whitespace-unsafe security operation status for ${control.name}`);
+  assertCleanSecurityMetadata(control.detail, `Whitespace-unsafe security operation detail for ${control.name}`);
   assertNoSecretLikeMetadata(control.detail, `Secret-like security operation detail for ${control.name}`);
 
   if (!allowedSecurityOperationControlStatuses.includes(control.status as (typeof allowedSecurityOperationControlStatuses)[number])) {
@@ -97,6 +106,8 @@ function assertValidationReference(reference: SecurityOperationValidationReferen
   }
 
   assertNonblankString(reference.purpose, `Invalid security operation validation purpose for ${reference.command}`);
+  assertCleanSecurityMetadata(reference.command, `Whitespace-unsafe security operation validation command ${reference.command}`);
+  assertCleanSecurityMetadata(reference.purpose, `Whitespace-unsafe security operation validation purpose for ${reference.command}`);
   assertNoSecretLikeMetadata(reference.purpose, `Secret-like security operation validation purpose for ${reference.command}`);
 }
 
@@ -144,6 +155,7 @@ function freezeValidationReferences(references: SecurityOperationValidationRefer
 function freezeSafetyBoundaries(boundaries: string[]) {
   for (const boundary of boundaries) {
     assertNonblankString(boundary, "Invalid security operation safety boundary");
+    assertCleanSecurityMetadata(boundary, "Whitespace-unsafe security operation safety boundary");
     assertNoSecretLikeMetadata(boundary, "Secret-like security operation safety boundary");
   }
 
