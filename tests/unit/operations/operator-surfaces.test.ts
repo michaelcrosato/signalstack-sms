@@ -96,6 +96,17 @@ describe("operator surface inventory", () => {
     expect(links.every((link) => link.label.length > 0 && link.note.length > 0)).toBe(true);
   });
 
+  it("keeps inventory group names, labels, and notes unambiguous", () => {
+    const groupNames = operatorSurfaceGroups.map((group) => group.name);
+    const links = operatorSurfaceGroups.flatMap((group) => group.links);
+    const labels = links.map((link) => link.label);
+    const notes = links.map((link) => link.note);
+
+    expect(new Set(groupNames).size).toBe(groupNames.length);
+    expect(new Set(labels).size).toBe(labels.length);
+    expect(new Set(notes).size).toBe(notes.length);
+  });
+
   it("keeps every projected operator navigation set unique and backed by the shared inventory", () => {
     const inventoryLinks = operatorSurfaceGroups.flatMap((group) => group.links);
     const inventoryRoutes = new Set(inventoryLinks.map((link) => link.href));

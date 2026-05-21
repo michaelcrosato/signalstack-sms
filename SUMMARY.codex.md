@@ -1,15 +1,20 @@
 # Codex Summary
 
-Run number: 61
+Run number: 62
 
 ## Completed
+
+- Advanced a post-MVP shared operator inventory copy-integrity checkpoint.
+- Added unit coverage that verifies shared operator surface group names, link labels, and link notes stay unique.
+- Updated testing contract/docs and README to document the unambiguous navigation-copy guard.
+- Protected local gate and targeted operator-surface unit coverage passed.
+
+## Prior Completed
 
 - Advanced a post-MVP shared operator projection integrity checkpoint.
 - Added unit coverage that verifies every shared per-page operator navigation projection has unique route entries, resolves only through the shared local operator surface inventory, and points at implemented `app/**/page.tsx` files.
 - Updated testing contract/docs and README to document the projection uniqueness guard.
 - Protected local gate, local migration check, demo seed, and seeded investor demo E2E passed.
-
-## Prior Completed
 
 - Advanced a post-MVP provider/readiness/runtime shared-inventory hardening checkpoint.
 - Refactored `/settings/provider`, `/settings/numbers`, `/settings/compliance`, `/settings/system`, `/settings/usage`, and `/settings/readiness-audit` header navigation to project from the shared operator surface inventory.

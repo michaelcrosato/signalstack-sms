@@ -379,3 +379,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
+## Run 062  GREEN  inventory-copy-uniqueness  2026-05-20 21:04
+Objective:    Add a shared guard against ambiguous operator inventory names, labels, and notes.
+Changed:
+- Added unit coverage that keeps shared operator surface group names, link labels, and link notes unique.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.

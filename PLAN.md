@@ -169,6 +169,7 @@ Post-MVP:
 - Local data and messaging shared-inventory coverage
 - Local provider, readiness, and runtime shared-inventory coverage
 - Local shared operator projection unique-route coverage
+- Local shared operator inventory unique-copy coverage
 
 ## Next Milestone
 

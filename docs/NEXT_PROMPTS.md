@@ -98,6 +98,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP data/messaging shared-inventory hardening: `/settings/contacts`, `/settings/campaigns`, `/settings/audience`, `/settings/templates`, `/settings/inbox`, and `/settings/data` now project header navigation from the shared operator surface inventory, with unit plus seeded browser coverage for labels, route targets, and backing pages.
 - Post-MVP provider/readiness/runtime shared-inventory hardening: `/settings/provider`, `/settings/numbers`, `/settings/compliance`, `/settings/system`, `/settings/usage`, and `/settings/readiness-audit` now project header navigation from the shared operator surface inventory, with unit plus seeded browser coverage for labels, route targets, and backing pages.
 - Post-MVP shared projection integrity hardening: unit coverage now verifies that every shared per-page operator navigation projection has unique route entries, resolves only through the shared local operator surface inventory, and points at implemented app pages.
+- Post-MVP shared inventory copy integrity hardening: unit coverage now verifies that shared operator surface group names, link labels, and link notes stay unique so projected navigation and browser checks cannot silently collide.
 
 Demo-safe defaults remain mandatory:
 

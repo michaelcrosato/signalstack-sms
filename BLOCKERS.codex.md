@@ -1,11 +1,12 @@
 # Codex Blockers
 
-Run number: 61
+Run number: 62
 
 No active blockers.
 
 ## Notes
 
+- Shared operator surface group names, link labels, and link notes now have unit coverage for uniqueness. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Every shared per-page operator navigation projection now has unit coverage for unique route entries, shared-inventory resolution, and backing `app/**/page.tsx` files. The check is local filesystem validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - `/settings/contacts`, `/settings/campaigns`, `/settings/audience`, `/settings/templates`, `/settings/inbox`, and `/settings/data` now project header navigation from the shared local operator surface inventory. Unit and seeded browser coverage verify labels, route targets, and backing `app/**/page.tsx` files without importing contacts, scheduling campaigns, changing audience labels, editing templates, mutating inbox threads, deleting data, calling providers, billing, notifying, sending SMS or email, exposing secrets, or enabling live features.
 - `/settings/provider`, `/settings/numbers`, `/settings/compliance`, `/settings/system`, `/settings/usage`, and `/settings/readiness-audit` now project header navigation from the shared local operator surface inventory. Unit and seeded browser coverage verify labels, route targets, and backing `app/**/page.tsx` files without calling providers, provisioning numbers, mutating compliance or audit records, billing, notifying, sending SMS or email, exposing secrets, or enabling live features.
