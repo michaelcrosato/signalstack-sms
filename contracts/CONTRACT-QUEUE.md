@@ -20,7 +20,7 @@ Milestone 4 does not call live providers.
 
 ## Post-MVP Local Worker Foundation
 
-`npm run worker` processes due `SCHEDULED_CAMPAIGN` jobs only when `MESSAGING_PROVIDER=dummy` and `LIVE_MESSAGING_ENABLED` is not `true`.
+`npm run worker` processes due `SCHEDULED_CAMPAIGN` jobs only in local/demo runtimes when `MESSAGING_PROVIDER=dummy`, `LIVE_MESSAGING_ENABLED` is not `true`, and no production-like runtime marker is present.
 
 - The worker uses validated version-1 scheduled campaign payloads.
 - Invalid payloads or missing scheduled campaigns are marked `FAILED`.
@@ -39,6 +39,7 @@ Continuous execution is opt-in and remains local/demo-safe:
 - `WORKER_MAX_ITERATIONS` may cap local/test loops.
 - `WORKER_MAX_JOBS_PER_POLL` caps due jobs processed per poll and is clamped between 1 and 100.
 - Every poll reuses the same dummy-only/live-disabled gate; blocked workers do not process or call providers.
+- Production-like runtime markers (`NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, or `APP_ENV` set to `production` or `prod`) block worker processing even when demo-safe provider defaults are set. Production worker execution requires a future explicit worker policy, not the general production external-impact override.
 
 ## Post-MVP BullMQ/Redis Enqueue Foundation
 
@@ -58,7 +59,7 @@ BullMQ workers may consume scheduled-campaign queue events only by referencing d
 - BullMQ worker payloads must include `queueJobId` plus the version-1 scheduled-campaign payload.
 - The BullMQ worker must reload and process the matching `QueueJob` row from the database.
 - Cancelled, completed, missing, invalid, or early jobs must be skipped or failed locally without provider calls.
-- Worker startup is blocked unless `QUEUE_BACKEND=bullmq`, `REDIS_URL` is configured, `MESSAGING_PROVIDER=dummy`, and `LIVE_MESSAGING_ENABLED` is not `true`.
+- Worker startup is blocked unless `QUEUE_BACKEND=bullmq`, `REDIS_URL` is configured, `MESSAGING_PROVIDER=dummy`, `LIVE_MESSAGING_ENABLED` is not `true`, and no production-like runtime marker is present.
 - The BullMQ worker must use the same dummy-only send path and idempotent `Message` rows as the database polling worker.
 
 ## Post-MVP BullMQ/Redis Smoke

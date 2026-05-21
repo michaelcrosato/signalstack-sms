@@ -3,6 +3,7 @@ import { ConsentStatus } from "@prisma/client";
 import {
   campaignMessageValues,
   localWorkerProviderIsAllowed,
+  localWorkerReadiness,
   parseWorkerRuntimeOptions,
   scheduledCampaignSendIsAllowed
 } from "@/lib/queue/worker";
@@ -12,6 +13,30 @@ describe("local queue worker", () => {
     expect(localWorkerProviderIsAllowed({ liveMessagingEnabled: "false", messagingProvider: "dummy" })).toBe(true);
     expect(localWorkerProviderIsAllowed({ liveMessagingEnabled: "true", messagingProvider: "dummy" })).toBe(false);
     expect(localWorkerProviderIsAllowed({ liveMessagingEnabled: "false", messagingProvider: "twilio" })).toBe(false);
+  });
+
+  it("blocks worker processing in production-like runtimes even with demo-safe provider defaults", () => {
+    expect(
+      localWorkerReadiness({
+        nodeEnv: "production",
+        liveMessagingEnabled: "false",
+        messagingProvider: "dummy"
+      })
+    ).toEqual({ allowed: false, reason: "production-worker-blocked" });
+    expect(
+      localWorkerReadiness({
+        appEnv: "prod",
+        liveMessagingEnabled: "false",
+        messagingProvider: "dummy"
+      })
+    ).toEqual({ allowed: false, reason: "production-worker-blocked" });
+    expect(
+      localWorkerReadiness({
+        nodeEnv: "development",
+        liveMessagingEnabled: "false",
+        messagingProvider: "dummy"
+      })
+    ).toEqual({ allowed: true });
   });
 
   it("builds campaign template values without leaking nulls", () => {

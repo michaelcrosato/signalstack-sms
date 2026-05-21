@@ -9,7 +9,11 @@ applyDemoSafeRuntimeDefaults();
 
 function logResult(result: Awaited<ReturnType<typeof processDueScheduledCampaignJobs>>, prefix = "SignalStack SMS worker") {
   if (result.blocked) {
-    console.log(`${prefix} blocked: only dummy provider with live messaging disabled is supported.`);
+    console.log(
+      result.reason === "production-worker-blocked"
+        ? `${prefix} blocked: worker execution is local/demo-only and disabled in production-like runtimes.`
+        : `${prefix} blocked: only dummy provider with live messaging disabled is supported.`
+    );
   } else {
     console.log(`${prefix} processed ${result.processed} scheduled campaign job(s), skipped ${result.skipped}.`);
   }

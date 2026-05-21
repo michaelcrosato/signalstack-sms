@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 211  GREEN  production-worker-runtime-block  2026-05-21 15:18
+Objective:    Block scheduled campaign workers in production-like runtimes before broader live-send work.
+Changed:
+- Added production-like runtime marker checks to database and BullMQ scheduled campaign worker readiness.
+- Added queue unit coverage proving production-like worker blocking still applies with dummy provider and live messaging disabled.
+- Updated queue contract, testing docs, roadmap, state matrix, README, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Run the protected local gate, then continue only with product lifecycle work or future live-provider design behind separate policy.
+
 ## Run 204  GREEN  product-contacts-list-import  2026-05-21 14:53
 Objective:    Build the first deeper product contacts workflow on existing local APIs.
 Changed:

@@ -2,13 +2,13 @@ import { Worker } from "bullmq";
 import { scheduledCampaignBullMqQueueName } from "@/lib/queue/bullmq";
 import { scheduledCampaignBullMqJobDataSchema } from "@/lib/queue/jobs";
 import { getRedisQueueConfig, redisConnectionFromUrl } from "@/lib/queue/redis";
-import { localWorkerProviderIsAllowed, processScheduledCampaignQueueJobById } from "@/lib/queue/worker";
+import { localWorkerReadiness, processScheduledCampaignQueueJobById } from "@/lib/queue/worker";
 
 export type BullMqWorkerStartResult =
   | { started: true; worker: Worker }
   | {
       started: false;
-      reason: "backend-disabled" | "missing-redis-url" | "provider-blocked";
+      reason: "backend-disabled" | "missing-redis-url" | "provider-blocked" | "production-worker-blocked";
     };
 
 export function bullMqWorkerCanStart(env: Record<string, string | undefined> = process.env) {
@@ -18,13 +18,16 @@ export function bullMqWorkerCanStart(env: Record<string, string | undefined> = p
   if (!env.REDIS_URL) {
     return { allowed: false, reason: "missing-redis-url" } as const;
   }
-  if (
-    !localWorkerProviderIsAllowed({
-      liveMessagingEnabled: env.LIVE_MESSAGING_ENABLED,
-      messagingProvider: env.MESSAGING_PROVIDER
-    })
-  ) {
-    return { allowed: false, reason: "provider-blocked" } as const;
+  const readiness = localWorkerReadiness({
+    liveMessagingEnabled: env.LIVE_MESSAGING_ENABLED,
+    messagingProvider: env.MESSAGING_PROVIDER,
+    nodeEnv: env.NODE_ENV,
+    vercelEnv: env.VERCEL_ENV,
+    deploymentEnv: env.DEPLOYMENT_ENV,
+    appEnv: env.APP_ENV
+  });
+  if (!readiness.allowed) {
+    return { allowed: false, reason: readiness.reason } as const;
   }
 
   return { allowed: true } as const;

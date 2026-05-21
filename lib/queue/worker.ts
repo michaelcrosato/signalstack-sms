@@ -1,6 +1,7 @@
 import { setTimeout as sleep } from "node:timers/promises";
 import { CampaignStatus, QueueJobStatus, QueueJobType, type Contact, type QueueJob } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
+import { environmentIsProductionLike } from "@/lib/deployment/production-gate";
 import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
 import { renderTemplate } from "@/lib/messaging/render-template";
 import { preflightCampaignRecipients } from "@/lib/messaging/send-preflight";
@@ -9,6 +10,10 @@ import { scheduledCampaignJobSchema } from "@/lib/queue/jobs";
 export type WorkerSafetyInput = {
   liveMessagingEnabled?: string;
   messagingProvider?: string;
+  nodeEnv?: string;
+  vercelEnv?: string;
+  deploymentEnv?: string;
+  appEnv?: string;
 };
 
 export type WorkerMode = "once" | "continuous";
@@ -28,12 +33,20 @@ export type SingleQueueJobProcessResult = {
   blocked: boolean;
   reason?:
     | "provider-blocked"
+    | "production-worker-blocked"
     | "missing-job"
     | "not-due"
     | "invalid-payload"
     | "invalid-campaign"
     | "send-preflight-failed";
 };
+
+export type WorkerReadinessResult =
+  | { allowed: true }
+  | {
+      allowed: false;
+      reason: "provider-blocked" | "production-worker-blocked";
+    };
 
 export type ContinuousWorkerInput = {
   pollIntervalMs: number;
@@ -51,6 +64,36 @@ const MAX_WORKER_MAX_JOBS_PER_POLL = 100;
 
 export function localWorkerProviderIsAllowed(input: WorkerSafetyInput) {
   return input.liveMessagingEnabled !== "true" && (input.messagingProvider ?? "dummy") === "dummy";
+}
+
+export function localWorkerReadiness(input: WorkerSafetyInput): WorkerReadinessResult {
+  if (
+    environmentIsProductionLike({
+      NODE_ENV: input.nodeEnv,
+      VERCEL_ENV: input.vercelEnv,
+      DEPLOYMENT_ENV: input.deploymentEnv,
+      APP_ENV: input.appEnv
+    })
+  ) {
+    return { allowed: false, reason: "production-worker-blocked" };
+  }
+
+  if (!localWorkerProviderIsAllowed(input)) {
+    return { allowed: false, reason: "provider-blocked" };
+  }
+
+  return { allowed: true };
+}
+
+function currentWorkerReadiness() {
+  return localWorkerReadiness({
+    liveMessagingEnabled: process.env.LIVE_MESSAGING_ENABLED,
+    messagingProvider: process.env.MESSAGING_PROVIDER,
+    nodeEnv: process.env.NODE_ENV,
+    vercelEnv: process.env.VERCEL_ENV,
+    deploymentEnv: process.env.DEPLOYMENT_ENV,
+    appEnv: process.env.APP_ENV
+  });
 }
 
 function parsePositiveInteger(value: string | undefined) {
@@ -115,16 +158,13 @@ export async function processDueScheduledCampaignJobs(
   now = new Date(),
   options: { maxJobsPerPoll?: number } = {}
 ) {
-  if (
-    !localWorkerProviderIsAllowed({
-      liveMessagingEnabled: process.env.LIVE_MESSAGING_ENABLED,
-      messagingProvider: process.env.MESSAGING_PROVIDER
-    })
-  ) {
+  const readiness = currentWorkerReadiness();
+  if (!readiness.allowed) {
     return {
       processed: 0,
       skipped: 0,
-      blocked: true
+      blocked: true,
+      reason: readiness.reason
     };
   }
 
@@ -179,13 +219,9 @@ async function processScheduledCampaignQueueJob(
   job: QueueJob,
   now = new Date()
 ): Promise<SingleQueueJobProcessResult> {
-  if (
-    !localWorkerProviderIsAllowed({
-      liveMessagingEnabled: process.env.LIVE_MESSAGING_ENABLED,
-      messagingProvider: process.env.MESSAGING_PROVIDER
-    })
-  ) {
-    return { processed: 0, skipped: 0, blocked: true, reason: "provider-blocked" };
+  const readiness = currentWorkerReadiness();
+  if (!readiness.allowed) {
+    return { processed: 0, skipped: 0, blocked: true, reason: readiness.reason };
   }
 
   if (job.runAt.getTime() > now.getTime()) {

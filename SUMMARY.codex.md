@@ -1,5 +1,14 @@
 # Codex Summary
 
+- Hardened production worker policy for scheduled campaign workers.
+- Database and BullMQ workers now block production-like runtime markers even when dummy provider mode and live messaging disabled are set.
+- Added queue unit coverage for production-like worker blocking and updated queue contract, testing docs, roadmap, state matrix, README, and handoff docs.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, worker execution, Redis calls, hard deletion, or protected gate-script edits were used.
+
+Run number: 211
+
+## Previous Run
+
 - Advanced Phase 1 product UI by adding a local duplicate-contact merge workflow to `/dashboard/contacts/:contactId`.
 - Added `POST /api/contacts/:contactId/merge`, which keeps the target contact, unions local labels, fills blank target profile fields from the source, moves safe local message/conversation links, and soft-archives the source contact.
 - Updated API contracts/map, operations inventory, product contact projections, unit coverage, seeded product-demo coverage, and roadmap handoff docs.

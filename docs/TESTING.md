@@ -15,8 +15,8 @@ Additional deterministic checks:
 
 - `npm run test:e2e:demo` runs the investor demo path after the local database has been migrated and seeded.
 - `npm run test:e2e:product-demo` runs the seeded product dashboard, contacts, campaign, inbox, template, analytics, and compliance paths for `/dashboard`, `/dashboard/contacts`, `/dashboard/campaigns`, `/dashboard/inbox`, `/dashboard/templates`, `/dashboard/analytics`, and `/dashboard/compliance` after the local database has been migrated and seeded. The contacts path imports a local CSV row through `POST /api/contacts/imports`; the campaign path creates, preflights, and schedules a local campaign; the inbox path creates a local inbound reply, adds a note, and resolves/reopens a local thread; the template path creates reusable local copy; the analytics path reads existing local overview totals without SMS, provider calls, billing, live AI, report execution, exports, mutations, or live messaging enablement.
-- `npm run worker` processes local due scheduled campaign jobs through the dummy provider only.
-- `npm run worker:watch` runs the same worker in continuous polling mode for local demos. It is still blocked unless `MESSAGING_PROVIDER=dummy` and live messaging is disabled.
+- `npm run worker` processes local due scheduled campaign jobs through the dummy provider only and is blocked in production-like runtimes.
+- `npm run worker:watch` runs the same worker in continuous polling mode for local demos. It is still blocked unless `MESSAGING_PROVIDER=dummy`, live messaging is disabled, and no production-like runtime marker is present.
 - `WORKER_MAX_JOBS_PER_POLL` caps local worker throughput per poll and is clamped to a bounded range for demos/tests.
 - BullMQ enqueue and worker helpers are unit-tested without requiring Redis. Local validation must remain green with `QUEUE_BACKEND` unset or set to `database`.
 - Production deployment gate tests verify that production-like environments cannot enable external-impact settings without an explicit future override.

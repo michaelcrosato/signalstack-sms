@@ -46,7 +46,7 @@ Goal: make the repo understandable in minutes and remove known correctness risks
 - Keep mutating-route RBAC enforcement covered while production auth is still pending.
 - Keep contact consent rechecks at send time in worker/send paths.
 - Keep idempotency keys tenant-scoped where cross-tenant key reuse is legitimate.
-- Keep live SMS, billing, AI, secrets, destructive DB operations, and production side effects hard-gated.
+- Keep live SMS, billing, AI, secrets, destructive DB operations, production worker execution, and production side effects hard-gated.
 - Keep `npm run validate` and the local gate green.
 
 ### Phase 1: Product UI Investor Demo
@@ -84,6 +84,6 @@ Goal: turn the demo-safe product into a paid production SaaS.
 ## Next Concrete Work
 
 1. Keep `docs/CURRENT_STATE_MATRIX.md` current.
-2. Harden production worker policy before broader live sending.
-3. Add campaign detail/edit/cancel flow only if the product demo review needs deeper lifecycle control.
-4. Add separate template detail/edit only if needed after product demo review.
+2. Add campaign detail/edit/cancel flow only if the product demo review needs deeper lifecycle control.
+3. Add separate template detail/edit only if needed after product demo review.
+4. Start live-provider design only after a separate production worker policy is specified.

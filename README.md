@@ -52,6 +52,8 @@ npm run test:e2e:product-demo
 
 All flows remain local/demo-only unless future hard gates explicitly enable live providers.
 
+Scheduled campaign workers are also local/demo-only. The database worker and optional BullMQ worker require dummy provider mode, live messaging disabled, and no production-like runtime marker.
+
 Production-like demo deployment is documented in `docs/PRODUCTION_GO_LIVE.md`. The current gate permits demo-safe production deployments only and keeps live SMS, billing, provider calls, and live AI blocked by default.
 
 Deployment platform notes are documented in `docs/DEPLOYMENT_PLATFORM_NOTES.md`; `npm run platform:check` verifies that demo-safe hosting boundaries remain documented and is included in `npm run validate`.
