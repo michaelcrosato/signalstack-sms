@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  allowedNotificationOperationChannelNames,
   allowedNotificationOperationChannelStatuses,
   getNotificationOperationsStatus,
   notificationOperationChannels,
@@ -116,6 +117,11 @@ describe("getNotificationOperationsStatus", () => {
   it("keeps notification operation statuses inside the supported local vocabulary", () => {
     expect(allowedNotificationOperationChannelStatuses).toEqual(["blocked", "not implemented", "inbound only"]);
     expect(notificationOperationChannels.map((channel) => channel.status).filter((status) => !allowedNotificationOperationChannelStatuses.includes(status))).toEqual([]);
+  });
+
+  it("keeps notification operation channel names inside the exported supported vocabulary", () => {
+    expect(allowedNotificationOperationChannelNames).toEqual(["Email", "In-app", "SMS alerts", "Webhooks"]);
+    expect(notificationOperationChannels.map((channel) => channel.name)).toEqual([...allowedNotificationOperationChannelNames]);
   });
 
   it("keeps notification operation channel boundaries aligned with their no-send surfaces", () => {

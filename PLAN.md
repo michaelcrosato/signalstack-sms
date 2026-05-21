@@ -145,6 +145,7 @@ Post-MVP:
 - Local notification operations whitespace-clean metadata hardening
 - Local notification operations command-literal metadata hardening
 - Local notification operations channel-vocabulary metadata hardening
+- Local notification operations exported channel-vocabulary hardening
 - Local notification operations status-vocabulary metadata hardening
 - Local notification operations channel-boundary term hardening
 - Read-only local readiness audit operations view
@@ -248,6 +249,7 @@ Post-MVP:
 - Local security operations secret-literal coverage
 - Local notification operations whitespace-clean coverage
 - Local notification operations command-literal coverage
+- Local notification operations exported channel-vocabulary coverage
 - Local notification operations status-vocabulary coverage
 - Local notification operations channel-boundary term coverage
 

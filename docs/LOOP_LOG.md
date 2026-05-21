@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 143  GREEN  notification-operations-exported-channel-vocabulary  2026-05-21 02:57
+Objective:    Keep notification operation channel metadata typed from the exported supported vocabulary.
+Changed:
+- Exported the supported notification channel-name vocabulary from `lib/operations/notification-operations.ts`.
+- Typed notification channel metadata from that vocabulary.
+- Added unit coverage proving the exported channel vocabulary stays aligned with the static notification channel inventory.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP notification operations hardening or safe read-only operator surface refinements.
+
 ## Run 142  GREEN  notification-operations-channel-boundaries  2026-05-21 02:54
 Objective:    Keep `/settings/notifications` channel boundary copy aligned with each no-send surface.
 Changed:
