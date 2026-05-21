@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 158  GREEN  api-operations-method-vocabulary  2026-05-21 04:04
+Objective:    Keep API operations route methods aligned with an exported frozen vocabulary.
+Changed:
+- Exported a runtime-frozen supported API method vocabulary from `lib/operations/api-operations.ts`.
+- Updated API route validation and unit coverage so `/settings/api` static route methods stay aligned to that vocabulary and caller mutation is rejected.
+- Updated README, PLAN, testing contract docs, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP API operations hardening or safe read-only operator surface refinements.
+
 ## Run 157  GREEN  security-operations-exported-vocabulary-mutation  2026-05-21 04:00
 Objective:    Keep exported `/settings/security` supported vocabularies frozen against caller mutation.
 Changed:

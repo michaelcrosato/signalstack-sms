@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { describe, expect, it } from "vitest";
-import { apiOperationRoutes, getApiOperationsStatus } from "@/lib/operations/api-operations";
+import { allowedApiOperationMethods, apiOperationRoutes, getApiOperationsStatus } from "@/lib/operations/api-operations";
 
 const publicApiOperationRouteFields = ["method", "path", "area", "mutates", "externalImpact", "safety"];
 const publicApiOperationsStatusFields = [
@@ -91,10 +91,9 @@ describe("getApiOperationsStatus", () => {
   });
 
   it("keeps API inventory values in a canonical local route shape", () => {
-    const supportedMethods = new Set(["GET", "POST", "PATCH", "DELETE"]);
     const routeKeys = apiOperationRoutes.map((route) => `${route.method} ${route.path}`);
 
-    expect(apiOperationRoutes.every((route) => supportedMethods.has(route.method))).toBe(true);
+    expect(apiOperationRoutes.every((route) => allowedApiOperationMethods.includes(route.method))).toBe(true);
     expect(apiOperationRoutes.map((route) => route.path).filter((path) => !path.startsWith("/api/"))).toEqual([]);
     expect(apiOperationRoutes.map((route) => route.path).filter((path) => path.endsWith("/"))).toEqual([]);
     expect(apiOperationRoutes.map((route) => route.path).filter((path) => path.includes("?") || path.includes("#"))).toEqual([]);
@@ -208,6 +207,15 @@ describe("getApiOperationsStatus", () => {
       })
     ).toThrow(TypeError);
     expect(() => ((firstRoute as { path: string }).path = "/api/unsafe")).toThrow(TypeError);
+  });
+
+  it("exports a frozen supported API method vocabulary aligned with the route inventory", () => {
+    const routeMethods = Array.from(new Set(apiOperationRoutes.map((route) => route.method))).sort();
+
+    expect(Object.isFrozen(allowedApiOperationMethods)).toBe(true);
+    expect([...allowedApiOperationMethods].sort()).toEqual(["DELETE", "GET", "PATCH", "POST"]);
+    expect(routeMethods).toEqual([...allowedApiOperationMethods].sort());
+    expect(() => (allowedApiOperationMethods as unknown as string[]).push("PUT")).toThrow(TypeError);
   });
 
   it("exposes only public API inventory route fields", () => {

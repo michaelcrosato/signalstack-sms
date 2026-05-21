@@ -1,5 +1,16 @@
 # Codex Summary
 
+- Advanced a post-MVP API operations method-vocabulary checkpoint.
+- Exported a runtime-frozen supported API method vocabulary and aligned API route validation to it.
+- Added unit coverage proving the method vocabulary is frozen, rejects caller mutation, and matches the static `/settings/api` route inventory before local API metadata renders.
+- Updated README, PLAN, testing contract docs, next-prompt handoff docs, blockers, and loop logs.
+- Focused API operations unit coverage and typecheck passed; protected local gate passed.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 158
+
+## Previous Run
+
 - Advanced a post-MVP security operations exported vocabulary mutation checkpoint.
 - Added unit coverage proving every exported `/settings/security` supported vocabulary is runtime-frozen and rejects caller mutation before local security metadata renders.
 - Updated README, PLAN, testing contract docs, next-prompt handoff docs, blockers, and loop logs.

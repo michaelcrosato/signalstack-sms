@@ -1,6 +1,8 @@
 import { getApiRateLimitPolicy } from "@/lib/rate-limit/api-rate-limit";
 
-export type ApiOperationMethod = "GET" | "POST" | "PATCH" | "DELETE";
+export const allowedApiOperationMethods = Object.freeze(["GET", "POST", "PATCH", "DELETE"] as const);
+
+export type ApiOperationMethod = (typeof allowedApiOperationMethods)[number];
 
 export type ApiOperationRoute = {
   method: ApiOperationMethod;
@@ -23,7 +25,6 @@ export type ApiOperationsStatus = {
   routes: readonly ApiOperationRoute[];
 };
 
-const apiOperationMethods = new Set<ApiOperationMethod>(["GET", "POST", "PATCH", "DELETE"]);
 const apiOperationRouteFields = ["method", "path", "area", "mutates", "externalImpact", "safety"] as const;
 const forbiddenApiOperationCommandPatterns = [
   /\bnpm\s+run\b/i,
@@ -54,7 +55,7 @@ function assertExactApiOperationRouteFields(route: ApiOperationRoute) {
 function assertApiOperationRoute(route: ApiOperationRoute) {
   assertExactApiOperationRouteFields(route);
 
-  if (!apiOperationMethods.has(route.method)) {
+  if (!allowedApiOperationMethods.includes(route.method)) {
     throw new Error(`Invalid API operation method ${String(route.method)}`);
   }
 
