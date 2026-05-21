@@ -528,6 +528,52 @@ describe("operator surface inventory", () => {
     );
   });
 
+  it("rejects supplied operator inventories with extra fields before projection", () => {
+    const symbolKey = Symbol("unsafe");
+    const groupWithExtraStringField = {
+      ...operatorSurfaceGroups[1],
+      internalOwner: "unsafe-owner"
+    } as unknown as OperatorSurfaceGroup;
+    const groupWithExtraSymbolField = {
+      ...operatorSurfaceGroups[1],
+      [symbolKey]: "unsafe-symbol"
+    } as unknown as OperatorSurfaceGroup;
+    const groupsWithExtraStringField = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) =>
+      groupIndex === 1 ? groupWithExtraStringField : group
+    );
+    const groupsWithExtraSymbolField = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) =>
+      groupIndex === 1 ? groupWithExtraSymbolField : group
+    );
+
+    const linkWithExtraStringField = {
+      ...operatorSurfaceGroups[1].links[0],
+      secretToken: "unsafe-token"
+    } as unknown as OperatorSurfaceLink;
+    const linkWithExtraSymbolField = {
+      ...operatorSurfaceGroups[1].links[0],
+      [symbolKey]: "unsafe-symbol"
+    } as unknown as OperatorSurfaceLink;
+    const groupsWithExtraStringLinkField = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [linkWithExtraStringField, ...group.links.slice(1)]
+          : group.links
+    }));
+    const groupsWithExtraSymbolLinkField = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [linkWithExtraSymbolField, ...group.links.slice(1)]
+          : group.links
+    }));
+
+    expect(() => getOperatorSurfaceSummary(groupsWithExtraStringField)).toThrow("Invalid operator surface group fields");
+    expect(() => getLaunchDashboardLinks(groupsWithExtraSymbolField)).toThrow("Invalid operator surface group fields");
+    expect(() => getSettingsNavigationLinks(groupsWithExtraStringLinkField)).toThrow("Invalid operator surface link fields");
+    expect(() => getDemoOperationsLinks(groupsWithExtraSymbolLinkField)).toThrow("Invalid operator surface link fields");
+  });
+
   it("rejects supplied operator inventories with sparse link entries before projection", () => {
     const sparseLinks = [...operatorSurfaceGroups[1].links];
     delete sparseLinks[0];
@@ -1167,13 +1213,7 @@ describe("operator surface inventory", () => {
   });
 
   it("keeps projected operator links limited to public navigation fields", () => {
-    const groups = cloneSurfaceGroups(operatorSurfaceGroups).map((group) => ({
-      ...group,
-      links: group.links.map((link) => ({
-        ...link,
-        secretToken: `unsafe-${link.href}`
-      }))
-    })) as OperatorSurfaceGroup[];
+    const groups = cloneSurfaceGroups(operatorSurfaceGroups);
     const projectedLinks = [
       ...getRunbookAdminLinks(groups),
       ...getSettingsNavigationLinks(groups),
@@ -1214,39 +1254,26 @@ describe("operator surface inventory", () => {
 
     for (const projectedLink of projectedLinks) {
       expect(Object.keys(projectedLink).sort(), projectedLink.href).toEqual(["href", "label", "note"].sort());
-      expect(projectedLink, projectedLink.href).not.toHaveProperty("secretToken");
     }
 
     for (const checkpoint of demoCheckpoints) {
       expect(Object.keys(checkpoint).sort(), checkpoint.href).toEqual(["boundary", "href", "name", "signal"].sort());
-      expect(checkpoint, checkpoint.href).not.toHaveProperty("secretToken");
     }
 
     for (const step of workflowSteps) {
       expect(Object.keys(step).sort(), step.href).toEqual(["boundary", "href", "name", "owner"].sort());
-      expect(step, step.href).not.toHaveProperty("secretToken");
     }
 
     for (const area of integrationAreas) {
       expect(Object.keys(area).sort(), area.href).toEqual(["boundary", "href", "label", "note", "state"].sort());
-      expect(area, area.href).not.toHaveProperty("secretToken");
     }
   });
 
   it("keeps the operator surface summary limited to public aggregate fields", () => {
-    const groups = cloneSurfaceGroups(operatorSurfaceGroups).map((group) => ({
-      ...group,
-      internalOwner: `unsafe-${group.name}`,
-      links: group.links.map((link) => ({
-        ...link,
-        secretToken: `unsafe-${link.href}`
-      }))
-    })) as OperatorSurfaceGroup[];
+    const groups = cloneSurfaceGroups(operatorSurfaceGroups);
     const summary = getOperatorSurfaceSummary(groups);
 
     expect(Object.keys(summary).sort()).toEqual(["groupCount", "routes", "surfaceCount"].sort());
-    expect(summary).not.toHaveProperty("internalOwner");
-    expect(summary).not.toHaveProperty("secretToken");
     expect(summary.groupCount).toBe(groups.length);
     expect(summary.surfaceCount).toBe(groups.flatMap((group) => group.links).length);
     expect(summary.routes).toEqual(groups.flatMap((group) => group.links.map((link) => link.href)));

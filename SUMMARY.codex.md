@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP shared operator supplied-inventory exact-field checkpoint.
+- Tightened the shared operator surface validator so supplied groups and links must expose only exact public fields, rejecting extra string or symbol fields before summaries or projections derive local navigation.
+- Added unit coverage proving extra supplied group/link fields fail before projection.
+- Updated testing contract/docs, README, PLAN, blockers, next-prompt handoff docs, and loop logs.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 111
+
+## Previous Run
+
 - Advanced a post-MVP shared operator canonical pre-export validation checkpoint.
 - Reused the shared operator surface validator before freezing the canonical inventory, so malformed built-in groups or links fail during module initialization before projections can render.
 - Added unit coverage aligning the exported canonical routes with the summary routes.

@@ -81,6 +81,17 @@ function assertOperatorSurfaceRouteShape(href: string) {
   }
 }
 
+function assertExactOperatorSurfaceFields(record: object, expectedKeys: readonly PropertyKey[], subject: string) {
+  const actualKeys = Reflect.ownKeys(record);
+
+  if (
+    actualKeys.length !== expectedKeys.length ||
+    actualKeys.some((key) => !expectedKeys.includes(key))
+  ) {
+    throw new Error(`Invalid operator surface ${subject} fields`);
+  }
+}
+
 function assertOperatorSurfaceGroup(group: OperatorSurfaceGroup) {
   if (!group || typeof group !== "object" || Array.isArray(group)) {
     throw new Error("Invalid operator surface group");
@@ -93,6 +104,8 @@ function assertOperatorSurfaceGroup(group: OperatorSurfaceGroup) {
   if (!Object.hasOwn(group, "name") || !Object.hasOwn(group, "links")) {
     throw new Error("Invalid operator surface group fields");
   }
+
+  assertExactOperatorSurfaceFields(group, ["name", "links"], "group");
 
   const nameDescriptor = Object.getOwnPropertyDescriptor(group, "name");
   const linksDescriptor = Object.getOwnPropertyDescriptor(group, "links");
@@ -121,6 +134,8 @@ function assertOperatorSurfaceLink(link: OperatorSurfaceLink) {
   if (!Object.hasOwn(link, "href") || !Object.hasOwn(link, "label") || !Object.hasOwn(link, "note")) {
     throw new Error("Invalid operator surface link fields");
   }
+
+  assertExactOperatorSurfaceFields(link, ["href", "label", "note"], "link");
 
   const hrefDescriptor = Object.getOwnPropertyDescriptor(link, "href");
   const labelDescriptor = Object.getOwnPropertyDescriptor(link, "label");

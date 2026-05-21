@@ -143,6 +143,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP shared supplied-inventory data-field hardening: summaries and projections now fail before deriving local navigation from accessor-backed supplied operator groups or links, requiring required navigation fields to be plain data properties.
 - Post-MVP shared supplied-inventory enumerable-field hardening: summaries and projections now fail before deriving local navigation from supplied operator groups or links with non-enumerable required fields, requiring required navigation fields to be normal enumerable data properties.
 - Post-MVP shared supplied-inventory plain-record hardening: summaries and projections now fail before deriving local navigation from supplied operator groups or links with custom prototypes, requiring ordinary object records.
+- Post-MVP shared supplied-inventory exact-field hardening: summaries and projections now fail before deriving local navigation from supplied operator groups or links with extra string or symbol fields, requiring exact public record shapes.
 - Post-MVP shared canonical pre-export validation hardening: the built-in shared operator surface inventory now runs through the same validator before it is frozen and exported, with unit coverage aligning exported canonical routes with summary routes.
 
 Demo-safe defaults remain mandatory:

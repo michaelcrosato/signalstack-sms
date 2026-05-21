@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 111  GREEN  supplied-inventory-exact-field-guard  2026-05-21 00:32
+Objective:    Fail supplied shared operator inventory records with extra fields before projection.
+Changed:
+- Tightened shared operator surface validation so supplied groups and links must expose only exact public fields.
+- Added unit coverage proving extra string and symbol fields on supplied group/link records fail before summaries or projections derive local navigation.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 110  GREEN  canonical-operator-inventory-preexport-validation  2026-05-21 00:28
 Objective:    Validate the canonical shared operator inventory before export and freeze.
 Changed:
