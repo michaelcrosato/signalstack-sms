@@ -1,66 +1,10 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { getOperatorSurfaceSummary, operatorSurfaceGroups } from "@/lib/operations/operator-surfaces";
 
 export const dynamic = "force-static";
 
-const operationGroups = [
-  {
-    name: "Demo And Workflow",
-    links: [
-      { href: "/demo", label: "Demo Console", note: "seeded investor path" },
-      { href: "/settings/demo", label: "Demo Operations", note: "seed readiness and runtime gates" },
-      { href: "/settings/workflows", label: "Workflow Operations", note: "local workflow checkpoints" },
-      { href: "/settings/releases", label: "Release Operations", note: "release gate references" }
-    ]
-  },
-  {
-    name: "Data And Messaging",
-    links: [
-      { href: "/settings/contacts", label: "Contact Operations", note: "consent and import metadata" },
-      { href: "/settings/audience", label: "Audience Operations", note: "tags, lists, and segments" },
-      { href: "/settings/templates", label: "Template Operations", note: "template variables and usage" },
-      { href: "/settings/campaigns", label: "Campaign Operations", note: "campaign and queue state" },
-      { href: "/settings/queue", label: "Queue Operations", note: "scheduled job metadata" },
-      { href: "/settings/inbox", label: "Inbox Operations", note: "conversation status and notes" },
-      { href: "/settings/webhooks", label: "Webhook Operations", note: "stored webhook metadata" },
-      { href: "/settings/delivery", label: "Delivery Operations", note: "message delivery state" }
-    ]
-  },
-  {
-    name: "Safety And Runtime",
-    links: [
-      { href: "/settings", label: "Go-Live Readiness", note: "provider and compliance blockers" },
-      { href: "/settings/system", label: "System Status", note: "runtime flags and queue backend" },
-      { href: "/settings/environment", label: "Environment Operations", note: "safe config categories" },
-      { href: "/settings/health", label: "Health Operations", note: "health contract and blockers" },
-      { href: "/settings/security", label: "Security Operations", note: "safety gates and secret boundaries" },
-      { href: "/settings/validation", label: "Validation Operations", note: "local gate and repair signals" },
-      { href: "/settings/contracts", label: "Contract Operations", note: "contract drift controls" },
-      { href: "/settings/api", label: "API Operations", note: "route inventory and rate limits" }
-    ]
-  },
-  {
-    name: "Provider And Reporting",
-    links: [
-      { href: "/settings/provider", label: "Provider Details", note: "redacted local credential metadata" },
-      { href: "/settings/numbers", label: "Provider Numbers", note: "local number metadata" },
-      { href: "/settings/compliance", label: "Compliance Detail", note: "profile and hard-gate blockers" },
-      { href: "/settings/readiness-audit", label: "Readiness Audit", note: "local readiness history" },
-      { href: "/settings/exports", label: "Admin Exports", note: "bounded local CSV links" },
-      { href: "/settings/reports", label: "Reporting Index", note: "reporting surface map" },
-      { href: "/settings/usage", label: "Usage & Analytics", note: "tenant metrics and local usage" },
-      { href: "/settings/billing", label: "Billing Operations", note: "local billing boundary" },
-      { href: "/settings/ai", label: "AI Operations", note: "fake AI boundary and usage" },
-      { href: "/settings/notifications", label: "Notification Operations", note: "no-send notification boundary" },
-      { href: "/settings/integrations", label: "Integration Operations", note: "external-impact integrations" },
-      { href: "/settings/team", label: "Team Operations", note: "membership metadata" },
-      { href: "/settings/data", label: "Data Operations", note: "record totals and archive state" },
-      { href: "/settings/runbook", label: "Operator Runbook", note: "local commands as read-only text" }
-    ]
-  }
-];
-
-const totalLinks = operationGroups.reduce((total, group) => total + group.links.length, 0);
+const operationSummary = getOperatorSurfaceSummary();
 
 export default function OperationsIndexPage() {
   return (
@@ -87,14 +31,14 @@ export default function OperationsIndexPage() {
       </header>
 
       <section className="grid gap-3 md:grid-cols-4">
-        <Metric label="Groups" value={String(operationGroups.length)} />
-        <Metric label="Local Surfaces" value={String(totalLinks)} />
+        <Metric label="Groups" value={String(operationSummary.groupCount)} />
+        <Metric label="Local Surfaces" value={String(operationSummary.surfaceCount)} />
         <Metric label="Mutations" value="none" />
         <Metric label="External Impact" value="blocked" />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
-        {operationGroups.map((group) => (
+        {operatorSurfaceGroups.map((group) => (
           <Panel key={group.name} title={group.name}>
             <ul className="grid gap-3 text-sm">
               {group.links.map((item) => (

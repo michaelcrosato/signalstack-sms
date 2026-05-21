@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 038  GREEN  operations-inventory-unit-coverage  2026-05-20 18:42
+Objective:    Add fast drift coverage for the local operations index inventory.
+Changed:
+- Moved `/settings/operations` grouped local operator surfaces into `lib/operations/operator-surfaces.ts`.
+- Added unit coverage for group count, surface count, duplicate app routes, app-route-only links, and safety-sensitive operations surfaces.
+- Updated testing contract, README, demo-mode docs, local operator runbook, SUMMARY, BLOCKERS, PLAN, and next-prompt handoff docs with the inventory drift boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP local-only admin/reporting/navigation hardening without live external-impact actions.
+
 ## Run 037  GREEN  operations-index  2026-05-20 18:37
 Objective:    Add a read-only local operations index for existing operator surfaces and safety boundaries.
 Changed:

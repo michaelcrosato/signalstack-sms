@@ -53,6 +53,8 @@ Demo operations review is available at `/settings/demo`. It renders seeded demo 
 
 Operations index review is available at `/settings/operations`. It renders grouped links to existing local operator surfaces and safety boundaries only; it does not execute commands, inspect files, call APIs, mutate records, create exports, call providers, bill, notify, expose secrets, or enable live features.
 
+The operations index route inventory is shared with unit tests so local surface counts and safety-sensitive links fail fast before browser demo coverage.
+
 Release operations review is available at `/settings/releases`. It renders local release checklist commands, protected gate expectations, seeded demo path, premerge metadata, and release surface links only; it does not execute commands, run migrations, launch tests or browsers, perform git operations, deploy, mutate records, call providers, bill, notify, expose logs, diffs, environment values, or secrets, or enable live features.
 
 Health operations review is available at `/settings/health`. It renders the local health endpoint contract, demo-safe defaults, runtime blockers, and operations links only; it does not execute probes, call APIs, run commands, mutate records, call providers, bill, notify, expose raw environment values or secrets, or enable live features.

@@ -187,6 +187,8 @@ Use `/settings/operations` for read-only local operator surface discovery before
 - route names for current demo-safe pages
 - safety boundaries for the index itself
 
+The operations index inventory is backed by a unit test so route-count drift, duplicate surface links, and missing safety-sensitive surfaces are caught before the seeded browser demo path.
+
 The page is display-only. It must not execute commands, inspect files, call APIs, mutate records, create exports, enqueue jobs, call Redis, expose secrets, call providers, call Stripe, call live AI, create billing records, send notifications, send SMS, send email, or enable live features.
 
 ## Release Operations

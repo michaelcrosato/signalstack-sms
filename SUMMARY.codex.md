@@ -1,15 +1,20 @@
 # Codex Summary
 
-Run number: 37
+Run number: 38
 
 ## Completed
+
+- Advanced a post-MVP local operations index inventory hardening checkpoint.
+- Moved the `/settings/operations` grouped local operator surface inventory into a shared module.
+- Added unit coverage for operations index group count, surface count, duplicate route protection, app-route-only links, and safety-sensitive local surfaces.
+- Updated testing contract, README, demo-mode docs, and local operator runbook with the fast inventory drift check.
+
+## Prior Completed
 
 - Advanced a post-MVP local operations index checkpoint.
 - Added `/settings/operations`, a read-only grouped index of existing local operator surfaces, route names, static surface counts, and safety boundaries.
 - Linked the operations index from the launch dashboard, go-live readiness, demo operations, reporting index, and operator runbook views.
 - Updated API/testing contracts, API map, README, PLAN, demo-mode docs, local operator runbook, next-prompt handoff docs, and seeded demo E2E coverage with the operations index boundary.
-
-## Prior Completed
 
 - Advanced a post-MVP local demo operations checkpoint.
 - Added `/settings/demo`, a read-only page that maps seeded demo readiness, workflow links, local metrics, usage totals, runtime gates, and safety boundaries.
@@ -90,6 +95,7 @@ Run number: 37
 ## Validation
 
 - `npm run typecheck`
+- `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - `npm run contracts:check`
 - `npm run lint`
 - `npm run build`
