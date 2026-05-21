@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 161  GREEN  validation-gate-command-vocabulary  2026-05-21 04:14
+Objective:    Keep `/settings/validation` gate command references tied to an exported runtime-frozen vocabulary.
+Changed:
+- Exported the supported validation operation gate command vocabulary.
+- Added unit coverage proving static validation gate commands stay inside that vocabulary and caller mutation is rejected before local validation metadata renders.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP validation/security operations hardening or safe read-only operator surface refinements.
+
 ## Run 158  GREEN  api-operations-method-vocabulary  2026-05-21 04:04
 Objective:    Keep API operations route methods aligned with an exported frozen vocabulary.
 Changed:

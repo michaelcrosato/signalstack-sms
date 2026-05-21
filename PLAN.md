@@ -259,6 +259,7 @@ Post-MVP:
 - Local validation operations package-script coverage
 - Local validation operations secret-literal coverage
 - Local validation operations runtime-frozen vocabulary coverage
+- Local validation operations gate-command vocabulary coverage
 - Local security operations package-script coverage
 - Local security operations secret-literal coverage
 - Local security operations runtime-frozen vocabulary coverage

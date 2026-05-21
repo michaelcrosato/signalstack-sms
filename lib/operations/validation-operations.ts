@@ -14,16 +14,7 @@ export type ValidationOperationsStatus = {
   repairSignals: readonly string[];
 };
 
-export const allowedValidationOperationCommandExecutionStates = Object.freeze(["none"] as const);
-export const allowedValidationOperationExternalImpactStates = Object.freeze(["none"] as const);
-export const allowedValidationOperationSecretsDisplayedStates = Object.freeze([false] as const);
-
-export type ValidationOperationCommandExecutionState = (typeof allowedValidationOperationCommandExecutionStates)[number];
-export type ValidationOperationExternalImpactState = (typeof allowedValidationOperationExternalImpactStates)[number];
-export type ValidationOperationSecretsDisplayedState = (typeof allowedValidationOperationSecretsDisplayedStates)[number];
-
-const validationOperationGateCommandFields = ["command", "area", "boundary"] as const;
-const allowedValidationOperationCommands = [
+export const allowedValidationOperationGateCommands = Object.freeze([
   "npm run validate",
   "npm run contracts:check",
   "npm run compliance:check",
@@ -33,7 +24,17 @@ const allowedValidationOperationCommands = [
   "npm run platform:check",
   "npm run secrets:scan",
   "npm run test:e2e:demo"
-] as const;
+] as const);
+export const allowedValidationOperationCommandExecutionStates = Object.freeze(["none"] as const);
+export const allowedValidationOperationExternalImpactStates = Object.freeze(["none"] as const);
+export const allowedValidationOperationSecretsDisplayedStates = Object.freeze([false] as const);
+
+export type ValidationOperationSupportedGateCommand = (typeof allowedValidationOperationGateCommands)[number];
+export type ValidationOperationCommandExecutionState = (typeof allowedValidationOperationCommandExecutionStates)[number];
+export type ValidationOperationExternalImpactState = (typeof allowedValidationOperationExternalImpactStates)[number];
+export type ValidationOperationSecretsDisplayedState = (typeof allowedValidationOperationSecretsDisplayedStates)[number];
+
+const validationOperationGateCommandFields = ["command", "area", "boundary"] as const;
 const allowedValidationOperationAreas = [
   "full local gate",
   "contracts",
@@ -109,7 +110,7 @@ function assertGateCommand(command: ValidationOperationGateCommand) {
     throw new Error(`Invalid validation operation command ${String(command.command)}`);
   }
 
-  if (!allowedValidationOperationCommands.includes(command.command as (typeof allowedValidationOperationCommands)[number])) {
+  if (!allowedValidationOperationGateCommands.includes(command.command as ValidationOperationSupportedGateCommand)) {
     throw new Error(`Unsupported validation operation command ${command.command}`);
   }
 

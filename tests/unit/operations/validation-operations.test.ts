@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   allowedValidationOperationCommandExecutionStates,
   allowedValidationOperationExternalImpactStates,
+  allowedValidationOperationGateCommands,
   allowedValidationOperationSecretsDisplayedStates,
   getValidationOperationsStatus,
   validationOperationGateCommands,
@@ -134,6 +135,7 @@ describe("getValidationOperationsStatus", () => {
 
   it("keeps exported validation operation vocabularies frozen against caller mutation", () => {
     const vocabularies = [
+      allowedValidationOperationGateCommands,
       allowedValidationOperationCommandExecutionStates,
       allowedValidationOperationExternalImpactStates,
       allowedValidationOperationSecretsDisplayedStates
@@ -143,6 +145,27 @@ describe("getValidationOperationsStatus", () => {
       expect(Object.isFrozen(vocabulary)).toBe(true);
       expect(() => (vocabulary as unknown as unknown[]).push("unsafe")).toThrow(TypeError);
     }
+  });
+
+  it("keeps validation operation gate commands inside the supported command allowlist", () => {
+    expect(allowedValidationOperationGateCommands).toEqual([
+      "npm run validate",
+      "npm run contracts:check",
+      "npm run compliance:check",
+      "npm run production:gate",
+      "npm run observability:check",
+      "npm run operator:check",
+      "npm run platform:check",
+      "npm run secrets:scan",
+      "npm run test:e2e:demo"
+    ]);
+    expect(Object.isFrozen(allowedValidationOperationGateCommands)).toBe(true);
+    expect(validationOperationGateCommands.map((gate) => gate.command)).toEqual(allowedValidationOperationGateCommands);
+    const allowedCommands = new Set<string>(allowedValidationOperationGateCommands);
+
+    expect(
+      validationOperationGateCommands.map((gate) => gate.command).filter((command) => !allowedCommands.has(command))
+    ).toEqual([]);
   });
 
   it("keeps validation operation inventory order stable for local review pages", () => {
