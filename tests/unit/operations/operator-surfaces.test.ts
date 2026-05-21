@@ -389,6 +389,50 @@ describe("operator surface inventory", () => {
     expect(() => getDemoOperationsLinks(groupsWithPrototypeBackedLink)).toThrow("Invalid operator surface link fields");
   });
 
+  it("rejects supplied operator inventories with accessor-backed fields before projection", () => {
+    const accessorBackedGroup = {} as OperatorSurfaceGroup;
+    Object.defineProperty(accessorBackedGroup, "name", {
+      get: () => "Accessor Group"
+    });
+    Object.defineProperty(accessorBackedGroup, "links", {
+      value: operatorSurfaceGroups[1].links
+    });
+    const groupsWithAccessorBackedGroup = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) =>
+      groupIndex === 1 ? accessorBackedGroup : group
+    );
+
+    const accessorBackedLink = {} as OperatorSurfaceLink;
+    Object.defineProperty(accessorBackedLink, "href", {
+      value: operatorSurfaceGroups[1].links[0].href
+    });
+    Object.defineProperty(accessorBackedLink, "label", {
+      get: () => operatorSurfaceGroups[1].links[0].label
+    });
+    Object.defineProperty(accessorBackedLink, "note", {
+      value: operatorSurfaceGroups[1].links[0].note
+    });
+    const groupsWithAccessorBackedLink = cloneSurfaceGroups(operatorSurfaceGroups).map((group, groupIndex) => ({
+      ...group,
+      links:
+        groupIndex === 1
+          ? [accessorBackedLink, ...group.links.slice(1)]
+          : group.links
+    }));
+
+    expect(() => getOperatorSurfaceSummary(groupsWithAccessorBackedGroup)).toThrow(
+      "Invalid operator surface group field descriptors"
+    );
+    expect(() => getLaunchDashboardLinks(groupsWithAccessorBackedGroup)).toThrow(
+      "Invalid operator surface group field descriptors"
+    );
+    expect(() => getSettingsNavigationLinks(groupsWithAccessorBackedLink)).toThrow(
+      "Invalid operator surface link field descriptors"
+    );
+    expect(() => getDemoOperationsLinks(groupsWithAccessorBackedLink)).toThrow(
+      "Invalid operator surface link field descriptors"
+    );
+  });
+
   it("rejects supplied operator inventories with sparse link entries before projection", () => {
     const sparseLinks = [...operatorSurfaceGroups[1].links];
     delete sparseLinks[0];

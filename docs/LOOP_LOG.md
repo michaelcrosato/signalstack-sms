@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 107  GREEN  supplied-inventory-data-field-guard  2026-05-21 00:18
+Objective:    Fail accessor-backed supplied shared operator inventory fields before projection.
+Changed:
+- Added descriptor guards requiring supplied operator group/link navigation fields to be plain data properties.
+- Added unit coverage proving accessor-backed supplied group/link fields fail before summaries or projections read local navigation values.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 106  GREEN  supplied-inventory-sparse-group-guard  2026-05-21 00:11
 Objective:    Fail supplied shared operator inventory sparse group entries before projection.
 Changed:

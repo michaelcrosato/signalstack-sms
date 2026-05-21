@@ -140,6 +140,7 @@ Completed through Milestone 10 hardening:
 - Post-MVP shared supplied-inventory sparse-group hardening: unit coverage now explicitly rejects sparse/missing supplied operator inventory group entries before summaries or projections can derive local navigation.
 - Post-MVP shared supplied-inventory sparse-link hardening: summaries and projections now fail before deriving local navigation from supplied operator inventory link arrays with sparse/missing entries, preventing malformed runtime link slots from being silently dropped.
 - Post-MVP shared supplied-inventory own-field hardening: summaries and projections now fail before deriving local navigation from prototype-backed supplied operator groups or links, requiring required navigation fields to be own properties.
+- Post-MVP shared supplied-inventory data-field hardening: summaries and projections now fail before deriving local navigation from accessor-backed supplied operator groups or links, requiring required navigation fields to be plain data properties.
 
 Demo-safe defaults remain mandatory:
 
