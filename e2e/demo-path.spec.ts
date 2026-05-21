@@ -298,6 +298,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Queue Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Worker Boundary" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Scheduled Timing" })).toBeVisible();
+  await expect(page.getByText("Command execution")).toBeVisible();
+  await expect(page.getByText("External impact")).toBeVisible();
+  await expect(page.getByText("Secrets displayed")).toBeVisible();
   for (const link of queueOperationLinks) {
     await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
   }

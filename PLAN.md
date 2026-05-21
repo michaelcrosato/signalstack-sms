@@ -157,6 +157,7 @@ Post-MVP:
 - Local queue operations static-metadata hardening
 - Local queue operations mode-vocabulary hardening
 - Local queue operations command-literal metadata hardening
+- Local queue operations no-impact summary rendering coverage
 - Local readiness audit operations static-metadata hardening
 - Local readiness audit operations export-limit vocabulary hardening
 - Local readiness audit query allowlist hardening
