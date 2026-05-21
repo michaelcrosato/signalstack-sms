@@ -1,12 +1,13 @@
 # Codex Blockers
 
-Run number: 72
+Run number: 73
 
 No active blockers.
 
 ## Notes
 
 - Root `LOOP_LOG.md` is synced with `docs/LOOP_LOG.md` through run 072. This coordination-only change preserves recent green loop history at the root without product code changes, protected gate script changes, live-action settings, credential use, or external-impact behavior.
+- Shared operator navigation projections now have unit coverage proving labels and notes derive from the supplied inventory instance. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator surface routes, group names, labels, and notes now have unit coverage for whitespace-clean copy. The check rejects leading/trailing whitespace, doubled spaces, and embedded newlines in the base shared inventory; it does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Shared operator surface group names, labels, and notes now have unit coverage for concise operator-scannable copy. The check rejects oversized group names, labels, and notes plus unexpected label suffixes; it does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.
 - Rich shared operator projections for demo checkpoints, workflow steps, and integration areas now have unit coverage for unique, whitespace-clean, boundary-oriented copy. The check is local inventory validation only and does not execute routes, commands, API handlers, migrations, providers, billing, notifications, SMS, email, live AI, or other live features.

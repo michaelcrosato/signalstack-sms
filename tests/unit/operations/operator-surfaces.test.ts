@@ -38,7 +38,8 @@ import {
   getComplianceOperationLinks,
   getWebhookOperationLinks,
   getWorkflowOperationSteps,
-  operatorSurfaceGroups
+  operatorSurfaceGroups,
+  type OperatorSurfaceGroup
 } from "@/lib/operations/operator-surfaces";
 
 function routeToAppPagePath(route: string) {
@@ -66,6 +67,17 @@ function collectPageRoutes(root: string) {
   walk(root);
 
   return routes.sort();
+}
+
+function withCustomSurfaceCopy(
+  groups: OperatorSurfaceGroup[],
+  href: string,
+  copy: { label: string; note: string }
+): OperatorSurfaceGroup[] {
+  return groups.map((group) => ({
+    ...group,
+    links: group.links.map((link) => (link.href === href ? { ...link, ...copy } : link))
+  }));
 }
 
 describe("operator surface inventory", () => {
@@ -257,6 +269,19 @@ describe("operator surface inventory", () => {
       expect(routes.filter((route) => !existsSync(routeToAppPagePath(route))), projection.name).toEqual([]);
       expect(projection.links, projection.name).toEqual(routes.map((route) => inventoryLinks.find((link) => link.href === route)));
     }
+  });
+
+  it("derives projected operator copy from the supplied inventory", () => {
+    const groups = withCustomSurfaceCopy(operatorSurfaceGroups, "/settings/usage", {
+      label: "Usage Review",
+      note: "custom local usage note"
+    });
+    const usageLink = { href: "/settings/usage", label: "Usage Review", note: "custom local usage note" };
+
+    expect(getLaunchDashboardLinks(groups).find((link) => link.href === "/settings/usage")).toEqual(usageLink);
+    expect(getSettingsNavigationLinks(groups).find((link) => link.href === "/settings/usage")).toEqual(usageLink);
+    expect(getReportingIndexLinks(groups).find((link) => link.href === "/settings/usage")).toEqual(usageLink);
+    expect(getBillingOperationLinks(groups).find((link) => link.href === "/settings/usage")).toEqual(usageLink);
   });
 
   it("keeps projected operator navigation route order stable", () => {

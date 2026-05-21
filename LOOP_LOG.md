@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 073  GREEN  projection-supplied-inventory-copy  2026-05-20 21:46
+Objective:    Guard shared operator navigation helpers against stale global copy fallback.
+Changed:
+- Added unit coverage that injects alternate operator surface copy and verifies launch, settings, reporting, and billing projections return the supplied labels and notes.
+- Updated testing docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP shared-inventory hardening or safe read-only operator surface refinements.
+
 ## Run 072  GREEN  loop-log-sync  2026-05-20 21:43
 Objective:    Reconcile the root loop log with the canonical documented loop log.
 Changed:
