@@ -602,6 +602,66 @@ describe("operator surface inventory", () => {
     }
   });
 
+  it("keeps operator projection result objects frozen per call", () => {
+    const groups = withCustomSurfaceCopy(operatorSurfaceGroups, "/settings/usage", {
+      label: "Usage Review",
+      note: "custom local usage note"
+    });
+    const projectionFactories = [
+      { name: "runbook", build: () => getRunbookAdminLinks(groups) },
+      { name: "settings", build: () => getSettingsNavigationLinks(groups) },
+      { name: "launch", build: () => getLaunchDashboardLinks(groups) },
+      { name: "demo console", build: () => getDemoConsoleLinks(groups) },
+      { name: "demo operations", build: () => getDemoOperationsLinks(groups) },
+      { name: "reporting", build: () => getReportingIndexLinks(groups) },
+      { name: "release", build: () => getReleaseOperationSurfaceLinks(groups) },
+      { name: "security", build: () => getSecurityOperationLinks(groups) },
+      { name: "environment", build: () => getEnvironmentOperationLinks(groups) },
+      { name: "health", build: () => getHealthOperationLinks(groups) },
+      { name: "contract", build: () => getContractOperationLinks(groups) },
+      { name: "validation", build: () => getValidationOperationLinks(groups) },
+      { name: "queue", build: () => getQueueOperationLinks(groups) },
+      { name: "contacts", build: () => getContactOperationLinks(groups) },
+      { name: "campaigns", build: () => getCampaignOperationLinks(groups) },
+      { name: "audience", build: () => getAudienceOperationLinks(groups) },
+      { name: "templates", build: () => getTemplateOperationLinks(groups) },
+      { name: "inbox", build: () => getInboxOperationLinks(groups) },
+      { name: "data", build: () => getDataOperationLinks(groups) },
+      { name: "notifications", build: () => getNotificationOperationLinks(groups) },
+      { name: "exports", build: () => getExportOperationLinks(groups) },
+      { name: "webhooks", build: () => getWebhookOperationLinks(groups) },
+      { name: "delivery", build: () => getDeliveryOperationLinks(groups) },
+      { name: "team", build: () => getTeamOperationLinks(groups) },
+      { name: "billing", build: () => getBillingOperationLinks(groups) },
+      { name: "ai", build: () => getAiOperationLinks(groups) },
+      { name: "provider", build: () => getProviderOperationLinks(groups) },
+      { name: "numbers", build: () => getNumberOperationLinks(groups) },
+      { name: "compliance", build: () => getComplianceOperationLinks(groups) },
+      { name: "system", build: () => getSystemOperationLinks(groups) },
+      { name: "usage", build: () => getUsageOperationLinks(groups) },
+      { name: "readiness audit", build: () => getReadinessAuditOperationLinks(groups) },
+      { name: "demo checkpoints", build: () => getDemoOperationsCheckpoints(groups) },
+      { name: "workflow steps", build: () => getWorkflowOperationSteps(groups) },
+      { name: "integration areas", build: () => getIntegrationOperationAreas(groups) }
+    ];
+
+    for (const projection of projectionFactories) {
+      const firstResult = projection.build()[0];
+
+      expect(Object.isFrozen(firstResult), projection.name).toBe(true);
+      expect(() => ((firstResult as { href: string }).href = "/settings/unsafe")).toThrow(TypeError);
+    }
+
+    const suppliedUsageLink = groups.flatMap((group) => group.links).find((link) => link.href === "/settings/usage");
+
+    expect(suppliedUsageLink).toEqual({
+      href: "/settings/usage",
+      label: "Usage Review",
+      note: "custom local usage note"
+    });
+    expect(getLaunchDashboardLinks(groups).find((link) => link.href === "/settings/usage")).toEqual(suppliedUsageLink);
+  });
+
   it("keeps projected operator navigation route order stable", () => {
     const stableProjectionOrders = [
       {

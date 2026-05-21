@@ -28,12 +28,16 @@ export type IntegrationOperationArea = OperatorSurfaceLink & {
   boundary: string;
 };
 
+function freezeOperatorSurfaceLink(link: OperatorSurfaceLink) {
+  return Object.freeze({ ...link });
+}
+
 function freezeOperatorSurfaceGroups(groups: OperatorSurfaceGroup[]) {
   return Object.freeze(
     groups.map((group) =>
       Object.freeze({
         ...group,
-        links: Object.freeze(group.links.map((link) => Object.freeze({ ...link })))
+        links: Object.freeze(group.links.map((link) => freezeOperatorSurfaceLink(link)))
       })
     )
   );
@@ -108,7 +112,10 @@ export function getOperatorSurfaceSummary(groups: readonly OperatorSurfaceGroup[
 }
 
 export function getRunbookAdminLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return groups.flatMap((group) => group.links).filter((link) => link.href === "/settings" || link.href.startsWith("/settings/"));
+  return groups
+    .flatMap((group) => group.links)
+    .filter((link) => link.href === "/settings" || link.href.startsWith("/settings/"))
+    .map((link) => freezeOperatorSurfaceLink(link));
 }
 
 export function getSettingsNavigationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
@@ -116,7 +123,7 @@ export function getSettingsNavigationLinks(groups: readonly OperatorSurfaceGroup
 }
 
 export function getLaunchDashboardLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
-  return groups.flatMap((group) => group.links);
+  return groups.flatMap((group) => group.links).map((link) => freezeOperatorSurfaceLink(link));
 }
 
 export function getDemoConsoleLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {
@@ -130,7 +137,7 @@ function findOperatorSurfaceLink(href: string, groups: readonly OperatorSurfaceG
     throw new Error(`Missing operator surface link for ${href}`);
   }
 
-  return link;
+  return freezeOperatorSurfaceLink(link);
 }
 
 const demoOperationsCheckpointDefinitions = [
@@ -516,10 +523,10 @@ export function getDemoOperationsCheckpoints(groups: readonly OperatorSurfaceGro
   return demoOperationsCheckpointDefinitions.map((checkpoint) => {
     const link = findOperatorSurfaceLink(checkpoint.href, groups);
 
-    return {
+    return Object.freeze({
       ...checkpoint,
       signal: link.label
-    };
+    });
   });
 }
 
@@ -535,10 +542,10 @@ export function getWorkflowOperationSteps(groups: readonly OperatorSurfaceGroup[
   return workflowOperationStepDefinitions.map((step) => {
     const link = findOperatorSurfaceLink(step.href, groups);
 
-    return {
+    return Object.freeze({
       ...step,
       owner: link.label
-    };
+    });
   });
 }
 
@@ -547,11 +554,13 @@ export function getReleaseOperationSurfaceLinks(groups: readonly OperatorSurface
 }
 
 export function getIntegrationOperationAreas(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups): IntegrationOperationArea[] {
-  return integrationOperationAreaDefinitions.map((area) => ({
-    ...findOperatorSurfaceLink(area.href, groups),
-    state: area.state,
-    boundary: area.boundary
-  }));
+  return integrationOperationAreaDefinitions.map((area) =>
+    Object.freeze({
+      ...findOperatorSurfaceLink(area.href, groups),
+      state: area.state,
+      boundary: area.boundary
+    })
+  );
 }
 
 export function getSecurityOperationLinks(groups: readonly OperatorSurfaceGroup[] = operatorSurfaceGroups) {

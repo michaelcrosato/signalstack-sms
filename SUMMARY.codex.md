@@ -1,8 +1,13 @@
 # Codex Summary
 
-Run number: 83
+Run number: 84
 
 ## Completed
+
+- Advanced a post-MVP shared operator projection result-freeze checkpoint.
+- Updated shared operator projection helpers to return frozen link and rich-projection result objects, including projections derived from mutable supplied inventories.
+- Added unit coverage proving caller-side result object mutation is rejected and does not mutate supplied inventory link copy.
+- Targeted operator-surface unit coverage and typecheck passed.
 
 - Advanced a post-MVP shared operator inventory runtime-freeze checkpoint.
 - Froze the canonical shared operator surface inventory at runtime while keeping projection helpers compatible with supplied inventory instances.
