@@ -1,13 +1,14 @@
 # Codex Blockers
 
-Run number: 170
+Run number: 171
 
-- Latest notification operations exported vocabulary mutation hardening adds unit coverage proving every exported `/settings/notifications` supported vocabulary rejects caller mutation before local notification metadata renders. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
+- Latest notification operations no-impact summary rendering coverage displays the validated command-execution, external-impact, and secrets-displayed summary states on `/settings/notifications` and pins them in the seeded investor demo path. The check is local read-only rendering/browser coverage only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 
 No active blockers.
 
 ## Notes
 
+- Latest notification operations exported vocabulary mutation hardening adds unit coverage proving every exported `/settings/notifications` supported vocabulary rejects caller mutation before local notification metadata renders. The check is local static metadata validation only and does not create recipients, templates, jobs, sends, alerts, webhooks, provider calls, bill, notify, send SMS/email, call live AI, mutate records, expose secrets, or enable live features.
 - Latest queue operations mode-vocabulary hardening exports a runtime-frozen `/settings/queue` worker mode vocabulary, types worker command metadata against it, and covers alignment plus caller-mutation rejection before local queue metadata renders. The check is local static metadata validation only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS/email, mutate queue rows, update campaigns, call live AI, expose secrets, or enable live features.
 - Latest queue operations static-metadata hardening moves `/settings/queue` worker command references and safety-boundary copy into validated frozen metadata, renders the page from that helper, and covers public fields, frozen snapshots, stable order, package-script references, allowlisted commands, no-impact summary states, and secret-like literal rejection before local queue metadata renders. The check is local static metadata validation only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS/email, mutate queue rows, update campaigns, call live AI, expose secrets, or enable live features.
 - Latest contract operations file-path vocabulary hardening exports a runtime-frozen supported contract file-path vocabulary for `/settings/contracts`, rejects static contract inventory paths outside that vocabulary before local metadata freezes, and covers caller-mutation rejection alongside the other exported contract operations vocabularies. The check is local static metadata validation only and does not read contract contents, execute commands, scan files, mutate records, call providers, bill, notify, send SMS/email, call live AI, expose secrets, or enable live features.

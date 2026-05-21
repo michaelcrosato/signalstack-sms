@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced a post-MVP notification operations no-impact summary rendering checkpoint.
+- Rendered the validated command-execution, external-impact, and secrets-displayed summary states on `/settings/notifications`.
+- Extended the seeded investor demo path to verify those read-only notification no-impact fields.
+- Updated README, PLAN, API/testing contract docs, next-prompt handoff docs, blockers, and loop logs.
+- No live SMS, email, notifications, billing, provider calls, live AI, real secrets, destructive database actions, or protected gate-script edits were used.
+
+Run number: 171
+
+## Previous Run
+
 - Advanced a post-MVP notification operations exported-vocabulary mutation checkpoint.
 - Added unit coverage proving every exported `/settings/notifications` supported vocabulary rejects caller mutation before local notification metadata renders.
 - Updated README, PLAN, testing contract/docs, next-prompt handoff docs, blockers, and loop logs.

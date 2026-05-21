@@ -1564,3 +1564,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP queue/notification/readiness operations hardening or safe read-only operator surface refinements.
+
+## Run 171  GREEN  notification-operations-no-impact-summary-rendering  2026-05-21 05:08
+Objective:    Render `/settings/notifications` no-impact summary states from validated operations metadata.
+Changed:
+- Rendered command-execution, external-impact, and secrets-displayed summary states on the notification operations page.
+- Extended the seeded investor demo path to verify the read-only notification no-impact fields.
+- Updated README, PLAN, API/testing contract docs, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP queue/notification/readiness operations hardening or safe read-only operator surface refinements.

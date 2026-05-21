@@ -57,6 +57,9 @@ export default async function NotificationOperationsPage() {
             <StatusRow label="Messaging provider" value={status.safety.messagingProvider} />
             <StatusRow label="AI provider" value={status.safety.aiProvider} />
             <StatusRow label="Production override" value={String(status.deployment.productionExternalOverride)} />
+            <StatusRow label="Command execution" value={notificationStatus.commandExecution} />
+            <StatusRow label="External impact" value={notificationStatus.externalImpact} />
+            <StatusRow label="Secrets displayed" value={String(notificationStatus.secretsDisplayed)} />
           </dl>
         </Panel>
 
