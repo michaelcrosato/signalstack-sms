@@ -1,7 +1,16 @@
 # Codex Summary
 
-- Added a planning-only `production-live-campaign` control checklist for Run 219.
-- Latest repo truth: database and BullMQ scheduled campaign workers accept only an unset worker deployment class or `local-demo`; every production/live class, including reserved `production-live-campaign`, is blocked before worker processing.
+- Added all-marker production-like worker block coverage for Run 220.
+- Latest repo truth: database and BullMQ scheduled campaign workers reject every production-like runtime marker before provider or future live-worker-class checks can fall through.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+Run number: 220
+
+## Previous Run
+
+- Added queue unit coverage proving `NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, and `APP_ENV` production/prod markers block database and BullMQ workers before provider or `production-live-campaign` checks.
+- Updated queue/testing contracts, README, roadmap, current state, and next-prompt handoff docs.
+- Focused queue worker and BullMQ worker tests passed.
 - No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
 
 Run number: 219

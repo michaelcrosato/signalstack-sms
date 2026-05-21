@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 220  GREEN  production-worker-marker-coverage  2026-05-21 16:56
+Objective:    Pin every production-like runtime marker as a worker startup blocker before live-worker design proceeds.
+Changed:
+- Added database worker readiness coverage for `NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, and `APP_ENV` production/prod markers.
+- Added BullMQ worker readiness coverage proving those markers block before provider or `production-live-campaign` checks can fall through.
+- Updated queue/testing contracts, README, roadmap, state matrix, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live campaign workers blocked; convert the `production-live-campaign` checklist into executable gates before adding any supported live worker class.
+
 ## Run 218  GREEN  worker-deployment-class-guard  2026-05-21 16:50
 Objective:    Add an executable worker deployment-class guard before live-worker design proceeds.
 Changed:

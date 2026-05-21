@@ -18,6 +18,7 @@ Milestone 10 hardening:
 Post-MVP local operations status:
 
 - Unit tests must verify that the system-status helper reports demo-safe defaults as external-impact blocked.
+- Queue worker unit tests must verify that both the database worker and BullMQ worker reject every production-like runtime marker (`NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, and `APP_ENV`) before provider or future live-worker-class checks can fall through.
 - Unit tests must verify that the shared operations-index inventory keeps all grouped local operator surfaces on app routes, has no duplicate routes, points every listed surface at an implemented `app/**/page.tsx`, lists every implemented local operator page, and includes current safety-sensitive surfaces such as release, health, environment, provider, readiness-audit, notification, and security operations.
 - Unit tests must verify that the operator runbook admin-link projection is derived from the same shared operations inventory, excludes only non-settings surfaces, keeps labels aligned, and points every runbook link at an implemented `app/**/page.tsx`.
 - Unit tests must verify that the go-live readiness page navigation is projected from the same shared operations inventory, excludes the current `/settings` page and non-settings surfaces, and points every projected link at an implemented `app/**/page.tsx`.

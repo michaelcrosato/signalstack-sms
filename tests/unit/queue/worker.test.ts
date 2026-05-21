@@ -11,6 +11,13 @@ import {
 } from "@/lib/queue/worker";
 
 describe("local queue worker", () => {
+  const productionLikeRuntimeMarkers = [
+    { name: "NODE_ENV", input: { nodeEnv: "production" } },
+    { name: "VERCEL_ENV", input: { vercelEnv: "production" } },
+    { name: "DEPLOYMENT_ENV", input: { deploymentEnv: "prod" } },
+    { name: "APP_ENV", input: { appEnv: "prod" } }
+  ];
+
   it("only allows dummy provider processing while live messaging is disabled", () => {
     expect(localWorkerProviderIsAllowed({ liveMessagingEnabled: "false", messagingProvider: "dummy" })).toBe(true);
     expect(localWorkerProviderIsAllowed({ liveMessagingEnabled: "true", messagingProvider: "dummy" })).toBe(false);
@@ -18,20 +25,16 @@ describe("local queue worker", () => {
   });
 
   it("blocks worker processing in production-like runtimes even with demo-safe provider defaults", () => {
-    expect(
-      localWorkerReadiness({
-        nodeEnv: "production",
-        liveMessagingEnabled: "false",
-        messagingProvider: "dummy"
-      })
-    ).toEqual({ allowed: false, reason: "production-worker-blocked" });
-    expect(
-      localWorkerReadiness({
-        appEnv: "prod",
-        liveMessagingEnabled: "false",
-        messagingProvider: "dummy"
-      })
-    ).toEqual({ allowed: false, reason: "production-worker-blocked" });
+    for (const marker of productionLikeRuntimeMarkers) {
+      expect(
+        localWorkerReadiness({
+          ...marker.input,
+          liveMessagingEnabled: "false",
+          messagingProvider: "dummy"
+        })
+      ).toEqual({ allowed: false, reason: "production-worker-blocked" });
+    }
+
     expect(
       localWorkerReadiness({
         nodeEnv: "development",
@@ -39,6 +42,19 @@ describe("local queue worker", () => {
         messagingProvider: "dummy"
       })
     ).toEqual({ allowed: true });
+  });
+
+  it("does not let production-like markers fall through to provider checks", () => {
+    for (const marker of productionLikeRuntimeMarkers) {
+      expect(
+        localWorkerReadiness({
+          ...marker.input,
+          liveMessagingEnabled: "true",
+          messagingProvider: "twilio",
+          workerDeploymentClass: "production-live-campaign"
+        })
+      ).toEqual({ allowed: false, reason: "production-worker-blocked" });
+    }
   });
 
   it("allows only the current local-demo worker deployment class", () => {

@@ -3,6 +3,13 @@ import { bullMqWorkerCanStart } from "@/lib/queue/bullmq-worker";
 import { scheduledCampaignBullMqJobDataSchema } from "@/lib/queue/jobs";
 
 describe("BullMQ worker foundation", () => {
+  const productionLikeRuntimeMarkers = [
+    { NODE_ENV: "production" },
+    { VERCEL_ENV: "production" },
+    { DEPLOYMENT_ENV: "prod" },
+    { APP_ENV: "prod" }
+  ];
+
   it("blocks worker startup unless BullMQ, Redis, and dummy-only safety gates are configured", () => {
     expect(bullMqWorkerCanStart({})).toEqual({ allowed: false, reason: "backend-disabled" });
     expect(bullMqWorkerCanStart({ QUEUE_BACKEND: "bullmq" })).toEqual({
@@ -61,6 +68,21 @@ describe("BullMQ worker foundation", () => {
         MESSAGING_PROVIDER: "dummy"
       })
     ).toEqual({ allowed: true });
+  });
+
+  it("blocks every production-like runtime marker before provider checks", () => {
+    for (const marker of productionLikeRuntimeMarkers) {
+      expect(
+        bullMqWorkerCanStart({
+          QUEUE_BACKEND: "bullmq",
+          REDIS_URL: "redis://localhost:6379",
+          ...marker,
+          LIVE_MESSAGING_ENABLED: "true",
+          MESSAGING_PROVIDER: "twilio",
+          WORKER_DEPLOYMENT_CLASS: "production-live-campaign"
+        })
+      ).toEqual({ allowed: false, reason: "production-worker-blocked" });
+    }
   });
 
   it("validates BullMQ worker payloads with durable queue job IDs", () => {
