@@ -10,7 +10,9 @@ import {
   getHealthOperationLinks,
   getIntegrationOperationAreas,
   getLaunchDashboardLinks,
+  getNotificationOperationLinks,
   getOperatorSurfaceSummary,
+  getQueueOperationLinks,
   getReleaseOperationSurfaceLinks,
   getReportingIndexLinks,
   getRunbookAdminLinks,
@@ -324,5 +326,35 @@ describe("operator surface inventory", () => {
     ]);
     expect(validationLinks).toEqual(validationRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
     expect(validationRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+  });
+
+  it("projects queue and notification operation links from the shared surface inventory", () => {
+    const inventoryLinks = operatorSurfaceGroups.flatMap((group) => group.links);
+    const queueLinks = getQueueOperationLinks();
+    const notificationLinks = getNotificationOperationLinks();
+    const queueRoutes = queueLinks.map((link) => link.href);
+    const notificationRoutes = notificationLinks.map((link) => link.href);
+
+    expect(queueRoutes).toEqual([
+      "/settings",
+      "/settings/campaigns",
+      "/settings/system",
+      "/settings/runbook",
+      "/settings/workflows",
+      "/settings/releases"
+    ]);
+    expect(queueLinks).toEqual(queueRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
+    expect(queueRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
+
+    expect(notificationRoutes).toEqual([
+      "/settings",
+      "/settings/security",
+      "/settings/system",
+      "/settings/integrations",
+      "/settings/runbook",
+      "/settings/releases"
+    ]);
+    expect(notificationLinks).toEqual(notificationRoutes.map((route) => inventoryLinks.find((link) => link.href === route)));
+    expect(notificationRoutes.filter((route) => !existsSync(routeToAppPagePath(route)))).toEqual([]);
   });
 });

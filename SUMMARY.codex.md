@@ -165,6 +165,13 @@ Run number: 54
 
 ## Validation
 
+- Latest queue/notification shared-inventory hardening moved `/settings/queue` and `/settings/notifications` header navigation into the shared local operator surface inventory. Unit and seeded browser coverage now verify labels, route targets, and backing `app/**/page.tsx` files without executing workers, enqueueing jobs, calling Redis/providers, billing, notifying, sending SMS or email, exposing secrets, mutating records, or enabling live features.
+- `npm run typecheck`
+- `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
+- `.\scripts\local-gate.ps1`
+- `npm install`
+- `npm run db:generate`
+- `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate; npm run demo:seed; npm run test:e2e:demo`
 - Latest integration/security shared-inventory hardening moved `/settings/integrations` surface links and `/settings/security` navigation links into the shared local operator surface inventory. Unit and seeded browser coverage now verify labels, route targets, states, boundaries, and backing app pages without executing commands, provider calls, billing, notifications, SMS, email, secrets, mutations, or live features.
 - `npm run typecheck`
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`

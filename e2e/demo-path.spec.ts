@@ -7,6 +7,8 @@ import {
   getEnvironmentOperationLinks,
   getHealthOperationLinks,
   getIntegrationOperationAreas,
+  getNotificationOperationLinks,
+  getQueueOperationLinks,
   getReleaseOperationSurfaceLinks,
   getReportingIndexLinks,
   getSecurityOperationLinks,
@@ -30,6 +32,8 @@ const environmentOperationLinks = getEnvironmentOperationLinks();
 const healthOperationLinks = getHealthOperationLinks();
 const contractOperationLinks = getContractOperationLinks();
 const validationOperationLinks = getValidationOperationLinks();
+const queueOperationLinks = getQueueOperationLinks();
+const notificationOperationLinks = getNotificationOperationLinks();
 
 test.setTimeout(60_000);
 
@@ -143,6 +147,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Notification Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Channel Boundaries" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "No-Send Controls" })).toBeVisible();
+  for (const link of notificationOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Integration Operations" }).click();
   await expect(page.getByRole("heading", { name: "Integration Operations" })).toBeVisible();
@@ -237,6 +244,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Queue Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Worker Boundary" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Scheduled Timing" })).toBeVisible();
+  for (const link of queueOperationLinks) {
+    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+  }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Campaign Operations" }).click();
   await page.getByRole("link", { name: "Contact Operations" }).click();
