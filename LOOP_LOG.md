@@ -1814,3 +1814,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue post-MVP security/validation/contract operations hardening or safe read-only operator surface refinements.
+
+## Run 198  GREEN  validation-operations-area-vocabulary  2026-05-21 07:09
+Objective:    Keep `/settings/validation` gate areas inside an exported runtime-frozen local-only vocabulary.
+Changed:
+- Exported the supported validation operation area vocabulary as frozen metadata.
+- Added unit coverage proving static gate areas stay aligned with the exported vocabulary and reject caller mutation.
+- Updated testing contract/docs, README, PLAN, SUMMARY, BLOCKERS, and next-prompt handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Continue post-MVP validation/security/contract operations hardening or safe read-only operator surface refinements.

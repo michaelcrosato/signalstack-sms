@@ -30,15 +30,7 @@ export const allowedValidationOperationCommandExecutionStates = Object.freeze(["
 export const allowedValidationOperationExternalImpactStates = Object.freeze(["none"] as const);
 export const allowedValidationOperationMutationStates = Object.freeze(["none"] as const);
 export const allowedValidationOperationSecretsDisplayedStates = Object.freeze([false] as const);
-
-export type ValidationOperationSupportedGateCommand = (typeof allowedValidationOperationGateCommands)[number];
-export type ValidationOperationCommandExecutionState = (typeof allowedValidationOperationCommandExecutionStates)[number];
-export type ValidationOperationExternalImpactState = (typeof allowedValidationOperationExternalImpactStates)[number];
-export type ValidationOperationMutationState = (typeof allowedValidationOperationMutationStates)[number];
-export type ValidationOperationSecretsDisplayedState = (typeof allowedValidationOperationSecretsDisplayedStates)[number];
-
-const validationOperationGateCommandFields = ["command", "area", "boundary"] as const;
-const allowedValidationOperationAreas = [
+export const allowedValidationOperationAreas = Object.freeze([
   "full local gate",
   "contracts",
   "safety defaults",
@@ -48,7 +40,16 @@ const allowedValidationOperationAreas = [
   "platform",
   "secrets",
   "investor demo"
-] as const;
+] as const);
+
+export type ValidationOperationSupportedGateCommand = (typeof allowedValidationOperationGateCommands)[number];
+export type ValidationOperationCommandExecutionState = (typeof allowedValidationOperationCommandExecutionStates)[number];
+export type ValidationOperationExternalImpactState = (typeof allowedValidationOperationExternalImpactStates)[number];
+export type ValidationOperationMutationState = (typeof allowedValidationOperationMutationStates)[number];
+export type ValidationOperationSecretsDisplayedState = (typeof allowedValidationOperationSecretsDisplayedStates)[number];
+export type ValidationOperationArea = (typeof allowedValidationOperationAreas)[number];
+
+const validationOperationGateCommandFields = ["command", "area", "boundary"] as const;
 const requiredGateBoundaryTerms = ["local", "demo-safe", "blocked", "secrets"] as const;
 const requiredRepairSignalTerms = [
   "does not execute commands",
@@ -149,7 +150,7 @@ function assertGateCommand(command: ValidationOperationGateCommand) {
   }
   assertCleanValidationMetadata(command.area, `Whitespace-unsafe validation operation area for ${command.command}`);
 
-  if (!allowedValidationOperationAreas.includes(command.area as (typeof allowedValidationOperationAreas)[number])) {
+  if (!allowedValidationOperationAreas.includes(command.area as ValidationOperationArea)) {
     throw new Error(`Unsupported validation operation area for ${command.command}`);
   }
   assertNoSecretLikeMetadata(command.area, `Secret-like validation operation area for ${command.command}`);

@@ -288,6 +288,7 @@ Post-MVP:
 - Local validation operations secret-literal coverage
 - Local validation operations runtime-frozen vocabulary coverage
 - Local validation operations gate-command vocabulary coverage
+- Local validation operations area-vocabulary coverage
 - Local validation operations whitespace-clean metadata coverage
 - Local validation operations command-literal metadata coverage
 - Local validation operations mutation no-impact summary coverage

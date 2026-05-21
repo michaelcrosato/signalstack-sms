@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  allowedValidationOperationAreas,
   allowedValidationOperationCommandExecutionStates,
   allowedValidationOperationExternalImpactStates,
   allowedValidationOperationGateCommands,
@@ -164,6 +165,7 @@ describe("getValidationOperationsStatus", () => {
   it("keeps exported validation operation vocabularies frozen against caller mutation", () => {
     const vocabularies = [
       allowedValidationOperationGateCommands,
+      allowedValidationOperationAreas,
       allowedValidationOperationCommandExecutionStates,
       allowedValidationOperationExternalImpactStates,
       allowedValidationOperationMutationStates,
@@ -195,6 +197,25 @@ describe("getValidationOperationsStatus", () => {
     expect(
       validationOperationGateCommands.map((gate) => gate.command).filter((command) => !allowedCommands.has(command))
     ).toEqual([]);
+  });
+
+  it("keeps validation operation areas inside the exported supported vocabulary", () => {
+    expect(allowedValidationOperationAreas).toEqual([
+      "full local gate",
+      "contracts",
+      "safety defaults",
+      "deployment",
+      "observability",
+      "runbook",
+      "platform",
+      "secrets",
+      "investor demo"
+    ]);
+    expect(Object.isFrozen(allowedValidationOperationAreas)).toBe(true);
+    expect(validationOperationGateCommands.map((gate) => gate.area)).toEqual(allowedValidationOperationAreas);
+    const allowedAreas = new Set<string>(allowedValidationOperationAreas);
+
+    expect(validationOperationGateCommands.map((gate) => gate.area).filter((area) => !allowedAreas.has(area))).toEqual([]);
   });
 
   it("keeps validation operation inventory order stable for local review pages", () => {
