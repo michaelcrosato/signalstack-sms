@@ -1,8 +1,30 @@
 import { ConsentStatus } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
-import { getProductContacts } from "@/lib/product/contacts";
+import { getProductContactDetail, getProductContacts } from "@/lib/product/contacts";
 
 vi.mock("@/lib/db/repositories/contacts", () => ({
+  getContact: vi.fn(async (_orgId: string, contactId: string) => {
+    if (contactId === "missing") {
+      return null;
+    }
+
+    return {
+      id: contactId,
+      displayName: null,
+      firstName: "Katherine",
+      lastName: "Johnson",
+      phone: "+15555550104",
+      email: "katherine@example.com",
+      consentStatus: ConsentStatus.OPTED_IN,
+      optInSource: "event_signup",
+      source: "demo",
+      notes: "Prefers morning reminders.",
+      archivedAt: null,
+      updatedAt: new Date("2026-01-04T00:00:00.000Z"),
+      tagLinks: [{ tag: { name: "vip" } }, { tag: { name: "alpha" } }],
+      listLinks: [{ list: { name: "Customers" } }]
+    };
+  }),
   listContacts: vi.fn(async () => [
     {
       id: "contact_2",
@@ -66,5 +88,29 @@ describe("getProductContacts", () => {
     ]);
     expect(result.contacts[0].tags).toEqual(["alpha", "beta"]);
     expect(result.contacts[0].lists).toEqual(["Leads"]);
+  });
+
+  it("builds a detail row for the product contact edit page", async () => {
+    const contact = await getProductContactDetail("org_1", "contact_4");
+
+    expect(contact).toMatchObject({
+      id: "contact_4",
+      displayName: "Katherine Johnson",
+      firstName: "Katherine",
+      lastName: "Johnson",
+      phone: "+15555550104",
+      email: "katherine@example.com",
+      consentStatus: ConsentStatus.OPTED_IN,
+      optInSource: "event_signup",
+      source: "demo",
+      notes: "Prefers morning reminders.",
+      tags: ["alpha", "vip"],
+      lists: ["Customers"],
+      archived: false
+    });
+  });
+
+  it("returns null when the product contact detail is outside the tenant", async () => {
+    await expect(getProductContactDetail("org_1", "missing")).resolves.toBeNull();
   });
 });

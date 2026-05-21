@@ -1857,3 +1857,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Continue Phase 0 correctness hardening: RBAC enforcement on mutating routes, then product shell work.
+
+## Run 207  GREEN  product-contact-detail-workspace  2026-05-21 14:55
+Objective:    Add an owner-facing contact detail/edit workflow on existing local contact APIs.
+Changed:
+- Added `/dashboard/contacts/:contactId` with local profile, consent, notes, tag/list editing, and soft archive controls.
+- Linked contact rows to the detail workspace and added a product contact detail adapter.
+- Updated API/testing contracts, roadmap handoff docs, current state matrix, unit tests, and seeded product-demo coverage.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Add product-facing analytics detail on existing local analytics APIs or continue controlled live-readiness hardening.

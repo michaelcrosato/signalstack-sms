@@ -1,5 +1,15 @@
 # Codex Summary
 
+- Advanced Phase 1 product UI by adding `/dashboard/contacts/:contactId`.
+- The contact detail workspace reads a tenant-scoped contact, updates local profile, consent, notes, tags, and lists through existing contact APIs, and exposes only soft archive for removal.
+- Updated contracts, API map, roadmap handoff docs, unit coverage, and seeded product-demo coverage so the owner contact edit workflow is browser-visible.
+- The protected local gate and seeded product demo path passed after tightening one browser assertion.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, worker execution, Redis calls, hard deletion, or protected gate-script edits were used.
+
+Run number: 207
+
+## Previous Run
+
 - Advanced Phase 1 product UI by adding `/dashboard/compliance`.
 - The compliance workspace reads the existing local compliance profile and hard-gate evaluator to show profile fields, A2P status, runtime blockers, and demo-safe live messaging state.
 - Updated product navigation, contracts, roadmap handoff docs, and seeded product-demo coverage so the owner readiness workflow is browser-visible.

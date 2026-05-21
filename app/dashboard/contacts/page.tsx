@@ -72,6 +72,13 @@ export default async function ContactsPage() {
                         <div className="font-medium text-slate-950">{contact.displayName}</div>
                         <div className="text-slate-600">{contact.phone}</div>
                         {contact.email ? <div className="text-slate-500">{contact.email}</div> : null}
+                        <Link
+                          aria-label={`View ${contact.displayName}`}
+                          className="mt-2 inline-flex text-xs font-semibold text-teal-700"
+                          href={`/dashboard/contacts/${contact.id}`}
+                        >
+                          View details
+                        </Link>
                       </td>
                       <td className="px-4 py-3">
                         <span className="rounded border border-slate-300 bg-slate-50 px-2 py-1 text-xs font-semibold">

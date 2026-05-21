@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 207
+
+- No blocker from the latest product contact detail workspace. `/dashboard/contacts/:contactId` reads and updates local tenant contact profile, consent, notes, tags, and lists through existing contact APIs, and soft-archives contacts only through the existing delete endpoint without live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits.
+
 Run number: 206
 
 - No blocker from the latest product compliance readiness workspace. `/dashboard/compliance` reads the existing local compliance profile and hard-gate evaluator to render owner-facing readiness fields, A2P status, runtime blockers, and demo-safe live messaging state without live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, worker execution, Redis calls, or protected gate-script edits.

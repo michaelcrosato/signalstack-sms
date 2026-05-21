@@ -7,7 +7,7 @@ This repo follows `docs/CANONICAL_IMPLEMENTATION_PLAN.md`. That canonical plan r
 As of 2026-05-21:
 
 - The repo has strong demo-safe foundations: data model, tenant boundaries, contracts, validation gates, seed data, local worker paths, Twilio webhook foundations, read-only operations surfaces, and automated tests.
-- The browser experience is still mostly an operator/admin console. A non-technical user cannot yet run the core SMS SaaS workflow from a polished product UI.
+- The browser experience now has a product-facing dashboard, contacts, campaigns, inbox, templates, and compliance flow, with remaining gaps around deeper lifecycle workflows and polish.
 - Live messaging remains blocked by default. The only intentional live external-impact path is the isolated `/demo` live-test SMS surface, which requires explicit Twilio credentials, live flags, a recipient allowlist, and the confirmation phrase.
 - Live campaign sending, live AI, live billing, real auth, production secret management, production Redis/rate-limit infrastructure, and production deployment are not complete.
 - Planning inputs from Claude, Gemini, Grok, and Codex are captured under `planning/`; the current consensus is summarized in `planning/CONSENSUS-2026-05-21.md`.
@@ -57,7 +57,7 @@ Goal: make SignalStack feel like usable SMS software, not only a system audit co
 - Keep the contacts list/import UI on existing APIs and add contact detail/edit later.
 - Campaign composer, recipient selection, preflight, schedule, and status UI on existing APIs are in place for the first product demo path.
 - Inbox list/thread UI with demo inbound, assignment, notes, resolve/reopen, and STOP visibility is in place on existing APIs.
-- Build template list/detail UI for existing template APIs.
+- Template list/create UI and contact detail/edit UI are in place on existing APIs.
 - Keep the gated live-test SMS demo available but visually separated from normal campaign sending.
 - Add `e2e/product-demo-path.spec.ts` for the non-technical browser demo path.
 
@@ -84,6 +84,6 @@ Goal: turn the demo-safe product into a paid production SaaS.
 ## Next Concrete Work
 
 1. Keep `docs/CURRENT_STATE_MATRIX.md` current.
-2. Build template list/detail UI on existing template APIs.
-3. Add contact detail/edit after the campaign, inbox, template, and compliance product flows exist.
+2. Add product-facing analytics detail on existing local analytics APIs.
+3. Add contact restore/merge workflow after the core product demo remains stable.
 4. Harden production worker policy before broader live sending.

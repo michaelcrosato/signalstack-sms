@@ -86,6 +86,47 @@ test("product contacts page lists seeded contacts and imports local CSV rows", a
   await expect(importedRow.getByText("trial")).toBeVisible();
 });
 
+test("product contact detail page updates local profile and consent metadata", async ({ page }) => {
+  const uniqueSuffix = Date.now().toString().slice(-7);
+  const phone = `+1555${uniqueSuffix}`;
+  const displayName = `Product Detail ${uniqueSuffix}`;
+  const updatedName = `Product Detail Updated ${uniqueSuffix}`;
+
+  await page.request.post("/api/contacts", {
+    data: {
+      phone,
+      email: `detail-${uniqueSuffix}@example.com`,
+      displayName,
+      consentStatus: "UNKNOWN",
+      source: "product_e2e",
+      tagNames: ["detail"],
+      listNames: ["Product Detail"]
+    }
+  });
+
+  await page.goto("/dashboard/contacts");
+  const createdRow = page.getByRole("row").filter({ hasText: displayName });
+  await expect(createdRow).toBeVisible();
+  await createdRow.getByRole("link", { name: `View ${displayName}` }).click();
+
+  await expect(page.getByRole("heading", { name: displayName })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Profile and consent" })).toBeVisible();
+  await page.getByLabel("Display name").fill(updatedName);
+  await page.getByLabel("Consent status").selectOption("OPTED_IN");
+  await page.getByLabel("Opt-in source").fill("product_detail_e2e");
+  await page.getByLabel("Tags").fill("detail, updated");
+  await page.getByLabel("Lists").fill("Product Detail, Updated Contacts");
+  await page.getByLabel("Notes").fill("Local profile update from product detail E2E.");
+  await page.getByRole("button", { name: "Save Contact" }).click();
+
+  await expect(page.getByRole("status")).toContainText("Contact updated locally");
+  await expect(page.getByLabel("Consent status")).toHaveValue("OPTED_IN");
+  await expect(page.getByLabel("Tags")).toHaveValue("detail, updated");
+  await expect(page.getByLabel("Lists")).toHaveValue("Product Detail, Updated Contacts");
+  await expect(page.getByRole("heading", { name: "Safety Boundary" })).toBeVisible();
+  await expect(page.getByText("It does not send SMS, call providers")).toBeVisible();
+});
+
 test("product campaigns page creates, preflights, and schedules a local campaign", async ({ page }) => {
   const campaignName = `Product E2E campaign ${Date.now()}`;
 
