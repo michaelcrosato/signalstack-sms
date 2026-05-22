@@ -2545,3 +2545,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 292  GREEN  sync-mutating-route-handler-scan  2026-05-21 23:35
+Objective:    Prevent synchronous exported mutating route handlers from bypassing local API role-gate scans.
+Changed:
+- Tightened the static mutating API authorization scanner to recognize both synchronous and async exported `POST`, `PATCH`, `PUT`, and `DELETE` route handlers.
+- Added synthetic auth unit coverage proving a synchronous mutating handler without `requireApiRole` is detected and synchronous body readers before the role gate fail while post-gate reads pass.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the synchronous handler boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.

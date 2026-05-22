@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 292
+
+- Hardened synchronous mutating route-handler authorization coverage for Run 292.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now recognizes both `export function POST/PATCH/PUT/DELETE` and `export async function ...` route handlers, so synchronous mutating handlers cannot bypass per-handler `requireApiRole` coverage or body-reader-before-role-gate ordering checks.
+- Updated the testing contract to name synchronous exported handler coverage.
+- Focused auth coverage, contracts check, typecheck, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 291
 
 - Hardened optional call/apply request body-reader authorization coverage for Run 291.

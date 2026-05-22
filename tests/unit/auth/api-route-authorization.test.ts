@@ -25,12 +25,12 @@ function routeFiles(directory: string): string[] {
 
 function exportedMutatingMethods(source: string) {
   return mutatingMethods.filter((method) =>
-    new RegExp(`export\\s+async\\s+function\\s+${method}\\b`).test(source)
+    new RegExp(`export\\s+(?:async\\s+)?function\\s+${method}\\b`).test(source)
   );
 }
 
 function exportedFunctionBody(source: string, method: (typeof mutatingMethods)[number]) {
-  const declaration = new RegExp(`export\\s+async\\s+function\\s+${method}\\b`);
+  const declaration = new RegExp(`export\\s+(?:async\\s+)?function\\s+${method}\\b`);
   const match = declaration.exec(source);
   if (match === null) {
     return "";
@@ -84,7 +84,7 @@ function exportedFunctionBody(source: string, method: (typeof mutatingMethods)[n
 }
 
 function exportedFunctionFirstParameterName(source: string, method: (typeof mutatingMethods)[number]) {
-  const declaration = new RegExp(`export\\s+async\\s+function\\s+${method}\\b`);
+  const declaration = new RegExp(`export\\s+(?:async\\s+)?function\\s+${method}\\b`);
   const match = declaration.exec(source);
   if (match === null) {
     return defaultRequestParameterName;
@@ -386,6 +386,35 @@ describe("API route authorization coverage", () => {
     });
 
     expect(bodyParsedBeforeRoleGate).toEqual([]);
+  });
+
+  it("tracks synchronous exported mutating route handlers for role-gate and body-order checks", () => {
+    const missingRoleGateSource = `
+      export function POST(request: Request) {
+        return Response.json({ ok: true });
+      }
+    `;
+    const unsafeSource = `
+      export function PATCH(request: Request) {
+        const payload = request.json();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const safeSource = `
+      export function DELETE(request: Request) {
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = request.clone().text();
+        return Response.json({ payload });
+      }
+    `;
+
+    expect(exportedMutatingMethods(missingRoleGateSource)).toEqual(["POST"]);
+    expect(exportedMutatingMethodHasRoleGate(missingRoleGateSource, "POST")).toBe(false);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "DELETE")).toBe(false);
   });
 
   it("treats cloned request body readers as body parsing for role-gate ordering", () => {
