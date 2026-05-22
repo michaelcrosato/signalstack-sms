@@ -245,6 +245,39 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects control entries missing public fields before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const withoutId = Object.freeze({
+      status: "implemented" as const,
+      requirement: implementedControls[0].requirement
+    });
+    const withoutStatus = Object.freeze({
+      id: implementedControls[0].id,
+      requirement: implementedControls[0].requirement
+    });
+    const withoutRequirement = Object.freeze({
+      id: implementedControls[0].id,
+      status: "implemented" as const
+    });
+
+    for (const malformedControl of [withoutId, withoutStatus, withoutRequirement]) {
+      const controls = Object.freeze(
+        implementedControls.map((control, index) => (index === 0 ? malformedControl : Object.freeze({ ...control })))
+      );
+
+      expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(false);
+      expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(malformedControl === withoutStatus);
+      expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(malformedControl !== withoutStatus);
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized({
+          workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+          controls
+        })
+      ).toBe(false);
+    }
+  });
+
   it("requires live-worker controls to expose own enumerable data fields", () => {
     const implementedControls = implementedFrozenControls();
     const accessorBackedControl = Object.freeze(

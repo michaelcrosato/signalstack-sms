@@ -2086,3 +2086,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing production-live-campaign control hardening without enabling live sends.
+
+## Run 231  GREEN  live-worker-control-missing-fields  2026-05-21 18:05
+Objective:    Prove incomplete supplied live-worker control records cannot authorize the reserved production worker class.
+Changed:
+- Added unit coverage for supplied `production-live-campaign` control entries missing `id`, `status`, or `requirement`.
+- Recorded that the change is local metadata coverage only and does not execute production workers or live external actions.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing production-live-campaign control hardening without enabling live sends.
