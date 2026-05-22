@@ -2716,3 +2716,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 299  GREEN  request-prototype-body-reader-scan  2026-05-22 00:51
+Objective:    Prevent `Request.prototype` body readers from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to treat `Request.prototype` body readers invoked with request or clone targets as body parsing.
+- Added synthetic auth unit coverage for direct `.call`, `.apply`, `.bind`, and `Reflect.apply` prototype-reader forms before and after `requireApiRole`.
+- Updated the testing contract, docs, SUMMARY, and BLOCKERS for the prototype body-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
