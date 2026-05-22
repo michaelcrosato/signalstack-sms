@@ -2805,3 +2805,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 311  GREEN  optional-reflect-get-body-reader-scan  2026-05-22 02:00
+Objective:    Prevent optional `Reflect.get` request body-reader lookups from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize `Reflect?.get(...)` and `Reflect.get?.(...)` before existing reflective body-reader checks.
+- Added synthetic auth unit coverage proving optional Reflect object and optional Reflect.get calls fail before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the optional Reflect.get boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.

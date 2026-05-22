@@ -302,6 +302,8 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
     }
   }
   const reflectedBodySlice = bodySlice
+    .replace(/\bReflect\s*\?\.\s*get\s*\(/g, "Reflect.get(")
+    .replace(/\bReflect\s*\.\s*get\s*\?\.\s*\(/g, "Reflect.get(")
     .replace(/\?\.\s*\[/g, "[")
     .replace(
       new RegExp(
@@ -2566,6 +2568,23 @@ describe("API route authorization coverage", () => {
         return Response.json({ payload });
       }
     `;
+    const unsafeOptionalReflectObjectSource = `
+      export async function POST(req: Request) {
+        const payload = await Reflect?.get(req, "json").call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeOptionalReflectGetSource = `
+      export async function DELETE(req: Request) {
+        const readerName = "blob";
+        const payload = await Reflect.get?.(req.clone(), readerName, req.clone()).call(req.clone());
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
     const safeSource = `
       export async function POST(req: Request) {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
@@ -2584,6 +2603,8 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedPropertyAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeReceiverSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCloneReceiverSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalReflectObjectSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalReflectGetSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
