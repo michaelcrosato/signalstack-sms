@@ -3084,3 +3084,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 343  GREEN  destructured-globalthis-builtin-alias-auth-scan  2026-05-22 04:31
+Objective:    Prevent destructured `globalThis` built-in aliases from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize destructured and computed destructured `globalThis` aliases for `Object` and `Reflect`.
+- Added synthetic auth unit coverage proving destructured `globalThis` built-in aliases with reflective body-reader helpers fail before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the destructured `globalThis` built-in alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
