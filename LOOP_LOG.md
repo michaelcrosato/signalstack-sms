@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 354  GREEN  nested-parenthesized-request-alias-auth-scan  2026-05-22 05:38
+Objective:    Prevent nested-parenthesized direct `Request` constructor/prototype aliases from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize parenthesized `Request` references alongside `Object` and `Reflect`.
+- Added synthetic auth unit coverage proving `const RequestCtor = ((Request))` and `const requestPrototype = ((Request)).prototype` forms fail before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the nested-parenthesized direct `Request` boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 352  GREEN  direct-request-constructor-alias-auth-scan  2026-05-22 05:29
 Objective:    Prevent direct `Request` constructor aliases from hiding mutating-route request body readers before authorization.
 Changed:
