@@ -9,6 +9,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
 
+## Run 343  GREEN  globalthis-local-alias-auth-scan  2026-05-22 04:25
+Objective:    Prevent local `globalThis` aliases from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize local aliases such as `const root = globalThis` and assigned `root = (globalThis)` before reflective built-in body-reader checks.
+- Added synthetic auth unit coverage proving aliased `root.Reflect.get(...)` and `root["Object"].getOwnPropertyDescriptor(...)` paths fail before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the local `globalThis` alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 342  GREEN  globalthis-computed-builtin-alias-auth-scan  2026-05-22 04:22
 Objective:    Prevent computed `globalThis` built-in aliases from hiding mutating-route request body readers before authorization.
 Changed:
