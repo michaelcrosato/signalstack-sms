@@ -2,6 +2,7 @@
 
 Run number: 380
 
+- Latest live-worker length coercion coverage proves supplied `production-live-campaign` control arrays with hostile non-primitive `length` descriptor values deny without coercing descriptor values or reading indexed controls. Focused unit coverage and the protected local gate passed; no workers, providers, billing, notifications, SMS, email, live AI, secrets, protected gate scripts, or destructive production actions were used.
 - Hardened live-worker control coverage so writable or configurable supplied control-array index descriptors cannot authorize the reserved `production-live-campaign` class.
 - Latest repo truth: `production-live-campaign` remains unsupported, and future control evidence must use own enumerable frozen indexed array data descriptors.
 - Updated the testing contract, NEXT_PROMPTS, and current state matrix for the writable/configurable index-descriptor boundary.

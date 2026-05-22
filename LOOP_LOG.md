@@ -3444,3 +3444,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 382  GREEN  live-worker-length-coercion-evidence  2026-05-22 08:23
+Objective:    Prove hostile non-primitive supplied control-array length descriptor values deny without coercion or indexed-control reads.
+Changed:
+- Added live-worker control coverage for a proxy-supplied `length` descriptor value whose coercion methods throw and whose indexed descriptor would throw if inspected.
+- Updated testing contract/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the non-coercive length-descriptor boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
