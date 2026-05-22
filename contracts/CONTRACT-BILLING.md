@@ -12,6 +12,7 @@ Billing and usage endpoints are local-only:
 - `BillingAccount` stores local billing status metadata and nullable Stripe placeholder IDs.
 - `GET /api/billing/usage` returns local totals and recent usage.
 - `POST /api/billing/usage` records local usage only.
+- Successful fake AI endpoints may record local `AI_REQUEST` usage events after deterministic fake-provider output.
 
 No endpoint may create Stripe customers, subscriptions, invoices, checkout sessions, payment intents, or charges. `LIVE_BILLING_ENABLED=false` remains the default and validation must prove live billing is blocked by default.
 

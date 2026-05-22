@@ -21,7 +21,7 @@ As of 2026-05-21:
 - Milestone 4: durable queue job records, schedule/cancel API foundations, hard gates before provider behavior.
 - Milestone 5: shared inbox APIs, demo inbound creation, assignment, notes, resolve/reopen, STOP/HELP local parsing.
 - Milestone 6: centralized messaging hard gate, compliance profile/checklist APIs, live-message blocker tests.
-- Milestone 7: deterministic fake AI provider and local AI endpoints with live AI blocked by default.
+- Milestone 7: deterministic fake AI provider and local AI endpoints with live AI blocked by default and successful fake calls metered as local `AI_REQUEST` usage.
 - Milestone 8: local usage/billing records, analytics overview, billing usage APIs, live billing blocked by default.
 - Milestone 9: `/demo` investor console and deterministic Playwright demo path.
 - Milestone 10: contract drift gate, tenant invariant checks, named seeded demo E2E script, local-gate documentation.

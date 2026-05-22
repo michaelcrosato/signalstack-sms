@@ -2350,3 +2350,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep product demo paths stable while preserving live SMS, provider, billing, live AI, and worker hard gates.
+
+## Run 265  GREEN  fake-ai-usage-metering  2026-05-21 21:10
+Objective:    Make successful deterministic fake AI endpoint calls update local usage analytics.
+Changed:
+- Added `recordFakeAiUsage` and wired all fake AI endpoints to record one local `AI_REQUEST` usage event after successful fake output.
+- Added static unit coverage that keeps fake AI API routes metered and verifies the helper stays local-only.
+- Updated AI/billing contracts, roadmap/state notes, and the seeded investor demo path to rely on endpoint-driven AI usage metering.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep product demo paths stable while preserving live SMS, provider, billing, live AI, and worker hard gates.

@@ -15,6 +15,8 @@ All AI endpoints use deterministic fake outputs while `AI_PROVIDER=fake`:
 
 If `AI_PROVIDER` is not `fake`, these endpoints are blocked in this milestone. No live provider calls, API keys, or paid AI usage are allowed.
 
+Successful fake AI endpoint calls record one local `AI_REQUEST` usage event with fake-provider metadata. This is local analytics/metering only and must not call billing providers, live AI providers, messaging providers, notifications, or external services.
+
 ## Post-MVP Local AI Operations
 
 `/settings/ai` renders the local AI safety boundary. It may display selected provider metadata, fake-provider readiness, endpoint coverage, AI usage totals, and recent local `AI_REQUEST` usage events.

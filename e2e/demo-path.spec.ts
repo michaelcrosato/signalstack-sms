@@ -553,17 +553,12 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
     stage: "HOT"
   });
 
+  const aiUsageResponse = await request.get("/api/billing/usage");
+  const aiUsageJson = await aiUsageResponse.json();
+  expect(aiUsageJson.usage.totals.AI_REQUEST).toBeGreaterThanOrEqual(1);
+
   const analyticsResponse = await request.get("/api/analytics/overview");
   const analyticsJson = await analyticsResponse.json();
   expect(analyticsJson.overview.contacts.total).toBeGreaterThanOrEqual(1);
-
-  const usageResponse = await request.post("/api/billing/usage", {
-    data: {
-      type: "AI_REQUEST",
-      quantity: 1,
-      metadata: { source: "demo_path" }
-    }
-  });
-  const usageJson = await usageResponse.json();
-  expect(usageJson.usage.liveBillingBlocked).toBe(true);
+  expect(aiUsageJson.usage.liveBillingBlocked).toBe(true);
 });

@@ -4,6 +4,7 @@ import { requireApiRole } from "@/lib/auth/api-authorization";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { resolveAiMessages } from "@/lib/ai/conversation-context";
 import { assertFakeAiProvider, fakeConversationSummary } from "@/lib/ai/fake-ai-provider";
+import { recordFakeAiUsage } from "@/lib/ai/usage";
 import { conversationAiRequestSchema } from "@/lib/validation/ai";
 
 export async function POST(request: Request) {
@@ -25,7 +26,9 @@ export async function POST(request: Request) {
     if (!messages) {
       return NextResponse.json({ error: "Conversation not found." }, { status: 404 });
     }
-    return NextResponse.json(fakeConversationSummary(messages));
+    const response = fakeConversationSummary(messages);
+    await recordFakeAiUsage(currentOrg.orgId, "conversation-summary");
+    return NextResponse.json(response);
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "AI provider blocked." }, { status: 403 });
   }
