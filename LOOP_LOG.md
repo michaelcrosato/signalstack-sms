@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 350  GREEN  parenthesized-globalthis-request-alias-auth-scan  2026-05-22 05:11
+Objective:    Prevent parenthesized local `globalThis.Request` constructor aliases from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize parenthesized local `globalThis` aliases before constructor-alias checks.
+- Added synthetic auth unit coverage proving `(root).Request`, `(root)?.[requestConstructorName]`, and destructured `{ Request } = (root)` forms fail before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the parenthesized local `globalThis.Request` alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 339  GREEN  parenthesized-object-reflect-body-reader-scan  2026-05-22 04:00
 Objective:    Prevent parenthesized direct `Object`/`Reflect` built-in access from hiding mutating-route request body readers before authorization.
 Changed:
