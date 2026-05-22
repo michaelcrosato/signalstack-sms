@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 294
+
+- Hardened typed exported const mutating route-handler authorization coverage for Run 294.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now recognizes TypeScript-annotated `export const POST/PATCH/PUT/DELETE: ... = async (...) => {}` and typed function-expression handlers, so future typed const-style mutating route handlers cannot bypass per-handler `requireApiRole` coverage or body-reader-before-role-gate ordering checks.
+- Updated the testing contract to name typed exported const handler coverage.
+- Focused auth coverage, contracts check, typecheck, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 293
 
 - Hardened exported const mutating route-handler authorization coverage for Run 293.

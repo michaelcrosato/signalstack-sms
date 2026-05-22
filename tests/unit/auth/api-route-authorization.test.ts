@@ -26,7 +26,7 @@ function routeFiles(directory: string): string[] {
 function exportedMutatingMethods(source: string) {
   return mutatingMethods.filter((method) =>
     new RegExp(
-      `export\\s+(?:(?:async\\s+)?function\\s+${method}\\b|const\\s+${method}\\s*=\\s*(?:async\\s+)?(?:function\\b)?)`
+      `export\\s+(?:(?:async\\s+)?function\\s+${method}\\b|const\\s+${method}\\b(?:\\s*:[\\s\\S]*?)?\\s*=\\s*(?:async\\s+)?(?:function\\b)?)`
     ).test(source)
   );
 }
@@ -39,7 +39,7 @@ function exportedHandlerSignatureStart(source: string, method: (typeof mutatingM
   }
 
   const constDeclaration = new RegExp(
-    `export\\s+const\\s+${method}\\s*=\\s*(?:async\\s+)?(?:function\\b\\s*)?`
+    `export\\s+const\\s+${method}\\b(?:\\s*:[\\s\\S]*?)?\\s*=\\s*(?:async\\s+)?(?:function\\b\\s*)?`
   );
   const constMatch = constDeclaration.exec(source);
   if (constMatch === null) {
@@ -450,6 +450,47 @@ describe("API route authorization coverage", () => {
     `;
     const safeSource = `
       export const DELETE = async (req: Request) => {
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await req.clone().arrayBuffer();
+        return Response.json({ size: payload.byteLength });
+      };
+    `;
+
+    expect(exportedMutatingMethods(missingRoleGateSource)).toEqual(["POST"]);
+    expect(exportedMutatingMethodHasRoleGate(missingRoleGateSource, "POST")).toBe(false);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeArrowSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeFunctionExpressionSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "DELETE")).toBe(false);
+  });
+
+  it("tracks typed exported const mutating route handlers for role-gate and body-order checks", () => {
+    const missingRoleGateSource = `
+      type RouteHandler = (request: Request) => Promise<Response>;
+      export const POST: RouteHandler = async (request: Request) => {
+        return Response.json({ ok: true });
+      };
+    `;
+    const unsafeArrowSource = `
+      type RouteHandler = (request: Request) => Promise<Response>;
+      export const PATCH: RouteHandler = async (request: Request) => {
+        const payload = await request.json();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      };
+    `;
+    const unsafeFunctionExpressionSource = `
+      export const PUT: (req: Request) => Promise<Response> = async function(req: Request) {
+        const cloned = req.clone();
+        const payload = await cloned.text();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      };
+    `;
+    const safeSource = `
+      export const DELETE: (req: Request) => Promise<Response> = async (req: Request) => {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
         if (roleResponse) return roleResponse;
         const payload = await req.clone().arrayBuffer();
