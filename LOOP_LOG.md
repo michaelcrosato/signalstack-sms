@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 369  GREEN  non-null-request-constructor-alias-auth-scan  2026-05-22 07:14
+Objective:    Prevent TypeScript non-null `Request` constructor/prototype aliases from hiding body readers before mutating-route role gates.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize non-null `Request`, `globalThis.Request`, and `Request.prototype` alias forms before body-reader checks.
+- Added synthetic auth unit coverage proving `const RequestCtor = Request!`, `const RequestCtor = globalThis.Request!`, and `const requestPrototype = Request.prototype!` fail before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the non-null constructor/prototype alias boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 368  GREEN  non-null-request-reader-auth-scan  2026-05-22 07:07
 Objective:    Prevent TypeScript non-null request body-reader expressions from hiding parsing before mutating-route role gates.
 Changed:
