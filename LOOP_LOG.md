@@ -3453,3 +3453,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 385  GREEN  api-route-external-impact-visibility  2026-05-22 08:40
+Objective:    Make the read-only API operations inventory visibly identify the gated live-test SMS external-impact route.
+Changed:
+- Added per-route external-impact labels to `/settings/api` route inventory while keeping the view read-only.
+- Extended the seeded investor demo path to verify `POST /api/demo/live-test-sms` renders as external impact with Twilio allowlist-gate safety copy.
+- Updated testing docs/contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the API external-impact visibility boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep product demo and Phase 0 safety gates green while live sends, provider calls, billing, live AI, notifications, and secrets remain blocked.

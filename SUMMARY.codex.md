@@ -1,6 +1,17 @@
 # Codex Summary
 
-Run number: 380
+Run number: 385
+
+- Latest API operations visibility work makes `/settings/api` display a route-level external-impact label for every listed API route and keeps `POST /api/demo/live-test-sms` visibly marked as the only external-impact route.
+- Updated seeded investor demo coverage to assert the live-test SMS route row renders both its external-impact classification and Twilio allowlist-gate safety copy.
+- Updated testing docs/contracts, NEXT_PROMPTS, and current state matrix for the API external-impact visibility boundary.
+- Focused checks passed: `npm run typecheck`, `npm run lint`, `npm run test -- tests/unit/operations/api-operations.test.ts`, and `$env:PLAYWRIGHT_PORT='3111'; npm run test:e2e:demo`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 413 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
+Run number: 384
 
 - Latest live-worker length coercion coverage proves supplied `production-live-campaign` control arrays with hostile non-primitive `length` descriptor values deny without coercing descriptor values or reading indexed controls. Focused unit coverage and the protected local gate passed; no workers, providers, billing, notifications, SMS, email, live AI, secrets, protected gate scripts, or destructive production actions were used.
 - Hardened live-worker control coverage so writable or configurable supplied control-array index descriptors cannot authorize the reserved `production-live-campaign` class.

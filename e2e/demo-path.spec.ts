@@ -153,6 +153,9 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(apiNoImpactSummary.getByText("External impact", { exact: true })).toBeVisible();
   await expect(apiNoImpactSummary.getByText("Mutation", { exact: true })).toBeVisible();
   await expect(apiNoImpactSummary.getByText("Secrets displayed", { exact: true })).toBeVisible();
+  const liveTestSmsRoute = page.locator("li").filter({ hasText: "POST" }).filter({ hasText: "/api/demo/live-test-sms" });
+  await expect(liveTestSmsRoute.getByText("external impact", { exact: true })).toBeVisible();
+  await expect(liveTestSmsRoute.getByText("Twilio live test SMS behind explicit allowlist gates")).toBeVisible();
   await expect(page.getByText("/api/webhooks/twilio/inbound")).toBeVisible();
   await expect(page.getByText("Safety Boundary")).toBeVisible();
   await page.getByRole("link", { name: "Contract Operations" }).click();

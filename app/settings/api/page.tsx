@@ -80,14 +80,20 @@ export default async function ApiOperationsPage() {
       <Panel title="Route Inventory">
         <ul className="grid gap-3 text-sm">
           {status.routes.map((route) => (
-            <li key={`${route.method}:${route.path}`} className="grid gap-2 border-b border-slate-100 pb-3 lg:grid-cols-[7rem_1fr_8rem_8rem]">
+            <li
+              key={`${route.method}:${route.path}`}
+              className="grid gap-2 border-b border-slate-100 pb-3 lg:grid-cols-[7rem_1fr_8rem_8rem_9rem]"
+            >
               <span className="font-mono text-xs font-semibold text-slate-950">{route.method}</span>
               <span className="break-words font-mono text-xs text-slate-800">{route.path}</span>
               <span className="text-slate-600">{route.area}</span>
               <span className={route.mutates ? "font-medium text-amber-700" : "font-medium text-teal-700"}>
                 {route.mutates ? "local write" : "read only"}
               </span>
-              <span className="lg:col-start-2 lg:col-span-3 text-xs text-slate-600">{route.safety}</span>
+              <span className={route.externalImpact ? "text-xs font-medium text-amber-700" : "text-xs font-medium text-teal-700"}>
+                {route.externalImpact ? "external impact" : "no external impact"}
+              </span>
+              <span className="text-xs text-slate-600 lg:col-start-2 lg:col-span-4">{route.safety}</span>
             </li>
           ))}
         </ul>
