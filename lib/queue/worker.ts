@@ -65,8 +65,12 @@ const MIN_WORKER_MAX_JOBS_PER_POLL = 1;
 const MAX_WORKER_MAX_JOBS_PER_POLL = 100;
 export const supportedWorkerDeploymentClasses = Object.freeze(["local-demo"] as const);
 
+function liveMessagingFlagIsDisabled(value: unknown) {
+  return value === undefined || value === "" || value === "false";
+}
+
 export function localWorkerProviderIsAllowed(input: WorkerSafetyInput) {
-  return input.liveMessagingEnabled !== "true" && (input.messagingProvider ?? "dummy") === "dummy";
+  return liveMessagingFlagIsDisabled(input.liveMessagingEnabled) && (input.messagingProvider ?? "dummy") === "dummy";
 }
 
 export function workerDeploymentClassIsAllowed(input: WorkerSafetyInput) {

@@ -19,9 +19,25 @@ describe("local queue worker", () => {
   ];
 
   it("only allows dummy provider processing while live messaging is disabled", () => {
+    expect(localWorkerProviderIsAllowed({ messagingProvider: "dummy" })).toBe(true);
+    expect(localWorkerProviderIsAllowed({ liveMessagingEnabled: "", messagingProvider: "dummy" })).toBe(true);
     expect(localWorkerProviderIsAllowed({ liveMessagingEnabled: "false", messagingProvider: "dummy" })).toBe(true);
     expect(localWorkerProviderIsAllowed({ liveMessagingEnabled: "true", messagingProvider: "dummy" })).toBe(false);
     expect(localWorkerProviderIsAllowed({ liveMessagingEnabled: "false", messagingProvider: "twilio" })).toBe(false);
+  });
+
+  it("fails closed for malformed live messaging flag values before worker processing", () => {
+    const malformedLiveFlagValues = [true, false, 1, 0, "TRUE", "0", null, Symbol("live-messaging-enabled")];
+
+    for (const liveMessagingEnabled of malformedLiveFlagValues) {
+      expect(localWorkerProviderIsAllowed({ liveMessagingEnabled, messagingProvider: "dummy" })).toBe(false);
+      expect(
+        localWorkerReadiness({
+          liveMessagingEnabled,
+          messagingProvider: "dummy"
+        })
+      ).toEqual({ allowed: false, reason: "provider-blocked" });
+    }
   });
 
   it("blocks worker processing in production-like runtimes even with demo-safe provider defaults", () => {

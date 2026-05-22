@@ -6,12 +6,14 @@ This policy is a planning gate for future live campaign sending. It does not aut
 
 The current supported worker posture is local/demo only:
 
-- `npm run worker` may process one local database-backed pass only when the runtime is not production-like, `MESSAGING_PROVIDER=dummy`, and `LIVE_MESSAGING_ENABLED` is not `true`.
+- `npm run worker` may process one local database-backed pass only when the runtime is not production-like, `MESSAGING_PROVIDER=dummy`, and `LIVE_MESSAGING_ENABLED` is unset, empty, or exactly `false`.
 - `npm run worker:watch` may poll repeatedly only under the same local/demo gate.
-- `npm run worker:bullmq` may consume BullMQ jobs only when `QUEUE_BACKEND=bullmq`, `REDIS_URL` is configured, the runtime is not production-like, `MESSAGING_PROVIDER=dummy`, and `LIVE_MESSAGING_ENABLED` is not `true`.
+- `npm run worker:bullmq` may consume BullMQ jobs only when `QUEUE_BACKEND=bullmq`, `REDIS_URL` is configured, the runtime is not production-like, `MESSAGING_PROVIDER=dummy`, and `LIVE_MESSAGING_ENABLED` is unset, empty, or exactly `false`.
 - `npm run queue:bullmq:smoke` is an optional local Redis smoke check and must not touch campaign jobs, provider calls, billing, notifications, or live messaging flags.
 
 `WORKER_DEPLOYMENT_CLASS` may be unset or `local-demo` only. Any other value, including future-looking names such as `production-live`, blocks scheduled-campaign worker startup until a later milestone adds reviewed live-worker controls.
+
+Runtime-unknown or malformed live-messaging flag values fail closed before worker jobs can process.
 
 Production-like runtime markers are `NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, or `APP_ENV` set to `production` or `prod`. These markers block scheduled-campaign worker execution today, even with demo-safe provider defaults.
 

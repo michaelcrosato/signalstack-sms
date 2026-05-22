@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 252  GREEN  worker-live-flag-fail-closed  2026-05-21 19:56
+Objective:    Fail closed for malformed local worker live-messaging flag values.
+Changed:
+- Tightened local scheduled-campaign worker provider readiness so `LIVE_MESSAGING_ENABLED` must be unset, empty, or exactly `false` before dummy worker processing is allowed.
+- Added queue unit coverage proving runtime-unknown or malformed live-messaging flag values return `provider-blocked` before worker jobs can process.
+- Updated queue/testing contracts, production worker policy docs, roadmap/state/handoff notes, README, SUMMARY, and BLOCKERS.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 250  GREEN  live-worker-hidden-required-fields  2026-05-21 19:44
 Objective:    Prove hidden required fields cannot authorize the reserved live worker class.
 Changed:

@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 252
+
+- No blocker from the worker live-messaging flag readiness hardening. Runtime-unknown or malformed `LIVE_MESSAGING_ENABLED` values now fail closed before scheduled campaign workers can process jobs; the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.
+
 Run number: 251
 
 - No blocker from the live-worker authorization wrapper key-evidence denial coverage. Reordered or extra wrapper keys now have explicit denial coverage before supplied controls are inspected; the reserved class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.

@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 252
+
+- Hardened local worker live-messaging flag readiness for Run 252.
+- Latest repo truth: scheduled campaign workers now fail closed unless `LIVE_MESSAGING_ENABLED` is unset, empty, or exactly `false`; runtime-unknown or malformed live-messaging flag values return `provider-blocked` before worker jobs can process.
+- Focused queue worker tests, typecheck, production-worker policy check, `git diff --check`, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 251
 
 - Hardened live-worker authorization wrapper key-evidence denial coverage for Run 251.
