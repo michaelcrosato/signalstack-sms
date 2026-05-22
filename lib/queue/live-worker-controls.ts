@@ -367,7 +367,7 @@ function authorizationInputExposesOnlyPublicFields(input: unknown) {
 
   return liveWorkerAuthorizationPublicFields.every((field) => {
     const descriptor = safeGetOwnPropertyDescriptor(input, field);
-    return ownKeys.includes(field) && descriptor !== undefined && "value" in descriptor && descriptor.enumerable === true;
+    return ownKeys.includes(field) && descriptorIsFrozenDataField(descriptor, { enumerable: true });
   });
 }
 

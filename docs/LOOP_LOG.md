@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 237  GREEN  live-worker-wrapper-descriptors  2026-05-21 18:37
+Objective:    Require frozen authorization wrapper fields before future live-worker authorization can pass.
+Changed:
+- Tightened `liveWorkerDeploymentClassIsAuthorized` so wrapper `workerDeploymentClass` and `controls` fields must be frozen data descriptors.
+- Added unit coverage proving mutable authorization wrapper fields cannot authorize `production-live-campaign`.
+- Updated queue/testing contracts, production worker policy docs, README, state matrix, SUMMARY, and BLOCKERS.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 236  GREEN  live-worker-nullish-control-evidence  2026-05-21 18:30
 Objective:    Require actual supplied control evidence before future live-worker authorization can pass.
 Changed:

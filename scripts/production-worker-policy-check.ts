@@ -47,6 +47,10 @@ const requiredTexts: RequiredText[] = [
     text: "malformed authorization wrapper input must deny without executing accessor-backed fields"
   },
   {
+    file: "docs/PRODUCTION_WORKER_POLICY.md",
+    text: "exposes only frozen public data fields for `workerDeploymentClass` and `controls`"
+  },
+  {
     file: "lib/queue/worker.ts",
     text: "reason: \"production-worker-blocked\""
   },
@@ -125,6 +129,10 @@ const requiredTexts: RequiredText[] = [
   {
     file: "tests/unit/queue/live-worker-controls.test.ts",
     text: "rejects malformed authorization inputs without throwing"
+  },
+  {
+    file: "tests/unit/queue/live-worker-controls.test.ts",
+    text: "requires frozen authorization wrapper data descriptors before live-worker authorization"
   },
   {
     file: "tests/unit/queue/live-worker-controls.test.ts",

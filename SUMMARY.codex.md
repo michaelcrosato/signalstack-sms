@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 237
+
+- Hardened live-worker authorization wrapper descriptor handling for Run 237.
+- Latest repo truth: `liveWorkerDeploymentClassIsAuthorized` now denies authorization wrappers unless `workerDeploymentClass` and `controls` are own enumerable frozen data descriptors; mutable wrapper fields cannot authorize the reserved `production-live-campaign` class even when supplied controls are otherwise implemented.
+- Focused live-worker control tests passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 236
 
 - Hardened live-worker authorization evidence handling for Run 236.

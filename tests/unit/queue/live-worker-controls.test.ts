@@ -41,6 +41,13 @@ describe("production live campaign worker controls", () => {
     );
   }
 
+  function frozenAuthorizationWrapper(workerDeploymentClass: string, controls: unknown) {
+    return Object.freeze({
+      workerDeploymentClass,
+      controls
+    });
+  }
+
   it("keeps the reserved production class outside the currently supported worker class list", () => {
     expect(reservedLiveWorkerDeploymentClass).toBe("production-live-campaign");
     expect(supportedWorkerDeploymentClasses).toEqual(["local-demo"]);
@@ -153,10 +160,9 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerControlsAreFrozen(subclassControls)).toBe(false);
     expect(liveWorkerControlsAreImplemented(subclassControls)).toBe(false);
     expect(
-      liveWorkerDeploymentClassIsAuthorized({
-        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
-        controls: subclassControls
-      })
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, subclassControls)
+      )
     ).toBe(false);
   });
 
@@ -270,10 +276,7 @@ describe("production live campaign worker controls", () => {
       expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(malformedControl !== withoutStatus);
       expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
       expect(
-        liveWorkerDeploymentClassIsAuthorized({
-          workerDeploymentClass: reservedLiveWorkerDeploymentClass,
-          controls
-        })
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
       ).toBe(false);
     }
   });
@@ -371,10 +374,7 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(false);
     expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
     expect(
-      liveWorkerDeploymentClassIsAuthorized({
-        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
-        controls
-      })
+      liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
     ).toBe(false);
   });
 
@@ -460,10 +460,7 @@ describe("production live campaign worker controls", () => {
       expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(false);
       expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
       expect(
-        liveWorkerDeploymentClassIsAuthorized({
-          workerDeploymentClass: reservedLiveWorkerDeploymentClass,
-          controls
-        })
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
       ).toBe(false);
     }
   });
@@ -521,10 +518,7 @@ describe("production live campaign worker controls", () => {
       expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
       expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
       expect(
-        liveWorkerDeploymentClassIsAuthorized({
-          workerDeploymentClass: reservedLiveWorkerDeploymentClass,
-          controls
-        })
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
       ).toBe(false);
     }
   });
@@ -543,21 +537,39 @@ describe("production live campaign worker controls", () => {
     });
 
     expect(() =>
-      liveWorkerDeploymentClassIsAuthorized({
-        workerDeploymentClass: "production-live",
-        controls: throwingEvidence
-      })
+      liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper("production-live", throwingEvidence))
     ).not.toThrow();
     expect(
-      liveWorkerDeploymentClassIsAuthorized({
-        workerDeploymentClass: "production-live",
-        controls: throwingEvidence
-      })
+      liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper("production-live", throwingEvidence))
     ).toBe(false);
+  });
+
+  it("requires frozen authorization wrapper data descriptors before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const mutableWrapper = {
+      workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+      controls: implementedControls
+    };
+    const sealedWrapper = Object.seal({
+      workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+      controls: implementedControls
+    });
+
+    expect(liveWorkerDeploymentClassIsAuthorized(mutableWrapper)).toBe(false);
+    expect(liveWorkerDeploymentClassIsAuthorized(sealedWrapper)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      )
+    ).toBe(true);
   });
 
   it("rejects malformed authorization inputs without throwing", () => {
     const implementedControls = implementedFrozenControls();
+    const mutableInput = {
+      workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+      controls: implementedControls
+    };
     const accessorBackedInput = Object.freeze(
       Object.defineProperties(
         {},
@@ -620,6 +632,7 @@ describe("production live campaign worker controls", () => {
       undefined,
       "production-live-campaign",
       reservedLiveWorkerDeploymentClass,
+      mutableInput,
       Object.freeze({}),
       Object.freeze({
         workerDeploymentClass: reservedLiveWorkerDeploymentClass
@@ -759,6 +772,30 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerControlsAreImplemented()).toBe(false);
     expect(liveWorkerDeploymentClassIsAuthorized({ workerDeploymentClass: reservedLiveWorkerDeploymentClass })).toBe(false);
     expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(
+          reservedLiveWorkerDeploymentClass,
+          Object.freeze([
+            Object.freeze({
+              id: "deploy-environment-allowlist",
+              status: "implemented",
+              requirement: "Only one implemented control is not enough to authorize live worker execution."
+            })
+          ])
+        )
+      )
+    ).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper("production-live", implementedFrozenControls())
+      )
+    ).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedFrozenControls())
+      )
+    ).toBe(true);
+    expect(
       liveWorkerDeploymentClassIsAuthorized({
         workerDeploymentClass: reservedLiveWorkerDeploymentClass,
         controls: Object.freeze([
@@ -770,17 +807,5 @@ describe("production live campaign worker controls", () => {
         ])
       })
     ).toBe(false);
-    expect(
-      liveWorkerDeploymentClassIsAuthorized({
-        workerDeploymentClass: "production-live",
-        controls: implementedFrozenControls()
-      })
-    ).toBe(false);
-    expect(
-      liveWorkerDeploymentClassIsAuthorized({
-        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
-        controls: implementedFrozenControls()
-      })
-    ).toBe(true);
   });
 });
