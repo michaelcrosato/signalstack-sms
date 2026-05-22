@@ -81,7 +81,7 @@ function isReadonlyControlArray(controls: unknown): controls is readonly LiveWor
 }
 
 function isControlRecord(control: unknown): control is LiveWorkerControl {
-  return control !== null && typeof control === "object";
+  return control !== null && typeof control === "object" && Object.getPrototypeOf(control) === Object.prototype;
 }
 
 function controlArrayIsDense(controls: readonly LiveWorkerControl[]) {

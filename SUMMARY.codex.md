@@ -1,5 +1,14 @@
 # Codex Summary
 
+- Tightened live-worker control entry-shape validation for Run 227.
+- Latest repo truth: future `production-live-campaign` authorization now rejects null-prototype and class-instance supplied control entries before checking implemented status; the reserved class remains outside supported worker classes.
+- Focused live-worker control tests, the production worker policy check, typecheck, `git diff --check`, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+Run number: 227
+
+## Previous Run
+
 - Tightened live-worker control array-shape validation for Run 226.
 - Latest repo truth: future `production-live-campaign` authorization now rejects decorated supplied control arrays with extra string, symbol, or hidden array-level fields before checking implemented status; the reserved class remains outside supported worker classes.
 - Focused live-worker control tests, the production worker policy check, typecheck, `git diff --check`, and the protected local gate passed.

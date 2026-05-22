@@ -241,6 +241,55 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("requires live-worker controls to be ordinary object records", () => {
+    const implementedControls = implementedFrozenControls();
+    const nullPrototypeControl = Object.create(null, {
+      id: {
+        value: implementedControls[0].id,
+        enumerable: true
+      },
+      status: {
+        value: "implemented",
+        enumerable: true
+      },
+      requirement: {
+        value: implementedControls[0].requirement,
+        enumerable: true
+      }
+    }) as LiveWorkerControl;
+    Object.freeze(nullPrototypeControl);
+
+    class ControlRecord {
+      id = implementedControls[0].id;
+      status = "implemented" as const;
+      requirement = implementedControls[0].requirement;
+    }
+    const classInstanceControl = Object.freeze(new ControlRecord()) as LiveWorkerControl;
+
+    expect(liveWorkerControlsExposeOnlyPublicFields(implementedControls)).toBe(true);
+    expect(
+      liveWorkerControlsExposeOnlyPublicFields(
+        Object.freeze(
+          implementedControls.map((control, index) => (index === 0 ? nullPrototypeControl : Object.freeze({ ...control })))
+        )
+      )
+    ).toBe(false);
+    expect(
+      liveWorkerControlsAreImplemented(
+        Object.freeze(
+          implementedControls.map((control, index) => (index === 0 ? nullPrototypeControl : Object.freeze({ ...control })))
+        )
+      )
+    ).toBe(false);
+    expect(
+      liveWorkerControlsAreImplemented(
+        Object.freeze(
+          implementedControls.map((control, index) => (index === 0 ? classInstanceControl : Object.freeze({ ...control })))
+        )
+      )
+    ).toBe(false);
+  });
+
   it("rejects malformed control evidence without throwing", () => {
     const sparseControls = Array<LiveWorkerControl>(2);
     sparseControls[0] = Object.freeze({ ...productionLiveCampaignWorkerControls[0], status: "implemented" as const });
