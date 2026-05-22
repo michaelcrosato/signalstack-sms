@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 426
+
+- Latest live-worker public-string exact-match coverage proves supplied `production-live-campaign` control entries with whitespace-padded or case-drifted `id`, `status`, or `requirement` strings deny without normalization.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 54 tests.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 440 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 425
 
 - Latest live-worker public-field non-coercion coverage proves supplied `production-live-campaign` control entries with boxed string `id` or `requirement` values deny before the reserved live worker class can authorize.

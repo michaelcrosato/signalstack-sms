@@ -877,6 +877,59 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("does not normalize control public strings before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const stringDriftControls = [
+      Object.freeze({
+        id: ` ${implementedControls[0].id}`,
+        status: "implemented" as const,
+        requirement: implementedControls[0].requirement
+      }),
+      Object.freeze({
+        id: implementedControls[0].id.toUpperCase(),
+        status: "implemented" as const,
+        requirement: implementedControls[0].requirement
+      }),
+      Object.freeze({
+        id: implementedControls[0].id,
+        status: " implemented " as LiveWorkerControl["status"],
+        requirement: implementedControls[0].requirement
+      }),
+      Object.freeze({
+        id: implementedControls[0].id,
+        status: "IMPLEMENTED" as LiveWorkerControl["status"],
+        requirement: implementedControls[0].requirement
+      }),
+      Object.freeze({
+        id: implementedControls[0].id,
+        status: "implemented" as const,
+        requirement: `${implementedControls[0].requirement} `
+      }),
+      Object.freeze({
+        id: implementedControls[0].id,
+        status: "implemented" as const,
+        requirement: implementedControls[0].requirement.toUpperCase()
+      })
+    ];
+
+    for (const driftedControl of stringDriftControls) {
+      const controls = Object.freeze(
+        implementedControls.map((control, index) => (index === 0 ? driftedControl : Object.freeze({ ...control })))
+      );
+
+      expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(true);
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).toBe(true);
+      expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(
+        driftedControl.id === implementedControls[0].id && driftedControl.requirement === implementedControls[0].requirement
+      );
+      expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(driftedControl.status === "implemented");
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).toBe(false);
+    }
+  });
+
   it("rejects hidden string metadata on control entries before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const hiddenMetadataControl = Object.freeze(

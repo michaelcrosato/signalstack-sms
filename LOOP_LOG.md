@@ -100,6 +100,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
 
+## Run 426  GREEN  live-worker-public-string-exact-match  2026-05-22 13:20
+Objective:    Prove control-entry public strings cannot authorize the reserved live worker class through trimming or case normalization.
+Changed:
+- Added live-worker control coverage for whitespace-padded or case-drifted `id`, `status`, and `requirement` strings on otherwise implemented supplied controls.
+- Updated queue/testing contracts, testing docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the public-string exact-match boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 390  GREEN  live-worker-mismatched-length-evidence  2026-05-22 09:09
 Objective:    Prove mismatched safe-integer supplied control-array length descriptors cannot authorize the reserved live worker class.
 Changed:
