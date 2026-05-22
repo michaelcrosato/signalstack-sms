@@ -43,10 +43,13 @@ function normalizeOptionalProviderValue(value: string | undefined) {
   return normalized ? normalized : undefined;
 }
 
-export function formDataToRecord(formData: FormData): Record<string, string> {
+export function formDataToRecord(formData: FormData): Record<string, string> | null {
   const payload: Record<string, string> = {};
   for (const [key, value] of formData.entries()) {
-    payload[key] = typeof value === "string" ? value : value.name;
+    if (typeof value !== "string") {
+      return null;
+    }
+    payload[key] = value;
   }
   return payload;
 }

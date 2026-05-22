@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 398  GREEN  twilio-string-form-payload  2026-05-22 09:46
+Objective:    Reject unsupported non-string Twilio webhook form parts before signature validation or raw payload trust.
+Changed:
+- Made `formDataToRecord` return `null` for non-string `FormData` parts instead of coercing file/blob parts to filenames.
+- Added inbound/status webhook route handling for invalid form payloads before signature validation.
+- Added focused webhook helper coverage and updated webhook/testing contracts, webhook/testing docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the string-only form boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep webhook parsing, product demo, live-worker, provider, billing, live AI, notification, and secret gates stable.
+
 ## Run 397  GREEN  twilio-unknown-field-signature  2026-05-22 09:42
 Objective:    Prove Twilio webhook signature validation includes unknown provider fields before local payload trust/storage.
 Changed:

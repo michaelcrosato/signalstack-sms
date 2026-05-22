@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 398
+
+- No blocker from Twilio string-only form payload enforcement. Focused webhook helper coverage and the protected local gate passed. The change is local webhook parsing/test coverage plus contract/docs/handoff truth only and does not call Twilio, use production credentials, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, execute workers, enqueue jobs, call Redis, hard-delete data, or perform destructive production database actions.
+
 Run number: 397
 
 - No blocker from Twilio unknown-field signature validation coverage. Focused webhook helper coverage and the protected local gate passed. The change is local webhook signature test coverage plus contract/docs/handoff truth only and does not call Twilio, use production credentials, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, execute workers, enqueue jobs, call Redis, hard-delete data, or perform destructive production database actions.

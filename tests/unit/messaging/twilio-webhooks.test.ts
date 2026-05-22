@@ -1,6 +1,7 @@
 import { createHmac } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import {
+  formDataToRecord,
   normalizeTwilioInbound,
   normalizeTwilioStatus,
   twilioStatusTransition,
@@ -15,6 +16,16 @@ function sign(url: string, params: Record<string, string>, token: string) {
 }
 
 describe("Twilio webhook helpers", () => {
+  it("rejects non-string form fields before signature validation", () => {
+    const formData = new FormData();
+    formData.append("From", "+15555550100");
+    formData.append("Body", "HELP");
+    formData.append("MessageSid", "SM123");
+    formData.append("Media", new Blob(["not-url-encoded"]), "upload.txt");
+
+    expect(formDataToRecord(formData)).toBeNull();
+  });
+
   it("validates form signatures with sorted parameters", () => {
     const url = "https://example.com/api/webhooks/twilio/inbound";
     const params = {

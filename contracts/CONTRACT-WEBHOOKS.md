@@ -12,6 +12,7 @@ Implemented foundations:
 Rules:
 
 - Webhook requests are `application/x-www-form-urlencoded`.
+- Non-string form parts are rejected before signature validation; Twilio webhook helpers must not coerce file/blob parts into filenames or trusted payload fields.
 - Signature validation uses the exact request URL, all received parameters including unknown provider fields, and `TWILIO_AUTH_TOKEN`.
 - Missing or invalid signatures return `403`.
 - Missing required normalized fields return `400`.

@@ -12,6 +12,10 @@ import { twilioWebhookPayloadSchema } from "@/lib/validation/webhooks";
 
 export async function POST(request: Request) {
   const rawPayload = formDataToRecord(await request.formData());
+  if (!rawPayload) {
+    return NextResponse.json({ error: "Invalid Twilio form payload." }, { status: 400 });
+  }
+
   const signatureValid = validateTwilioSignature({
     authToken: process.env.TWILIO_AUTH_TOKEN,
     signature: request.headers.get("x-twilio-signature"),
