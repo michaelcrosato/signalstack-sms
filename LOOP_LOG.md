@@ -3744,3 +3744,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 416  GREEN  live-worker-hidden-wrapper-string-evidence  2026-05-22 12:21
+Objective:    Prove hidden string metadata on authorization wrappers cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for otherwise valid authorization wrappers carrying non-enumerable string metadata.
+- Updated queue/testing contracts, production-worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the hidden string authorization-wrapper boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.

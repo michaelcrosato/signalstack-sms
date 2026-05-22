@@ -1798,6 +1798,19 @@ describe("production live campaign worker controls", () => {
         }
       )
     );
+    const hiddenStringExtraKeyWrapper = Object.freeze(
+      Object.defineProperty(
+        {
+          workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+          controls: throwingEvidence
+        },
+        "hiddenLiveWorkerWrapperKey",
+        {
+          value: true,
+          enumerable: false
+        }
+      )
+    );
     const symbolExtraKeyWrapper = Object.freeze(
       Object.assign(
         {
@@ -1827,6 +1840,7 @@ describe("production live campaign worker controls", () => {
       extraKeyWrapper,
       duplicateKeyWrapper,
       hiddenExtraKeyWrapper,
+      hiddenStringExtraKeyWrapper,
       symbolExtraKeyWrapper,
       hiddenSymbolExtraKeyWrapper
     ]) {
