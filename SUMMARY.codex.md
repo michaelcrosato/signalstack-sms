@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 355
+
+- Hardened whole-parenthesized `globalThis.Request` constructor and `Request.prototype` alias authorization coverage.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes whole parenthesized member aliases such as `const RequestCtor = (globalThis.Request)` and `const requestPrototype = (Request.prototype)`, so their later `Request.prototype` body-reader calls cannot parse a mutating-route request body before the handler's top-level `requireApiRole`.
+- Updated the testing contract and testing docs for the whole-parenthesized member-alias boundary.
+- The first focused auth run failed on the newly added `(globalThis.Request)` case, confirming the scanner gap; after member-expression parenthesis normalization, focused auth coverage passed: `npm run test -- tests/unit/auth/api-route-authorization.test.ts`.
+- `.\scripts\local-gate.ps1` passed on 2026-05-22 05:46 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 46 unit test files / 391 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 354
 
 - Hardened nested-parenthesized direct `Request` constructor/prototype alias authorization coverage.

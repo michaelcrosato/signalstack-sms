@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 355
+
+- No blocker from whole-parenthesized `globalThis.Request` constructor and `Request.prototype` alias authorization hardening. The first focused auth run failed on the newly added `(globalThis.Request)` case, confirming the scanner gap; after normalization, focused auth coverage and the protected local gate passed. The change tightens local static API authorization coverage plus testing-contract/docs text only and does not execute API handlers, parse live requests, use production credentials, mutate product records beyond validation behavior, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, execute workers, enqueue jobs, call Redis, edit protected gate scripts, hard-delete data, or perform destructive production database actions.
+
 Run number: 354
 
 - No blocker from nested-parenthesized direct `Request` constructor/prototype alias authorization hardening. Focused auth coverage and the protected local gate passed. The change tightens local static API authorization coverage plus testing-contract/docs text only and does not execute API handlers, parse live requests, use production credentials, mutate product records beyond validation behavior, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, execute workers, enqueue jobs, call Redis, edit protected gate scripts, hard-delete data, or perform destructive production database actions.

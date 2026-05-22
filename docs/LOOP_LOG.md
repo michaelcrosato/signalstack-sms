@@ -2902,3 +2902,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 355  GREEN  whole-parenthesized-request-member-alias-auth-scan  2026-05-22 05:46
+Objective:    Prevent whole-parenthesized `globalThis.Request` and `Request.prototype` aliases from hiding body-reader calls before mutating-route role gates.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize whole-parenthesized `globalThis.Request`, `globalThis["Request"]`, `Request.prototype`, and `Request["prototype"]` member expressions before alias checks.
+- Added synthetic auth unit coverage proving `const RequestCtor = (globalThis.Request)` and `const requestPrototype = (Request.prototype)` fail before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the whole-parenthesized member-alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
