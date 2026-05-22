@@ -628,6 +628,30 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects sealed but writable control entries before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const sealedWritableControl = Object.seal({
+      id: implementedControls[0].id,
+      status: "implemented" as const,
+      requirement: implementedControls[0].requirement
+    }) as LiveWorkerControl;
+    const controls = Object.freeze(
+      implementedControls.map((control, index) => (index === 0 ? sealedWritableControl : Object.freeze({ ...control })))
+    );
+
+    expect(Object.isSealed(sealedWritableControl)).toBe(true);
+    expect(Object.isFrozen(sealedWritableControl)).toBe(false);
+    expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(true);
+    expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(true);
+    expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(true);
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).toBe(false);
+    expect(liveWorkerControlsAreFrozen(controls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+    ).toBe(false);
+  });
+
   it("requires live-worker control public fields in exact order", () => {
     const implementedControls = implementedFrozenControls();
     const reorderedFieldControl = Object.freeze({

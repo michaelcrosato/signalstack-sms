@@ -3612,3 +3612,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep webhook idempotency, product demo, live-worker, provider, billing, live AI, notification, and secret gates stable.
+
+## Run 401  GREEN  live-worker-sealed-entry-evidence  2026-05-22 10:03
+Objective:    Prove sealed-but-writable supplied control entries cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for sealed control entries whose public fields remain writable.
+- Updated queue/testing contracts, production-worker/testing docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the sealed-but-writable entry boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
