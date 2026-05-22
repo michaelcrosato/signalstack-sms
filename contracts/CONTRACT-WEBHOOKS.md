@@ -17,7 +17,7 @@ Rules:
 - Missing required normalized fields return `400`.
 - Valid and duplicate events return `204`.
 - Raw payloads are stored in `WebhookEvent.rawPayload` without dropping unknown provider fields.
-- Delivery-status idempotency keys normalize provider status casing before local storage.
+- Delivery-status idempotency keys normalize provider status casing and surrounding whitespace before local storage.
 - Inbound webhooks may create local inbox messages and local STOP/HELP consent effects through the same demo-safe inbound path.
 - Status webhooks may update matching local `Message` rows by `providerMessageId` with provider status, provider error code, and delivered/failed timestamps.
 

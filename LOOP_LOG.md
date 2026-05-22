@@ -3054,3 +3054,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 340  GREEN  twilio-status-whitespace-idempotency  2026-05-22 04:13
+Objective:    Prevent delivery-status whitespace drift from creating duplicate local webhook status events.
+Changed:
+- Trimmed Twilio delivery-status values before lowercasing and deriving status webhook idempotency keys.
+- Added focused webhook helper coverage for whitespace-padded status values and whitespace-only rejection.
+- Updated webhook/testing contracts, docs, SUMMARY, BLOCKERS, and the current state matrix with the protected gate result.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 webhook idempotency and external-impact gates green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.

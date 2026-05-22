@@ -87,6 +87,27 @@ describe("Twilio webhook helpers", () => {
     });
   });
 
+  it("normalizes status whitespace before deriving idempotent event keys", () => {
+    expect(
+      normalizeTwilioStatus({
+        MessageSid: "SM123",
+        MessageStatus: " delivered "
+      })
+    ).toEqual({
+      providerMessageId: "SM123",
+      status: "delivered",
+      errorCode: undefined,
+      idempotencyKey: "twilio:status:SM123:delivered:none"
+    });
+
+    expect(
+      normalizeTwilioStatus({
+        MessageSid: "SM123",
+        MessageStatus: " \t "
+      })
+    ).toBeNull();
+  });
+
   it("maps provider statuses into local message transition fields", () => {
     const now = new Date("2026-01-01T00:00:00.000Z");
 
