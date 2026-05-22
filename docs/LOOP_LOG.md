@@ -3460,3 +3460,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 419  GREEN  live-worker-nullish-length-evidence  2026-05-22 12:38
+Objective:    Prove nullish supplied control-array length descriptors cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for `null` and `undefined` length descriptor values that deny before indexed controls are read.
+- Updated queue/testing contracts, production-worker policy, NEXT_PROMPTS, and current state matrix for the nullish length-descriptor boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.

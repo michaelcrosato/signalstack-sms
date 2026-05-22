@@ -488,6 +488,43 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects nullish control-array length descriptor values before indexed reads", () => {
+    const implementedControls = implementedFrozenControls();
+
+    for (const lengthValue of [null, undefined]) {
+      const nullishLengthControls = new Proxy([...implementedControls], {
+        getOwnPropertyDescriptor: (target, property) => {
+          if (property === "length") {
+            return {
+              value: lengthValue,
+              enumerable: false,
+              writable: false,
+              configurable: false
+            };
+          }
+
+          if (property === "0") {
+            throw new Error("nullish length evidence must deny before reading indexed controls");
+          }
+
+          return Reflect.getOwnPropertyDescriptor(target, property);
+        }
+      });
+
+      expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(nullishLengthControls)).not.toThrow();
+      expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(nullishLengthControls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(nullishLengthControls)).not.toThrow();
+      expect(liveWorkerControlArrayExposesOnlyIndexedEntries(nullishLengthControls)).toBe(false);
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(nullishLengthControls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(nullishLengthControls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, nullishLengthControls)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects missing or accessor-backed control-array length descriptors before indexed reads", () => {
     const implementedControls = implementedFrozenControls();
     const malformedLengthDescriptorControls = [
