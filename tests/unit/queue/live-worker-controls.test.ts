@@ -1789,6 +1789,33 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects blank deployment class strings before inspecting supplied controls", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("blank worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("blank worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("blank worker classes must not inspect control evidence");
+      }
+    });
+
+    for (const workerDeploymentClass of ["", " ", "\t", "\n", "\r", "\r\n"]) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("requires frozen authorization wrapper data descriptors before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const mutableWrapper = {
