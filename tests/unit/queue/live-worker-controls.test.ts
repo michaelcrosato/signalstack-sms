@@ -1773,6 +1773,8 @@ describe("production live campaign worker controls", () => {
       `${reservedLiveWorkerDeploymentClass}\n`,
       `\r${reservedLiveWorkerDeploymentClass}`,
       `${reservedLiveWorkerDeploymentClass}\r\n`,
+      `\v${reservedLiveWorkerDeploymentClass}`,
+      `${reservedLiveWorkerDeploymentClass}\f`,
       reservedLiveWorkerDeploymentClass.toUpperCase(),
       "Production-Live-Campaign"
     ]) {
@@ -1802,7 +1804,7 @@ describe("production live campaign worker controls", () => {
       }
     });
 
-    for (const workerDeploymentClass of ["", " ", "\t", "\n", "\r", "\r\n"]) {
+    for (const workerDeploymentClass of ["", " ", "\t", "\n", "\r", "\r\n", "\v", "\f"]) {
       expect(() =>
         liveWorkerDeploymentClassIsAuthorized(
           frozenAuthorizationWrapper(workerDeploymentClass, throwingEvidence)

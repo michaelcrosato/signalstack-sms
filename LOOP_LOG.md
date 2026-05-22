@@ -3998,3 +3998,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 444  GREEN  live-worker-vertical-whitespace-evidence  2026-05-22 14:56
+Objective:    Prove vertical-tab and form-feed deployment-class strings cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker authorization coverage for vertical-tab/form-feed padded `production-live-campaign` strings and blank vertical-tab/form-feed class strings.
+- Updated queue/testing contracts, production-worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the expanded whitespace deployment-class boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
