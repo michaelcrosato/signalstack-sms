@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 254
+
+- Hardened live-worker hidden-controls wrapper denial coverage for Run 254.
+- Latest repo truth: a future `production-live-campaign` authorization wrapper with a hidden/non-enumerable `controls` field denies before hostile supplied control evidence is inspected; the reserved class remains unsupported.
+- Focused live-worker control tests, typecheck, production-worker policy check, diff whitespace check, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 253
 
 - Hardened live-worker accessor-wrapper shape denial coverage for Run 253.

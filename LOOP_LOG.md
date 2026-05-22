@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 254  GREEN  live-worker-hidden-controls-wrapper  2026-05-21 20:11
+Objective:    Prove hidden `controls` fields on live-worker authorization wrappers deny before supplied evidence is inspected.
+Changed:
+- Added live-worker authorization coverage for a frozen wrapper with enumerable `workerDeploymentClass` and hidden/non-enumerable `controls`.
+- Updated SUMMARY and BLOCKERS to record that the change is local metadata/test coverage only.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 253  GREEN  live-worker-wrapper-shape-short-circuit  2026-05-21 20:00
 Objective:    Prove malformed live-worker authorization wrapper shapes deny before inspecting hostile supplied controls.
 Changed:
