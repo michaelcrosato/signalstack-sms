@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 316  GREEN  descriptor-object-alias-body-reader-scan  2026-05-22 01:52
+Objective:    Prevent aliased descriptor objects from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize local descriptor object aliases from `Object.getOwnPropertyDescriptor` and `Reflect.getOwnPropertyDescriptor`.
+- Added synthetic auth unit coverage for `Request.prototype`, `Object.getPrototypeOf(req)`, and `Reflect.getPrototypeOf(req)` descriptor aliases before `requireApiRole`.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the descriptor-object alias body-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 315  GREEN  reflect-descriptor-body-reader-scan  2026-05-22 01:48
 Objective:    Prevent `Reflect.getOwnPropertyDescriptor` body-reader descriptors from bypassing mutating-route role-gate ordering checks.
 Changed:
