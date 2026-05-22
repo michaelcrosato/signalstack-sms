@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 323  GREEN  computed-destructured-reader-auth-scan  2026-05-22 02:35
+Objective:    Prevent computed destructured request body-reader aliases from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize computed destructured body-reader fields such as `{ ["json"]: readJson }` and `{ [readerName]: readText }`.
+- Added synthetic auth unit coverage proving computed literal, property-alias, assigned, and cloned computed destructured readers fail before the role gate and pass after it.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the computed destructured reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 320  GREEN  bracket-reflect-body-reader-scan  2026-05-22 02:22
 Objective:    Prevent bracket-notation `Reflect.apply` and `Reflect.get` request body-reader invocations from bypassing mutating-route role-gate ordering checks.
 Changed:

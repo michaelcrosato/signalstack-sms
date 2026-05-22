@@ -391,6 +391,7 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
     reflectedDescriptorAliasBodySlice
   );
   const normalizedReflectedBodySlice = reflectedDescriptorValueAliasBodySlice
+    .replace(new RegExp(`\\[\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\]\\s*:`, "g"), "$1:")
     .replace(new RegExp(`\\[\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\]`, "g"), ".$1")
     .replace(/\[\s*["'`]clone["'`]\s*\]/g, ".clone")
     .replace(/\.\s*clone\s*\?\.\s*\(/g, ".clone(")
@@ -634,10 +635,23 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
       const fieldMatch = new RegExp(`^\\s*(${requestBodyReaderNames})\\s*(?::\\s*([A-Za-z_$][\\w$]*))?\\s*$`).exec(
         field
       );
-      if (fieldMatch === null) {
-        return [];
+      if (fieldMatch !== null) {
+        return [fieldMatch[2] ?? fieldMatch[1]];
       }
-      return [fieldMatch[2] ?? fieldMatch[1]];
+
+      const computedLiteralFieldMatch = new RegExp(
+        `^\\s*\\[\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\]\\s*:\\s*([A-Za-z_$][\\w$]*)\\s*$`
+      ).exec(field);
+      if (computedLiteralFieldMatch !== null) {
+        return [computedLiteralFieldMatch[2]];
+      }
+
+      const computedAliasFieldMatch = /^\s*\[\s*([A-Za-z_$][\w$]*)\s*\]\s*:\s*([A-Za-z_$][\w$]*)\s*$/.exec(field);
+      if (computedAliasFieldMatch !== null && bodyReaderPropertyAliases.has(computedAliasFieldMatch[1])) {
+        return [computedAliasFieldMatch[2]];
+      }
+
+      return [];
     })
   );
 
@@ -2169,6 +2183,54 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAliasSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalCallSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("treats computed destructured request body readers as body parsing for role-gate ordering", () => {
+    const unsafeLiteralSource = `
+      export async function POST(req: Request) {
+        const { ["json"]: readJson } = req;
+        const payload = await readJson.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafePropertyAliasSource = `
+      export async function PATCH(req: Request) {
+        const readerName = "text";
+        const { [readerName]: readText } = req.clone();
+        const payload = await readText.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeAssignedSource = `
+      export async function PUT(req: Request) {
+        let readFormData;
+        const readerName = ("formData");
+        ({ [readerName]: readFormData } = req);
+        const payload = await Reflect.apply(readFormData, req, []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const readerName = "arrayBuffer";
+        const { [readerName]: readArrayBuffer } = req;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await readArrayBuffer.call(req);
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeLiteralSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafePropertyAliasSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
