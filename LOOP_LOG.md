@@ -3292,3 +3292,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 367  GREEN  type-asserted-request-reader-auth-scan  2026-05-22 06:58
+Objective:    Prevent TypeScript-asserted request body-reader expressions from hiding parsing before mutating-route role gates.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize simple `as typeof ...` and `satisfies typeof ...` wrappers on standard request body-reader member expressions.
+- Added synthetic auth coverage proving asserted direct reader calls, `satisfies` detached reader aliases, and cloned asserted reader aliases fail before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the type-asserted request-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
