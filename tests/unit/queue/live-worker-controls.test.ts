@@ -421,9 +421,14 @@ describe("production live campaign worker controls", () => {
     }
   });
 
-  it("rejects mismatched safe-integer control-array length descriptors before authorization", () => {
+  it("rejects mismatched safe-integer control-array length descriptors before indexed reads", () => {
     const implementedControls = implementedFrozenControls();
-    const mismatchedLengthValues = [0, implementedControls.length - 1, implementedControls.length + 1];
+    const mismatchedLengthValues = [
+      0,
+      implementedControls.length - 1,
+      implementedControls.length + 1,
+      Number.MAX_SAFE_INTEGER
+    ];
 
     for (const lengthValue of mismatchedLengthValues) {
       const mismatchedLengthControls = new Proxy([...implementedControls], {

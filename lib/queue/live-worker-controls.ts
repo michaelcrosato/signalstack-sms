@@ -131,7 +131,7 @@ function arrayLengthFromDescriptor(controls: readonly LiveWorkerControl[]) {
     return null;
   }
 
-  return Number.isSafeInteger(descriptor.value) && descriptor.value >= 0 ? descriptor.value : null;
+  return descriptor.value === requiredLiveWorkerControlIds.length ? descriptor.value : null;
 }
 
 function isReadonlyControlArray(controls: unknown): controls is readonly LiveWorkerControl[] {

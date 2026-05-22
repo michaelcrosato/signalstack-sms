@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 399  GREEN  live-worker-exact-length-evidence  2026-05-22 09:53
+Objective:    Deny oversized supplied control-array length descriptors before live-worker indexed evidence scans.
+Changed:
+- Clamped supplied `production-live-campaign` control-array `length` evidence to the exact future-control checklist size.
+- Expanded live-worker control coverage so `Number.MAX_SAFE_INTEGER` length evidence denies before indexed controls are read.
+- Updated queue/testing contracts, production-worker/testing docs, SUMMARY, BLOCKERS, NEXT_PROMPTS, and current state matrix for the exact checklist-size length boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 398  GREEN  twilio-string-form-payload  2026-05-22 09:46
 Objective:    Reject unsupported non-string Twilio webhook form parts before signature validation or raw payload trust.
 Changed:
