@@ -1994,6 +1994,72 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects non-enumerable authorization wrapper public fields before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("non-enumerable wrapper fields must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("non-enumerable wrapper fields must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("non-enumerable wrapper fields must not inspect control evidence");
+      }
+    });
+    const descriptorVariants = [
+      {
+        name: "non-enumerable worker class",
+        workerDeploymentClass: {
+          value: reservedLiveWorkerDeploymentClass,
+          enumerable: false,
+          writable: false,
+          configurable: false
+        },
+        controls: {
+          value: throwingEvidence,
+          enumerable: true,
+          writable: false,
+          configurable: false
+        }
+      },
+      {
+        name: "non-enumerable controls",
+        workerDeploymentClass: {
+          value: reservedLiveWorkerDeploymentClass,
+          enumerable: true,
+          writable: false,
+          configurable: false
+        },
+        controls: {
+          value: throwingEvidence,
+          enumerable: false,
+          writable: false,
+          configurable: false
+        }
+      }
+    ] satisfies Array<{
+      name: string;
+      workerDeploymentClass: PropertyDescriptor;
+      controls: PropertyDescriptor;
+    }>;
+
+    for (const variant of descriptorVariants) {
+      const wrapper = Object.preventExtensions(
+        Object.defineProperties(
+          {},
+          {
+            workerDeploymentClass: variant.workerDeploymentClass,
+            controls: variant.controls
+          }
+        )
+      );
+
+      expect(Object.isFrozen(wrapper), variant.name).toBe(true);
+      expect(() => liveWorkerDeploymentClassIsAuthorized(wrapper), variant.name).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(wrapper), variant.name).toBe(false);
+    }
+  });
+
   it("rejects proxy-invalid authorization wrapper field descriptors without throwing", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       getPrototypeOf: () => {
