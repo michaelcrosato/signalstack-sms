@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 365  GREEN  satisfies-alias-auth-scan  2026-05-22 06:47
+Objective:    Prevent TypeScript `satisfies` aliases from hiding request body readers before mutating-route role gates.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize `satisfies` aliases for `globalThis`, `Object`/`Reflect`, `Request`, and `Request.prototype`.
+- Added synthetic auth unit coverage proving those aliases fail before the role gate while post-gate parsing remains allowed through existing safe cases.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the TypeScript `satisfies` alias boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 364  GREEN  parenthesized-type-asserted-globalthis-alias-auth-scan  2026-05-22 06:39
 Objective:    Prevent parenthesized TypeScript type-asserted `globalThis` aliases from hiding reflective request body readers before mutating-route role gates.
 Changed:
