@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 324  GREEN  const-asserted-reader-alias-scan  2026-05-22 02:40
+Objective:    Prevent TypeScript const-asserted body-reader property aliases from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize body-reader property aliases such as `const readerName = "json" as const`, `("blob") as const`, and `("text" as const)`.
+- Added synthetic auth unit coverage proving const-asserted `Reflect.get` and descriptor property aliases fail before the role gate and pass after it.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the const-asserted reader-alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 323  GREEN  computed-destructured-reader-auth-scan  2026-05-22 02:35
 Objective:    Prevent computed destructured request body-reader aliases from bypassing mutating-route role-gate ordering checks.
 Changed:
