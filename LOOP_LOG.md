@@ -3094,3 +3094,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 344  GREEN  computed-globalthis-local-alias-auth-scan  2026-05-22 04:36
+Objective:    Prevent computed built-in access through local `globalThis` aliases from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize local `globalThis` aliases with computed `Object`/`Reflect` built-in names before reflective body-reader checks.
+- Added synthetic auth unit coverage proving `root[builtInName]["get"](...)` and `root[objectName]["getOwnPropertyDescriptor"](...)` forms fail before `requireApiRole`.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the computed local `globalThis` alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.

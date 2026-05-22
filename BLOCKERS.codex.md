@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 344
+
+- No blocker from computed local `globalThis` alias body-reader authorization hardening. The first focused auth run failed on the newly added `root[builtInName]["get"](...)` case, confirming the scanner gap; after normalizing computed built-in access through local `globalThis` aliases, focused auth coverage and the protected local gate passed. The change tightens local static API authorization coverage plus testing-contract/docs text only and does not execute API handlers, parse live requests, use production credentials, mutate product records beyond validation behavior, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, execute workers, enqueue jobs, call Redis, edit protected gate scripts, hard-delete data, or perform destructive production database actions.
+
 Run number: 342
 
 - No blocker from computed `globalThis` built-in alias body-reader authorization hardening. The first focused auth run failed on an intentionally broader computed reflective method alias case through `globalThis`; the implemented boundary was kept to computed `globalThis` built-in aliases with literal reflective methods, then focused auth coverage, contracts check, typecheck, and the protected local gate passed. The change tightens local static API authorization coverage plus testing-contract/docs text only and does not execute API handlers, parse live requests, use production credentials, mutate product records beyond validation behavior, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, execute workers, enqueue jobs, call Redis, edit protected gate scripts, hard-delete data, or perform destructive production database actions.

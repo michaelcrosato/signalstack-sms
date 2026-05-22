@@ -259,6 +259,12 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
     bodySlice = bodySlice
       .replace(new RegExp(`\\b${escapeRegExp(alias)}\\s*(?:\\?\\.)?\\[\\s*["'\`](Object|Reflect)["'\`]\\s*\\]`, "g"), "$1")
       .replace(new RegExp(`\\b${escapeRegExp(alias)}\\s*\\??\\.\\s*(Object|Reflect)\\b`, "g"), "$1");
+    for (const [builtInAlias, builtInName] of builtInPropertyAliases) {
+      bodySlice = bodySlice.replace(
+        new RegExp(`\\b${escapeRegExp(alias)}\\s*(?:\\?\\.)?\\[\\s*${escapeRegExp(builtInAlias)}\\s*\\]`, "g"),
+        builtInName
+      );
+    }
   }
   for (const [alias, builtInName] of builtInPropertyAliases) {
     bodySlice = bodySlice.replace(
@@ -3623,6 +3629,30 @@ describe("API route authorization coverage", () => {
         return Response.json({ payload });
       }
     `;
+    const unsafeGlobalAliasComputedReflectGetSource = `
+      export async function POST(req: Request) {
+        const root = globalThis;
+        const builtInName = "Reflect" as const;
+        const payload = await root[builtInName]["get"](req, "json").call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeGlobalAliasComputedObjectDescriptorSource = `
+      export async function PATCH(req: Request) {
+        const root = globalThis;
+        const objectName = ("Object");
+        const reflectName = "Reflect" as const;
+        const payload = await root[objectName]["getOwnPropertyDescriptor"](
+          root[reflectName]["getPrototypeOf"](req),
+          "formData"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
     const unsafeDestructuredGlobalReflectSource = `
       export async function POST(req: Request) {
         const { Reflect: ReflectBuiltin } = globalThis;
@@ -3684,6 +3714,8 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalComputedObjectDescriptorSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalAliasReflectGetSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedGlobalAliasDescriptorSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalAliasComputedReflectGetSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalAliasComputedObjectDescriptorSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDestructuredGlobalReflectSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedDestructuredGlobalObjectSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedDestructuredGlobalObjectSource, "PUT")).toBe(true);

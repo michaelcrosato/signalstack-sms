@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 344
+
+- Hardened computed built-in access through local `globalThis` aliases in mutating-route authorization coverage.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes paths such as `const root = globalThis; root[builtInName]["get"](...)` and `root[objectName]["getOwnPropertyDescriptor"](...)` before reflective request body-reader checks.
+- Updated the testing contract, testing docs, and current state matrix for the computed local `globalThis` alias boundary.
+- Focused auth coverage and `.\scripts\local-gate.ps1` passed on 2026-05-22 04:36 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 46 unit test files / 390 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 343
 
 - Hardened local `globalThis` alias body-reader authorization coverage.
