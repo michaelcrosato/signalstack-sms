@@ -10,6 +10,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
 
+## Run 297  GREEN  direct-bound-request-body-reader-scan  2026-05-21 23:56
+Objective:    Prevent direct bound request body-reader invocations from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to treat immediate bound reader invocations such as `req.json.bind(req)()` as body parsing.
+- Added synthetic auth unit coverage proving direct request, cloned alias, and direct cloned bound readers fail before the role gate and pass after it.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the direct bound reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 294  GREEN  typed-exported-const-route-handler-scan  2026-05-21 23:40
 Objective:    Prevent typed exported const mutating route handlers from bypassing local API role-gate scans.
 Changed:
