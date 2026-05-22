@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 307  GREEN  non-null-descriptor-body-reader-scan  2026-05-22 00:59
+Objective:    Prevent non-null descriptor-derived `Request.prototype` body readers from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize `Object.getOwnPropertyDescriptor(Request.prototype, "...")!.value` body readers.
+- Added synthetic auth unit coverage proving direct, aliased, and local property-alias non-null descriptor readers fail before the role gate and pass after it.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the non-null descriptor-derived body-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 304  GREEN  reflect-get-template-property-body-reader-scan  2026-05-22 00:40
 Objective:    Prevent plain template-literal `Reflect.get` body-reader property names from bypassing mutating-route role-gate ordering checks.
 Changed:
