@@ -118,7 +118,7 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
     .replace(new RegExp(`\\.\\s*(${requestBodyReaderNames})\\s*\\?\\.\\s*\\(`, "g"), ".$1(")
     .replace(/\?\.\s*/g, ".")
     .replace(/\(\s*([A-Za-z_$][\w$]*)\s*\.\s*clone\s*\(\s*\)\s*\)/g, "$1.clone()")
-    .replace(/\(\s*([A-Za-z_$][\w$]*)\s*\)/g, "$1"));
+    .replace(/(^|[^A-Za-z0-9_$.\]])\(\s*([A-Za-z_$][\w$]*)\s*\)/g, "$1$2"));
   const requestAliases = new Set([requestParameterName]);
   let discoveredRequestAlias = true;
   while (discoveredRequestAlias) {
@@ -158,10 +158,10 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   }
 
   const readerSourcePattern = [...requestAliases, ...cloneAliases].map(escapeRegExp).join("|");
-  const boundReaderMethodPattern = new RegExp(
+  const normalizedBoundReaderMethodPattern = new RegExp(
     `\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s*(?::[^=;\\n]+)?\\s*=\\s*(?:${readerSourcePattern})\\s*\\.\\s*(?:${requestBodyReaderNames})\\s*\\.\\s*bind\\s*\\([^)]*\\)\\s*(?:;|\\r?\\n)[\\s\\S]*?\\b\\1\\s*\\(`
   );
-  if (boundReaderMethodPattern.test(maskedBodySlice)) {
+  if (normalizedBoundReaderMethodPattern.test(normalizedBodySlice)) {
     return true;
   }
   const readerMethodAliasPattern = new RegExp(
@@ -718,6 +718,41 @@ describe("API route authorization coverage", () => {
     const safeSource = `
       export async function POST(req: Request) {
         const readFormData = req.formData.bind(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await readFormData();
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCloneAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("treats bracket-notation bound request body reader aliases as body parsing for role-gate ordering", () => {
+    const unsafeDirectAliasSource = `
+      export async function POST(req: Request) {
+        const readJson = req["json"].bind(req);
+        const payload = await readJson();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeCloneAliasSource = `
+      export async function POST(req: Request) {
+        const cloned = req["clone"]();
+        const readText = cloned["text"].bind(cloned);
+        const payload = await readText();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const readFormData = req["formData"].bind(req);
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
         if (roleResponse) return roleResponse;
         const payload = await readFormData();

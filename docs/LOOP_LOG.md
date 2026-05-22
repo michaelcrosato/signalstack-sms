@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 287  GREEN  bracket-bound-body-reader-scan  2026-05-21 23:05
+Objective:    Prevent bracket-notation bound request body readers from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner so bracket-normalized bound readers are evaluated without erasing `bind(req)` arguments.
+- Added synthetic auth unit coverage proving `const readJson = req["json"].bind(req); await readJson()` and cloned bracket-bound readers fail before the role gate and pass after it.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the bracket-bound body-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 286  GREEN  request-object-alias-body-reader-scan  2026-05-21 22:55
 Objective:    Prevent direct request object aliases from bypassing mutating-route role-gate ordering checks.
 Changed:
