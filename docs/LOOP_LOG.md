@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 317  GREEN  destructured-descriptor-value-body-reader-scan  2026-05-22 01:57
+Objective:    Prevent destructured descriptor `value` aliases from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize `value` reader aliases destructured from `Object.getOwnPropertyDescriptor(...)` and `Reflect.getOwnPropertyDescriptor(...)`.
+- Added synthetic auth unit coverage for `Request.prototype`, `Object.getPrototypeOf(req)`, and `Reflect.getPrototypeOf(req)` destructured descriptor-value aliases before `requireApiRole`.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the destructured descriptor-value body-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 316  GREEN  descriptor-object-alias-body-reader-scan  2026-05-22 01:52
 Objective:    Prevent aliased descriptor objects from hiding mutating-route request body readers before authorization.
 Changed:

@@ -243,6 +243,64 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
       );
     }
   }
+  const descriptorValueReaderAliases = new Map<string, string>();
+  const descriptorValueAliasPattern = new RegExp(
+    `${variableDeclaratorStart}\\{([^}]+)\\}\\s*(?::[^=;,\\n]+)?=\\s*${descriptorLookupPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)\\s*!?${variableDeclaratorEnd}`,
+    "g"
+  );
+  const assignedDescriptorValueAliasPattern = new RegExp(
+    `(?:^|[;\\r\\n])\\s*\\(\\s*\\{([^}]+)\\}\\s*=\\s*${descriptorLookupPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)\\s*!?\\s*\\)\\s*(?=;|\\r?\\n)`,
+    "g"
+  );
+  const descriptorValuePropertyAliasPattern = new RegExp(
+    `${variableDeclaratorStart}\\{([^}]+)\\}\\s*(?::[^=;,\\n]+)?=\\s*${descriptorLookupPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*!?${variableDeclaratorEnd}`,
+    "g"
+  );
+  const assignedDescriptorValuePropertyAliasPattern = new RegExp(
+    `(?:^|[;\\r\\n])\\s*\\(\\s*\\{([^}]+)\\}\\s*=\\s*${descriptorLookupPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*!?\\s*\\)\\s*(?=;|\\r?\\n)`,
+    "g"
+  );
+  const descriptorValueAliasMatches = [
+    ...bodySlice.matchAll(descriptorValueAliasPattern),
+    ...bodySlice.matchAll(assignedDescriptorValueAliasPattern)
+  ];
+  for (const match of descriptorValueAliasMatches) {
+    const fields = match[1];
+    const prototypeTarget = match[2];
+    const readerName = match[3];
+    for (const field of fields.split(",")) {
+      const fieldMatch = /^\s*value\s*(?::\s*([A-Za-z_$][\w$]*))?\s*$/.exec(field);
+      if (fieldMatch !== null) {
+        descriptorValueReaderAliases.set(
+          fieldMatch[1] ?? "value",
+          prototypeTarget === undefined ? `Request.prototype.${readerName}` : `Object.getPrototypeOf(${prototypeTarget}).${readerName}`
+        );
+      }
+    }
+  }
+  const descriptorValuePropertyAliasMatches = [
+    ...bodySlice.matchAll(descriptorValuePropertyAliasPattern),
+    ...bodySlice.matchAll(assignedDescriptorValuePropertyAliasPattern)
+  ];
+  for (const match of descriptorValuePropertyAliasMatches) {
+    const fields = match[1];
+    const prototypeTarget = match[2];
+    const propertyAlias = match[3];
+    const readerName = bodyReaderPropertyAliases.get(propertyAlias);
+    if (readerName !== undefined) {
+      for (const field of fields.split(",")) {
+        const fieldMatch = /^\s*value\s*(?::\s*([A-Za-z_$][\w$]*))?\s*$/.exec(field);
+        if (fieldMatch !== null) {
+          descriptorValueReaderAliases.set(
+            fieldMatch[1] ?? "value",
+            prototypeTarget === undefined
+              ? `Request.prototype.${readerName}`
+              : `Object.getPrototypeOf(${prototypeTarget}).${readerName}`
+          );
+        }
+      }
+    }
+  }
   const reflectedBodySlice = bodySlice
     .replace(/\?\.\s*\[/g, "[")
     .replace(
@@ -318,7 +376,12 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
       source.replace(new RegExp(`\\b${escapeRegExp(descriptorAlias)}\\s*${descriptorValueAccessPattern}`, "g"), normalizedReader),
     reflectedBodySlice
   );
-  const normalizedReflectedBodySlice = reflectedDescriptorAliasBodySlice
+  const reflectedDescriptorValueAliasBodySlice = [...descriptorValueReaderAliases.entries()].reduce(
+    (source, [valueAlias, normalizedReader]) =>
+      source.replace(new RegExp(`\\b${escapeRegExp(valueAlias)}\\s*(?=\\.|\\(|,)`, "g"), normalizedReader),
+    reflectedDescriptorAliasBodySlice
+  );
+  const normalizedReflectedBodySlice = reflectedDescriptorValueAliasBodySlice
     .replace(new RegExp(`\\[\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\]`, "g"), ".$1")
     .replace(/\[\s*["'`]clone["'`]\s*\]/g, ".clone")
     .replace(/\.\s*clone\s*\?\.\s*\(/g, ".clone(")
@@ -1717,6 +1780,62 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedDescriptorAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafePrototypeDescriptorAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeReflectPrototypePropertyAliasSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("treats destructured descriptor value body readers as body parsing for role-gate ordering", () => {
+    const unsafeRequestPrototypeSource = `
+      export async function POST(req: Request) {
+        const { value: readJson } = Object.getOwnPropertyDescriptor(Request.prototype, "json")!;
+        const payload = await readJson.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeAssignedSource = `
+      export async function PATCH(req: Request) {
+        let readText;
+        ({ value: readText } = Reflect.getOwnPropertyDescriptor(Request.prototype, "text")!);
+        const payload = await readText.apply(req, []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafePrototypeSource = `
+      export async function PUT(req: Request) {
+        const { value: readFormData } = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(req), "formData")!;
+        const payload = await readFormData.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafePropertyAliasSource = `
+      export async function DELETE(req: Request) {
+        const readerName = "arrayBuffer";
+        const { value: readArrayBuffer } = Reflect.getOwnPropertyDescriptor(Reflect.getPrototypeOf(req), readerName)!;
+        const payload = await Reflect.apply(readArrayBuffer, req, []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const { value: readJson } = Object.getOwnPropertyDescriptor(Request.prototype, "json")!;
+        const payload = await readJson.call(req);
+        return Response.json(payload);
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeRequestPrototypeSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafePrototypeSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafePropertyAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 

@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 317
+
+- Hardened destructured descriptor-value body-reader authorization coverage for Run 317.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes `value` reader aliases destructured from `Object.getOwnPropertyDescriptor(...)` or `Reflect.getOwnPropertyDescriptor(...)` for `Request.prototype`, `Object.getPrototypeOf(req)`, and `Reflect.getPrototypeOf(req)`, so later alias calls are treated as body parsing when they occur before a mutating handler's top-level `requireApiRole`.
+- Updated the testing contract and testing docs to name the destructured descriptor-value alias boundary.
+- Focused auth coverage and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 316
 
 - Hardened descriptor-object alias body-reader authorization coverage for Run 316.
