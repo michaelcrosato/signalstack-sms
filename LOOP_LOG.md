@@ -2567,3 +2567,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 286  GREEN  bound-request-body-reader-scan  2026-05-21 23:01
+Objective:    Prevent bound request body-reader aliases from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to treat bound readers such as `request.json.bind(request)` and cloned-reader binds as body parsing.
+- Added synthetic auth unit coverage proving bound direct and cloned body readers fail before the role gate and pass after it.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the bound request reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
