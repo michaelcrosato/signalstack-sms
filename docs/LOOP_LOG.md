@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 435  GREEN  live-worker-tampered-array-prototype-evidence  2026-05-22 14:07
+Objective:    Prove tampered supplied control-array prototypes cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for `production-live-campaign` control arrays with custom or null prototypes, denying before indexed descriptors, keys, or get traps are inspected.
+- Updated queue/testing contracts, production-worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the tampered control-array prototype boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 434  GREEN  live-worker-hidden-symbol-entry-evidence  2026-05-22 14:00
 Objective:    Prove hidden symbol metadata on supplied control entries cannot authorize the reserved live worker class.
 Changed:

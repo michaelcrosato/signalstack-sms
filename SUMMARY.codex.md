@@ -1,11 +1,20 @@
 # Codex Summary
 
-Run number: 433
+Run number: 435
 
-- Added live-worker control coverage proving nullish supplied control-entry public fields (`id`, `status`, or `requirement`) cannot authorize the reserved `production-live-campaign` worker class.
-- Updated queue/testing contracts, production-worker/testing docs, NEXT_PROMPTS, and current state matrix for the nullish public-field boundary.
-- Focused coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 56 tests.
-- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 444 tests, Playwright smoke, and build green.
+- Added live-worker control coverage proving custom-prototype and null-prototype supplied control arrays cannot authorize the reserved `production-live-campaign` worker class.
+- Updated queue/testing contracts, production-worker policy, NEXT_PROMPTS, and current state matrix for the tampered control-array prototype boundary.
+- Focused coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 58 tests.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 446 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
+Run number: 434
+
+- Added explicit authorization-path coverage for otherwise valid `production-live-campaign` control entries carrying non-enumerable symbol metadata.
+- Updated the production worker policy to name hidden string and symbol control-entry metadata symmetrically.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 445 tests, Playwright smoke, and build green.
 - No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
 
 ## Previous Run

@@ -237,6 +237,45 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects tampered control-array prototypes before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const customPrototypeControls = [...implementedControls];
+    Object.setPrototypeOf(customPrototypeControls, {
+      reviewerBypass() {
+        return true;
+      }
+    });
+    Object.freeze(customPrototypeControls);
+    const nullPrototypeControls = [...implementedControls];
+    Object.setPrototypeOf(nullPrototypeControls, null);
+    Object.freeze(nullPrototypeControls);
+
+    for (const target of [customPrototypeControls, nullPrototypeControls]) {
+      const controls = new Proxy(target, {
+        get: () => {
+          throw new Error("tampered control-array prototypes must deny before get traps run");
+        },
+        getOwnPropertyDescriptor: () => {
+          throw new Error("tampered control-array prototypes must deny before indexed descriptors are inspected");
+        },
+        ownKeys: () => {
+          throw new Error("tampered control-array prototypes must deny before reflected keys are inspected");
+        }
+      });
+
+      expect(Array.isArray(controls)).toBe(true);
+      expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(controls)).not.toThrow();
+      expect(() => liveWorkerControlsAreFrozen(controls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
+      expect(liveWorkerControlArrayExposesOnlyIndexedEntries(controls)).toBe(false);
+      expect(liveWorkerControlsAreFrozen(controls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).toBe(false);
+    }
+  });
+
   it("rejects inherited control-array index slots without reading prototype getters", () => {
     const implementedControls = implementedFrozenControls();
     const sparseControls = [...implementedControls];
