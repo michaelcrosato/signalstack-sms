@@ -3124,3 +3124,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 347  GREEN  globalthis-request-prototype-auth-scan  2026-05-22 04:54
+Objective:    Prevent `globalThis.Request` prototype body-reader forms from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize `globalThis.Request` and optional/bracketed `globalThis["Request"]` before prototype body-reader checks.
+- Added synthetic auth unit coverage proving `globalThis.Request["prototype"].text.call(req)` and `globalThis?.["Request"]?.prototype?.["arrayBuffer"]?.call(req)` fail before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the `globalThis.Request` prototype boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.

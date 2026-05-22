@@ -767,6 +767,8 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
   const normalizedReflectedBodySlice = reflectedDescriptorValueAliasBodySlice
     .replace(new RegExp(`\\[\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\]\\s*:`, "g"), "$1:")
     .replace(new RegExp(`\\[\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\]`, "g"), ".$1")
+    .replace(/\bglobalThis\s*(?:\?\.)?\[\s*["'`]Request["'`]\s*\]/g, "Request")
+    .replace(/\bglobalThis\s*\??\.\s*Request\b/g, "Request")
     .replace(/\bRequest\s*\[\s*["'`]prototype["'`]\s*\]/g, "Request.prototype")
     .replace(/\[\s*["'`]clone["'`]\s*\]/g, ".clone")
     .replace(/\[\s*["'`](call|apply|bind)["'`]\s*\]/g, ".$1")
@@ -1787,6 +1789,22 @@ describe("API route authorization coverage", () => {
         return Response.json({ ok: Boolean(payload) });
       }
     `;
+    const unsafeGlobalThisPrototypeSource = `
+      export async function PATCH(req: Request) {
+        const payload = await globalThis.Request["prototype"].text.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeOptionalGlobalThisPrototypeSource = `
+      export async function DELETE(req: Request) {
+        const payload = await globalThis?.["Request"]?.prototype?.["arrayBuffer"]?.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
     const unsafeDirectReflectSource = `
       export async function POST(req: Request) {
         const cloned = req.clone();
@@ -1811,6 +1829,8 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeBoundSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeBracketPrototypeSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalThisPrototypeSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalGlobalThisPrototypeSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectReflectSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
