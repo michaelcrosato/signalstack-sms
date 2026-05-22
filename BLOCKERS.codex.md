@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 264
+
+- No blocker from the product inbox HELP consent visibility work. The change displays local keyword handling status for HELP and STOP in the existing tenant-scoped inbox workflow and extends seeded browser coverage; it does not use production credentials, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, execute workers, enqueue jobs, call Redis, edit protected gate scripts, hard-delete data, or perform destructive production database actions.
+
 Run number: 263
 
 - No blocker from the product inbox STOP consent visibility work. The change displays existing local tenant-scoped consent status in the selected inbox thread and extends seeded browser coverage for a local STOP reply; it does not use production credentials, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, execute workers, enqueue jobs, call Redis, edit protected gate scripts, hard-delete data, or perform destructive production database actions.

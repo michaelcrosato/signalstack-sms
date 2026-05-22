@@ -60,7 +60,12 @@ export function InboxWorkspace({
   const threadStatus = localThreadStatus;
   const orderedMessages = useMemo(() => selectedConversation?.messages ?? [], [selectedConversation]);
 
-  async function submitJson(path: string, body: unknown, successMessage: string, refresh = true) {
+  async function submitJson(
+    path: string,
+    body: unknown,
+    successMessage: string | ((payload: Record<string, unknown>) => string),
+    refresh = true
+  ) {
     setPending(true);
     setStatus(null);
     setError(null);
@@ -78,7 +83,7 @@ export function InboxWorkspace({
       return;
     }
 
-    setStatus(successMessage);
+    setStatus(typeof successMessage === "function" ? successMessage(payload) : successMessage);
     setPending(false);
     if (refresh) {
       router.refresh();
@@ -94,7 +99,7 @@ export function InboxWorkspace({
     void submitJson(
       `/api/inbox/conversations/${selectedConversation.id}/messages`,
       { body: messageBody },
-      "Local inbound reply added. No provider send ran."
+      (payload) => inboundStatusMessage(payload)
     );
   }
 
@@ -304,4 +309,16 @@ export function InboxWorkspace({
       </div>
     </section>
   );
+}
+
+function inboundStatusMessage(payload: Record<string, unknown>) {
+  if (payload.keywordAction === "HELP") {
+    return "Local HELP reply recorded. Consent stayed unchanged and no provider send ran.";
+  }
+
+  if (payload.keywordAction === "OPT_OUT") {
+    return "Local STOP opt-out recorded. No provider send ran.";
+  }
+
+  return "Local inbound reply added. No provider send ran.";
 }

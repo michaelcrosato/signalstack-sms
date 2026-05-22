@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 264  GREEN  inbox-help-consent-visibility  2026-05-21 20:53
+Objective:    Make HELP keyword handling visible in the product inbox demo path without changing consent.
+Changed:
+- Added keyword-aware local inbound status messages to `/dashboard/inbox` for HELP and STOP replies.
+- Extended the seeded product demo path to prove local HELP keeps consent `UNKNOWN` before local STOP flips the thread to `OPTED_OUT`.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep product demo paths stable while preserving live SMS, provider, billing, AI, and worker hard gates.
+
 ## Run 254  GREEN  live-worker-hidden-controls-wrapper  2026-05-21 20:11
 Objective:    Prove hidden `controls` fields on live-worker authorization wrappers deny before supplied evidence is inspected.
 Changed:

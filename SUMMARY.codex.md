@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 264
+
+- Added product inbox HELP consent visibility for Run 264.
+- Latest repo truth: `/dashboard/inbox` now shows keyword-aware local inbound status messages, with HELP recorded as consent unchanged and STOP recorded as local opt-out.
+- The seeded product demo path now proves a local HELP reply leaves thread consent `UNKNOWN` before a local STOP reply shows `OPTED_OUT`.
+- Focused typecheck, lint, product inbox unit coverage, and seeded product E2E passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 261
 
 - Tightened mutating API authorization ordering for Run 261.
