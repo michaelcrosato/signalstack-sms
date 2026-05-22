@@ -3049,3 +3049,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 376  GREEN  live-worker-accessor-index-evidence  2026-05-22 07:48
+Objective:    Prove accessor-backed supplied control-array index slots cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for accessor-backed indexed array slots that throw if read.
+- Updated testing contract/docs, SUMMARY, BLOCKERS, and current state matrix for the accessor-index evidence boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.

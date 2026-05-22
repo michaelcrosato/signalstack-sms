@@ -137,6 +137,15 @@ describe("production live campaign worker controls", () => {
       enumerable: false
     });
     Object.freeze(hiddenSymbolFieldControls);
+    const accessorIndexControls = [...implementedControls];
+    Object.defineProperty(accessorIndexControls, "0", {
+      enumerable: true,
+      configurable: false,
+      get: () => {
+        throw new Error("control array index getter must not be read");
+      }
+    });
+    Object.freeze(accessorIndexControls);
     const nonEnumerableIndexControls = [...implementedControls];
     Object.defineProperty(nonEnumerableIndexControls, "0", {
       value: implementedControls[0],
@@ -155,9 +164,19 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerControlsAreImplemented(hiddenExtraFieldControls)).toBe(false);
     expect(liveWorkerControlArrayExposesOnlyIndexedEntries(hiddenSymbolFieldControls)).toBe(false);
     expect(liveWorkerControlsAreImplemented(hiddenSymbolFieldControls)).toBe(false);
+    expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(accessorIndexControls)).not.toThrow();
+    expect(() => liveWorkerControlsAreImplemented(accessorIndexControls)).not.toThrow();
+    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(accessorIndexControls)).toBe(false);
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(accessorIndexControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(accessorIndexControls)).toBe(false);
     expect(liveWorkerControlArrayExposesOnlyIndexedEntries(nonEnumerableIndexControls)).toBe(false);
     expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(nonEnumerableIndexControls)).toBe(false);
     expect(liveWorkerControlsAreImplemented(nonEnumerableIndexControls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, accessorIndexControls)
+      )
+    ).toBe(false);
     expect(
       liveWorkerDeploymentClassIsAuthorized(
         frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, nonEnumerableIndexControls)
