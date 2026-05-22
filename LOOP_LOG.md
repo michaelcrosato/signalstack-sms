@@ -2370,3 +2370,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep product demo paths stable while preserving live SMS, provider, billing, live AI, and worker hard gates.
+
+## Run 269  GREEN  product-analytics-fake-ai-metering  2026-05-21 21:24
+Objective:    Prove product analytics shows endpoint-driven fake-AI usage metering in the browser demo path.
+Changed:
+- Extended the seeded product analytics E2E to call the local fake campaign-copy endpoint before opening `/dashboard/analytics`.
+- Verified the analytics usage table shows a nonzero `Fake AI requests` / `AI_REQUEST` row.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep product demo paths stable while preserving live SMS, provider, billing, live AI, notification, worker, and secret gates.

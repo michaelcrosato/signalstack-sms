@@ -359,6 +359,14 @@ test("product templates page creates local reusable copy", async ({ page }) => {
 });
 
 test("product analytics page renders local overview detail", async ({ page }) => {
+  const aiResponse = await page.request.post("/api/ai/campaign-copy", {
+    data: {
+      prompt: "Summarize local analytics value after fake AI usage",
+      businessName: "SignalStack Demo Co"
+    }
+  });
+  expect(aiResponse.ok()).toBe(true);
+
   await page.goto("/dashboard/analytics");
 
   await expect(page.getByRole("heading", { name: "Analytics workspace" })).toBeVisible();
@@ -378,6 +386,10 @@ test("product analytics page renders local overview detail", async ({ page }) =>
   await expect(page.getByText("Provider sends")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Usage Metering" })).toBeVisible();
   await expect(page.getByRole("row").filter({ hasText: "Contacts imported" })).toBeVisible();
+  const fakeAiUsageRow = page.getByRole("row").filter({ hasText: "Fake AI requests" });
+  await expect(fakeAiUsageRow).toBeVisible();
+  await expect(fakeAiUsageRow.getByText("AI_REQUEST")).toBeVisible();
+  await expect(fakeAiUsageRow.getByRole("cell").last()).toHaveText(/[1-9]\d*/);
   await expect(page.getByRole("heading", { name: "Safety Boundary" })).toBeVisible();
   await expect(page.getByText("It does not execute reports, create exports, mutate records")).toBeVisible();
 });

@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 269
+
+- Tightened product analytics fake-AI metering coverage for Run 269.
+- Latest repo truth: the seeded product analytics browser path now creates a deterministic local fake-AI campaign-copy request through the real API before opening `/dashboard/analytics`, then verifies the `Fake AI requests` / `AI_REQUEST` usage row shows a nonzero local quantity.
+- This proves the product analytics workspace reflects endpoint-driven fake-AI usage metering without live AI, live billing, provider calls, SMS, notifications, or exports.
+- Focused product analytics E2E, product analytics unit coverage, diff whitespace check, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 268
 
 - Added product inbox fake-AI insights for Run 268.
