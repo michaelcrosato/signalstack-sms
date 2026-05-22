@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 303  GREEN  reflect-get-body-reader-scan  2026-05-22 00:30
+Objective:    Prevent `Reflect.get` request body-reader lookups from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Normalized `Reflect.get(request, "json")`-style standard body-reader lookups before non-code masking in the static mutating API authorization scanner.
+- Added synthetic auth unit coverage proving direct request, cloned request alias, declared alias, and assigned alias `Reflect.get` reader forms fail before the role gate and pass after it.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the `Reflect.get` body-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 302  GREEN  assigned-destructured-body-reader-scan  2026-05-22 00:22
 Objective:    Prevent assigned destructured request body readers from bypassing mutating-route role-gate ordering checks.
 Changed:
