@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 265
+
+- Hardened live-worker reordered-wrapper field short-circuit coverage for Run 265.
+- Latest repo truth: frozen authorization wrappers for the reserved `production-live-campaign` class with `controls` before `workerDeploymentClass` now deny before hostile supplied control evidence is inspected.
+- Focused live-worker control tests, production worker policy check, and typecheck passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 264
 
 - Added product inbox HELP consent visibility for Run 264.

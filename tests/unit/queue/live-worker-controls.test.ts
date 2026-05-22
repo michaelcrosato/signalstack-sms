@@ -1008,6 +1008,10 @@ describe("production live campaign worker controls", () => {
     const reorderedKeyWrapper = new Proxy(baseWrapper, {
       ownKeys: () => ["controls", "workerDeploymentClass"]
     });
+    const reorderedFieldWrapper = Object.freeze({
+      controls: throwingEvidence,
+      workerDeploymentClass: reservedLiveWorkerDeploymentClass
+    });
     const extraKeyWrapper = new Proxy(baseWrapper, {
       ownKeys: () => ["workerDeploymentClass", "controls", "reviewerBypass"]
     });
@@ -1034,7 +1038,13 @@ describe("production live campaign worker controls", () => {
       )
     );
 
-    for (const input of [reorderedKeyWrapper, extraKeyWrapper, hiddenExtraKeyWrapper, symbolExtraKeyWrapper]) {
+    for (const input of [
+      reorderedKeyWrapper,
+      reorderedFieldWrapper,
+      extraKeyWrapper,
+      hiddenExtraKeyWrapper,
+      symbolExtraKeyWrapper
+    ]) {
       expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
       expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
     }

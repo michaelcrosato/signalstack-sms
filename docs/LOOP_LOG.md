@@ -27,6 +27,15 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo and live-worker boundaries remain stable.
+
+## Run 265  GREEN  live-worker-reordered-wrapper-fields  2026-05-21 20:56
+Objective:    Prove reordered live-worker authorization wrapper fields deny before supplied controls are inspected.
+Changed:
+- Added queue unit coverage using hostile supplied control evidence behind a frozen `production-live-campaign` authorization wrapper whose public fields are declared in the wrong order.
+- Updated SUMMARY and BLOCKERS to record that the change is local unit coverage only.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
 ## Run 262  GREEN  live-worker-control-field-order  2026-05-21 20:43
 Objective:    Require exact public-field order on supplied live-worker control entries.
 Changed:

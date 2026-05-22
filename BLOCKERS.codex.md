@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 265
+
+- No blocker from the live-worker reordered-wrapper field short-circuit coverage. The change adds local unit coverage only: a frozen future authorization wrapper with reordered public fields remains unauthorized and does not inspect hostile supplied controls; it does not execute workers, enqueue jobs, call Redis, call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production database actions.
+
 Run number: 264
 
 - No blocker from the product inbox HELP consent visibility work. The change displays local keyword handling status for HELP and STOP in the existing tenant-scoped inbox workflow and extends seeded browser coverage; it does not use production credentials, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, execute workers, enqueue jobs, call Redis, edit protected gate scripts, hard-delete data, or perform destructive production database actions.
