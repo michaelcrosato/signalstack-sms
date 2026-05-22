@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 288  GREEN  template-interpolation-body-reader-scan  2026-05-21 23:16
+Objective:    Prevent template interpolation request body reads from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Preserved executable `${...}` template interpolation while masking non-executable template text in the static mutating API authorization scanner.
+- Added synthetic auth coverage proving interpolation body readers before `requireApiRole` fail, interpolation role-gate markers do not count as top-level gates, and plain template text remains ignored.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the template-interpolation body-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 287  GREEN  bracket-bound-body-reader-scan  2026-05-21 23:05
 Objective:    Prevent bracket-notation bound request body readers from bypassing mutating-route role-gate ordering checks.
 Changed:

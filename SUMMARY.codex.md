@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 288
+
+- Hardened template-interpolation body-reader authorization coverage for Run 288.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now preserves executable `${...}` template interpolation while masking non-executable template text, so `await req.json()` or cloned body readers inside interpolation before the handler's top-level `requireApiRole` are caught, while plain template text mentions remain ignored.
+- Updated the testing contract to name executable template interpolation body-reader coverage.
+- Focused auth coverage, typecheck, contracts check, lint, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 286
 
 - Hardened direct request-alias body-reader authorization coverage for Run 286.

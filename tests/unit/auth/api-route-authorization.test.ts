@@ -230,7 +230,58 @@ function maskNonCodeTokens(source: string) {
       continue;
     }
 
-    if (char === "\"" || char === "'" || char === "`") {
+    if (char === "`") {
+      masked += " ";
+      while (index + 1 < source.length) {
+        index += 1;
+        const templateChar = source[index];
+
+        if (templateChar === "\\") {
+          masked += " ";
+          if (index + 1 < source.length) {
+            index += 1;
+            masked += source[index] === "\n" ? "\n" : " ";
+          }
+          continue;
+        }
+
+        if (templateChar === "$" && source[index + 1] === "{") {
+          index += 2;
+          let expression = "";
+          let depth = 1;
+          while (index < source.length && depth > 0) {
+            const expressionChar = source[index];
+            if (expressionChar === "{") {
+              depth += 1;
+              expression += expressionChar;
+              index += 1;
+              continue;
+            }
+            if (expressionChar === "}") {
+              depth -= 1;
+              if (depth > 0) {
+                expression += expressionChar;
+              }
+              index += 1;
+              continue;
+            }
+            expression += expressionChar;
+            index += 1;
+          }
+          masked += `{${maskNonCodeTokens(expression)}}`;
+          index -= 1;
+          continue;
+        }
+
+        masked += templateChar === "\n" ? "\n" : " ";
+        if (templateChar === "`") {
+          break;
+        }
+      }
+      continue;
+    }
+
+    if (char === "\"" || char === "'") {
       const quote = char;
       masked += " ";
       while (index + 1 < source.length) {
@@ -819,6 +870,53 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTemplateSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeBlockCommentSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("treats template interpolation body readers as body parsing before role-gate ordering checks", () => {
+    const unsafeBodyReaderSource = `
+      export async function POST(req: Request) {
+        const sample = \`payload: ${"${await req.json()}"}\`;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ sample });
+      }
+    `;
+    const unsafeNestedBodyReaderSource = `
+      export async function PATCH(req: Request) {
+        const sample = \`payload: ${"${condition ? await req.clone().text() : \"\"}"}\`;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ sample });
+      }
+    `;
+    const missingTopLevelGateSource = `
+      export async function PUT(req: Request) {
+        const sample = \`marker: ${"${requireApiRole(currentOrg, MembershipRole.ADMIN)}"}\`;
+        return Response.json({ sample });
+      }
+    `;
+    const safeTemplateTextSource = `
+      export async function POST(req: Request) {
+        const sample = \`await req.json() requireApiRole(currentOrg, MembershipRole.ADMIN)\`;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ sample });
+      }
+    `;
+    const safeAfterGateSource = `
+      export async function POST(req: Request) {
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const sample = \`payload: ${"${await req.formData()}"}\`;
+        return Response.json({ sample });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeBodyReaderSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNestedBodyReaderSource, "PATCH")).toBe(true);
+    expect(exportedMutatingMethodHasRoleGate(missingTopLevelGateSource, "PUT")).toBe(false);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeTemplateTextSource, "POST")).toBe(false);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeAfterGateSource, "POST")).toBe(false);
   });
 
   it("ignores nested helper mentions of requireApiRole before body-reader ordering checks", () => {
