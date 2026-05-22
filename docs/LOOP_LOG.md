@@ -2804,3 +2804,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 328  GREEN  destructured-lookup-alias-body-reader-scan  2026-05-22 03:09
+Objective:    Prevent destructured descriptor/prototype lookup aliases from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to resolve destructured `Object`/`Reflect` aliases for `getOwnPropertyDescriptor` and `getPrototypeOf`.
+- Added synthetic auth unit coverage proving destructured descriptor/prototype lookup aliases fail before the role gate while post-gate reads remain allowed.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the destructured lookup-alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
