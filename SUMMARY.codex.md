@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 256
+
+- Hardened live-worker non-ordinary wrapper short-circuit coverage for Run 256.
+- Latest repo truth: null-prototype and class-instance authorization wrappers for the reserved `production-live-campaign` class deny before hostile supplied control evidence is inspected; the reserved class remains unsupported.
+- Focused live-worker control tests and typecheck passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 255
 
 - Hardened live-worker non-frozen wrapper descriptor short-circuit coverage for Run 255.

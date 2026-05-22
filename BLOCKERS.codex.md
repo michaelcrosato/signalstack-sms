@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 256
+
+- No blocker from the live-worker non-ordinary wrapper short-circuit coverage. Null-prototype and class-instance authorization wrappers for the reserved `production-live-campaign` class remain unauthorized and do not inspect hostile supplied control evidence; the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.
+
 Run number: 255
 
 - No blocker from the live-worker non-frozen wrapper descriptor short-circuit coverage. Writable or configurable public fields on future authorization wrapper evidence remain unauthorized for the reserved `production-live-campaign` class and do not inspect hostile supplied control evidence; the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.

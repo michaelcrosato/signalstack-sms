@@ -2276,3 +2276,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 256  GREEN  live-worker-non-ordinary-wrapper-short-circuit  2026-05-21 20:20
+Objective:    Prove non-ordinary authorization wrappers deny before inspecting supplied live-worker controls.
+Changed:
+- Added queue unit coverage using hostile supplied control evidence behind null-prototype and class-instance authorization wrappers.
+- Updated SUMMARY and BLOCKERS to record that the change is local unit coverage only.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.

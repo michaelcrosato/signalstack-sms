@@ -1162,6 +1162,37 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects non-ordinary authorization wrappers before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("non-ordinary wrappers must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("non-ordinary wrappers must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("non-ordinary wrappers must not inspect control evidence");
+      }
+    });
+    const nullPrototypeWrapper = Object.freeze(
+      Object.assign(Object.create(null) as Record<string, unknown>, {
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: throwingEvidence
+      })
+    );
+
+    class AuthorizationWrapper {
+      workerDeploymentClass = reservedLiveWorkerDeploymentClass;
+      controls = throwingEvidence;
+    }
+    const classInstanceWrapper = Object.freeze(new AuthorizationWrapper());
+
+    for (const input of [nullPrototypeWrapper, classInstanceWrapper]) {
+      expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
+    }
+  });
+
   it("does not execute authorization wrapper get traps while denying unsupported classes", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       get: () => {
