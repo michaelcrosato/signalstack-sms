@@ -103,6 +103,20 @@ describe("getApiOperationsStatus", () => {
     });
   });
 
+  it("classifies fake AI endpoints as local usage-metering mutations without external impact", () => {
+    const aiRoutes = getApiOperationsStatus({}).routes.filter((route) => route.area === "AI");
+
+    expect(aiRoutes.map((route) => `${route.method} ${route.path}`)).toEqual([
+      "POST /api/ai/campaign-copy",
+      "POST /api/ai/reply-suggestion",
+      "POST /api/ai/conversation-summary",
+      "POST /api/ai/lead-qualification"
+    ]);
+    expect(aiRoutes.every((route) => route.mutates)).toBe(true);
+    expect(aiRoutes.every((route) => !route.externalImpact)).toBe(true);
+    expect(aiRoutes.every((route) => route.safety === "fake provider and local AI usage metering only")).toBe(true);
+  });
+
   it("keeps API inventory entries unique and backed by implemented route files", () => {
     const routeKeys = apiOperationRoutes.map((route) => `${route.method} ${route.path}`);
     const missingRouteFiles = apiOperationRoutes

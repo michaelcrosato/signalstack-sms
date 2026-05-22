@@ -2360,3 +2360,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep product demo paths stable while preserving live SMS, provider, billing, live AI, and worker hard gates.
+
+## Run 267  GREEN  api-ai-mutation-inventory  2026-05-21 21:14
+Objective:    Align API operations metadata with fake AI endpoint usage metering writes.
+Changed:
+- Marked all fake AI POST endpoints as local mutating routes in the static API operations inventory.
+- Added unit coverage proving fake AI endpoints remain no-external-impact while reporting local usage-metering mutation behavior.
+- Updated API contract/map copy to document the local `AI_REQUEST` usage event side effect.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep product demo paths stable while preserving live SMS, provider, billing, live AI, and worker hard gates.

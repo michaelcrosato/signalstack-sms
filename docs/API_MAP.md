@@ -57,10 +57,10 @@ Milestone 6:
 
 Milestone 7:
 
-- `POST /api/ai/campaign-copy`: returns fake campaign copy variants.
-- `POST /api/ai/reply-suggestion`: returns a fake reply suggestion.
-- `POST /api/ai/conversation-summary`: returns a fake conversation summary.
-- `POST /api/ai/lead-qualification`: returns fake lead qualification.
+- `POST /api/ai/campaign-copy`: returns fake campaign copy variants and records local AI usage.
+- `POST /api/ai/reply-suggestion`: returns a fake reply suggestion and records local AI usage.
+- `POST /api/ai/conversation-summary`: returns a fake conversation summary and records local AI usage.
+- `POST /api/ai/lead-qualification`: returns fake lead qualification and records local AI usage.
 
 Milestone 8:
 

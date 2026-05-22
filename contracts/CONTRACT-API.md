@@ -170,19 +170,19 @@ Updates business identity, messaging use case, opt-in description, policy URLs, 
 
 ### `POST /api/ai/campaign-copy`
 
-Returns deterministic fake campaign copy variants from `{ "prompt": "..." }`.
+Returns deterministic fake campaign copy variants from `{ "prompt": "..." }` and records one local `AI_REQUEST` usage event after successful fake output.
 
 ### `POST /api/ai/reply-suggestion`
 
-Returns a deterministic fake reply suggestion from supplied `messages` or a tenant-scoped `conversationId`.
+Returns a deterministic fake reply suggestion from supplied `messages` or a tenant-scoped `conversationId` and records one local `AI_REQUEST` usage event after successful fake output.
 
 ### `POST /api/ai/conversation-summary`
 
-Returns a deterministic fake summary from supplied `messages` or a tenant-scoped `conversationId`.
+Returns a deterministic fake summary from supplied `messages` or a tenant-scoped `conversationId` and records one local `AI_REQUEST` usage event after successful fake output.
 
 ### `POST /api/ai/lead-qualification`
 
-Returns deterministic fake lead qualification score, stage, and reasons from supplied `messages` or a tenant-scoped `conversationId`.
+Returns deterministic fake lead qualification score, stage, and reasons from supplied `messages` or a tenant-scoped `conversationId` and records one local `AI_REQUEST` usage event after successful fake output.
 
 ### `GET /api/analytics/overview`
 

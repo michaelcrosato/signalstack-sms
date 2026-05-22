@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 267
+
+- Corrected API operations metadata for Run 267.
+- Latest repo truth: fake AI POST endpoints are now inventoried as local mutating routes because successful fake outputs record `AI_REQUEST` usage events, while still remaining no-external-impact and fake-provider-only.
+- Updated API contract/map copy and unit coverage so the static `/settings/api` route inventory cannot drift back to non-mutating AI endpoint labels.
+- Focused API operations/AI metering tests, contracts check, typecheck, diff whitespace check, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 266
 
 - Added INFO help-keyword handling for Run 266.
