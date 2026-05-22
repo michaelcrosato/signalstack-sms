@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 268
+
+- No blocker from product inbox fake-AI insights. The browser flow calls existing deterministic local fake-AI endpoints and renders local summary/lead qualification only; it does not use production credentials, call live AI, send SMS or email, call providers, bill, notify, expose secrets, execute workers, enqueue jobs, call Redis, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production database actions.
+
 Run number: 267
 
 - No blocker from API operations fake-AI mutation metadata alignment. The change updates local static route inventory, docs, and unit coverage only; it does not use production credentials, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, execute workers, enqueue jobs, call Redis, edit protected gate scripts, hard-delete data, or perform destructive production database actions.

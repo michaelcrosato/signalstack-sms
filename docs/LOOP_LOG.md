@@ -2356,6 +2356,16 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo and live-worker boundaries remain stable.
+
+## Run 268  GREEN  inbox-fake-ai-insights  2026-05-21 21:20
+Objective:    Add deterministic fake-AI summary and lead qualification to the product inbox workflow.
+Changed:
+- Added `/dashboard/inbox` fake-AI insights UI that calls existing local conversation-summary and lead-qualification endpoints.
+- Extended the seeded product demo path to generate inbox insights before local HELP/STOP, note, resolve, and reopen actions.
+- Updated API/testing contracts, PLAN, current-state matrix, SUMMARY, and BLOCKERS for the local-only fake-AI inbox boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep product demo paths stable while preserving live SMS, provider, billing, live AI, notification, worker, and secret gates.
 ## Run 260  GREEN  per-handler-api-role-gate-scan  2026-05-21 20:35
 Objective:    Prevent one guarded mutating API handler from masking another unguarded handler in the same route file.
 Changed:

@@ -57,7 +57,7 @@ Goal: make SignalStack feel like usable SMS software, not only a system audit co
 - Product shell at `/dashboard` has primary navigation for contacts, campaigns, inbox, templates, analytics, compliance, and settings.
 - Keep the contacts list/import/detail UI on existing APIs, including local soft archive, restore, and duplicate merge.
 - Campaign composer, fake-AI copy assist, recipient selection, preflight, schedule, detail, draft edit, and queued-campaign cancel UI on existing APIs are in place for the first product demo path.
-- Inbox list/thread UI with demo inbound, assignment, notes, resolve/reopen, and STOP visibility is in place on existing APIs.
+- Inbox list/thread UI with demo inbound, assignment, notes, resolve/reopen, STOP visibility, and deterministic fake-AI summary/lead qualification is in place on existing APIs.
 - Template list/create/detail/edit UI and contact detail/edit/merge UI are in place on existing APIs.
 - Keep the gated live-test SMS demo available but visually separated from normal campaign sending.
 - `e2e/product-demo-path.spec.ts` covers the non-technical browser demo path across dashboard, contacts, campaigns, inbox, templates, analytics, and compliance.
@@ -85,5 +85,5 @@ Goal: turn the demo-safe product into a paid production SaaS.
 ## Next Concrete Work
 
 1. Keep `docs/CURRENT_STATE_MATRIX.md` current.
-2. Keep the product demo path stable while collecting review feedback.
+2. Keep the product demo path stable while collecting review feedback, including fake-AI campaign copy and inbox insights.
 3. Continue hardening the executable `production-live-campaign` control checklist, without adding it to supported worker classes until every listed control is implemented.

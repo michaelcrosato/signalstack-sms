@@ -370,7 +370,7 @@ Renders the product-facing campaign workspace for the current organization. It m
 
 ### `/dashboard/inbox`
 
-Renders the product-facing inbox workspace for the current organization. It may display tenant-scoped conversations, create local inbound demo messages, add internal notes, assign conversations, and resolve or reopen threads through existing inbox endpoints. It must not send outbound SMS, call providers, create billing records, call live AI, expose secrets, notify contacts, or enable live messaging.
+Renders the product-facing inbox workspace for the current organization. It may display tenant-scoped conversations, create local inbound demo messages, add internal notes, assign conversations, resolve or reopen threads through existing inbox endpoints, and request deterministic fake-AI conversation summary plus lead qualification from existing local AI endpoints. It must not send outbound SMS, call providers, create billing records, call live AI, expose secrets, notify contacts, or enable live messaging.
 
 ### `/dashboard/templates`
 

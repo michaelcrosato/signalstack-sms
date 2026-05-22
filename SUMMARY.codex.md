@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 268
+
+- Added product inbox fake-AI insights for Run 268.
+- Latest repo truth: `/dashboard/inbox` can now request deterministic local fake-AI conversation summary and lead qualification from the existing AI endpoints, render the summary/stage/score/reasons in the thread workflow, and keep live AI blocked.
+- Extended seeded product demo coverage to generate inbox insights before local HELP/STOP, notes, resolve, and reopen actions.
+- Updated API/testing contracts plus PLAN and current-state matrix so the documented inbox/AI product boundary matches implementation.
+- Focused checks, seeded product E2E, diff whitespace check, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 267
 
 - Corrected API operations metadata for Run 267.

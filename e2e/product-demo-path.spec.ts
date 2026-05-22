@@ -287,8 +287,15 @@ test("product inbox page manages a local conversation thread", async ({ page }) 
   await expect(page.getByText("Can you send pricing?").first()).toBeVisible();
   await expect(page.getByRole("heading", { name: "Thread" })).toBeVisible();
   await expect(page.getByLabel("Thread status").getByText("Consent")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Fake AI insights" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Demo inbound" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Internal note" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Generate Fake AI Insights" }).click();
+  await expect(page.getByRole("status")).toContainText("Fake AI inbox insights generated locally");
+  await expect(page.getByText("Demo summary:")).toBeVisible();
+  await expect(page.getByText("HOT")).toBeVisible();
+  await expect(page.getByText("Asked about pricing or quote.")).toBeVisible();
 
   await page.getByLabel("Reply body").fill("HELP");
   await page.getByRole("button", { name: "Add Local Reply" }).click();

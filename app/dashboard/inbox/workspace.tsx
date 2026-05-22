@@ -41,6 +41,13 @@ type SelectedConversation = {
   messages: InboxMessage[];
 };
 
+type AiInsights = {
+  summary: string;
+  stage: string;
+  score: number;
+  reasons: string[];
+};
+
 export function InboxWorkspace({
   conversations,
   currentUserId,
@@ -56,6 +63,8 @@ export function InboxWorkspace({
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [aiPending, setAiPending] = useState(false);
+  const [aiInsights, setAiInsights] = useState<AiInsights | null>(null);
   const [localThreadStatus, setLocalThreadStatus] = useState(selectedConversation?.status ?? "OPEN");
   const threadStatus = localThreadStatus;
   const orderedMessages = useMemo(() => selectedConversation?.messages ?? [], [selectedConversation]);
@@ -140,6 +149,55 @@ export function InboxWorkspace({
       resolved ? "Conversation resolved." : "Conversation reopened.",
       false
     );
+  }
+
+  async function generateAiInsights() {
+    if (!selectedConversation) {
+      return;
+    }
+
+    setAiPending(true);
+    setStatus(null);
+    setError(null);
+
+    const request = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ conversationId: selectedConversation.id })
+    };
+    const [summaryResponse, qualificationResponse] = await Promise.all([
+      fetch("/api/ai/conversation-summary", request),
+      fetch("/api/ai/lead-qualification", request)
+    ]);
+    const [summaryPayload, qualificationPayload] = await Promise.all([
+      summaryResponse.json().catch(() => ({})),
+      qualificationResponse.json().catch(() => ({}))
+    ]);
+
+    if (!summaryResponse.ok || !qualificationResponse.ok) {
+      const message =
+        typeof summaryPayload.error === "string"
+          ? summaryPayload.error
+          : typeof qualificationPayload.error === "string"
+            ? qualificationPayload.error
+            : "Fake AI insights failed.";
+      setError(message);
+      setAiPending(false);
+      return;
+    }
+
+    const reasonsPayload: unknown = qualificationPayload.reasons;
+
+    setAiInsights({
+      summary: typeof summaryPayload.summary === "string" ? summaryPayload.summary : "No summary returned.",
+      stage: typeof qualificationPayload.stage === "string" ? qualificationPayload.stage : "UNKNOWN",
+      score: typeof qualificationPayload.score === "number" ? qualificationPayload.score : 0,
+      reasons: Array.isArray(reasonsPayload)
+        ? reasonsPayload.filter((reason: unknown): reason is string => typeof reason === "string")
+        : []
+    });
+    setStatus("Fake AI inbox insights generated locally. Live AI remains blocked.");
+    setAiPending(false);
   }
 
   return (
@@ -238,6 +296,52 @@ export function InboxWorkspace({
               </article>
             ))}
           </div>
+        </section>
+
+        <section className="rounded border border-slate-200 bg-white p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">Fake AI insights</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Generates deterministic local summary and lead score only; live AI providers stay blocked.
+              </p>
+            </div>
+            <button
+              className="rounded bg-teal-700 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-400"
+              disabled={aiPending || !selectedConversation}
+              onClick={generateAiInsights}
+              type="button"
+            >
+              {aiPending ? "Generating..." : "Generate Fake AI Insights"}
+            </button>
+          </div>
+
+          {aiInsights ? (
+            <div className="mt-4 grid gap-3 md:grid-cols-[1.5fr_1fr]">
+              <article className="rounded border border-slate-200 bg-slate-50 p-4">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Summary</h3>
+                <p className="mt-2 text-sm text-slate-800">{aiInsights.summary}</p>
+              </article>
+              <article className="rounded border border-slate-200 bg-slate-50 p-4">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Lead qualification</h3>
+                <dl className="mt-2 grid gap-2 text-sm">
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-slate-600">Stage</dt>
+                    <dd className="font-semibold text-slate-950">{aiInsights.stage}</dd>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-slate-600">Score</dt>
+                    <dd className="font-semibold text-slate-950">{aiInsights.score}</dd>
+                  </div>
+                </dl>
+                <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                  {aiInsights.reasons.map((reason) => (
+                    <li key={reason}>{reason}</li>
+                  ))}
+                </ul>
+              </article>
+            </div>
+          ) : null}
         </section>
 
         <section className="grid gap-6 md:grid-cols-2">
