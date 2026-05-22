@@ -468,6 +468,67 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects proxy-backed control evidence without throwing", () => {
+    const implementedControls = implementedFrozenControls();
+    const throwingArrayPrototypeProxy = new Proxy([...implementedControls], {
+      getPrototypeOf: () => {
+        throw new Error("array prototype trap must not escape");
+      }
+    });
+    const throwingArrayDescriptorProxy = new Proxy([...implementedControls], {
+      getOwnPropertyDescriptor: () => {
+        throw new Error("array descriptor trap must not escape");
+      }
+    });
+    const throwingArrayKeysProxy = new Proxy([...implementedControls], {
+      ownKeys: () => {
+        throw new Error("array keys trap must not escape");
+      }
+    });
+    const throwingControlPrototypeProxy = new Proxy({ ...implementedControls[0] }, {
+      getPrototypeOf: () => {
+        throw new Error("control prototype trap must not escape");
+      }
+    });
+    const throwingControlDescriptorProxy = new Proxy({ ...implementedControls[0] }, {
+      getOwnPropertyDescriptor: () => {
+        throw new Error("control descriptor trap must not escape");
+      }
+    });
+    const proxyInputs = [
+      throwingArrayPrototypeProxy,
+      throwingArrayDescriptorProxy,
+      throwingArrayKeysProxy,
+      Object.freeze(
+        implementedControls.map((control, index) =>
+          index === 0 ? throwingControlPrototypeProxy : Object.freeze({ ...control })
+        )
+      ),
+      Object.freeze(
+        implementedControls.map((control, index) =>
+          index === 0 ? throwingControlDescriptorProxy : Object.freeze({ ...control })
+        )
+      )
+    ];
+
+    for (const controls of proxyInputs) {
+      expect(() => liveWorkerControlsAreFrozen(controls)).not.toThrow();
+      expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).not.toThrow();
+      expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(controls)).not.toThrow();
+      expect(() => liveWorkerControlsExposeOnlyPublicFields(controls)).not.toThrow();
+      expect(() => liveWorkerControlsUseSupportedStatuses(controls)).not.toThrow();
+      expect(() => liveWorkerControlIdsMatchRequiredChecklist(controls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized({
+          workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+          controls
+        })
+      ).toBe(false);
+    }
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 

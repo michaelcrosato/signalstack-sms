@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 232
+
+- Hardened live-worker control malformed-evidence handling for Run 232.
+- Latest repo truth: future `production-live-campaign` authorization now catches reflection failures from proxy-backed supplied control arrays or entries and denies cleanly instead of throwing; the reserved class remains outside supported worker classes.
+- Focused live-worker control tests, typecheck, and the production worker policy check passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 231
 
 - Tightened live-worker control identity/status predicates for Run 231.

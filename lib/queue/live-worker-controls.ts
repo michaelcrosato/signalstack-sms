@@ -76,12 +76,69 @@ export const productionLiveCampaignWorkerControls = Object.freeze(
   liveWorkerControls.map((control) => Object.freeze({ ...control }))
 );
 
+function safeArrayIsArray(value: unknown) {
+  try {
+    return Array.isArray(value);
+  } catch {
+    return false;
+  }
+}
+
+function safeGetPrototypeOf(value: object) {
+  try {
+    return Object.getPrototypeOf(value);
+  } catch {
+    return null;
+  }
+}
+
+function safeGetOwnPropertyDescriptor(value: object, property: PropertyKey) {
+  try {
+    return Object.getOwnPropertyDescriptor(value, property);
+  } catch {
+    return undefined;
+  }
+}
+
+function safeOwnKeys(value: object) {
+  try {
+    return Reflect.ownKeys(value);
+  } catch {
+    return null;
+  }
+}
+
+function safeHasOwnProperty(value: object, property: PropertyKey) {
+  try {
+    return Object.prototype.hasOwnProperty.call(value, property);
+  } catch {
+    return false;
+  }
+}
+
+function safeIsFrozen(value: object) {
+  try {
+    return Object.isFrozen(value);
+  } catch {
+    return false;
+  }
+}
+
+function arrayLengthFromDescriptor(controls: readonly LiveWorkerControl[]) {
+  const descriptor = safeGetOwnPropertyDescriptor(controls, "length");
+  if (descriptor === undefined || !("value" in descriptor)) {
+    return null;
+  }
+
+  return Number.isSafeInteger(descriptor.value) && descriptor.value >= 0 ? descriptor.value : null;
+}
+
 function isReadonlyControlArray(controls: unknown): controls is readonly LiveWorkerControl[] {
-  return Array.isArray(controls) && Object.getPrototypeOf(controls) === Array.prototype;
+  return safeArrayIsArray(controls) && safeGetPrototypeOf(controls as object) === Array.prototype;
 }
 
 function isControlRecord(control: unknown): control is LiveWorkerControl {
-  return control !== null && typeof control === "object" && Object.getPrototypeOf(control) === Object.prototype;
+  return control !== null && typeof control === "object" && safeGetPrototypeOf(control) === Object.prototype;
 }
 
 function controlDataFieldValue(control: unknown, field: keyof LiveWorkerControl) {
@@ -89,7 +146,7 @@ function controlDataFieldValue(control: unknown, field: keyof LiveWorkerControl)
     return undefined;
   }
 
-  const descriptor = Object.getOwnPropertyDescriptor(control, field);
+  const descriptor = safeGetOwnPropertyDescriptor(control, field);
   return descriptor !== undefined && "value" in descriptor ? descriptor.value : undefined;
 }
 
@@ -98,8 +155,13 @@ function isLiveWorkerControlStatus(status: unknown): status is LiveWorkerControl
 }
 
 function controlArrayIsDense(controls: readonly LiveWorkerControl[]) {
-  for (let index = 0; index < controls.length; index += 1) {
-    if (!Object.prototype.hasOwnProperty.call(controls, index)) {
+  const length = arrayLengthFromDescriptor(controls);
+  if (length === null) {
+    return false;
+  }
+
+  for (let index = 0; index < length; index += 1) {
+    if (!safeHasOwnProperty(controls, index)) {
       return false;
     }
   }
@@ -111,8 +173,13 @@ function liveWorkerControlArrayValues(controls: unknown) {
     return null;
   }
 
-  return Array.from({ length: controls.length }, (_, index) => {
-    const descriptor = Object.getOwnPropertyDescriptor(controls, String(index));
+  const length = arrayLengthFromDescriptor(controls);
+  if (length === null) {
+    return null;
+  }
+
+  return Array.from({ length }, (_, index) => {
+    const descriptor = safeGetOwnPropertyDescriptor(controls, String(index));
     return descriptor !== undefined && "value" in descriptor ? descriptor.value : null;
   });
 }
@@ -122,19 +189,24 @@ export function liveWorkerControlArrayExposesOnlyIndexedEntries(controls: unknow
     return false;
   }
 
-  const ownKeys = Reflect.ownKeys(controls);
-  const expectedKeys = [...Array.from({ length: controls.length }, (_, index) => String(index)), "length"];
+  const length = arrayLengthFromDescriptor(controls);
+  const ownKeys = safeOwnKeys(controls);
+  if (length === null || ownKeys === null) {
+    return false;
+  }
+
+  const expectedKeys = [...Array.from({ length }, (_, index) => String(index)), "length"];
   if (ownKeys.length !== expectedKeys.length || !expectedKeys.every((key) => ownKeys.includes(key))) {
     return false;
   }
 
-  const lengthDescriptor = Object.getOwnPropertyDescriptor(controls, "length");
+  const lengthDescriptor = safeGetOwnPropertyDescriptor(controls, "length");
   if (lengthDescriptor === undefined || !("value" in lengthDescriptor) || lengthDescriptor.enumerable) {
     return false;
   }
 
-  for (let index = 0; index < controls.length; index += 1) {
-    const descriptor = Object.getOwnPropertyDescriptor(controls, String(index));
+  for (let index = 0; index < length; index += 1) {
+    const descriptor = safeGetOwnPropertyDescriptor(controls, String(index));
     if (descriptor === undefined || !("value" in descriptor) || descriptor.enumerable !== true) {
       return false;
     }
@@ -171,11 +243,15 @@ export function liveWorkerControlsExposeOnlyPublicFields(controls: unknown) {
       return false;
     }
 
-    const ownKeys = Reflect.ownKeys(control);
+    const ownKeys = safeOwnKeys(control);
+    if (ownKeys === null) {
+      return false;
+    }
+
     return (
       ownKeys.length === liveWorkerControlPublicFields.length &&
       liveWorkerControlPublicFields.every((field) => {
-        const descriptor = Object.getOwnPropertyDescriptor(control, field);
+        const descriptor = safeGetOwnPropertyDescriptor(control, field);
         return (
           ownKeys.includes(field) &&
           descriptor !== undefined &&
@@ -206,7 +282,8 @@ export function liveWorkerControlsAreFrozen(controls: unknown) {
     return false;
   }
 
-  return Object.isFrozen(controls) && controlValues.every((control) => isControlRecord(control) && Object.isFrozen(control));
+  const controlArray = controls as readonly LiveWorkerControl[];
+  return safeIsFrozen(controlArray) && controlValues.every((control) => isControlRecord(control) && safeIsFrozen(control));
 }
 
 function descriptorIsFrozenDataField(
@@ -228,12 +305,13 @@ export function liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls: unk
     return false;
   }
 
-  if (!descriptorIsFrozenDataField(Object.getOwnPropertyDescriptor(controls, "length"), { enumerable: false })) {
+  const controlArray = controls as readonly LiveWorkerControl[];
+  if (!descriptorIsFrozenDataField(safeGetOwnPropertyDescriptor(controlArray, "length"), { enumerable: false })) {
     return false;
   }
 
   for (let index = 0; index < controlValues.length; index += 1) {
-    if (!descriptorIsFrozenDataField(Object.getOwnPropertyDescriptor(controls, String(index)), { enumerable: true })) {
+    if (!descriptorIsFrozenDataField(safeGetOwnPropertyDescriptor(controlArray, String(index)), { enumerable: true })) {
       return false;
     }
   }
@@ -244,7 +322,7 @@ export function liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls: unk
     }
 
     return liveWorkerControlPublicFields.every((field) =>
-      descriptorIsFrozenDataField(Object.getOwnPropertyDescriptor(control, field), { enumerable: true })
+      descriptorIsFrozenDataField(safeGetOwnPropertyDescriptor(control, field), { enumerable: true })
     );
   });
 }
