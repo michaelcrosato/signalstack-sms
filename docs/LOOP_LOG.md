@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 319  GREEN  optional-reflect-apply-body-reader-scan  2026-05-22 02:18
+Objective:    Prevent optional `Reflect.apply` request body-reader invocations from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize `Reflect?.apply(...)` and `Reflect.apply?.(...)` before existing reflective body-reader checks.
+- Added synthetic auth unit coverage proving optional `Reflect.apply` direct, cloned, and bound reader forms fail before `requireApiRole` and pass after it.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the optional `Reflect.apply` boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 318  GREEN  optional-descriptor-body-reader-scan  2026-05-22 02:12
 Objective:    Prevent optional descriptor/prototype lookups from hiding mutating-route request body readers before authorization.
 Changed:
