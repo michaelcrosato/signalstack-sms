@@ -3,7 +3,8 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const mutatingMethods = ["POST", "PATCH", "PUT", "DELETE"] as const;
-const requestBodyReaderPattern = /\brequest\s*\.\s*(?:json|formData|text|arrayBuffer|blob)\s*\(/;
+const requestBodyReaderPattern =
+  /\brequest\s*(?:\.\s*clone\s*\(\s*\))?\s*\.\s*(?:json|formData|text|arrayBuffer|blob)\s*\(/;
 const roleGateExceptionRoutes = new Set([
   "app/api/webhooks/twilio/inbound/route.ts",
   "app/api/webhooks/twilio/status/route.ts"
@@ -130,6 +131,28 @@ describe("API route authorization coverage", () => {
     });
 
     expect(bodyParsedBeforeRoleGate).toEqual([]);
+  });
+
+  it("treats cloned request body readers as body parsing for role-gate ordering", () => {
+    const unsafeSource = `
+      export async function POST(request: Request) {
+        const payload = await request.clone().json();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const safeSource = `
+      export async function POST(request: Request) {
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await request.clone().json();
+        return Response.json(payload);
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
   it("keeps role-gate exceptions limited to signed Twilio webhook handlers", () => {

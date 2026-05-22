@@ -2435,3 +2435,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo and live-worker boundaries remain stable.
+
+## Run 272  GREEN  cloned-request-body-role-scan  2026-05-21 22:02
+Objective:    Prevent cloned request body parsing from bypassing local mutating API role-gate ordering checks.
+Changed:
+- Tightened the static mutating API body-reader scanner to include `request.clone().json()` and other cloned standard request readers.
+- Added synthetic auth unit coverage proving cloned request body reads before `requireApiRole` are detected while post-gate reads remain allowed.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the cloned request reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
