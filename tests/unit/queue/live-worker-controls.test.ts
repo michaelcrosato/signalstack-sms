@@ -131,6 +131,12 @@ describe("production live campaign worker controls", () => {
       enumerable: false
     });
     Object.freeze(hiddenExtraFieldControls);
+    const hiddenSymbolFieldControls = [...implementedControls];
+    Object.defineProperty(hiddenSymbolFieldControls, Symbol("hidden-live-worker-array-bypass"), {
+      value: true,
+      enumerable: false
+    });
+    Object.freeze(hiddenSymbolFieldControls);
     const nonEnumerableIndexControls = [...implementedControls];
     Object.defineProperty(nonEnumerableIndexControls, "0", {
       value: implementedControls[0],
@@ -147,6 +153,8 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerControlsAreImplemented(extraSymbolFieldControls)).toBe(false);
     expect(liveWorkerControlArrayExposesOnlyIndexedEntries(hiddenExtraFieldControls)).toBe(false);
     expect(liveWorkerControlsAreImplemented(hiddenExtraFieldControls)).toBe(false);
+    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(hiddenSymbolFieldControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(hiddenSymbolFieldControls)).toBe(false);
     expect(liveWorkerControlArrayExposesOnlyIndexedEntries(nonEnumerableIndexControls)).toBe(false);
     expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(nonEnumerableIndexControls)).toBe(false);
     expect(liveWorkerControlsAreImplemented(nonEnumerableIndexControls)).toBe(false);

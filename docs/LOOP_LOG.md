@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 374  GREEN  live-worker-hidden-symbol-array-metadata  2026-05-22 07:38
+Objective:    Prove hidden symbol metadata on supplied live-worker control arrays cannot authorize the reserved production class.
+Changed:
+- Added queue unit coverage for non-enumerable symbol fields on otherwise implemented `production-live-campaign` control-array evidence.
+- Updated queue contract and production-worker/testing docs for the hidden symbol control-array metadata boundary.
+- Updated SUMMARY, BLOCKERS, and current state matrix for Run 374.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep Phase 0 live-worker, API authorization, provider, billing, live AI, notification, and secret gates stable.
+
 ## Run 373  GREEN  live-worker-wrapper-descriptor-trap  2026-05-22 07:33
 Objective:    Prove live-worker authorization wrapper descriptor proxy traps deny cleanly without escaping.
 Changed:
