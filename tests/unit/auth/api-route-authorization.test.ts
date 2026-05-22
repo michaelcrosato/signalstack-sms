@@ -3,6 +3,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const mutatingMethods = ["POST", "PATCH", "PUT", "DELETE"] as const;
+const requestBodyReaderPattern = /\brequest\s*\.\s*(?:json|formData|text|arrayBuffer|blob)\s*\(/;
 const roleGateExceptionRoutes = new Set([
   "app/api/webhooks/twilio/inbound/route.ts",
   "app/api/webhooks/twilio/status/route.ts"
@@ -89,7 +90,7 @@ function exportedMutatingMethodHasRoleGate(source: string, method: (typeof mutat
 function mutatingMethodParsesBodyBeforeRoleGate(source: string, method: (typeof mutatingMethods)[number]) {
   const body = exportedFunctionBody(source, method);
   const roleGateIndex = body.search(/\brequireApiRole\s*\(/);
-  const bodyParseIndex = body.search(/\brequest\s*\.\s*json\s*\(/);
+  const bodyParseIndex = body.search(requestBodyReaderPattern);
 
   return bodyParseIndex !== -1 && (roleGateIndex === -1 || bodyParseIndex < roleGateIndex);
 }
@@ -113,7 +114,7 @@ describe("API route authorization coverage", () => {
     expect(missingRoleGate).toEqual([]);
   });
 
-  it("keeps local mutating API body parsing behind each handler's role check", () => {
+  it("keeps local mutating API body readers behind each handler's role check", () => {
     const apiRoot = path.join(process.cwd(), "app", "api");
     const bodyParsedBeforeRoleGate = routeFiles(apiRoot).flatMap((filePath) => {
       const source = readFileSync(filePath, "utf8");

@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 276
+
+- Hardened mutating API body-reader authorization coverage for Run 276.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now treats `request.json()`, `request.formData()`, `request.text()`, `request.arrayBuffer()`, and `request.blob()` as body readers that must happen after each mutating handler's own `requireApiRole` call, with signed Twilio webhook handlers remaining the only exception.
+- Updated the testing contract to name the covered standard `Request` body readers.
+- Focused auth coverage, typecheck, lint, contracts check, diff whitespace check, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 275
 
 - Added product dashboard opt-in rate visibility for Run 275.

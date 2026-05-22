@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 276  GREEN  mutating-api-body-reader-guard  2026-05-21 21:55
+Objective:    Catch every standard Request body reader before mutating-route role checks.
+Changed:
+- Expanded the static mutating API authorization scanner from `request.json()` to `json`, `formData`, `text`, `arrayBuffer`, and `blob` body readers.
+- Kept signed Twilio webhook handlers as the only body-reader-before-role exception.
+- Updated the testing contract and handoff notes for the widened authorization boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo and live-worker boundaries remain stable.
+
 ## Run 275  GREEN  product-dashboard-opt-in-rate  2026-05-21 21:51
 Objective:    Show active-contact opt-in rate in the product dashboard's owner-facing signals.
 Changed:
