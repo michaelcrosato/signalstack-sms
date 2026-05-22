@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 280
+
+- No blocker from optional-chained request body-reader authorization coverage. The change is local static unit coverage plus testing-contract text only; it does not execute routes, parse live requests, use production credentials, mutate records, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, execute workers, enqueue jobs, call Redis, edit protected gate scripts, hard-delete data, or perform destructive production database actions.
+
 Run number: 279
 
 - No blocker from bracket-notation request body-reader authorization coverage. The change is local static unit coverage plus testing-contract text only; it does not execute routes, parse live requests, use production credentials, mutate records, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, execute workers, enqueue jobs, call Redis, edit protected gate scripts, hard-delete data, or perform destructive production database actions.

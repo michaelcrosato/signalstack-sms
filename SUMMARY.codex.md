@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 280
+
+- Hardened optional-chained request body-reader authorization coverage for Run 280.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes optional-chained standard `Request` body readers and `clone` calls so `req?.json()`, `req?.clone()?.text()`, and `const cloned = req?.["clone"]?.(); await cloned?.["formData"]?.()` are treated as body parsing that must happen after each mutating handler's own `requireApiRole` call, with signed Twilio webhook handlers remaining the only exception.
+- Updated the testing contract to name optional-chained reader and clone-reader cases.
+- Focused auth coverage, typecheck, contracts check, lint, diff whitespace check, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 279
 
 - Hardened bracket-notation request body-reader authorization coverage for Run 279.

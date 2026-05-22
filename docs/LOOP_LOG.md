@@ -2465,3 +2465,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 280  GREEN  optional-chained-request-body-role-scan  2026-05-21 22:25
+Objective:    Prevent optional-chained request body readers from bypassing local mutating API role-gate ordering checks.
+Changed:
+- Tightened the static mutating API body-reader scanner to normalize optional-chained request readers and clone calls.
+- Added synthetic auth unit coverage proving `req?.json()`, `req?.clone()?.text()`, and optional-chained bracket clone aliases before `requireApiRole` are detected while post-gate reads remain allowed.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the optional-chained request reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
