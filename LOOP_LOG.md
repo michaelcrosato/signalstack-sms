@@ -2387,6 +2387,16 @@ Objective:    Require exact public-field order on supplied live-worker control e
 Changed:
 - Tightened live-worker control evidence so entries must expose `id`, `status`, and `requirement` in exact order.
 - Added queue unit coverage proving reordered control-entry fields remain unauthorized even with matching IDs, requirements, and implemented statuses.
+## Run 282  GREEN  body-reader-string-mask  2026-05-21 22:33
+Objective:    Prevent comment or string mentions of request body readers from creating noisy mutating API authorization failures.
+Changed:
+- Masked comments, string literals, and template literals after body-reader syntax normalization in the static mutating API role-gate scanner.
+- Added synthetic auth unit coverage proving comment, string, and template-literal body-reader mentions before `requireApiRole` are ignored while real body reads still fail ordering checks.
+- Updated the testing contract for the body-reader non-code token boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 - Updated queue contract, production worker policy docs, roadmap/state/handoff notes, SUMMARY, and BLOCKERS.
 Gate:         passed
 Commit/Saved: this commit

@@ -2090,6 +2090,7 @@ Run number: 95
 - `npm run test -- tests/unit/operations/operator-surfaces.test.ts`
 - `npm run lint`
 - `.\scripts\local-gate.ps1`
+- Latest body-reader string-mask hardening makes the static mutating API authorization scanner ignore comment, string, and template-literal mentions of request body readers before `requireApiRole`, while still catching real pre-gate body reads after syntax normalization. Focused auth coverage and the protected local gate passed; the change is local unit/static coverage only and does not execute API handlers, use production credentials, call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
 - `npm run demo:seed`
 - `npm run test:e2e:demo`
 - Latest billing/AI shared-inventory hardening moved `/settings/billing` and `/settings/ai` header navigation into the shared local operator surface inventory. Unit and seeded browser coverage now verify labels, route targets, and backing `app/**/page.tsx` files without calling Stripe, live AI, providers, creating billing artifacts, notifying, sending SMS or email, exposing secrets, mutating records, or enabling live billing or live AI.
