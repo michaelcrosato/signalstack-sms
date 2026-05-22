@@ -2267,3 +2267,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 255  GREEN  live-worker-wrapper-descriptor-short-circuit  2026-05-21 20:17
+Objective:    Prove non-frozen authorization wrapper descriptors deny before inspecting supplied live-worker controls.
+Changed:
+- Added queue unit coverage using hostile supplied control evidence behind writable and configurable authorization-wrapper fields.
+- Updated SUMMARY and BLOCKERS to record that the change is local unit coverage only.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.

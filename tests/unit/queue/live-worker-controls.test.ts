@@ -699,6 +699,17 @@ describe("production live campaign worker controls", () => {
 
   it("rejects non-frozen authorization wrapper descriptors before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
+    const throwingEvidence = new Proxy(implementedControls, {
+      getPrototypeOf: () => {
+        throw new Error("non-frozen wrapper descriptors must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("non-frozen wrapper descriptors must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("non-frozen wrapper descriptors must not inspect control evidence");
+      }
+    });
     const writableClassWrapper = Object.preventExtensions(
       Object.defineProperties(
         {},
@@ -710,7 +721,7 @@ describe("production live campaign worker controls", () => {
             configurable: false
           },
           controls: {
-            value: implementedControls,
+            value: throwingEvidence,
             enumerable: true,
             writable: false,
             configurable: false
@@ -729,7 +740,7 @@ describe("production live campaign worker controls", () => {
             configurable: false
           },
           controls: {
-            value: implementedControls,
+            value: throwingEvidence,
             enumerable: true,
             writable: false,
             configurable: true
@@ -740,6 +751,8 @@ describe("production live campaign worker controls", () => {
 
     expect(Object.isFrozen(writableClassWrapper)).toBe(false);
     expect(Object.isFrozen(configurableControlsWrapper)).toBe(false);
+    expect(() => liveWorkerDeploymentClassIsAuthorized(writableClassWrapper)).not.toThrow();
+    expect(() => liveWorkerDeploymentClassIsAuthorized(configurableControlsWrapper)).not.toThrow();
     expect(liveWorkerDeploymentClassIsAuthorized(writableClassWrapper)).toBe(false);
     expect(liveWorkerDeploymentClassIsAuthorized(configurableControlsWrapper)).toBe(false);
   });
