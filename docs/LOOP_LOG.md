@@ -3133,3 +3133,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 384  GREEN  live-worker-primitive-length-expansion  2026-05-22 08:35
+Objective:    Prove boolean, bigint, and symbol supplied control-array length descriptor values deny before indexed-control reads.
+Changed:
+- Expanded live-worker control coverage for malformed primitive `length` descriptor values to include boolean, bigint, and symbol cases.
+- Updated the testing contract/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the expanded primitive length-descriptor boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.

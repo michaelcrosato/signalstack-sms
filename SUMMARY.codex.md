@@ -2969,6 +2969,7 @@ Run number: 95
 - `npm run test -- tests/unit/operations/api-operations.test.ts`
 - `npm run contracts:check`
 - `npm run lint`
+- Latest live-worker primitive length expansion proves supplied `production-live-campaign` control arrays with boolean, bigint, or symbol `length` descriptor values also deny before indexed controls are read. Focused unit coverage and the protected local gate passed; the change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
 - `npm run build`
 - `npm install`
 - `npm run db:generate`

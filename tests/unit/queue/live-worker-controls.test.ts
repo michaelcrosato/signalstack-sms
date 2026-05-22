@@ -376,7 +376,16 @@ describe("production live campaign worker controls", () => {
 
   it("rejects malformed primitive control-array length descriptor values before indexed reads", () => {
     const implementedControls = implementedFrozenControls();
-    const malformedLengthValues = [-1, 1.5, Number.NaN, Number.POSITIVE_INFINITY, "11"];
+    const malformedLengthValues = [
+      -1,
+      1.5,
+      Number.NaN,
+      Number.POSITIVE_INFINITY,
+      "11",
+      true,
+      11n,
+      Symbol("unsafe-live-worker-control-length")
+    ];
 
     for (const lengthValue of malformedLengthValues) {
       const malformedLengthControls = new Proxy([...implementedControls], {
