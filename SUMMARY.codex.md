@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 296
+
+- Hardened assigned request body-reader authorization coverage for Run 296.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now treats reassigned aliases such as `bodySource = req`, `cloned = req.clone()`, `readFormData = req.formData`, and `readBlob = req.blob.bind(req)` as body parsing when invoked before each mutating handler's top-level `requireApiRole` call.
+- Updated the testing contract to name assigned request, clone, detached-reader, and bound-reader alias coverage.
+- Focused auth coverage passed; the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 295
 
 - Hardened named-export mutating route-handler authorization coverage for Run 295.
