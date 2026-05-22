@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 333
+
+- Kept the quick repo-truth handoff current after a protected local-gate pass.
+- Latest repo truth: `docs/CURRENT_STATE_MATRIX.md` now records the 2026-05-22 protected `npm run validate` pass and names the green checks covered by that run.
+- The protected local gate passed: contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, unit tests, Playwright smoke, and build were green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 332
 
 - Hardened non-code export discovery for mutating API authorization coverage.
