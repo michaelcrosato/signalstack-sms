@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 434  GREEN  live-worker-hidden-symbol-entry-evidence  2026-05-22 14:00
+Objective:    Prove hidden symbol metadata on supplied control entries cannot authorize the reserved live worker class.
+Changed:
+- Added explicit authorization-path coverage for otherwise valid `production-live-campaign` control entries carrying non-enumerable symbol metadata.
+- Updated the production worker policy to name hidden string and symbol control-entry metadata symmetrically.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 433  GREEN  live-worker-nullish-public-field-evidence  2026-05-22 13:55
 Objective:    Prove nullish supplied control-entry public fields cannot authorize the reserved live worker class.
 Changed:
