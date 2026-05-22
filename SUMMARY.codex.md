@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 259
+
+- Added static API route authorization coverage for Run 259.
+- Latest repo truth: every implemented local mutating API route is now scanned for `requireApiRole`; the only allowed omissions are the Twilio inbound/status webhook handlers, and those exceptions are pinned to `validateTwilioSignature`.
+- Focused auth unit coverage passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 256
 
 - Hardened live-worker non-ordinary wrapper short-circuit coverage for Run 256.

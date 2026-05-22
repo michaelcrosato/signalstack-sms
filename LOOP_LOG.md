@@ -2303,3 +2303,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+## Run 259  GREEN  mutating-api-role-gate-scan  2026-05-21 20:32
+Objective:    Prevent local mutating API routes from losing role checks.
+Changed:
+- Added static auth unit coverage that scans implemented `app/api/**/route.ts` mutating methods for `requireApiRole`.
+- Pinned signed Twilio inbound/status webhook handlers as the only role-gate exceptions and required `validateTwilioSignature` there.
+- Updated testing contract, SUMMARY, and BLOCKERS for the route authorization boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 correctness checks green while product demo and live-worker boundaries remain stable.
