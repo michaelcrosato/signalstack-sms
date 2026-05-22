@@ -9,7 +9,6 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
-
 ## Run 433  GREEN  live-worker-nullish-public-field-evidence  2026-05-22 13:55
 Objective:    Prove nullish supplied control-entry public fields cannot authorize the reserved live worker class.
 Changed:
@@ -3951,3 +3950,12 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+## Run 439  GREEN  current-state-gate-truth-sync  2026-05-22 14:27
+Objective:    Synchronize current-state gate truth with the latest protected local gate.
+Changed:
+- Updated `docs/CURRENT_STATE_MATRIX.md` so the latest-gate header and Tests/Gates row consistently name Run 439 instead of retaining stale Run 435 wording.
+- Updated SUMMARY and BLOCKERS for the documentation-only truth sync.
+- Kept source behavior, product features, live sends, providers, billing, secrets, workers, Redis, and protected gate scripts untouched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

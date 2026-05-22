@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 439
+
+- Synchronized `docs/CURRENT_STATE_MATRIX.md` so the Tests/Gates row and latest-gate header both point at the Run 439 protected local gate instead of retaining stale Run 435 wording.
+- No source code, product behavior, contracts, protected gate scripts, live-worker controls, provider paths, billing paths, secrets, or live-feature flags changed.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 446 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 438
 
 - Added live-worker authorization coverage proving carriage-return-padded and CRLF-padded `production-live-campaign` deployment-class strings deny before supplied controls are inspected.
