@@ -907,6 +907,34 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("does not execute authorization wrapper get traps while denying unsupported classes", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      get: () => {
+        throw new Error("control evidence get trap must not be read");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("control evidence descriptor trap must not be inspected for unsupported classes");
+      },
+      ownKeys: () => {
+        throw new Error("control evidence keys trap must not be inspected for unsupported classes");
+      }
+    });
+    const unsupportedClassInput = new Proxy(
+      Object.freeze({
+        workerDeploymentClass: "production-live",
+        controls: throwingEvidence
+      }),
+      {
+        get: () => {
+          throw new Error("authorization input get trap must not be read");
+        }
+      }
+    );
+
+    expect(() => liveWorkerDeploymentClassIsAuthorized(unsupportedClassInput)).not.toThrow();
+    expect(liveWorkerDeploymentClassIsAuthorized(unsupportedClassInput)).toBe(false);
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 

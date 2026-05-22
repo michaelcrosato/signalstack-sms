@@ -2194,3 +2194,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 249  GREEN  live-worker-wrapper-get-traps  2026-05-21 19:39
+Objective:    Prove unsupported live-worker deployment classes deny without executing wrapper get traps or inspecting hostile controls.
+Changed:
+- Added queue unit coverage using an authorization-wrapper proxy with a throwing `get` trap and hostile control evidence against unsupported `production-live`.
+- Updated SUMMARY and BLOCKERS to record that the change is local metadata/test coverage only.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
