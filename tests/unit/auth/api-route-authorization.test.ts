@@ -191,6 +191,7 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   }
   const descriptorValueAccessPattern =
     String.raw`(?:\?\s*\.\s*(?:value|\[\s*["'\`]value["'\`]\s*\])|!\s*(?:\.\s*value|\[\s*["'\`]value["'\`]\s*\])|\.\s*value|\[\s*["'\`]value["'\`]\s*\])`;
+  const optionalReflectGetReceiverArgument = `(?:\\s*,\\s*${simpleCallArguments})?`;
   const reflectedBodySlice = bodySlice
     .replace(/\?\.\s*\[/g, "[")
     .replace(
@@ -212,21 +213,21 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
     )
     .replace(
       new RegExp(
-        `Reflect\\s*\\.\\s*get\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\.\\s*clone\\s*\\(\\s*\\)\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)`,
+        `Reflect\\s*\\.\\s*get\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\.\\s*clone\\s*\\(\\s*\\)\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]${optionalReflectGetReceiverArgument}\\s*\\)`,
         "g"
       ),
       "$1.clone().$2"
     )
     .replace(
       new RegExp(
-        `\\bReflect\\s*\\.\\s*get\\s*\\(\\s*([^,]+?)\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)`,
+        `\\bReflect\\s*\\.\\s*get\\s*\\(\\s*([^,]+?)\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]${optionalReflectGetReceiverArgument}\\s*\\)`,
         "g"
       ),
       "$1.$2"
     )
     .replace(
       new RegExp(
-        `Reflect\\s*\\.\\s*get\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\.\\s*clone\\s*\\(\\s*\\)\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)`,
+        `Reflect\\s*\\.\\s*get\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\.\\s*clone\\s*\\(\\s*\\)\\s*,\\s*([A-Za-z_$][\\w$]*)${optionalReflectGetReceiverArgument}\\s*\\)`,
         "g"
       ),
       (match, requestAlias: string, propertyAlias: string) => {
@@ -235,7 +236,10 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
       }
     )
     .replace(
-      new RegExp(`\\bReflect\\s*\\.\\s*get\\s*\\(\\s*([^,]+?)\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)`, "g"),
+      new RegExp(
+        `\\bReflect\\s*\\.\\s*get\\s*\\(\\s*([^,]+?)\\s*,\\s*([A-Za-z_$][\\w$]*)${optionalReflectGetReceiverArgument}\\s*\\)`,
+        "g"
+      ),
       (match, target: string, propertyAlias: string) => {
         const readerName = bodyReaderPropertyAliases.get(propertyAlias);
         return readerName === undefined ? match : `${target}.${readerName}`;
@@ -1996,6 +2000,23 @@ describe("API route authorization coverage", () => {
         return Response.json({ payload });
       }
     `;
+    const unsafeReceiverSource = `
+      export async function DELETE(req: Request) {
+        const payload = await Reflect.get(req, "json", req).call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeCloneReceiverSource = `
+      export async function PATCH(req: Request) {
+        const readerName = "text";
+        const payload = await Reflect.get(req.clone(), readerName, req.clone()).call(req.clone());
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
     const safeSource = `
       export async function POST(req: Request) {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
@@ -2012,6 +2033,8 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafePropertyAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedPropertyAliasSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeReceiverSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCloneReceiverSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 

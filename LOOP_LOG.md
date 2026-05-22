@@ -2755,3 +2755,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 310  GREEN  reflect-get-receiver-body-reader-scan  2026-05-22 01:13
+Objective:    Prevent three-argument `Reflect.get` request body-reader lookups from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize `Reflect.get(request, "json", receiver)` and cloned/property-alias receiver forms before body-reader ordering checks.
+- Added synthetic auth unit coverage proving three-argument direct and cloned `Reflect.get` body-reader lookups fail before the role gate while post-gate reads remain allowed.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the Reflect.get receiver-argument boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
