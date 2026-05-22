@@ -91,4 +91,17 @@ describe("contracts-check route method extraction", () => {
 
     expect(extractExportedRouteMethods(source)).toEqual(["GET", "HEAD"]);
   });
+
+  it("ignores route method export mentions in regex literals", () => {
+    const source = `
+      const directExportPattern = /export async function POST/;
+      const namedExportPattern = /export { removeContact as DELETE }/;
+
+      export async function GET() {
+        return Response.json({ directExportPattern, namedExportPattern });
+      }
+    `;
+
+    expect(extractExportedRouteMethods(source)).toEqual(["GET"]);
+  });
 });

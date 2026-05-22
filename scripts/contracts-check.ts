@@ -17,10 +17,28 @@ const required = [
 const appApiRoot = path.join("app", "api");
 export const supportedRouteMethods = ["GET", "POST", "PATCH", "DELETE", "PUT", "HEAD", "OPTIONS"] as const;
 
+function previousSignificantCharacter(source: string, endIndex: number) {
+  for (let index = endIndex - 1; index >= 0; index -= 1) {
+    const character = source[index];
+    if (!/\s/.test(character)) {
+      return character;
+    }
+  }
+
+  return "";
+}
+
+function canStartRegexLiteral(source: string, slashIndex: number) {
+  const previous = previousSignificantCharacter(source, slashIndex);
+  return previous === "" || "({[=,:;!&|?+-*%^~<>".includes(previous);
+}
+
 function maskNonCode(source: string) {
   let masked = "";
   let index = 0;
-  let state: "code" | "line-comment" | "block-comment" | "single-quote" | "double-quote" | "template" = "code";
+  let state: "code" | "line-comment" | "block-comment" | "single-quote" | "double-quote" | "template" | "regex" =
+    "code";
+  let regexCharacterClass = false;
 
   while (index < source.length) {
     const current = source[index];
@@ -37,6 +55,13 @@ function maskNonCode(source: string) {
         masked += "  ";
         index += 2;
         state = "block-comment";
+        continue;
+      }
+      if (current === "/" && canStartRegexLiteral(source, index)) {
+        masked += " ";
+        index += 1;
+        state = "regex";
+        regexCharacterClass = false;
         continue;
       }
       if (current === "'") {
@@ -78,6 +103,30 @@ function maskNonCode(source: string) {
       if (current === "*" && next === "/") {
         masked += " ";
         index += 1;
+        state = "code";
+      }
+      continue;
+    }
+
+    if (state === "regex") {
+      masked += current === "\n" || current === "\r" ? current : " ";
+      index += 1;
+      if (current === "\\") {
+        if (index < source.length) {
+          masked += source[index] === "\n" || source[index] === "\r" ? source[index] : " ";
+          index += 1;
+        }
+        continue;
+      }
+      if (current === "[") {
+        regexCharacterClass = true;
+        continue;
+      }
+      if (current === "]") {
+        regexCharacterClass = false;
+        continue;
+      }
+      if (current === "/" && !regexCharacterClass) {
         state = "code";
       }
       continue;

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 430  GREEN  contract-route-regex-literal-masking  2026-05-22 13:39
+Objective:    Prevent regex-literal examples from creating false implemented API route-method inventory.
+Changed:
+- Taught the shared contract route-method extractor to mask regex literals before detecting exported Next API route handlers.
+- Added focused contract coverage for regex literals containing export-shaped `POST` and named-export `DELETE` text.
+- Updated testing contract/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the regex-literal non-code scanner boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo and release-safety gates stable; continue shared scanner hardening only where it removes real drift.
+
 ## Run 400  GREEN  twilio-duplicate-form-payload  2026-05-22 09:58
 Objective:    Reject duplicate Twilio webhook form fields before signature validation or raw payload trust.
 Changed:
