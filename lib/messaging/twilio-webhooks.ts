@@ -63,13 +63,15 @@ export function validateTwilioSignature(input: {
 
 export function normalizeTwilioInbound(payload: TwilioWebhookPayload): NormalizedTwilioInbound | null {
   const providerMessageId = normalizeRequiredProviderValue(payload.MessageSid ?? payload.SmsSid);
-  if (!payload.From || !payload.Body || !providerMessageId) {
+  const from = normalizeRequiredProviderValue(payload.From);
+  const to = normalizeOptionalProviderValue(payload.To);
+  if (!from || !payload.Body || !providerMessageId) {
     return null;
   }
 
   return {
-    from: payload.From,
-    to: payload.To,
+    from,
+    to,
     body: payload.Body,
     providerMessageId,
     idempotencyKey: `twilio:inbound:${providerMessageId}`

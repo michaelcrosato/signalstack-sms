@@ -168,6 +168,31 @@ describe("Twilio webhook helpers", () => {
     ).toBeNull();
   });
 
+  it("normalizes inbound address whitespace before local message creation", () => {
+    expect(
+      normalizeTwilioInbound({
+        From: " +15555550100 ",
+        To: " +15555550199 ",
+        Body: "HELP",
+        MessageSid: "SM123"
+      })
+    ).toEqual({
+      from: "+15555550100",
+      to: "+15555550199",
+      body: "HELP",
+      providerMessageId: "SM123",
+      idempotencyKey: "twilio:inbound:SM123"
+    });
+
+    expect(
+      normalizeTwilioInbound({
+        From: " \t ",
+        Body: "HELP",
+        MessageSid: "SM123"
+      })
+    ).toBeNull();
+  });
+
   it("maps provider statuses into local message transition fields", () => {
     const now = new Date("2026-01-01T00:00:00.000Z");
 
