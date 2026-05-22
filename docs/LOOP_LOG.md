@@ -2575,3 +2575,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+## Run 295  GREEN  named-export-route-auth-scan  2026-05-21 23:47
+Objective:    Prevent named-export mutating route handlers from bypassing local API role-gate scans.
+Changed:
+- Tightened the static mutating API authorization scanner to recognize named export lists such as `export { createPost as POST }` and `export { POST }`.
+- Added synthetic auth unit coverage proving named-export local functions and const handlers require `requireApiRole` and keep body readers after the role gate.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the named-export handler boundary.
+Gate:         passed after rerunning local `db:migrate` with the repo's demo-local Postgres URL because the shell initially had no `DATABASE_URL`
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.

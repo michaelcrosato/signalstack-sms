@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 295
+
+- No blocker from named-export mutating route-handler authorization coverage. The first documented local-gate `db:migrate` attempt failed because `DATABASE_URL` was unset in the shell; rerunning with the repo's demo-local `.env.example` Postgres URL against the local Docker Postgres service passed. The change is local static unit coverage plus testing-contract text only; it does not execute routes, parse live requests, use production credentials, mutate product records beyond demo seed, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, execute workers, enqueue jobs, call Redis, edit protected gate scripts, hard-delete data, or perform destructive production database actions.
+
 Run number: 294
 
 - No blocker from typed exported const mutating route-handler authorization coverage so far. The change is local static unit coverage plus testing-contract text only; it does not execute routes, parse live requests, use production credentials, mutate records, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, execute workers, enqueue jobs, call Redis, edit protected gate scripts, hard-delete data, or perform destructive production database actions.

@@ -27,8 +27,28 @@ function exportedMutatingMethods(source: string) {
   return mutatingMethods.filter((method) =>
     new RegExp(
       `export\\s+(?:(?:async\\s+)?function\\s+${method}\\b|const\\s+${method}\\b(?:\\s*:[\\s\\S]*?)?\\s*=\\s*(?:async\\s+)?(?:function\\b)?)`
-    ).test(source)
+    ).test(source) || exportedHandlerLocalName(source, method) !== null
   );
+}
+
+function exportedHandlerLocalName(source: string, method: (typeof mutatingMethods)[number]) {
+  const namedExportPattern = /export\s*\{([^}]+)\}/g;
+  for (const match of source.matchAll(namedExportPattern)) {
+    const exportedNames = match[1].split(",");
+    for (const exportedName of exportedNames) {
+      const aliasMatch = /^\s*([A-Za-z_$][\w$]*)\s+as\s+([A-Za-z_$][\w$]*)\s*$/.exec(exportedName);
+      if (aliasMatch !== null && aliasMatch[2] === method) {
+        return aliasMatch[1];
+      }
+
+      const directMatch = /^\s*([A-Za-z_$][\w$]*)\s*$/.exec(exportedName);
+      if (directMatch !== null && directMatch[1] === method) {
+        return directMatch[1];
+      }
+    }
+  }
+
+  return null;
 }
 
 function exportedHandlerSignatureStart(source: string, method: (typeof mutatingMethods)[number]) {
@@ -43,7 +63,26 @@ function exportedHandlerSignatureStart(source: string, method: (typeof mutatingM
   );
   const constMatch = constDeclaration.exec(source);
   if (constMatch === null) {
-    return -1;
+    const localHandlerName = exportedHandlerLocalName(source, method);
+    if (localHandlerName === null) {
+      return -1;
+    }
+
+    const localFunctionDeclaration = new RegExp(`(?:^|[\\r\\n;])\\s*(?:async\\s+)?function\\s+${localHandlerName}\\b`);
+    const localFunctionMatch = localFunctionDeclaration.exec(source);
+    if (localFunctionMatch !== null) {
+      return source.indexOf("(", localFunctionMatch.index);
+    }
+
+    const localConstDeclaration = new RegExp(
+      `(?:^|[\\r\\n;])\\s*const\\s+${localHandlerName}\\b(?:\\s*:[\\s\\S]*?)?\\s*=\\s*(?:async\\s+)?(?:function\\b\\s*)?`
+    );
+    const localConstMatch = localConstDeclaration.exec(source);
+    if (localConstMatch === null) {
+      return -1;
+    }
+
+    return source.indexOf("(", localConstMatch.index + localConstMatch[0].length);
   }
 
   return source.indexOf("(", constMatch.index + constMatch[0].length);
@@ -503,6 +542,49 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeArrowSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeFunctionExpressionSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "DELETE")).toBe(false);
+  });
+
+  it("tracks named-export mutating route handlers for role-gate and body-order checks", () => {
+    const missingRoleGateSource = `
+      async function createPost(request: Request) {
+        return Response.json({ ok: true });
+      }
+      export { createPost as POST };
+    `;
+    const unsafeLocalConstSource = `
+      const updateContact: (request: Request) => Promise<Response> = async (request: Request) => {
+        const payload = await request.json();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      };
+      export { updateContact as PATCH };
+    `;
+    const unsafeDirectNamedConstSource = `
+      const DELETE = async function(req: Request) {
+        const cloned = req.clone();
+        const payload = await cloned.text();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      };
+      export { DELETE };
+    `;
+    const safeSource = `
+      async function replaceCampaign(req: Request) {
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await req.clone().arrayBuffer();
+        return Response.json({ size: payload.byteLength });
+      }
+      export { replaceCampaign as PUT };
+    `;
+
+    expect(exportedMutatingMethods(missingRoleGateSource)).toEqual(["POST"]);
+    expect(exportedMutatingMethodHasRoleGate(missingRoleGateSource, "POST")).toBe(false);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeLocalConstSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectNamedConstSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "PUT")).toBe(false);
   });
 
   it("treats cloned request body readers as body parsing for role-gate ordering", () => {

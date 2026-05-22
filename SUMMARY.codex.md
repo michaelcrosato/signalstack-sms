@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 295
+
+- Hardened named-export mutating route-handler authorization coverage for Run 295.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now recognizes mutating handlers exported through named export lists such as `export { createPost as POST }` and `export { POST }`, so alias-exported route handlers cannot bypass per-handler `requireApiRole` coverage or body-reader-before-role-gate ordering checks.
+- Updated the testing contract to name named-export handler coverage.
+- Focused auth coverage, contracts check, typecheck, and the protected local gate passed. The first `db:migrate` attempt failed because `DATABASE_URL` was unset; rerun used the repo's demo-local Postgres URL from `.env.example` against the local Docker Postgres service.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 294
 
 - Hardened typed exported const mutating route-handler authorization coverage for Run 294.
