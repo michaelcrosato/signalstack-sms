@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 290
+
+- Hardened parenthesized request body-reader function authorization coverage for Run 290.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now treats parenthesized standard `Request` body-reader function calls such as `(req.json)()`, `(req.clone().text)()`, and parenthesized detached reader aliases as body parsing that must remain behind each mutating handler's own top-level `requireApiRole` call.
+- Updated the testing contract to name parenthesized reader-function coverage.
+- Focused auth coverage, contracts check, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 289
 
 - Hardened comma-declared request body-reader authorization coverage for Run 289.

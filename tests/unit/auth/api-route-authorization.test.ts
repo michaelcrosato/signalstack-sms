@@ -120,6 +120,13 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
     .replace(/\.\s*clone\s*\?\.\s*\(/g, ".clone(")
     .replace(new RegExp(`\\.\\s*(${requestBodyReaderNames})\\s*\\?\\.\\s*\\(`, "g"), ".$1(")
     .replace(/\?\.\s*/g, ".")
+    .replace(
+      new RegExp(
+        `\\(\\s*([A-Za-z_$][\\w$]*(?:\\s*\\.\\s*clone\\s*\\(\\s*\\))?\\s*\\.\\s*(?:${requestBodyReaderNames}))\\s*\\)`,
+        "g"
+      ),
+      "$1"
+    )
     .replace(/\(\s*([A-Za-z_$][\w$]*)\s*\.\s*clone\s*\(\s*\)\s*\)/g, "$1.clone()")
     .replace(/(^|[^A-Za-z0-9_$.\]])\(\s*([A-Za-z_$][\w$]*)\s*\)/g, "$1$2"));
   const requestAliases = new Set([requestParameterName]);
@@ -641,6 +648,47 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "PATCH")).toBe(false);
+  });
+
+  it("treats parenthesized request body reader function calls as body parsing for role-gate ordering", () => {
+    const unsafeDirectReaderSource = `
+      export async function POST(req: Request) {
+        const payload = await (req.json)();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeClonedReaderSource = `
+      export async function PATCH(req: Request) {
+        const payload = await (req.clone().text)();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeAliasReaderSource = `
+      export async function POST(req: Request) {
+        const readFormData = (req.formData);
+        const payload = await readFormData.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await (req.json)();
+        return Response.json(payload);
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectReaderSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeClonedReaderSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAliasReaderSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
   it("treats bracket-notation request and clone body readers as body parsing for role-gate ordering", () => {
