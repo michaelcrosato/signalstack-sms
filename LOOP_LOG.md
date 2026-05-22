@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 359  GREEN  type-asserted-request-prototype-alias-auth-scan  2026-05-22 06:11
+Objective:    Prevent TypeScript type-asserted `Request.prototype` object aliases from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize `Request.prototype as typeof Request.prototype` object aliases before body-reader checks.
+- Added synthetic auth unit coverage proving `const requestPrototype = Request.prototype as typeof Request.prototype; requestPrototype.formData.call(req)` fails before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the type-asserted prototype-alias boundary.
+Gate:         passed with `PLAYWRIGHT_PORT=3111 .\scripts\local-gate.ps1` after a default-port Playwright web-server startup failure
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 357  GREEN  nested-local-globalthis-alias-auth-scan  2026-05-22 05:59
 Objective:    Prevent nested-parenthesized local `globalThis` aliases from hiding mutating-route request body readers before authorization.
 Changed:

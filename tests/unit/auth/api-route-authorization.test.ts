@@ -404,11 +404,11 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
       : "Request";
   const requestPrototypeAliases = new Set<string>();
   const directRequestPrototypeAliasPattern = new RegExp(
-    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${requestConstructorTargetPattern}\\s*(?:(?:\\.|\\?\\.)\\s*prototype|(?:\\?\\.)?\\[\\s*${literalRequestPrototypeNamePattern}\\s*\\])${variableDeclaratorEnd}`,
+    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${requestConstructorTargetPattern}\\s*(?:(?:\\.|\\?\\.)\\s*prototype|(?:\\?\\.)?\\[\\s*${literalRequestPrototypeNamePattern}\\s*\\])(?:\\s+as\\s+typeof\\s+Request\\s*\\.\\s*prototype)?${variableDeclaratorEnd}`,
     "g"
   );
   const assignedRequestPrototypeAliasPattern = new RegExp(
-    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${requestConstructorTargetPattern}\\s*(?:(?:\\.|\\?\\.)\\s*prototype|(?:\\?\\.)?\\[\\s*${literalRequestPrototypeNamePattern}\\s*\\])\\s*(?=;|\\r?\\n)`,
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${requestConstructorTargetPattern}\\s*(?:(?:\\.|\\?\\.)\\s*prototype|(?:\\?\\.)?\\[\\s*${literalRequestPrototypeNamePattern}\\s*\\])(?:\\s+as\\s+typeof\\s+Request\\s*\\.\\s*prototype)?\\s*(?=;|\\r?\\n)`,
     "g"
   );
   const collectRequestPrototypeDestructuringAliases = (fields: string) =>
@@ -2207,6 +2207,15 @@ describe("API route authorization coverage", () => {
         return Response.json({ size: payload.size });
       }
     `;
+    const unsafeTypeAssertedDirectPrototypeAliasSource = `
+      export async function DELETE(req: Request) {
+        const requestPrototype = Request.prototype as typeof Request.prototype;
+        const payload = await requestPrototype.formData.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
     const unsafeAssignedPrototypeAliasSource = `
       export async function PATCH(req: Request) {
         let requestPrototype;
@@ -2277,6 +2286,7 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectPrototypeAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedDirectPrototypeAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeWholeParenthesizedDirectPrototypeAliasSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTypeAssertedDirectPrototypeAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedPrototypeAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDestructuredPrototypeAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedDestructuredPrototypeAliasSource, "POST")).toBe(true);

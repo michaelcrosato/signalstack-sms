@@ -1,5 +1,17 @@
 # Codex Summary
 
+Run number: 359
+
+- Hardened TypeScript type-asserted `Request.prototype` object-alias authorization coverage.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes `const requestPrototype = Request.prototype as typeof Request.prototype`, so later prototype body-reader calls cannot parse a mutating-route request body before the handler's top-level `requireApiRole`.
+- Updated the testing contract, testing docs, and current state matrix for the type-asserted prototype-alias boundary.
+- Focused auth coverage passed: `npm run test -- tests/unit/auth/api-route-authorization.test.ts`.
+- `npm run contracts:check`, `npm run typecheck`, and `PLAYWRIGHT_PORT=3111 .\scripts\local-gate.ps1` passed on 2026-05-22 06:11 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 46 unit test files / 391 tests, Playwright smoke, and build green.
+- A default-port protected gate rerun failed at Playwright web-server startup after unit checks; the allowed `PLAYWRIGHT_PORT=3111` rerun passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 358
 
 - Hardened TypeScript type-asserted `Request` constructor-alias authorization coverage.
