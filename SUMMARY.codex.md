@@ -2196,6 +2196,7 @@ Run number: 95
 - Latest live-worker control metadata hardening pinned the reserved `production-live-campaign` checklist in frozen executable metadata and wired worker class authorization through it while keeping the class blocked because every control remains planned. Focused queue tests, typecheck, production worker policy check, and the protected local gate passed without live SMS, billing, provider, notification, live AI, credential, or destructive production actions.
 - `npm run typecheck`
 - `npm run lint`
+- Latest bound `Reflect.apply` body-reader hardening tightens the static mutating API authorization scanner so direct, cloned, declared-alias, and assigned-alias bound `Request` body readers executed through `Reflect.apply(...)` are treated as body parsing that must remain after each handler's own top-level `requireApiRole` call. Focused auth coverage and the protected local gate passed; the change is local static test coverage only and does not execute API handlers, use production credentials, call providers, bill, notify, send SMS/email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
 - `git diff --check`
 - `.\scripts\local-gate.ps1`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed; npm run test:e2e:demo`

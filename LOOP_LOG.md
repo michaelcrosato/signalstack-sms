@@ -2547,6 +2547,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
 
+## Run 301  GREEN  reflect-apply-bound-body-reader-scan  2026-05-22 00:19
+Objective:    Prevent `Reflect.apply` bound request body-reader invocations from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to treat direct, cloned, declared-alias, and assigned-alias bound `Reflect.apply(...)` body-reader invocations as body parsing.
+- Added synthetic auth unit coverage proving those bound `Reflect.apply` cases fail before the role gate and pass after it.
+- Updated the testing contract for the bound `Reflect.apply` body-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 272  GREEN  cloned-request-body-role-scan  2026-05-21 22:02
 Objective:    Prevent cloned request body parsing from bypassing local mutating API role-gate ordering checks.
 Changed:

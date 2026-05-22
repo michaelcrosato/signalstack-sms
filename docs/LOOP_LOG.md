@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 301  GREEN  reflect-apply-bound-body-reader-scan  2026-05-22 00:19
+Objective:    Prevent `Reflect.apply` bound request body-reader invocations from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to treat direct, cloned, declared-alias, and assigned-alias bound `Reflect.apply(...)` body-reader invocations as body parsing.
+- Added synthetic auth unit coverage proving those bound `Reflect.apply` cases fail before the role gate and pass after it.
+- Updated the testing contract for the bound `Reflect.apply` body-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 300  GREEN  reflect-apply-body-reader-scan  2026-05-22 00:15
 Objective:    Prevent `Reflect.apply` request body-reader invocations from bypassing mutating-route role-gate ordering checks.
 Changed:

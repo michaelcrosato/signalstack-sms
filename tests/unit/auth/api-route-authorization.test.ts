@@ -237,6 +237,12 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   if (directReflectApplyRequestBodyReaderPattern.test(normalizedBodySlice)) {
     return true;
   }
+  const directReflectApplyBoundRequestBodyReaderPattern = new RegExp(
+    `\\bReflect\\s*\\.\\s*apply\\s*\\(\\s*(?:${requestSourcePattern})\\s*(?:\\.\\s*clone\\s*\\(\\s*\\))?\\s*\\.\\s*(?:${requestBodyReaderNames})\\s*\\.\\s*bind\\s*\\(${simpleCallArguments}\\)\\s*,`
+  );
+  if (directReflectApplyBoundRequestBodyReaderPattern.test(normalizedBodySlice)) {
+    return true;
+  }
 
   const requestCloneAliasPattern = new RegExp(
     `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*(?:${requestSourcePattern})\\s*\\.\\s*clone\\s*\\(\\s*\\)${variableDeclaratorEnd}`,
@@ -263,6 +269,15 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   if (
     cloneAliases.some((alias) =>
       new RegExp(
+        `\\bReflect\\s*\\.\\s*apply\\s*\\(\\s*${escapeRegExp(alias)}\\s*\\.\\s*(?:${requestBodyReaderNames})\\s*\\.\\s*bind\\s*\\(${simpleCallArguments}\\)\\s*,`
+      ).test(normalizedBodySlice)
+    )
+  ) {
+    return true;
+  }
+  if (
+    cloneAliases.some((alias) =>
+      new RegExp(
         `\\b${escapeRegExp(alias)}\\s*\\.\\s*(?:${requestBodyReaderNames})\\s*(?:\\(|\\.\\s*(?:call|apply)\\s*\\(|\\.\\s*bind\\s*\\(${simpleCallArguments}\\)\\s*\\()`
       ).test(
         normalizedBodySlice
@@ -280,6 +295,25 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
     `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*(?:${readerSourcePattern})\\s*\\.\\s*(?:${requestBodyReaderNames})\\s*\\.\\s*bind\\s*\\([^)]*\\)\\s*(?=;|\\r?\\n)[\\s\\S]*?\\b\\1\\s*\\(`
   );
   if (normalizedBoundReaderMethodPattern.test(normalizedBodySlice) || assignedBoundReaderMethodPattern.test(normalizedBodySlice)) {
+    return true;
+  }
+  const boundReaderAliasPattern = new RegExp(
+    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?\\s*=\\s*(?:${readerSourcePattern})\\s*\\.\\s*(?:${requestBodyReaderNames})\\s*\\.\\s*bind\\s*\\([^)]*\\)${variableDeclaratorEnd}`,
+    "g"
+  );
+  const assignedBoundReaderAliasPattern = new RegExp(
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*(?:${readerSourcePattern})\\s*\\.\\s*(?:${requestBodyReaderNames})\\s*\\.\\s*bind\\s*\\([^)]*\\)\\s*(?=;|\\r?\\n)`,
+    "g"
+  );
+  const boundReaderAliases = [
+    ...normalizedBodySlice.matchAll(boundReaderAliasPattern),
+    ...normalizedBodySlice.matchAll(assignedBoundReaderAliasPattern)
+  ].map((match) => match[1]);
+  if (
+    boundReaderAliases.some((alias) =>
+      new RegExp(`\\bReflect\\s*\\.\\s*apply\\s*\\(\\s*${escapeRegExp(alias)}\\s*,`).test(normalizedBodySlice)
+    )
+  ) {
     return true;
   }
   const readerMethodAliasPattern = new RegExp(
@@ -1496,6 +1530,60 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCloneSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDetachedSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDestructuredSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("treats Reflect.apply bound request body reader invocations as body parsing for role-gate ordering", () => {
+    const unsafeDirectBoundSource = `
+      export async function POST(req: Request) {
+        const payload = await Reflect.apply(req.json.bind(req), undefined, []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeCloneBoundSource = `
+      export async function PATCH(req: Request) {
+        const cloned = req.clone();
+        const payload = await Reflect.apply(cloned.text.bind(cloned), undefined, []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeBoundAliasSource = `
+      export async function PUT(req: Request) {
+        const readFormData = req.formData.bind(req);
+        const payload = await Reflect.apply(readFormData, undefined, []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeAssignedBoundAliasSource = `
+      export async function DELETE(req: Request) {
+        let readBlob;
+        readBlob = req.blob.bind(req);
+        const payload = await Reflect.apply(readBlob, undefined, []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const readJson = req.json.bind(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await Reflect.apply(readJson, undefined, []);
+        return Response.json(payload);
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectBoundSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCloneBoundSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeBoundAliasSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedBoundAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
