@@ -46,7 +46,7 @@ export default async function AnalyticsPage() {
           <Metric label="Consent Coverage" value={`${analytics.derived.consentCoveragePercent}%`} detail={`${analytics.contacts.optedIn}/${analytics.contacts.total} opted in`} />
           <Metric label="Campaigns" value={analytics.campaigns.total} detail="local campaign records" />
           <Metric label="Inbox Load" value={analytics.conversations.open} detail={`${analytics.messages.total} local messages`} />
-          <Metric label="Usage Events" value={analytics.usageRows.reduce((total, row) => total + row.quantity, 0)} detail="local metering only" />
+          <Metric label="Usage Events" value={analytics.derived.totalUsageEvents} detail="local metering only" />
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
@@ -76,6 +76,7 @@ export default async function AnalyticsPage() {
               <StatusRow label="Campaign records" value={String(analytics.campaigns.total)} />
               <StatusRow label="Scheduled campaigns" value={String(analytics.campaigns.scheduled)} />
               <StatusRow label="Scheduled rate" value={`${analytics.derived.scheduledCampaignPercent}%`} />
+              <StatusRow label="Fake AI usage share" value={`${analytics.derived.fakeAiUsagePercent}%`} />
               <StatusRow label="Scheduled work source" value="local queue records" />
               <StatusRow label="Provider sends" value="disabled" />
               <StatusRow label="Live messaging" value="blocked" />

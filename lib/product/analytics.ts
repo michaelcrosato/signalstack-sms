@@ -18,6 +18,9 @@ export async function getProductAnalytics(orgId: string) {
       : 0;
   const scheduledCampaignPercent =
     overview.campaigns.total > 0 ? Math.round((overview.campaigns.scheduled / overview.campaigns.total) * 100) : 0;
+  const totalUsageEvents = Object.values(overview.usage).reduce((total, quantity) => total + quantity, 0);
+  const fakeAiUsagePercent =
+    totalUsageEvents > 0 ? Math.round((overview.usage[UsageEventType.AI_REQUEST] / totalUsageEvents) * 100) : 0;
 
   return {
     ...overview,
@@ -28,7 +31,9 @@ export async function getProductAnalytics(orgId: string) {
       scheduledCampaignPercent,
       resolvedConversationPercent,
       averageMessagesPerConversation:
-        overview.conversations.total > 0 ? Number((overview.messages.total / overview.conversations.total).toFixed(1)) : 0
+        overview.conversations.total > 0 ? Number((overview.messages.total / overview.conversations.total).toFixed(1)) : 0,
+      totalUsageEvents,
+      fakeAiUsagePercent
     },
     usageRows: Object.values(UsageEventType).map((type) => ({
       type,

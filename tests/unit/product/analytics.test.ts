@@ -43,7 +43,9 @@ describe("product analytics", () => {
       optedOutPercent: 25,
       scheduledCampaignPercent: 25,
       resolvedConversationPercent: 60,
-      averageMessagesPerConversation: 2.2
+      averageMessagesPerConversation: 2.2,
+      totalUsageEvents: 10,
+      fakeAiUsagePercent: 10
     });
     expect(analytics.usageRows).toEqual([
       { type: UsageEventType.CONTACT_IMPORTED, label: "Contacts imported", quantity: 4 },
@@ -86,7 +88,9 @@ describe("product analytics", () => {
         optedOutPercent: 0,
         scheduledCampaignPercent: 0,
         resolvedConversationPercent: 0,
-        averageMessagesPerConversation: 0
+        averageMessagesPerConversation: 0,
+        totalUsageEvents: 0,
+        fakeAiUsagePercent: 0
       }
     });
   });

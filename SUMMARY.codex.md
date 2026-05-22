@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 272
+
+- Added product analytics fake-AI usage share visibility for Run 272.
+- Latest repo truth: `lib/product/analytics.ts` now derives total local usage quantity and fake-AI usage percentage, `/dashboard/analytics` renders the fake-AI usage share, and the seeded product demo path verifies the row.
+- The change is read-only product analytics display/projection coverage only; it does not mutate analytics data, execute reports, create exports, run workers, enqueue jobs, call providers, call Stripe, send SMS/email/notifications, expose secrets, call live AI, or enable live features.
+- Focused product analytics unit coverage, typecheck, seeded product E2E, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 271
 
 - Added product analytics scheduled-campaign visibility for Run 271.

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 272  GREEN  product-analytics-fake-ai-share  2026-05-21 21:39
+Objective:    Make fake-AI usage share visible in the product analytics workspace.
+Changed:
+- Centralized total local usage quantity and fake-AI usage percentage in the product analytics projection.
+- Updated `/dashboard/analytics` to render the derived usage total and fake-AI usage share.
+- Extended product analytics unit coverage and the seeded product demo path for the new row.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep product demo paths stable while preserving live SMS, provider, billing, live AI, notification, worker, and secret gates.
+
 ## Run 264  GREEN  inbox-help-consent-visibility  2026-05-21 20:53
 Objective:    Make HELP keyword handling visible in the product inbox demo path without changing consent.
 Changed:

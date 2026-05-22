@@ -386,6 +386,7 @@ test("product analytics page renders local overview detail", async ({ page }) =>
   await expect(page.getByRole("heading", { name: "Campaign Signals" })).toBeVisible();
   await expect(page.getByText("Scheduled campaigns")).toBeVisible();
   await expect(page.getByText("Scheduled rate")).toBeVisible();
+  await expect(page.getByText("Fake AI usage share")).toBeVisible();
   await expect(page.getByText("Provider sends")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Usage Metering" })).toBeVisible();
   await expect(page.getByRole("row").filter({ hasText: "Contacts imported" })).toBeVisible();
