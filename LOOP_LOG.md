@@ -2571,6 +2571,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
 
+## Run 335  GREEN  optional-bracket-globalthis-auth-scan  2026-05-22 03:43
+Objective:    Prevent optional bracketed `globalThis` built-in access from becoming an untested mutating-route body-reader scanner boundary.
+Changed:
+- Added synthetic auth coverage for `globalThis?.["Reflect"]?.get(...)` request body-reader lookups before the role gate.
+- Added synthetic auth coverage for `globalThis?.["Object"]?.getOwnPropertyDescriptor(...)` descriptor-derived request body readers before the role gate.
+- Updated SUMMARY and BLOCKERS for the optional bracketed `globalThis` reflective built-in boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 334  GREEN  globalthis-reflect-body-reader-scan  2026-05-22 03:40
 Objective:    Prevent `globalThis.Object` and `globalThis.Reflect` body-reader access paths from bypassing mutating-route role-gate ordering checks.
 Changed:

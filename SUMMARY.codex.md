@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 335
+
+- Hardened optional bracketed `globalThis` reflective built-in body-reader authorization coverage.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now proves `globalThis?.["Reflect"]?.get(...)` and `globalThis?.["Object"]?.getOwnPropertyDescriptor(...)` request body-reader paths are normalized before mutating-route role-gate ordering checks.
+- Focused auth coverage passed; protected local gate status is recorded in `LOOP_LOG.md`.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 334
 
 - Hardened `globalThis` reflective built-in body-reader authorization coverage.
