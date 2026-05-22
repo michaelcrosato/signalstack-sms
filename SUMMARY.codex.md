@@ -3280,6 +3280,8 @@ Run number: 95
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed`
 - `$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo`
 
+- Latest live-worker malformed primitive public-field coverage proves supplied `production-live-campaign` control entries with primitive non-string `id` or `requirement` values deny before the reserved live worker class can authorize. Focused unit coverage, production-worker policy check, contracts check, and the protected local gate passed without executing workers, enqueueing jobs, calling Redis/providers, billing, notifying, sending SMS or email, calling live AI, exposing secrets, enabling live features, editing protected gate scripts, or performing destructive database actions.
+
 Latest Twilio inbound address normalization trims inbound `From`/`To` address whitespace before local contact/message creation and rejects blank `From` values. Focused webhook helper coverage and the protected local gate passed. The change is local webhook parsing only and does not call Twilio, use production credentials, send SMS, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
 
 Latest demo-operations browser inventory hardening targeted demo E2E, protected local gate, local migration check, demo seed, and seeded investor demo path passed.

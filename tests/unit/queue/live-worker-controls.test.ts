@@ -786,6 +786,49 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects malformed primitive control public-field values before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const malformedControls = [
+      Object.freeze({
+        id: 42 as unknown as string,
+        status: "implemented" as const,
+        requirement: implementedControls[0].requirement
+      }),
+      Object.freeze({
+        id: Symbol("deploy-environment-allowlist") as unknown as string,
+        status: "implemented" as const,
+        requirement: implementedControls[0].requirement
+      }),
+      Object.freeze({
+        id: implementedControls[0].id,
+        status: "implemented" as const,
+        requirement: true as unknown as string
+      }),
+      Object.freeze({
+        id: implementedControls[0].id,
+        status: "implemented" as const,
+        requirement: 11n as unknown as string
+      })
+    ];
+
+    for (const malformedControl of malformedControls) {
+      const controls = Object.freeze(
+        implementedControls.map((control, index) => (index === 0 ? malformedControl : Object.freeze({ ...control })))
+      );
+
+      expect(() => liveWorkerControlIdsMatchRequiredChecklist(controls)).not.toThrow();
+      expect(() => liveWorkerControlsUseSupportedStatuses(controls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
+      expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(true);
+      expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(true);
+      expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).toBe(false);
+    }
+  });
+
   it("rejects hidden string metadata on control entries before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const hiddenMetadataControl = Object.freeze(
