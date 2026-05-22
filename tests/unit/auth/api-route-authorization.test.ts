@@ -5,6 +5,8 @@ import { describe, expect, it } from "vitest";
 const mutatingMethods = ["POST", "PATCH", "PUT", "DELETE"] as const;
 const requestBodyReaderPattern =
   /\brequest\s*(?:\.\s*clone\s*\(\s*\))?\s*\.\s*(?:json|formData|text|arrayBuffer|blob)\s*\(/;
+const requestCloneAliasPattern =
+  /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*request\s*\.\s*clone\s*\(\s*\)\s*;/g;
 const roleGateExceptionRoutes = new Set([
   "app/api/webhooks/twilio/inbound/route.ts",
   "app/api/webhooks/twilio/status/route.ts"
@@ -88,12 +90,28 @@ function exportedMutatingMethodHasRoleGate(source: string, method: (typeof mutat
   return /\brequireApiRole\s*\(/.test(exportedFunctionBody(source, method));
 }
 
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function bodySliceParsesRequestBody(bodySlice: string) {
+  if (requestBodyReaderPattern.test(bodySlice)) {
+    return true;
+  }
+
+  requestCloneAliasPattern.lastIndex = 0;
+  const cloneAliases = [...bodySlice.matchAll(requestCloneAliasPattern)].map((match) => match[1]);
+  return cloneAliases.some((alias) =>
+    new RegExp(`\\b${escapeRegExp(alias)}\\s*\\.\\s*(?:json|formData|text|arrayBuffer|blob)\\s*\\(`).test(bodySlice)
+  );
+}
+
 function mutatingMethodParsesBodyBeforeRoleGate(source: string, method: (typeof mutatingMethods)[number]) {
   const body = exportedFunctionBody(source, method);
   const roleGateIndex = body.search(/\brequireApiRole\s*\(/);
-  const bodyParseIndex = body.search(requestBodyReaderPattern);
+  const bodySliceBeforeRoleGate = roleGateIndex === -1 ? body : body.slice(0, roleGateIndex);
 
-  return bodyParseIndex !== -1 && (roleGateIndex === -1 || bodyParseIndex < roleGateIndex);
+  return bodySliceParsesRequestBody(bodySliceBeforeRoleGate);
 }
 
 describe("API route authorization coverage", () => {
@@ -153,6 +171,30 @@ describe("API route authorization coverage", () => {
 
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("treats aliased cloned request body readers as body parsing for role-gate ordering", () => {
+    const unsafeSource = `
+      export async function PATCH(request: Request) {
+        const cloned = request.clone();
+        const payload = await cloned.formData();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const safeSource = `
+      export async function PATCH(request: Request) {
+        const cloned = request.clone();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await cloned.formData();
+        return Response.json(payload);
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "PATCH")).toBe(false);
   });
 
   it("keeps role-gate exceptions limited to signed Twilio webhook handlers", () => {
