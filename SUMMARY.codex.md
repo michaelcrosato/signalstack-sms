@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 442
+
+- Added live-worker authorization coverage proving malformed primitive `bigint` deployment-class values deny before supplied `production-live-campaign` controls are inspected.
+- Updated queue/testing contracts, production-worker policy, TESTING, NEXT_PROMPTS, and current state matrix for the malformed primitive deployment-class boundary.
+- Focused checks passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts`, `npm run production-worker:check`, and `npm run contracts:check`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 446 tests, Playwright smoke, and build green.
+- No source behavior beyond local test evidence, product features, live sends, provider calls, billing calls, notifications, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate scripts, or live feature flags changed.
+
+## Previous Run
+
 Run number: 441
 
 - Aligned live-worker queue/testing contracts and production-worker/testing docs with executable proxy evidence behavior: malformed, invalid-descriptor, duplicate-key, trap-throwing, or revoked proxy-backed evidence denies cleanly, while descriptor-valid proxy-wrapped exact frozen evidence is evaluated through descriptors without `get` trap execution.

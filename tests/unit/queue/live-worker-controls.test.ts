@@ -1693,6 +1693,7 @@ describe("production live campaign worker controls", () => {
       null,
       undefined,
       42,
+      42n,
       true,
       Symbol("production-live-campaign"),
       Object.freeze(["production-live-campaign"]),

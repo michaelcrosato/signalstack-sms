@@ -3979,3 +3979,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 442  GREEN  live-worker-bigint-class-evidence  2026-05-22 14:45
+Objective:    Prove malformed primitive bigint deployment-class values cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker authorization coverage for `bigint` `workerDeploymentClass` values denying before supplied controls are inspected.
+- Updated queue/testing contracts, production-worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the malformed primitive deployment-class boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
