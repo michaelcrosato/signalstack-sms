@@ -1108,6 +1108,31 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("does not coerce malformed controls evidence before denying authorization", () => {
+    const hostileControlsEvidence = Object.freeze({
+      [Symbol.toPrimitive]: () => {
+        throw new Error("controls evidence must not be coerced");
+      },
+      toString: () => {
+        throw new Error("controls evidence toString must not be called");
+      },
+      valueOf: () => {
+        throw new Error("controls evidence valueOf must not be called");
+      }
+    });
+
+    expect(() =>
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, hostileControlsEvidence)
+      )
+    ).not.toThrow();
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, hostileControlsEvidence)
+      )
+    ).toBe(false);
+  });
+
   it("rejects proxy-backed control evidence without throwing", () => {
     const implementedControls = implementedFrozenControls();
     const throwingArrayLengthDescriptorProxy = new Proxy([...implementedControls], {
