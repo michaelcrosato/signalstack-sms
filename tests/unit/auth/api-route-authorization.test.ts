@@ -767,6 +767,7 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
   const normalizedReflectedBodySlice = reflectedDescriptorValueAliasBodySlice
     .replace(new RegExp(`\\[\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\]\\s*:`, "g"), "$1:")
     .replace(new RegExp(`\\[\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\]`, "g"), ".$1")
+    .replace(/\bRequest\s*\[\s*["'`]prototype["'`]\s*\]/g, "Request.prototype")
     .replace(/\[\s*["'`]clone["'`]\s*\]/g, ".clone")
     .replace(/\[\s*["'`](call|apply|bind)["'`]\s*\]/g, ".$1")
     .replace(/\.\s*clone\s*\?\.\s*\(/g, ".clone(")
@@ -1778,6 +1779,14 @@ describe("API route authorization coverage", () => {
         return Response.json({ size: payload.byteLength });
       }
     `;
+    const unsafeBracketPrototypeSource = `
+      export async function PUT(req: Request) {
+        const payload = await Request["prototype"]["formData"]["call"](req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
     const unsafeDirectReflectSource = `
       export async function POST(req: Request) {
         const cloned = req.clone();
@@ -1801,6 +1810,7 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCloneSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeBoundSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAliasSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeBracketPrototypeSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectReflectSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });

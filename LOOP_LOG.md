@@ -3114,3 +3114,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 346  GREEN  bracketed-request-prototype-auth-scan  2026-05-22 04:46
+Objective:    Prevent bracketed `Request["prototype"]` body-reader forms from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize `Request["prototype"]` before prototype body-reader checks.
+- Added synthetic auth unit coverage proving `Request["prototype"]["formData"]["call"](req)` fails before the role gate while post-gate reads remain allowed.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the bracketed Request prototype boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
