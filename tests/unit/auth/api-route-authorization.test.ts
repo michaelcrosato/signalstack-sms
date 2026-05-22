@@ -189,9 +189,9 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
   const builtInPropertyAliases = new Map<string, string>();
   const globalThisAliases = new Set<string>();
   const globalThisAliasPattern =
-    /(?:\b(?:const|let|var)\s+|,\s*)([A-Za-z_$][\w$]*)\s*(?::[^=;,\n]+)?=\s*\(?\s*globalThis\s*\)?(?:\s+as\s+typeof\s+globalThis)?\s*(?=,|;|\r?\n)/g;
+    /(?:\b(?:const|let|var)\s+|,\s*)([A-Za-z_$][\w$]*)\s*(?::[^=;,\n]+)?=\s*\(*\s*globalThis(?:\s+as\s+typeof\s+globalThis)?\s*\)*\s*(?=,|;|\r?\n)/g;
   const assignedGlobalThisAliasPattern =
-    /(?:^|[;\r\n])\s*([A-Za-z_$][\w$]*)\s*=\s*\(?\s*globalThis\s*\)?(?:\s+as\s+typeof\s+globalThis)?\s*(?=;|\r?\n)/g;
+    /(?:^|[;\r\n])\s*([A-Za-z_$][\w$]*)\s*=\s*\(*\s*globalThis(?:\s+as\s+typeof\s+globalThis)?\s*\)*\s*(?=;|\r?\n)/g;
   for (const match of [
     ...normalizedGlobalThisBodySlice.matchAll(globalThisAliasPattern),
     ...normalizedGlobalThisBodySlice.matchAll(assignedGlobalThisAliasPattern)
@@ -4227,6 +4227,28 @@ describe("API route authorization coverage", () => {
         return Response.json({ size: payload.size });
       }
     `;
+    const unsafeParenthesizedTypeAssertedGlobalAliasReflectGetSource = `
+      export async function POST(req: Request) {
+        const root = (globalThis as typeof globalThis);
+        const payload = await root.Reflect.get(req, "text").call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeAssignedParenthesizedTypeAssertedGlobalAliasDescriptorSource = `
+      export async function PATCH(req: Request) {
+        let root;
+        root = ((globalThis as typeof globalThis));
+        const payload = await root.Object.getOwnPropertyDescriptor(
+          root.Reflect.getPrototypeOf(req),
+          "formData"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
     const unsafeGlobalAliasComputedReflectGetSource = `
       export async function POST(req: Request) {
         const root = globalThis;
@@ -4314,6 +4336,12 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedGlobalAliasDescriptorSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTypeAssertedGlobalAliasReflectGetSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedTypeAssertedGlobalAliasDescriptorSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedTypeAssertedGlobalAliasReflectGetSource, "POST")).toBe(
+      true
+    );
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedParenthesizedTypeAssertedGlobalAliasDescriptorSource, "PATCH")
+    ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalAliasComputedReflectGetSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalAliasComputedObjectDescriptorSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDestructuredGlobalReflectSource, "POST")).toBe(true);

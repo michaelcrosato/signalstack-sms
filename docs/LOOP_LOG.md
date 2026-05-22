@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 364  GREEN  parenthesized-type-asserted-globalthis-alias-auth-scan  2026-05-22 06:39
+Objective:    Prevent parenthesized TypeScript type-asserted `globalThis` aliases from hiding reflective request body readers before mutating-route role gates.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize direct and assigned parenthesized `globalThis as typeof globalThis` aliases before reflective `Object`/`Reflect` body-reader checks.
+- Added synthetic auth unit coverage proving `const root = (globalThis as typeof globalThis)` and `root = ((globalThis as typeof globalThis))` forms fail before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the parenthesized type-asserted `globalThis` alias boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 361  GREEN  object-reflect-builtin-alias-auth-scan  2026-05-22 06:25
 Objective:    Prevent direct local `Object` and `Reflect` built-in aliases from hiding mutating-route request body readers before authorization.
 Changed:

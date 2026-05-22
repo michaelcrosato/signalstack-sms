@@ -1,5 +1,17 @@
 # Codex Summary
 
+Run number: 364
+
+- Hardened mutating-route authorization coverage for parenthesized TypeScript type-asserted local `globalThis` aliases.
+- Latest repo truth: the static body-reader scanner now normalizes aliases such as `const root = (globalThis as typeof globalThis)` and assigned nested `root = ((globalThis as typeof globalThis))` before reflective `Object`/`Reflect` request body-reader checks.
+- Added synthetic auth coverage proving those aliases cannot parse request bodies before a handler's top-level `requireApiRole`.
+- Updated the testing contract, testing docs, and current state matrix for the parenthesized type-asserted `globalThis` alias boundary.
+- The first focused auth run failed on the newly added assigned parenthesized type-asserted `globalThis` alias case, confirming the scanner gap; after alias-pattern normalization, focused auth coverage passed: `npm run test -- tests/unit/auth/api-route-authorization.test.ts`.
+- `npm run contracts:check`, `npm run typecheck`, and `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-22 06:41 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 unit test files / 405 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 363
 
 - Hardened mutating-route authorization coverage for parenthesized TypeScript type-asserted `Object` and `Reflect` built-in aliases.
