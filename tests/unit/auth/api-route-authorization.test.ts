@@ -94,10 +94,11 @@ function exportedFunctionBody(source: string, method: (typeof mutatingMethods)[n
     return "";
   }
 
+  const maskedSource = maskNonCodeTokens(source);
   let parameterDepth = 0;
   let signatureEnd = -1;
   for (let index = signatureStart; index < source.length; index += 1) {
-    const char = source[index];
+    const char = maskedSource[index];
     if (char === "(") {
       parameterDepth += 1;
     }
@@ -114,14 +115,14 @@ function exportedFunctionBody(source: string, method: (typeof mutatingMethods)[n
     return "";
   }
 
-  const bodyStart = source.indexOf("{", signatureEnd);
+  const bodyStart = maskedSource.indexOf("{", signatureEnd);
   if (bodyStart === -1) {
     return "";
   }
 
   let depth = 0;
   for (let index = bodyStart; index < source.length; index += 1) {
-    const char = source[index];
+    const char = maskedSource[index];
     if (char === "{") {
       depth += 1;
     }
@@ -364,7 +365,7 @@ function maskNonCodeTokens(source: string) {
             expression += expressionChar;
             index += 1;
           }
-          masked += `{${maskNonCodeTokens(expression)}}`;
+          masked += ` {${maskNonCodeTokens(expression)}}`;
           index -= 1;
           continue;
         }
@@ -1557,6 +1558,50 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeStringSource, "POST")).toBe(false);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeTemplateSource, "POST")).toBe(false);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSource, "POST")).toBe(true);
+  });
+
+  it("ignores non-code braces while extracting mutating handler bodies", () => {
+    const unsafeStringBraceSource = `
+      export async function POST(req: Request) {
+        const marker = "}";
+        const payload = await req.json();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ marker, payload });
+      }
+    `;
+    const unsafeCommentBraceSource = `
+      export async function PATCH(req: Request) {
+        /* } */
+        const payload = await req.clone().text();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeTemplateBraceSource = `
+      export async function PUT(req: Request) {
+        const marker = \`}\`;
+        const payload = await req.formData();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ marker, ok: Boolean(payload) });
+      }
+    `;
+    const safeTemplateInterpolationSource = `
+      export async function POST(req: Request) {
+        const sample = \`marker: ${"${\"}\"}"}\`;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await req.blob();
+        return Response.json({ sample, size: payload.size });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeStringBraceSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCommentBraceSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTemplateBraceSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeTemplateInterpolationSource, "POST")).toBe(false);
   });
 
   it("keeps role-gate exceptions limited to signed Twilio webhook handlers", () => {

@@ -2626,3 +2626,14 @@ Changed:
 Gate:         passed after rerunning local `db:migrate` with the repo's demo-local Postgres URL because the shell initially had no `DATABASE_URL`
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 297  GREEN  non-code-brace-handler-body-scan  2026-05-22 00:01
+Objective:    Prevent non-code braces from truncating mutating route handler body scans before authorization checks.
+Changed:
+- Hardened static mutating API handler body extraction to count braces from comment/string/template-masked source while preserving original source slices.
+- Preserved template interpolation body-reader detection while keeping template expression masking index-aligned.
+- Added synthetic auth unit coverage proving comments, strings, and template literals containing stray braces cannot hide pre-role-gate request body readers.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the non-code brace parser boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
