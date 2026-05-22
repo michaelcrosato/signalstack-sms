@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 342
+
+- Hardened computed `globalThis` built-in alias body-reader authorization coverage.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes local string aliases for `globalThis["Reflect"]` and `globalThis["Object"]` before reflective mutating-route body-reader checks.
+- Updated the testing contract, testing docs, and current state matrix to record the new computed `globalThis` built-in alias boundary.
+- Focused auth coverage, contracts check, typecheck, and `.\scripts\local-gate.ps1` passed with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 46 unit test files / 390 tests, Playwright smoke, and build green.
+- The first focused auth run exposed one too-broad synthetic case for computed reflective method aliases through `globalThis`; the case was narrowed to computed built-in aliases with literal reflective methods, and the focused test passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 341
 
 - Hardened computed `Object`/`Reflect` method alias body-reader authorization coverage.

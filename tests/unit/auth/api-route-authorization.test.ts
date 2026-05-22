@@ -181,12 +181,35 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
       .replace(/\(\s*(Object|Reflect)\s*\)/g, "$1");
   } while (normalizedGlobalThisBodySlice !== previousGlobalThisBodySlice);
 
-  const bodySlice = normalizedGlobalThisBodySlice
+  const builtInPropertyAliases = new Map<string, string>();
+  const literalBuiltInNamePattern = String.raw`\(?\s*["'\`](Object|Reflect)["'\`]\s*(?:\)?\s+as\s+const\s*\)?|\)?)`;
+  const builtInPropertyAliasPattern = new RegExp(
+    `(?:\\b(?:const|let|var)\\s+|,\\s*)([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${literalBuiltInNamePattern}\\s*(?=,|;|\\r?\\n)`,
+    "g"
+  );
+  const assignedBuiltInPropertyAliasPattern = new RegExp(
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${literalBuiltInNamePattern}\\s*(?=;|\\r?\\n)`,
+    "g"
+  );
+  for (const match of [
+    ...normalizedGlobalThisBodySlice.matchAll(builtInPropertyAliasPattern),
+    ...normalizedGlobalThisBodySlice.matchAll(assignedBuiltInPropertyAliasPattern)
+  ]) {
+    builtInPropertyAliases.set(match[1], match[2]);
+  }
+
+  let bodySlice = normalizedGlobalThisBodySlice
     .replace(/\(\s*globalThis\s*\)\s*(?:\?\.)?\[\s*["'`](Object|Reflect)["'`]\s*\]/g, "$1")
     .replace(/\(\s*globalThis\s*\)\s*\??\.\s*(Object|Reflect)\b/g, "$1")
     .replace(/\bglobalThis\s*\?\.\s*(Object|Reflect)\b/g, "$1")
     .replace(/\bglobalThis\s*\.\s*(Object|Reflect)\b/g, "$1")
     .replace(/\bglobalThis\s*(?:\?\.)?\[\s*["'`](Object|Reflect)["'`]\s*\]/g, "$1");
+  for (const [alias, builtInName] of builtInPropertyAliases) {
+    bodySlice = bodySlice.replace(
+      new RegExp(`\\bglobalThis\\s*(?:\\?\\.)?\\[\\s*${escapeRegExp(alias)}\\s*\\]`, "g"),
+      builtInName
+    );
+  }
   const requestBodyReaderNames = "json|formData|text|arrayBuffer|blob";
   const simpleCallArguments = "(?:[^()]|\\([^()]*\\))*";
   const variableDeclaratorStart = "(?:\\b(?:const|let|var)\\s+|,\\s*)";
@@ -3502,6 +3525,28 @@ describe("API route authorization coverage", () => {
         return Response.json({ payload });
       }
     `;
+    const unsafeGlobalComputedReflectGetSource = `
+      export async function POST(req: Request) {
+        const builtInName = "Reflect" as const;
+        const payload = await globalThis[builtInName]["get"](req, "json").call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeGlobalComputedObjectDescriptorSource = `
+      export async function PATCH(req: Request) {
+        const objectName = ("Object");
+        const reflectName = "Reflect" as const;
+        const payload = await globalThis[objectName]["getOwnPropertyDescriptor"](
+          globalThis[reflectName]["getPrototypeOf"](req),
+          "formData"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
     const safeSource = `
       export async function POST(req: Request) {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
@@ -3523,6 +3568,8 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNestedParenthesizedOptionalGlobalDescriptorSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalBracketedMethodDescriptorSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalBracketedReflectGetSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalComputedReflectGetSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalComputedObjectDescriptorSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 

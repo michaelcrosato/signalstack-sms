@@ -9,6 +9,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
 
+## Run 342  GREEN  globalthis-computed-builtin-alias-auth-scan  2026-05-22 04:22
+Objective:    Prevent computed `globalThis` built-in aliases from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize local string aliases for `globalThis["Reflect"]` and `globalThis["Object"]`.
+- Added synthetic auth unit coverage proving computed `globalThis` built-in aliases with reflective body-reader helpers fail before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the computed `globalThis` built-in alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 323  GREEN  computed-destructured-reader-auth-scan  2026-05-22 02:35
 Objective:    Prevent computed destructured request body-reader aliases from bypassing mutating-route role-gate ordering checks.
 Changed:
