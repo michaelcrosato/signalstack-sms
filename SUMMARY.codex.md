@@ -1,5 +1,17 @@
 # Codex Summary
 
+Run number: 360
+
+- Hardened `/settings/delivery` operations metadata by moving delivery checkpoints, safety boundaries, and no-impact summary states into `lib/operations/delivery-operations.ts`.
+- Latest repo truth: `/settings/delivery` now renders frozen delivery operation checkpoints and safety-boundary copy from the shared metadata module instead of page-local prose.
+- Added `tests/unit/operations/delivery-operations.test.ts` with coverage for public fields, frozen snapshots, detached returned arrays, status/no-impact vocabularies, stable ordering, unique identifiers, whitespace-clean copy, command-like literal rejection, secret-like literal rejection, and required no-send/no-mutation delivery boundary terms.
+- Updated the testing contract, testing docs, and current state matrix for the delivery operations inventory boundary.
+- Focused delivery coverage passed: `npm run test -- tests/unit/operations/delivery-operations.test.ts`; `npm run typecheck` and `npm run lint` also passed.
+- `PLAYWRIGHT_PORT=3111 .\scripts\local-gate.ps1` passed on 2026-05-22 06:20 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 unit test files / 404 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 359
 
 - Hardened TypeScript type-asserted `Request.prototype` object-alias authorization coverage.

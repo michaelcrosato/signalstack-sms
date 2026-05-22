@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { prisma } from "@/lib/db/prisma";
+import { getDeliveryOperationsStatus } from "@/lib/operations/delivery-operations";
 import { getDeliveryOperationLinks } from "@/lib/operations/operator-surfaces";
 
 export const dynamic = "force-dynamic";
@@ -9,6 +10,7 @@ export const dynamic = "force-dynamic";
 export default async function DeliveryOperationsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
   const operationLinks = getDeliveryOperationLinks();
+  const deliveryStatus = getDeliveryOperationsStatus();
   const messages = await prisma.message.findMany({
     where: { orgId: currentOrg.orgId },
     include: {
@@ -68,9 +70,25 @@ export default async function DeliveryOperationsPage() {
             <StatusRow label="Failed" value={String(failedMessages.length)} />
             <StatusRow label="With provider ID" value={String(messages.filter((message) => message.providerMessageId).length)} />
             <StatusRow label="Provider calls" value="none from this view" />
+            <StatusRow label="Command execution" value={deliveryStatus.commandExecution} />
+            <StatusRow label="External impact" value={deliveryStatus.externalImpact} />
+            <StatusRow label="Mutation" value={deliveryStatus.mutation} />
+            <StatusRow label="Secrets displayed" value={String(deliveryStatus.secretsDisplayed)} />
           </dl>
         </Panel>
       </section>
+
+      <Panel title="Delivery Checkpoints">
+        <ul className="grid gap-3 text-sm">
+          {deliveryStatus.checkpoints.map((checkpoint) => (
+            <li key={checkpoint.name} className="grid gap-2 border-b border-slate-100 pb-3 md:grid-cols-[160px_140px_1fr]">
+              <span className="font-medium text-slate-950">{checkpoint.name}</span>
+              <span className="text-slate-600">{checkpoint.status}</span>
+              <span className="text-slate-700">{checkpoint.boundary}</span>
+            </li>
+          ))}
+        </ul>
+      </Panel>
 
       <Panel title="Recent Messages">
         <ul className="grid gap-3 text-sm">
@@ -100,10 +118,9 @@ export default async function DeliveryOperationsPage() {
 
       <Panel title="Safety Boundary">
         <ul className="grid gap-2 text-sm text-slate-700">
-          <li>Delivery status updates remain webhook/API behavior, not UI actions from this page.</li>
-          <li>Outbound sends remain blocked by demo-safe defaults and provider hard gates.</li>
-          <li>Retries, replays, provider lookups, notifications, and billing actions are not available here.</li>
-          <li>No message mutations, live SMS, provider calls, secrets, or live feature enablement occur from this view.</li>
+          {deliveryStatus.safetyBoundaries.map((boundary) => (
+            <li key={boundary}>{boundary}</li>
+          ))}
         </ul>
       </Panel>
     </main>

@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 360  GREEN  delivery-operations-metadata  2026-05-22 06:20
+Objective:    Pin `/settings/delivery` read-only operations metadata behind executable unit coverage.
+Changed:
+- Added frozen delivery operations checkpoints, no-impact summary states, and safety-boundary metadata.
+- Updated `/settings/delivery` to render the centralized delivery operations metadata instead of page-local safety prose.
+- Added unit coverage for delivery metadata public fields, frozen snapshots, detached returned arrays, vocabularies, stable order, unique identifiers, whitespace-clean copy, command/secret literal rejection, and required no-send/no-mutation boundary terms.
+- Updated testing contracts, testing docs, SUMMARY, BLOCKERS, and current state matrix for the delivery operations metadata boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 operations metadata and external-impact gates green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 358  GREEN  type-asserted-request-constructor-auth-scan  2026-05-22 06:03
 Objective:    Prevent TypeScript type-asserted `Request` constructor aliases from hiding mutating-route request body readers before authorization.
 Changed:

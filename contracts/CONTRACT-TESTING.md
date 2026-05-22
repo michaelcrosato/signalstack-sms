@@ -257,3 +257,4 @@ Post-MVP webhook operations view:
 Post-MVP delivery operations view:
 
 - The seeded investor demo path must verify that `/settings/delivery` renders read-only message direction counts, delivery status metadata, provider status labels, recent message metadata, and safety-boundary text without sends, retries, webhook replays, provider calls, message mutation, notifications, billing records, SMS, or live messaging enablement.
+- Unit tests must verify that the static delivery operations inventory keeps checkpoint statuses, no-impact summary states, public fields, frozen snapshots, detached returned arrays with aligned counts, stable order, unique identifiers, whitespace-clean copy, secret-like literal rejection, command-like literal rejection, and required no-send/no-mutation boundary terms stable before `/settings/delivery` renders them.
