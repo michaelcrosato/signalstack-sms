@@ -2111,3 +2111,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing production-live-campaign control hardening without enabling live sends.
+
+## Run 235  GREEN  live-worker-wrapper-proxy-traps  2026-05-21 18:33
+Objective:    Prove malformed live-worker authorization wrapper proxy reflection traps deny cleanly.
+Changed:
+- Added unit coverage for `getPrototypeOf` and `ownKeys` traps on supplied authorization wrapper input.
+- Updated state/handoff docs, SUMMARY, and BLOCKERS to record the proxy-trap-safe wrapper boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing production-live-campaign control hardening without enabling live sends.

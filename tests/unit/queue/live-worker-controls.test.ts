@@ -658,6 +658,45 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects authorization wrapper proxy reflection traps without throwing", () => {
+    const implementedControls = implementedFrozenControls();
+    const prototypeThrowingInput = new Proxy(
+      {
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: implementedControls
+      },
+      {
+        getPrototypeOf: () => {
+          throw new Error("authorization input prototype trap must not escape");
+        }
+      }
+    );
+    const keysThrowingInput = new Proxy(
+      {
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: implementedControls
+      },
+      {
+        ownKeys: () => {
+          throw new Error("authorization input ownKeys trap must not escape");
+        }
+      }
+    );
+
+    for (const input of [prototypeThrowingInput, keysThrowingInput]) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          input as Parameters<typeof liveWorkerDeploymentClassIsAuthorized>[0]
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          input as Parameters<typeof liveWorkerDeploymentClassIsAuthorized>[0]
+        )
+      ).toBe(false);
+    }
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 
