@@ -3715,3 +3715,12 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+## Run 413  GREEN  live-worker-hidden-entry-symbol-evidence  2026-05-22 12:05
+Objective:    Prove hidden symbol metadata on supplied control entries cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for otherwise valid supplied control entries carrying non-enumerable symbol metadata.
+- Updated queue/testing contracts, production-worker/testing docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the hidden symbol control-entry boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.

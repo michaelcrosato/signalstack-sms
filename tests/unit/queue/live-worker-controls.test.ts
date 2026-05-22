@@ -572,6 +572,7 @@ describe("production live campaign worker controls", () => {
   it("rejects control arrays with non-public fields before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const symbolField = Symbol("unsafe-live-worker-field");
+    const hiddenSymbolField = Symbol("hidden-unsafe-live-worker-field");
     const nonEnumerableField = Object.freeze(
       Object.defineProperty(
         {
@@ -580,6 +581,18 @@ describe("production live campaign worker controls", () => {
         "reviewerBypass",
         {
           value: true,
+          enumerable: false
+        }
+      )
+    );
+    const nonEnumerableSymbolField = Object.freeze(
+      Object.defineProperty(
+        {
+          ...implementedControls[0]
+        },
+        hiddenSymbolField,
+        {
+          value: "unsafe",
           enumerable: false
         }
       )
@@ -616,6 +629,15 @@ describe("production live campaign worker controls", () => {
       liveWorkerControlsAreImplemented(
         Object.freeze(
           implementedControls.map((control, index) => (index === 0 ? nonEnumerableField : Object.freeze({ ...control })))
+        )
+      )
+    ).toBe(false);
+    expect(
+      liveWorkerControlsAreImplemented(
+        Object.freeze(
+          implementedControls.map((control, index) =>
+            index === 0 ? nonEnumerableSymbolField : Object.freeze({ ...control })
+          )
         )
       )
     ).toBe(false);
