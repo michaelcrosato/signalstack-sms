@@ -176,7 +176,9 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
   let previousGlobalThisBodySlice: string;
   do {
     previousGlobalThisBodySlice = normalizedGlobalThisBodySlice;
-    normalizedGlobalThisBodySlice = normalizedGlobalThisBodySlice.replace(/\(\s*globalThis\s*\)/g, "globalThis");
+    normalizedGlobalThisBodySlice = normalizedGlobalThisBodySlice
+      .replace(/\(\s*globalThis\s*\)/g, "globalThis")
+      .replace(/\(\s*(Object|Reflect)\s*\)/g, "$1");
   } while (normalizedGlobalThisBodySlice !== previousGlobalThisBodySlice);
 
   const bodySlice = normalizedGlobalThisBodySlice
@@ -3488,6 +3490,49 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedGlobalObjectDescriptorSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNestedParenthesizedGlobalReflectGetSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNestedParenthesizedOptionalGlobalDescriptorSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("treats parenthesized Object and Reflect body-reader lookups as body parsing for role-gate ordering", () => {
+    const unsafeParenthesizedReflectGetSource = `
+      export async function POST(req: Request) {
+        const payload = await (Reflect).get(req, "json").call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeNestedParenthesizedObjectDescriptorSource = `
+      export async function PATCH(req: Request) {
+        const payload = await ((Object)).getOwnPropertyDescriptor(
+          (Reflect).getPrototypeOf(req),
+          "text"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeParenthesizedBracketReflectApplySource = `
+      export async function PUT(req: Request) {
+        const payload = await ((Reflect))?.["apply"]?.(req.clone().blob, req.clone(), []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await (Reflect).get(req, "arrayBuffer").call(req);
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedReflectGetSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNestedParenthesizedObjectDescriptorSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedBracketReflectApplySource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 

@@ -2,7 +2,7 @@
 
 Last updated: 2026-05-22.
 
-Latest protected local gate: `.\scripts\local-gate.ps1` passed on 2026-05-22 03:56 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 46 unit test files / 387 tests, Playwright smoke, and build green.
+Latest protected local gate: `.\scripts\local-gate.ps1` passed on 2026-05-22 04:00 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 46 unit test files / 388 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 

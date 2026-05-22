@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 339  GREEN  parenthesized-object-reflect-body-reader-scan  2026-05-22 04:00
+Objective:    Prevent parenthesized direct `Object`/`Reflect` built-in access from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to iteratively normalize `(Object)`, `((Object))`, `(Reflect)`, and `((Reflect))` before existing reflective body-reader checks.
+- Added synthetic auth unit coverage proving parenthesized `Reflect.get`, nested-parenthesized `Object.getOwnPropertyDescriptor`, and optional bracketed `Reflect.apply` forms fail before `requireApiRole`.
+- Updated the testing contract, testing docs, current state matrix, SUMMARY, and BLOCKERS for the parenthesized direct built-in boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 338  GREEN  nested-parenthesized-globalthis-body-reader-scan  2026-05-22 03:56
 Objective:    Prevent nested-parenthesized `globalThis` reflective built-in access from hiding mutating-route request body readers before authorization.
 Changed:
