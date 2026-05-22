@@ -189,18 +189,20 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   ]) {
     bodyReaderPropertyAliases.set(match[1], match[2]);
   }
+  const descriptorValueAccessPattern =
+    String.raw`(?:\?\s*\.\s*(?:value|\[\s*["'\`]value["'\`]\s*\])|!\s*(?:\.\s*value|\[\s*["'\`]value["'\`]\s*\])|\.\s*value|\[\s*["'\`]value["'\`]\s*\])`;
   const reflectedBodySlice = bodySlice
     .replace(/\?\.\s*\[/g, "[")
     .replace(
       new RegExp(
-        `Object\\s*\\.\\s*getOwnPropertyDescriptor\\s*\\(\\s*Request\\s*\\.\\s*prototype\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)\\s*(?:\\?\\s*\\.|!\\s*\\.|\\.)\\s*value`,
+        `Object\\s*\\.\\s*getOwnPropertyDescriptor\\s*\\(\\s*Request\\s*\\.\\s*prototype\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)\\s*${descriptorValueAccessPattern}`,
         "g"
       ),
       "Request.prototype.$1"
     )
     .replace(
       new RegExp(
-        `Object\\s*\\.\\s*getOwnPropertyDescriptor\\s*\\(\\s*Request\\s*\\.\\s*prototype\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*(?:\\?\\s*\\.|!\\s*\\.|\\.)\\s*value`,
+        `Object\\s*\\.\\s*getOwnPropertyDescriptor\\s*\\(\\s*Request\\s*\\.\\s*prototype\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*${descriptorValueAccessPattern}`,
         "g"
       ),
       (match, propertyAlias: string) => {
@@ -1224,11 +1226,20 @@ describe("API route authorization coverage", () => {
         return Response.json({ payload });
       }
     `;
+    const unsafeBracketValueDescriptorSource = `
+      export async function DELETE(req: Request) {
+        const readBlob = Object.getOwnPropertyDescriptor(Request.prototype, "blob")?.["value"];
+        const payload = await readBlob.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
     const safeSource = `
       export async function POST(req: Request) {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
         if (roleResponse) return roleResponse;
-        const payload = await Object.getOwnPropertyDescriptor(Request.prototype, "arrayBuffer")?.value.call(req);
+        const payload = await Object.getOwnPropertyDescriptor(Request.prototype, "arrayBuffer")?.["value"].call(req);
         return Response.json({ size: payload.byteLength });
       }
     `;
@@ -1236,6 +1247,7 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectDescriptorSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDescriptorAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafePropertyAliasDescriptorSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeBracketValueDescriptorSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
@@ -1267,11 +1279,20 @@ describe("API route authorization coverage", () => {
         return Response.json({ ok: Boolean(payload) });
       }
     `;
+    const unsafeNonNullBracketValueDescriptorSource = `
+      export async function DELETE(req: Request) {
+        const readBlob = Object.getOwnPropertyDescriptor(Request.prototype, "blob")!["value"];
+        const payload = await Reflect.apply(readBlob, req, []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
     const safeSource = `
       export async function POST(req: Request) {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
         if (roleResponse) return roleResponse;
-        const payload = await Object.getOwnPropertyDescriptor(Request.prototype, "arrayBuffer")!.value.call(req);
+        const payload = await Object.getOwnPropertyDescriptor(Request.prototype, "arrayBuffer")!["value"].call(req);
         return Response.json({ size: payload.byteLength });
       }
     `;
@@ -1279,6 +1300,7 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNonNullDescriptorSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNonNullDescriptorAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNonNullPropertyAliasDescriptorSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNonNullBracketValueDescriptorSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
