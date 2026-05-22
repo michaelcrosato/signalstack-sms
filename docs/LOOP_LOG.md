@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 378  GREEN  api-inventory-runbook-truth  2026-05-22 08:08
+Objective:    Align the local operator runbook with the current API inventory external-impact route classification.
+Changed:
+- Updated `docs/LOCAL_OPERATOR_RUNBOOK.md` so `/settings/api` records one external-impact route, limited to `POST /api/demo/live-test-sms`, instead of stale zero-route language.
+- Updated SUMMARY, BLOCKERS, and current state matrix for the runbook truth sync.
+- Kept the change to docs/handoff truth only; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep Phase 0 API inventory, live-worker, provider, billing, live AI, notification, and secret gates stable.
+
 ## Run 377  GREEN  loop-handoff-truth-sync  2026-05-22 07:52
 Objective:    Repair loop handoff truth so the latest live-worker accessor-index run is visible in summary, blockers, and logs.
 Changed:

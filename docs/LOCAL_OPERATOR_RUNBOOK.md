@@ -211,7 +211,7 @@ Use `/settings/api` for read-only local API route inventory review before API or
 - backing `app/**/route.ts` files for listed API paths
 - reverse coverage for implemented local API route methods
 - current local route count
-- external-impact route count remains zero
+- external-impact route count remains one, limited to `POST /api/demo/live-test-sms`
 
 The page and inventory tests are local metadata checks only. They must not execute route handlers, mutate records, call providers, create billing records, send notifications, send SMS, send email, expose secrets, or enable live features.
 

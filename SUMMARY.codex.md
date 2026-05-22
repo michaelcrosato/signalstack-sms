@@ -1,7 +1,9 @@
 # Codex Summary
 
-Run number: 377
+Run number: 378
 
+- Corrected local operator runbook truth for `/settings/api`: the current executable API inventory has exactly one external-impact route, `POST /api/demo/live-test-sms`, and the operations page remains read-only.
+- Protected local gate passed on 2026-05-22 08:00: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`.
 - Repaired loop handoff truth so Run 376 live-worker accessor-index evidence appears in root/docs loop logs and the active Codex handoff files.
 - Latest repo truth: `production-live-campaign` remains unsupported, and supplied future authorization evidence explicitly denies accessor-backed indexed control-array slots without reading hostile getters.
 - Updated LOOP_LOG, docs/LOOP_LOG, SUMMARY, BLOCKERS, and current state matrix for the Run 377 truth synchronization.
