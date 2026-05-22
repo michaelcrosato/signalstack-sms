@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 271
+
+- No blocker from product analytics scheduled-campaign visibility. The change reads existing tenant-scoped local campaign status counts and displays scheduled count/rate in analytics only; it does not use production credentials, mutate campaigns, execute reports, create exports, run workers, enqueue jobs, call Redis, call providers, call Stripe, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production database actions.
+
 Run number: 270
 
 - No blocker from product analytics resolution-rate visibility. The change displays an existing derived local analytics percentage and pins it in the seeded browser path only; it does not use production credentials, mutate records, execute reports, create exports, call providers, call Stripe, bill, notify, send SMS or email, call live AI, expose secrets, execute workers, enqueue jobs, call Redis, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production database actions.

@@ -2303,6 +2303,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
 
+## Run 271  GREEN  product-analytics-scheduled-campaigns  2026-05-21 21:36
+Objective:    Show scheduled local campaign work in the product analytics workspace.
+Changed:
+- Added tenant-scoped scheduled campaign count to the analytics overview helper.
+- Rendered scheduled campaign count and scheduled rate in `/dashboard/analytics`.
+- Updated product analytics unit/browser coverage and API/testing docs for scheduled-campaign visibility.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep product demo analytics stable while live sends, workers, providers, billing, notifications, live AI, and secrets remain blocked.
+
 ## Run 245  GREEN  live-worker-wrapper-descriptors  2026-05-21 19:25
 Objective:    Prove non-frozen authorization wrapper data descriptors cannot authorize the reserved production worker class.
 Changed:

@@ -16,7 +16,8 @@ describe("product analytics", () => {
         optedOut: 1
       },
       campaigns: {
-        total: 2
+        total: 4,
+        scheduled: 1
       },
       conversations: {
         total: 5,
@@ -40,6 +41,7 @@ describe("product analytics", () => {
     expect(analytics.derived).toMatchObject({
       consentCoveragePercent: 75,
       optedOutPercent: 25,
+      scheduledCampaignPercent: 25,
       resolvedConversationPercent: 60,
       averageMessagesPerConversation: 2.2
     });
@@ -59,7 +61,8 @@ describe("product analytics", () => {
         optedOut: 0
       },
       campaigns: {
-        total: 0
+        total: 0,
+        scheduled: 0
       },
       conversations: {
         total: 0,
@@ -81,6 +84,7 @@ describe("product analytics", () => {
       derived: {
         consentCoveragePercent: 0,
         optedOutPercent: 0,
+        scheduledCampaignPercent: 0,
         resolvedConversationPercent: 0,
         averageMessagesPerConversation: 0
       }

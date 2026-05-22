@@ -7,6 +7,7 @@ export async function getAnalyticsOverview(orgId: string) {
     optedInContacts,
     optedOutContacts,
     campaigns,
+    scheduledCampaigns,
     conversations,
     openConversations,
     messages,
@@ -16,6 +17,7 @@ export async function getAnalyticsOverview(orgId: string) {
     prisma.contact.count({ where: { orgId, archivedAt: null, consentStatus: "OPTED_IN" } }),
     prisma.contact.count({ where: { orgId, archivedAt: null, consentStatus: "OPTED_OUT" } }),
     prisma.campaign.count({ where: { orgId } }),
+    prisma.campaign.count({ where: { orgId, status: "SCHEDULED" } }),
     prisma.conversation.count({ where: { orgId } }),
     prisma.conversation.count({ where: { orgId, status: "OPEN" } }),
     prisma.message.count({ where: { orgId } }),
@@ -29,7 +31,8 @@ export async function getAnalyticsOverview(orgId: string) {
       optedOut: optedOutContacts
     },
     campaigns: {
-      total: campaigns
+      total: campaigns,
+      scheduled: scheduledCampaigns
     },
     conversations: {
       total: conversations,

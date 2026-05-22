@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 271
+
+- Added product analytics scheduled-campaign visibility for Run 271.
+- Latest repo truth: `GET /api/analytics/overview` now includes the tenant-scoped scheduled campaign count, `/dashboard/analytics` renders scheduled campaign count and scheduled rate, and the seeded product demo path verifies both rows.
+- The change is read-only product analytics coverage only; it does not mutate campaigns, execute reports, create exports, run workers, enqueue jobs, call providers, call Stripe, send SMS/email/notifications, expose secrets, call live AI, or enable live features.
+- Focused product analytics unit coverage, typecheck, contracts check, lint, seeded product E2E, diff whitespace check, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 270
 
 - Added product analytics resolution-rate visibility for Run 270.

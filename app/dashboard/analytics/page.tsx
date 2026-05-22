@@ -74,6 +74,8 @@ export default async function AnalyticsPage() {
           <Panel title="Campaign Signals">
             <dl className="grid gap-3 text-sm">
               <StatusRow label="Campaign records" value={String(analytics.campaigns.total)} />
+              <StatusRow label="Scheduled campaigns" value={String(analytics.campaigns.scheduled)} />
+              <StatusRow label="Scheduled rate" value={`${analytics.derived.scheduledCampaignPercent}%`} />
               <StatusRow label="Scheduled work source" value="local queue records" />
               <StatusRow label="Provider sends" value="disabled" />
               <StatusRow label="Live messaging" value="blocked" />

@@ -16,6 +16,8 @@ export async function getProductAnalytics(orgId: string) {
     overview.conversations.total > 0
       ? Math.round((overview.conversations.resolved / overview.conversations.total) * 100)
       : 0;
+  const scheduledCampaignPercent =
+    overview.campaigns.total > 0 ? Math.round((overview.campaigns.scheduled / overview.campaigns.total) * 100) : 0;
 
   return {
     ...overview,
@@ -23,6 +25,7 @@ export async function getProductAnalytics(orgId: string) {
       consentCoveragePercent,
       optedOutPercent:
         overview.contacts.total > 0 ? Math.round((overview.contacts.optedOut / overview.contacts.total) * 100) : 0,
+      scheduledCampaignPercent,
       resolvedConversationPercent,
       averageMessagesPerConversation:
         overview.conversations.total > 0 ? Number((overview.messages.total / overview.conversations.total).toFixed(1)) : 0
