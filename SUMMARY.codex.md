@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 299
+
+- Hardened destructured optional-call request body-reader authorization coverage for Run 299.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now proves destructured aliases such as `const { arrayBuffer: readArrayBuffer } = req; await readArrayBuffer?.call(req)` before a mutating handler's top-level `requireApiRole` are treated as body parsing.
+- Updated the testing contract to name destructured optional-call body-reader coverage.
+- Focused auth coverage and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 298
 
 - Hardened parenthesized exported const route-handler authorization coverage for Run 298.

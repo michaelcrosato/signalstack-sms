@@ -1140,6 +1140,15 @@ describe("API route authorization coverage", () => {
         return Response.json({ payload });
       }
     `;
+    const unsafeOptionalCallSource = `
+      export async function POST(req: Request) {
+        const { arrayBuffer: readArrayBuffer } = req;
+        const payload = await readArrayBuffer?.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload?.byteLength });
+      }
+    `;
     const safeSource = `
       export async function POST(req: Request) {
         const { formData: readFormData } = req;
@@ -1152,6 +1161,7 @@ describe("API route authorization coverage", () => {
 
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalCallSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 

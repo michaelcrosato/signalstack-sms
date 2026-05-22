@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 299  GREEN  destructured-optional-call-body-reader-scan  2026-05-22 00:10
+Objective:    Prevent destructured optional-call request body readers from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Added synthetic auth coverage proving destructured reader aliases invoked through optional `.call` before `requireApiRole` are treated as body parsing.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the destructured optional-call body-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 288  GREEN  template-interpolation-body-reader-scan  2026-05-21 23:16
 Objective:    Prevent template interpolation request body reads from bypassing mutating-route role-gate ordering checks.
 Changed:
