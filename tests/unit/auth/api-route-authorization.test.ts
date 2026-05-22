@@ -138,10 +138,69 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   );
 }
 
+function maskNonCodeTokens(source: string) {
+  let masked = "";
+  for (let index = 0; index < source.length; index += 1) {
+    const char = source[index];
+    const nextChar = source[index + 1];
+
+    if (char === "/" && nextChar === "/") {
+      masked += "  ";
+      index += 1;
+      while (index + 1 < source.length && source[index + 1] !== "\n") {
+        masked += " ";
+        index += 1;
+      }
+      continue;
+    }
+
+    if (char === "/" && nextChar === "*") {
+      masked += "  ";
+      index += 1;
+      while (index + 1 < source.length) {
+        const commentChar = source[index + 1];
+        masked += commentChar === "\n" ? "\n" : " ";
+        index += 1;
+        if (source[index] === "*" && source[index + 1] === "/") {
+          masked += " ";
+          index += 1;
+          break;
+        }
+      }
+      continue;
+    }
+
+    if (char === "\"" || char === "'" || char === "`") {
+      const quote = char;
+      masked += " ";
+      while (index + 1 < source.length) {
+        index += 1;
+        const stringChar = source[index];
+        masked += stringChar === "\n" ? "\n" : " ";
+        if (stringChar === "\\") {
+          if (index + 1 < source.length) {
+            index += 1;
+            masked += source[index] === "\n" ? "\n" : " ";
+          }
+          continue;
+        }
+        if (stringChar === quote) {
+          break;
+        }
+      }
+      continue;
+    }
+
+    masked += char;
+  }
+
+  return masked;
+}
+
 function mutatingMethodParsesBodyBeforeRoleGate(source: string, method: (typeof mutatingMethods)[number]) {
   const body = exportedFunctionBody(source, method);
   const requestParameterName = exportedFunctionFirstParameterName(source, method);
-  const roleGateIndex = body.search(/\brequireApiRole\s*\(/);
+  const roleGateIndex = maskNonCodeTokens(body).search(/\brequireApiRole\s*\(/);
   const bodySliceBeforeRoleGate = roleGateIndex === -1 ? body : body.slice(0, roleGateIndex);
 
   return bodySliceParsesRequestBody(bodySliceBeforeRoleGate, requestParameterName);
@@ -414,6 +473,62 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCloneSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "PATCH")).toBe(false);
+  });
+
+  it("ignores comment and string mentions of requireApiRole before body-reader ordering checks", () => {
+    const unsafeCommentSource = `
+      export async function POST(req: Request) {
+        // requireApiRole(currentOrg, MembershipRole.ADMIN);
+        const payload = await req.json();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeStringSource = `
+      export async function POST(req: Request) {
+        const marker = "requireApiRole(currentOrg, MembershipRole.ADMIN)";
+        const payload = await req.text();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ marker, payload });
+      }
+    `;
+    const unsafeTemplateSource = `
+      export async function POST(req: Request) {
+        const marker = \`requireApiRole(currentOrg, MembershipRole.ADMIN)\`;
+        const payload = await req.formData();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ marker, payload });
+      }
+    `;
+    const unsafeBlockCommentSource = `
+      export async function POST(req: Request) {
+        /*
+          requireApiRole(currentOrg, MembershipRole.ADMIN);
+        */
+        const payload = await req.clone().arrayBuffer();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const marker = "requireApiRole(currentOrg, MembershipRole.ADMIN)";
+        const payload = await req.json();
+        return Response.json({ marker, payload });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCommentSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeStringSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTemplateSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeBlockCommentSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
   it("keeps role-gate exceptions limited to signed Twilio webhook handlers", () => {

@@ -2497,3 +2497,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 281  GREEN  comment-string-role-gate-marker-scan  2026-05-21 22:29
+Objective:    Prevent comments or strings containing `requireApiRole` from masking body parsing before authorization.
+Changed:
+- Masked comments, string literals, and template literals before the static mutating API scanner locates the real `requireApiRole` call.
+- Added synthetic auth unit coverage proving comment, string, template-literal, and block-comment role-gate markers before body readers still fail ordering checks.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the comment/string marker boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.

@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 281
+
+- Hardened comment/string role-gate marker authorization coverage for Run 281.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now masks comments plus string and template literals before locating the real `requireApiRole` call, so a comment, string, or template literal containing `requireApiRole(...)` before `req.json()`, `req.text()`, `req.formData()`, or cloned readers cannot make unsafe body parsing look authorized.
+- Updated the testing contract to name comment/string role-gate marker coverage.
+- Focused auth coverage, typecheck, contracts check, lint, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 280
 
 - Hardened optional-chained request body-reader authorization coverage for Run 280.
