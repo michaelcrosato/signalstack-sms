@@ -93,6 +93,17 @@ function controlArrayIsDense(controls: readonly LiveWorkerControl[]) {
   return true;
 }
 
+function liveWorkerControlArrayValues(controls: unknown) {
+  if (!isReadonlyControlArray(controls) || !controlArrayIsDense(controls)) {
+    return null;
+  }
+
+  return Array.from({ length: controls.length }, (_, index) => {
+    const descriptor = Object.getOwnPropertyDescriptor(controls, String(index));
+    return descriptor !== undefined && "value" in descriptor ? descriptor.value : null;
+  });
+}
+
 export function liveWorkerControlArrayExposesOnlyIndexedEntries(controls: unknown) {
   if (!isReadonlyControlArray(controls) || !controlArrayIsDense(controls)) {
     return false;
@@ -120,13 +131,14 @@ export function liveWorkerControlArrayExposesOnlyIndexedEntries(controls: unknow
 }
 
 export function liveWorkerControlIdsMatchRequiredChecklist(controls: unknown) {
-  if (!isReadonlyControlArray(controls) || !controlArrayIsDense(controls)) {
+  const controlValues = liveWorkerControlArrayValues(controls);
+  if (controlValues === null) {
     return false;
   }
 
   return (
-    controls.length === requiredLiveWorkerControlIds.length &&
-    controls.every(
+    controlValues.length === requiredLiveWorkerControlIds.length &&
+    controlValues.every(
       (control, index) =>
         isControlRecord(control) &&
         control.id === requiredLiveWorkerControlIds[index] &&
@@ -136,11 +148,12 @@ export function liveWorkerControlIdsMatchRequiredChecklist(controls: unknown) {
 }
 
 export function liveWorkerControlsExposeOnlyPublicFields(controls: unknown) {
-  if (!isReadonlyControlArray(controls) || !controlArrayIsDense(controls)) {
+  const controlValues = liveWorkerControlArrayValues(controls);
+  if (controlValues === null) {
     return false;
   }
 
-  return controls.every((control) => {
+  return controlValues.every((control) => {
     if (!isControlRecord(control)) {
       return false;
     }
@@ -162,21 +175,23 @@ export function liveWorkerControlsExposeOnlyPublicFields(controls: unknown) {
 }
 
 export function liveWorkerControlsUseSupportedStatuses(controls: unknown) {
-  if (!isReadonlyControlArray(controls) || !controlArrayIsDense(controls)) {
+  const controlValues = liveWorkerControlArrayValues(controls);
+  if (controlValues === null) {
     return false;
   }
 
-  return controls.every(
+  return controlValues.every(
     (control) => isControlRecord(control) && supportedLiveWorkerControlStatuses.includes(control.status)
   );
 }
 
 export function liveWorkerControlsAreFrozen(controls: unknown) {
-  if (!isReadonlyControlArray(controls) || !controlArrayIsDense(controls)) {
+  const controlValues = liveWorkerControlArrayValues(controls);
+  if (controlValues === null) {
     return false;
   }
 
-  return Object.isFrozen(controls) && controls.every((control) => isControlRecord(control) && Object.isFrozen(control));
+  return Object.isFrozen(controls) && controlValues.every((control) => isControlRecord(control) && Object.isFrozen(control));
 }
 
 function descriptorIsFrozenDataField(
@@ -193,7 +208,8 @@ function descriptorIsFrozenDataField(
 }
 
 export function liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls: unknown) {
-  if (!isReadonlyControlArray(controls) || !controlArrayIsDense(controls)) {
+  const controlValues = liveWorkerControlArrayValues(controls);
+  if (controlValues === null) {
     return false;
   }
 
@@ -201,13 +217,13 @@ export function liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls: unk
     return false;
   }
 
-  for (let index = 0; index < controls.length; index += 1) {
+  for (let index = 0; index < controlValues.length; index += 1) {
     if (!descriptorIsFrozenDataField(Object.getOwnPropertyDescriptor(controls, String(index)), { enumerable: true })) {
       return false;
     }
   }
 
-  return controls.every((control) => {
+  return controlValues.every((control) => {
     if (!isControlRecord(control)) {
       return false;
     }

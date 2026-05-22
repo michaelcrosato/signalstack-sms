@@ -351,6 +351,15 @@ describe("production live campaign worker controls", () => {
   it("rejects malformed control evidence without throwing", () => {
     const sparseControls = Array<LiveWorkerControl>(2);
     sparseControls[0] = Object.freeze({ ...productionLiveCampaignWorkerControls[0], status: "implemented" as const });
+    const accessorSlotControls = Object.freeze(
+      Object.defineProperty([...implementedFrozenControls()], "0", {
+        enumerable: true,
+        configurable: false,
+        get: () => {
+          throw new Error("array slot getter must not be read");
+        }
+      })
+    );
 
     const malformedInputs = [
       null,
@@ -360,7 +369,8 @@ describe("production live campaign worker controls", () => {
       Object.freeze({ status: "implemented" }),
       Object.freeze([null]),
       Object.freeze(["implemented"]),
-      Object.freeze(sparseControls)
+      Object.freeze(sparseControls),
+      accessorSlotControls
     ];
 
     for (const controls of malformedInputs) {

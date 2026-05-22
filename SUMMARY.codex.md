@@ -1,5 +1,14 @@
 # Codex Summary
 
+- Tightened live-worker control array-slot descriptor validation for Run 230.
+- Latest repo truth: future `production-live-campaign` authorization now reads supplied control entries only from array index data descriptors, so accessor-backed array slots deny cleanly without getter execution; the reserved class remains outside supported worker classes.
+- Focused live-worker control tests and the production worker policy check passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+Run number: 230
+
+## Previous Run
+
 - Tightened live-worker control descriptor validation for Run 229.
 - Latest repo truth: future `production-live-campaign` authorization now rejects supplied control evidence unless array slots, `length`, and public control fields use frozen data descriptors before checking implemented status; the reserved class remains outside supported worker classes.
 - Focused live-worker control tests, the production worker policy check, typecheck, `git diff --check`, and the protected local gate passed.
