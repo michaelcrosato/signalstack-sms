@@ -172,7 +172,14 @@ function escapeRegExp(value: string) {
 }
 
 function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName = defaultRequestParameterName) {
-  const bodySlice = rawBodySlice
+  let normalizedGlobalThisBodySlice = rawBodySlice;
+  let previousGlobalThisBodySlice: string;
+  do {
+    previousGlobalThisBodySlice = normalizedGlobalThisBodySlice;
+    normalizedGlobalThisBodySlice = normalizedGlobalThisBodySlice.replace(/\(\s*globalThis\s*\)/g, "globalThis");
+  } while (normalizedGlobalThisBodySlice !== previousGlobalThisBodySlice);
+
+  const bodySlice = normalizedGlobalThisBodySlice
     .replace(/\(\s*globalThis\s*\)\s*(?:\?\.)?\[\s*["'`](Object|Reflect)["'`]\s*\]/g, "$1")
     .replace(/\(\s*globalThis\s*\)\s*\??\.\s*(Object|Reflect)\b/g, "$1")
     .replace(/\bglobalThis\s*\?\.\s*(Object|Reflect)\b/g, "$1")
@@ -3443,6 +3450,25 @@ describe("API route authorization coverage", () => {
         return Response.json({ payload });
       }
     `;
+    const unsafeNestedParenthesizedGlobalReflectGetSource = `
+      export async function POST(req: Request) {
+        const payload = await ((globalThis)).Reflect.get(req, "blob").call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const unsafeNestedParenthesizedOptionalGlobalDescriptorSource = `
+      export async function PATCH(req: Request) {
+        const payload = await ((globalThis))?.["Object"]?.getOwnPropertyDescriptor(
+          ((globalThis))?.Reflect.getPrototypeOf(req),
+          "arrayBuffer"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
     const safeSource = `
       export async function POST(req: Request) {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
@@ -3460,6 +3486,8 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalGlobalBracketObjectDescriptorSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedGlobalReflectGetSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedGlobalObjectDescriptorSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNestedParenthesizedGlobalReflectGetSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNestedParenthesizedOptionalGlobalDescriptorSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 338  GREEN  nested-parenthesized-globalthis-body-reader-scan  2026-05-22 03:56
+Objective:    Prevent nested-parenthesized `globalThis` reflective built-in access from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to iteratively normalize `((globalThis))` before existing `Object` and `Reflect` body-reader checks.
+- Added synthetic auth unit coverage proving nested-parenthesized `globalThis.Reflect.get` and optional/bracketed `globalThis.Object.getOwnPropertyDescriptor` fail before `requireApiRole`.
+- Updated the testing contract, testing docs, current state matrix, SUMMARY, and BLOCKERS for the nested-parenthesized globalThis boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 330  GREEN  computed-destructured-lookup-alias-body-reader-scan  2026-05-22 03:17
 Objective:    Prevent computed destructured descriptor/prototype lookup aliases from hiding mutating-route request body readers before authorization.
 Changed:
