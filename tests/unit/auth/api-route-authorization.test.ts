@@ -28,8 +28,66 @@ function exportedMutatingMethods(source: string) {
   );
 }
 
+function exportedFunctionBody(source: string, method: (typeof mutatingMethods)[number]) {
+  const declaration = new RegExp(`export\\s+async\\s+function\\s+${method}\\b`);
+  const match = declaration.exec(source);
+  if (match === null) {
+    return "";
+  }
+
+  const signatureStart = source.indexOf("(", match.index);
+  if (signatureStart === -1) {
+    return "";
+  }
+
+  let parameterDepth = 0;
+  let signatureEnd = -1;
+  for (let index = signatureStart; index < source.length; index += 1) {
+    const char = source[index];
+    if (char === "(") {
+      parameterDepth += 1;
+    }
+    if (char === ")") {
+      parameterDepth -= 1;
+    }
+    if (parameterDepth === 0) {
+      signatureEnd = index;
+      break;
+    }
+  }
+
+  if (signatureEnd === -1) {
+    return "";
+  }
+
+  const bodyStart = source.indexOf("{", signatureEnd);
+  if (bodyStart === -1) {
+    return "";
+  }
+
+  let depth = 0;
+  for (let index = bodyStart; index < source.length; index += 1) {
+    const char = source[index];
+    if (char === "{") {
+      depth += 1;
+    }
+    if (char === "}") {
+      depth -= 1;
+    }
+    if (depth === 0) {
+      return source.slice(bodyStart + 1, index);
+    }
+  }
+
+  return "";
+}
+
+function exportedMutatingMethodHasRoleGate(source: string, method: (typeof mutatingMethods)[number]) {
+  return /\brequireApiRole\s*\(/.test(exportedFunctionBody(source, method));
+}
+
 describe("API route authorization coverage", () => {
-  it("keeps local mutating API routes behind role checks unless they use signed webhooks", () => {
+  it("keeps each local mutating API handler behind its own role check unless it uses signed webhooks", () => {
     const apiRoot = path.join(process.cwd(), "app", "api");
     const missingRoleGate = routeFiles(apiRoot).flatMap((filePath) => {
       const source = readFileSync(filePath, "utf8");
@@ -39,9 +97,9 @@ describe("API route authorization coverage", () => {
         return [];
       }
 
-      return source.includes("requireApiRole")
-        ? []
-        : methods.map((method) => `${method} ${repoPath}`);
+      return methods
+        .filter((method) => !exportedMutatingMethodHasRoleGate(source, method))
+        .map((method) => `${method} ${repoPath}`);
     });
 
     expect(missingRoleGate).toEqual([]);

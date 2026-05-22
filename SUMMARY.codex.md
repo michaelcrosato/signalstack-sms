@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 260
+
+- Tightened static API route authorization coverage for Run 260.
+- Latest repo truth: every exported local mutating API handler is now scanned for a `requireApiRole` call inside that handler body; one guarded handler in a route file can no longer mask an unguarded mutating handler in the same file.
+- Focused auth unit coverage passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 259
 
 - Added static API route authorization coverage for Run 259.

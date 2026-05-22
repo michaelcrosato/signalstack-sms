@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 260
+
+- No blocker from the per-handler API route authorization coverage. The change is local static unit coverage only: it scans each implemented mutating route handler body for `requireApiRole` and still pins signed Twilio webhooks as the only exception; it does not execute routes, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, run workers, enqueue jobs, call Redis, hard-delete data, or perform destructive production database actions.
+
 Run number: 259
 
 - No blocker from the API route authorization coverage. The change is local static unit coverage only: it scans implemented API route source files for mutating method role gates and pins signed Twilio webhooks as the only exception; it does not execute routes, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, run workers, enqueue jobs, call Redis, hard-delete data, or perform destructive production database actions.

@@ -2300,3 +2300,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo and live-worker boundaries remain stable.
+## Run 260  GREEN  per-handler-api-role-gate-scan  2026-05-21 20:35
+Objective:    Prevent one guarded mutating API handler from masking another unguarded handler in the same route file.
+Changed:
+- Tightened the static auth unit scanner to inspect each exported mutating handler body for its own `requireApiRole` call.
+- Kept signed Twilio inbound/status webhook handlers as the only role-gate exceptions.
+- Updated testing contract, SUMMARY, and BLOCKERS for the per-handler authorization boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 correctness checks green while product demo and live-worker boundaries remain stable.
