@@ -3,10 +3,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const mutatingMethods = ["POST", "PATCH", "PUT", "DELETE"] as const;
-const requestBodyReaderPattern =
-  /\brequest\s*(?:\.\s*clone\s*\(\s*\))?\s*\.\s*(?:json|formData|text|arrayBuffer|blob)\s*\(/;
-const requestCloneAliasPattern =
-  /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*(?::[^=;]+)?=\s*request\s*\.\s*clone\s*\(\s*\)\s*;/g;
+const defaultRequestParameterName = "request";
 const roleGateExceptionRoutes = new Set([
   "app/api/webhooks/twilio/inbound/route.ts",
   "app/api/webhooks/twilio/status/route.ts"
@@ -86,6 +83,22 @@ function exportedFunctionBody(source: string, method: (typeof mutatingMethods)[n
   return "";
 }
 
+function exportedFunctionFirstParameterName(source: string, method: (typeof mutatingMethods)[number]) {
+  const declaration = new RegExp(`export\\s+async\\s+function\\s+${method}\\b`);
+  const match = declaration.exec(source);
+  if (match === null) {
+    return defaultRequestParameterName;
+  }
+
+  const signatureStart = source.indexOf("(", match.index);
+  if (signatureStart === -1) {
+    return defaultRequestParameterName;
+  }
+
+  const firstParameterMatch = /\(\s*([A-Za-z_$][\w$]*)\b/.exec(source.slice(signatureStart));
+  return firstParameterMatch?.[1] ?? defaultRequestParameterName;
+}
+
 function exportedMutatingMethodHasRoleGate(source: string, method: (typeof mutatingMethods)[number]) {
   return /\brequireApiRole\s*\(/.test(exportedFunctionBody(source, method));
 }
@@ -94,11 +107,19 @@ function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function bodySliceParsesRequestBody(bodySlice: string) {
+function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = defaultRequestParameterName) {
+  const escapedRequestParameterName = escapeRegExp(requestParameterName);
+  const requestBodyReaderPattern = new RegExp(
+    `\\b${escapedRequestParameterName}\\s*(?:\\.\\s*clone\\s*\\(\\s*\\))?\\s*\\.\\s*(?:json|formData|text|arrayBuffer|blob)\\s*\\(`
+  );
   if (requestBodyReaderPattern.test(bodySlice)) {
     return true;
   }
 
+  const requestCloneAliasPattern = new RegExp(
+    `\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s*(?::[^=;]+)?=\\s*${escapedRequestParameterName}\\s*\\.\\s*clone\\s*\\(\\s*\\)\\s*;`,
+    "g"
+  );
   requestCloneAliasPattern.lastIndex = 0;
   const cloneAliases = [...bodySlice.matchAll(requestCloneAliasPattern)].map((match) => match[1]);
   return cloneAliases.some((alias) =>
@@ -108,10 +129,11 @@ function bodySliceParsesRequestBody(bodySlice: string) {
 
 function mutatingMethodParsesBodyBeforeRoleGate(source: string, method: (typeof mutatingMethods)[number]) {
   const body = exportedFunctionBody(source, method);
+  const requestParameterName = exportedFunctionFirstParameterName(source, method);
   const roleGateIndex = body.search(/\brequireApiRole\s*\(/);
   const bodySliceBeforeRoleGate = roleGateIndex === -1 ? body : body.slice(0, roleGateIndex);
 
-  return bodySliceParsesRequestBody(bodySliceBeforeRoleGate);
+  return bodySliceParsesRequestBody(bodySliceBeforeRoleGate, requestParameterName);
 }
 
 describe("API route authorization coverage", () => {
@@ -219,6 +241,30 @@ describe("API route authorization coverage", () => {
 
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "PUT")).toBe(false);
+  });
+
+  it("tracks body readers when handlers use non-default request parameter names", () => {
+    const unsafeSource = `
+      export async function DELETE(req: Request) {
+        const cloned = req.clone();
+        const payload = await cloned.arrayBuffer();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+    const safeSource = `
+      export async function DELETE(req: Request) {
+        const cloned = req.clone();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await cloned.arrayBuffer();
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "DELETE")).toBe(false);
   });
 
   it("keeps role-gate exceptions limited to signed Twilio webhook handlers", () => {

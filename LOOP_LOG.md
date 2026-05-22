@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 277  GREEN  non-default-request-body-reader-scan  2026-05-21 22:13
+Objective:    Keep mutating API body-reader role-gate scans effective when handlers use non-default request parameter names.
+Changed:
+- Derived each exported mutating handler's first parameter name before scanning for direct or cloned standard Request body readers.
+- Added synthetic auth coverage proving a `req`-named handler cannot parse cloned body data before its own `requireApiRole` call.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the expanded static authorization boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo and live-worker boundaries remain stable.
+
 ## Run 276  GREEN  mutating-api-body-reader-guard  2026-05-21 21:55
 Objective:    Catch every standard Request body reader before mutating-route role checks.
 Changed:
