@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 250
+
+- No blocker from the live-worker hidden required-field denial coverage. Hidden/non-enumerable required fields on supplied `production-live-campaign` controls or authorization wrappers now have explicit denial coverage; the reserved class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.
+
 Run number: 248
 
 - No blocker from the live-worker planned-control denial coverage. The built-in planned checklist and partially implemented checklist evidence now have explicit denial coverage for the reserved `production-live-campaign` class; the reserved class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.

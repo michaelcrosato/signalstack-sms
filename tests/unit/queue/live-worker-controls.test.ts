@@ -324,6 +324,25 @@ describe("production live campaign worker controls", () => {
         }
       })
     ) as LiveWorkerControl;
+    const hiddenRequiredFieldControl = Object.freeze(
+      Object.defineProperties(
+        {},
+        {
+          id: {
+            value: implementedControls[0].id,
+            enumerable: false
+          },
+          status: {
+            value: "implemented",
+            enumerable: true
+          },
+          requirement: {
+            value: implementedControls[0].requirement,
+            enumerable: true
+          }
+        }
+      )
+    ) as LiveWorkerControl;
 
     expect(liveWorkerControlsExposeOnlyPublicFields(implementedControls)).toBe(true);
     expect(
@@ -344,6 +363,15 @@ describe("production live campaign worker controls", () => {
       liveWorkerControlsAreImplemented(
         Object.freeze(
           implementedControls.map((control, index) => (index === 0 ? prototypeBackedControl : Object.freeze({ ...control })))
+        )
+      )
+    ).toBe(false);
+    expect(
+      liveWorkerControlsAreImplemented(
+        Object.freeze(
+          implementedControls.map((control, index) =>
+            index === 0 ? hiddenRequiredFieldControl : Object.freeze({ ...control })
+          )
         )
       )
     ).toBe(false);
@@ -805,6 +833,25 @@ describe("production live campaign worker controls", () => {
         }
       )
     );
+    const hiddenRequiredFieldInput = Object.freeze(
+      Object.defineProperties(
+        {},
+        {
+          workerDeploymentClass: {
+            value: reservedLiveWorkerDeploymentClass,
+            enumerable: false,
+            writable: false,
+            configurable: false
+          },
+          controls: {
+            value: implementedControls,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          }
+        }
+      )
+    );
     class AuthorizationWrapper {
       workerDeploymentClass = reservedLiveWorkerDeploymentClass;
       controls = implementedControls;
@@ -838,6 +885,7 @@ describe("production live campaign worker controls", () => {
       nullPrototypeInput,
       inheritedFieldInput,
       inheritedExtraFieldInput,
+      hiddenRequiredFieldInput,
       Object.freeze(new AuthorizationWrapper()),
       accessorBackedInput,
       descriptorThrowingInput

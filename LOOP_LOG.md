@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 250  GREEN  live-worker-hidden-required-fields  2026-05-21 19:44
+Objective:    Prove hidden required fields cannot authorize the reserved live worker class.
+Changed:
+- Added unit coverage showing non-enumerable required control fields and authorization wrapper fields deny for `production-live-campaign`.
+- Updated queue/testing contracts and production worker policy docs for the hidden required-field boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 247  GREEN  live-worker-array-key-order  2026-05-21 19:32
 Objective:    Require ordinary array key order before supplied live-worker controls can authorize the reserved class.
 Changed:

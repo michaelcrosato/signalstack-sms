@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 250
+
+- Hardened live-worker hidden required-field denial coverage for Run 250.
+- Latest repo truth: hidden/non-enumerable required fields on supplied `production-live-campaign` controls or authorization wrappers remain unauthorized and cannot satisfy the reserved class evidence boundary.
+- Focused live-worker control tests, typecheck, production-worker policy check, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 248
 
 - Hardened live-worker planned-control denial coverage for Run 248.
