@@ -9,6 +9,15 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
 
+## Run 246  GREEN  live-worker-control-entry-proxy-traps  2026-05-21 19:22
+Objective:    Prove proxy traps on individual supplied live-worker control entries deny cleanly.
+Changed:
+- Added unit coverage for hostile `ownKeys` and frozen-state traps on supplied `production-live-campaign` control entries.
+- Updated production worker policy, queue/testing contracts, README, state matrix, SUMMARY, and BLOCKERS for the entry proxy-trap boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 242  GREEN  live-worker-wrapper-frozen-object  2026-05-21 19:03
 Objective:    Require frozen authorization wrapper objects before reserved live-worker authorization can pass.
 Changed:

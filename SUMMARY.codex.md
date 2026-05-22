@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 246
+
+- Hardened live-worker control-entry proxy trap coverage for Run 246.
+- Latest repo truth: `liveWorkerControlsAreImplemented` and `liveWorkerDeploymentClassIsAuthorized` now have explicit unit coverage proving supplied `production-live-campaign` control entries with hostile `ownKeys` or frozen-state traps deny cleanly without authorizing the reserved class.
+- Focused live-worker control tests, the production worker policy check, and typecheck passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 245
 
 - Hardened live-worker non-enumerable index-slot coverage for Run 245.

@@ -511,6 +511,16 @@ describe("production live campaign worker controls", () => {
         throw new Error("control descriptor trap must not escape");
       }
     });
+    const throwingControlKeysProxy = new Proxy({ ...implementedControls[0] }, {
+      ownKeys: () => {
+        throw new Error("control keys trap must not escape");
+      }
+    });
+    const throwingControlFrozenStateProxy = new Proxy({ ...implementedControls[0] }, {
+      isExtensible: () => {
+        throw new Error("control frozen-state trap must not escape");
+      }
+    });
     const proxyInputs = [
       throwingArrayPrototypeProxy,
       throwingArrayDescriptorProxy,
@@ -524,6 +534,16 @@ describe("production live campaign worker controls", () => {
       Object.freeze(
         implementedControls.map((control, index) =>
           index === 0 ? throwingControlDescriptorProxy : Object.freeze({ ...control })
+        )
+      ),
+      Object.freeze(
+        implementedControls.map((control, index) =>
+          index === 0 ? throwingControlKeysProxy : Object.freeze({ ...control })
+        )
+      ),
+      Object.freeze(
+        implementedControls.map((control, index) =>
+          index === 0 ? throwingControlFrozenStateProxy : Object.freeze({ ...control })
         )
       )
     ];
