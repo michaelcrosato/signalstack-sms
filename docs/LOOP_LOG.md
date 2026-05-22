@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 308  GREEN  contract-route-export-inventory  2026-05-22 01:17
+Objective:    Prevent non-function API route exports from bypassing contract documentation drift checks.
+Changed:
+- Updated `scripts/contracts-check.ts` to extract exported function, exported const, typed exported const, and named-export route methods before checking `contracts/CONTRACT-API.md` and `docs/API_MAP.md`.
+- Added focused contract-gate unit coverage for exported const and named-export route method inventory.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the contract route export inventory boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 contract, API authorization, product demo, live-worker, provider, billing, live AI, notification, and secret gates green.
+
 ## Run 307  GREEN  non-null-descriptor-body-reader-scan  2026-05-22 00:59
 Objective:    Prevent non-null descriptor-derived `Request.prototype` body readers from bypassing mutating-route role-gate ordering checks.
 Changed:

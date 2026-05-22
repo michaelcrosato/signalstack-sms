@@ -10,7 +10,7 @@ Milestone 0 required tests:
 
 Milestone 10 hardening:
 
-- `npm run contracts:check` must fail when an implemented API route/method pair is missing from either `contracts/CONTRACT-API.md` or `docs/API_MAP.md`.
+- `npm run contracts:check` must fail when an implemented API route/method pair is missing from either `contracts/CONTRACT-API.md` or `docs/API_MAP.md`, including exported function handlers, exported const handlers, typed exported const handlers, and named-export handlers such as `export { createPost as POST }` or `export { POST }`.
 - `npm run contracts:check` must fail when a tenant-scoped Prisma model loses its `orgId` field.
 - `npm run test:e2e:demo` is the explicit seeded-database investor demo path and remains separate from the default validation gate.
 - Playwright browser checks must use a local-only server on `127.0.0.1` and default to a test port separate from the normal dev port. `PLAYWRIGHT_PORT` may override that port with a valid TCP port, and existing-server reuse must remain explicit through `PLAYWRIGHT_REUSE_EXISTING_SERVER=true`.
