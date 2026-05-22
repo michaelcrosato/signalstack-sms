@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 308
+
+- Hardened live-worker control evidence get-trap coverage for Run 308.
+- Latest repo truth: `tests/unit/queue/live-worker-controls.test.ts` now proves exact frozen supplied `production-live-campaign` control arrays and entries are evaluated through descriptors without executing array or entry `get` traps while the reserved class still requires every frozen control to be implemented.
+- Updated the queue contract and production worker policy to name the exact frozen control evidence get-trap boundary.
+- Focused live-worker control coverage and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 307
 
 - Hardened non-null descriptor-derived `Request.prototype` body-reader authorization coverage for Run 307.

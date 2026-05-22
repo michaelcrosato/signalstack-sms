@@ -1322,6 +1322,39 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerDeploymentClassIsAuthorized(exactClassInput)).toBe(true);
   });
 
+  it("does not execute control evidence get traps while authorizing exact frozen evidence", () => {
+    const implementedControlsWithEntryGetTraps = Object.freeze(
+      implementedFrozenControls().map(
+        (control) =>
+          new Proxy(control, {
+            get: () => {
+              throw new Error("control entry get trap must not be read");
+            }
+          })
+      )
+    );
+    const implementedControlsWithArrayGetTrap = new Proxy(implementedFrozenControls(), {
+      get: () => {
+        throw new Error("control array get trap must not be read");
+      }
+    });
+
+    expect(() => liveWorkerControlsAreImplemented(implementedControlsWithEntryGetTraps)).not.toThrow();
+    expect(liveWorkerControlsAreImplemented(implementedControlsWithEntryGetTraps)).toBe(true);
+    expect(() => liveWorkerControlsAreImplemented(implementedControlsWithArrayGetTrap)).not.toThrow();
+    expect(liveWorkerControlsAreImplemented(implementedControlsWithArrayGetTrap)).toBe(true);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControlsWithEntryGetTraps)
+      )
+    ).toBe(true);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControlsWithArrayGetTrap)
+      )
+    ).toBe(true);
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 

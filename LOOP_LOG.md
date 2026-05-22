@@ -2617,6 +2617,15 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
 
+## Run 308  GREEN  live-worker-control-get-trap-coverage  2026-05-22 01:03
+Objective:    Prevent future live-worker control evidence checks from regressing to property reads that execute array or entry get traps.
+Changed:
+- Added unit coverage proving exact frozen supplied `production-live-campaign` control arrays and entries are evaluated without executing `get` traps.
+- Updated the queue contract and production-worker policy for the exact frozen control evidence get-trap boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 production-worker gates green while product demo, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 274  GREEN  typed-cloned-request-body-role-scan  2026-05-21 22:09
 Objective:    Prevent typed cloned request aliases from bypassing local mutating API role-gate ordering checks.
 Changed:

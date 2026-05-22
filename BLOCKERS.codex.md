@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 308
+
+- No blocker from live-worker control evidence get-trap coverage. The change is local unit coverage plus queue contract and production-worker policy text only; it does not execute workers, enqueue jobs, call Redis, call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production database actions.
+
 Run number: 307
 
 - No blocker from non-null descriptor-derived `Request.prototype` body-reader authorization coverage. The change is local static unit coverage plus testing-contract text only; it does not execute routes, parse live requests, use production credentials, mutate product records beyond validation seed behavior, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, execute workers, enqueue jobs, call Redis, edit protected gate scripts, hard-delete data, or perform destructive production database actions.
