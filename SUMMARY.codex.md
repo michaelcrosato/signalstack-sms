@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 291
+
+- Hardened optional call/apply request body-reader authorization coverage for Run 291.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes optional call/apply and optional detached/bound reader invocation syntax, so `req.json.call?.(req)`, `readText?.call(req)`, and `readFormData?.()` before a mutating handler's top-level `requireApiRole` are treated as body parsing.
+- Updated the testing contract to name optional call/apply and bound-reader invocation coverage.
+- Focused auth coverage, contracts check, typecheck, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 290
 
 - Hardened parenthesized request body-reader function authorization coverage for Run 290.

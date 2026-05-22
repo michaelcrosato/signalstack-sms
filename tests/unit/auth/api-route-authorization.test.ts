@@ -112,13 +112,14 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   const variableDeclaratorStart = "(?:\\b(?:const|let|var)\\s+|,\\s*)";
   const variableDeclaratorTerminator = "(?:,|;|\\r?\\n)";
   const variableDeclaratorEnd = `\\s*(?=${variableDeclaratorTerminator})`;
-  const maskedBodySlice = maskNonCodeTokens(bodySlice);
   const normalizedBodySlice = maskNonCodeTokens(bodySlice
     .replace(/\?\.\s*\[/g, "[")
     .replace(new RegExp(`\\[\\s*["'](${requestBodyReaderNames})["']\\s*\\]`, "g"), ".$1")
     .replace(/\[\s*["']clone["']\s*\]/g, ".clone")
     .replace(/\.\s*clone\s*\?\.\s*\(/g, ".clone(")
+    .replace(/\.\s*(call|apply|bind)\s*\?\.\s*\(/g, ".$1(")
     .replace(new RegExp(`\\.\\s*(${requestBodyReaderNames})\\s*\\?\\.\\s*\\(`, "g"), ".$1(")
+    .replace(/\b([A-Za-z_$][\w$]*)\s*\?\.\s*\(/g, "$1(")
     .replace(/\?\.\s*/g, ".")
     .replace(
       new RegExp(
@@ -183,7 +184,7 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   const readerMethodAliases = [...normalizedBodySlice.matchAll(readerMethodAliasPattern)].map((match) => match[1]);
   if (
     readerMethodAliases.some((alias) =>
-      new RegExp(`\\b${escapeRegExp(alias)}\\s*(?:\\(|\\.\\s*(?:call|apply)\\s*\\()`).test(maskedBodySlice)
+      new RegExp(`\\b${escapeRegExp(alias)}\\s*(?:\\(|\\.\\s*(?:call|apply)\\s*\\()`).test(normalizedBodySlice)
     )
   ) {
     return true;
@@ -206,7 +207,7 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   );
 
   return destructuredAliases.some((alias) =>
-    new RegExp(`\\b${escapeRegExp(alias)}\\s*(?:\\(|\\.\\s*(?:call|apply)\\s*\\()`).test(maskedBodySlice)
+    new RegExp(`\\b${escapeRegExp(alias)}\\s*(?:\\(|\\.\\s*(?:call|apply)\\s*\\()`).test(normalizedBodySlice)
   );
 }
 
@@ -985,6 +986,49 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectCallSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCloneApplySource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeBracketCallSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("treats optional call/apply body reader invocations as body parsing for role-gate ordering", () => {
+    const unsafeDirectOptionalCallSource = `
+      export async function POST(req: Request) {
+        const payload = await req.json.call?.(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeDetachedOptionalCallSource = `
+      export async function POST(req: Request) {
+        const readText = req.text;
+        const payload = await readText?.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeBoundOptionalInvocationSource = `
+      export async function PATCH(req: Request) {
+        const readFormData = req.formData.bind?.(req);
+        const payload = await readFormData?.();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const readJson = req.json;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await readJson?.call(req);
+        return Response.json(payload);
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectOptionalCallSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDetachedOptionalCallSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeBoundOptionalInvocationSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 

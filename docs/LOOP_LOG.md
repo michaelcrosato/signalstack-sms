@@ -2535,3 +2535,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 291  GREEN  optional-call-apply-body-reader-scan  2026-05-21 23:28
+Objective:    Prevent optional call/apply request body-reader invocations from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize optional `call`, `apply`, `bind`, and detached/bound reader invocation syntax before checking body parsing order.
+- Added synthetic auth unit coverage proving `req.json.call?.(req)`, `readText?.call(req)`, and `readFormData?.()` before `requireApiRole` are detected while post-gate reads remain allowed.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the optional call/apply reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
