@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 400  GREEN  twilio-duplicate-form-payload  2026-05-22 09:58
+Objective:    Reject duplicate Twilio webhook form fields before signature validation or raw payload trust.
+Changed:
+- Made `formDataToRecord` return `null` when a `FormData` payload repeats a field name, preventing ambiguous last-value collapse.
+- Added focused webhook helper coverage for duplicate form fields before signature validation.
+- Updated webhook/testing contracts, webhook/testing docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the duplicate-free form boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep webhook parsing, product demo, live-worker, provider, billing, live AI, notification, and secret gates stable.
+
 ## Run 399  GREEN  live-worker-exact-length-evidence  2026-05-22 09:53
 Objective:    Deny oversized supplied control-array length descriptors before live-worker indexed evidence scans.
 Changed:

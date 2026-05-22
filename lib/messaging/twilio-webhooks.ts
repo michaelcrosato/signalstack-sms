@@ -49,6 +49,9 @@ export function formDataToRecord(formData: FormData): Record<string, string> | n
     if (typeof value !== "string") {
       return null;
     }
+    if (Object.hasOwn(payload, key)) {
+      return null;
+    }
     payload[key] = value;
   }
   return payload;

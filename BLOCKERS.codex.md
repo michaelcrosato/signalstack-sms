@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 400
+
+- No blocker from Twilio duplicate form field rejection. Focused webhook helper coverage and the protected local gate passed. The change is local webhook parsing/test coverage plus contract/docs/handoff truth only and does not call Twilio, use production credentials, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, execute workers, enqueue jobs, call Redis, hard-delete data, or perform destructive production database actions.
+
 Run number: 399
 
 - No blocker from live-worker exact-length evidence hardening. Focused queue coverage and the protected local gate passed. The change tightens local live-worker authorization logic, unit coverage, and queue/testing contract docs only and does not execute workers, enqueue jobs, call Redis, use production credentials, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production database actions.

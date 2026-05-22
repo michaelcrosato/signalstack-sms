@@ -26,6 +26,16 @@ describe("Twilio webhook helpers", () => {
     expect(formDataToRecord(formData)).toBeNull();
   });
 
+  it("rejects duplicate form fields before signature validation", () => {
+    const formData = new FormData();
+    formData.append("From", "+15555550100");
+    formData.append("Body", "HELP");
+    formData.append("MessageSid", "SM123");
+    formData.append("Body", "STOP");
+
+    expect(formDataToRecord(formData)).toBeNull();
+  });
+
   it("validates form signatures with sorted parameters", () => {
     const url = "https://example.com/api/webhooks/twilio/inbound";
     const params = {

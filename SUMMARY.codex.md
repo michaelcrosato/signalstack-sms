@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 400
+
+- Latest Twilio webhook form parsing rejects duplicate form field names before signature validation, so repeated provider fields cannot collapse into an ambiguous last-value payload.
+- Focused webhook helper coverage passed: `npm run test -- tests/unit/messaging/twilio-webhooks.test.ts`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 424 tests, Playwright smoke, and build green.
+- Updated webhook/testing contracts, webhook/testing docs, NEXT_PROMPTS, LOOP_LOG, BLOCKERS, and current state matrix for the duplicate-free webhook form boundary.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 399
 
 - Latest live-worker control hardening clamps supplied `production-live-campaign` control-array `length` evidence to the exact checklist size before dense-index inspection, so oversized safe-integer descriptors such as `Number.MAX_SAFE_INTEGER` deny without forcing huge indexed scans.
@@ -8,7 +18,7 @@ Run number: 399
 - Updated queue/testing contracts, production-worker/testing docs, NEXT_PROMPTS, LOOP_LOG, BLOCKERS, and current state matrix for the exact checklist-size length evidence boundary.
 - No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
 
-## Previous Run
+## Earlier Run
 
 Run number: 398
 
