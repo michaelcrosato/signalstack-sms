@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 228  GREEN  live-worker-control-array-prototype  2026-05-21 18:02
+Objective:    Require plain array control evidence before future live worker authorization can pass.
+Changed:
+- Tightened live-worker control array validation so Array subclass evidence is rejected before `production-live-campaign` controls can be treated as implemented.
+- Added focused unit coverage proving subclassed arrays remain unauthorized even when frozen and otherwise field-compatible.
+- Updated queue/testing contracts, production worker policy docs, roadmap state, handoff notes, SUMMARY, and BLOCKERS.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live campaign workers blocked while continuing executable control hardening or product demo stabilization.
+
 ## Run 227  GREEN  live-worker-control-entry-shape  2026-05-21 17:45
 Objective:    Require ordinary object control entries before future live worker authorization can pass.
 Changed:

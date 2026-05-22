@@ -135,6 +135,30 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerControlsAreImplemented(hiddenExtraFieldControls)).toBe(false);
   });
 
+  it("rejects array subclass evidence before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+
+    class LiveWorkerControlArray extends Array<LiveWorkerControl> {
+      reviewerBypass() {
+        return true;
+      }
+    }
+
+    const subclassControls = new LiveWorkerControlArray(...implementedControls);
+    Object.freeze(subclassControls);
+
+    expect(Array.isArray(subclassControls)).toBe(true);
+    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(subclassControls)).toBe(false);
+    expect(liveWorkerControlsAreFrozen(subclassControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(subclassControls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized({
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: subclassControls
+      })
+    ).toBe(false);
+  });
+
   it("rejects control arrays with non-public fields before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const symbolField = Symbol("unsafe-live-worker-field");

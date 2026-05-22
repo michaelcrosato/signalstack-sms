@@ -77,7 +77,7 @@ export const productionLiveCampaignWorkerControls = Object.freeze(
 );
 
 function isReadonlyControlArray(controls: unknown): controls is readonly LiveWorkerControl[] {
-  return Array.isArray(controls);
+  return Array.isArray(controls) && Object.getPrototypeOf(controls) === Array.prototype;
 }
 
 function isControlRecord(control: unknown): control is LiveWorkerControl {
