@@ -741,6 +741,24 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects duplicate reflected control-entry keys without throwing", () => {
+    const implementedControls = implementedFrozenControls();
+    const duplicateKeyControl = new Proxy(Object.freeze({ ...implementedControls[0] }), {
+      ownKeys: () => ["id", "id", "status", "requirement"]
+    });
+    const controls = Object.freeze(
+      implementedControls.map((control, index) => (index === 0 ? duplicateKeyControl : Object.freeze({ ...control })))
+    );
+
+    expect(() => liveWorkerControlsExposeOnlyPublicFields(controls)).not.toThrow();
+    expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
+    expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+    ).toBe(false);
+  });
+
   it("rejects accessor-backed public fields without reading getters", () => {
     const implementedControls = implementedFrozenControls();
     const accessorBackedControl = Object.freeze(

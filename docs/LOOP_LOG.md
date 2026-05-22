@@ -3318,3 +3318,11 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+## Run 404  GREEN  live-worker-duplicate-entry-key-evidence  2026-05-22 10:19
+Objective:    Prove duplicate reflected supplied control-entry keys cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for proxy-backed control entries whose reflected public keys include duplicates.
+- Updated queue/testing contracts, production-worker/testing docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the duplicate-entry-key boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
