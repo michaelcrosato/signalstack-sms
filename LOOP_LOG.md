@@ -3014,3 +3014,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 336  GREEN  protected-gate-truth-refresh  2026-05-22 03:48
+Objective:    Reconcile repo truth after a protected local-gate pass without expanding product or live-impact behavior.
+Changed:
+- Ran `.\scripts\local-gate.ps1`; gate integrity and the full validation chain passed.
+- Updated `docs/CURRENT_STATE_MATRIX.md` with the latest protected gate command, timestamp, and covered checks.
+- Updated SUMMARY and BLOCKERS with the no-live-impact validation result.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
