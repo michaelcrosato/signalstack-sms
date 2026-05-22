@@ -8,9 +8,11 @@ describe("inbound keyword classification", () => {
     expect(classifyInboundKeyword("quit.")).toBe("OPT_OUT");
   });
 
-  it("classifies HELP without opting the contact in", () => {
+  it("classifies HELP-class keywords without opting the contact in", () => {
     expect(classifyInboundKeyword("HELP")).toBe("HELP");
     expect(classifyInboundKeyword("help me")).toBe("HELP");
+    expect(classifyInboundKeyword("INFO")).toBe("HELP");
+    expect(classifyInboundKeyword("info please")).toBe("HELP");
   });
 
   it("ignores non-keyword replies", () => {

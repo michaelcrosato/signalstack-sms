@@ -8,7 +8,7 @@ Milestone 0 safety defaults block external impact:
 - `MESSAGING_PROVIDER=dummy`
 - `AI_PROVIDER=fake`
 
-Future SMS behavior must enforce consent, opt-out, STOP/HELP handling, tenant isolation, auditability, and provider readiness.
+Future SMS behavior must enforce consent, opt-out, STOP/HELP/INFO handling, tenant isolation, auditability, and provider readiness.
 
 ## Milestone 6 Compliance Gate
 

@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 266
+
+- Added INFO help-keyword handling for Run 266.
+- Latest repo truth: inbound `INFO` is now classified with HELP-class local keyword handling, leaves contact consent unchanged, and does not trigger provider sends or automatic outbound replies.
+- Updated the product inbox status copy and seeded product demo assertion to show HELP/INFO as a local no-provider request path.
+- Focused compliance keyword tests, typecheck, contract checks, the protected local gate, and the seeded product demo path passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 265
 
 - Hardened live-worker reordered-wrapper field short-circuit coverage for Run 265.

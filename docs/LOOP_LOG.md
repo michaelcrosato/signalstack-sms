@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 266  GREEN  info-help-keyword-handling  2026-05-21 21:01
+Objective:    Align local inbound help-keyword handling with the canonical HELP/INFO default.
+Changed:
+- Classified `INFO` as a HELP-class inbound keyword without changing contact consent or sending provider responses.
+- Updated product inbox status copy, seeded product demo assertion, and compliance/API docs for HELP/INFO handling.
+- Confirmed the protected local gate and seeded product demo path pass with demo-safe local database settings.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep product demo paths stable while preserving live SMS, provider, billing, AI, notification, and worker hard gates.
+
 ## Run 264  GREEN  inbox-help-consent-visibility  2026-05-21 20:53
 Objective:    Make HELP keyword handling visible in the product inbox demo path without changing consent.
 Changed:

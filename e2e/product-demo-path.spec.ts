@@ -285,7 +285,7 @@ test("product inbox page manages a local conversation thread", async ({ page }) 
 
   await page.getByLabel("Reply body").fill("HELP");
   await page.getByRole("button", { name: "Add Local Reply" }).click();
-  await expect(page.getByRole("status")).toContainText("Local HELP reply recorded");
+  await expect(page.getByRole("status")).toContainText("Local HELP/INFO request recorded");
   await expect(page.getByRole("status")).toContainText("Consent stayed unchanged");
   await expect(page.getByText("HELP").first()).toBeVisible();
   await expect(page.getByLabel("Thread status").getByText("UNKNOWN")).toBeVisible();

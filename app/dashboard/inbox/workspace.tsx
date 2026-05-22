@@ -313,7 +313,7 @@ export function InboxWorkspace({
 
 function inboundStatusMessage(payload: Record<string, unknown>) {
   if (payload.keywordAction === "HELP") {
-    return "Local HELP reply recorded. Consent stayed unchanged and no provider send ran.";
+    return "Local HELP/INFO request recorded. Consent stayed unchanged and no provider send ran.";
   }
 
   if (payload.keywordAction === "OPT_OUT") {

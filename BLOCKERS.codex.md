@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 266
+
+- No blocker from INFO help-keyword handling. The change is local keyword classification, UI copy, tests, and contract/docs only; it does not send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, execute workers, enqueue jobs, call Redis, edit protected gate scripts, hard-delete data, or perform destructive production database actions.
+
 Run number: 265
 
 - No blocker from the live-worker reordered-wrapper field short-circuit coverage. The change adds local unit coverage only: a frozen future authorization wrapper with reordered public fields remains unauthorized and does not inspect hostile supplied controls; it does not execute workers, enqueue jobs, call Redis, call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production database actions.

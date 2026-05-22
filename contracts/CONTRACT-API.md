@@ -130,7 +130,7 @@ Returns tenant-scoped messages for the conversation in chronological order.
 
 ### `POST /api/inbox/conversations/:conversationId/messages`
 
-Creates a demo-safe inbound message on an existing conversation. STOP-class keywords update local consent to `OPTED_OUT`; HELP is recorded but does not opt the contact in or send a provider response.
+Creates a demo-safe inbound message on an existing conversation. STOP-class keywords update local consent to `OPTED_OUT`; HELP/INFO-class keywords are recorded but do not opt the contact in or send a provider response.
 
 ### `POST /api/inbox/conversations/:conversationId/assign`
 
