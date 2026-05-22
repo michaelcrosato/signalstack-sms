@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   liveWorkerControlIdsMatchRequiredChecklist,
   liveWorkerControlsAreImplemented,
+  liveWorkerControlsUseSupportedStatuses,
   liveWorkerDeploymentClassIsAuthorized,
   productionLiveCampaignWorkerControls,
   reservedLiveWorkerDeploymentClass,
@@ -56,6 +57,14 @@ describe("production live campaign worker controls", () => {
         supportedLiveWorkerControlStatuses.includes(control.status)
       )
     ).toBe(true);
+    expect(liveWorkerControlsUseSupportedStatuses(productionLiveCampaignWorkerControls)).toBe(true);
+    expect(
+      liveWorkerControlsUseSupportedStatuses(
+        productionLiveCampaignWorkerControls.map((control, index) =>
+          index === 0 ? { ...control, status: "waived" as LiveWorkerControl["status"] } : control
+        )
+      )
+    ).toBe(false);
   });
 
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
@@ -98,6 +107,13 @@ describe("production live campaign worker controls", () => {
                 requirement: "Matching IDs with replaced requirement copy must not authorize live worker execution."
               }
             : control
+        )
+      )
+    ).toBe(false);
+    expect(
+      liveWorkerControlsAreImplemented(
+        implementedControls.map((control, index) =>
+          index === 0 ? { ...control, status: "waived" as LiveWorkerControl["status"] } : control
         )
       )
     ).toBe(false);

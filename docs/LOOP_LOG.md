@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 223  GREEN  live-worker-control-status-vocabulary  2026-05-21 17:18
+Objective:    Keep future live-worker control authorization constrained to the supported status vocabulary.
+Changed:
+- Added an exported live-worker control status-vocabulary helper and required it before controls can be treated as implemented.
+- Added unit coverage proving unsupported control statuses remain unauthorized even when the rest of the frozen checklist matches.
+- Updated queue/testing contracts and production worker policy checks to record the status-vocabulary requirement.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live campaign workers blocked; implement concrete future controls before adding any supported live worker class.
+
 ## Run 222  GREEN  live-worker-control-requirement-identity  2026-05-21 17:10
 Objective:    Require frozen requirement text identity before future live worker authorization can pass.
 Changed:

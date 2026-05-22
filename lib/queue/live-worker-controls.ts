@@ -86,8 +86,13 @@ export function liveWorkerControlIdsMatchRequiredChecklist(controls: readonly Li
   );
 }
 
+export function liveWorkerControlsUseSupportedStatuses(controls: readonly LiveWorkerControl[]) {
+  return controls.every((control) => supportedLiveWorkerControlStatuses.includes(control.status));
+}
+
 export function liveWorkerControlsAreImplemented(controls: readonly LiveWorkerControl[] = productionLiveCampaignWorkerControls) {
   return (
+    liveWorkerControlsUseSupportedStatuses(controls) &&
     liveWorkerControlIdsMatchRequiredChecklist(controls) &&
     controls.every((control) => control.status === "implemented")
   );

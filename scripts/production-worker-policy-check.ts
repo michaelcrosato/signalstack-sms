@@ -64,6 +64,10 @@ const requiredTexts: RequiredText[] = [
   },
   {
     file: "lib/queue/live-worker-controls.ts",
+    text: "liveWorkerControlsUseSupportedStatuses"
+  },
+  {
+    file: "lib/queue/live-worker-controls.ts",
     text: "liveWorkerDeploymentClassIsAuthorized"
   },
   {
@@ -89,6 +93,10 @@ const requiredTexts: RequiredText[] = [
   {
     file: "tests/unit/queue/live-worker-controls.test.ts",
     text: "requires the exact frozen control checklist"
+  },
+  {
+    file: "tests/unit/queue/live-worker-controls.test.ts",
+    text: "keeps live-worker control statuses inside the exported vocabulary"
   },
   {
     file: "tests/unit/queue/bullmq-worker.test.ts",

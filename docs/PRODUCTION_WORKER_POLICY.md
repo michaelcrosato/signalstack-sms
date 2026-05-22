@@ -35,7 +35,7 @@ A future production worker milestone must satisfy all of these before any live c
 
 The reserved future class name is `production-live-campaign`. It is a planning label only. Current source code and tests must keep this class blocked exactly like every other non-`local-demo` value until a later milestone implements every frozen control in `lib/queue/live-worker-controls.ts`.
 
-Before `production-live-campaign` can become a supported worker deployment class, the implementation must add all of these controls:
+Before `production-live-campaign` can become a supported worker deployment class, the implementation must add all of these controls. The executable checklist must keep the exact IDs and requirement text in order, and every control status must remain inside the supported status vocabulary.
 
 - A deploy-time allowlist that names the exact production worker environment and rejects every other production-like environment.
 - A separate org-level live-campaign-sending flag that is independent from `LIVE_MESSAGING_ENABLED` and independent from the isolated `/demo` live-test SMS route.
