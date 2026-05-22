@@ -3621,3 +3621,11 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+## Run 402  GREEN  live-worker-length-descriptor-shape-evidence  2026-05-22 10:09
+Objective:    Prove missing or accessor-backed supplied control-array length descriptors deny before indexed-control reads.
+Changed:
+- Added live-worker control coverage for missing and accessor-backed `length` descriptors whose indexed descriptors would throw if inspected.
+- Updated queue/testing contracts, production-worker/testing docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the missing/accessor length-descriptor boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.

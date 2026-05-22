@@ -421,6 +421,56 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects missing or accessor-backed control-array length descriptors before indexed reads", () => {
+    const implementedControls = implementedFrozenControls();
+    const malformedLengthDescriptorControls = [
+      new Proxy([...implementedControls], {
+        getOwnPropertyDescriptor: (target, property) => {
+          if (property === "length") {
+            return undefined;
+          }
+
+          if (property === "0") {
+            throw new Error("missing length evidence must deny before reading indexed controls");
+          }
+
+          return Reflect.getOwnPropertyDescriptor(target, property);
+        }
+      }),
+      new Proxy([...implementedControls], {
+        getOwnPropertyDescriptor: (target, property) => {
+          if (property === "length") {
+            return {
+              enumerable: false,
+              configurable: false,
+              get: () => {
+                throw new Error("accessor length evidence must not be read");
+              }
+            };
+          }
+
+          if (property === "0") {
+            throw new Error("accessor length evidence must deny before reading indexed controls");
+          }
+
+          return Reflect.getOwnPropertyDescriptor(target, property);
+        }
+      })
+    ];
+
+    for (const controls of malformedLengthDescriptorControls) {
+      expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(controls)).not.toThrow();
+      expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
+      expect(liveWorkerControlArrayExposesOnlyIndexedEntries(controls)).toBe(false);
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).toBe(false);
+    }
+  });
+
   it("rejects mismatched safe-integer control-array length descriptors before indexed reads", () => {
     const implementedControls = implementedFrozenControls();
     const mismatchedLengthValues = [
