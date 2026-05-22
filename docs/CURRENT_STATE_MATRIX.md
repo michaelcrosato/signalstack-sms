@@ -2,7 +2,9 @@
 
 Last updated: 2026-05-22.
 
-Latest protected local gate for Run 436: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-22 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 446 tests, Playwright smoke, and build green.
+Run 437 note: live-worker deployment-class exact-match coverage now includes tab-padded and newline-padded `production-live-campaign` strings, which deny before supplied controls are inspected.
+
+Latest protected local gate for Run 437: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-22 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 446 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 
