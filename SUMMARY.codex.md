@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 270
+
+- Added product analytics resolution-rate visibility for Run 270.
+- Latest repo truth: `/dashboard/analytics` now renders the already-derived resolved-conversation percentage in Inbox Signals, and the seeded product demo path verifies the `Resolution rate` row.
+- The change is read-only product UI coverage only; it does not mutate analytics data, execute reports, create exports, call providers, call Stripe, send SMS/email/notifications, expose secrets, enable live AI, or enable live features.
+- Focused typecheck, product analytics unit coverage, lint, seeded product E2E, diff whitespace check, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 269
 
 - Tightened product analytics fake-AI metering coverage for Run 269.

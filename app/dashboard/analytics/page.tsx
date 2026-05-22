@@ -64,6 +64,7 @@ export default async function AnalyticsPage() {
               <StatusRow label="Total conversations" value={String(analytics.conversations.total)} />
               <StatusRow label="Open conversations" value={String(analytics.conversations.open)} />
               <StatusRow label="Resolved conversations" value={String(analytics.conversations.resolved)} />
+              <StatusRow label="Resolution rate" value={`${analytics.derived.resolvedConversationPercent}%`} />
               <StatusRow label="Average messages per conversation" value={String(analytics.derived.averageMessagesPerConversation)} />
             </dl>
           </Panel>

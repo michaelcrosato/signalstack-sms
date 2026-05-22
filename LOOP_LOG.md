@@ -2379,3 +2379,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep product demo paths stable while preserving live SMS, provider, billing, live AI, notification, worker, and secret gates.
+
+## Run 270  GREEN  product-analytics-resolution-rate  2026-05-21 21:29
+Objective:    Make the existing resolved-conversation percentage visible in the product analytics workspace.
+Changed:
+- Added a read-only `Resolution rate` row to `/dashboard/analytics` Inbox Signals from existing derived analytics.
+- Extended the seeded product demo path to verify the resolution-rate row renders.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep product demo paths stable while preserving live SMS, provider, billing, live AI, notification, worker, and secret gates.

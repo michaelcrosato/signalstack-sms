@@ -381,6 +381,7 @@ test("product analytics page renders local overview detail", async ({ page }) =>
   await expect(page.getByRole("heading", { name: "Audience Signals" })).toBeVisible();
   await expect(page.getByText("Opt-out share")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Inbox Signals" })).toBeVisible();
+  await expect(page.getByText("Resolution rate")).toBeVisible();
   await expect(page.getByText("Average messages per conversation")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Campaign Signals" })).toBeVisible();
   await expect(page.getByText("Provider sends")).toBeVisible();
