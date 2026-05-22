@@ -10,6 +10,16 @@ Gate:         passed with `PLAYWRIGHT_PORT=3111 .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
 
+## Run 362  GREEN  type-asserted-globalthis-alias-auth-scan  2026-05-22 06:31
+Objective:    Prevent TypeScript-asserted `globalThis` aliases from hiding reflective request body readers before mutating-route role gates.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize direct and assigned `globalThis as typeof globalThis` aliases before reflective `Object`/`Reflect` body-reader checks.
+- Added synthetic auth unit coverage proving type-asserted `globalThis` aliases fail before the role gate while post-gate reads remain allowed.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix with the protected gate result.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 360  GREEN  delivery-operations-metadata  2026-05-22 06:20
 Objective:    Pin `/settings/delivery` read-only operations metadata behind executable unit coverage.
 Changed:
