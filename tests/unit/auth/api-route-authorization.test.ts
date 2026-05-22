@@ -25,18 +25,32 @@ function routeFiles(directory: string): string[] {
 
 function exportedMutatingMethods(source: string) {
   return mutatingMethods.filter((method) =>
-    new RegExp(`export\\s+(?:async\\s+)?function\\s+${method}\\b`).test(source)
+    new RegExp(
+      `export\\s+(?:(?:async\\s+)?function\\s+${method}\\b|const\\s+${method}\\s*=\\s*(?:async\\s+)?(?:function\\b)?)`
+    ).test(source)
   );
 }
 
-function exportedFunctionBody(source: string, method: (typeof mutatingMethods)[number]) {
-  const declaration = new RegExp(`export\\s+(?:async\\s+)?function\\s+${method}\\b`);
-  const match = declaration.exec(source);
-  if (match === null) {
-    return "";
+function exportedHandlerSignatureStart(source: string, method: (typeof mutatingMethods)[number]) {
+  const functionDeclaration = new RegExp(`export\\s+(?:async\\s+)?function\\s+${method}\\b`);
+  const functionMatch = functionDeclaration.exec(source);
+  if (functionMatch !== null) {
+    return source.indexOf("(", functionMatch.index);
   }
 
-  const signatureStart = source.indexOf("(", match.index);
+  const constDeclaration = new RegExp(
+    `export\\s+const\\s+${method}\\s*=\\s*(?:async\\s+)?(?:function\\b\\s*)?`
+  );
+  const constMatch = constDeclaration.exec(source);
+  if (constMatch === null) {
+    return -1;
+  }
+
+  return source.indexOf("(", constMatch.index + constMatch[0].length);
+}
+
+function exportedFunctionBody(source: string, method: (typeof mutatingMethods)[number]) {
+  const signatureStart = exportedHandlerSignatureStart(source, method);
   if (signatureStart === -1) {
     return "";
   }
@@ -84,13 +98,7 @@ function exportedFunctionBody(source: string, method: (typeof mutatingMethods)[n
 }
 
 function exportedFunctionFirstParameterName(source: string, method: (typeof mutatingMethods)[number]) {
-  const declaration = new RegExp(`export\\s+(?:async\\s+)?function\\s+${method}\\b`);
-  const match = declaration.exec(source);
-  if (match === null) {
-    return defaultRequestParameterName;
-  }
-
-  const signatureStart = source.indexOf("(", match.index);
+  const signatureStart = exportedHandlerSignatureStart(source, method);
   if (signatureStart === -1) {
     return defaultRequestParameterName;
   }
@@ -414,6 +422,45 @@ describe("API route authorization coverage", () => {
     expect(exportedMutatingMethods(missingRoleGateSource)).toEqual(["POST"]);
     expect(exportedMutatingMethodHasRoleGate(missingRoleGateSource, "POST")).toBe(false);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "DELETE")).toBe(false);
+  });
+
+  it("tracks exported const mutating route handlers for role-gate and body-order checks", () => {
+    const missingRoleGateSource = `
+      export const POST = async (request: Request) => {
+        return Response.json({ ok: true });
+      };
+    `;
+    const unsafeArrowSource = `
+      export const PATCH = async (request: Request) => {
+        const payload = await request.json();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      };
+    `;
+    const unsafeFunctionExpressionSource = `
+      export const PUT = async function(req: Request) {
+        const cloned = req.clone();
+        const payload = await cloned.text();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      };
+    `;
+    const safeSource = `
+      export const DELETE = async (req: Request) => {
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await req.clone().arrayBuffer();
+        return Response.json({ size: payload.byteLength });
+      };
+    `;
+
+    expect(exportedMutatingMethods(missingRoleGateSource)).toEqual(["POST"]);
+    expect(exportedMutatingMethodHasRoleGate(missingRoleGateSource, "POST")).toBe(false);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeArrowSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeFunctionExpressionSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "DELETE")).toBe(false);
   });
 

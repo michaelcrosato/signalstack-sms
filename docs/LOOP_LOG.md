@@ -10,6 +10,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
 
+## Run 293  GREEN  exported-const-mutating-route-handler-scan  2026-05-21 23:36
+Objective:    Prevent exported const mutating route handlers from bypassing local API role-gate scans.
+Changed:
+- Tightened the static mutating API authorization scanner to recognize exported const arrow and function-expression `POST`, `PATCH`, `PUT`, and `DELETE` route handlers.
+- Added synthetic auth unit coverage proving exported const handlers without `requireApiRole` are detected and body readers before the role gate fail while post-gate reads pass.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the exported const handler boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 289  GREEN  comma-declared-body-reader-scan  2026-05-21 23:14
 Objective:    Prevent comma-declared request aliases from bypassing mutating-route role-gate ordering checks.
 Changed:
