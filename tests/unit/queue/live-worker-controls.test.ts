@@ -1081,6 +1081,19 @@ describe("production live campaign worker controls", () => {
         }
       )
     );
+    const inheritedClassWrapper = Object.freeze(
+      Object.create(
+        { workerDeploymentClass: reservedLiveWorkerDeploymentClass },
+        {
+          controls: {
+            value: throwingEvidence,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          }
+        }
+      )
+    );
     const accessorClassWrapper = Object.freeze(
       Object.defineProperties(
         {},
@@ -1127,6 +1140,7 @@ describe("production live campaign worker controls", () => {
       hiddenClassWrapper,
       hiddenControlsWrapper,
       inheritedControlsWrapper,
+      inheritedClassWrapper,
       accessorClassWrapper,
       accessorControlsWrapper
     ]) {

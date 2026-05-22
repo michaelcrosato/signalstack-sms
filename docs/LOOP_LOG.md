@@ -2264,3 +2264,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 251  GREEN  live-worker-inherited-class-wrapper  2026-05-21 20:14
+Objective:    Prove inherited worker-deployment-class wrapper fields deny before inspecting supplied live-worker controls.
+Changed:
+- Added queue unit coverage using hostile supplied control evidence behind an authorization wrapper with inherited `workerDeploymentClass`.
+- Updated SUMMARY and BLOCKERS to record that the change is local unit coverage only.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
