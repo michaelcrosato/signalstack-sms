@@ -47,7 +47,7 @@ Goal: make the repo understandable in minutes and remove known correctness risks
 - Keep contact consent rechecks at send time in worker/send paths.
 - Keep idempotency keys tenant-scoped where cross-tenant key reuse is legitimate.
 - Keep live SMS, billing, AI, secrets, destructive DB operations, production worker execution, and production side effects hard-gated.
-- Keep `docs/PRODUCTION_WORKER_POLICY.md`, the `WORKER_DEPLOYMENT_CLASS=local-demo` executable guard, and explicit all-marker production-like worker blocking as the gate before any live campaign worker or production worker deployment work starts. The reserved `production-live-campaign` planning label remains blocked until future live-worker controls become executable.
+- Keep `docs/PRODUCTION_WORKER_POLICY.md`, the `WORKER_DEPLOYMENT_CLASS=local-demo` executable guard, explicit all-marker production-like worker blocking, and the frozen `production-live-campaign` control metadata as the gate before any live campaign worker or production worker deployment work starts. The reserved `production-live-campaign` planning label remains blocked until every future live-worker control is implemented.
 - Keep `npm run validate` and the local gate green.
 
 ### Phase 1: Product UI Investor Demo
@@ -86,4 +86,4 @@ Goal: turn the demo-safe product into a paid production SaaS.
 
 1. Keep `docs/CURRENT_STATE_MATRIX.md` current.
 2. Keep the product demo path stable while collecting review feedback.
-3. Start live-provider design from the planning-only `production-live-campaign` control checklist, without adding it to supported worker classes until executable gates exist.
+3. Continue hardening the executable `production-live-campaign` control checklist, without adding it to supported worker classes until every listed control is implemented.

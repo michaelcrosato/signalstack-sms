@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 221  GREEN  live-worker-control-metadata  2026-05-21 17:00
+Objective:    Pin the reserved live campaign worker controls as executable metadata while keeping live workers blocked.
+Changed:
+- Added frozen `production-live-campaign` control metadata with planned/implemented status vocabulary.
+- Wired worker deployment-class authorization through the control checklist so the reserved class remains blocked until every control is implemented.
+- Added focused queue unit coverage plus production worker policy check coverage and updated queue/testing/roadmap handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live campaign workers blocked; implement concrete future controls before adding any supported live worker class.
+
 ## Run 220  GREEN  production-worker-marker-coverage  2026-05-21 16:56
 Objective:    Pin every production-like runtime marker as a worker startup blocker before live-worker design proceeds.
 Changed:

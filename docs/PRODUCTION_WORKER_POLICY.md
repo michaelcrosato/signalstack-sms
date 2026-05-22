@@ -33,7 +33,7 @@ A future production worker milestone must satisfy all of these before any live c
 
 ## Reserved Live Worker Control Checklist
 
-The reserved future class name is `production-live-campaign`. It is a planning label only. Current source code and tests must keep this class blocked exactly like every other non-`local-demo` value until a later milestone adds executable live-worker gates.
+The reserved future class name is `production-live-campaign`. It is a planning label only. Current source code and tests must keep this class blocked exactly like every other non-`local-demo` value until a later milestone implements every frozen control in `lib/queue/live-worker-controls.ts`.
 
 Before `production-live-campaign` can become a supported worker deployment class, the implementation must add all of these controls:
 

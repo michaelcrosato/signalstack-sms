@@ -22,7 +22,7 @@ Milestone 4 does not call live providers.
 
 `npm run worker` processes due `SCHEDULED_CAMPAIGN` jobs only in local/demo runtimes when `MESSAGING_PROVIDER=dummy`, `LIVE_MESSAGING_ENABLED` is not `true`, and no production-like runtime marker is present. The database worker must reject every production-like runtime marker (`NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, or `APP_ENV`) before provider or live-worker-class checks can fall through.
 `WORKER_DEPLOYMENT_CLASS` may be unset or `local-demo` only. Any other deployment class is treated as a production worker attempt and is blocked before jobs are processed.
-`production-live-campaign` is reserved as a future planning label only. It must remain blocked until a later milestone adds the live-worker controls in `docs/PRODUCTION_WORKER_POLICY.md`.
+`production-live-campaign` is reserved as a future planning label only. It must remain blocked until a later milestone implements every frozen live-worker control in `lib/queue/live-worker-controls.ts` and keeps the controls aligned with `docs/PRODUCTION_WORKER_POLICY.md`.
 
 - The worker uses validated version-1 scheduled campaign payloads.
 - Invalid payloads or missing scheduled campaigns are marked `FAILED`.
@@ -42,7 +42,7 @@ Continuous execution is opt-in and remains local/demo-safe:
 - `WORKER_MAX_JOBS_PER_POLL` caps due jobs processed per poll and is clamped between 1 and 100.
 - Every poll reuses the same dummy-only/live-disabled gate; blocked workers do not process or call providers.
 - Production-like runtime markers (`NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, or `APP_ENV` set to `production` or `prod`) and non-`local-demo` `WORKER_DEPLOYMENT_CLASS` values block worker processing even when demo-safe provider defaults are set. Production worker execution requires a future explicit worker policy, not the general production external-impact override.
-- `docs/PRODUCTION_WORKER_POLICY.md` is the current planning gate for that future explicit policy. It defines the reserved live-worker control checklist, but does not authorize production worker execution or live campaign sends.
+- `docs/PRODUCTION_WORKER_POLICY.md` is the current planning gate for that future explicit policy. It defines the reserved live-worker control checklist, and `lib/queue/live-worker-controls.ts` pins that checklist as frozen executable metadata, but neither authorizes production worker execution or live campaign sends.
 
 ## Post-MVP BullMQ/Redis Enqueue Foundation
 
@@ -64,7 +64,7 @@ BullMQ workers may consume scheduled-campaign queue events only by referencing d
 - Cancelled, completed, missing, invalid, or early jobs must be skipped or failed locally without provider calls.
 - Worker startup is blocked unless `QUEUE_BACKEND=bullmq`, `REDIS_URL` is configured, `MESSAGING_PROVIDER=dummy`, `LIVE_MESSAGING_ENABLED` is not `true`, and no production-like runtime marker is present. BullMQ worker readiness must reject every production-like runtime marker before provider or live-worker-class checks can fall through.
 - BullMQ worker startup also rejects any `WORKER_DEPLOYMENT_CLASS` other than `local-demo`.
-- BullMQ worker startup must continue to reject `WORKER_DEPLOYMENT_CLASS=production-live-campaign` until the future live-worker controls are executable.
+- BullMQ worker startup must continue to reject `WORKER_DEPLOYMENT_CLASS=production-live-campaign` until every frozen future live-worker control is implemented.
 - The BullMQ worker must use the same dummy-only send path and idempotent `Message` rows as the database polling worker.
 
 ## Post-MVP BullMQ/Redis Smoke

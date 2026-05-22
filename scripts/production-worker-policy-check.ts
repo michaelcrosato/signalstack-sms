@@ -51,6 +51,18 @@ const requiredTexts: RequiredText[] = [
     text: "supportedWorkerDeploymentClasses"
   },
   {
+    file: "lib/queue/live-worker-controls.ts",
+    text: "reservedLiveWorkerDeploymentClass = \"production-live-campaign\""
+  },
+  {
+    file: "lib/queue/live-worker-controls.ts",
+    text: "liveWorkerControlsAreImplemented"
+  },
+  {
+    file: "lib/queue/live-worker-controls.ts",
+    text: "liveWorkerDeploymentClassIsAuthorized"
+  },
+  {
     file: "lib/queue/bullmq-worker.ts",
     text: "WORKER_DEPLOYMENT_CLASS"
   },
@@ -65,6 +77,10 @@ const requiredTexts: RequiredText[] = [
   {
     file: "tests/unit/queue/worker.test.ts",
     text: "production-live-campaign"
+  },
+  {
+    file: "tests/unit/queue/live-worker-controls.test.ts",
+    text: "authorizes the reserved production class only when every control is implemented"
   },
   {
     file: "tests/unit/queue/bullmq-worker.test.ts",

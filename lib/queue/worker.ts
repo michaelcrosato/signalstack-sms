@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db/prisma";
 import { environmentIsProductionLike } from "@/lib/deployment/production-gate";
 import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
 import { renderTemplate } from "@/lib/messaging/render-template";
+import { liveWorkerDeploymentClassIsAuthorized } from "@/lib/queue/live-worker-controls";
 import { preflightCampaignRecipients } from "@/lib/messaging/send-preflight";
 import { scheduledCampaignJobSchema } from "@/lib/queue/jobs";
 
@@ -69,7 +70,11 @@ export function localWorkerProviderIsAllowed(input: WorkerSafetyInput) {
 }
 
 export function workerDeploymentClassIsAllowed(input: WorkerSafetyInput) {
-  return !input.workerDeploymentClass || supportedWorkerDeploymentClasses.includes(input.workerDeploymentClass as "local-demo");
+  return (
+    !input.workerDeploymentClass ||
+    supportedWorkerDeploymentClasses.includes(input.workerDeploymentClass as "local-demo") ||
+    liveWorkerDeploymentClassIsAuthorized({ workerDeploymentClass: input.workerDeploymentClass })
+  );
 }
 
 export function localWorkerReadiness(input: WorkerSafetyInput): WorkerReadinessResult {
