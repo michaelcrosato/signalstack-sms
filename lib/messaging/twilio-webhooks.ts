@@ -65,14 +65,16 @@ export function normalizeTwilioInbound(payload: TwilioWebhookPayload): Normalize
   const providerMessageId = normalizeRequiredProviderValue(payload.MessageSid ?? payload.SmsSid);
   const from = normalizeRequiredProviderValue(payload.From);
   const to = normalizeOptionalProviderValue(payload.To);
-  if (!from || !payload.Body || !providerMessageId) {
+  const rawBody = payload.Body;
+  const body = normalizeRequiredProviderValue(rawBody);
+  if (!from || !rawBody || !body || !providerMessageId) {
     return null;
   }
 
   return {
     from,
     to,
-    body: payload.Body,
+    body: rawBody,
     providerMessageId,
     idempotencyKey: `twilio:inbound:${providerMessageId}`
   };

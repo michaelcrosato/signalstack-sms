@@ -193,6 +193,30 @@ describe("Twilio webhook helpers", () => {
     ).toBeNull();
   });
 
+  it("rejects whitespace-only inbound bodies without trimming stored message text", () => {
+    expect(
+      normalizeTwilioInbound({
+        From: "+15555550100",
+        Body: "  HELP  ",
+        MessageSid: "SM123"
+      })
+    ).toEqual({
+      from: "+15555550100",
+      to: undefined,
+      body: "  HELP  ",
+      providerMessageId: "SM123",
+      idempotencyKey: "twilio:inbound:SM123"
+    });
+
+    expect(
+      normalizeTwilioInbound({
+        From: "+15555550100",
+        Body: " \t ",
+        MessageSid: "SM123"
+      })
+    ).toBeNull();
+  });
+
   it("maps provider statuses into local message transition fields", () => {
     const now = new Date("2026-01-01T00:00:00.000Z");
 

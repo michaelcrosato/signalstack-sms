@@ -365,6 +365,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep webhook idempotency, product demo, live-worker, provider, billing, live AI, notification, and secret gates stable.
 
+## Run 388  GREEN  twilio-inbound-body-validation  2026-05-22 09:00
+Objective:    Reject whitespace-only Twilio inbound webhook bodies before local message creation.
+Changed:
+- Tightened Twilio inbound normalization to reject whitespace-only `Body` payloads while preserving nonblank body text exactly.
+- Added focused webhook helper coverage for whitespace-only rejection and exact nonblank body preservation.
+- Updated webhook/testing contracts, webhook/testing docs, NEXT_PROMPTS, and current state matrix for the inbound body boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep webhook validation, product demo, live-worker, provider, billing, live AI, notification, and secret gates stable.
+
 ## Run 304  GREEN  inline-cloned-reflect-body-reader-scan  2026-05-22 00:37
 Objective:    Prevent inline cloned `Reflect.apply` and `Reflect.get` request body-reader forms from bypassing mutating-route role-gate ordering checks.
 Changed:
