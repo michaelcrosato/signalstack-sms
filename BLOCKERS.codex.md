@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 311
+
+- No blocker from template-literal bracket-notation `Request` body-reader authorization coverage. The change is local static unit coverage plus testing-contract text only; it does not execute routes, parse live requests, use production credentials, mutate product records beyond validation seed behavior, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, execute workers, enqueue jobs, call Redis, edit protected gate scripts, hard-delete data, or perform destructive production database actions.
+
 Run number: 309
 
 - No blocker from bracket-value descriptor-derived `Request.prototype` body-reader authorization coverage. The change is local static unit coverage plus testing-contract/docs text only; it does not execute routes, parse live requests, use production credentials, mutate product records beyond validation seed behavior, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, execute workers, enqueue jobs, call Redis, edit protected gate scripts, hard-delete data, or perform destructive production database actions.

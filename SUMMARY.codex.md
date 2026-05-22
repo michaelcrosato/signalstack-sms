@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 311
+
+- Hardened template-literal bracket-notation `Request` body-reader authorization coverage for Run 311.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes plain backtick bracket properties such as ``req[`json`]()``, ``req[`clone`]()[`text`]()`` the same way as quoted bracket body readers, so those reads are treated as body parsing when they occur before a mutating handler's top-level `requireApiRole`.
+- Updated the testing contract to name the template-literal bracket-notation body-reader boundary.
+- Focused auth coverage and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 309
 
 - Hardened bracket-value descriptor-derived `Request.prototype` body-reader authorization coverage for Run 309.
