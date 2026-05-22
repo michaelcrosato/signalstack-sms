@@ -54,7 +54,7 @@ Goal: make the repo understandable in minutes and remove known correctness risks
 
 Goal: make SignalStack feel like usable SMS software, not only a system audit console.
 
-- Product shell at `/dashboard` has primary navigation for contacts, campaigns, inbox, templates, analytics, compliance, and settings.
+- Product shell at `/dashboard` has primary navigation for contacts, campaigns, inbox, templates, analytics, compliance, and settings, plus local usage and fake-AI usage visibility.
 - Keep the contacts list/import/detail UI on existing APIs, including local soft archive, restore, and duplicate merge.
 - Campaign composer, fake-AI copy assist, recipient selection, preflight, schedule, detail, draft edit, and queued-campaign cancel UI on existing APIs are in place for the first product demo path.
 - Inbox list/thread UI with demo inbound, assignment, notes, resolve/reopen, STOP visibility, and deterministic fake-AI summary/lead qualification is in place on existing APIs.

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 274  GREEN  product-dashboard-local-usage-total  2026-05-21 21:49
+Objective:    Show total local usage quantity in the product dashboard's owner-facing signals.
+Changed:
+- Added a `Local usage events` signal to `/dashboard` using the existing tenant-scoped usage aggregation.
+- Extended seeded product-demo browser coverage to verify the dashboard signal.
+- Updated testing contract, roadmap, current-state matrix, SUMMARY, and BLOCKERS for the read-only local usage boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep product demo usage visibility stable while live sends, providers, billing, live AI, workers, notifications, secrets, and destructive actions remain blocked.
+
 ## Run 273  GREEN  product-dashboard-fake-ai-usage  2026-05-21 21:45
 Objective:    Surface endpoint-driven fake-AI usage on the product dashboard.
 Changed:

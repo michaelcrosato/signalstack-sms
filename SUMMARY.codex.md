@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 274
+
+- Added product dashboard local usage total visibility for Run 274.
+- Latest repo truth: `/dashboard` now renders the already-derived tenant-scoped local usage event quantity alongside fake-AI requests in Local Signals, and the seeded product demo path verifies the signal.
+- The change is read-only product dashboard display/projection coverage only; it does not mutate usage data, execute reports, create exports, run workers, enqueue jobs, call Redis, call providers, call Stripe, send SMS/email/notifications, expose secrets, call live AI, or enable live features.
+- Focused product dashboard unit coverage, typecheck, contracts check, lint, and seeded product E2E passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 273
 
 - Added product dashboard fake-AI usage visibility for Run 273.
