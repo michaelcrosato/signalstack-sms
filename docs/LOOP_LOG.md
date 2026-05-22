@@ -2784,3 +2784,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 326  GREEN  parenthesized-inline-property-body-reader-scan  2026-05-22 02:56
+Objective:    Prevent parenthesized inline body-reader property names from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize inline parenthesized `Reflect.get` and descriptor property names such as `Reflect.get(req, ("json"))` and `Object.getOwnPropertyDescriptor(Request.prototype, ("text"))`.
+- Added synthetic auth unit coverage proving parenthesized inline property-name body readers fail before the role gate and pass after it.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the parenthesized inline property-name boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
