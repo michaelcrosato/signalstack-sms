@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 352  GREEN  direct-request-constructor-alias-auth-scan  2026-05-22 05:29
+Objective:    Prevent direct `Request` constructor aliases from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize direct and assigned local aliases of the global `Request` constructor before `Request.prototype` body-reader checks.
+- Added synthetic auth unit coverage proving `const RequestCtor = Request; RequestCtor.prototype.json.call(req)` and assigned `(Request)` aliases fail before the role gate.
+- Updated the testing contract and testing docs for the direct `Request` constructor-alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 351  GREEN  const-asserted-globalthis-request-auth-scan  2026-05-22 05:18
 Objective:    Prevent const-asserted `globalThis["Request" as const]` and prototype bracket names from hiding mutating-route request body readers before authorization.
 Changed:
