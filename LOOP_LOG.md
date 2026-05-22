@@ -3959,3 +3959,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 440  GREEN  current-state-run-note-sync  2026-05-22 14:30
+Objective:    Synchronize the current-state run note with the latest protected local gate.
+Changed:
+- Updated `docs/CURRENT_STATE_MATRIX.md` so the Run 440 note points at the Run 440 protected local gate instead of retaining stale Run 438 wording.
+- Updated SUMMARY and BLOCKERS for the documentation-only truth sync.
+- Kept source behavior, product features, live sends, providers, billing, secrets, workers, Redis, and protected gate scripts untouched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
