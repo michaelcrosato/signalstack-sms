@@ -2647,6 +2647,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
 
+## Run 306  GREEN  descriptor-prototype-body-reader-scan  2026-05-22 00:54
+Objective:    Prevent descriptor-derived `Request.prototype` body readers from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize `Object.getOwnPropertyDescriptor(Request.prototype, "...")?.value` body readers before role-gate ordering checks.
+- Added synthetic auth unit coverage for direct descriptor calls, descriptor reader aliases, and local string-literal property alias descriptor forms before and after `requireApiRole`.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the descriptor-derived prototype body-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 282  GREEN  destructured-request-body-reader-scan  2026-05-21 22:39
 Objective:    Prevent destructured request body readers from bypassing mutating-route role-gate ordering checks.
 Changed:

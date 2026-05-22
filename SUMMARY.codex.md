@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 306
+
+- Hardened descriptor-derived `Request.prototype` body-reader authorization coverage for Run 306.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes `Object.getOwnPropertyDescriptor(Request.prototype, "json")?.value` and local string-literal property alias variants to `Request.prototype` body readers, so direct descriptor calls and descriptor reader aliases are treated as body parsing when they occur before a mutating handler's top-level `requireApiRole`.
+- Updated the testing contract to name the descriptor-derived prototype body-reader boundary.
+- Focused auth coverage and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 305
 
 - Hardened local string-literal `Reflect.get` body-reader property alias authorization coverage for Run 305.
