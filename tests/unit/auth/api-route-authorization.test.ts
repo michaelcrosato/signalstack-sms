@@ -206,6 +206,22 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   ]) {
     lookupPropertyAliases.set(match[1], match[2]);
   }
+  const reflectMethodPropertyAliases = new Map<string, string>();
+  const literalReflectMethodNamePattern = String.raw`\(?\s*["'\`](get|apply)["'\`]\s*(?:\)?\s+as\s+const\s*\)?|\)?)`;
+  const reflectMethodPropertyAliasPattern = new RegExp(
+    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${literalReflectMethodNamePattern}${variableDeclaratorEnd}`,
+    "g"
+  );
+  const assignedReflectMethodPropertyAliasPattern = new RegExp(
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${literalReflectMethodNamePattern}\\s*(?=;|\\r?\\n)`,
+    "g"
+  );
+  for (const match of [
+    ...bodySlice.matchAll(reflectMethodPropertyAliasPattern),
+    ...bodySlice.matchAll(assignedReflectMethodPropertyAliasPattern)
+  ]) {
+    reflectMethodPropertyAliases.set(match[1], match[2]);
+  }
   const descriptorValueAccessPattern =
     String.raw`(?:\?\s*\.\s*(?:value|\[\s*["'\`]value["'\`]\s*\])|!\s*(?:\.\s*value|\[\s*["'\`]value["'\`]\s*\])|\.\s*value|\[\s*["'\`]value["'\`]\s*\])`;
   const objectOrReflectMemberPattern = (memberName: string) =>
@@ -214,6 +230,8 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   const prototypeLookupPattern = objectOrReflectMemberPattern("getPrototypeOf");
   const descriptorLookupAliases = new Set<string>();
   const prototypeLookupAliases = new Set<string>();
+  const reflectGetAliases = new Set<string>();
+  const reflectApplyAliases = new Set<string>();
   const collectLookupDestructuringAliases = (fields: string, memberName: string) =>
     fields.split(",").flatMap((field) => {
       const fieldMatch = new RegExp(`^\\s*${memberName}\\s*(?::\\s*([A-Za-z_$][\\w$]*))?\\s*$`).exec(field);
@@ -230,6 +248,25 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
 
       const computedAliasMatch = /^\s*\[\s*([A-Za-z_$][\w$]*)\s*\]\s*:\s*([A-Za-z_$][\w$]*)\s*$/.exec(field);
       return computedAliasMatch !== null && lookupPropertyAliases.get(computedAliasMatch[1]) === memberName
+        ? [computedAliasMatch[2]]
+        : [];
+    });
+  const collectReflectMethodDestructuringAliases = (fields: string, memberName: string) =>
+    fields.split(",").flatMap((field) => {
+      const fieldMatch = new RegExp(`^\\s*${memberName}\\s*(?::\\s*([A-Za-z_$][\\w$]*))?\\s*$`).exec(field);
+      if (fieldMatch !== null) {
+        return [fieldMatch[1] ?? memberName];
+      }
+
+      const computedLiteralMatch = new RegExp(
+        `^\\s*\\[\\s*["'\`]${memberName}["'\`]\\s*\\]\\s*:\\s*([A-Za-z_$][\\w$]*)\\s*$`
+      ).exec(field);
+      if (computedLiteralMatch !== null) {
+        return [computedLiteralMatch[1]];
+      }
+
+      const computedAliasMatch = /^\s*\[\s*([A-Za-z_$][\w$]*)\s*\]\s*:\s*([A-Za-z_$][\w$]*)\s*$/.exec(field);
+      return computedAliasMatch !== null && reflectMethodPropertyAliases.get(computedAliasMatch[1]) === memberName
         ? [computedAliasMatch[2]]
         : [];
     });
@@ -257,6 +294,30 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
     `(?:^|[;\\r\\n])\\s*\\(\\s*\\{([^}]+)\\}\\s*=\\s*(?:Object|Reflect)\\s*\\)\\s*(?=;|\\r?\\n)`,
     "g"
   );
+  const reflectGetAliasPattern = new RegExp(
+    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*Reflect\\s*(?:(?:\\.|\\?\\.)\\s*get|(?:\\?\\.)?\\[\\s*["'\`]get["'\`]\\s*\\])\\s*(?:\\?\\.)?${variableDeclaratorEnd}`,
+    "g"
+  );
+  const assignedReflectGetAliasPattern = new RegExp(
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*Reflect\\s*(?:(?:\\.|\\?\\.)\\s*get|(?:\\?\\.)?\\[\\s*["'\`]get["'\`]\\s*\\])\\s*(?:\\?\\.)?\\s*(?=;|\\r?\\n)`,
+    "g"
+  );
+  const reflectApplyAliasPattern = new RegExp(
+    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*Reflect\\s*(?:(?:\\.|\\?\\.)\\s*apply|(?:\\?\\.)?\\[\\s*["'\`]apply["'\`]\\s*\\])\\s*(?:\\?\\.)?${variableDeclaratorEnd}`,
+    "g"
+  );
+  const assignedReflectApplyAliasPattern = new RegExp(
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*Reflect\\s*(?:(?:\\.|\\?\\.)\\s*apply|(?:\\?\\.)?\\[\\s*["'\`]apply["'\`]\\s*\\])\\s*(?:\\?\\.)?\\s*(?=;|\\r?\\n)`,
+    "g"
+  );
+  const destructuredReflectAliasPattern = new RegExp(
+    `${variableDeclaratorStart}\\{([^}]+)\\}\\s*(?::[^=;,\\n]+)?=\\s*Reflect${variableDeclaratorEnd}`,
+    "g"
+  );
+  const assignedDestructuredReflectAliasPattern = new RegExp(
+    `(?:^|[;\\r\\n])\\s*\\(\\s*\\{([^}]+)\\}\\s*=\\s*Reflect\\s*\\)\\s*(?=;|\\r?\\n)`,
+    "g"
+  );
   for (const match of [
     ...bodySlice.matchAll(descriptorLookupAliasPattern),
     ...bodySlice.matchAll(assignedDescriptorLookupAliasPattern)
@@ -278,6 +339,26 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
     }
     for (const alias of collectLookupDestructuringAliases(match[1], "getPrototypeOf")) {
       prototypeLookupAliases.add(alias);
+    }
+  }
+  for (const match of [...bodySlice.matchAll(reflectGetAliasPattern), ...bodySlice.matchAll(assignedReflectGetAliasPattern)]) {
+    reflectGetAliases.add(match[1]);
+  }
+  for (const match of [
+    ...bodySlice.matchAll(reflectApplyAliasPattern),
+    ...bodySlice.matchAll(assignedReflectApplyAliasPattern)
+  ]) {
+    reflectApplyAliases.add(match[1]);
+  }
+  for (const match of [
+    ...bodySlice.matchAll(destructuredReflectAliasPattern),
+    ...bodySlice.matchAll(assignedDestructuredReflectAliasPattern)
+  ]) {
+    for (const alias of collectReflectMethodDestructuringAliases(match[1], "get")) {
+      reflectGetAliases.add(alias);
+    }
+    for (const alias of collectReflectMethodDestructuringAliases(match[1], "apply")) {
+      reflectApplyAliases.add(alias);
     }
   }
   const descriptorLookupCallPattern = `(?:${descriptorLookupPattern}|${[...descriptorLookupAliases].map(escapeRegExp).join("|") || "(?!)"})`;
@@ -390,7 +471,14 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
       }
     }
   }
-  const reflectedBodySlice = bodySlice
+  const reflectMethodAliasBodySlice = [...reflectGetAliases].reduce(
+    (source, alias) => source.replace(new RegExp(`\\b${escapeRegExp(alias)}\\s*\\(`, "g"), "Reflect.get("),
+    [...reflectApplyAliases].reduce(
+      (source, alias) => source.replace(new RegExp(`\\b${escapeRegExp(alias)}\\s*\\(`, "g"), "Reflect.apply("),
+      bodySlice
+    )
+  );
+  const reflectedBodySlice = reflectMethodAliasBodySlice
     .replace(/\bReflect\s*(?:\?\.\s*)?\[\s*["'`]get["'`]\s*\]\s*(?:\?\.)?\s*\(/g, "Reflect.get(")
     .replace(/\bReflect\s*(?:\?\.\s*)?\[\s*["'`]apply["'`]\s*\]\s*(?:\?\.)?\s*\(/g, "Reflect.apply(")
     .replace(/\bReflect\s*\?\.\s*get\s*\(/g, "Reflect.get(")
@@ -2909,6 +2997,64 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
+  it("treats aliased Reflect.apply request body reader invocations as body parsing for role-gate ordering", () => {
+    const unsafeDirectAliasSource = `
+      export async function POST(req: Request) {
+        const reflectApply = Reflect.apply;
+        const payload = await reflectApply(req.json, req, []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeAssignedBracketAliasSource = `
+      export async function PATCH(req: Request) {
+        let reflectApply;
+        reflectApply = Reflect["apply"];
+        const cloned = req.clone();
+        const payload = await reflectApply(cloned.text, cloned, []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeDestructuredAliasSource = `
+      export async function PUT(req: Request) {
+        const { apply: reflectApply } = Reflect;
+        const readFormData = req.formData.bind(req);
+        const payload = await reflectApply(readFormData, undefined, []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const unsafeComputedDestructuredAliasSource = `
+      export async function DELETE(req: Request) {
+        const methodName = "apply" as const;
+        const { [methodName]: reflectApply } = Reflect;
+        const payload = await reflectApply(req.clone().blob, req.clone(), []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const { apply: reflectApply } = Reflect;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await reflectApply(req.json, req, []);
+        return Response.json(payload);
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedBracketAliasSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDestructuredAliasSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedDestructuredAliasSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
   it("treats Reflect.apply bound request body reader invocations as body parsing for role-gate ordering", () => {
     const unsafeDirectBoundSource = `
       export async function POST(req: Request) {
@@ -3167,6 +3313,65 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeBracketGetSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTemplateBracketGetSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalBracketGetSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("treats aliased Reflect.get request body readers as body parsing for role-gate ordering", () => {
+    const unsafeDirectAliasSource = `
+      export async function POST(req: Request) {
+        const reflectGet = Reflect.get;
+        const payload = await reflectGet(req, "json").call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeAssignedBracketAliasSource = `
+      export async function PATCH(req: Request) {
+        let reflectGet;
+        reflectGet = Reflect["get"];
+        const readerName = "text";
+        const payload = await reflectGet(req.clone(), readerName, req.clone()).call(req.clone());
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeDestructuredAliasSource = `
+      export async function PUT(req: Request) {
+        const { get: reflectGet } = Reflect;
+        const readFormData = reflectGet(req, "formData");
+        const payload = await Reflect.apply(readFormData, req, []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const unsafeComputedDestructuredAliasSource = `
+      export async function DELETE(req: Request) {
+        const methodName = "get" as const;
+        const readerName = "blob";
+        const { [methodName]: reflectGet } = Reflect;
+        const payload = await reflectGet(req, readerName).call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const { get: reflectGet } = Reflect;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await reflectGet(req, "arrayBuffer").call(req);
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedBracketAliasSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDestructuredAliasSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedDestructuredAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 

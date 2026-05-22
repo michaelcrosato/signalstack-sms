@@ -2775,6 +2775,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
 
+## Run 329  GREEN  reflect-method-alias-body-reader-scan  2026-05-22 03:23
+Objective:    Prevent aliased `Reflect.get` and `Reflect.apply` calls from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize direct, assigned, destructured, and computed destructured aliases for `Reflect.get` and `Reflect.apply`.
+- Added synthetic auth unit coverage proving aliased reflective body-reader calls fail before the role gate while post-gate reads remain allowed.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the Reflect method alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 325  GREEN  parenthesized-call-apply-body-reader-scan  2026-05-22 02:52
 Objective:    Prevent parenthesized `call`/`apply` request body-reader invocations from bypassing mutating-route role-gate ordering checks.
 Changed:
