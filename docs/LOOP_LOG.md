@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 395  GREEN  twilio-terminal-transition-regression  2026-05-22 09:34
+Objective:    Prove Twilio terminal delivery updates overwrite stale opposite terminal timestamps when applied to local message metadata.
+Changed:
+- Added webhook helper regression coverage that applies delivered-after-failed and undelivered-after-delivered transitions to stale local metadata.
+- Confirmed the transition payload leaves only one terminal timestamp visible after local storage updates.
+- Updated SUMMARY, BLOCKERS, and current state matrix for the explicit terminal-transition regression boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep webhook idempotency, product demo, live-worker, provider, billing, live AI, notification, and secret gates stable.
+
 ## Run 394  GREEN  twilio-blank-alias-fallback  2026-05-22 09:31
 Objective:    Prevent blank modern Twilio webhook alias fields from blocking nonblank legacy aliases during local idempotency normalization.
 Changed:

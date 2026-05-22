@@ -276,4 +276,32 @@ describe("Twilio webhook helpers", () => {
       failedAt: now
     });
   });
+
+  it("keeps terminal delivery transitions mutually exclusive when applied to stale local metadata", () => {
+    const deliveredAt = new Date("2026-01-01T00:00:00.000Z");
+    const failedAt = new Date("2026-01-02T00:00:00.000Z");
+    const staleFailedMessage = {
+      deliveredAt: null as Date | null,
+      failedAt
+    };
+    const staleDeliveredMessage = {
+      deliveredAt,
+      failedAt: null as Date | null
+    };
+
+    expect({
+      ...staleFailedMessage,
+      ...twilioStatusTransition({ status: "delivered", now: deliveredAt })
+    }).toMatchObject({
+      deliveredAt,
+      failedAt: null
+    });
+    expect({
+      ...staleDeliveredMessage,
+      ...twilioStatusTransition({ status: "undelivered", now: failedAt })
+    }).toMatchObject({
+      deliveredAt: null,
+      failedAt
+    });
+  });
 });
