@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 318  GREEN  optional-descriptor-body-reader-scan  2026-05-22 02:12
+Objective:    Prevent optional descriptor/prototype lookups from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize optional `Object?.getOwnPropertyDescriptor(...)`, `Reflect.getOwnPropertyDescriptor?.(...)`, `Object?.getPrototypeOf(...)`, and `Reflect.getPrototypeOf?.(...)` forms.
+- Added synthetic auth unit coverage proving optional descriptor/prototype lookup body readers fail before `requireApiRole` and pass after it.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the optional descriptor/prototype lookup boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 317  GREEN  destructured-descriptor-value-body-reader-scan  2026-05-22 01:57
 Objective:    Prevent destructured descriptor `value` aliases from hiding mutating-route request body readers before authorization.
 Changed:

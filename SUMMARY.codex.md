@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 318
+
+- Hardened optional descriptor/prototype lookup body-reader authorization coverage for Run 318.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes optional `Object?.getOwnPropertyDescriptor(...)`, `Reflect.getOwnPropertyDescriptor?.(...)`, `Object?.getPrototypeOf(...)`, and `Reflect.getPrototypeOf?.(...)` forms before body-reader ordering checks, so descriptor-derived standard `Request` body readers cannot occur before a mutating handler's top-level `requireApiRole`.
+- Updated the testing contract and testing docs to name the optional descriptor/prototype lookup boundary.
+- Focused auth coverage and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 317
 
 - Hardened destructured descriptor-value body-reader authorization coverage for Run 317.
