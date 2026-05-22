@@ -1,5 +1,13 @@
 # Codex Summary
 
+Run number: 427
+
+- Latest contract truth sync records the already-tested boxed string `id`, `status`, and `requirement` live-worker public-field denial in the queue/testing contracts and current state matrix.
+- No source code or test behavior changed; this iteration keeps `production-live-campaign` unsupported and only aligns handoff docs with existing executable coverage.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 426
 
 - Latest live-worker public-string exact-match coverage proves supplied `production-live-campaign` control entries with whitespace-padded or case-drifted `id`, `status`, or `requirement` strings deny without normalization.

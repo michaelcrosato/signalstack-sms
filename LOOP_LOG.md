@@ -3854,3 +3854,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 427  GREEN  live-worker-boxed-field-contract-sync  2026-05-22 13:20
+Objective:    Align queue/testing contracts with existing boxed string public-field live-worker coverage.
+Changed:
+- Updated queue and testing contracts to name boxed string `id`, `status`, and `requirement` denial for supplied live-worker control entries.
+- Updated current state and Codex handoff truth for the boxed string public-field boundary.
+- Kept `production-live-campaign` unsupported; no source behavior, product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
