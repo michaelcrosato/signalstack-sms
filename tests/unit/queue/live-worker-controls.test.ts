@@ -955,6 +955,35 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects malformed authorization wrapper key evidence before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("malformed wrapper keys must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("malformed wrapper keys must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("malformed wrapper keys must not inspect control evidence");
+      }
+    });
+    const baseWrapper = Object.freeze({
+      workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+      controls: throwingEvidence
+    });
+    const reorderedKeyWrapper = new Proxy(baseWrapper, {
+      ownKeys: () => ["controls", "workerDeploymentClass"]
+    });
+    const extraKeyWrapper = new Proxy(baseWrapper, {
+      ownKeys: () => ["workerDeploymentClass", "controls", "reviewerBypass"]
+    });
+
+    for (const input of [reorderedKeyWrapper, extraKeyWrapper]) {
+      expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
+    }
+  });
+
   it("does not execute authorization wrapper get traps while denying unsupported classes", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       get: () => {

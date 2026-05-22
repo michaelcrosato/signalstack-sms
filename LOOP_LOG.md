@@ -9,6 +9,15 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
 
+## Run 251  GREEN  live-worker-wrapper-key-evidence  2026-05-21 19:49
+Objective:    Prove malformed live-worker authorization wrapper keys deny before inspecting supplied controls.
+Changed:
+- Added queue unit coverage for reordered and extra authorization wrapper keys with hostile supplied control evidence.
+- Updated queue/testing contracts, production worker policy docs, roadmap/state notes, README, SUMMARY, and BLOCKERS for the wrapper-key boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 247  GREEN  live-worker-array-key-order  2026-05-21 19:32
 Objective:    Require ordinary array key order before supplied live-worker controls can authorize the reserved class.
 Changed:
