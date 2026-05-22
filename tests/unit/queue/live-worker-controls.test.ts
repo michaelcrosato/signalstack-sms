@@ -482,6 +482,11 @@ describe("production live campaign worker controls", () => {
         throw new Error("array keys trap must not escape");
       }
     });
+    const throwingArrayFrozenStateProxy = new Proxy([...implementedControls], {
+      isExtensible: () => {
+        throw new Error("array frozen-state trap must not escape");
+      }
+    });
     const throwingControlPrototypeProxy = new Proxy({ ...implementedControls[0] }, {
       getPrototypeOf: () => {
         throw new Error("control prototype trap must not escape");
@@ -496,6 +501,7 @@ describe("production live campaign worker controls", () => {
       throwingArrayPrototypeProxy,
       throwingArrayDescriptorProxy,
       throwingArrayKeysProxy,
+      throwingArrayFrozenStateProxy,
       Object.freeze(
         implementedControls.map((control, index) =>
           index === 0 ? throwingControlPrototypeProxy : Object.freeze({ ...control })
@@ -790,8 +796,19 @@ describe("production live campaign worker controls", () => {
         }
       }
     );
+    const frozenStateThrowingInput = new Proxy(
+      {
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: implementedControls
+      },
+      {
+        isExtensible: () => {
+          throw new Error("authorization input frozen-state trap must not escape");
+        }
+      }
+    );
 
-    for (const input of [prototypeThrowingInput, keysThrowingInput]) {
+    for (const input of [prototypeThrowingInput, keysThrowingInput, frozenStateThrowingInput]) {
       expect(() =>
         liveWorkerDeploymentClassIsAuthorized(
           input as Parameters<typeof liveWorkerDeploymentClassIsAuthorized>[0]

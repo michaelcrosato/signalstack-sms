@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 243
+
+- Hardened live-worker proxy frozen-state trap coverage for Run 243.
+- Latest repo truth: `liveWorkerControlsAreImplemented` and `liveWorkerDeploymentClassIsAuthorized` now have explicit unit coverage proving proxy-backed control evidence or authorization wrappers with hostile frozen-state traps deny cleanly without authorizing the reserved `production-live-campaign` class.
+- Focused live-worker control tests, the production worker policy check, `git diff --check`, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 242
 
 - Hardened live-worker authorization wrapper frozen-object handling for Run 242.
