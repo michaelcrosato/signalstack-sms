@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 356  GREEN  nested-globalthis-request-parenthesized-auth-scan  2026-05-22 05:53
+Objective:    Prevent nested whole-parenthesized `globalThis.Request` constructor aliases from hiding mutating-route request body readers before authorization.
+Changed:
+- Added static auth coverage for `((globalThis.Request))` and `((globalThis["Request"]))` constructor aliases before `Request.prototype` body-reader calls.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the nested parenthesized constructor-alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 354  GREEN  nested-parenthesized-request-alias-auth-scan  2026-05-22 05:38
 Objective:    Prevent nested-parenthesized direct `Request` constructor/prototype aliases from hiding mutating-route request body readers before authorization.
 Changed:
