@@ -2312,6 +2312,7 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo and live-worker boundaries remain stable.
+
 ## Run 262  GREEN  live-worker-control-field-order  2026-05-21 20:43
 Objective:    Require exact public-field order on supplied live-worker control entries.
 Changed:
@@ -2321,3 +2322,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo and live-worker boundaries remain stable.
+
+## Run 263  GREEN  inbox-stop-consent-visibility  2026-05-21 20:48
+Objective:    Make STOP-driven opt-out state visible in the product inbox demo path.
+Changed:
+- Added selected-thread consent status to the `/dashboard/inbox` thread header.
+- Extended the seeded product demo path to submit a local STOP reply and verify `OPTED_OUT` visibility without provider sends.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep product demo paths stable while preserving live SMS, provider, billing, AI, and worker hard gates.

@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 263
+
+- No blocker from the product inbox STOP consent visibility work. The change displays existing local tenant-scoped consent status in the selected inbox thread and extends seeded browser coverage for a local STOP reply; it does not use production credentials, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, execute workers, enqueue jobs, call Redis, edit protected gate scripts, hard-delete data, or perform destructive production database actions.
+
 Run number: 261
 
 - No blocker from the mutating API authorization ordering hardening. The change moves the isolated live-test SMS body parse behind the admin role gate and adds local static unit coverage for body parsing after `requireApiRole`; it does not execute routes, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, run workers, enqueue jobs, call Redis, hard-delete data, or perform destructive production database actions.

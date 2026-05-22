@@ -184,9 +184,16 @@ export function InboxWorkspace({
                     : "No conversations yet"}
                 </p>
                 {selectedConversation ? (
-                  <span className="mt-2 inline-flex rounded border border-slate-300 bg-slate-50 px-2 py-1 text-xs font-semibold">
-                    {threadStatus}
-                  </span>
+                  <dl aria-label="Thread status" className="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
+                    <div className="inline-flex gap-1 rounded border border-slate-300 bg-slate-50 px-2 py-1">
+                      <dt>Thread</dt>
+                      <dd>{threadStatus}</dd>
+                    </div>
+                    <div className="inline-flex gap-1 rounded border border-slate-300 bg-slate-50 px-2 py-1">
+                      <dt>Consent</dt>
+                      <dd>{selectedConversation.consentStatus}</dd>
+                    </div>
+                  </dl>
                 ) : null}
               </div>
               {selectedConversation ? (

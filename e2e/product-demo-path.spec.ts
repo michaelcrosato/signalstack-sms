@@ -279,6 +279,7 @@ test("product inbox page manages a local conversation thread", async ({ page }) 
   await expect(page.getByText(phone).first()).toBeVisible();
   await expect(page.getByText("Can you send pricing?").first()).toBeVisible();
   await expect(page.getByRole("heading", { name: "Thread" })).toBeVisible();
+  await expect(page.getByLabel("Thread status").getByText("Consent")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Demo inbound" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Internal note" })).toBeVisible();
 
@@ -286,6 +287,11 @@ test("product inbox page manages a local conversation thread", async ({ page }) 
   await page.getByRole("button", { name: "Add Local Reply" }).click();
   await expect(page.getByRole("status")).toContainText("Local inbound reply added");
   await expect(page.getByText("HELP").first()).toBeVisible();
+
+  await page.getByLabel("Reply body").fill("STOP");
+  await page.getByRole("button", { name: "Add Local Reply" }).click();
+  await expect(page.getByRole("status")).toContainText("Local inbound reply added");
+  await expect(page.getByLabel("Thread status").getByText("OPTED_OUT")).toBeVisible();
 
   await page.getByLabel("Note body").fill(noteBody);
   await page.getByRole("button", { name: "Add Note" }).click();
