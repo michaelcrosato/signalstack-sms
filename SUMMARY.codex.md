@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 253
+
+- Hardened live-worker accessor-wrapper shape denial coverage for Run 253.
+- Latest repo truth: accessor-backed authorization wrapper fields for the reserved `production-live-campaign` class deny without executing getters or inspecting hostile supplied control evidence; the reserved class remains unsupported.
+- Focused live-worker control tests, typecheck, production-worker policy check, diff whitespace check, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 252
 
 - Hardened local worker live-messaging flag readiness for Run 252.

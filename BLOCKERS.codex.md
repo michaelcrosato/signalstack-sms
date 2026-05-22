@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 253
+
+- No blocker from the live-worker accessor-wrapper shape denial coverage. Accessor-backed `workerDeploymentClass` or `controls` fields on future authorization wrapper evidence remain unauthorized for the reserved `production-live-campaign` class and do not execute getters or inspect hostile supplied control evidence; the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.
+
 Run number: 252
 
 - No blocker from the worker live-messaging flag readiness hardening. Runtime-unknown or malformed `LIVE_MESSAGING_ENABLED` values now fail closed before scheduled campaign workers can process jobs; the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.

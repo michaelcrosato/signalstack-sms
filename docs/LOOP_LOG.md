@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 253  GREEN  live-worker-accessor-wrapper-shapes  2026-05-21 20:08
+Objective:    Prove accessor-backed authorization wrapper fields deny before hostile control evidence is inspected.
+Changed:
+- Added unit coverage showing accessor-backed `workerDeploymentClass` and `controls` wrapper fields cannot authorize `production-live-campaign`.
+- Confirmed the denial path does not execute wrapper getters or inspect hostile supplied control evidence.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 250  GREEN  live-worker-hidden-required-fields  2026-05-21 19:44
 Objective:    Prove hidden required fields cannot authorize the reserved live worker class.
 Changed:

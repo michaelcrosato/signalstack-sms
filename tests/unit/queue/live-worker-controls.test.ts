@@ -1062,13 +1062,53 @@ describe("production live campaign worker controls", () => {
         }
       )
     );
+    const accessorClassWrapper = Object.freeze(
+      Object.defineProperties(
+        {},
+        {
+          workerDeploymentClass: {
+            enumerable: true,
+            get: () => {
+              throw new Error("malformed wrapper shapes must not read worker class getters");
+            }
+          },
+          controls: {
+            value: throwingEvidence,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          }
+        }
+      )
+    );
+    const accessorControlsWrapper = Object.freeze(
+      Object.defineProperties(
+        {},
+        {
+          workerDeploymentClass: {
+            value: reservedLiveWorkerDeploymentClass,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          },
+          controls: {
+            enumerable: true,
+            get: () => {
+              throw new Error("malformed wrapper shapes must not read controls getters");
+            }
+          }
+        }
+      )
+    );
 
     for (const input of [
       mutableWrapper,
       missingControlsWrapper,
       extraFieldWrapper,
       hiddenClassWrapper,
-      inheritedControlsWrapper
+      inheritedControlsWrapper,
+      accessorClassWrapper,
+      accessorControlsWrapper
     ]) {
       expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
       expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
