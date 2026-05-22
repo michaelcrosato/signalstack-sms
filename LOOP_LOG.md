@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 312  GREEN  object-prototype-body-reader-scan  2026-05-22 01:32
+Objective:    Prevent `Object.getPrototypeOf(request)` body readers from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to treat `Object.getPrototypeOf(req).json.call(req)`, clone-target `apply`, bound prototype readers, direct reflective invocations, and detached aliases as body parsing.
+- Added synthetic auth unit coverage proving those forms fail before the role gate and pass after it.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the `Object.getPrototypeOf` prototype-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 311  GREEN  template-bracket-body-reader-scan  2026-05-22 01:23
 Objective:    Prevent template-literal bracket body-reader properties from bypassing mutating-route role-gate ordering checks.
 Changed:

@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 312
+
+- Hardened `Object.getPrototypeOf(request)` body-reader authorization coverage for Run 312.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now treats prototype-derived readers such as `Object.getPrototypeOf(req).json.call(req)`, clone-target `.apply(...)`, bound prototype readers, direct `Reflect.apply(Object.getPrototypeOf(req).blob, req, [])`, and detached prototype reader aliases as body parsing when they occur before a mutating handler's top-level `requireApiRole`.
+- Updated the testing contract to name the `Object.getPrototypeOf` prototype-reader boundary.
+- Focused auth coverage and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 311
 
 - Hardened template-literal bracket-notation `Request` body-reader authorization coverage for Run 311.
