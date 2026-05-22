@@ -79,9 +79,16 @@ describe("getApiOperationsStatus", () => {
     expect(status.routes.every((route) => route.path.startsWith("/api/"))).toBe(true);
     expect(status.routes.some((route) => route.path === "/api/webhooks/twilio/inbound")).toBe(true);
     expect(status.routes.some((route) => route.path === "/api/settings/provider/rotations/export")).toBe(true);
-    expect(status.routes.filter((route) => route.externalImpact).map((route) => `${route.method} ${route.path}`)).toEqual([
+    const externalImpactRoutes = status.routes.filter((route) => route.externalImpact);
+
+    expect(externalImpactRoutes.map((route) => `${route.method} ${route.path}`)).toEqual([
       "POST /api/demo/live-test-sms"
     ]);
+    expect(externalImpactRoutes[0]).toMatchObject({
+      area: "Demo",
+      mutates: true,
+      safety: "Twilio live test SMS behind explicit allowlist gates"
+    });
     expect(status.routes.map((route) => `${route.method} ${route.path}`)).toEqual(
       expect.arrayContaining([
         "DELETE /api/contacts/[contactId]",

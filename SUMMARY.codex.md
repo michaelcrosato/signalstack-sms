@@ -1,20 +1,19 @@
 # Codex Summary
 
-Run number: 387
+Run number: 389
 
-- Latest Twilio inbound address normalization trims inbound `From`/`To` address whitespace before local contact/message creation and rejects blank `From` values.
-- Focused webhook helper coverage and the protected local gate passed for the inbound normalization work.
-- Updated webhook contract, NEXT_PROMPTS, BLOCKERS, root loop log, and current state matrix for the inbound address normalization boundary.
-- This run reconciles the docs loop log and active Codex handoff header with the already committed Run 387 repo truth.
-- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 416 tests, Playwright smoke, and build green.
+- Latest API operations inventory hardening pins `POST /api/demo/live-test-sms` as the only external-impact route and asserts its Demo area, mutation flag, and explicit Twilio allowlist-gate safety copy.
+- Focused API operations coverage and the protected local gate passed for Run 389.
+- Updated testing docs/contracts, BLOCKERS, loop logs, and current state matrix for the API external-impact safety-copy boundary.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 417 tests, Playwright smoke, and build green.
 - No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
 
 ## Previous Run
 
-Run number: 386
+Run number: 388
 
-- Latest Twilio webhook idempotency normalization trims provider message IDs and status error codes before local idempotency behavior.
-- Focused webhook helper coverage and the protected local gate passed for Run 386.
+- Latest Twilio inbound body validation rejects whitespace-only inbound webhook `Body` payloads before local message creation while preserving nonblank body text exactly.
+- Focused webhook helper coverage and the protected local gate passed for Run 388.
 - The change was local webhook parsing and test/docs coverage only.
 - No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
 

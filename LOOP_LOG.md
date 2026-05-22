@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 389  GREEN  api-external-impact-safety-copy  2026-05-22 09:05
+Objective:    Pin the API operations inventory safety copy for the single external-impact live-test SMS route.
+Changed:
+- Added API operations unit coverage proving `POST /api/demo/live-test-sms` is the only external-impact route and retains Demo area, mutation, and explicit Twilio allowlist-gate safety copy.
+- Updated testing contract/docs, SUMMARY, BLOCKERS, and current state matrix for the external-impact safety-copy boundary.
+- Kept the change to local inventory test/docs coverage only; no live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep API inventory, product demo, live-worker, provider, billing, live AI, notification, and secret gates stable.
+
 ## Run 387  GREEN  twilio-inbound-address-normalization  2026-05-22 08:50
 Objective:    Normalize Twilio inbound webhook address fields before local contact/message creation.
 Changed:
