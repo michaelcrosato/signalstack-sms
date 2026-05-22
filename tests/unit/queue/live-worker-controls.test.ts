@@ -556,6 +556,63 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects malformed authorization inputs without throwing", () => {
+    const implementedControls = implementedFrozenControls();
+    const accessorBackedInput = Object.freeze(
+      Object.defineProperties(
+        {},
+        {
+          workerDeploymentClass: {
+            enumerable: true,
+            get: () => {
+              throw new Error("worker deployment class getter must not be read");
+            }
+          },
+          controls: {
+            enumerable: true,
+            get: () => {
+              throw new Error("controls getter must not be read");
+            }
+          }
+        }
+      )
+    );
+    const descriptorThrowingInput = new Proxy(
+      {
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: implementedControls
+      },
+      {
+        getOwnPropertyDescriptor: () => {
+          throw new Error("authorization input descriptor trap must not escape");
+        }
+      }
+    );
+
+    const malformedInputs = [
+      null,
+      undefined,
+      "production-live-campaign",
+      reservedLiveWorkerDeploymentClass,
+      Object.freeze({}),
+      accessorBackedInput,
+      descriptorThrowingInput
+    ];
+
+    for (const input of malformedInputs) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          input as Parameters<typeof liveWorkerDeploymentClassIsAuthorized>[0]
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          input as Parameters<typeof liveWorkerDeploymentClassIsAuthorized>[0]
+        )
+      ).toBe(false);
+    }
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 

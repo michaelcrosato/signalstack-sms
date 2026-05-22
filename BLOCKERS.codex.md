@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 234
+
+- No blocker from the live-worker authorization wrapper hardening. Malformed, primitive, accessor-backed, and descriptor-trap authorization wrapper inputs now deny without throwing or reading hostile fields; the reserved `production-live-campaign` class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.
+
 Run number: 233
 
 - No blocker from the live-worker unsupported-class short-circuit coverage. Unsupported worker deployment classes now deny without inspecting supplied control evidence; the reserved `production-live-campaign` class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.

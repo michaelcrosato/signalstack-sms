@@ -345,12 +345,26 @@ export function liveWorkerControlsAreImplemented(controls: unknown = productionL
   );
 }
 
+function authorizationInputDataFieldValue(input: unknown, field: "workerDeploymentClass" | "controls") {
+  if (input === null || typeof input !== "object") {
+    return undefined;
+  }
+
+  const descriptor = safeGetOwnPropertyDescriptor(input, field);
+  return descriptor !== undefined && "value" in descriptor ? descriptor.value : undefined;
+}
+
 export function liveWorkerDeploymentClassIsAuthorized(input: {
   workerDeploymentClass?: string;
   controls?: unknown;
-}) {
+} = {}) {
+  const workerDeploymentClass = authorizationInputDataFieldValue(input, "workerDeploymentClass");
+  if (workerDeploymentClass !== reservedLiveWorkerDeploymentClass) {
+    return false;
+  }
+
+  const controls = authorizationInputDataFieldValue(input, "controls");
   return (
-    input.workerDeploymentClass === reservedLiveWorkerDeploymentClass &&
-    liveWorkerControlsAreImplemented(input.controls ?? productionLiveCampaignWorkerControls)
+    liveWorkerControlsAreImplemented(controls ?? productionLiveCampaignWorkerControls)
   );
 }

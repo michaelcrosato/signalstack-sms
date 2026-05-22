@@ -2089,5 +2089,15 @@ Changed:
 - Added live-worker control unit coverage using throwing proxy evidence against an unsupported deployment class.
 - Updated production worker policy, queue/testing contracts, README, state matrix, and next-prompt handoff text for the short-circuit boundary.
 Gate:         passed
-Commit/Saved: pending
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing production-live-campaign control hardening without enabling live sends.
+
+## Run 234  GREEN  live-worker-authorization-wrapper-input  2026-05-21 18:20
+Objective:    Deny malformed live-worker authorization wrapper input before future production worker authorization can pass.
+Changed:
+- Hardened `liveWorkerDeploymentClassIsAuthorized` to read wrapper fields through data-property descriptors and return false for malformed, primitive, accessor-backed, or descriptor-trap inputs.
+- Added unit coverage proving malformed authorization wrappers do not throw and cannot authorize `production-live-campaign`.
+- Updated production worker policy, queue/testing contracts, roadmap/state/handoff docs, README, SUMMARY, and BLOCKERS.
+Gate:         passed
+Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing production-live-campaign control hardening without enabling live sends.

@@ -43,6 +43,10 @@ const requiredTexts: RequiredText[] = [
     text: "require a frozen control array with frozen entries"
   },
   {
+    file: "docs/PRODUCTION_WORKER_POLICY.md",
+    text: "malformed authorization wrapper input must deny without executing accessor-backed fields"
+  },
+  {
     file: "lib/queue/worker.ts",
     text: "reason: \"production-worker-blocked\""
   },
@@ -117,6 +121,10 @@ const requiredTexts: RequiredText[] = [
   {
     file: "tests/unit/queue/live-worker-controls.test.ts",
     text: "rejects decorated control arrays before live-worker authorization"
+  },
+  {
+    file: "tests/unit/queue/live-worker-controls.test.ts",
+    text: "rejects malformed authorization inputs without throwing"
   },
   {
     file: "tests/unit/queue/live-worker-controls.test.ts",

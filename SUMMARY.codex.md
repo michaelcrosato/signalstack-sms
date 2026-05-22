@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 234
+
+- Hardened live-worker authorization wrapper input handling for Run 234.
+- Latest repo truth: `liveWorkerDeploymentClassIsAuthorized` now reads `workerDeploymentClass` and `controls` only from data-property descriptors, so malformed, primitive, accessor-backed, or descriptor-trap authorization inputs deny cleanly without executing hostile fields; the reserved `production-live-campaign` class remains outside supported worker classes.
+- Focused live-worker control tests, typecheck, production worker policy check, and `git diff --check` passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 233
 
 - Hardened live-worker authorization short-circuit coverage for Run 233.
