@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 358  GREEN  type-asserted-request-constructor-auth-scan  2026-05-22 06:03
+Objective:    Prevent TypeScript type-asserted `Request` constructor aliases from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize `Request as typeof Request` and `globalThis.Request as typeof Request` constructor aliases before `Request.prototype` body-reader checks.
+- Added synthetic auth coverage proving type-asserted direct and `globalThis` constructor aliases fail before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the type-asserted constructor-alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 340  GREEN  globalthis-bracketed-method-auth-scan  2026-05-22 04:04
 Objective:    Prove bracketed built-in method calls through `globalThis.Object` and `globalThis.Reflect` stay behind mutating-route role-gate ordering checks.
 Changed:
