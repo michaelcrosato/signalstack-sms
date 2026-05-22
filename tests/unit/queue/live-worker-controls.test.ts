@@ -916,6 +916,57 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects nullish control public-field values before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const malformedControls = [
+      Object.freeze({
+        id: null as unknown as string,
+        status: "implemented" as const,
+        requirement: implementedControls[0].requirement
+      }),
+      Object.freeze({
+        id: undefined as unknown as string,
+        status: "implemented" as const,
+        requirement: implementedControls[0].requirement
+      }),
+      Object.freeze({
+        id: implementedControls[0].id,
+        status: null as unknown as LiveWorkerControl["status"],
+        requirement: implementedControls[0].requirement
+      }),
+      Object.freeze({
+        id: implementedControls[0].id,
+        status: undefined as unknown as LiveWorkerControl["status"],
+        requirement: implementedControls[0].requirement
+      }),
+      Object.freeze({
+        id: implementedControls[0].id,
+        status: "implemented" as const,
+        requirement: null as unknown as string
+      }),
+      Object.freeze({
+        id: implementedControls[0].id,
+        status: "implemented" as const,
+        requirement: undefined as unknown as string
+      })
+    ];
+
+    for (const malformedControl of malformedControls) {
+      const controls = Object.freeze(
+        implementedControls.map((control, index) => (index === 0 ? malformedControl : Object.freeze({ ...control })))
+      );
+
+      expect(() => liveWorkerControlIdsMatchRequiredChecklist(controls)).not.toThrow();
+      expect(() => liveWorkerControlsUseSupportedStatuses(controls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
+      expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(true);
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).toBe(false);
+    }
+  });
+
   it("does not normalize control public strings before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const stringDriftControls = [
