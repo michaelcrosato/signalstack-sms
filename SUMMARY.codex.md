@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 300
+
+- Hardened `Reflect.apply` request body-reader authorization coverage for Run 300.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now treats direct, cloned-alias, detached-reader, and destructured-reader `Reflect.apply(...)` invocations before a mutating handler's top-level `requireApiRole` as body parsing.
+- Updated the testing contract to name the `Reflect.apply` body-reader boundary.
+- Focused auth coverage, contracts check, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 299
 
 - Hardened destructured optional-call request body-reader authorization coverage for Run 299.
