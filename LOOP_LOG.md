@@ -2517,3 +2517,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 282  GREEN  destructured-request-body-reader-scan  2026-05-21 22:39
+Objective:    Prevent destructured request body readers from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to treat destructured standard `Request` body readers invoked before `requireApiRole` as body parsing.
+- Added synthetic auth unit coverage proving direct and aliased destructured readers fail before the role gate and pass after it.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the destructured request reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
