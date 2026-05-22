@@ -335,6 +335,9 @@ describe("production live campaign worker controls", () => {
   it("rejects non-primitive control-array length descriptor values without coercion", () => {
     const implementedControls = implementedFrozenControls();
     const hostileLengthValue = {
+      [Symbol.toPrimitive]: () => {
+        throw new Error("control array length descriptor primitive conversion must not run");
+      },
       valueOf: () => {
         throw new Error("control array length descriptor value must not be coerced");
       },
@@ -342,36 +345,40 @@ describe("production live campaign worker controls", () => {
         throw new Error("control array length descriptor value must not be stringified");
       }
     };
-    const hostileLengthControls = new Proxy([...implementedControls], {
-      getOwnPropertyDescriptor: (_target, property) => {
-        if (property === "length") {
-          return {
-            value: hostileLengthValue,
-            enumerable: false,
-            writable: false,
-            configurable: false
-          };
+    const boxedLengthValue = Object.freeze(new Number(implementedControls.length));
+
+    for (const lengthValue of [hostileLengthValue, boxedLengthValue]) {
+      const hostileLengthControls = new Proxy([...implementedControls], {
+        getOwnPropertyDescriptor: (_target, property) => {
+          if (property === "length") {
+            return {
+              value: lengthValue,
+              enumerable: false,
+              writable: false,
+              configurable: false
+            };
+          }
+
+          if (property === "0") {
+            throw new Error("invalid length evidence must deny before reading indexed controls");
+          }
+
+          return Reflect.getOwnPropertyDescriptor(_target, property);
         }
+      });
 
-        if (property === "0") {
-          throw new Error("invalid length evidence must deny before reading indexed controls");
-        }
-
-        return Reflect.getOwnPropertyDescriptor(_target, property);
-      }
-    });
-
-    expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(hostileLengthControls)).not.toThrow();
-    expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(hostileLengthControls)).not.toThrow();
-    expect(() => liveWorkerControlsAreImplemented(hostileLengthControls)).not.toThrow();
-    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(hostileLengthControls)).toBe(false);
-    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(hostileLengthControls)).toBe(false);
-    expect(liveWorkerControlsAreImplemented(hostileLengthControls)).toBe(false);
-    expect(
-      liveWorkerDeploymentClassIsAuthorized(
-        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, hostileLengthControls)
-      )
-    ).toBe(false);
+      expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(hostileLengthControls)).not.toThrow();
+      expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(hostileLengthControls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(hostileLengthControls)).not.toThrow();
+      expect(liveWorkerControlArrayExposesOnlyIndexedEntries(hostileLengthControls)).toBe(false);
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(hostileLengthControls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(hostileLengthControls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, hostileLengthControls)
+        )
+      ).toBe(false);
+    }
   });
 
   it("rejects malformed primitive control-array length descriptor values before indexed reads", () => {

@@ -3335,3 +3335,12 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+## Run 406  GREEN  live-worker-boxed-length-evidence  2026-05-22 10:34
+Objective:    Prove boxed numeric and hostile object supplied control-array length descriptors cannot authorize the reserved live worker class.
+Changed:
+- Expanded live-worker control coverage so boxed numeric `length` descriptor values and hostile coercion hooks deny before indexed controls are read.
+- Updated queue/testing contracts, testing docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the boxed-length boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
