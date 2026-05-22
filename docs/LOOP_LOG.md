@@ -2282,3 +2282,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 258  GREEN  live-worker-inherited-extra-wrapper  2026-05-21 20:28
+Objective:    Prove inherited extra authorization-wrapper fields deny before supplied live-worker controls are inspected.
+Changed:
+- Added queue unit coverage using hostile supplied control evidence behind an authorization wrapper with inherited extra fields.
+- Updated SUMMARY and BLOCKERS to record that the change is local unit coverage only.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
