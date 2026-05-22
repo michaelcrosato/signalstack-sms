@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 302  GREEN  assigned-destructured-body-reader-scan  2026-05-22 00:22
+Objective:    Prevent assigned destructured request body readers from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to treat destructuring assignment aliases from request and cloned request sources as body parsing.
+- Added synthetic auth unit coverage proving assigned destructured readers fail before the role gate and pass after it.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the assigned destructured request-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 301  GREEN  reflect-apply-bound-body-reader-scan  2026-05-22 00:19
 Objective:    Prevent `Reflect.apply` bound request body-reader invocations from bypassing mutating-route role-gate ordering checks.
 Changed:

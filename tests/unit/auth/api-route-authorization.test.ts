@@ -341,7 +341,14 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
     `${variableDeclaratorStart}\\{([^}]+)\\}\\s*=\\s*(?:(?:${readerSourcePattern})|(?:${requestSourcePattern})\\s*\\.\\s*clone\\s*\\(\\s*\\))${variableDeclaratorEnd}`,
     "g"
   );
-  const destructuredAliases = [...normalizedBodySlice.matchAll(destructuredReaderAliasPattern)].flatMap((match) =>
+  const assignedDestructuredReaderAliasPattern = new RegExp(
+    `(?:^|[;\\r\\n])\\s*\\(\\s*\\{([^}]+)\\}\\s*=\\s*(?:(?:${readerSourcePattern})|(?:${requestSourcePattern})\\s*\\.\\s*clone\\s*\\(\\s*\\))\\s*\\)\\s*(?=;|\\r?\\n)`,
+    "g"
+  );
+  const destructuredAliases = [
+    ...normalizedBodySlice.matchAll(destructuredReaderAliasPattern),
+    ...normalizedBodySlice.matchAll(assignedDestructuredReaderAliasPattern)
+  ].flatMap((match) =>
     match[1].split(",").flatMap((field) => {
       const fieldMatch = new RegExp(`^\\s*(${requestBodyReaderNames})\\s*(?::\\s*([A-Za-z_$][\\w$]*))?\\s*$`).exec(
         field
@@ -1283,6 +1290,55 @@ describe("API route authorization coverage", () => {
 
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectAliasSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCloneAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("treats assigned destructured request body readers as body parsing for role-gate ordering", () => {
+    const unsafeAssignedSource = `
+      export async function POST(req: Request) {
+        let readJson;
+        ({ json: readJson } = req);
+        const payload = await readJson.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeAssignedCloneSource = `
+      export async function PATCH(req: Request) {
+        const cloned = req.clone();
+        let readText;
+        ({ text: readText } = cloned);
+        const payload = await Reflect.apply(readText, cloned, []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeDirectCloneAssignmentSource = `
+      export async function PUT(req: Request) {
+        let readArrayBuffer;
+        ({ arrayBuffer: readArrayBuffer } = req.clone());
+        const payload = await readArrayBuffer.apply(req, []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        let readJson;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        ({ json: readJson } = req);
+        const payload = await readJson.call(req);
+        return Response.json(payload);
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedCloneSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectCloneAssignmentSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
