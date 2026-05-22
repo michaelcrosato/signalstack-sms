@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 298
+
+- Hardened parenthesized exported const route-handler authorization coverage for Run 298.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now recognizes parenthesized exported const mutating handlers such as `export const POST = (async (request) => { ... })`, so wrapped async arrow/function route handlers cannot bypass per-handler `requireApiRole` coverage or body-reader-before-role-gate ordering checks.
+- Updated the testing contract to name parenthesized exported const handler coverage.
+- Focused auth coverage, typecheck, contracts check, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 297
 
 - Hardened direct bound request body-reader authorization coverage for Run 297.

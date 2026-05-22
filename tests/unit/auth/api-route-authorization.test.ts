@@ -82,10 +82,23 @@ function exportedHandlerSignatureStart(source: string, method: (typeof mutatingM
       return -1;
     }
 
-    return source.indexOf("(", localConstMatch.index + localConstMatch[0].length);
+    return constHandlerParameterStart(source, localConstMatch.index + localConstMatch[0].length, localConstMatch[0]);
   }
 
-  return source.indexOf("(", constMatch.index + constMatch[0].length);
+  return constHandlerParameterStart(source, constMatch.index + constMatch[0].length, constMatch[0]);
+}
+
+function constHandlerParameterStart(source: string, searchStart: number, declarationPrefix: string) {
+  if (/=\s*$/.test(declarationPrefix)) {
+    const parenthesizedHandlerPrefix = /^\s*\(\s*(?:async\s+)?(?:function\b\s*(?:[A-Za-z_$][\w$]*\s*)?)?/.exec(
+      source.slice(searchStart)
+    );
+    if (parenthesizedHandlerPrefix !== null) {
+      return source.indexOf("(", searchStart + parenthesizedHandlerPrefix[0].length);
+    }
+  }
+
+  return source.indexOf("(", searchStart);
 }
 
 function exportedFunctionBody(source: string, method: (typeof mutatingMethods)[number]) {
@@ -572,6 +585,45 @@ describe("API route authorization coverage", () => {
         const payload = await req.clone().arrayBuffer();
         return Response.json({ size: payload.byteLength });
       };
+    `;
+
+    expect(exportedMutatingMethods(missingRoleGateSource)).toEqual(["POST"]);
+    expect(exportedMutatingMethodHasRoleGate(missingRoleGateSource, "POST")).toBe(false);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeArrowSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeFunctionExpressionSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "DELETE")).toBe(false);
+  });
+
+  it("tracks parenthesized exported const mutating route handlers for role-gate and body-order checks", () => {
+    const missingRoleGateSource = `
+      export const POST = (async (request: Request) => {
+        return Response.json({ ok: true });
+      });
+    `;
+    const unsafeArrowSource = `
+      export const PATCH = (async (request: Request) => {
+        const payload = await request.json();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      });
+    `;
+    const unsafeFunctionExpressionSource = `
+      export const PUT = (async function updateRoute(req: Request) {
+        const cloned = req.clone();
+        const payload = await cloned.text();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      });
+    `;
+    const safeSource = `
+      export const DELETE = (async (req: Request) => {
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await req.clone().arrayBuffer();
+        return Response.json({ size: payload.byteLength });
+      });
     `;
 
     expect(exportedMutatingMethods(missingRoleGateSource)).toEqual(["POST"]);
