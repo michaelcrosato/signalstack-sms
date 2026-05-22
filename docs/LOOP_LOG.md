@@ -10,6 +10,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
 
+## Run 436  GREEN  live-worker-non-ordinary-wrapper-evidence  2026-05-22 14:14
+Objective:    Prove non-ordinary authorization wrappers cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker authorization coverage for frozen array, Date, and function-shaped wrappers that carry valid-looking public fields but deny before supplied controls are inspected.
+- Updated queue/testing contracts, production-worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the non-ordinary authorization-wrapper boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 434  GREEN  live-worker-hidden-symbol-entry-evidence  2026-05-22 14:00
 Objective:    Prove hidden symbol metadata on supplied control entries cannot authorize the reserved live worker class.
 Changed:

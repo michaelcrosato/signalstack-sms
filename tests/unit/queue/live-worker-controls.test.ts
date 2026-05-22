@@ -2524,8 +2524,26 @@ describe("production live campaign worker controls", () => {
       controls = throwingEvidence;
     }
     const classInstanceWrapper = Object.freeze(new AuthorizationWrapper());
+    const arrayWrapper = Object.freeze(
+      Object.assign([], {
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: throwingEvidence
+      })
+    );
+    const dateWrapper = Object.freeze(
+      Object.assign(new Date(0), {
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: throwingEvidence
+      })
+    );
+    const functionWrapper = Object.freeze(
+      Object.assign(() => reservedLiveWorkerDeploymentClass, {
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: throwingEvidence
+      })
+    );
 
-    for (const input of [nullPrototypeWrapper, classInstanceWrapper]) {
+    for (const input of [nullPrototypeWrapper, classInstanceWrapper, arrayWrapper, dateWrapper, functionWrapper]) {
       expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
       expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
     }
