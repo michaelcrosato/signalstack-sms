@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 357  GREEN  nested-local-globalthis-alias-auth-scan  2026-05-22 05:59
+Objective:    Prevent nested-parenthesized local `globalThis` aliases from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to repeatedly normalize parenthesized local `globalThis` aliases before constructor-alias checks.
+- Added synthetic auth unit coverage proving `const root = globalThis; const RequestCtor = ((root)).Request; RequestCtor.prototype.text.call(req)` fails before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the nested local `globalThis` alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 356  GREEN  nested-globalthis-request-parenthesized-auth-scan  2026-05-22 05:53
 Objective:    Prevent nested whole-parenthesized `globalThis.Request` constructor aliases from hiding mutating-route request body readers before authorization.
 Changed:
