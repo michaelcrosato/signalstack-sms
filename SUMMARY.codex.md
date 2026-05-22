@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 240
+
+- Hardened live-worker malformed deployment-class short-circuit coverage for Run 240.
+- Latest repo truth: `liveWorkerDeploymentClassIsAuthorized` now has explicit unit coverage proving non-string, nullish, symbol, array, and object deployment-class values deny before supplied controls are inspected, so hostile control evidence cannot run unless the wrapper class value exactly matches `production-live-campaign`.
+- Focused live-worker control tests and the production worker policy check passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 239
 
 - Hardened live-worker authorization wrapper field-order handling for Run 239.

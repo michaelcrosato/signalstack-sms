@@ -2120,3 +2120,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing production-live-campaign control hardening without enabling live sends.
+
+## Run 240  GREEN  live-worker-malformed-class-short-circuit  2026-05-21 18:52
+Objective:    Prove malformed deployment-class values deny before inspecting supplied live-worker controls.
+Changed:
+- Added unit coverage using hostile supplied control evidence against nullish, non-string, symbol, array, and object deployment-class values.
+- Updated production worker policy, queue/testing contracts, roadmap/state/handoff docs, README, SUMMARY, and BLOCKERS for the malformed-class short-circuit boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing production-live-campaign control hardening without enabling live sends.

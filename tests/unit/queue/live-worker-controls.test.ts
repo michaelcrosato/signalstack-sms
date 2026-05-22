@@ -544,6 +544,43 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("does not inspect supplied controls for malformed deployment class values", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("malformed worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("malformed worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("malformed worker classes must not inspect control evidence");
+      }
+    });
+
+    const malformedClassValues = [
+      null,
+      undefined,
+      42,
+      true,
+      Symbol("production-live-campaign"),
+      Object.freeze(["production-live-campaign"]),
+      Object.freeze({ value: reservedLiveWorkerDeploymentClass })
+    ];
+
+    for (const workerDeploymentClass of malformedClassValues) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("requires frozen authorization wrapper data descriptors before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const mutableWrapper = {
