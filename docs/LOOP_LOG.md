@@ -2006,3 +2006,13 @@ Changed:
 Gate:         passed
 Commit/Saved: pending
 Next:         Keep product demo paths stable and continue production-live-campaign control hardening without enabling live workers.
+
+## Run 216  GREEN  live-worker-control-field-shape  2026-05-21 17:26
+Objective:    Require own enumerable data fields before future live worker control evidence can authorize `production-live-campaign`.
+Changed:
+- Tightened live-worker control public-field validation to reject hidden extra fields and require own enumerable data descriptors for `id`, `status`, and `requirement`.
+- Added unit coverage proving accessor-backed, prototype-backed, and non-enumerable extra-field controls remain unauthorized.
+- Updated queue/testing contracts, production worker policy docs, roadmap/state/handoff notes, SUMMARY, and BLOCKERS.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue production-live-campaign control hardening without enabling live workers.

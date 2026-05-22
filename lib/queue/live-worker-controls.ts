@@ -89,11 +89,18 @@ export function liveWorkerControlIdsMatchRequiredChecklist(controls: readonly Li
 
 export function liveWorkerControlsExposeOnlyPublicFields(controls: readonly LiveWorkerControl[]) {
   return controls.every((control) => {
-    const keys = Object.keys(control);
+    const ownKeys = Reflect.ownKeys(control);
     return (
-      Object.getOwnPropertySymbols(control).length === 0 &&
-      keys.length === liveWorkerControlPublicFields.length &&
-      liveWorkerControlPublicFields.every((field) => keys.includes(field))
+      ownKeys.length === liveWorkerControlPublicFields.length &&
+      liveWorkerControlPublicFields.every((field) => {
+        const descriptor = Object.getOwnPropertyDescriptor(control, field);
+        return (
+          ownKeys.includes(field) &&
+          descriptor !== undefined &&
+          "value" in descriptor &&
+          descriptor.enumerable === true
+        );
+      })
     );
   });
 }

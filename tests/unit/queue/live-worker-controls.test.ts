@@ -105,6 +105,18 @@ describe("production live campaign worker controls", () => {
   it("rejects control arrays with non-public fields before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const symbolField = Symbol("unsafe-live-worker-field");
+    const nonEnumerableField = Object.freeze(
+      Object.defineProperty(
+        {
+          ...implementedControls[0]
+        },
+        "reviewerBypass",
+        {
+          value: true,
+          enumerable: false
+        }
+      )
+    );
 
     expect(liveWorkerControlsExposeOnlyPublicFields(productionLiveCampaignWorkerControls)).toBe(true);
     expect(liveWorkerControlsAreImplemented(implementedControls)).toBe(true);
@@ -130,6 +142,67 @@ describe("production live campaign worker controls", () => {
           implementedControls.map((control, index) =>
             Object.freeze(index === 0 ? Object.assign({ ...control }, { [symbolField]: "unsafe" }) : { ...control })
           )
+        )
+      )
+    ).toBe(false);
+    expect(
+      liveWorkerControlsAreImplemented(
+        Object.freeze(
+          implementedControls.map((control, index) => (index === 0 ? nonEnumerableField : Object.freeze({ ...control })))
+        )
+      )
+    ).toBe(false);
+  });
+
+  it("requires live-worker controls to expose own enumerable data fields", () => {
+    const implementedControls = implementedFrozenControls();
+    const accessorBackedControl = Object.freeze(
+      Object.defineProperties(
+        {},
+        {
+          id: {
+            enumerable: true,
+            get: () => implementedControls[0].id
+          },
+          status: {
+            enumerable: true,
+            get: () => "implemented"
+          },
+          requirement: {
+            enumerable: true,
+            get: () => implementedControls[0].requirement
+          }
+        }
+      )
+    ) as LiveWorkerControl;
+    const prototypeBackedControl = Object.freeze(
+      Object.create(implementedControls[0], {
+        status: {
+          value: "implemented",
+          enumerable: true
+        }
+      })
+    ) as LiveWorkerControl;
+
+    expect(liveWorkerControlsExposeOnlyPublicFields(implementedControls)).toBe(true);
+    expect(
+      liveWorkerControlsExposeOnlyPublicFields(
+        Object.freeze(
+          implementedControls.map((control, index) => (index === 0 ? accessorBackedControl : Object.freeze({ ...control })))
+        )
+      )
+    ).toBe(false);
+    expect(
+      liveWorkerControlsAreImplemented(
+        Object.freeze(
+          implementedControls.map((control, index) => (index === 0 ? accessorBackedControl : Object.freeze({ ...control })))
+        )
+      )
+    ).toBe(false);
+    expect(
+      liveWorkerControlsAreImplemented(
+        Object.freeze(
+          implementedControls.map((control, index) => (index === 0 ? prototypeBackedControl : Object.freeze({ ...control })))
         )
       )
     ).toBe(false);
