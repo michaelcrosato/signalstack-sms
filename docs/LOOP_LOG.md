@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 396  GREEN  codex-handoff-truth-sync  2026-05-22 09:38
+Objective:    Sync active Codex handoff truth with the latest validated Twilio terminal-transition regression run.
+Changed:
+- Updated SUMMARY.codex.md and BLOCKERS.codex.md so the active Codex handoff starts at Run 395 instead of stale Run 394.
+- Refreshed the current state matrix latest protected gate stamp for this Run 396 validation.
+- Kept the change to handoff/state truth only; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue safety-gate hardening without enabling live external-impact paths.
+
 ## Run 395  GREEN  twilio-terminal-transition-regression  2026-05-22 09:34
 Objective:    Prove Twilio terminal delivery updates overwrite stale opposite terminal timestamps when applied to local message metadata.
 Changed:

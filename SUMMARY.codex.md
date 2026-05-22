@@ -1,5 +1,25 @@
 # Codex Summary
 
+Run number: 396
+
+- Latest active Codex handoff truth now starts at Run 395, matching the loop logs and current state matrix instead of stale Run 394.
+- Focused webhook helper coverage passed: `npm run test -- tests/unit/messaging/twilio-webhooks.test.ts`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 421 tests, Playwright smoke, and build green.
+- Updated SUMMARY, BLOCKERS, root/docs loop logs, and current state matrix for the handoff truth synchronization.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
+Run number: 395
+
+- Latest Twilio webhook transition regression coverage proves delivered-after-failed and undelivered-after-delivered status updates clear the stale opposite terminal timestamp before local delivery metadata is stored.
+- Focused webhook helper coverage passed: `npm run test -- tests/unit/messaging/twilio-webhooks.test.ts`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 421 tests, Playwright smoke, and build green.
+- Updated SUMMARY, BLOCKERS, loop logs, and current state matrix for the explicit terminal-transition regression boundary.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 394
 
 - Latest Twilio webhook normalization now falls back from blank modern `MessageSid`/`MessageStatus` fields to nonblank legacy `SmsSid`/`SmsStatus` aliases before deriving local idempotency keys.

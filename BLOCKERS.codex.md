@@ -1,5 +1,13 @@
 # Codex Blockers
 
+Run number: 396
+
+- No blocker from Codex handoff truth synchronization. Focused webhook helper coverage and the protected local gate passed. The change updates handoff/state/log truth only and does not call Twilio, use production credentials, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, execute workers, enqueue jobs, call Redis, hard-delete data, or perform destructive production database actions.
+
+Run number: 395
+
+- No blocker from Twilio terminal transition regression coverage. Focused webhook helper coverage and the protected local gate passed. The change is local webhook transition test coverage plus handoff truth synchronization only and does not call Twilio, use production credentials, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, execute workers, enqueue jobs, call Redis, hard-delete data, or perform destructive production database actions.
+
 Run number: 394
 
 - No blocker from Twilio blank alias fallback normalization. Focused webhook helper coverage and the protected local gate passed. The change is local webhook parsing plus contract/docs coverage only and does not call Twilio, use production credentials, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, execute workers, enqueue jobs, call Redis, hard-delete data, or perform destructive production database actions.
