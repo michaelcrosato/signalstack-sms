@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 315
+
+- Hardened `Reflect.getOwnPropertyDescriptor` body-reader authorization coverage for Run 315.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes descriptor-derived body readers from `Reflect.getOwnPropertyDescriptor(Request.prototype, "...")`, `Reflect.getOwnPropertyDescriptor(Object.getPrototypeOf(req), "...")`, and `Reflect.getOwnPropertyDescriptor(Reflect.getPrototypeOf(req), "...")`, so those calls are treated as body parsing when they occur before a mutating handler's top-level `requireApiRole`.
+- Updated the testing contract and testing docs to name the Reflect descriptor-derived body-reader boundary.
+- Focused auth coverage, contracts check, typecheck, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 314
 
 - Hardened `Reflect.getPrototypeOf(request)` body-reader authorization coverage for Run 314.

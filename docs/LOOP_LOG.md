@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 315  GREEN  reflect-descriptor-body-reader-scan  2026-05-22 01:48
+Objective:    Prevent `Reflect.getOwnPropertyDescriptor` body-reader descriptors from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize `Reflect.getOwnPropertyDescriptor(...)` body-reader descriptors for `Request.prototype`, `Object.getPrototypeOf(req)`, and `Reflect.getPrototypeOf(req)`.
+- Added synthetic auth unit coverage for optional, non-null, bracket-value, prototype-target, and Reflect-prototype descriptor readers before `requireApiRole`.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the Reflect descriptor-derived body-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 313  GREEN  object-prototype-descriptor-body-reader-scan  2026-05-22 01:37
 Objective:    Prevent descriptor-derived `Object.getPrototypeOf(request)` body readers from bypassing mutating-route role-gate ordering checks.
 Changed:
