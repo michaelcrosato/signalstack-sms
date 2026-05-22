@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 261
+
+- Tightened mutating API authorization ordering for Run 261.
+- Latest repo truth: local mutating API handlers are now scanned to ensure `request.json()` body parsing happens only after the handler's own `requireApiRole` call, with signed Twilio webhook handlers remaining the only exception.
+- Moved `/api/demo/live-test-sms` payload parsing behind the admin role gate so the isolated live-test surface does not parse or validate request bodies before authorization.
+- Focused auth and live-test SMS unit coverage passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 260
 
 - Tightened static API route authorization coverage for Run 260.

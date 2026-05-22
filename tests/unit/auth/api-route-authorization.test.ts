@@ -86,6 +86,14 @@ function exportedMutatingMethodHasRoleGate(source: string, method: (typeof mutat
   return /\brequireApiRole\s*\(/.test(exportedFunctionBody(source, method));
 }
 
+function mutatingMethodParsesBodyBeforeRoleGate(source: string, method: (typeof mutatingMethods)[number]) {
+  const body = exportedFunctionBody(source, method);
+  const roleGateIndex = body.search(/\brequireApiRole\s*\(/);
+  const bodyParseIndex = body.search(/\brequest\s*\.\s*json\s*\(/);
+
+  return bodyParseIndex !== -1 && (roleGateIndex === -1 || bodyParseIndex < roleGateIndex);
+}
+
 describe("API route authorization coverage", () => {
   it("keeps each local mutating API handler behind its own role check unless it uses signed webhooks", () => {
     const apiRoot = path.join(process.cwd(), "app", "api");
@@ -103,6 +111,24 @@ describe("API route authorization coverage", () => {
     });
 
     expect(missingRoleGate).toEqual([]);
+  });
+
+  it("keeps local mutating API body parsing behind each handler's role check", () => {
+    const apiRoot = path.join(process.cwd(), "app", "api");
+    const bodyParsedBeforeRoleGate = routeFiles(apiRoot).flatMap((filePath) => {
+      const source = readFileSync(filePath, "utf8");
+      const methods = exportedMutatingMethods(source);
+      const repoPath = toRepoPath(path.relative(process.cwd(), filePath));
+      if (methods.length === 0 || roleGateExceptionRoutes.has(repoPath)) {
+        return [];
+      }
+
+      return methods
+        .filter((method) => mutatingMethodParsesBodyBeforeRoleGate(source, method))
+        .map((method) => `${method} ${repoPath}`);
+    });
+
+    expect(bodyParsedBeforeRoleGate).toEqual([]);
   });
 
   it("keeps role-gate exceptions limited to signed Twilio webhook handlers", () => {

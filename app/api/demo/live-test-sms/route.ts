@@ -12,16 +12,16 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const payload = liveTestSmsSchema.safeParse(await request.json());
-
-  if (!payload.success) {
-    return NextResponse.json({ error: "Invalid live test SMS payload.", issues: payload.error.flatten() }, { status: 400 });
-  }
-
   const currentOrg = await getOrCreateCurrentOrg();
   const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
   if (roleResponse) {
     return roleResponse;
+  }
+
+  const payload = liveTestSmsSchema.safeParse(await request.json());
+
+  if (!payload.success) {
+    return NextResponse.json({ error: "Invalid live test SMS payload.", issues: payload.error.flatten() }, { status: 400 });
   }
 
   try {

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 261  GREEN  mutating-api-body-parse-after-role  2026-05-21 20:38
+Objective:    Keep mutating API request body parsing behind per-handler role gates.
+Changed:
+- Moved `/api/demo/live-test-sms` JSON payload parsing behind its admin `requireApiRole` check.
+- Added static auth unit coverage proving local mutating API handlers do not call `request.json()` before their own role gate, with signed Twilio webhooks still the only exception.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the authorization-ordering boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 correctness checks green while product demo and live-worker boundaries remain stable.
+
 ## Run 253  GREEN  live-worker-accessor-wrapper-shapes  2026-05-21 20:08
 Objective:    Prove accessor-backed authorization wrapper fields deny before hostile control evidence is inspected.
 Changed:

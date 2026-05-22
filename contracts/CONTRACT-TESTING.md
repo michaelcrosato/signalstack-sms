@@ -19,6 +19,7 @@ Post-MVP local operations status:
 
 - Unit tests must verify that the system-status helper reports demo-safe defaults as external-impact blocked.
 - Unit tests must verify that every implemented local mutating API handler contains its own `requireApiRole` call, except the Twilio inbound/status webhook handlers, which must remain limited to signed webhook validation.
+- Unit tests must verify that local mutating API handlers parse request bodies only after their own `requireApiRole` call, except signed Twilio webhook handlers.
 - Unit tests must verify that local worker readiness fails closed for runtime-unknown or malformed `LIVE_MESSAGING_ENABLED` values, allowing only unset, empty, or exactly `false` live-messaging flags with the dummy provider.
 - Queue worker unit tests must verify that both the database worker and BullMQ worker reject every production-like runtime marker (`NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, and `APP_ENV`) before provider or future live-worker-class checks can fall through.
 - Unit tests must verify that the shared operations-index inventory keeps all grouped local operator surfaces on app routes, has no duplicate routes, points every listed surface at an implemented `app/**/page.tsx`, lists every implemented local operator page, and includes current safety-sensitive surfaces such as release, health, environment, provider, readiness-audit, notification, and security operations.
