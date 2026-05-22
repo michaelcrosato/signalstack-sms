@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 330
+
+- Hardened computed destructured descriptor/prototype lookup alias authorization coverage for Run 330.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now resolves computed destructured `Object`/`Reflect` lookup aliases such as `{ ["getOwnPropertyDescriptor"]: getDescriptor }` and `{ [lookupName]: getPrototype }`, so descriptor-derived standard `Request` body readers cannot parse a mutating route request body before the handler's top-level `requireApiRole`.
+- Updated the testing contract and testing docs to name the computed destructured lookup-alias boundary.
+- Focused auth coverage passed; protected local gate status is recorded in `LOOP_LOG.md`.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 329
 
 - Hardened parenthesized descriptor-alias body-reader authorization coverage for Run 329.

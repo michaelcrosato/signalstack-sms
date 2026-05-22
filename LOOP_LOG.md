@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 330  GREEN  computed-destructured-lookup-alias-body-reader-scan  2026-05-22 03:17
+Objective:    Prevent computed destructured descriptor/prototype lookup aliases from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to resolve computed destructured `Object`/`Reflect` lookup aliases such as `{ ["getOwnPropertyDescriptor"]: getDescriptor }` and `{ [lookupName]: getPrototype }`.
+- Added synthetic auth unit coverage proving computed literal and local property-alias descriptor/prototype lookup aliases fail before `requireApiRole` and pass after it.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the computed destructured lookup-alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 329  GREEN  parenthesized-descriptor-alias-body-reader-scan  2026-05-22 03:13
 Objective:    Prevent parenthesized or const-asserted descriptor-alias property names from bypassing mutating-route role-gate ordering checks.
 Changed:
