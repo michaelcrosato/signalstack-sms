@@ -1014,6 +1014,17 @@ describe("production live campaign worker controls", () => {
         }
       }
     );
+    const descriptorThrowingInput = new Proxy(
+      {
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: implementedControls
+      },
+      {
+        getOwnPropertyDescriptor: () => {
+          throw new Error("authorization input descriptor trap must not escape");
+        }
+      }
+    );
     const keysThrowingInput = new Proxy(
       {
         workerDeploymentClass: reservedLiveWorkerDeploymentClass,
@@ -1037,7 +1048,7 @@ describe("production live campaign worker controls", () => {
       }
     );
 
-    for (const input of [prototypeThrowingInput, keysThrowingInput, frozenStateThrowingInput]) {
+    for (const input of [prototypeThrowingInput, descriptorThrowingInput, keysThrowingInput, frozenStateThrowingInput]) {
       expect(() =>
         liveWorkerDeploymentClassIsAuthorized(
           input as Parameters<typeof liveWorkerDeploymentClassIsAuthorized>[0]

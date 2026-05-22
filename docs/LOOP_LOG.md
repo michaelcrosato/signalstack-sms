@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 373  GREEN  live-worker-wrapper-descriptor-trap  2026-05-22 07:33
+Objective:    Prove live-worker authorization wrapper descriptor proxy traps deny cleanly without escaping.
+Changed:
+- Added queue unit coverage for a hostile `getOwnPropertyDescriptor` trap on the `production-live-campaign` authorization wrapper.
+- Updated testing docs, SUMMARY, BLOCKERS, and current state matrix for the wrapper descriptor-trap boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep Phase 0 live-worker, API authorization, provider, billing, live AI, notification, and secret gates stable.
+
 ## Run 372  GREEN  live-worker-deployment-class-noncoercion  2026-05-22 07:29
 Objective:    Prove malformed live-worker deployment-class object values deny without coercion or supplied-control inspection.
 Changed:
