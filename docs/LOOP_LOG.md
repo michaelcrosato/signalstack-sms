@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 304  GREEN  reflect-get-template-property-body-reader-scan  2026-05-22 00:40
+Objective:    Prevent plain template-literal `Reflect.get` body-reader property names from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Normalized plain template-literal `Reflect.get` standard body-reader lookups before non-code masking in the static mutating API authorization scanner.
+- Added synthetic auth unit coverage proving direct request, inline cloned request, and assigned alias template-literal `Reflect.get` reader forms fail before the role gate while post-gate reads remain allowed.
+- Updated the testing contract for the template-literal `Reflect.get` body-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 303  GREEN  reflect-get-body-reader-scan  2026-05-22 00:30
 Objective:    Prevent `Reflect.get` request body-reader lookups from bypassing mutating-route role-gate ordering checks.
 Changed:

@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 304
+
+- Hardened plain template-literal `Reflect.get` request body-reader authorization coverage for Run 304.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes plain template-literal `Reflect.get(req, \`json\`)`-style standard body-reader lookups before non-code masking, so direct request, inline cloned request, and assigned alias forms are treated as body parsing when they occur before a mutating handler's top-level `requireApiRole`.
+- Updated the testing contract to name the quoted and plain template-literal `Reflect.get` body-reader property boundary.
+- Focused auth coverage, contracts check, typecheck, lint, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 303
 
 - Hardened `Reflect.get` request body-reader authorization coverage for Run 303.

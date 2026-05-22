@@ -178,14 +178,14 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
     .replace(/\?\.\s*\[/g, "[")
     .replace(
       new RegExp(
-        `Reflect\\s*\\.\\s*get\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\.\\s*clone\\s*\\(\\s*\\)\\s*,\\s*["'](${requestBodyReaderNames})["']\\s*\\)`,
+        `Reflect\\s*\\.\\s*get\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\.\\s*clone\\s*\\(\\s*\\)\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)`,
         "g"
       ),
       "$1.clone().$2"
     )
     .replace(
       new RegExp(
-        `\\bReflect\\s*\\.\\s*get\\s*\\(\\s*([^,]+?)\\s*,\\s*["'](${requestBodyReaderNames})["']\\s*\\)`,
+        `\\bReflect\\s*\\.\\s*get\\s*\\(\\s*([^,]+?)\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)`,
         "g"
       ),
       "$1.$2"
@@ -1670,7 +1670,7 @@ describe("API route authorization coverage", () => {
   it("treats Reflect.get request body readers as body parsing for role-gate ordering", () => {
     const unsafeDirectSource = `
       export async function POST(req: Request) {
-        const payload = await Reflect.get(req, "json").call(req);
+        const payload = await Reflect.get(req, \`json\`).call(req);
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
         if (roleResponse) return roleResponse;
         return Response.json(payload);
@@ -1687,7 +1687,7 @@ describe("API route authorization coverage", () => {
     `;
     const unsafeInlineCloneSource = `
       export async function POST(req: Request) {
-        const payload = await Reflect.get(req.clone(), "blob").call(req.clone());
+        const payload = await Reflect.get(req.clone(), \`blob\`).call(req.clone());
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
         if (roleResponse) return roleResponse;
         return Response.json({ size: payload.size });
@@ -1705,7 +1705,7 @@ describe("API route authorization coverage", () => {
     const unsafeAssignedAliasSource = `
       export async function DELETE(req: Request) {
         let readBlob;
-        readBlob = Reflect.get(req, "blob");
+        readBlob = Reflect.get(req, \`blob\`);
         const payload = await readBlob.call(req);
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
         if (roleResponse) return roleResponse;
