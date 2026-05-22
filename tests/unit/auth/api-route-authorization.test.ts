@@ -141,8 +141,22 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
     return true;
   }
 
+  const readerSourcePattern = [escapedRequestParameterName, ...cloneAliases.map(escapeRegExp)].join("|");
+  const readerMethodAliasPattern = new RegExp(
+    `\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s*(?::[^=;\\n]+)?=\\s*(?:${readerSourcePattern})\\s*\\.\\s*(?:${requestBodyReaderNames})\\s*(?:;|\\r?\\n)`,
+    "g"
+  );
+  const readerMethodAliases = [...normalizedBodySlice.matchAll(readerMethodAliasPattern)].map((match) => match[1]);
+  if (
+    readerMethodAliases.some((alias) =>
+      new RegExp(`\\b${escapeRegExp(alias)}\\s*(?:\\(|\\.\\s*(?:call|apply)\\s*\\()`).test(maskedBodySlice)
+    )
+  ) {
+    return true;
+  }
+
   const destructuredReaderAliasPattern = new RegExp(
-    `\\b(?:const|let|var)\\s*\\{([^}]+)\\}\\s*=\\s*${escapedRequestParameterName}\\s*(?:\\.\\s*clone\\s*\\(\\s*\\))?\\s*(?:;|\\r?\\n)`,
+    `\\b(?:const|let|var)\\s*\\{([^}]+)\\}\\s*=\\s*(?:(?:${readerSourcePattern})|${escapedRequestParameterName}\\s*\\.\\s*clone\\s*\\(\\s*\\))\\s*(?:;|\\r?\\n)`,
     "g"
   );
   const destructuredAliases = [...normalizedBodySlice.matchAll(destructuredReaderAliasPattern)].flatMap((match) =>
@@ -565,6 +579,42 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "PATCH")).toBe(false);
+  });
+
+  it("treats detached request body reader aliases as body parsing for role-gate ordering", () => {
+    const unsafeDirectAliasSource = `
+      export async function POST(req: Request) {
+        const readJson = req.json;
+        const payload = await readJson.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeCloneAliasSource = `
+      export async function POST(req: Request) {
+        const cloned = req.clone();
+        const { text: readText } = cloned;
+        const payload = await readText.call(cloned);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const cloned = req.clone();
+        const readFormData = cloned.formData;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await readFormData.call(cloned);
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCloneAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
   it("ignores comment and string mentions of requireApiRole before body-reader ordering checks", () => {

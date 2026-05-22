@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 284
+
+- Hardened detached request body-reader authorization coverage for Run 284.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now treats detached reader aliases such as `const readJson = req.json; await readJson.call(req)` and destructured readers taken from a cloned request alias as body parsing that must remain after each mutating handler's own `requireApiRole` call, with signed Twilio webhook handlers remaining the only exception.
+- Updated the testing contract to name detached reader aliases and destructured readers from cloned request aliases.
+- Focused auth coverage and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 283
 
 - Hardened destructured cloned request body-reader authorization coverage for Run 283.
