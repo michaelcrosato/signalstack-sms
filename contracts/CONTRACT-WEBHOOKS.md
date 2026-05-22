@@ -12,7 +12,7 @@ Implemented foundations:
 Rules:
 
 - Webhook requests are `application/x-www-form-urlencoded`.
-- Signature validation uses the exact request URL, all received parameters, and `TWILIO_AUTH_TOKEN`.
+- Signature validation uses the exact request URL, all received parameters including unknown provider fields, and `TWILIO_AUTH_TOKEN`.
 - Missing or invalid signatures return `403`.
 - Missing required normalized fields return `400`.
 - Valid and duplicate events return `204`.

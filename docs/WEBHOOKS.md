@@ -5,7 +5,7 @@ Twilio webhook foundations are implemented for inbound message and delivery-stat
 - `POST /api/webhooks/twilio/inbound`
 - `POST /api/webhooks/twilio/status`
 
-Both handlers validate `X-Twilio-Signature` using `TWILIO_AUTH_TOKEN`, the exact request URL, and all form parameters. Invalid or unsigned requests return `403`.
+Both handlers validate `X-Twilio-Signature` using `TWILIO_AUTH_TOKEN`, the exact request URL, and all form parameters, including unknown provider fields. Invalid or unsigned requests return `403`.
 
 Valid webhook payloads are stored in `WebhookEvent` with the full raw form payload, including unknown provider fields. Duplicate idempotency keys within the current organization return `204` without repeating local message mutations. Delivery-status idempotency keys normalize provider status casing and surrounding whitespace before storage so provider retries cannot create duplicate local events only by changing status formatting. Inbound webhooks reject whitespace-only bodies while preserving nonblank body text exactly for local message creation.
 

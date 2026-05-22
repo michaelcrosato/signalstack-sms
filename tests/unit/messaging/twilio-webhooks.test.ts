@@ -28,6 +28,31 @@ describe("Twilio webhook helpers", () => {
     expect(validateTwilioSignature({ authToken: "test_token", signature: "bad", url, params })).toBe(false);
   });
 
+  it("includes unknown provider fields in signature validation", () => {
+    const url = "https://example.com/api/webhooks/twilio/inbound";
+    const params = {
+      From: "+15555550100",
+      Body: "HELP",
+      MessageSid: "SM123",
+      FutureField: "must affect signature"
+    };
+    const signature = sign(url, params, "test_token");
+
+    expect(validateTwilioSignature({ authToken: "test_token", signature, url, params })).toBe(true);
+    expect(
+      validateTwilioSignature({
+        authToken: "test_token",
+        signature,
+        url,
+        params: {
+          From: params.From,
+          Body: params.Body,
+          MessageSid: params.MessageSid
+        }
+      })
+    ).toBe(false);
+  });
+
   it("normalizes inbound payloads without dropping unknown fields", () => {
     expect(
       normalizeTwilioInbound({

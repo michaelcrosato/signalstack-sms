@@ -257,6 +257,7 @@ Post-MVP API operations inventory:
 Post-MVP webhook operations view:
 
 - Webhook helper tests must verify delivery-status casing and surrounding whitespace are normalized before status idempotency keys are derived, preventing duplicate local webhook events from provider retry formatting drift.
+- Webhook helper tests must verify Twilio signature validation includes unknown provider fields before inbound/status webhook handlers can trust or store a payload.
 - Webhook helper tests must verify blank `MessageSid`/`MessageStatus` values fall back to nonblank legacy `SmsSid`/`SmsStatus` aliases before deriving idempotency keys.
 - Webhook helper tests must verify inbound webhook bodies reject whitespace-only payloads while preserving nonblank body text exactly for local message creation.
 - Webhook helper tests must verify terminal Twilio delivery transitions clear the opposite terminal timestamp so local delivery metadata cannot show stale delivered and failed states at once.

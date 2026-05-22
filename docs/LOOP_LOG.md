@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 397  GREEN  twilio-unknown-field-signature  2026-05-22 09:42
+Objective:    Prove Twilio webhook signature validation includes unknown provider fields before local payload trust/storage.
+Changed:
+- Added webhook helper regression coverage that signs an inbound payload with a future provider field and proves removing that field invalidates the signature.
+- Updated webhook/testing contracts, webhook/testing docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the unknown-field signature boundary.
+- Kept the change to local webhook helper coverage and docs only; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep webhook validation/idempotency, product demo, live-worker, provider, billing, live AI, notification, and secret gates stable.
+
 ## Run 396  GREEN  codex-handoff-truth-sync  2026-05-22 09:38
 Objective:    Sync active Codex handoff truth with the latest validated Twilio terminal-transition regression run.
 Changed:
