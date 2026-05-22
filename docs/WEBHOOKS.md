@@ -9,6 +9,6 @@ Both handlers validate `X-Twilio-Signature` using `TWILIO_AUTH_TOKEN`, the exact
 
 Valid webhook payloads are stored in `WebhookEvent` with the full raw form payload, including unknown provider fields. Duplicate idempotency keys within the current organization return `204` without repeating local message mutations. Delivery-status idempotency keys normalize provider status casing and surrounding whitespace before storage so provider retries cannot create duplicate local events only by changing status formatting. Inbound webhooks reject whitespace-only bodies while preserving nonblank body text exactly for local message creation.
 
-Inbound webhooks create local inbox messages through the existing demo-safe inbound path, so STOP updates local consent and HELP is recorded without automatic provider replies. Status webhooks update matching local messages by provider message ID with provider status, optional error code, and delivered/failed timestamps.
+Inbound webhooks create local inbox messages through the existing demo-safe inbound path, so STOP updates local consent and HELP is recorded without automatic provider replies. Status webhooks update matching local messages by provider message ID with provider status, optional error code, and delivered/failed timestamps; terminal delivered versus failed/undelivered transitions clear the opposite terminal timestamp to avoid stale delivery metadata.
 
 Webhook handlers must never send SMS replies, email, notifications, billing events, live AI calls, or provider mutations.

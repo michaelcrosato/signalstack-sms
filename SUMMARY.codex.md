@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 393
+
+- Latest Twilio status transition hardening clears stale terminal timestamps when delivery-status webhooks move a local message into delivered, failed, or undelivered states.
+- Focused webhook helper coverage passed: `npm run test -- tests/unit/messaging/twilio-webhooks.test.ts`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 418 tests, Playwright smoke, and build green.
+- Updated webhook/testing contracts, webhook/testing docs, BLOCKERS, loop logs, NEXT_PROMPTS, and current state matrix for the terminal timestamp cleanup boundary.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 391
 
 - Latest live-worker control coverage proves duplicate proxy-reflected supplied control-array keys deny cleanly before `production-live-campaign` authorization.

@@ -20,7 +20,7 @@ Rules:
 - Delivery-status idempotency keys normalize provider message ID whitespace, provider status casing/whitespace, and provider error-code whitespace before local storage.
 - Inbound webhook idempotency keys normalize provider message ID whitespace before local storage, inbound `From`/`To` addresses are trimmed before local contact/message creation, and whitespace-only inbound bodies are rejected without trimming stored nonblank body text.
 - Inbound webhooks may create local inbox messages and local STOP/HELP consent effects through the same demo-safe inbound path.
-- Status webhooks may update matching local `Message` rows by `providerMessageId` with provider status, provider error code, and delivered/failed timestamps.
+- Status webhooks may update matching local `Message` rows by `providerMessageId` with provider status, provider error code, and delivered/failed timestamps. Delivered transitions clear stale failed timestamps; failed or undelivered transitions clear stale delivered timestamps.
 
 ## Post-MVP Local Webhook Operations
 

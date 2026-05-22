@@ -223,11 +223,13 @@ describe("Twilio webhook helpers", () => {
     expect(twilioStatusTransition({ status: "delivered", now })).toEqual({
       providerStatus: "delivered",
       providerErrorCode: null,
-      deliveredAt: now
+      deliveredAt: now,
+      failedAt: null
     });
     expect(twilioStatusTransition({ status: "undelivered", errorCode: "30007", now })).toEqual({
       providerStatus: "undelivered",
       providerErrorCode: "30007",
+      deliveredAt: null,
       failedAt: now
     });
     expect(twilioStatusTransition({ status: "sent", now })).toEqual({
@@ -237,6 +239,7 @@ describe("Twilio webhook helpers", () => {
     expect(twilioStatusTransition({ status: " FAILED ", errorCode: " 30008 ", now })).toEqual({
       providerStatus: "failed",
       providerErrorCode: "30008",
+      deliveredAt: null,
       failedAt: now
     });
   });

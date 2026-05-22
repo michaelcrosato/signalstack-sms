@@ -19,8 +19,8 @@ export type NormalizedTwilioStatus = {
 export type MessageStatusTransition = {
   providerStatus: string;
   providerErrorCode: string | null;
-  deliveredAt?: Date;
-  failedAt?: Date;
+  deliveredAt?: Date | null;
+  failedAt?: Date | null;
 };
 
 function normalizeRequiredProviderValue(value: string | undefined) {
@@ -110,7 +110,7 @@ export function twilioStatusTransition(input: { status: string; errorCode?: stri
   return {
     providerStatus: status,
     providerErrorCode: errorCode ?? null,
-    ...(status === "delivered" ? { deliveredAt: now } : {}),
-    ...(status === "failed" || status === "undelivered" ? { failedAt: now } : {})
+    ...(status === "delivered" ? { deliveredAt: now, failedAt: null } : {}),
+    ...(status === "failed" || status === "undelivered" ? { deliveredAt: null, failedAt: now } : {})
   };
 }
