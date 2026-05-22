@@ -1445,6 +1445,38 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("does not normalize deployment class strings before denying authorization", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("normalized worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("normalized worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("normalized worker classes must not inspect control evidence");
+      }
+    });
+
+    for (const workerDeploymentClass of [
+      ` ${reservedLiveWorkerDeploymentClass}`,
+      `${reservedLiveWorkerDeploymentClass} `,
+      reservedLiveWorkerDeploymentClass.toUpperCase(),
+      "Production-Live-Campaign"
+    ]) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("requires frozen authorization wrapper data descriptors before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const mutableWrapper = {

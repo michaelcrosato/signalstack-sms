@@ -3804,3 +3804,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 422  GREEN  live-worker-exact-class-string-evidence  2026-05-22 12:52
+Objective:    Prove case-drifted or whitespace-padded deployment-class strings cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker authorization coverage showing deployment-class strings are matched exactly without trimming or case normalization.
+- Updated queue/testing contracts, production-worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the exact deployment-class string boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
