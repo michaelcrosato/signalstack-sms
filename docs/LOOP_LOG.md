@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 224  GREEN  live-worker-control-public-fields  2026-05-21 17:19
+Objective:    Keep future live-worker control authorization limited to public control fields.
+Changed:
+- Added a public-field-only live-worker control helper and required it before controls can be treated as implemented.
+- Added unit coverage proving extra string or symbol fields remain unauthorized even when the rest of the frozen checklist matches.
+- Updated queue/testing contracts, production worker policy docs/checks, roadmap handoff, SUMMARY, and BLOCKERS.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live campaign workers blocked while concrete future controls are implemented.
+
 ## Run 223  GREEN  live-worker-control-status-vocabulary  2026-05-21 17:18
 Objective:    Keep future live-worker control authorization constrained to the supported status vocabulary.
 Changed:

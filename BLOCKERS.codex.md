@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 224
+
+- No blocker from the live-worker control public-field hardening. Future `production-live-campaign` authorization now rejects custom control arrays with extra string or symbol fields before checking implemented status; the reserved class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.
+
 Run number: 223
 
 - No blocker from the live-worker control status-vocabulary hardening. Future `production-live-campaign` authorization now rejects control arrays with unsupported statuses before checking implemented status; the reserved class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.

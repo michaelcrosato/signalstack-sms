@@ -47,7 +47,7 @@ Goal: make the repo understandable in minutes and remove known correctness risks
 - Keep contact consent rechecks at send time in worker/send paths.
 - Keep idempotency keys tenant-scoped where cross-tenant key reuse is legitimate.
 - Keep live SMS, billing, AI, secrets, destructive DB operations, production worker execution, and production side effects hard-gated.
-- Keep `docs/PRODUCTION_WORKER_POLICY.md`, the `WORKER_DEPLOYMENT_CLASS=local-demo` executable guard, explicit all-marker production-like worker blocking, and the frozen `production-live-campaign` control metadata as the gate before any live campaign worker or production worker deployment work starts. The reserved `production-live-campaign` planning label remains blocked until every future live-worker control is implemented.
+- Keep `docs/PRODUCTION_WORKER_POLICY.md`, the `WORKER_DEPLOYMENT_CLASS=local-demo` executable guard, explicit all-marker production-like worker blocking, and the frozen public-field-only `production-live-campaign` control metadata as the gate before any live campaign worker or production worker deployment work starts. The reserved `production-live-campaign` planning label remains blocked until every future live-worker control is implemented.
 - Keep `npm run validate` and the local gate green.
 
 ### Phase 1: Product UI Investor Demo

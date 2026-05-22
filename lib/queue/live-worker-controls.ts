@@ -70,6 +70,7 @@ const liveWorkerControls = [
 
 const requiredLiveWorkerControlIds = liveWorkerControls.map((control) => control.id);
 const requiredLiveWorkerControlRequirements = liveWorkerControls.map((control) => control.requirement);
+const liveWorkerControlPublicFields = Object.freeze(["id", "status", "requirement"] as const);
 
 export const productionLiveCampaignWorkerControls = Object.freeze(
   liveWorkerControls.map((control) => Object.freeze({ ...control }))
@@ -86,12 +87,24 @@ export function liveWorkerControlIdsMatchRequiredChecklist(controls: readonly Li
   );
 }
 
+export function liveWorkerControlsExposeOnlyPublicFields(controls: readonly LiveWorkerControl[]) {
+  return controls.every((control) => {
+    const keys = Object.keys(control);
+    return (
+      Object.getOwnPropertySymbols(control).length === 0 &&
+      keys.length === liveWorkerControlPublicFields.length &&
+      liveWorkerControlPublicFields.every((field) => keys.includes(field))
+    );
+  });
+}
+
 export function liveWorkerControlsUseSupportedStatuses(controls: readonly LiveWorkerControl[]) {
   return controls.every((control) => supportedLiveWorkerControlStatuses.includes(control.status));
 }
 
 export function liveWorkerControlsAreImplemented(controls: readonly LiveWorkerControl[] = productionLiveCampaignWorkerControls) {
   return (
+    liveWorkerControlsExposeOnlyPublicFields(controls) &&
     liveWorkerControlsUseSupportedStatuses(controls) &&
     liveWorkerControlIdsMatchRequiredChecklist(controls) &&
     controls.every((control) => control.status === "implemented")

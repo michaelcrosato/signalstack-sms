@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   liveWorkerControlIdsMatchRequiredChecklist,
+  liveWorkerControlsExposeOnlyPublicFields,
   liveWorkerControlsAreImplemented,
   liveWorkerControlsUseSupportedStatuses,
   liveWorkerDeploymentClassIsAuthorized,
@@ -62,6 +63,38 @@ describe("production live campaign worker controls", () => {
       liveWorkerControlsUseSupportedStatuses(
         productionLiveCampaignWorkerControls.map((control, index) =>
           index === 0 ? { ...control, status: "waived" as LiveWorkerControl["status"] } : control
+        )
+      )
+    ).toBe(false);
+  });
+
+  it("rejects control arrays with non-public fields before live-worker authorization", () => {
+    const implementedControls = productionLiveCampaignWorkerControls.map((control) => ({
+      ...control,
+      status: "implemented" as const
+    }));
+    const symbolField = Symbol("unsafe-live-worker-field");
+
+    expect(liveWorkerControlsExposeOnlyPublicFields(productionLiveCampaignWorkerControls)).toBe(true);
+    expect(liveWorkerControlsAreImplemented(implementedControls)).toBe(true);
+    expect(
+      liveWorkerControlsExposeOnlyPublicFields(
+        implementedControls.map((control, index) =>
+          index === 0 ? { ...control, reviewerBypass: true } : control
+        ) as readonly LiveWorkerControl[]
+      )
+    ).toBe(false);
+    expect(
+      liveWorkerControlsAreImplemented(
+        implementedControls.map((control, index) =>
+          index === 0 ? { ...control, reviewerBypass: true } : control
+        ) as readonly LiveWorkerControl[]
+      )
+    ).toBe(false);
+    expect(
+      liveWorkerControlsAreImplemented(
+        implementedControls.map((control, index) =>
+          index === 0 ? Object.assign({ ...control }, { [symbolField]: "unsafe" }) : control
         )
       )
     ).toBe(false);
