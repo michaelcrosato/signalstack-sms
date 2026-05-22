@@ -2571,6 +2571,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
 
+## Run 337  GREEN  parenthesized-globalthis-body-reader-scan  2026-05-22 03:51
+Objective:    Prevent parenthesized `globalThis` reflective request body-reader access from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened mutating API route authorization scanning to normalize `(globalThis).Object`, `(globalThis).Reflect`, and bracketed parenthesized global access before reflective body-reader checks.
+- Added synthetic auth coverage proving parenthesized global `Reflect.get` and `Object.getOwnPropertyDescriptor` reader paths fail before the role gate and pass after it.
+- Updated the testing contract, state matrix, SUMMARY, and BLOCKERS for the parenthesized globalThis boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 335  GREEN  optional-bracket-globalthis-auth-scan  2026-05-22 03:43
 Objective:    Prevent optional bracketed `globalThis` built-in access from becoming an untested mutating-route body-reader scanner boundary.
 Changed:

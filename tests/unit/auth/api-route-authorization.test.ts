@@ -173,6 +173,8 @@ function escapeRegExp(value: string) {
 
 function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName = defaultRequestParameterName) {
   const bodySlice = rawBodySlice
+    .replace(/\(\s*globalThis\s*\)\s*(?:\?\.)?\[\s*["'`](Object|Reflect)["'`]\s*\]/g, "$1")
+    .replace(/\(\s*globalThis\s*\)\s*\??\.\s*(Object|Reflect)\b/g, "$1")
     .replace(/\bglobalThis\s*\?\.\s*(Object|Reflect)\b/g, "$1")
     .replace(/\bglobalThis\s*\.\s*(Object|Reflect)\b/g, "$1")
     .replace(/\bglobalThis\s*(?:\?\.)?\[\s*["'`](Object|Reflect)["'`]\s*\]/g, "$1");
@@ -3422,6 +3424,25 @@ describe("API route authorization coverage", () => {
         return Response.json(payload);
       }
     `;
+    const unsafeParenthesizedGlobalReflectGetSource = `
+      export async function PUT(req: Request) {
+        const payload = await (globalThis).Reflect.get(req, "json").call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeParenthesizedGlobalObjectDescriptorSource = `
+      export async function DELETE(req: Request) {
+        const payload = await (globalThis)["Object"].getOwnPropertyDescriptor(
+          (globalThis).Reflect.getPrototypeOf(req),
+          "text"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
     const safeSource = `
       export async function POST(req: Request) {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
@@ -3437,6 +3458,8 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalGlobalObjectPrototypeSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalGlobalBracketReflectGetSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalGlobalBracketObjectDescriptorSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedGlobalReflectGetSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedGlobalObjectDescriptorSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
