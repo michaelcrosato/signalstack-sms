@@ -3884,3 +3884,12 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+## Run 431  GREEN  contract-regex-character-class-masking  2026-05-22 13:42
+Objective:    Prove escaped regex bodies and regex character classes cannot leak route export phrases into contract route-method detection.
+Changed:
+- Added focused contract scanner coverage for escaped regex bodies and character-class regex literals that mention route exports.
+- Updated testing contract/docs and NEXT_PROMPTS to name escaped-regex and character-class masking in the non-code route scanner boundary.
+- Kept the change local to static contract validation; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

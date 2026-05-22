@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 431
+
+- Added contract scanner coverage proving escaped regex bodies and regex character classes remain masked while route methods are extracted.
+- Updated `contracts/CONTRACT-TESTING.md`, `docs/TESTING.md`, and `docs/NEXT_PROMPTS.md` to name escaped-regex and character-class regex masking in the non-code route scanner boundary.
+- Focused coverage passed: `npm run test -- tests/unit/contracts/contracts-check.test.ts`; `npm run contracts:check` passed.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 442 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 430
 
 - The shared `scripts/contracts-check.ts` route-method extractor now masks regex literals before collecting implemented route methods, so regex examples such as `/export async function POST/` cannot create false contract/API inventory entries.

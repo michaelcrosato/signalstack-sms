@@ -104,4 +104,16 @@ describe("contracts-check route method extraction", () => {
 
     expect(extractExportedRouteMethods(source)).toEqual(["GET"]);
   });
+
+  it("keeps escaped regex bodies and character classes masked while extracting route methods", () => {
+    const source = `
+      const escapedRegex = /\\/export const POST = async/;
+      const classRegex = /[}] export { removeContact as DELETE } [}]/;
+      const slashClassRegex = /[\\/] export function PATCH/;
+
+      export const OPTIONS = () => new Response(null, { status: 204 });
+    `;
+
+    expect(extractExportedRouteMethods(source)).toEqual(["OPTIONS"]);
+  });
 });

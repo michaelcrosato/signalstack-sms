@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 431
+
+- No blocker from escaped-regex route scanner coverage. Focused contract coverage and the protected local gate passed. The change tightens local static scanner coverage only and does not execute API handlers, use production credentials, call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
 Run number: 430
 
 - No blocker from contract route-method regex-literal masking. Focused API/contract coverage and the protected local gate passed. The change tightens local static scanner coverage only and does not execute API handlers, use production credentials, call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
