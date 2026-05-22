@@ -1221,6 +1221,20 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerDeploymentClassIsAuthorized(unsupportedClassInput)).toBe(false);
   });
 
+  it("does not execute authorization wrapper get traps while authorizing exact frozen evidence", () => {
+    const exactClassInput = new Proxy(
+      frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedFrozenControls()),
+      {
+        get: () => {
+          throw new Error("authorization input get trap must not be read");
+        }
+      }
+    );
+
+    expect(() => liveWorkerDeploymentClassIsAuthorized(exactClassInput)).not.toThrow();
+    expect(liveWorkerDeploymentClassIsAuthorized(exactClassInput)).toBe(true);
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 
