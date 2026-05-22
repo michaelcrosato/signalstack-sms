@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 418
+
+- Latest live-worker controls evidence coverage explicitly proves hidden string or symbol metadata on otherwise valid frozen control arrays cannot authorize the reserved `production-live-campaign` class.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 435 tests, Playwright smoke, and build green.
+- Updated NEXT_PROMPTS, BLOCKERS, LOOP_LOG, and current state matrix for the explicit hidden control-array metadata boundary.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 417
 
 - Latest live-worker controls evidence coverage proves hostile non-array `controls` values cannot authorize the reserved `production-live-campaign` class and are denied without primitive coercion.

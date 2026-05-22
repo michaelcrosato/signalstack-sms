@@ -3450,3 +3450,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 418  GREEN  live-worker-hidden-array-metadata-evidence  2026-05-22 12:31
+Objective:    Prove hidden string or symbol metadata on supplied control arrays cannot authorize the reserved live worker class.
+Changed:
+- Added focused live-worker control coverage for otherwise valid frozen control arrays carrying non-enumerable string or symbol metadata.
+- Updated NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the explicit hidden control-array metadata boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.

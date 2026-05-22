@@ -184,6 +184,36 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects hidden string and symbol metadata on control arrays before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const hiddenStringMetadataControls = [...implementedControls];
+    Object.defineProperty(hiddenStringMetadataControls, "reviewerBypass", {
+      value: "unsafe",
+      enumerable: false
+    });
+    Object.freeze(hiddenStringMetadataControls);
+    const hiddenSymbolMetadataControls = [...implementedControls];
+    Object.defineProperty(hiddenSymbolMetadataControls, Symbol("hidden-live-worker-array-bypass"), {
+      value: "unsafe",
+      enumerable: false
+    });
+    Object.freeze(hiddenSymbolMetadataControls);
+
+    for (const controls of [hiddenStringMetadataControls, hiddenSymbolMetadataControls]) {
+      expect(Object.isFrozen(controls)).toBe(true);
+      expect(liveWorkerControlsAreFrozen(controls)).toBe(true);
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).toBe(true);
+      expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(true);
+      expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(true);
+      expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(true);
+      expect(liveWorkerControlArrayExposesOnlyIndexedEntries(controls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).toBe(false);
+    }
+  });
+
   it("rejects array subclass evidence before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
 
