@@ -3124,3 +3124,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 383  GREEN  live-worker-primitive-length-evidence  2026-05-22 08:29
+Objective:    Prove malformed primitive supplied control-array length descriptor values deny before indexed-control reads.
+Changed:
+- Added live-worker control coverage for negative, fractional, `NaN`, infinite, and string `length` descriptor values with hostile indexed descriptors.
+- Updated testing contract/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the malformed primitive length-descriptor boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
