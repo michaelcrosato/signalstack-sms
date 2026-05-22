@@ -2457,3 +2457,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 274  GREEN  typed-cloned-request-body-role-scan  2026-05-21 22:09
+Objective:    Prevent typed cloned request aliases from bypassing local mutating API role-gate ordering checks.
+Changed:
+- Tightened the static mutating API body-reader scanner to include TypeScript-annotated aliases created from `request.clone()`.
+- Added synthetic auth unit coverage proving typed cloned body reads before `requireApiRole` are detected while post-gate reads remain allowed.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the typed cloned request reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.

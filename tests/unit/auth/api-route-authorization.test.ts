@@ -6,7 +6,7 @@ const mutatingMethods = ["POST", "PATCH", "PUT", "DELETE"] as const;
 const requestBodyReaderPattern =
   /\brequest\s*(?:\.\s*clone\s*\(\s*\))?\s*\.\s*(?:json|formData|text|arrayBuffer|blob)\s*\(/;
 const requestCloneAliasPattern =
-  /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*request\s*\.\s*clone\s*\(\s*\)\s*;/g;
+  /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*(?::[^=;]+)?=\s*request\s*\.\s*clone\s*\(\s*\)\s*;/g;
 const roleGateExceptionRoutes = new Set([
   "app/api/webhooks/twilio/inbound/route.ts",
   "app/api/webhooks/twilio/status/route.ts"
@@ -195,6 +195,30 @@ describe("API route authorization coverage", () => {
 
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "PATCH")).toBe(false);
+  });
+
+  it("treats typed cloned request aliases as body parsing for role-gate ordering", () => {
+    const unsafeSource = `
+      export async function PUT(request: Request) {
+        const cloned: Request = request.clone();
+        const payload = await cloned.text();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const safeSource = `
+      export async function PUT(request: Request) {
+        const cloned: Request = request.clone();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await cloned.text();
+        return Response.json(payload);
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "PUT")).toBe(false);
   });
 
   it("keeps role-gate exceptions limited to signed Twilio webhook handlers", () => {
