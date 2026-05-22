@@ -2774,3 +2774,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 325  GREEN  parenthesized-call-apply-body-reader-scan  2026-05-22 02:52
+Objective:    Prevent parenthesized `call`/`apply` request body-reader invocations from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize parenthesized member-call forms such as `(req.json.call)(req)` and `(req.clone().text.apply)(req.clone())`.
+- Added synthetic auth unit coverage proving parenthesized call/apply reader invocations fail before the role gate while post-gate reads remain allowed.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the parenthesized call/apply body-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.

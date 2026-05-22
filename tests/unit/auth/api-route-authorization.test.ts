@@ -402,6 +402,13 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
     .replace(/\?\.\s*/g, ".")
     .replace(
       new RegExp(
+        `\\(\\s*([A-Za-z_$][\\w$]*(?:\\s*\\.\\s*clone\\s*\\(\\s*\\))?\\s*\\.\\s*(?:${requestBodyReaderNames})\\s*\\.\\s*(?:call|apply|bind))\\s*\\)`,
+        "g"
+      ),
+      "$1"
+    )
+    .replace(
+      new RegExp(
         `\\(\\s*([A-Za-z_$][\\w$]*(?:\\s*\\.\\s*clone\\s*\\(\\s*\\))?\\s*\\.\\s*(?:${requestBodyReaderNames}))\\s*\\)`,
         "g"
       ),
@@ -2491,6 +2498,22 @@ describe("API route authorization coverage", () => {
         return Response.json({ ok: Boolean(payload) });
       }
     `;
+    const unsafeParenthesizedCallSource = `
+      export async function DELETE(req: Request) {
+        const payload = await (req.json.call)(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeParenthesizedCloneApplySource = `
+      export async function PUT(req: Request) {
+        const payload = await (req.clone().text.apply)(req.clone());
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
     const safeSource = `
       export async function POST(req: Request) {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
@@ -2503,6 +2526,8 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectCallSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCloneApplySource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeBracketCallSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedCallSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedCloneApplySource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
