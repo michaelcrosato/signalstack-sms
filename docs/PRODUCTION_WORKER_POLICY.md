@@ -49,6 +49,8 @@ Before `production-live-campaign` can become a supported worker deployment class
 - A rollback runbook that disables live campaign workers without code changes and proves queued work stops before provider calls.
 - Unit, integration, and browser-safe operations coverage proving every current blocked state remains blocked until all future controls are present.
 
+The executable authorization helper must require the exact frozen checklist IDs in the documented order and every status set to `implemented`. Missing, reordered, renamed, or partial custom control arrays must not authorize the reserved worker deployment class.
+
 ## Non-Requirements For Current Demo Deployments
 
 Production-like demo deployments do not need a running worker. Campaign scheduling may continue to create local `QueueJob` rows for browser demo evidence, but those rows must not be processed by a production worker under the current gate.

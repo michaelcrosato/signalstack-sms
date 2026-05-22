@@ -1956,3 +1956,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Add contact merge workflow or campaign detail/edit only after the core product demo remains stable.
+
+## Run 215  GREEN  live-worker-control-checklist-identity  2026-05-21 17:05
+Objective:    Require exact frozen control checklist identity before future live worker authorization can pass.
+Changed:
+- Tightened `liveWorkerControlsAreImplemented` to require the exact reserved checklist IDs in order, not only implemented statuses.
+- Added unit coverage proving partial, reordered, or renamed control arrays remain unauthorized for `production-live-campaign`.
+- Updated queue/testing/production-worker policy docs and the production worker policy check.
+Gate:         passed
+Commit/Saved: pending
+Next:         Keep product demo paths stable and continue production-live-campaign control hardening without enabling live workers.

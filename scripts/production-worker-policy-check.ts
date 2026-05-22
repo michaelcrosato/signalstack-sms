@@ -60,6 +60,10 @@ const requiredTexts: RequiredText[] = [
   },
   {
     file: "lib/queue/live-worker-controls.ts",
+    text: "liveWorkerControlIdsMatchRequiredChecklist"
+  },
+  {
+    file: "lib/queue/live-worker-controls.ts",
     text: "liveWorkerDeploymentClassIsAuthorized"
   },
   {
@@ -81,6 +85,10 @@ const requiredTexts: RequiredText[] = [
   {
     file: "tests/unit/queue/live-worker-controls.test.ts",
     text: "authorizes the reserved production class only when every control is implemented"
+  },
+  {
+    file: "tests/unit/queue/live-worker-controls.test.ts",
+    text: "requires the exact frozen control checklist"
   },
   {
     file: "tests/unit/queue/bullmq-worker.test.ts",

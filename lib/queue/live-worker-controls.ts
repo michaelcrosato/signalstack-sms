@@ -68,12 +68,24 @@ const liveWorkerControls = [
   }
 ] as const satisfies readonly LiveWorkerControl[];
 
+const requiredLiveWorkerControlIds = liveWorkerControls.map((control) => control.id);
+
 export const productionLiveCampaignWorkerControls = Object.freeze(
   liveWorkerControls.map((control) => Object.freeze({ ...control }))
 );
 
+export function liveWorkerControlIdsMatchRequiredChecklist(controls: readonly LiveWorkerControl[]) {
+  return (
+    controls.length === requiredLiveWorkerControlIds.length &&
+    controls.every((control, index) => control.id === requiredLiveWorkerControlIds[index])
+  );
+}
+
 export function liveWorkerControlsAreImplemented(controls: readonly LiveWorkerControl[] = productionLiveCampaignWorkerControls) {
-  return controls.length > 0 && controls.every((control) => control.status === "implemented");
+  return (
+    liveWorkerControlIdsMatchRequiredChecklist(controls) &&
+    controls.every((control) => control.status === "implemented")
+  );
 }
 
 export function liveWorkerDeploymentClassIsAuthorized(input: {

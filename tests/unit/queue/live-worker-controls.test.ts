@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  liveWorkerControlIdsMatchRequiredChecklist,
   liveWorkerControlsAreImplemented,
   liveWorkerDeploymentClassIsAuthorized,
   productionLiveCampaignWorkerControls,
@@ -57,9 +58,54 @@ describe("production live campaign worker controls", () => {
     ).toBe(true);
   });
 
+  it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
+    const implementedControls = productionLiveCampaignWorkerControls.map((control) => ({
+      ...control,
+      status: "implemented" as const
+    }));
+
+    expect(liveWorkerControlIdsMatchRequiredChecklist(productionLiveCampaignWorkerControls)).toBe(true);
+    expect(liveWorkerControlsAreImplemented(implementedControls)).toBe(true);
+    expect(liveWorkerControlsAreImplemented(implementedControls.slice(0, -1))).toBe(false);
+    expect(
+      liveWorkerControlsAreImplemented([
+        {
+          id: "deploy-environment-allowlist",
+          status: "implemented",
+          requirement: "Only one implemented control is not enough to authorize live worker execution."
+        }
+      ])
+    ).toBe(false);
+    expect(
+      liveWorkerControlsAreImplemented([
+        ...implementedControls.slice(1),
+        implementedControls[0]
+      ])
+    ).toBe(false);
+    expect(
+      liveWorkerControlsAreImplemented(
+        implementedControls.map((control, index) =>
+          index === 0 ? { ...control, id: "unexpected-live-worker-control" } : control
+        )
+      )
+    ).toBe(false);
+  });
+
   it("authorizes the reserved production class only when every control is implemented", () => {
     expect(liveWorkerControlsAreImplemented()).toBe(false);
     expect(liveWorkerDeploymentClassIsAuthorized({ workerDeploymentClass: reservedLiveWorkerDeploymentClass })).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized({
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: [
+          {
+            id: "deploy-environment-allowlist",
+            status: "implemented",
+            requirement: "Only one implemented control is not enough to authorize live worker execution."
+          }
+        ]
+      })
+    ).toBe(false);
     expect(
       liveWorkerDeploymentClassIsAuthorized({
         workerDeploymentClass: "production-live",
