@@ -4018,3 +4018,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 446  GREEN  live-worker-unicode-separator-evidence  2026-05-22 15:08
+Objective:    Prove Unicode line-separator and paragraph-separator deployment-class padding cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker authorization coverage for `\u2028` and `\u2029` padded `production-live-campaign` strings.
+- Updated queue/testing contracts, production-worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the Unicode separator deployment-class boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.

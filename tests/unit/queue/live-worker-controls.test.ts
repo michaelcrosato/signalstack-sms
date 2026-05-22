@@ -1809,7 +1809,9 @@ describe("production live campaign worker controls", () => {
       `${reservedLiveWorkerDeploymentClass}\u2007`,
       `\u202f${reservedLiveWorkerDeploymentClass}`,
       `${reservedLiveWorkerDeploymentClass}\ufeff`,
-      `\u200b${reservedLiveWorkerDeploymentClass}\u200b`
+      `\u200b${reservedLiveWorkerDeploymentClass}\u200b`,
+      `\u2028${reservedLiveWorkerDeploymentClass}`,
+      `${reservedLiveWorkerDeploymentClass}\u2029`
     ]) {
       expect(() =>
         liveWorkerDeploymentClassIsAuthorized(
