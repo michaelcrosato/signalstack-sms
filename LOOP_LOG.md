@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 375  GREEN  live-worker-revoked-proxy-evidence  2026-05-22 07:46
+Objective:    Prove revoked proxy-backed live-worker authorization evidence denies cleanly without escaping.
+Changed:
+- Added queue unit coverage for revoked control-array, control-entry, and authorization-wrapper proxy evidence around the reserved `production-live-campaign` class.
+- Updated queue/testing contracts and production-worker/testing docs for the revoked proxy-backed evidence boundary.
+- Updated SUMMARY, BLOCKERS, and current state matrix for Run 375.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep Phase 0 live-worker, API authorization, provider, billing, live AI, notification, and secret gates stable.
+
 ## Run 374  GREEN  live-worker-hidden-symbol-array-metadata  2026-05-22 07:38
 Objective:    Prove hidden symbol metadata on supplied live-worker control arrays cannot authorize the reserved production class.
 Changed:

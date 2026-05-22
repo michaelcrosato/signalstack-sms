@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 375
+
+- Hardened live-worker authorization coverage so revoked proxy-backed control evidence and revoked proxy-backed authorization wrappers cannot throw through the reserved `production-live-campaign` gate.
+- Latest repo truth: `production-live-campaign` remains unsupported, and future supplied authorization evidence now explicitly denies revoked array, entry, and wrapper proxies cleanly.
+- Updated the queue contract, testing contract, production-worker policy, testing docs, LOOP_LOG, BLOCKERS, and current state matrix for the revoked proxy-backed evidence boundary.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts`.
+- `npm run contracts:check`, `npm run typecheck`, and `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-22 07:46 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 unit test files / 408 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 374
 
 - Hardened live-worker control-array evidence coverage so hidden symbol metadata cannot ride along with otherwise implemented reserved `production-live-campaign` controls.

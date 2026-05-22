@@ -647,6 +647,33 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects revoked proxy-backed control evidence without throwing", () => {
+    const implementedControls = implementedFrozenControls();
+    const { proxy: revokedArrayProxy, revoke: revokeArrayProxy } = Proxy.revocable([...implementedControls], {});
+    const { proxy: revokedEntryProxy, revoke: revokeEntryProxy } = Proxy.revocable({ ...implementedControls[0] }, {});
+
+    revokeArrayProxy();
+    revokeEntryProxy();
+
+    const controlsWithRevokedEntry = Object.freeze(
+      implementedControls.map((control, index) => (index === 0 ? revokedEntryProxy : Object.freeze({ ...control })))
+    );
+
+    for (const controls of [revokedArrayProxy, controlsWithRevokedEntry]) {
+      expect(() => liveWorkerControlsAreFrozen(controls)).not.toThrow();
+      expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).not.toThrow();
+      expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(controls)).not.toThrow();
+      expect(() => liveWorkerControlsExposeOnlyPublicFields(controls)).not.toThrow();
+      expect(() => liveWorkerControlsUseSupportedStatuses(controls)).not.toThrow();
+      expect(() => liveWorkerControlIdsMatchRequiredChecklist(controls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).toBe(false);
+    }
+  });
+
   it("does not inspect supplied controls for unsupported deployment classes", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {
@@ -1068,6 +1095,18 @@ describe("production live campaign worker controls", () => {
         )
       ).toBe(false);
     }
+  });
+
+  it("rejects revoked proxy-backed authorization wrappers without throwing", () => {
+    const { proxy: revokedWrapper, revoke } = Proxy.revocable(
+      frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedFrozenControls()),
+      {}
+    );
+
+    revoke();
+
+    expect(() => liveWorkerDeploymentClassIsAuthorized(revokedWrapper)).not.toThrow();
+    expect(liveWorkerDeploymentClassIsAuthorized(revokedWrapper)).toBe(false);
   });
 
   it("rejects malformed authorization wrapper key evidence before inspecting controls", () => {
