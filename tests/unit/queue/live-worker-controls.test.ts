@@ -1807,6 +1807,19 @@ describe("production live campaign worker controls", () => {
         { [Symbol("unsafe-live-worker-wrapper-key")]: true }
       )
     );
+    const hiddenSymbolExtraKeyWrapper = Object.freeze(
+      Object.defineProperty(
+        {
+          workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+          controls: throwingEvidence
+        },
+        Symbol("hidden-live-worker-wrapper-key"),
+        {
+          value: true,
+          enumerable: false
+        }
+      )
+    );
 
     for (const input of [
       reorderedKeyWrapper,
@@ -1814,7 +1827,8 @@ describe("production live campaign worker controls", () => {
       extraKeyWrapper,
       duplicateKeyWrapper,
       hiddenExtraKeyWrapper,
-      symbolExtraKeyWrapper
+      symbolExtraKeyWrapper,
+      hiddenSymbolExtraKeyWrapper
     ]) {
       expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
       expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
