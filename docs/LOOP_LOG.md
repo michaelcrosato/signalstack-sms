@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 238  GREEN  live-worker-wrapper-null-prototype  2026-05-21 18:44
+Objective:    Prove null-prototype authorization wrappers cannot authorize the reserved live worker class.
+Changed:
+- Added unit coverage showing null-prototype wrapper evidence denies for `production-live-campaign` even with otherwise implemented controls.
+- Updated the production worker policy and testing contract to name null-prototype wrapper input explicitly.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 237  GREEN  live-worker-wrapper-descriptors  2026-05-21 18:37
 Objective:    Require frozen authorization wrapper fields before future live-worker authorization can pass.
 Changed:

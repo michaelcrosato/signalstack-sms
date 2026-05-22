@@ -622,6 +622,12 @@ describe("production live campaign worker controls", () => {
         { [Symbol("unsafe-live-worker-authorization")]: true }
       )
     );
+    const nullPrototypeInput = Object.freeze(
+      Object.assign(Object.create(null) as Record<string, unknown>, {
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: implementedControls
+      })
+    );
     class AuthorizationWrapper {
       workerDeploymentClass = reservedLiveWorkerDeploymentClass;
       controls = implementedControls;
@@ -652,6 +658,7 @@ describe("production live campaign worker controls", () => {
       }),
       hiddenExtraFieldInput,
       symbolExtraFieldInput,
+      nullPrototypeInput,
       Object.freeze(new AuthorizationWrapper()),
       accessorBackedInput,
       descriptorThrowingInput

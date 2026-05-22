@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 238
+
+- Hardened live-worker authorization wrapper shape coverage for Run 238.
+- Latest repo truth: null-prototype authorization wrapper input is explicitly covered as denied for the reserved `production-live-campaign` class, even when supplied controls are otherwise implemented.
+- Focused live-worker control tests, typecheck, and the production worker policy check passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 237
 
 - Hardened live-worker authorization wrapper descriptor handling for Run 237.
