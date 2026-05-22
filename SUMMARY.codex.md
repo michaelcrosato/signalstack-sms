@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 372
+
+- Hardened live-worker deployment-class coverage so malformed object values cannot authorize the reserved `production-live-campaign` class through coercion.
+- Latest repo truth: `production-live-campaign` remains unsupported, and authorization now has explicit unit coverage proving hostile `Symbol.toPrimitive`/`toString`/`valueOf` deployment-class objects and boxed strings deny without inspecting supplied controls.
+- Updated the testing contract, testing docs, and current state matrix for the deployment-class non-coercion boundary.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts`.
+- `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-22 07:29 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 unit test files / 406 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 371
 
 - Hardened live-worker control evidence coverage for malformed supplied control-array `length` descriptors.

@@ -697,6 +697,45 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("does not coerce malformed deployment class values before denying authorization", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("coerced worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("coerced worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("coerced worker classes must not inspect control evidence");
+      }
+    });
+    const primitiveThrowingClass = Object.freeze({
+      [Symbol.toPrimitive]: () => {
+        throw new Error("worker deployment class must not be coerced");
+      },
+      toString: () => {
+        throw new Error("worker deployment class toString must not be called");
+      },
+      valueOf: () => {
+        throw new Error("worker deployment class valueOf must not be called");
+      }
+    });
+    const stringObjectClass = Object.freeze(new String(reservedLiveWorkerDeploymentClass));
+
+    for (const workerDeploymentClass of [primitiveThrowingClass, stringObjectClass]) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("requires frozen authorization wrapper data descriptors before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const mutableWrapper = {
