@@ -60,6 +60,33 @@ describe("Twilio webhook helpers", () => {
     });
   });
 
+  it("normalizes status casing before deriving idempotent event keys", () => {
+    expect(
+      normalizeTwilioStatus({
+        MessageSid: "SM123",
+        MessageStatus: "DELIVERED"
+      })
+    ).toEqual({
+      providerMessageId: "SM123",
+      status: "delivered",
+      errorCode: undefined,
+      idempotencyKey: "twilio:status:SM123:delivered:none"
+    });
+
+    expect(
+      normalizeTwilioStatus({
+        MessageSid: "SM123",
+        SmsStatus: "Undelivered",
+        ErrorCode: "30007"
+      })
+    ).toEqual({
+      providerMessageId: "SM123",
+      status: "undelivered",
+      errorCode: "30007",
+      idempotencyKey: "twilio:status:SM123:undelivered:30007"
+    });
+  });
+
   it("maps provider statuses into local message transition fields", () => {
     const now = new Date("2026-01-01T00:00:00.000Z");
 

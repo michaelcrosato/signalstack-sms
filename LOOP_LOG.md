@@ -10,6 +10,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
 
+## Run 311  GREEN  twilio-status-idempotency-casing  2026-05-22 01:27
+Objective:    Prevent Twilio delivery-status retry casing drift from creating duplicate local webhook events.
+Changed:
+- Normalized Twilio delivery status casing before returning status helper output and deriving local status idempotency keys.
+- Added webhook helper coverage for uppercase `MessageStatus` and mixed-case `SmsStatus` retry payloads.
+- Updated webhook docs and contracts for casing-stable delivery-status idempotency.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep webhook idempotency, product demo, live-worker, provider, billing, live AI, notification, and secret gates stable.
+
 ## Run 304  GREEN  inline-cloned-reflect-body-reader-scan  2026-05-22 00:37
 Objective:    Prevent inline cloned `Reflect.apply` and `Reflect.get` request body-reader forms from bypassing mutating-route role-gate ordering checks.
 Changed:

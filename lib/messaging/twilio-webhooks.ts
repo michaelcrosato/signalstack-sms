@@ -68,10 +68,12 @@ export function normalizeTwilioInbound(payload: TwilioWebhookPayload): Normalize
 
 export function normalizeTwilioStatus(payload: TwilioWebhookPayload): NormalizedTwilioStatus | null {
   const providerMessageId = payload.MessageSid ?? payload.SmsSid;
-  const status = payload.MessageStatus ?? payload.SmsStatus;
-  if (!providerMessageId || !status) {
+  const rawStatus = payload.MessageStatus ?? payload.SmsStatus;
+  if (!providerMessageId || !rawStatus) {
     return null;
   }
+
+  const status = rawStatus.toLowerCase();
 
   return {
     providerMessageId,
