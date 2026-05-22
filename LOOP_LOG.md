@@ -2362,6 +2362,16 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+## Run 277  GREEN  semicolonless-cloned-request-body-role-scan  2026-05-21 22:15
+Objective:    Prevent semicolonless cloned request aliases from bypassing local mutating API role-gate ordering checks.
+Changed:
+- Tightened the static mutating API body-reader scanner to recognize `const cloned = req.clone()` followed by newline/ASI before a cloned body reader.
+- Added synthetic auth unit coverage proving semicolonless cloned body reads before `requireApiRole` are detected while post-gate reads remain allowed.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the semicolonless cloned request reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 259  GREEN  mutating-api-role-gate-scan  2026-05-21 20:32
 Objective:    Prevent local mutating API routes from losing role checks.
 Changed:

@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 277
+
+- Hardened semicolonless cloned request-alias authorization coverage for Run 277.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now treats `const cloned = req.clone()` followed by a newline and later `cloned.blob()` as body parsing that must happen after each mutating handler's own `requireApiRole` call, with signed Twilio webhook handlers remaining the only exception.
+- Updated the testing contract to name the semicolonless cloned-alias body-reader case.
+- Focused auth coverage and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 276
 
 - Hardened mutating API body-reader authorization coverage for Run 276.

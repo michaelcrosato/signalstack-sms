@@ -117,7 +117,7 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   }
 
   const requestCloneAliasPattern = new RegExp(
-    `\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s*(?::[^=;]+)?=\\s*${escapedRequestParameterName}\\s*\\.\\s*clone\\s*\\(\\s*\\)\\s*;`,
+    `\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s*(?::[^=;\\n]+)?=\\s*${escapedRequestParameterName}\\s*\\.\\s*clone\\s*\\(\\s*\\)\\s*(?:;|\\r?\\n)`,
     "g"
   );
   requestCloneAliasPattern.lastIndex = 0;
@@ -265,6 +265,30 @@ describe("API route authorization coverage", () => {
 
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "DELETE")).toBe(false);
+  });
+
+  it("treats semicolonless cloned request aliases as body parsing for role-gate ordering", () => {
+    const unsafeSource = `
+      export async function POST(req: Request) {
+        const cloned = req.clone()
+        const payload = await cloned.blob();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const cloned = req.clone()
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await cloned.blob();
+        return Response.json({ size: payload.size });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
   it("keeps role-gate exceptions limited to signed Twilio webhook handlers", () => {
