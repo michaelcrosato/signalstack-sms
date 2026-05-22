@@ -76,19 +76,49 @@ export const productionLiveCampaignWorkerControls = Object.freeze(
   liveWorkerControls.map((control) => Object.freeze({ ...control }))
 );
 
-export function liveWorkerControlIdsMatchRequiredChecklist(controls: readonly LiveWorkerControl[]) {
+function isReadonlyControlArray(controls: unknown): controls is readonly LiveWorkerControl[] {
+  return Array.isArray(controls);
+}
+
+function isControlRecord(control: unknown): control is LiveWorkerControl {
+  return control !== null && typeof control === "object";
+}
+
+function controlArrayIsDense(controls: readonly LiveWorkerControl[]) {
+  for (let index = 0; index < controls.length; index += 1) {
+    if (!Object.prototype.hasOwnProperty.call(controls, index)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+export function liveWorkerControlIdsMatchRequiredChecklist(controls: unknown) {
+  if (!isReadonlyControlArray(controls) || !controlArrayIsDense(controls)) {
+    return false;
+  }
+
   return (
     controls.length === requiredLiveWorkerControlIds.length &&
     controls.every(
       (control, index) =>
+        isControlRecord(control) &&
         control.id === requiredLiveWorkerControlIds[index] &&
         control.requirement === requiredLiveWorkerControlRequirements[index]
     )
   );
 }
 
-export function liveWorkerControlsExposeOnlyPublicFields(controls: readonly LiveWorkerControl[]) {
+export function liveWorkerControlsExposeOnlyPublicFields(controls: unknown) {
+  if (!isReadonlyControlArray(controls) || !controlArrayIsDense(controls)) {
+    return false;
+  }
+
   return controls.every((control) => {
+    if (!isControlRecord(control)) {
+      return false;
+    }
+
     const ownKeys = Reflect.ownKeys(control);
     return (
       ownKeys.length === liveWorkerControlPublicFields.length &&
@@ -105,15 +135,29 @@ export function liveWorkerControlsExposeOnlyPublicFields(controls: readonly Live
   });
 }
 
-export function liveWorkerControlsUseSupportedStatuses(controls: readonly LiveWorkerControl[]) {
-  return controls.every((control) => supportedLiveWorkerControlStatuses.includes(control.status));
+export function liveWorkerControlsUseSupportedStatuses(controls: unknown) {
+  if (!isReadonlyControlArray(controls) || !controlArrayIsDense(controls)) {
+    return false;
+  }
+
+  return controls.every(
+    (control) => isControlRecord(control) && supportedLiveWorkerControlStatuses.includes(control.status)
+  );
 }
 
-export function liveWorkerControlsAreFrozen(controls: readonly LiveWorkerControl[]) {
-  return Object.isFrozen(controls) && controls.every((control) => Object.isFrozen(control));
+export function liveWorkerControlsAreFrozen(controls: unknown) {
+  if (!isReadonlyControlArray(controls) || !controlArrayIsDense(controls)) {
+    return false;
+  }
+
+  return Object.isFrozen(controls) && controls.every((control) => isControlRecord(control) && Object.isFrozen(control));
 }
 
-export function liveWorkerControlsAreImplemented(controls: readonly LiveWorkerControl[] = productionLiveCampaignWorkerControls) {
+export function liveWorkerControlsAreImplemented(controls: unknown = productionLiveCampaignWorkerControls) {
+  if (!isReadonlyControlArray(controls)) {
+    return false;
+  }
+
   return (
     liveWorkerControlsAreFrozen(controls) &&
     liveWorkerControlsExposeOnlyPublicFields(controls) &&
@@ -125,7 +169,7 @@ export function liveWorkerControlsAreImplemented(controls: readonly LiveWorkerCo
 
 export function liveWorkerDeploymentClassIsAuthorized(input: {
   workerDeploymentClass?: string;
-  controls?: readonly LiveWorkerControl[];
+  controls?: unknown;
 }) {
   return (
     input.workerDeploymentClass === reservedLiveWorkerDeploymentClass &&

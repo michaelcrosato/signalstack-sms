@@ -2033,3 +2033,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue production-live-campaign control hardening without enabling live workers.
+
+## Run 217  GREEN  live-worker-control-malformed-input  2026-05-21 17:33
+Objective:    Make future live-worker control authorization deny malformed supplied evidence cleanly.
+Changed:
+- Hardened live-worker control predicates to accept unknown runtime input and return false for non-arrays, sparse arrays, primitives, null entries, and malformed records.
+- Added unit coverage proving malformed supplied controls cannot authorize the reserved `production-live-campaign` class and do not throw.
+- Updated queue/testing contracts, production worker policy docs, roadmap/state notes, SUMMARY, and BLOCKERS.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing production-live-campaign control hardening without enabling live sends.

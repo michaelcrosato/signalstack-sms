@@ -208,6 +208,36 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects malformed control evidence without throwing", () => {
+    const sparseControls = Array<LiveWorkerControl>(2);
+    sparseControls[0] = Object.freeze({ ...productionLiveCampaignWorkerControls[0], status: "implemented" as const });
+
+    const malformedInputs = [
+      null,
+      undefined,
+      "implemented",
+      1,
+      Object.freeze({ status: "implemented" }),
+      Object.freeze([null]),
+      Object.freeze(["implemented"]),
+      Object.freeze(sparseControls)
+    ];
+
+    for (const controls of malformedInputs) {
+      expect(liveWorkerControlsAreFrozen(controls)).toBe(false);
+      expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(false);
+      expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(false);
+      expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized({
+          workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+          controls
+        })
+      ).toBe(false);
+    }
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 

@@ -49,7 +49,7 @@ Before `production-live-campaign` can become a supported worker deployment class
 - A rollback runbook that disables live campaign workers without code changes and proves queued work stops before provider calls.
 - Unit, integration, and browser-safe operations coverage proving every current blocked state remains blocked until all future controls are present.
 
-The executable authorization helper must require a frozen control array with frozen entries, the exact frozen checklist IDs and requirement text in the documented order, own enumerable data fields only, no fields beyond the public `id`, `status`, and `requirement` fields, and every status set to `implemented`. Mutable, missing, reordered, renamed, requirement-replaced, unsupported-status, extra-field, accessor-backed, prototype-backed, or partial custom control arrays must not authorize the reserved worker deployment class.
+The executable authorization helper must require a frozen control array with frozen entries; that array must also be dense, preserve the exact frozen checklist IDs and requirement text in the documented order, expose own enumerable data fields only, include no fields beyond the public `id`, `status`, and `requirement` fields, and set every status to `implemented`. Malformed, non-array, sparse, mutable, missing, reordered, renamed, requirement-replaced, unsupported-status, extra-field, accessor-backed, prototype-backed, or partial custom control arrays must not authorize the reserved worker deployment class.
 
 ## Non-Requirements For Current Demo Deployments
 
