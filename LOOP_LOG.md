@@ -2340,3 +2340,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep product demo paths stable while preserving live SMS, provider, billing, AI, and worker hard gates.
+
+## Run 264  GREEN  campaign-fake-ai-copy-assist  2026-05-21 21:05
+Objective:    Surface deterministic fake campaign-copy generation inside the product campaign composer.
+Changed:
+- Added a fake-AI copy assist to `/dashboard/campaigns` that calls the existing local campaign-copy endpoint and applies selected variants to the draft body.
+- Extended the seeded product demo path to generate fake copy, apply a variant, and continue local preflight/schedule without live AI or SMS.
+- Updated the short plan and current-state matrix to reflect the product campaign fake-AI workflow.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep product demo paths stable while preserving live SMS, provider, billing, live AI, and worker hard gates.

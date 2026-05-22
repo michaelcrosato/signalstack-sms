@@ -7,7 +7,7 @@ This repo follows `docs/CANONICAL_IMPLEMENTATION_PLAN.md`. That canonical plan r
 As of 2026-05-21:
 
 - The repo has strong demo-safe foundations: data model, tenant boundaries, contracts, validation gates, seed data, local worker paths, Twilio webhook foundations, read-only operations surfaces, and automated tests.
-- The browser experience now has a product-facing dashboard, contacts, contact restore/merge, campaigns, campaign detail/edit/cancel, inbox, templates, template detail/edit, analytics, and compliance flow, with remaining gaps around demo polish and production readiness.
+- The browser experience now has a product-facing dashboard, contacts, contact restore/merge, campaigns with fake-AI copy assist, campaign detail/edit/cancel, inbox, templates, template detail/edit, analytics, and compliance flow, with remaining gaps around demo polish and production readiness.
 - Live messaging remains blocked by default. The only intentional live external-impact path is the isolated `/demo` live-test SMS surface, which requires explicit Twilio credentials, live flags, a recipient allowlist, and the confirmation phrase.
 - Live campaign sending, live AI, live billing, real auth, production secret management, production Redis/rate-limit infrastructure, and production deployment are not complete.
 - Planning inputs from Claude, Gemini, Grok, and Codex are captured under `planning/`; the current consensus is summarized in `planning/CONSENSUS-2026-05-21.md`.
@@ -56,7 +56,7 @@ Goal: make SignalStack feel like usable SMS software, not only a system audit co
 
 - Product shell at `/dashboard` has primary navigation for contacts, campaigns, inbox, templates, analytics, compliance, and settings.
 - Keep the contacts list/import/detail UI on existing APIs, including local soft archive, restore, and duplicate merge.
-- Campaign composer, recipient selection, preflight, schedule, detail, draft edit, and queued-campaign cancel UI on existing APIs are in place for the first product demo path.
+- Campaign composer, fake-AI copy assist, recipient selection, preflight, schedule, detail, draft edit, and queued-campaign cancel UI on existing APIs are in place for the first product demo path.
 - Inbox list/thread UI with demo inbound, assignment, notes, resolve/reopen, and STOP visibility is in place on existing APIs.
 - Template list/create/detail/edit UI and contact detail/edit/merge UI are in place on existing APIs.
 - Keep the gated live-test SMS demo available but visually separated from normal campaign sending.

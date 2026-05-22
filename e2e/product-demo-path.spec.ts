@@ -199,6 +199,13 @@ test("product campaigns page creates, preflights, and schedules a local campaign
   await expect(page.getByText("Demo intro campaign")).toBeVisible();
 
   await page.getByLabel("Campaign name").fill(campaignName);
+  await expect(page.getByRole("heading", { name: "Fake AI copy assist" })).toBeVisible();
+  await page.getByLabel("Copy prompt").fill("Invite opted-in leads to book a same-week walkthrough");
+  await page.getByRole("button", { name: "Generate Fake Copy" }).click();
+  await expect(page.getByRole("status")).toContainText("Fake AI copy generated locally");
+  await expect(page.getByText("SignalStack Demo Co: Demo-safe campaign copy")).toBeVisible();
+  await page.getByRole("button", { name: "Use Variant 1" }).click();
+  await expect(page.getByLabel("Message body")).toHaveValue(/same-week walkthrough/);
   await page.getByRole("button", { name: "Save Draft And Preflight" }).click();
 
   await expect(page.getByRole("status")).toContainText("Draft saved");

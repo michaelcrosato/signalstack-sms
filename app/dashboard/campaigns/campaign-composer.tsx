@@ -24,6 +24,11 @@ type PreflightResult = {
   recipients: Array<{ contactId: string; allowed: boolean; reasons: string[] }>;
 };
 
+type AiCopyResult = {
+  provider: "fake";
+  variants: string[];
+};
+
 const defaultSchedule = () => {
   const nextHour = new Date(Date.now() + 60 * 60 * 1000);
   nextHour.setMinutes(0, 0, 0);
@@ -41,6 +46,9 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
   const [campaignId, setCampaignId] = useState<string | null>(null);
   const [preflight, setPreflight] = useState<PreflightResult | null>(null);
   const [scheduledAt, setScheduledAt] = useState(defaultSchedule);
+  const [copyPrompt, setCopyPrompt] = useState("Invite opted-in leads to book a quick demo");
+  const [copyVariants, setCopyVariants] = useState<string[]>([]);
+  const [aiPending, setAiPending] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -57,6 +65,29 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
     setContactIds((current) =>
       current.includes(contactId) ? current.filter((id) => id !== contactId) : [...current, contactId]
     );
+  }
+
+  async function generateCopy() {
+    setAiPending(true);
+    setError(null);
+    setStatus(null);
+
+    const response = await fetch("/api/ai/campaign-copy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: copyPrompt, businessName: "SignalStack Demo Co", tone: "concise" })
+    });
+    const payload = (await response.json()) as AiCopyResult | { error?: string };
+
+    if (!response.ok || !("variants" in payload)) {
+      setError(("error" in payload && payload.error) || "Fake AI copy could not be generated.");
+      setAiPending(false);
+      return;
+    }
+
+    setCopyVariants(payload.variants);
+    setStatus("Fake AI copy generated locally. Live AI remains blocked.");
+    setAiPending(false);
   }
 
   async function createCampaign(event: FormEvent<HTMLFormElement>) {
@@ -155,6 +186,47 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
             ))}
           </select>
         </label>
+
+        <section aria-label="Fake AI copy assist" className="grid gap-3 rounded border border-slate-200 bg-slate-50 p-4">
+          <div>
+            <h3 className="font-semibold text-slate-950">Fake AI copy assist</h3>
+            <p className="mt-1 text-sm text-slate-600">
+              Generates deterministic local copy only. Live AI providers stay blocked.
+            </p>
+          </div>
+          <label className="grid gap-2 text-sm font-medium text-slate-700">
+            Copy prompt
+            <input
+              className="rounded border border-slate-300 bg-white px-3 py-2 text-slate-950"
+              onChange={(event) => setCopyPrompt(event.target.value)}
+              value={copyPrompt}
+            />
+          </label>
+          <button
+            className="rounded border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:text-slate-400"
+            disabled={aiPending || copyPrompt.trim().length === 0}
+            onClick={generateCopy}
+            type="button"
+          >
+            {aiPending ? "Generating" : "Generate Fake Copy"}
+          </button>
+          {copyVariants.length > 0 ? (
+            <div className="grid gap-2">
+              {copyVariants.map((variant, index) => (
+                <div className="grid gap-2 rounded border border-slate-200 bg-white p-3" key={variant}>
+                  <p className="text-sm text-slate-700">{variant}</p>
+                  <button
+                    className="justify-self-start rounded border border-teal-700 px-3 py-1.5 text-sm font-semibold text-teal-700"
+                    onClick={() => setBody(variant)}
+                    type="button"
+                  >
+                    Use Variant {index + 1}
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </section>
 
         <label className="grid gap-2 text-sm font-medium text-slate-700">
           Message body
