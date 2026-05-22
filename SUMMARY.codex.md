@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 403
+
+- Latest live-worker control coverage proves proxy-invalid configurable supplied control-array `length` descriptors deny cleanly without leaking descriptor invariant errors or reading indexed controls.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 426 tests, Playwright smoke, and build green.
+- Updated testing contract/docs, production-worker policy, NEXT_PROMPTS, LOOP_LOG, BLOCKERS, and current state matrix for the invalid configurable length-descriptor boundary.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 402
 
 - Latest live-worker control coverage proves supplied control arrays with missing or accessor-backed `length` descriptors deny before indexed controls are inspected.

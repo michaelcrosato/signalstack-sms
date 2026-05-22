@@ -455,6 +455,24 @@ describe("production live campaign worker controls", () => {
 
           return Reflect.getOwnPropertyDescriptor(target, property);
         }
+      }),
+      new Proxy([...implementedControls], {
+        getOwnPropertyDescriptor: (target, property) => {
+          if (property === "length") {
+            return {
+              value: implementedControls.length,
+              enumerable: false,
+              writable: false,
+              configurable: true
+            };
+          }
+
+          if (property === "0") {
+            throw new Error("invalid configurable length evidence must deny before reading indexed controls");
+          }
+
+          return Reflect.getOwnPropertyDescriptor(target, property);
+        }
       })
     ];
 

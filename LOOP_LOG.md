@@ -3629,3 +3629,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 403  GREEN  live-worker-invalid-length-descriptor-evidence  2026-05-22 10:14
+Objective:    Prove proxy-invalid configurable supplied control-array length descriptors deny without leaking descriptor invariant errors.
+Changed:
+- Added live-worker control coverage for proxy-supplied configurable `length` descriptors whose indexed descriptors would throw if inspected.
+- Updated testing contract/docs, production-worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the invalid configurable length-descriptor boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
