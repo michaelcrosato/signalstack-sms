@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 248
+
+- Hardened live-worker planned-control denial coverage for Run 248.
+- Latest repo truth: `liveWorkerDeploymentClassIsAuthorized` now has explicit unit coverage proving the reserved `production-live-campaign` class remains unauthorized when supplied with the built-in planned checklist or only partially implemented checklist evidence.
+- Focused live-worker control tests passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 247
 
 - Hardened live-worker supplied control array key-order validation for Run 247.

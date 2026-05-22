@@ -2185,3 +2185,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 248  GREEN  live-worker-planned-control-denial  2026-05-21 19:35
+Objective:    Prove planned or partially implemented live-worker control evidence cannot authorize the reserved production worker class.
+Changed:
+- Added queue unit coverage proving `production-live-campaign` remains unauthorized with the built-in planned checklist and with only one control marked implemented.
+- Updated SUMMARY and BLOCKERS to record that the change is local metadata/test coverage only.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.

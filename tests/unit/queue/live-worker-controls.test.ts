@@ -970,6 +970,11 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerDeploymentClassIsAuthorized({ workerDeploymentClass: reservedLiveWorkerDeploymentClass })).toBe(false);
     expect(
       liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, productionLiveCampaignWorkerControls)
+      )
+    ).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
         frozenAuthorizationWrapper(
           reservedLiveWorkerDeploymentClass,
           Object.freeze([
@@ -979,6 +984,21 @@ describe("production live campaign worker controls", () => {
               requirement: "Only one implemented control is not enough to authorize live worker execution."
             })
           ])
+        )
+      )
+    ).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(
+          reservedLiveWorkerDeploymentClass,
+          Object.freeze(
+            productionLiveCampaignWorkerControls.map((control, index) =>
+              Object.freeze({
+                ...control,
+                status: index === 0 ? "implemented" : control.status
+              })
+            )
+          )
         )
       )
     ).toBe(false);
