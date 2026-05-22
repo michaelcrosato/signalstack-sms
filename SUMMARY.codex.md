@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 410
+
+- Latest live-worker control coverage proves non-primitive supplied control-entry public-field values cannot authorize the reserved `production-live-campaign` class. Hostile object-backed `id`/`requirement` values and boxed-string `status` values deny without coercion.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, Vitest, Playwright smoke, and build green.
+- Updated queue/testing contracts, production-worker policy, NEXT_PROMPTS, BLOCKERS, LOOP_LOG, and current state matrix for the public-field-value non-coercion boundary.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 407
 
 - Latest live-worker control coverage proves proxy-invalid supplied control-array indexed descriptors deny cleanly without leaking descriptor invariant errors or authorizing the reserved `production-live-campaign` class.

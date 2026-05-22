@@ -651,6 +651,52 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects non-primitive control public-field values without coercion", () => {
+    const implementedControls = implementedFrozenControls();
+    const hostileValue = Object.freeze({
+      [Symbol.toPrimitive]: () => {
+        throw new Error("control public-field values must not be coerced");
+      },
+      toString: () => {
+        throw new Error("control public-field values must not be stringified");
+      },
+      valueOf: () => {
+        throw new Error("control public-field values must not use valueOf");
+      }
+    });
+    const malformedControls = [
+      Object.freeze({
+        id: hostileValue,
+        status: "implemented" as const,
+        requirement: implementedControls[0].requirement
+      }),
+      Object.freeze({
+        id: implementedControls[0].id,
+        status: Object.freeze(new String("implemented")) as LiveWorkerControl["status"],
+        requirement: implementedControls[0].requirement
+      }),
+      Object.freeze({
+        id: implementedControls[0].id,
+        status: "implemented" as const,
+        requirement: hostileValue
+      })
+    ];
+
+    for (const malformedControl of malformedControls) {
+      const controls = Object.freeze(
+        implementedControls.map((control, index) => (index === 0 ? malformedControl : Object.freeze({ ...control })))
+      );
+
+      expect(() => liveWorkerControlIdsMatchRequiredChecklist(controls)).not.toThrow();
+      expect(() => liveWorkerControlsUseSupportedStatuses(controls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).toBe(false);
+    }
+  });
+
   it("requires live-worker controls to expose own enumerable data fields", () => {
     const implementedControls = implementedFrozenControls();
     const accessorBackedControl = Object.freeze(

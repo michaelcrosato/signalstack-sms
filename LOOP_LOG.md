@@ -3686,3 +3686,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue live-worker hardening without enabling live sends.
+
+## Run 410  GREEN  live-worker-public-field-value-evidence  2026-05-22 11:40
+Objective:    Prove non-primitive supplied control-entry public-field values cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for hostile object-backed `id`/`requirement` values and boxed-string `status` values.
+- Updated queue/testing contracts, production-worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the public-field-value non-coercion boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
