@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 379  GREEN  live-worker-inherited-index-evidence  2026-05-22 08:07
+Objective:    Prove inherited supplied control-array index slots cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for sparse supplied control arrays with hostile inherited indexed getters on `Array.prototype`.
+- Updated queue/testing contracts, production-worker/testing docs, SUMMARY, BLOCKERS, NEXT_PROMPTS, and current state matrix for the inherited-index evidence boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 378  GREEN  api-inventory-runbook-truth  2026-05-22 08:08
 Objective:    Align the local operator runbook with the current API inventory external-impact route classification.
 Changed:
