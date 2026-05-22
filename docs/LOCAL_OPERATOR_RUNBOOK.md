@@ -28,6 +28,22 @@ $env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalsta
 npm run validate
 ```
 
+## Autonomous Codex Loop
+
+For the unattended local loop:
+
+```powershell
+.\codex-skynet-max.ps1 -FullYolo -KeepAwake
+```
+
+This launch path is endless by default and should stop only when the PowerShell process is interrupted or killed. Use `-FuseMinutes <minutes>` only when a capped run is wanted. If `codex exec` or the protected local gate exits nonzero, the loop waits briefly and starts a fresh iteration; failed gates are not treated as green.
+
+For a strict one-shot launch check:
+
+```powershell
+.\codex-skynet-max.ps1 -PreflightOnly
+```
+
 Run the seeded investor path after changes that touch pages, APIs, seed data, provider metadata, exports, campaigns, inbox, AI, analytics, billing, or middleware:
 
 ```bash

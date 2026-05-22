@@ -57,7 +57,7 @@ while ($true) {
   }
 
   & (Join-Path $PSScriptRoot "assert-gate-integrity.ps1")
-  $integrityExitCode = $LASTEXITCODE
+  $integrityExitCode = if ($?) { 0 } else { 1 }
   if ($integrityExitCode -ne 0) {
     Write-Warning "Gate integrity check exited $integrityExitCode. Waiting before the next loop attempt."
     Wait-BeforeNextIteration
@@ -76,7 +76,7 @@ Do not use production credentials or destructive live-world actions.
     Write-Host "Dry run: would invoke Codex for one loop iteration with the operating prompt."
     Write-Host $prompt
     & (Join-Path $PSScriptRoot "local-gate.ps1")
-    $dryGateExitCode = $LASTEXITCODE
+    $dryGateExitCode = if ($?) { 0 } else { 1 }
     if ($dryGateExitCode -ne 0) {
       Write-Warning "Dry iteration local gate exited $dryGateExitCode."
     }
@@ -105,7 +105,7 @@ Do not use production credentials or destructive live-world actions.
   }
 
   & (Join-Path $PSScriptRoot "local-gate.ps1")
-  $gateExitCode = $LASTEXITCODE
+  $gateExitCode = if ($?) { 0 } else { 1 }
   if ($gateExitCode -ne 0) {
     if (Test-FuseExpired) {
       Write-Error "Protected local gate exited $gateExitCode at the fuse deadline. Human restart required."

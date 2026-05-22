@@ -18,6 +18,9 @@ It intentionally avoids adding doctrine, retry counters, multi-agent machinery,
 or alternate validation rules.
 
 Run:
+  .\codex-skynet-max.ps1 -FullYolo -KeepAwake
+
+Optional capped run:
   .\codex-skynet-max.ps1 -FullYolo -KeepAwake -FuseMinutes 4320
 
 Optional one-shot preflight:
@@ -28,9 +31,10 @@ Optional one-shot preflight:
 param(
   [string]$Repo = "C:\dev\signalstack-sms",
 
-  # Cost/time fuse. This is the unattended backstop for "Never Stop Looping."
-  # 4320 minutes = 72 hours, enough for an unattended weekend run.
-  [int]$FuseMinutes = 4320,
+  # Optional cost/time fuse. The default is endless; use Ctrl+C or stop the process to end it.
+  # 4320 minutes = 72 hours for a capped unattended weekend run.
+  [int]$FuseMinutes = 0,
+  [int]$GateRetryDelaySeconds = 15,
 
   [switch]$FullYolo,
   [switch]$KeepAwake,
@@ -88,6 +92,20 @@ function Assert-RequiredPath {
 
 $repoRoot = (Resolve-Path $Repo).Path
 Set-Location $repoRoot
+$startedAt = Get-Date
+$deadline = if ($FuseMinutes -gt 0) {
+  $startedAt.AddMinutes($FuseMinutes)
+} else {
+  $null
+}
+
+function Test-FuseExpired {
+  $null -ne $deadline -and (Get-Date) -ge $deadline
+}
+
+function Wait-BeforeRestart {
+  Start-Sleep -Seconds $GateRetryDelaySeconds
+}
 
 Require-Command "git" | Out-Null
 Require-Command "npm" | Out-Null
@@ -98,11 +116,16 @@ if (-not $PreflightOnly) {
 Write-Host "========================================"
 Write-Host "SignalStack SMS canonical loop launcher"
 Write-Host "Repo: $repoRoot"
-Write-Host "FuseMinutes: $FuseMinutes"
+if ($FuseMinutes -gt 0) {
+  Write-Host "FuseMinutes: $FuseMinutes"
+} else {
+  Write-Host "FuseMinutes: none"
+}
+Write-Host "GateRetryDelaySeconds: $GateRetryDelaySeconds"
 Write-Host "FullYolo: $FullYolo"
 Write-Host "PreflightOnly: $PreflightOnly"
 Write-Host "DryIteration: $DryIteration"
-Write-Host "Started: $(Get-Date)"
+Write-Host "Started: $startedAt"
 Write-Host "========================================"
 
 if ($KeepAwake) {
@@ -132,18 +155,29 @@ Write-Host "Required canonical loop files exist."
 # First trust boundary: protected files must match the pinned manifest.
 Invoke-RepoScript -ScriptPath "scripts\assert-gate-integrity.ps1"
 
-# Second trust boundary: current repo must be green before unattended looping.
-Invoke-RepoScript -ScriptPath "scripts\local-gate.ps1"
+# Second trust boundary: preflight mode must be green. Normal loop mode can start from
+# a red or transiently crashed local gate because the agent loop is responsible for repair.
+if ($PreflightOnly) {
+  Invoke-RepoScript -ScriptPath "scripts\local-gate.ps1"
+} else {
+  try {
+    Invoke-RepoScript -ScriptPath "scripts\local-gate.ps1"
+  } catch {
+    Write-Warning "Initial local gate did not pass before loop launch: $($_.Exception.Message)"
+    Write-Warning "Continuing into the repo-native loop; failed gates are not treated as green."
+  }
+}
 
 if ($PreflightOnly) {
   Write-Host "Preflight passed. Exiting because -PreflightOnly was supplied."
   exit 0
 }
 
-$loopArgs = @(
-  "-Repo", $repoRoot,
-  "-FuseMinutes", "$FuseMinutes"
-)
+$loopArgs = @("-Repo", $repoRoot, "-GateRetryDelaySeconds", "$GateRetryDelaySeconds")
+
+if ($FuseMinutes -gt 0) {
+  $loopArgs += @("-FuseMinutes", "$FuseMinutes")
+}
 
 if ($FullYolo) {
   $loopArgs += "-FullYolo"
@@ -163,18 +197,45 @@ Write-Host "Loop script: scripts\run-codex-yolo-loop.ps1"
 Write-Host "Arguments: $($loopArgs -join ' ')"
 Write-Host ""
 
-& powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "scripts\run-codex-yolo-loop.ps1" @loopArgs
-$loopExit = $LASTEXITCODE
+while ($true) {
+  if (Test-FuseExpired) {
+    Write-Error "Outer launcher fuse reached after $FuseMinutes minutes. Human restart required."
+    exit 1
+  }
 
-Write-Host ""
-Write-Host "========================================"
-Write-Host "Canonical loop ended"
-Write-Host "Exit code: $loopExit"
-Write-Host "Finished: $(Get-Date)"
-Write-Host "Latest commits:"
-git log --oneline -10
-Write-Host "Current status:"
-git status --short
-Write-Host "========================================"
+  & powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "scripts\run-codex-yolo-loop.ps1" @loopArgs
+  $loopExit = $LASTEXITCODE
 
-exit $loopExit
+  Write-Host ""
+  Write-Host "========================================"
+  Write-Host "Canonical loop ended"
+  Write-Host "Exit code: $loopExit"
+  Write-Host "Finished: $(Get-Date)"
+  Write-Host "Latest commits:"
+  git log --oneline -10
+  Write-Host "Current status:"
+  git status --short
+  Write-Host "========================================"
+
+  if ($DryIteration) {
+    exit $loopExit
+  }
+
+  if ($loopExit -eq 0) {
+    if (Test-FuseExpired) {
+      exit 0
+    }
+
+    Write-Warning "Repo-native loop exited cleanly before the launcher was stopped. Restarting it."
+    Wait-BeforeRestart
+    continue
+  }
+
+  if (Test-FuseExpired) {
+    Write-Error "Repo-native loop exited $loopExit at the fuse deadline. Human restart required."
+    exit $loopExit
+  }
+
+  Write-Warning "Repo-native loop exited $loopExit. Restarting it; failed gates are not treated as green."
+  Wait-BeforeRestart
+}
