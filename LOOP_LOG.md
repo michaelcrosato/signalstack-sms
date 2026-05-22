@@ -2845,3 +2845,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 321  GREEN  bracket-descriptor-prototype-auth-scan  2026-05-22 02:26
+Objective:    Prevent bracket-notation descriptor/prototype request body-reader lookups from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to recognize bracket-notation `Object`/`Reflect` descriptor and prototype lookup methods.
+- Added synthetic auth unit coverage proving bracketed descriptor/prototype lookups fail before the role gate and pass after it.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the bracket-notation descriptor/prototype lookup boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.

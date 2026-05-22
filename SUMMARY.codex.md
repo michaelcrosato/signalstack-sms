@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 321
+
+- Hardened bracket-notation descriptor/prototype body-reader authorization coverage for Run 321.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now recognizes `Object["getOwnPropertyDescriptor"](...)`, ``Reflect[`getOwnPropertyDescriptor`](...)``, `Object["getPrototypeOf"](...)`, and `Reflect?.["getPrototypeOf"]?.(...)` when they resolve standard `Request` body readers, so descriptor-derived body parsing cannot occur before a mutating handler's top-level `requireApiRole`.
+- Updated the testing contract and testing docs to name the bracket-notation descriptor/prototype lookup boundary.
+- Focused auth coverage, contracts check, typecheck, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 320
 
 - Hardened bracket-notation reflective body-reader authorization coverage for Run 320.
