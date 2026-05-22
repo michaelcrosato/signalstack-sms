@@ -3942,3 +3942,12 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+## Run 438  GREEN  live-worker-crlf-class-evidence  2026-05-22 14:22
+Objective:    Prove carriage-return and CRLF-padded reserved live-worker deployment-class strings deny before supplied controls are inspected.
+Changed:
+- Added live-worker authorization coverage for carriage-return-padded and CRLF-padded `production-live-campaign` class strings.
+- Updated queue/testing contracts, production-worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the expanded whitespace-padded deployment-class boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.

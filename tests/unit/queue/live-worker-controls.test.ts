@@ -1770,6 +1770,8 @@ describe("production live campaign worker controls", () => {
       `${reservedLiveWorkerDeploymentClass} `,
       `\t${reservedLiveWorkerDeploymentClass}`,
       `${reservedLiveWorkerDeploymentClass}\n`,
+      `\r${reservedLiveWorkerDeploymentClass}`,
+      `${reservedLiveWorkerDeploymentClass}\r\n`,
       reservedLiveWorkerDeploymentClass.toUpperCase(),
       "Production-Live-Campaign"
     ]) {

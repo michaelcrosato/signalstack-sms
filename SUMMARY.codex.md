@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 438
+
+- Added live-worker authorization coverage proving carriage-return-padded and CRLF-padded `production-live-campaign` deployment-class strings deny before supplied controls are inspected.
+- Updated queue/testing contracts, production-worker policy, NEXT_PROMPTS, TESTING, and current state matrix for the expanded whitespace-padded deployment-class boundary.
+- Focused coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 58 tests.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 446 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 437
 
 - Added live-worker authorization coverage proving tab-padded and newline-padded `production-live-campaign` deployment-class strings deny before supplied controls are inspected.
