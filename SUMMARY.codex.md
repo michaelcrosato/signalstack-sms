@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 314
+
+- Hardened `Reflect.getPrototypeOf(request)` body-reader authorization coverage for Run 314.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now treats `Reflect.getPrototypeOf(req).json.call(req)`, clone-target `.apply(...)`, bound prototype readers, direct `Reflect.apply(Reflect.getPrototypeOf(req).blob, req, [])`, detached aliases, and descriptor-derived `Object.getOwnPropertyDescriptor(Reflect.getPrototypeOf(req), "...")` readers as body parsing when they occur before a mutating handler's top-level `requireApiRole`.
+- Updated the testing contract and testing docs to name the `Reflect.getPrototypeOf(request)` prototype-reader boundary.
+- Focused auth coverage and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 313
 
 - Hardened descriptor-derived `Object.getPrototypeOf(request)` body-reader authorization coverage for Run 313.
