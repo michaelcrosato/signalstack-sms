@@ -1,3 +1,5 @@
+import { UsageEventType } from "@prisma/client";
+import { aggregateUsageEvents } from "@/lib/billing/metering";
 import { prisma } from "@/lib/db/prisma";
 
 export const productNavigation = Object.freeze([
@@ -21,7 +23,8 @@ export async function getProductDashboard(orgId: string) {
     openConversations,
     templates,
     messages,
-    complianceProfile
+    complianceProfile,
+    usageEvents
   ] = await Promise.all([
     prisma.contact.count({ where: { orgId, archivedAt: null } }),
     prisma.contact.count({ where: { orgId, archivedAt: null, consentStatus: "OPTED_IN" } }),
@@ -32,7 +35,8 @@ export async function getProductDashboard(orgId: string) {
     prisma.conversation.count({ where: { orgId, status: "OPEN" } }),
     prisma.messageTemplate.count({ where: { orgId } }),
     prisma.message.count({ where: { orgId } }),
-    prisma.complianceProfile.findUnique({ where: { orgId } })
+    prisma.complianceProfile.findUnique({ where: { orgId } }),
+    prisma.usageEvent.findMany({ where: { orgId }, select: { type: true, quantity: true } })
   ]);
 
   const requiredComplianceFields = [
@@ -43,6 +47,7 @@ export async function getProductDashboard(orgId: string) {
     complianceProfile?.termsOfServiceUrl
   ];
   const completeComplianceFields = requiredComplianceFields.filter(Boolean).length;
+  const usage = aggregateUsageEvents(usageEvents);
 
   return {
     contacts: {
@@ -66,6 +71,10 @@ export async function getProductDashboard(orgId: string) {
       completeFields: completeComplianceFields,
       requiredFields: requiredComplianceFields.length,
       a2pRegistrationStatus: complianceProfile?.a2pRegistrationStatus ?? "NOT_STARTED"
+    },
+    usage: {
+      fakeAiRequests: usage[UsageEventType.AI_REQUEST],
+      totalEvents: Object.values(usage).reduce((total, quantity) => total + quantity, 0)
     }
   };
 }

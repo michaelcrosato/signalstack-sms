@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 273
+
+- Added product dashboard fake-AI usage visibility for Run 273.
+- Latest repo truth: `getProductDashboard` now aggregates existing local usage events, `/dashboard` renders a `Fake AI requests` local analytics pill, and the seeded product demo path verifies the signal.
+- The change is read-only product dashboard display/projection coverage only; it does not mutate usage data, execute reports, create exports, run workers, enqueue jobs, call providers, call Stripe, send SMS/email/notifications, expose secrets, call live AI, or enable live features.
+- Focused product dashboard/analytics unit coverage, typecheck, contracts check, lint, seeded product E2E, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 272
 
 - Added product analytics fake-AI usage share visibility for Run 272.

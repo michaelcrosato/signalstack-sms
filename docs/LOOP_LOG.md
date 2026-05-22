@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 273  GREEN  product-dashboard-fake-ai-usage  2026-05-21 21:45
+Objective:    Surface endpoint-driven fake-AI usage on the product dashboard.
+Changed:
+- Aggregated existing local usage events in the product dashboard projection.
+- Added a read-only `Fake AI requests` analytics pill to `/dashboard`.
+- Extended product dashboard unit coverage, product demo E2E coverage, testing contract, current-state matrix, SUMMARY, and BLOCKERS.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep product demo paths stable while preserving live SMS, provider, billing, live AI, notification, worker, and secret gates.
+
 ## Run 272  GREEN  product-analytics-fake-ai-share  2026-05-21 21:39
 Objective:    Make fake-AI usage share visible in the product analytics workspace.
 Changed:

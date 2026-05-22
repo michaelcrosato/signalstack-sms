@@ -64,6 +64,7 @@ test("product dashboard renders seeded owner workflow checkpoints", async ({ pag
   await expect(analytics.getByText(/\d+\/\d+/)).toBeVisible();
   await expect(analytics.getByText("Scheduled work")).toBeVisible();
   await expect(analytics.getByText("Inbox load")).toBeVisible();
+  await expect(analytics.getByText("Fake AI requests")).toBeVisible();
 });
 
 test("product contacts page lists seeded contacts and imports local CSV rows", async ({ page }) => {
