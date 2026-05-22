@@ -3144,3 +3144,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 349  GREEN  computed-globalthis-request-alias-auth-scan  2026-05-22 05:04
+Objective:    Prevent computed `globalThis["Request"]` constructor aliases from hiding prototype body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize computed and computed-destructured local aliases of `globalThis["Request"]` before `Request.prototype` body-reader checks.
+- Added synthetic auth unit coverage proving `globalThis[requestConstructorName]` and `{ [requestConstructorName]: RequestCtor } = globalThis` forms fail before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the computed constructor-alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
