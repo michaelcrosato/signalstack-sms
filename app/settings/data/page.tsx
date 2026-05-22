@@ -73,11 +73,13 @@ export default async function DataOperationsPage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
-        {operationLinks.map((link) => (
-          <Link key={link.href} className="text-sm font-medium text-teal-700" href={link.href}>
-            {link.label}
-          </Link>
-        ))}
+        <nav aria-label="Related settings" className="flex flex-wrap gap-2">
+          {operationLinks.map((link) => (
+            <Link key={link.href} className="rounded border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-teal-700 transition hover:border-teal-300 hover:bg-teal-50" href={link.href}>
+              {link.label}
+            </Link>
+          ))}
+        </nav>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Data Operations</h1>
@@ -199,3 +201,5 @@ function StatusRow({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+

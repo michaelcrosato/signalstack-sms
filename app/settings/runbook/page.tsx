@@ -50,11 +50,11 @@ export default function OperatorRunbookPage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
-        {adminLinks.map((link) => (
-          <Link key={link.href} className="text-sm font-medium text-teal-700" href={link.href}>
-            {link.label}
-          </Link>
-        ))}
+        <nav aria-label="Related settings" className="flex flex-wrap gap-2">
+          <HeaderLink href="/settings" label="Go-Live Readiness" />
+          <HeaderLink href="/settings/operations" label="Operations Index" />
+          <HeaderLink href="/settings/demo" label="Demo Operations" />
+        </nav>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Operator Runbook</h1>
@@ -134,6 +134,17 @@ function CommandPanel({ title, commands }: { title: string; commands: string[] }
 function AdminLink({ href, label }: { href: string; label: string }) {
   return (
     <Link className="rounded border border-slate-200 px-3 py-2 font-semibold text-teal-700" href={href}>
+      {label}
+    </Link>
+  );
+}
+
+function HeaderLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      className="rounded border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-teal-700 transition hover:border-teal-300 hover:bg-teal-50"
+      href={href}
+    >
       {label}
     </Link>
   );

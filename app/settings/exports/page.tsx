@@ -18,7 +18,15 @@ export default async function SettingsExportsPage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
-        <nav aria-label="Admin export operations" className="grid gap-2 md:grid-cols-3">
+        <div>
+          <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
+          <h1 className="text-4xl font-semibold text-slate-950">Admin Exports</h1>
+        </div>
+      </header>
+
+      <section className="rounded border border-slate-200 bg-white p-5">
+        <h2 className="text-lg font-semibold text-slate-950">Export Operations</h2>
+        <nav aria-label="Admin export operations" className="mt-4 grid gap-2 md:grid-cols-3">
           {operationLinks.map((link) => (
             <Link key={link.href} className="rounded border border-slate-200 p-3 text-sm font-medium text-teal-700" href={link.href}>
               <span>{link.label}</span>
@@ -26,11 +34,7 @@ export default async function SettingsExportsPage() {
             </Link>
           ))}
         </nav>
-        <div>
-          <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
-          <h1 className="text-4xl font-semibold text-slate-950">Admin Exports</h1>
-        </div>
-      </header>
+      </section>
 
       <section className="grid gap-6 md:grid-cols-2">
         <ExportPanel

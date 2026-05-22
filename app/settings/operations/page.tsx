@@ -10,15 +10,11 @@ export default function OperationsIndexPage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
-        <Link className="text-sm font-medium text-teal-700" href="/">
-          Local Launch Dashboard
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/demo">
-          Demo Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
-          Operator Runbook
-        </Link>
+        <nav aria-label="Related settings" className="flex flex-wrap gap-2">
+          <HeaderLink href="/" label="Local Launch Dashboard" />
+          <HeaderLink href="/settings/demo" label="Demo Operations" />
+          <HeaderLink href="/settings/runbook" label="Operator Runbook" />
+        </nav>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Operations Index</h1>
@@ -82,5 +78,16 @@ function Panel({ title, children }: { title: string; children: ReactNode }) {
       <h2 className="text-lg font-semibold text-slate-950">{title}</h2>
       <div className="mt-4">{children}</div>
     </section>
+  );
+}
+
+function HeaderLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      className="rounded border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-teal-700 transition hover:border-teal-300 hover:bg-teal-50"
+      href={href}
+    >
+      {label}
+    </Link>
   );
 }

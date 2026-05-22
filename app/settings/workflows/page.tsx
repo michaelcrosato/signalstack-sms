@@ -29,24 +29,14 @@ export default async function WorkflowOperationsPage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
-        <Link className="text-sm font-medium text-teal-700" href="/settings">
-          Go-Live Readiness
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/demo">
-          Demo Console
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/demo">
-          Demo Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/integrations">
-          Integration Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/reports">
-          Reporting Index
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/releases">
-          Release Operations
-        </Link>
+        <nav aria-label="Related settings" className="flex flex-wrap gap-2">
+          <HeaderLink href="/settings" label="Go-Live Readiness" />
+          <HeaderLink href="/demo" label="Demo Console" />
+          <HeaderLink href="/settings/demo" label="Demo Operations" />
+          <HeaderLink href="/settings/integrations" label="Integration Operations" />
+          <HeaderLink href="/settings/reports" label="Reporting Index" />
+          <HeaderLink href="/settings/releases" label="Release Operations" />
+        </nav>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Workflow Operations</h1>
@@ -146,6 +136,17 @@ function Panel({ title, children }: { title: string; children: ReactNode }) {
       <h2 className="text-lg font-semibold text-slate-950">{title}</h2>
       <div className="mt-4">{children}</div>
     </section>
+  );
+}
+
+function HeaderLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      className="rounded border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-teal-700 transition hover:border-teal-300 hover:bg-teal-50"
+      href={href}
+    >
+      {label}
+    </Link>
   );
 }
 

@@ -33,24 +33,14 @@ export default async function DemoOperationsPage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
-        <Link className="text-sm font-medium text-teal-700" href="/demo">
-          Demo Console
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings">
-          Go-Live Readiness
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/operations">
-          Operations Index
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/workflows">
-          Workflow Operations
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/reports">
-          Reporting Index
-        </Link>
-        <Link className="text-sm font-medium text-teal-700" href="/settings/runbook">
-          Operator Runbook
-        </Link>
+        <nav aria-label="Related settings" className="flex flex-wrap gap-2">
+          <HeaderLink href="/demo" label="Demo Console" />
+          <HeaderLink href="/settings" label="Go-Live Readiness" />
+          <HeaderLink href="/settings/operations" label="Operations Index" />
+          <HeaderLink href="/settings/workflows" label="Workflow Operations" />
+          <HeaderLink href="/settings/reports" label="Reporting Index" />
+          <HeaderLink href="/settings/runbook" label="Operator Runbook" />
+        </nav>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
           <h1 className="text-4xl font-semibold text-slate-950">Demo Operations</h1>
@@ -154,6 +144,17 @@ function OperationLink({ href, label, note }: { href: string; label: string; not
       </Link>
       <p className="mt-2 text-slate-600">{note}</p>
     </li>
+  );
+}
+
+function HeaderLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      className="rounded border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-teal-700 transition hover:border-teal-300 hover:bg-teal-50"
+      href={href}
+    >
+      {label}
+    </Link>
   );
 }
 
