@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 313
+
+- Hardened descriptor-derived `Object.getPrototypeOf(request)` body-reader authorization coverage for Run 313.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes `Object.getOwnPropertyDescriptor(Object.getPrototypeOf(req), "...")?.value`, bracket-value, non-null, clone-target, and local property-alias forms to prototype body readers, so those calls are treated as body parsing when they occur before a mutating handler's top-level `requireApiRole`.
+- Updated the testing contract and testing docs to name the descriptor-derived `Object.getPrototypeOf(request)` body-reader boundary.
+- Focused auth coverage and the protected local gate passed. The first `db:migrate` attempt used the wrong local demo username and failed with Postgres auth; rerunning with `.env.example`'s `signalstack:signalstack` local URL passed, followed by `demo:seed` and `npm run validate`.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 312
 
 - Hardened `Object.getPrototypeOf(request)` body-reader authorization coverage for Run 312.

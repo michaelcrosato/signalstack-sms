@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 313  GREEN  object-prototype-descriptor-body-reader-scan  2026-05-22 01:37
+Objective:    Prevent descriptor-derived `Object.getPrototypeOf(request)` body readers from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize `Object.getOwnPropertyDescriptor(Object.getPrototypeOf(req), "...")` body-reader descriptors.
+- Added synthetic auth unit coverage for optional, non-null, bracket-value, clone-target, and property-alias descriptor-derived prototype readers before `requireApiRole`.
+- Updated testing docs, SUMMARY, and BLOCKERS for the descriptor-derived `Object.getPrototypeOf(request)` boundary.
+Gate:         passed after rerunning local `db:migrate` with the repo's demo-safe `signalstack:signalstack` Postgres URL because my first attempt used the wrong local username
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 311  GREEN  template-bracket-body-reader-scan  2026-05-22 01:23
 Objective:    Prevent template-literal bracket body-reader properties from bypassing mutating-route role-gate ordering checks.
 Changed:
