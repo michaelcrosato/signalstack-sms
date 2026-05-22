@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 304  GREEN  inline-cloned-reflect-body-reader-scan  2026-05-22 00:37
+Objective:    Prevent inline cloned `Reflect.apply` and `Reflect.get` request body-reader forms from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Added synthetic auth unit coverage for `Reflect.apply(req.clone().blob, req.clone(), [])` and `Reflect.get(req.clone(), "blob").call(req.clone())` before `requireApiRole`.
+- Split reflected-reader normalization from non-code masking and fixed parenthesized clone cleanup so `.call(req.clone())` is not collapsed into an undetectable token.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the inline cloned reflective reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 303  GREEN  reflect-get-body-reader-scan  2026-05-22 00:30
 Objective:    Prevent `Reflect.get` request body-reader lookups from bypassing mutating-route role-gate ordering checks.
 Changed:

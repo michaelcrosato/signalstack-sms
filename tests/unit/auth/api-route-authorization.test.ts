@@ -174,11 +174,11 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   const variableDeclaratorStart = "(?:\\b(?:const|let|var)\\s+|,\\s*)";
   const variableDeclaratorTerminator = "(?:,|;|\\r?\\n)";
   const variableDeclaratorEnd = `\\s*(?=${variableDeclaratorTerminator})`;
-  const normalizedBodySlice = maskNonCodeTokens(bodySlice
+  const reflectedBodySlice = bodySlice
     .replace(/\?\.\s*\[/g, "[")
     .replace(
       new RegExp(
-        `\\bReflect\\s*\\.\\s*get\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\.\\s*clone\\s*\\(\\s*\\)\\s*,\\s*["'](${requestBodyReaderNames})["']\\s*\\)`,
+        `Reflect\\s*\\.\\s*get\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\.\\s*clone\\s*\\(\\s*\\)\\s*,\\s*["'](${requestBodyReaderNames})["']\\s*\\)`,
         "g"
       ),
       "$1.clone().$2"
@@ -204,8 +204,9 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
       ),
       "$1"
     )
-    .replace(/\(\s*([A-Za-z_$][\w$]*)\s*\.\s*clone\s*\(\s*\)\s*\)/g, "$1.clone()")
-    .replace(/(^|[^A-Za-z0-9_$.\]])\(\s*([A-Za-z_$][\w$]*)\s*\)/g, "$1$2"));
+    .replace(/(^|[^A-Za-z0-9_$.\]])\(\s*([A-Za-z_$][\w$]*)\s*\.\s*clone\s*\(\s*\)\s*\)/g, "$1$2.clone()")
+    .replace(/(^|[^A-Za-z0-9_$.\]])\(\s*([A-Za-z_$][\w$]*)\s*\)/g, "$1$2");
+  const normalizedBodySlice = maskNonCodeTokens(reflectedBodySlice);
   const requestAliases = new Set([requestParameterName]);
   let discoveredRequestAlias = true;
   while (discoveredRequestAlias) {
@@ -1569,6 +1570,14 @@ describe("API route authorization coverage", () => {
         return Response.json({ payload });
       }
     `;
+    const unsafeInlineCloneSource = `
+      export async function POST(req: Request) {
+        const payload = await Reflect.apply(req.clone().blob, req.clone(), []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
     const unsafeDetachedSource = `
       export async function PUT(req: Request) {
         const readFormData = req.formData;
@@ -1598,6 +1607,7 @@ describe("API route authorization coverage", () => {
 
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCloneSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeInlineCloneSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDetachedSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDestructuredSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
@@ -1675,6 +1685,14 @@ describe("API route authorization coverage", () => {
         return Response.json({ payload });
       }
     `;
+    const unsafeInlineCloneSource = `
+      export async function POST(req: Request) {
+        const payload = await Reflect.get(req.clone(), "blob").call(req.clone());
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
     const unsafeAliasSource = `
       export async function PUT(req: Request) {
         const readFormData = Reflect.get(req, "formData");
@@ -1705,6 +1723,7 @@ describe("API route authorization coverage", () => {
 
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCloneSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeInlineCloneSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
