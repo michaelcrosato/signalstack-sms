@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 432  GREEN  live-worker-non-enumerable-index-evidence  2026-05-22 13:49
+Objective:    Prove non-enumerable supplied control-array index slots cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for `production-live-campaign` control arrays whose indexed data slot is non-enumerable.
+- Updated testing contract, NEXT_PROMPTS, and current state matrix for the non-enumerable indexed-slot boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 430  GREEN  contract-route-regex-literal-masking  2026-05-22 13:39
 Objective:    Prevent regex-literal examples from creating false implemented API route-method inventory.
 Changed:

@@ -338,6 +338,27 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects non-enumerable indexed control-array descriptors before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const nonEnumerableIndexControls = [...implementedControls];
+    Object.defineProperty(nonEnumerableIndexControls, "0", {
+      value: implementedControls[0],
+      enumerable: false,
+      writable: false,
+      configurable: false
+    });
+    Object.preventExtensions(nonEnumerableIndexControls);
+
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(nonEnumerableIndexControls)).toBe(false);
+    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(nonEnumerableIndexControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(nonEnumerableIndexControls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, nonEnumerableIndexControls)
+      )
+    ).toBe(false);
+  });
+
   it("rejects proxy-invalid indexed control-array descriptors without throwing", () => {
     const implementedControls = implementedFrozenControls();
     const invalidIndexedDescriptorControls = new Proxy(implementedControls, {
