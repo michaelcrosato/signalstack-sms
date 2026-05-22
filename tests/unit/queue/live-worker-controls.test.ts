@@ -308,6 +308,30 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects writable control-array length descriptors before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const writableLengthControls = [...implementedControls];
+    Object.preventExtensions(writableLengthControls);
+
+    expect(Object.getOwnPropertyDescriptor(writableLengthControls, "length")).toMatchObject({
+      enumerable: false,
+      writable: true,
+      configurable: false
+    });
+    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(writableLengthControls)).toBe(true);
+    expect(liveWorkerControlsExposeOnlyPublicFields(writableLengthControls)).toBe(true);
+    expect(liveWorkerControlsUseSupportedStatuses(writableLengthControls)).toBe(true);
+    expect(liveWorkerControlIdsMatchRequiredChecklist(writableLengthControls)).toBe(true);
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(writableLengthControls)).toBe(false);
+    expect(liveWorkerControlsAreFrozen(writableLengthControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(writableLengthControls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, writableLengthControls)
+      )
+    ).toBe(false);
+  });
+
   it("rejects control arrays with non-public fields before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const symbolField = Symbol("unsafe-live-worker-field");

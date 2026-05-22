@@ -3435,3 +3435,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 381  GREEN  live-worker-length-descriptor-evidence  2026-05-22 08:17
+Objective:    Prove writable supplied control-array length descriptors cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for a non-extensible supplied control array whose native `length` descriptor remains writable.
+- Updated the testing contract, testing docs, NEXT_PROMPTS, SUMMARY, and current state matrix for the length-descriptor boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
