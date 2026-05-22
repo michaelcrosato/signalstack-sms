@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 285  GREEN  nested-helper-role-gate-scan  2026-05-21 22:50
+Objective:    Prevent nested helper `requireApiRole` mentions from masking mutating-route body parsing before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to count only top-level handler `requireApiRole` calls as the route role gate.
+- Added synthetic auth unit coverage proving nested function and arrow-helper role checks do not authorize earlier request body reads or satisfy the per-handler gate.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the nested-helper role-gate boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 283  GREEN  destructured-cloned-request-body-reader-scan  2026-05-21 22:43
 Objective:    Prevent destructured cloned request body readers from bypassing mutating-route role-gate ordering checks.
 Changed:

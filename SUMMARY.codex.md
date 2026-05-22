@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 285
+
+- Hardened nested-helper role-gate authorization coverage for Run 285.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now counts only top-level handler `requireApiRole` calls as the route role gate. Nested function or arrow-helper mentions no longer make body parsing before the real handler gate look authorized, and they no longer satisfy the per-handler role-gate check.
+- Updated the testing contract to name nested helper role-gate mentions.
+- Focused auth coverage and typecheck passed; the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 284
 
 - Hardened detached request body-reader authorization coverage for Run 284.

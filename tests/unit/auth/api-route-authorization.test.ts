@@ -100,7 +100,7 @@ function exportedFunctionFirstParameterName(source: string, method: (typeof muta
 }
 
 function exportedMutatingMethodHasRoleGate(source: string, method: (typeof mutatingMethods)[number]) {
-  return /\brequireApiRole\s*\(/.test(exportedFunctionBody(source, method));
+  return topLevelRoleGateIndex(exportedFunctionBody(source, method)) !== -1;
 }
 
 function escapeRegExp(value: string) {
@@ -235,10 +235,31 @@ function maskNonCodeTokens(source: string) {
   return masked;
 }
 
+function topLevelRoleGateIndex(body: string) {
+  const maskedBody = maskNonCodeTokens(body);
+  let blockDepth = 0;
+  for (let index = 0; index < maskedBody.length; index += 1) {
+    const char = maskedBody[index];
+    if (char === "{") {
+      blockDepth += 1;
+      continue;
+    }
+    if (char === "}") {
+      blockDepth = Math.max(0, blockDepth - 1);
+      continue;
+    }
+    if (blockDepth === 0 && /^\brequireApiRole\s*\(/.test(maskedBody.slice(index))) {
+      return index;
+    }
+  }
+
+  return -1;
+}
+
 function mutatingMethodParsesBodyBeforeRoleGate(source: string, method: (typeof mutatingMethods)[number]) {
   const body = exportedFunctionBody(source, method);
   const requestParameterName = exportedFunctionFirstParameterName(source, method);
-  const roleGateIndex = maskNonCodeTokens(body).search(/\brequireApiRole\s*\(/);
+  const roleGateIndex = topLevelRoleGateIndex(body);
   const bodySliceBeforeRoleGate = roleGateIndex === -1 ? body : body.slice(0, roleGateIndex);
 
   return bodySliceParsesRequestBody(bodySliceBeforeRoleGate, requestParameterName);
@@ -670,6 +691,55 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeStringSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTemplateSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeBlockCommentSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("ignores nested helper mentions of requireApiRole before body-reader ordering checks", () => {
+    const unsafeFunctionSource = `
+      export async function POST(req: Request) {
+        function nestedGuard() {
+          return requireApiRole(currentOrg, MembershipRole.ADMIN);
+        }
+        const payload = await req.json();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload, nestedGuard });
+      }
+    `;
+    const unsafeArrowSource = `
+      export async function PATCH(req: Request) {
+        const nestedGuard = () => {
+          return requireApiRole(currentOrg, MembershipRole.ADMIN);
+        };
+        const payload = await req.clone().text();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload, nestedGuard });
+      }
+    `;
+    const missingTopLevelGateSource = `
+      export async function PUT(req: Request) {
+        function nestedGuard() {
+          return requireApiRole(currentOrg, MembershipRole.ADMIN);
+        }
+        return Response.json({ ok: true, nestedGuard });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        function nestedGuard() {
+          return requireApiRole(currentOrg, MembershipRole.ADMIN);
+        }
+        const payload = await req.json();
+        return Response.json({ payload, nestedGuard });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeFunctionSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeArrowSource, "PATCH")).toBe(true);
+    expect(exportedMutatingMethodHasRoleGate(missingTopLevelGateSource, "PUT")).toBe(false);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
