@@ -984,6 +984,75 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects malformed authorization wrapper shapes before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("malformed wrapper shapes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("malformed wrapper shapes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("malformed wrapper shapes must not inspect control evidence");
+      }
+    });
+    const mutableWrapper = {
+      workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+      controls: throwingEvidence
+    };
+    const missingControlsWrapper = Object.freeze({
+      workerDeploymentClass: reservedLiveWorkerDeploymentClass
+    });
+    const extraFieldWrapper = Object.freeze({
+      workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+      controls: throwingEvidence,
+      reviewerBypass: true
+    });
+    const hiddenClassWrapper = Object.freeze(
+      Object.defineProperties(
+        {},
+        {
+          workerDeploymentClass: {
+            value: reservedLiveWorkerDeploymentClass,
+            enumerable: false,
+            writable: false,
+            configurable: false
+          },
+          controls: {
+            value: throwingEvidence,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          }
+        }
+      )
+    );
+    const inheritedControlsWrapper = Object.freeze(
+      Object.create(
+        { controls: throwingEvidence },
+        {
+          workerDeploymentClass: {
+            value: reservedLiveWorkerDeploymentClass,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          }
+        }
+      )
+    );
+
+    for (const input of [
+      mutableWrapper,
+      missingControlsWrapper,
+      extraFieldWrapper,
+      hiddenClassWrapper,
+      inheritedControlsWrapper
+    ]) {
+      expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
+    }
+  });
+
   it("does not execute authorization wrapper get traps while denying unsupported classes", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       get: () => {

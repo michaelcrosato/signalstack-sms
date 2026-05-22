@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 253  GREEN  live-worker-wrapper-shape-short-circuit  2026-05-21 20:00
+Objective:    Prove malformed live-worker authorization wrapper shapes deny before inspecting hostile supplied controls.
+Changed:
+- Added queue unit coverage using hostile supplied controls against mutable, missing-field, extra-field, hidden-field, and inherited-field wrapper shapes.
+- Updated production worker policy, queue/testing contracts, roadmap/state/handoff notes, README, SUMMARY, and BLOCKERS for the wrapper-shape short-circuit boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 252  GREEN  worker-live-flag-fail-closed  2026-05-21 19:56
 Objective:    Fail closed for malformed local worker live-messaging flag values.
 Changed:
