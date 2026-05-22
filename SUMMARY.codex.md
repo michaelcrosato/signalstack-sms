@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 305
+
+- Hardened local string-literal `Reflect.get` body-reader property alias authorization coverage for Run 305.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes `Reflect.get(req, readerName)` and inline-cloned forms when `readerName` is locally declared or assigned to a standard body-reader name such as `"json"` or `"text"`, so those reflective reads are treated as body parsing when they occur before a mutating handler's top-level `requireApiRole`.
+- Updated the testing contract to name the local string-literal `Reflect.get` body-reader property alias boundary.
+- Focused auth coverage and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 304
 
 - Hardened plain template-literal `Reflect.get` request body-reader authorization coverage for Run 304.

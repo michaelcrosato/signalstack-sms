@@ -2587,6 +2587,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
 
+## Run 305  GREEN  reflect-get-property-alias-body-scan  2026-05-22 00:45
+Objective:    Prevent local string-literal `Reflect.get` body-reader property aliases from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize `Reflect.get(req, readerName)` when `readerName` is declared or assigned to a standard request body-reader name.
+- Added synthetic auth unit coverage proving direct and inline-cloned `Reflect.get` property-alias readers fail before the role gate while post-gate readers remain allowed.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the local string-literal `Reflect.get` property-alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 272  GREEN  cloned-request-body-role-scan  2026-05-21 22:02
 Objective:    Prevent cloned request body parsing from bypassing local mutating API role-gate ordering checks.
 Changed:

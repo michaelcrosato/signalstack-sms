@@ -174,6 +174,21 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   const variableDeclaratorStart = "(?:\\b(?:const|let|var)\\s+|,\\s*)";
   const variableDeclaratorTerminator = "(?:,|;|\\r?\\n)";
   const variableDeclaratorEnd = `\\s*(?=${variableDeclaratorTerminator})`;
+  const bodyReaderPropertyAliases = new Map<string, string>();
+  const bodyReaderPropertyAliasPattern = new RegExp(
+    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*["'\`](${requestBodyReaderNames})["'\`]${variableDeclaratorEnd}`,
+    "g"
+  );
+  const assignedBodyReaderPropertyAliasPattern = new RegExp(
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*(?=;|\\r?\\n)`,
+    "g"
+  );
+  for (const match of [
+    ...bodySlice.matchAll(bodyReaderPropertyAliasPattern),
+    ...bodySlice.matchAll(assignedBodyReaderPropertyAliasPattern)
+  ]) {
+    bodyReaderPropertyAliases.set(match[1], match[2]);
+  }
   const reflectedBodySlice = bodySlice
     .replace(/\?\.\s*\[/g, "[")
     .replace(
@@ -189,6 +204,23 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
         "g"
       ),
       "$1.$2"
+    )
+    .replace(
+      new RegExp(
+        `Reflect\\s*\\.\\s*get\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\.\\s*clone\\s*\\(\\s*\\)\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)`,
+        "g"
+      ),
+      (match, requestAlias: string, propertyAlias: string) => {
+        const readerName = bodyReaderPropertyAliases.get(propertyAlias);
+        return readerName === undefined ? match : `${requestAlias}.clone().${readerName}`;
+      }
+    )
+    .replace(
+      new RegExp(`\\bReflect\\s*\\.\\s*get\\s*\\(\\s*([^,]+?)\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)`, "g"),
+      (match, target: string, propertyAlias: string) => {
+        const readerName = bodyReaderPropertyAliases.get(propertyAlias);
+        return readerName === undefined ? match : `${target}.${readerName}`;
+      }
     )
     .replace(new RegExp(`\\[\\s*["'](${requestBodyReaderNames})["']\\s*\\]`, "g"), ".$1")
     .replace(/\[\s*["']clone["']\s*\]/g, ".clone")
@@ -1712,6 +1744,25 @@ describe("API route authorization coverage", () => {
         return Response.json({ size: payload.size });
       }
     `;
+    const unsafePropertyAliasSource = `
+      export async function PATCH(req: Request) {
+        const readerName = "json";
+        const payload = await Reflect.get(req, readerName).call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeAssignedPropertyAliasSource = `
+      export async function PUT(req: Request) {
+        let readerName;
+        readerName = "text";
+        const payload = await Reflect.get(req.clone(), readerName).call(req.clone());
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
     const safeSource = `
       export async function POST(req: Request) {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
@@ -1726,6 +1777,8 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeInlineCloneSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedAliasSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafePropertyAliasSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedPropertyAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
