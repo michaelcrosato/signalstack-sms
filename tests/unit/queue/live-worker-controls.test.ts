@@ -849,25 +849,27 @@ describe("production live campaign worker controls", () => {
         }
       })
     ) as LiveWorkerControl;
-    const hiddenRequiredFieldControl = Object.freeze(
-      Object.defineProperties(
-        {},
-        {
-          id: {
-            value: implementedControls[0].id,
-            enumerable: false
-          },
-          status: {
-            value: "implemented",
-            enumerable: true
-          },
-          requirement: {
-            value: implementedControls[0].requirement,
-            enumerable: true
+    const hiddenRequiredFieldControls = (["id", "status", "requirement"] as const).map((hiddenField) =>
+      Object.freeze(
+        Object.defineProperties(
+          {},
+          {
+            id: {
+              value: implementedControls[0].id,
+              enumerable: hiddenField !== "id"
+            },
+            status: {
+              value: "implemented",
+              enumerable: hiddenField !== "status"
+            },
+            requirement: {
+              value: implementedControls[0].requirement,
+              enumerable: hiddenField !== "requirement"
+            }
           }
-        }
-      )
-    ) as LiveWorkerControl;
+        )
+      ) as LiveWorkerControl
+    );
 
     expect(liveWorkerControlsExposeOnlyPublicFields(implementedControls)).toBe(true);
     expect(
@@ -891,15 +893,19 @@ describe("production live campaign worker controls", () => {
         )
       )
     ).toBe(false);
-    expect(
-      liveWorkerControlsAreImplemented(
-        Object.freeze(
-          implementedControls.map((control, index) =>
-            index === 0 ? hiddenRequiredFieldControl : Object.freeze({ ...control })
-          )
+    for (const hiddenRequiredFieldControl of hiddenRequiredFieldControls) {
+      const controls = Object.freeze(
+        implementedControls.map((control, index) =>
+          index === 0 ? hiddenRequiredFieldControl : Object.freeze({ ...control })
         )
-      )
-    ).toBe(false);
+      );
+
+      expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).toBe(false);
+    }
   });
 
   it("rejects sealed but writable control entries before live-worker authorization", () => {

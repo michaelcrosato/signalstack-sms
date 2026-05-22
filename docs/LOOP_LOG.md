@@ -3470,3 +3470,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 420  GREEN  live-worker-hidden-required-field-evidence  2026-05-22 12:42
+Objective:    Prove hidden required public fields on supplied control entries cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for hidden `id`, `status`, and `requirement` public fields on otherwise valid control entries.
+- Updated NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the symmetric hidden required-field boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
