@@ -102,8 +102,13 @@ export function liveWorkerControlsUseSupportedStatuses(controls: readonly LiveWo
   return controls.every((control) => supportedLiveWorkerControlStatuses.includes(control.status));
 }
 
+export function liveWorkerControlsAreFrozen(controls: readonly LiveWorkerControl[]) {
+  return Object.isFrozen(controls) && controls.every((control) => Object.isFrozen(control));
+}
+
 export function liveWorkerControlsAreImplemented(controls: readonly LiveWorkerControl[] = productionLiveCampaignWorkerControls) {
   return (
+    liveWorkerControlsAreFrozen(controls) &&
     liveWorkerControlsExposeOnlyPublicFields(controls) &&
     liveWorkerControlsUseSupportedStatuses(controls) &&
     liveWorkerControlIdsMatchRequiredChecklist(controls) &&

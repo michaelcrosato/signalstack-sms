@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  liveWorkerControlsAreFrozen,
   liveWorkerControlIdsMatchRequiredChecklist,
   liveWorkerControlsExposeOnlyPublicFields,
   liveWorkerControlsAreImplemented,
@@ -26,6 +27,17 @@ describe("production live campaign worker controls", () => {
     "rollback-runbook",
     "blocked-state-coverage"
   ];
+
+  function implementedFrozenControls() {
+    return Object.freeze(
+      productionLiveCampaignWorkerControls.map((control) =>
+        Object.freeze({
+          ...control,
+          status: "implemented" as const
+        })
+      )
+    );
+  }
 
   it("keeps the reserved production class outside the currently supported worker class list", () => {
     expect(reservedLiveWorkerDeploymentClass).toBe("production-live-campaign");
@@ -68,11 +80,30 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
-  it("rejects control arrays with non-public fields before live-worker authorization", () => {
-    const implementedControls = productionLiveCampaignWorkerControls.map((control) => ({
+  it("requires frozen control arrays and entries before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const mutableImplementedControls = productionLiveCampaignWorkerControls.map((control) => ({
       ...control,
       status: "implemented" as const
     }));
+    const mutableEntryControls = Object.freeze(
+      productionLiveCampaignWorkerControls.map((control) => ({
+        ...control,
+        status: "implemented" as const
+      }))
+    );
+
+    expect(liveWorkerControlsAreFrozen(productionLiveCampaignWorkerControls)).toBe(true);
+    expect(liveWorkerControlsAreFrozen(implementedControls)).toBe(true);
+    expect(liveWorkerControlsAreFrozen(mutableImplementedControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(mutableImplementedControls)).toBe(false);
+    expect(liveWorkerControlsAreFrozen(mutableEntryControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(mutableEntryControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(implementedControls)).toBe(true);
+  });
+
+  it("rejects control arrays with non-public fields before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
     const symbolField = Symbol("unsafe-live-worker-field");
 
     expect(liveWorkerControlsExposeOnlyPublicFields(productionLiveCampaignWorkerControls)).toBe(true);
@@ -86,67 +117,77 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
     expect(
       liveWorkerControlsAreImplemented(
-        implementedControls.map((control, index) =>
-          index === 0 ? { ...control, reviewerBypass: true } : control
+        Object.freeze(
+          implementedControls.map((control, index) =>
+            Object.freeze(index === 0 ? { ...control, reviewerBypass: true } : { ...control })
+          )
         ) as readonly LiveWorkerControl[]
       )
     ).toBe(false);
     expect(
       liveWorkerControlsAreImplemented(
-        implementedControls.map((control, index) =>
-          index === 0 ? Object.assign({ ...control }, { [symbolField]: "unsafe" }) : control
+        Object.freeze(
+          implementedControls.map((control, index) =>
+            Object.freeze(index === 0 ? Object.assign({ ...control }, { [symbolField]: "unsafe" }) : { ...control })
+          )
         )
       )
     ).toBe(false);
   });
 
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
-    const implementedControls = productionLiveCampaignWorkerControls.map((control) => ({
-      ...control,
-      status: "implemented" as const
-    }));
+    const implementedControls = implementedFrozenControls();
 
     expect(liveWorkerControlIdsMatchRequiredChecklist(productionLiveCampaignWorkerControls)).toBe(true);
     expect(liveWorkerControlsAreImplemented(implementedControls)).toBe(true);
-    expect(liveWorkerControlsAreImplemented(implementedControls.slice(0, -1))).toBe(false);
+    expect(liveWorkerControlsAreImplemented(Object.freeze(implementedControls.slice(0, -1)))).toBe(false);
     expect(
-      liveWorkerControlsAreImplemented([
-        {
-          id: "deploy-environment-allowlist",
-          status: "implemented",
-          requirement: "Only one implemented control is not enough to authorize live worker execution."
-        }
-      ])
-    ).toBe(false);
-    expect(
-      liveWorkerControlsAreImplemented([
-        ...implementedControls.slice(1),
-        implementedControls[0]
-      ])
+      liveWorkerControlsAreImplemented(
+        Object.freeze([
+          Object.freeze({
+            id: "deploy-environment-allowlist",
+            status: "implemented",
+            requirement: "Only one implemented control is not enough to authorize live worker execution."
+          })
+        ])
+      )
     ).toBe(false);
     expect(
       liveWorkerControlsAreImplemented(
-        implementedControls.map((control, index) =>
-          index === 0 ? { ...control, id: "unexpected-live-worker-control" } : control
+        Object.freeze([...implementedControls.slice(1), implementedControls[0]])
+      )
+    ).toBe(false);
+    expect(
+      liveWorkerControlsAreImplemented(
+        Object.freeze(
+          implementedControls.map((control, index) =>
+            Object.freeze(index === 0 ? { ...control, id: "unexpected-live-worker-control" } : { ...control })
+          )
         )
       )
     ).toBe(false);
     expect(
       liveWorkerControlsAreImplemented(
-        implementedControls.map((control, index) =>
-          index === 0
-            ? {
-                ...control,
-                requirement: "Matching IDs with replaced requirement copy must not authorize live worker execution."
-              }
-            : control
+        Object.freeze(
+          implementedControls.map((control, index) =>
+            Object.freeze(
+              index === 0
+                ? {
+                    ...control,
+                    requirement: "Matching IDs with replaced requirement copy must not authorize live worker execution."
+                  }
+                : { ...control }
+            )
+          )
         )
       )
     ).toBe(false);
     expect(
       liveWorkerControlsAreImplemented(
-        implementedControls.map((control, index) =>
-          index === 0 ? { ...control, status: "waived" as LiveWorkerControl["status"] } : control
+        Object.freeze(
+          implementedControls.map((control, index) =>
+            Object.freeze(index === 0 ? { ...control, status: "waived" as LiveWorkerControl["status"] } : { ...control })
+          )
         )
       )
     ).toBe(false);
@@ -158,25 +199,25 @@ describe("production live campaign worker controls", () => {
     expect(
       liveWorkerDeploymentClassIsAuthorized({
         workerDeploymentClass: reservedLiveWorkerDeploymentClass,
-        controls: [
-          {
+        controls: Object.freeze([
+          Object.freeze({
             id: "deploy-environment-allowlist",
             status: "implemented",
             requirement: "Only one implemented control is not enough to authorize live worker execution."
-          }
-        ]
+          })
+        ])
       })
     ).toBe(false);
     expect(
       liveWorkerDeploymentClassIsAuthorized({
         workerDeploymentClass: "production-live",
-        controls: productionLiveCampaignWorkerControls.map((control) => ({ ...control, status: "implemented" }))
+        controls: implementedFrozenControls()
       })
     ).toBe(false);
     expect(
       liveWorkerDeploymentClassIsAuthorized({
         workerDeploymentClass: reservedLiveWorkerDeploymentClass,
-        controls: productionLiveCampaignWorkerControls.map((control) => ({ ...control, status: "implemented" }))
+        controls: implementedFrozenControls()
       })
     ).toBe(true);
   });

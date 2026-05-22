@@ -39,6 +39,10 @@ const requiredTexts: RequiredText[] = [
     text: "A rollback runbook that disables live campaign workers without code changes"
   },
   {
+    file: "docs/PRODUCTION_WORKER_POLICY.md",
+    text: "require a frozen control array with frozen entries"
+  },
+  {
     file: "lib/queue/worker.ts",
     text: "reason: \"production-worker-blocked\""
   },
@@ -69,6 +73,10 @@ const requiredTexts: RequiredText[] = [
   {
     file: "lib/queue/live-worker-controls.ts",
     text: "liveWorkerControlsUseSupportedStatuses"
+  },
+  {
+    file: "lib/queue/live-worker-controls.ts",
+    text: "liveWorkerControlsAreFrozen"
   },
   {
     file: "lib/queue/live-worker-controls.ts",
@@ -105,6 +113,10 @@ const requiredTexts: RequiredText[] = [
   {
     file: "tests/unit/queue/live-worker-controls.test.ts",
     text: "rejects control arrays with non-public fields before live-worker authorization"
+  },
+  {
+    file: "tests/unit/queue/live-worker-controls.test.ts",
+    text: "requires frozen control arrays and entries before live-worker authorization"
   },
   {
     file: "tests/unit/queue/bullmq-worker.test.ts",

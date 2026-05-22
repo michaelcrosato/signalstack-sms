@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 225  GREEN  live-worker-control-frozen-metadata  2026-05-21 17:23
+Objective:    Require frozen supplied control metadata before future live worker authorization can pass.
+Changed:
+- Added a live-worker frozen-metadata helper and required it before controls can be treated as implemented.
+- Added unit coverage proving mutable control arrays or mutable entries remain unauthorized even when all other control identity and status fields match.
+- Updated queue/testing contracts, production worker policy docs/checks, README, roadmap, state matrix, handoff, SUMMARY, and BLOCKERS.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live campaign workers blocked while concrete future controls are implemented.
+
 ## Run 224  GREEN  live-worker-control-public-fields  2026-05-21 17:19
 Objective:    Keep future live-worker control authorization limited to public control fields.
 Changed:

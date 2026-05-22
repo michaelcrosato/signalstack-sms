@@ -1,7 +1,17 @@
 # Codex Summary
 
-- Tightened live-worker control public-field validation for Run 224.
-- Latest repo truth: future `production-live-campaign` authorization requires the exact frozen control IDs and requirement text in order, no extra string or symbol fields, every status inside the supported status vocabulary, and every status implemented; the reserved class remains outside supported worker classes.
+- Tightened live-worker control frozen-metadata validation for Run 225.
+- Latest repo truth: future `production-live-campaign` authorization requires a frozen supplied control array with frozen entries, the exact frozen control IDs and requirement text in order, no extra string or symbol fields, every status inside the supported status vocabulary, and every status implemented; the reserved class remains outside supported worker classes.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+Run number: 225
+
+## Previous Run
+
+- Added `liveWorkerControlsAreFrozen` and required it before future live-worker controls can be treated as implemented.
+- Added focused queue unit coverage proving mutable control arrays or mutable control entries remain unauthorized even when IDs, requirement text, public fields, supported statuses, and implemented statuses otherwise match.
+- Updated queue/testing contracts, production worker policy docs/checks, README, roadmap, state matrix, handoff docs, and loop records.
+- Focused worker-control tests, the production worker policy check, typecheck, `git diff --check`, and the protected local gate passed.
 - No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
 
 Run number: 224
