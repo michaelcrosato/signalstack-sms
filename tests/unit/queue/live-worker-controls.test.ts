@@ -803,6 +803,51 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects configurable control-entry public fields before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const configurableFieldControl = Object.defineProperties(
+      {},
+      {
+        id: {
+          value: implementedControls[0].id,
+          enumerable: true,
+          writable: false,
+          configurable: true
+        },
+        status: {
+          value: "implemented",
+          enumerable: true,
+          writable: false,
+          configurable: false
+        },
+        requirement: {
+          value: implementedControls[0].requirement,
+          enumerable: true,
+          writable: false,
+          configurable: false
+        }
+      }
+    ) as LiveWorkerControl;
+    Object.preventExtensions(configurableFieldControl);
+    const controls = Object.freeze(
+      implementedControls.map((control, index) =>
+        index === 0 ? configurableFieldControl : Object.freeze({ ...control })
+      )
+    );
+
+    expect(Object.isExtensible(configurableFieldControl)).toBe(false);
+    expect(Object.isFrozen(configurableFieldControl)).toBe(false);
+    expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(true);
+    expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(true);
+    expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(true);
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).toBe(false);
+    expect(liveWorkerControlsAreFrozen(controls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+    ).toBe(false);
+  });
+
   it("requires live-worker control public fields in exact order", () => {
     const implementedControls = implementedFrozenControls();
     const reorderedFieldControl = Object.freeze({
