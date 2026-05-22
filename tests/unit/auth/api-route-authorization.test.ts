@@ -174,13 +174,14 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   const variableDeclaratorStart = "(?:\\b(?:const|let|var)\\s+|,\\s*)";
   const variableDeclaratorTerminator = "(?:,|;|\\r?\\n)";
   const variableDeclaratorEnd = `\\s*(?=${variableDeclaratorTerminator})`;
+  const literalBodyReaderNamePattern = `\\(?\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)?`;
   const bodyReaderPropertyAliases = new Map<string, string>();
   const bodyReaderPropertyAliasPattern = new RegExp(
-    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*["'\`](${requestBodyReaderNames})["'\`]${variableDeclaratorEnd}`,
+    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${literalBodyReaderNamePattern}${variableDeclaratorEnd}`,
     "g"
   );
   const assignedBodyReaderPropertyAliasPattern = new RegExp(
-    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*(?=;|\\r?\\n)`,
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${literalBodyReaderNamePattern}\\s*(?=;|\\r?\\n)`,
     "g"
   );
   for (const match of [
@@ -2888,6 +2889,42 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeBracketGetSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTemplateBracketGetSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalBracketGetSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("treats parenthesized body-reader property aliases as body parsing for role-gate ordering", () => {
+    const unsafeReflectGetSource = `
+      export async function POST(req: Request) {
+        const readerName = ("json");
+        const payload = await Reflect.get(req, readerName).call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeAssignedDescriptorSource = `
+      export async function PATCH(req: Request) {
+        let readerName;
+        readerName = ("text");
+        const descriptor = Object.getOwnPropertyDescriptor(Request.prototype, readerName);
+        const payload = await descriptor?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const readerName = ("arrayBuffer");
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await Reflect.get(req, readerName).call(req);
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeReflectGetSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedDescriptorSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 

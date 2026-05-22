@@ -2855,3 +2855,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 322  GREEN  parenthesized-reader-property-alias-scan  2026-05-22 02:29
+Objective:    Prevent parenthesized body-reader property aliases from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize parenthesized literal reader aliases such as `const readerName = ("json")`.
+- Added synthetic auth unit coverage proving parenthesized `Reflect.get` and descriptor property aliases fail before the role gate and pass after it.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the parenthesized body-reader property alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
