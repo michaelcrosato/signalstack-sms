@@ -1157,6 +1157,40 @@ describe("production live campaign worker controls", () => {
         }
       )
     );
+    const inheritedAccessorClassWrapper = Object.freeze(
+      Object.create(
+        {
+          get workerDeploymentClass() {
+            throw new Error("malformed wrapper shapes must not read inherited worker class getters");
+          }
+        },
+        {
+          controls: {
+            value: throwingEvidence,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          }
+        }
+      )
+    );
+    const inheritedAccessorControlsWrapper = Object.freeze(
+      Object.create(
+        {
+          get controls() {
+            throw new Error("malformed wrapper shapes must not read inherited controls getters");
+          }
+        },
+        {
+          workerDeploymentClass: {
+            value: reservedLiveWorkerDeploymentClass,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          }
+        }
+      )
+    );
     const accessorClassWrapper = Object.freeze(
       Object.defineProperties(
         {},
@@ -1205,6 +1239,8 @@ describe("production live campaign worker controls", () => {
       inheritedControlsWrapper,
       inheritedClassWrapper,
       inheritedExtraFieldWrapper,
+      inheritedAccessorClassWrapper,
+      inheritedAccessorControlsWrapper,
       accessorClassWrapper,
       accessorControlsWrapper
     ]) {

@@ -2428,3 +2428,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep product demo paths stable while preserving live SMS, provider, billing, live AI, notification, worker, and secret gates.
+
+## Run 271  GREEN  live-worker-inherited-accessor-wrapper  2026-05-21 21:59
+Objective:    Prove inherited accessor-backed authorization-wrapper fields deny before supplied live-worker controls are inspected.
+Changed:
+- Added queue unit coverage using hostile supplied control evidence behind authorization wrappers with inherited `workerDeploymentClass` or `controls` getters.
+- Updated SUMMARY and BLOCKERS to record that the change is local unit coverage only.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
