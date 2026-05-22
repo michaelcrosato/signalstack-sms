@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 391  GREEN  live-worker-duplicate-key-evidence  2026-05-22 09:14
+Objective:    Prove duplicate proxy-reflected supplied control-array keys cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for proxy-backed `production-live-campaign` control arrays whose `ownKeys` evidence includes duplicate indexed keys.
+- Updated queue/testing contracts, production-worker/testing docs, SUMMARY, BLOCKERS, NEXT_PROMPTS, and current state matrix for the duplicate proxy-key boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 390  GREEN  live-worker-mismatched-length-evidence  2026-05-22 09:09
 Objective:    Prove mismatched safe-integer supplied control-array length descriptors cannot authorize the reserved live worker class.
 Changed:

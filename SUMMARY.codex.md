@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 391
+
+- Latest live-worker control coverage proves duplicate proxy-reflected supplied control-array keys deny cleanly before `production-live-campaign` authorization.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 418 tests, Playwright smoke, and build green.
+- Updated queue/testing contracts, production-worker/testing docs, NEXT_PROMPTS, BLOCKERS, and current state matrix for the duplicate proxy-key evidence boundary.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 390
 
 - Latest live-worker control coverage proves supplied `production-live-campaign` control arrays with mismatched safe-integer `length` descriptor values deny before authorization and without trusting indexed controls.

@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 391
+
+- No blocker from live-worker duplicate proxy-key evidence hardening. Focused queue coverage and the protected local gate passed. The change tightens local unit coverage plus queue/testing contract docs only and does not execute workers, enqueue jobs, call Redis, use production credentials, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production database actions.
+
 Run number: 390
 
 - No blocker from live-worker mismatched length-descriptor evidence hardening. Focused queue coverage and the protected local gate passed. The change tightens local unit coverage plus queue/testing contract docs only and does not execute workers, enqueue jobs, call Redis, use production credentials, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production database actions.

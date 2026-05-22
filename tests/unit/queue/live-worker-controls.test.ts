@@ -815,6 +815,9 @@ describe("production live campaign worker controls", () => {
     const reorderedArrayKeysProxy = new Proxy(implementedControls, {
       ownKeys: () => ["length", ...implementedControls.map((_, index) => String(index))]
     });
+    const duplicateArrayKeysProxy = new Proxy(implementedControls, {
+      ownKeys: () => ["0", "0", "length", ...implementedControls.slice(1).map((_, index) => String(index + 1))]
+    });
     const throwingArrayFrozenStateProxy = new Proxy([...implementedControls], {
       isExtensible: () => {
         throw new Error("array frozen-state trap must not escape");
@@ -847,6 +850,7 @@ describe("production live campaign worker controls", () => {
       throwingArrayDescriptorProxy,
       throwingArrayKeysProxy,
       reorderedArrayKeysProxy,
+      duplicateArrayKeysProxy,
       throwingArrayFrozenStateProxy,
       Object.freeze(
         implementedControls.map((control, index) =>
