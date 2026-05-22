@@ -2833,3 +2833,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+## Run 341  GREEN  computed-method-alias-body-reader-scan  2026-05-22 04:09
+Objective:    Prevent computed `Object`/`Reflect` method aliases from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize computed member aliases such as `Reflect[methodName]`, `Object[lookupName]`, and `Reflect[lookupName]` when those names resolve to reflective body-reader helpers.
+- Added synthetic auth unit coverage proving computed Reflect get/apply aliases and computed Object/Reflect descriptor/prototype aliases fail before the role gate while post-gate reads remain allowed.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the computed method-alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.

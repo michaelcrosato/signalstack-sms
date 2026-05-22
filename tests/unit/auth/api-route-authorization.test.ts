@@ -242,8 +242,20 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
   }
   const descriptorValueAccessPattern =
     String.raw`(?:\?\s*\.\s*(?:value|\[\s*["'\`]value["'\`]\s*\])|!\s*(?:\.\s*value|\[\s*["'\`]value["'\`]\s*\])|\.\s*value|\[\s*["'\`]value["'\`]\s*\])`;
+  const lookupPropertyAliasPatternFor = (memberName: string) => {
+    const aliases = [...lookupPropertyAliases.entries()]
+      .filter(([, lookupName]) => lookupName === memberName)
+      .map(([alias]) => escapeRegExp(alias));
+    return aliases.length > 0 ? `|${aliases.join("|")}` : "";
+  };
+  const reflectMethodPropertyAliasPatternFor = (memberName: string) => {
+    const aliases = [...reflectMethodPropertyAliases.entries()]
+      .filter(([, methodName]) => methodName === memberName)
+      .map(([alias]) => escapeRegExp(alias));
+    return aliases.length > 0 ? `|${aliases.join("|")}` : "";
+  };
   const objectOrReflectMemberPattern = (memberName: string) =>
-    String.raw`(?:Object|Reflect)\s*(?:(?:\.|\?\.)\s*${memberName}|(?:\?\.)?\[\s*["'\`]${memberName}["'\`]\s*\])\s*(?:\?\.)?`;
+    String.raw`(?:Object|Reflect)\s*(?:(?:\.|\?\.)\s*${memberName}|(?:\?\.)?\[\s*(?:["'\`]${memberName}["'\`]${lookupPropertyAliasPatternFor(memberName)})\s*\])\s*(?:\?\.)?`;
   const descriptorLookupPattern = objectOrReflectMemberPattern("getOwnPropertyDescriptor");
   const prototypeLookupPattern = objectOrReflectMemberPattern("getPrototypeOf");
   const descriptorLookupAliases = new Set<string>();
@@ -313,19 +325,19 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
     "g"
   );
   const reflectGetAliasPattern = new RegExp(
-    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*Reflect\\s*(?:(?:\\.|\\?\\.)\\s*get|(?:\\?\\.)?\\[\\s*["'\`]get["'\`]\\s*\\])\\s*(?:\\?\\.)?${variableDeclaratorEnd}`,
+    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*Reflect\\s*(?:(?:\\.|\\?\\.)\\s*get|(?:\\?\\.)?\\[\\s*(?:["'\`]get["'\`]${reflectMethodPropertyAliasPatternFor("get")})\\s*\\])\\s*(?:\\?\\.)?${variableDeclaratorEnd}`,
     "g"
   );
   const assignedReflectGetAliasPattern = new RegExp(
-    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*Reflect\\s*(?:(?:\\.|\\?\\.)\\s*get|(?:\\?\\.)?\\[\\s*["'\`]get["'\`]\\s*\\])\\s*(?:\\?\\.)?\\s*(?=;|\\r?\\n)`,
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*Reflect\\s*(?:(?:\\.|\\?\\.)\\s*get|(?:\\?\\.)?\\[\\s*(?:["'\`]get["'\`]${reflectMethodPropertyAliasPatternFor("get")})\\s*\\])\\s*(?:\\?\\.)?\\s*(?=;|\\r?\\n)`,
     "g"
   );
   const reflectApplyAliasPattern = new RegExp(
-    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*Reflect\\s*(?:(?:\\.|\\?\\.)\\s*apply|(?:\\?\\.)?\\[\\s*["'\`]apply["'\`]\\s*\\])\\s*(?:\\?\\.)?${variableDeclaratorEnd}`,
+    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*Reflect\\s*(?:(?:\\.|\\?\\.)\\s*apply|(?:\\?\\.)?\\[\\s*(?:["'\`]apply["'\`]${reflectMethodPropertyAliasPatternFor("apply")})\\s*\\])\\s*(?:\\?\\.)?${variableDeclaratorEnd}`,
     "g"
   );
   const assignedReflectApplyAliasPattern = new RegExp(
-    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*Reflect\\s*(?:(?:\\.|\\?\\.)\\s*apply|(?:\\?\\.)?\\[\\s*["'\`]apply["'\`]\\s*\\])\\s*(?:\\?\\.)?\\s*(?=;|\\r?\\n)`,
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*Reflect\\s*(?:(?:\\.|\\?\\.)\\s*apply|(?:\\?\\.)?\\[\\s*(?:["'\`]apply["'\`]${reflectMethodPropertyAliasPatternFor("apply")})\\s*\\])\\s*(?:\\?\\.)?\\s*(?=;|\\r?\\n)`,
     "g"
   );
   const destructuredReflectAliasPattern = new RegExp(
@@ -3613,6 +3625,66 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedBracketAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDestructuredAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedDestructuredAliasSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("treats computed Object and Reflect method aliases as body parsing for role-gate ordering", () => {
+    const unsafeComputedReflectGetAliasSource = `
+      export async function POST(req: Request) {
+        const methodName = "get";
+        const reflectGet = Reflect[methodName];
+        const payload = await reflectGet(req, "json").call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeAssignedComputedReflectApplyAliasSource = `
+      export async function PATCH(req: Request) {
+        const methodName = "apply" as const;
+        let reflectApply;
+        reflectApply = Reflect[methodName];
+        const payload = await reflectApply(req.clone().text, req.clone(), []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeComputedObjectDescriptorAliasSource = `
+      export async function PUT(req: Request) {
+        const lookupName = "getOwnPropertyDescriptor";
+        const getDescriptor = Object[lookupName];
+        const payload = await getDescriptor(Request.prototype, "formData")?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const unsafeComputedReflectPrototypeAliasSource = `
+      export async function DELETE(req: Request) {
+        const lookupName = "getPrototypeOf" as const;
+        const getPrototype = Reflect[lookupName];
+        const payload = await Object.getOwnPropertyDescriptor(getPrototype(req), "blob")?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const methodName = "get";
+        const reflectGet = Reflect[methodName];
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await reflectGet(req, "arrayBuffer").call(req);
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedReflectGetAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedComputedReflectApplyAliasSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedObjectDescriptorAliasSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedReflectPrototypeAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
