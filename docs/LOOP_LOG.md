@@ -3620,3 +3620,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 441  GREEN  live-worker-proxy-evidence-truth-sync  2026-05-22 14:38
+Objective:    Align live-worker proxy evidence docs with executable descriptor-based behavior.
+Changed:
+- Updated queue/testing contracts and production-worker/testing docs to distinguish malformed or revoked proxy-backed evidence, which denies cleanly, from descriptor-valid proxy-wrapped exact frozen evidence, which is evaluated without `get` trap execution.
+- Updated current state, NEXT_PROMPTS, SUMMARY, and BLOCKERS for the proxy evidence truth sync.
+- Kept `production-live-campaign` unsupported; no source behavior, product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.

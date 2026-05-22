@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 441
+
+- Aligned live-worker queue/testing contracts and production-worker/testing docs with executable proxy evidence behavior: malformed, invalid-descriptor, duplicate-key, trap-throwing, or revoked proxy-backed evidence denies cleanly, while descriptor-valid proxy-wrapped exact frozen evidence is evaluated through descriptors without `get` trap execution.
+- Updated `docs/CURRENT_STATE_MATRIX.md` and `docs/NEXT_PROMPTS.md` for the proxy evidence truth sync.
+- Focused checks passed: `npm run production-worker:check`, `npm run contracts:check`, and `npm run test -- tests/unit/queue/live-worker-controls.test.ts`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 446 tests, Playwright smoke, and build green.
+- No source behavior, product features, live sends, provider calls, billing calls, notifications, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate scripts, or live feature flags changed.
+
+## Previous Run
+
 Run number: 440
 
 - Synchronized `docs/CURRENT_STATE_MATRIX.md` so the latest run note points at the Run 440 protected local gate instead of retaining stale Run 438 wording.
