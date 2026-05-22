@@ -2815,3 +2815,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 312  GREEN  bound-reader-call-apply-alias-scan  2026-05-22 02:08
+Objective:    Prevent bound request body-reader aliases invoked through `.call()` or `.apply()` from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to treat bound reader aliases invoked as `readJson.call(...)` or `readJson.apply(...)` as body parsing.
+- Added synthetic auth unit coverage for direct, cloned, and assigned bound reader aliases before and after `requireApiRole`.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the bound-reader call/apply alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
