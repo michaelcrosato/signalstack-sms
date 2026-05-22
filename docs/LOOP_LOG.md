@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 340  GREEN  globalthis-bracketed-method-auth-scan  2026-05-22 04:04
+Objective:    Prove bracketed built-in method calls through `globalThis.Object` and `globalThis.Reflect` stay behind mutating-route role-gate ordering checks.
+Changed:
+- Added synthetic auth coverage for `globalThis.Object["getOwnPropertyDescriptor"](...)`, `globalThis.Reflect["getPrototypeOf"](...)`, and `globalThis["Reflect"]["get"](...)` body-reader paths before `requireApiRole`.
+- Updated the testing contract, testing docs, and current state matrix for the bracketed globalThis method boundary and latest protected local gate.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 323  GREEN  computed-destructured-reader-auth-scan  2026-05-22 02:35
 Objective:    Prevent computed destructured request body-reader aliases from bypassing mutating-route role-gate ordering checks.
 Changed:

@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 340
+
+- Hardened bracketed `globalThis` built-in method body-reader authorization coverage.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now proves `globalThis.Object["getOwnPropertyDescriptor"](...)`, `globalThis.Reflect["getPrototypeOf"](...)`, and `globalThis["Reflect"]["get"](...)` request body-reader paths are normalized before mutating-route role-gate ordering checks.
+- Updated the testing contract, testing docs, and current state matrix to record the new boundary and latest protected gate result.
+- Focused auth coverage, contracts check, typecheck, and `.\scripts\local-gate.ps1` passed with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 46 unit test files / 388 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 339
 
 - Hardened parenthesized direct `Object`/`Reflect` built-in body-reader authorization coverage.
