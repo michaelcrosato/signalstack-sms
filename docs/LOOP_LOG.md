@@ -1,5 +1,24 @@
 # LOOP_LOG
 
+## Run 377  GREEN  loop-handoff-truth-sync  2026-05-22 07:52
+Objective:    Repair loop handoff truth so the latest live-worker accessor-index run is visible in summary, blockers, and logs.
+Changed:
+- Added the missing Run 376 loop-log entry for the live-worker accessor-index evidence work already recorded in the current state matrix.
+- Updated SUMMARY, BLOCKERS, and current state matrix for Run 377 truth synchronization.
+- Kept the change to local docs/handoff state only; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep Phase 0 live-worker, API authorization, provider, billing, live AI, notification, and secret gates stable.
+
+## Run 376  GREEN  live-worker-accessor-index-evidence  2026-05-22 07:48
+Objective:    Prove accessor-backed supplied control-array index slots cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for accessor-backed indexed array slots that throw if read.
+- Updated testing contract/docs, SUMMARY, BLOCKERS, and current state matrix for the accessor-index evidence boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 375  GREEN  live-worker-revoked-proxy-evidence  2026-05-22 07:46
 Objective:    Prove revoked proxy-backed live-worker authorization evidence denies cleanly without escaping.
 Changed:

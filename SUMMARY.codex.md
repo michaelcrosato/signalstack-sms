@@ -1,5 +1,26 @@
 # Codex Summary
 
+Run number: 377
+
+- Repaired loop handoff truth so Run 376 live-worker accessor-index evidence appears in root/docs loop logs and the active Codex handoff files.
+- Latest repo truth: `production-live-campaign` remains unsupported, and supplied future authorization evidence explicitly denies accessor-backed indexed control-array slots without reading hostile getters.
+- Updated LOOP_LOG, docs/LOOP_LOG, SUMMARY, BLOCKERS, and current state matrix for the Run 377 truth synchronization.
+- Protected local gate passed on 2026-05-22 07:54: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
+Run number: 376
+
+- Hardened live-worker control coverage so accessor-backed supplied control-array index slots cannot authorize the reserved `production-live-campaign` class.
+- Latest repo truth: `production-live-campaign` remains unsupported, and accessor-backed indexed array slots deny without reading getters.
+- Updated the testing contract/docs, SUMMARY, BLOCKERS, and current state matrix for the accessor-index evidence boundary.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts`.
+- `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-22 07:50 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 unit test files / 408 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 375
 
 - Hardened live-worker authorization coverage so revoked proxy-backed control evidence and revoked proxy-backed authorization wrappers cannot throw through the reserved `production-live-campaign` gate.
