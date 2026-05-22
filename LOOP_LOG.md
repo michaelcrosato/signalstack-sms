@@ -3784,3 +3784,23 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 420  GREEN  live-worker-hidden-required-field-evidence  2026-05-22 12:43
+Objective:    Prove hidden required public fields on supplied control entries cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for supplied `production-live-campaign` control entries with non-enumerable `id`, `status`, or `requirement` fields.
+- Updated live-worker handoff truth for the symmetric hidden required-field control-entry boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 421  GREEN  live-worker-wrapper-controls-proxy-descriptor-evidence  2026-05-22 12:46
+Objective:    Prove proxy-invalid authorization-wrapper `controls` field descriptors deny before supplied live-worker controls are inspected.
+Changed:
+- Expanded proxy-invalid authorization-wrapper descriptor coverage to include the `controls` public field, matching existing `workerDeploymentClass` coverage.
+- Updated NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the symmetric proxy-invalid wrapper descriptor boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.

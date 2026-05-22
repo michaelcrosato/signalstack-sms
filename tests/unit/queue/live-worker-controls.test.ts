@@ -1598,9 +1598,8 @@ describe("production live campaign worker controls", () => {
         throw new Error("invalid wrapper field descriptors must not inspect control evidence");
       }
     });
-    const invalidWrapperDescriptorInput = new Proxy(
-      frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, throwingEvidence),
-      {
+    const invalidWrapperDescriptorInputs = [
+      new Proxy(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, throwingEvidence), {
         getOwnPropertyDescriptor: (target, property) => {
           if (property === "workerDeploymentClass") {
             return {
@@ -1613,11 +1612,27 @@ describe("production live campaign worker controls", () => {
 
           return Reflect.getOwnPropertyDescriptor(target, property);
         }
-      }
-    );
+      }),
+      new Proxy(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, throwingEvidence), {
+        getOwnPropertyDescriptor: (target, property) => {
+          if (property === "controls") {
+            return {
+              value: throwingEvidence,
+              enumerable: true,
+              writable: false,
+              configurable: true
+            };
+          }
 
-    expect(() => liveWorkerDeploymentClassIsAuthorized(invalidWrapperDescriptorInput)).not.toThrow();
-    expect(liveWorkerDeploymentClassIsAuthorized(invalidWrapperDescriptorInput)).toBe(false);
+          return Reflect.getOwnPropertyDescriptor(target, property);
+        }
+      })
+    ];
+
+    for (const input of invalidWrapperDescriptorInputs) {
+      expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
+    }
   });
 
   it("rejects malformed authorization inputs without throwing", () => {

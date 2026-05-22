@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 421
+
+- Latest live-worker controls evidence coverage now exercises proxy-invalid authorization-wrapper descriptors for both public fields, including the `controls` field, before supplied control evidence can be inspected.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 50 tests.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 436 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 420
 
 - Latest live-worker controls evidence coverage proves supplied `production-live-campaign` control entries with any hidden required public field (`id`, `status`, or `requirement`) deny authorization.
