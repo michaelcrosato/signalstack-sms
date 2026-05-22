@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 275
+
+- Added product dashboard opt-in rate visibility for Run 275.
+- Latest repo truth: `getProductDashboard` now derives an existing tenant-scoped active-contact opt-in percentage, `/dashboard` renders an `Opt-in rate` local signal, and the seeded product demo path verifies the signal.
+- The change is read-only product dashboard display/projection coverage only; it does not mutate contacts, consent, usage data, execute reports, create exports, run workers, enqueue jobs, call Redis, call providers, call Stripe, send SMS/email/notifications, expose secrets, call live AI, or enable live features.
+- Focused product dashboard unit coverage and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 274
 
 - Added product dashboard local usage total visibility for Run 274.

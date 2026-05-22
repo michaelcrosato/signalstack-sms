@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 275
+
+- No blocker from product dashboard opt-in rate visibility. The change reads existing tenant-scoped active contact and consent counts for product dashboard display only; it does not use production credentials, mutate records or consent, execute reports, create exports, run workers, enqueue jobs, call Redis, call providers, call Stripe, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production database actions.
+
 Run number: 274
 
 - No blocker from product dashboard local usage total visibility. The change reads existing tenant-scoped local usage totals for product dashboard display only; it does not use production credentials, mutate records, execute reports, create exports, run workers, enqueue jobs, call Redis, call providers, call Stripe, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production database actions.

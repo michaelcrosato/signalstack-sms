@@ -101,8 +101,9 @@ export default async function DashboardPage() {
         </section>
 
         <ProductSection id="analytics" title="Analytics" eyebrow="Local Signals">
-          <div className="grid gap-3 text-sm md:grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-3 text-sm md:grid-cols-2 lg:grid-cols-6">
             <StatusPill label="Consent coverage" value={`${dashboard.contacts.optedIn}/${dashboard.contacts.total}`} />
+            <StatusPill label="Opt-in rate" value={`${dashboard.contacts.optedInPercent}%`} />
             <StatusPill label="Scheduled work" value={String(dashboard.campaigns.scheduled)} />
             <StatusPill label="Inbox load" value={String(dashboard.inbox.open)} />
             <StatusPill label="Fake AI requests" value={String(dashboard.usage.fakeAiRequests)} />

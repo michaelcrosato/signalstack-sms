@@ -92,7 +92,8 @@ describe("product dashboard navigation", () => {
       contacts: {
         total: 10,
         optedIn: 7,
-        optedOut: 2
+        optedOut: 2,
+        optedInPercent: 70
       },
       campaigns: {
         total: 5,

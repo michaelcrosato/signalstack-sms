@@ -48,12 +48,14 @@ export async function getProductDashboard(orgId: string) {
   ];
   const completeComplianceFields = requiredComplianceFields.filter(Boolean).length;
   const usage = aggregateUsageEvents(usageEvents);
+  const optedInPercent = contacts > 0 ? Math.round((optedInContacts / contacts) * 100) : 0;
 
   return {
     contacts: {
       total: contacts,
       optedIn: optedInContacts,
-      optedOut: optedOutContacts
+      optedOut: optedOutContacts,
+      optedInPercent
     },
     campaigns: {
       total: campaigns,

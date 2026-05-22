@@ -62,6 +62,8 @@ test("product dashboard renders seeded owner workflow checkpoints", async ({ pag
   await expect(analytics.getByRole("heading", { name: "Analytics" })).toBeVisible();
   await expect(analytics.getByText("Consent coverage")).toBeVisible();
   await expect(analytics.getByText(/\d+\/\d+/)).toBeVisible();
+  await expect(analytics.getByText("Opt-in rate")).toBeVisible();
+  await expect(analytics.getByText(/\d+%/)).toBeVisible();
   await expect(analytics.getByText("Scheduled work")).toBeVisible();
   await expect(analytics.getByText("Inbox load")).toBeVisible();
   await expect(analytics.getByText("Fake AI requests")).toBeVisible();

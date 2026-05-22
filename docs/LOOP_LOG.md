@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 275  GREEN  product-dashboard-opt-in-rate  2026-05-21 21:51
+Objective:    Show active-contact opt-in rate in the product dashboard's owner-facing signals.
+Changed:
+- Derived active-contact opt-in percentage in the product dashboard projection.
+- Added a read-only `Opt-in rate` signal to `/dashboard`.
+- Extended seeded product-demo browser coverage and refreshed testing/state/handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep product demo usage and consent visibility stable while live sends, providers, billing, live AI, workers, notifications, secrets, and destructive actions remain blocked.
+
 ## Run 274  GREEN  product-dashboard-local-usage-total  2026-05-21 21:49
 Objective:    Show total local usage quantity in the product dashboard's owner-facing signals.
 Changed:
