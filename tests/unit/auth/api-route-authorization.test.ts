@@ -275,6 +275,52 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
   for (const [alias, builtInName] of builtInObjectAliases) {
     bodySlice = bodySlice.replace(new RegExp(`\\b${escapeRegExp(alias)}\\b`, "g"), builtInName);
   }
+  const requestConstructorAliases = new Set<string>();
+  const requestConstructorAliasPattern = new RegExp(
+    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${globalThisTargetPattern()}\\s*(?:(?:\\.|\\?\\.)\\s*Request|(?:\\?\\.)?\\[\\s*["'\`]Request["'\`]\\s*\\])${variableDeclaratorEnd}`,
+    "g"
+  );
+  const assignedRequestConstructorAliasPattern = new RegExp(
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${globalThisTargetPattern()}\\s*(?:(?:\\.|\\?\\.)\\s*Request|(?:\\?\\.)?\\[\\s*["'\`]Request["'\`]\\s*\\])\\s*(?=;|\\r?\\n)`,
+    "g"
+  );
+  const collectGlobalThisRequestAliases = (fields: string) =>
+    fields.split(",").flatMap((field) => {
+      const fieldMatch = /^\s*Request\s*(?::\s*([A-Za-z_$][\w$]*))?\s*$/.exec(field);
+      if (fieldMatch !== null) {
+        return [fieldMatch[1] ?? "Request"];
+      }
+
+      const computedLiteralMatch = /^\s*\[\s*["'`]Request["'`]\s*\]\s*:\s*([A-Za-z_$][\w$]*)\s*$/.exec(field);
+      return computedLiteralMatch === null ? [] : [computedLiteralMatch[1]];
+    });
+  const destructuredGlobalThisRequestAliasPattern = new RegExp(
+    `${variableDeclaratorStart}\\{([^}]+)\\}\\s*(?::[^=;,\\n]+)?=\\s*${globalThisTargetPattern()}${variableDeclaratorEnd}`,
+    "g"
+  );
+  const assignedDestructuredGlobalThisRequestAliasPattern = new RegExp(
+    `(?:^|[;\\r\\n])\\s*\\(\\s*\\{([^}]+)\\}\\s*=\\s*${globalThisTargetPattern()}\\s*\\)\\s*(?=;|\\r?\\n)`,
+    "g"
+  );
+  for (const match of [
+    ...bodySlice.matchAll(requestConstructorAliasPattern),
+    ...bodySlice.matchAll(assignedRequestConstructorAliasPattern)
+  ]) {
+    requestConstructorAliases.add(match[1]);
+  }
+  for (const match of [
+    ...bodySlice.matchAll(destructuredGlobalThisRequestAliasPattern),
+    ...bodySlice.matchAll(assignedDestructuredGlobalThisRequestAliasPattern)
+  ]) {
+    for (const alias of collectGlobalThisRequestAliases(match[1])) {
+      requestConstructorAliases.add(alias);
+    }
+  }
+  for (const alias of requestConstructorAliases) {
+    bodySlice = bodySlice
+      .replace(new RegExp(`\\b${escapeRegExp(alias)}\\s*(?:\\?\\.)?\\[\\s*["'\`]prototype["'\`]\\s*\\]`, "g"), "Request.prototype")
+      .replace(new RegExp(`\\b${escapeRegExp(alias)}\\s*\\??\\.\\s*prototype\\b`, "g"), "Request.prototype");
+  }
   const literalBodyReaderNamePattern = `\\(?\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*(?:\\)?\\s+as\\s+const\\s*\\)?|\\)?)`;
   const bodyReaderPropertyAliases = new Map<string, string>();
   const bodyReaderPropertyAliasPattern = new RegExp(
@@ -1805,6 +1851,25 @@ describe("API route authorization coverage", () => {
         return Response.json({ size: payload.byteLength });
       }
     `;
+    const unsafeGlobalThisRequestAliasSource = `
+      export async function PATCH(req: Request) {
+        const RequestCtor = globalThis.Request;
+        const payload = await RequestCtor.prototype.text.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeAssignedGlobalThisRequestAliasSource = `
+      export async function PUT(req: Request) {
+        let RequestCtor;
+        RequestCtor = globalThis?.["Request"];
+        const payload = await RequestCtor["prototype"]["formData"].call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
     const unsafeDirectReflectSource = `
       export async function POST(req: Request) {
         const cloned = req.clone();
@@ -1831,6 +1896,8 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeBracketPrototypeSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalThisPrototypeSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalGlobalThisPrototypeSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalThisRequestAliasSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedGlobalThisRequestAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectReflectSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });

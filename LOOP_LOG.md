@@ -3134,3 +3134,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 348  GREEN  globalthis-request-alias-auth-scan  2026-05-22 04:58
+Objective:    Prevent local `globalThis.Request` constructor aliases from hiding prototype body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize direct, assigned, and destructured local aliases of `globalThis.Request` before `Request.prototype` body-reader checks.
+- Added synthetic auth unit coverage proving `const RequestCtor = globalThis.Request; RequestCtor.prototype.text.call(req)` and assigned optional/bracketed constructor aliases fail before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the local constructor-alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
