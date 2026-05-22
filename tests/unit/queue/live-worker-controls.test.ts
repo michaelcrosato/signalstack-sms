@@ -308,6 +308,36 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects proxy-invalid indexed control-array descriptors without throwing", () => {
+    const implementedControls = implementedFrozenControls();
+    const invalidIndexedDescriptorControls = new Proxy(implementedControls, {
+      getOwnPropertyDescriptor: (target, property) => {
+        if (property === "0") {
+          return {
+            value: implementedControls[0],
+            enumerable: true,
+            writable: true,
+            configurable: true
+          };
+        }
+
+        return Reflect.getOwnPropertyDescriptor(target, property);
+      }
+    });
+
+    expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(invalidIndexedDescriptorControls)).not.toThrow();
+    expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(invalidIndexedDescriptorControls)).not.toThrow();
+    expect(() => liveWorkerControlsAreImplemented(invalidIndexedDescriptorControls)).not.toThrow();
+    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(invalidIndexedDescriptorControls)).toBe(false);
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(invalidIndexedDescriptorControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(invalidIndexedDescriptorControls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, invalidIndexedDescriptorControls)
+      )
+    ).toBe(false);
+  });
+
   it("rejects writable control-array length descriptors before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const writableLengthControls = [...implementedControls];
