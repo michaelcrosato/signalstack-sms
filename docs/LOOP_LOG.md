@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 231  GREEN  live-worker-control-getter-fields  2026-05-21 18:00
+Objective:    Deny getter-backed public control fields before future live worker authorization can read them.
+Changed:
+- Read live-worker control `id`, `status`, and `requirement` through own data-property descriptors in identity/status authorization predicates.
+- Added unit coverage proving getter-backed public fields remain unauthorized without getter execution.
+- Updated queue/testing contracts, production worker policy docs, roadmap state, SUMMARY, BLOCKERS, and next-prompt handoff notes.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing production-live-campaign control hardening without enabling live sends.
+
 ## Run 229  GREEN  live-worker-control-descriptors  2026-05-21 17:50
 Objective:    Require frozen data descriptors before future live worker authorization can pass.
 Changed:

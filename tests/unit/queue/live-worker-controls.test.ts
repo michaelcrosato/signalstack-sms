@@ -299,6 +299,52 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects accessor-backed public fields without reading getters", () => {
+    const implementedControls = implementedFrozenControls();
+    const accessorBackedControl = Object.freeze(
+      Object.defineProperties(
+        {},
+        {
+          id: {
+            enumerable: true,
+            get: () => {
+              throw new Error("id getter must not be read");
+            }
+          },
+          status: {
+            enumerable: true,
+            get: () => {
+              throw new Error("status getter must not be read");
+            }
+          },
+          requirement: {
+            enumerable: true,
+            get: () => {
+              throw new Error("requirement getter must not be read");
+            }
+          }
+        }
+      )
+    ) as LiveWorkerControl;
+    const controls = Object.freeze(
+      implementedControls.map((control, index) => (index === 0 ? accessorBackedControl : Object.freeze({ ...control })))
+    );
+
+    expect(() => liveWorkerControlIdsMatchRequiredChecklist(controls)).not.toThrow();
+    expect(() => liveWorkerControlsUseSupportedStatuses(controls)).not.toThrow();
+    expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
+    expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(false);
+    expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(false);
+    expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized({
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls
+      })
+    ).toBe(false);
+  });
+
   it("requires live-worker controls to be ordinary object records", () => {
     const implementedControls = implementedFrozenControls();
     const nullPrototypeControl = Object.create(null, {

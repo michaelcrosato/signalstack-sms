@@ -84,6 +84,19 @@ function isControlRecord(control: unknown): control is LiveWorkerControl {
   return control !== null && typeof control === "object" && Object.getPrototypeOf(control) === Object.prototype;
 }
 
+function controlDataFieldValue(control: unknown, field: keyof LiveWorkerControl) {
+  if (!isControlRecord(control)) {
+    return undefined;
+  }
+
+  const descriptor = Object.getOwnPropertyDescriptor(control, field);
+  return descriptor !== undefined && "value" in descriptor ? descriptor.value : undefined;
+}
+
+function isLiveWorkerControlStatus(status: unknown): status is LiveWorkerControlStatus {
+  return typeof status === "string" && supportedLiveWorkerControlStatuses.includes(status as LiveWorkerControlStatus);
+}
+
 function controlArrayIsDense(controls: readonly LiveWorkerControl[]) {
   for (let index = 0; index < controls.length; index += 1) {
     if (!Object.prototype.hasOwnProperty.call(controls, index)) {
@@ -141,8 +154,8 @@ export function liveWorkerControlIdsMatchRequiredChecklist(controls: unknown) {
     controlValues.every(
       (control, index) =>
         isControlRecord(control) &&
-        control.id === requiredLiveWorkerControlIds[index] &&
-        control.requirement === requiredLiveWorkerControlRequirements[index]
+        controlDataFieldValue(control, "id") === requiredLiveWorkerControlIds[index] &&
+        controlDataFieldValue(control, "requirement") === requiredLiveWorkerControlRequirements[index]
     )
   );
 }
@@ -181,7 +194,9 @@ export function liveWorkerControlsUseSupportedStatuses(controls: unknown) {
   }
 
   return controlValues.every(
-    (control) => isControlRecord(control) && supportedLiveWorkerControlStatuses.includes(control.status)
+    (control) =>
+      isControlRecord(control) &&
+      isLiveWorkerControlStatus(controlDataFieldValue(control, "status"))
   );
 }
 
@@ -246,7 +261,9 @@ export function liveWorkerControlsAreImplemented(controls: unknown = productionL
     liveWorkerControlsExposeOnlyPublicFields(controls) &&
     liveWorkerControlsUseSupportedStatuses(controls) &&
     liveWorkerControlIdsMatchRequiredChecklist(controls) &&
-    controls.every((control) => control.status === "implemented")
+    liveWorkerControlArrayValues(controls)?.every(
+      (control) => controlDataFieldValue(control, "status") === "implemented"
+    ) === true
   );
 }
 
