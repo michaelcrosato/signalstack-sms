@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 279  GREEN  bracket-notation-body-reader-scan  2026-05-21 22:21
+Objective:    Prevent bracket-notation request body readers from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Normalized bracket-notation `Request` body readers and `clone` calls in the static mutating API authorization scanner.
+- Added synthetic auth unit coverage proving `req["json"]()`, `req["clone"]()["text"]()`, and cloned bracket aliases are detected before `requireApiRole`.
+- Updated the testing contract for the bracket-notation body-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 276  GREEN  mutating-api-body-reader-guard  2026-05-21 21:55
 Objective:    Catch every standard Request body reader before mutating-route role checks.
 Changed:

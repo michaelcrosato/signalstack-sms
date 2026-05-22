@@ -110,7 +110,9 @@ function escapeRegExp(value: string) {
 function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = defaultRequestParameterName) {
   const normalizedBodySlice = bodySlice
     .replace(/\(\s*([A-Za-z_$][\w$]*)\s*\.\s*clone\s*\(\s*\)\s*\)/g, "$1.clone()")
-    .replace(/\(\s*([A-Za-z_$][\w$]*)\s*\)/g, "$1");
+    .replace(/\(\s*([A-Za-z_$][\w$]*)\s*\)/g, "$1")
+    .replace(/\[\s*["'](json|formData|text|arrayBuffer|blob)["']\s*\]/g, ".$1")
+    .replace(/\[\s*["']clone["']\s*\]/g, ".clone");
   const escapedRequestParameterName = escapeRegExp(requestParameterName);
   const requestBodyReaderPattern = new RegExp(
     `\\b${escapedRequestParameterName}\\s*(?:\\.\\s*clone\\s*\\(\\s*\\))?\\s*\\.\\s*(?:json|formData|text|arrayBuffer|blob)\\s*\\(`
@@ -326,6 +328,47 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "PATCH")).toBe(false);
+  });
+
+  it("treats bracket-notation request and clone body readers as body parsing for role-gate ordering", () => {
+    const unsafeDirectSource = `
+      export async function POST(req: Request) {
+        const payload = await req["json"]();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeCloneSource = `
+      export async function POST(req: Request) {
+        const payload = await req["clone"]()["text"]();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeAliasSource = `
+      export async function POST(req: Request) {
+        const cloned = req["clone"]();
+        const payload = await cloned["formData"]();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await req["json"]();
+        return Response.json(payload);
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCloneSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
   it("keeps role-gate exceptions limited to signed Twilio webhook handlers", () => {
