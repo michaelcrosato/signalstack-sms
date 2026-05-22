@@ -28,6 +28,16 @@ function normalizeRequiredProviderValue(value: string | undefined) {
   return normalized ? normalized : undefined;
 }
 
+function firstRequiredProviderValue(...values: Array<string | undefined>) {
+  for (const value of values) {
+    const normalized = normalizeRequiredProviderValue(value);
+    if (normalized) {
+      return normalized;
+    }
+  }
+  return undefined;
+}
+
 function normalizeOptionalProviderValue(value: string | undefined) {
   const normalized = value?.trim();
   return normalized ? normalized : undefined;
@@ -62,7 +72,7 @@ export function validateTwilioSignature(input: {
 }
 
 export function normalizeTwilioInbound(payload: TwilioWebhookPayload): NormalizedTwilioInbound | null {
-  const providerMessageId = normalizeRequiredProviderValue(payload.MessageSid ?? payload.SmsSid);
+  const providerMessageId = firstRequiredProviderValue(payload.MessageSid, payload.SmsSid);
   const from = normalizeRequiredProviderValue(payload.From);
   const to = normalizeOptionalProviderValue(payload.To);
   const rawBody = payload.Body;
@@ -81,16 +91,13 @@ export function normalizeTwilioInbound(payload: TwilioWebhookPayload): Normalize
 }
 
 export function normalizeTwilioStatus(payload: TwilioWebhookPayload): NormalizedTwilioStatus | null {
-  const providerMessageId = normalizeRequiredProviderValue(payload.MessageSid ?? payload.SmsSid);
-  const rawStatus = payload.MessageStatus ?? payload.SmsStatus;
+  const providerMessageId = firstRequiredProviderValue(payload.MessageSid, payload.SmsSid);
+  const rawStatus = firstRequiredProviderValue(payload.MessageStatus, payload.SmsStatus);
   if (!providerMessageId || !rawStatus) {
     return null;
   }
 
-  const status = rawStatus.trim().toLowerCase();
-  if (!status) {
-    return null;
-  }
+  const status = rawStatus.toLowerCase();
 
   const errorCode = normalizeOptionalProviderValue(payload.ErrorCode);
 

@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 394
+
+- Latest Twilio webhook normalization now falls back from blank modern `MessageSid`/`MessageStatus` fields to nonblank legacy `SmsSid`/`SmsStatus` aliases before deriving local idempotency keys.
+- Focused webhook helper coverage passed: `npm run test -- tests/unit/messaging/twilio-webhooks.test.ts`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 420 tests, Playwright smoke, and build green.
+- Updated webhook/testing contracts, webhook/testing docs, BLOCKERS, loop logs, NEXT_PROMPTS, and current state matrix for the Twilio blank alias fallback boundary.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 393
 
 - Latest Twilio status transition hardening clears stale terminal timestamps when delivery-status webhooks move a local message into delivered, failed, or undelivered states.

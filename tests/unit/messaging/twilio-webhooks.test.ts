@@ -143,6 +143,22 @@ describe("Twilio webhook helpers", () => {
     ).toBeNull();
   });
 
+  it("falls back to nonblank status alias fields before deriving idempotent event keys", () => {
+    expect(
+      normalizeTwilioStatus({
+        MessageSid: " \t ",
+        SmsSid: " SM123 ",
+        MessageStatus: " \t ",
+        SmsStatus: " DELIVERED "
+      })
+    ).toEqual({
+      providerMessageId: "SM123",
+      status: "delivered",
+      errorCode: undefined,
+      idempotencyKey: "twilio:status:SM123:delivered:none"
+    });
+  });
+
   it("normalizes inbound provider message IDs for idempotent event keys", () => {
     expect(
       normalizeTwilioInbound({
@@ -166,6 +182,23 @@ describe("Twilio webhook helpers", () => {
         MessageSid: " \t "
       })
     ).toBeNull();
+  });
+
+  it("falls back to nonblank inbound message ID aliases before deriving idempotent event keys", () => {
+    expect(
+      normalizeTwilioInbound({
+        From: "+15555550100",
+        Body: "HELP",
+        MessageSid: " \t ",
+        SmsSid: " SM123 "
+      })
+    ).toEqual({
+      from: "+15555550100",
+      to: undefined,
+      body: "HELP",
+      providerMessageId: "SM123",
+      idempotencyKey: "twilio:inbound:SM123"
+    });
   });
 
   it("normalizes inbound address whitespace before local message creation", () => {

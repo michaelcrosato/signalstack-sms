@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 394  GREEN  twilio-blank-alias-fallback  2026-05-22 09:31
+Objective:    Prevent blank modern Twilio webhook alias fields from blocking nonblank legacy aliases during local idempotency normalization.
+Changed:
+- Updated Twilio inbound/status normalization to choose the first nonblank message ID/status alias before deriving local idempotency keys.
+- Added focused webhook helper coverage for blank `MessageSid`/`MessageStatus` fallback to nonblank `SmsSid`/`SmsStatus`.
+- Updated webhook/testing contracts, webhook/testing docs, SUMMARY, BLOCKERS, NEXT_PROMPTS, and current state matrix for the blank alias fallback boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep webhook normalization, product demo, live-worker, provider, billing, live AI, notification, and secret gates stable.
+
 ## Run 393  GREEN  twilio-terminal-status-timestamps  2026-05-22 09:25
 Objective:    Keep local Twilio delivery metadata from showing stale delivered and failed terminal timestamps at once.
 Changed:

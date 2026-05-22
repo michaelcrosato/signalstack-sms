@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 394
+
+- No blocker from Twilio blank alias fallback normalization. Focused webhook helper coverage and the protected local gate passed. The change is local webhook parsing plus contract/docs coverage only and does not call Twilio, use production credentials, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, execute workers, enqueue jobs, call Redis, hard-delete data, or perform destructive production database actions.
+
 Run number: 393
 
 - No blocker from Twilio terminal status timestamp cleanup. Focused webhook helper coverage and the protected local gate passed. The change is local webhook transition logic plus contract/docs coverage only and does not call Twilio, use production credentials, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, execute workers, enqueue jobs, call Redis, hard-delete data, or perform destructive production database actions.
