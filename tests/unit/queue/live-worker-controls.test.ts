@@ -1377,6 +1377,9 @@ describe("production live campaign worker controls", () => {
     const extraKeyWrapper = new Proxy(baseWrapper, {
       ownKeys: () => ["workerDeploymentClass", "controls", "reviewerBypass"]
     });
+    const duplicateKeyWrapper = new Proxy(baseWrapper, {
+      ownKeys: () => ["workerDeploymentClass", "workerDeploymentClass", "controls"]
+    });
     const hiddenExtraKeyWrapper = Object.freeze(
       Object.defineProperty(
         {
@@ -1404,6 +1407,7 @@ describe("production live campaign worker controls", () => {
       reorderedKeyWrapper,
       reorderedFieldWrapper,
       extraKeyWrapper,
+      duplicateKeyWrapper,
       hiddenExtraKeyWrapper,
       symbolExtraKeyWrapper
     ]) {

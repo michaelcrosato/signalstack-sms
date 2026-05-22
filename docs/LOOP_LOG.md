@@ -335,6 +335,15 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep webhook idempotency, product demo, live-worker, provider, billing, live AI, notification, and secret gates stable.
 
+## Run 392  GREEN  live-worker-wrapper-duplicate-key-evidence  2026-05-22 09:21
+Objective:    Prove duplicate authorization-wrapper keys cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for proxy-backed authorization wrappers that report duplicate public keys.
+- Updated queue/testing contracts, production-worker policy docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the duplicate wrapper-key boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 388  GREEN  twilio-inbound-body-validation  2026-05-22 09:00
 Objective:    Reject whitespace-only Twilio inbound webhook bodies before local message creation.
 Changed:
