@@ -89,6 +89,18 @@ describe("production live campaign worker controls", () => {
         )
       )
     ).toBe(false);
+    expect(
+      liveWorkerControlsAreImplemented(
+        implementedControls.map((control, index) =>
+          index === 0
+            ? {
+                ...control,
+                requirement: "Matching IDs with replaced requirement copy must not authorize live worker execution."
+              }
+            : control
+        )
+      )
+    ).toBe(false);
   });
 
   it("authorizes the reserved production class only when every control is implemented", () => {

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 222  GREEN  live-worker-control-requirement-identity  2026-05-21 17:10
+Objective:    Require frozen requirement text identity before future live worker authorization can pass.
+Changed:
+- Tightened `liveWorkerControlIdsMatchRequiredChecklist` so custom control arrays must match frozen checklist IDs and requirement text in order.
+- Added focused unit coverage proving requirement-replaced controls remain unauthorized even with implemented statuses.
+- Updated queue/testing contracts and production worker policy docs to record the stricter identity requirement.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live campaign workers blocked; implement concrete future controls before adding any supported live worker class.
+
 ## Run 221  GREEN  live-worker-control-metadata  2026-05-21 17:00
 Objective:    Pin the reserved live campaign worker controls as executable metadata while keeping live workers blocked.
 Changed:

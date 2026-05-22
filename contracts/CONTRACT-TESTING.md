@@ -93,7 +93,7 @@ Post-MVP deployment platform notes:
 
 - `npm run platform:check` must verify that `docs/DEPLOYMENT_PLATFORM_NOTES.md` documents demo-safe hosting defaults, production gate usage, smoke routes, worker boundaries, and no-external-impact platform constraints.
 - `npm run validate` must include `npm run platform:check`.
-- `docs/PRODUCTION_WORKER_POLICY.md` must remain planning-only until future executable worker gates are added; current validation must continue to prove production-like worker execution and non-`local-demo` worker deployment classes are blocked, including the reserved `production-live-campaign` planning label.
+- `docs/PRODUCTION_WORKER_POLICY.md` must remain planning-only until future executable worker gates are added; current validation must continue to prove production-like worker execution and non-`local-demo` worker deployment classes are blocked, including the reserved `production-live-campaign` planning label. Live-worker control tests must reject missing, reordered, renamed, requirement-replaced, and partial custom control arrays before any future authorization can pass.
 
 Post-MVP local usage view:
 

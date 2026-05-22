@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 222
+
+- No blocker from the live-worker control requirement-identity hardening. Future `production-live-campaign` authorization now requires custom control arrays to match the frozen IDs and requirement text in order, with every status implemented; the reserved class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.
+
 Run number: 220
 
 - No blocker from the all-marker production-like worker block coverage. Database and BullMQ worker readiness tests now prove `NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, and `APP_ENV` production/prod markers return `production-worker-blocked` before provider or future live-worker-class checks can fall through; the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.

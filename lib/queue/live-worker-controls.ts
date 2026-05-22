@@ -69,6 +69,7 @@ const liveWorkerControls = [
 ] as const satisfies readonly LiveWorkerControl[];
 
 const requiredLiveWorkerControlIds = liveWorkerControls.map((control) => control.id);
+const requiredLiveWorkerControlRequirements = liveWorkerControls.map((control) => control.requirement);
 
 export const productionLiveCampaignWorkerControls = Object.freeze(
   liveWorkerControls.map((control) => Object.freeze({ ...control }))
@@ -77,7 +78,11 @@ export const productionLiveCampaignWorkerControls = Object.freeze(
 export function liveWorkerControlIdsMatchRequiredChecklist(controls: readonly LiveWorkerControl[]) {
   return (
     controls.length === requiredLiveWorkerControlIds.length &&
-    controls.every((control, index) => control.id === requiredLiveWorkerControlIds[index])
+    controls.every(
+      (control, index) =>
+        control.id === requiredLiveWorkerControlIds[index] &&
+        control.requirement === requiredLiveWorkerControlRequirements[index]
+    )
   );
 }
 

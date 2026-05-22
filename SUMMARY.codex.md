@@ -1,7 +1,17 @@
 # Codex Summary
 
-- Added all-marker production-like worker block coverage for Run 220.
-- Latest repo truth: database and BullMQ scheduled campaign workers reject every production-like runtime marker before provider or future live-worker-class checks can fall through.
+- Tightened live-worker control identity for Run 222.
+- Latest repo truth: future `production-live-campaign` authorization requires the exact frozen control IDs and requirement text in order, with every status implemented; the reserved class remains outside supported worker classes.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+Run number: 222
+
+## Previous Run
+
+- Required custom live-worker control arrays to match frozen checklist IDs and requirement text before authorization can pass.
+- Added focused queue unit coverage for requirement-replaced controls remaining unauthorized.
+- Updated queue/testing contracts, production worker policy docs, and loop records.
+- Focused worker-control tests, production worker policy check, `git diff --check`, and the protected local gate passed.
 - No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
 
 Run number: 220
