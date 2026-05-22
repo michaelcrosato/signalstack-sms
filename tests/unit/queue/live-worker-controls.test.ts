@@ -719,6 +719,40 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects hidden string metadata on control entries before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const hiddenMetadataControl = Object.freeze(
+      Object.defineProperty(
+        {
+          ...implementedControls[0]
+        },
+        "reviewerBypass",
+        {
+          value: "unsafe",
+          enumerable: false
+        }
+      )
+    );
+    const controls = Object.freeze(
+      implementedControls.map((control, index) =>
+        index === 0 ? hiddenMetadataControl : Object.freeze({ ...control })
+      )
+    );
+
+    expect(Object.isFrozen(hiddenMetadataControl)).toBe(true);
+    expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(true);
+    expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(true);
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).toBe(true);
+    expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+    expect(() =>
+      liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+    ).not.toThrow();
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+    ).toBe(false);
+  });
+
   it("requires live-worker controls to expose own enumerable data fields", () => {
     const implementedControls = implementedFrozenControls();
     const accessorBackedControl = Object.freeze(
