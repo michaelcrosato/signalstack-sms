@@ -969,6 +969,7 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
     .replace(/\.\s*clone\s*\?\.\s*\(/g, ".clone(")
     .replace(/\.\s*(call|apply|bind)\s*\?\.\s*\(/g, ".$1(")
     .replace(new RegExp(`\\.\\s*(${requestBodyReaderNames})\\s*\\?\\.\\s*\\(`, "g"), ".$1(")
+    .replace(new RegExp(`(\\.\\s*(?:${requestBodyReaderNames}))\\s*!\\s*(?=\\(|\\.|,|;|\\r?\\n)`, "g"), "$1")
     .replace(
       new RegExp(
         `(\\b[A-Za-z_$][\\w$]*(?:\\s*\\.\\s*clone\\s*\\(\\s*\\))?\\s*\\.\\s*(?:${requestBodyReaderNames}))\\s+(?:as|satisfies)\\s+typeof\\s+[A-Za-z_$][\\w$]*(?:\\s*\\.\\s*clone\\s*\\(\\s*\\))?\\s*\\.\\s*(?:${requestBodyReaderNames})`,
@@ -3071,6 +3072,31 @@ describe("API route authorization coverage", () => {
         return Response.json({ size: payload.size });
       }
     `;
+    const unsafeNonNullDirectReaderSource = `
+      export async function POST(req: Request) {
+        const payload = await req.json!();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeNonNullReaderCallSource = `
+      export async function PATCH(req: Request) {
+        const payload = await req.clone().text!.call(req.clone());
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeNonNullAliasReaderSource = `
+      export async function PUT(req: Request) {
+        const readFormData = req.formData!;
+        const payload = await Reflect.apply(readFormData, req, []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
     const safeSource = `
       export async function POST(req: Request) {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
@@ -3086,6 +3112,9 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTypeAssertedReaderSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSatisfiesAliasReaderSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCloneTypeAssertedAliasSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNonNullDirectReaderSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNonNullReaderCallSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNonNullAliasReaderSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 

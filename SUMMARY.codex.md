@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 368
+
+- Hardened mutating-route authorization coverage for TypeScript non-null assertions on standard request body readers.
+- Latest repo truth: the static body-reader scanner now normalizes direct and aliased non-null reader forms such as `req.json!()`, `req.clone().text!.call(req.clone())`, and `const readFormData = req.formData!` before checking top-level `requireApiRole` ordering.
+- Updated the testing contract, testing docs, and current state matrix for the non-null request-reader boundary.
+- Focused auth coverage passed: `npm run test -- tests/unit/auth/api-route-authorization.test.ts`.
+- `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-22 07:07 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 unit test files / 405 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 366
 
 - Hardened mutating-route authorization coverage for assigned TypeScript `satisfies` aliases.
