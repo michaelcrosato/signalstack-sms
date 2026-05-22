@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 331
+
+- Hardened bracket destructured descriptor-value authorization coverage for Run 331.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes destructured descriptor `["value"]` reader aliases such as `{ ["value"]: readJson } = Object.getOwnPropertyDescriptor(...)`, so descriptor-derived standard `Request` body readers cannot parse a mutating route request body before the handler's top-level `requireApiRole`.
+- Updated the testing contract and testing docs to name the bracket destructured descriptor-value boundary.
+- Focused auth coverage passed; protected local gate status is recorded in `LOOP_LOG.md`.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 330
 
 - Hardened computed destructured descriptor/prototype lookup alias authorization coverage for Run 330.

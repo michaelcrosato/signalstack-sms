@@ -2846,6 +2846,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
 
+## Run 331  GREEN  bracket-destructured-descriptor-value-scan  2026-05-22 03:27
+Objective:    Prevent bracket destructured descriptor-value aliases from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize descriptor `["value"]` aliases destructured from `Object.getOwnPropertyDescriptor(...)` or `Reflect.getOwnPropertyDescriptor(...)`.
+- Added synthetic auth unit coverage proving bracket destructured descriptor-value readers fail before the role gate and pass after it.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the bracket destructured descriptor-value boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 299  GREEN  request-prototype-body-reader-scan  2026-05-22 00:51
 Objective:    Prevent `Request.prototype` body readers from bypassing mutating-route role-gate ordering checks.
 Changed:
