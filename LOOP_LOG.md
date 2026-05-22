@@ -3264,3 +3264,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+## Run 363  GREEN  parenthesized-type-asserted-builtin-alias-auth-scan  2026-05-22 06:36
+Objective:    Prevent parenthesized TypeScript type-asserted `Object`/`Reflect` aliases from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize `const ReflectBuiltin = (Reflect as typeof Reflect)` and assigned nested `((Object as typeof Object))` aliases before reflective body-reader checks.
+- Added synthetic auth unit coverage proving those aliases fail before the role gate while post-gate reads remain allowed.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the parenthesized type-asserted built-in alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.

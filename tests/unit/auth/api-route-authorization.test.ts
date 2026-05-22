@@ -256,11 +256,11 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
     "g"
   );
   const directBuiltInObjectAliasPattern = new RegExp(
-    `\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*(Object|Reflect)(?:\\s+as\\s+typeof\\s+(?:Object|Reflect))?${variableDeclaratorEnd}`,
+    `\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*\\(*\\s*(Object|Reflect)(?:\\s+as\\s+typeof\\s+(?:Object|Reflect))?\\s*\\)*${variableDeclaratorEnd}`,
     "g"
   );
   const assignedBuiltInObjectAliasPattern = new RegExp(
-    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*(Object|Reflect)(?:\\s+as\\s+typeof\\s+(?:Object|Reflect))?\\s*(?=;|\\r?\\n)`,
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*\\(*\\s*(Object|Reflect)(?:\\s+as\\s+typeof\\s+(?:Object|Reflect))?\\s*\\)*\\s*(?=;|\\r?\\n)`,
     "g"
   );
   for (const match of [
@@ -4406,6 +4406,28 @@ describe("API route authorization coverage", () => {
         return Response.json({ ok: Boolean(payload) });
       }
     `;
+    const unsafeParenthesizedTypeAssertedReflectAliasSource = `
+      export async function POST(req: Request) {
+        const ReflectBuiltin = (Reflect as typeof Reflect);
+        const payload = await ReflectBuiltin.get(req, "arrayBuffer").call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+    const unsafeNestedParenthesizedTypeAssertedObjectAliasSource = `
+      export async function PATCH(req: Request) {
+        let ObjectBuiltin;
+        ObjectBuiltin = ((Object as typeof Object));
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          Request.prototype,
+          "blob"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
     const safeSource = `
       export async function POST(req: Request) {
         const ReflectBuiltin = Reflect;
@@ -4420,6 +4442,8 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeObjectAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedReflectAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTypeAssertedObjectAliasSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedTypeAssertedReflectAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNestedParenthesizedTypeAssertedObjectAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
