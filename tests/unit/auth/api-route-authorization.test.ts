@@ -255,6 +255,20 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
     `(?:^|[;\\r\\n])\\s*\\(\\s*\\{([^}]+)\\}\\s*=\\s*${globalThisTargetPattern()}\\s*\\)\\s*(?=;|\\r?\\n)`,
     "g"
   );
+  const directBuiltInObjectAliasPattern = new RegExp(
+    `\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*(Object|Reflect)(?:\\s+as\\s+typeof\\s+(?:Object|Reflect))?${variableDeclaratorEnd}`,
+    "g"
+  );
+  const assignedBuiltInObjectAliasPattern = new RegExp(
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*(Object|Reflect)(?:\\s+as\\s+typeof\\s+(?:Object|Reflect))?\\s*(?=;|\\r?\\n)`,
+    "g"
+  );
+  for (const match of [
+    ...normalizedGlobalThisBodySlice.matchAll(directBuiltInObjectAliasPattern),
+    ...normalizedGlobalThisBodySlice.matchAll(assignedBuiltInObjectAliasPattern)
+  ]) {
+    builtInObjectAliases.set(match[1], match[2]);
+  }
   for (const match of [
     ...normalizedGlobalThisBodySlice.matchAll(destructuredGlobalThisBuiltInAliasPattern),
     ...normalizedGlobalThisBodySlice.matchAll(assignedDestructuredGlobalThisBuiltInAliasPattern)
@@ -4324,6 +4338,64 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedReflectGetSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNestedParenthesizedObjectDescriptorSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedBracketReflectApplySource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("treats aliased Object and Reflect built-ins as body parsing for role-gate ordering", () => {
+    const unsafeReflectAliasSource = `
+      export async function POST(req: Request) {
+        const ReflectBuiltin = Reflect;
+        const payload = await ReflectBuiltin.get(req, "json").call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeObjectAliasSource = `
+      export async function PATCH(req: Request) {
+        const ObjectBuiltin = Object;
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          Reflect.getPrototypeOf(req),
+          "text"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeAssignedReflectAliasSource = `
+      export async function PUT(req: Request) {
+        let ReflectBuiltin;
+        ReflectBuiltin = Reflect;
+        const payload = await ReflectBuiltin.apply(req.clone().blob, req.clone(), []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const unsafeTypeAssertedObjectAliasSource = `
+      export async function DELETE(req: Request) {
+        const ObjectBuiltin = Object as typeof Object;
+        const payload = await ObjectBuiltin.getPrototypeOf(req).formData.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const ReflectBuiltin = Reflect;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await ReflectBuiltin.get(req, "arrayBuffer").call(req);
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeReflectAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeObjectAliasSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedReflectAliasSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTypeAssertedObjectAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 

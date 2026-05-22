@@ -1,5 +1,17 @@
 # Codex Summary
 
+Run number: 361
+
+- Hardened mutating-route authorization coverage for direct local `Object` and `Reflect` built-in aliases.
+- Latest repo truth: the static body-reader scanner now normalizes direct, assigned, and TypeScript type-asserted aliases such as `const ReflectBuiltin = Reflect`, `ReflectBuiltin = Reflect`, and `const ObjectBuiltin = Object as typeof Object` before reflective request body-reader checks.
+- Added synthetic auth coverage proving aliased `Reflect.get`, `Reflect.apply`, `Object.getOwnPropertyDescriptor`, and `Object.getPrototypeOf` body-reader paths fail before `requireApiRole` and pass after it.
+- Updated the testing contract, testing docs, and current state matrix for the built-in alias auth boundary.
+- Focused auth coverage passed: `npm run test -- tests/unit/auth/api-route-authorization.test.ts`.
+- `PLAYWRIGHT_PORT=3111 .\scripts\local-gate.ps1` passed on 2026-05-22 06:25 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 unit test files / 405 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 360
 
 - Hardened `/settings/delivery` operations metadata by moving delivery checkpoints, safety boundaries, and no-impact summary states into `lib/operations/delivery-operations.ts`.
@@ -9,8 +21,6 @@ Run number: 360
 - Focused delivery coverage passed: `npm run test -- tests/unit/operations/delivery-operations.test.ts`; `npm run typecheck` and `npm run lint` also passed.
 - `PLAYWRIGHT_PORT=3111 .\scripts\local-gate.ps1` passed on 2026-05-22 06:20 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 unit test files / 404 tests, Playwright smoke, and build green.
 - No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
-
-## Previous Run
 
 Run number: 359
 

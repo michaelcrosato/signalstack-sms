@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 361  GREEN  object-reflect-builtin-alias-auth-scan  2026-05-22 06:25
+Objective:    Prevent direct local `Object` and `Reflect` built-in aliases from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize direct, assigned, and TypeScript type-asserted local aliases of `Object` and `Reflect`.
+- Added synthetic auth unit coverage proving aliased `Reflect.get`, `Reflect.apply`, `Object.getOwnPropertyDescriptor`, and `Object.getPrototypeOf` body-reader paths fail before the role gate while post-gate reads remain allowed.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the built-in alias boundary.
+Gate:         passed with `PLAYWRIGHT_PORT=3111 .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 360  GREEN  delivery-operations-metadata  2026-05-22 06:20
 Objective:    Pin `/settings/delivery` read-only operations metadata behind executable unit coverage.
 Changed:
