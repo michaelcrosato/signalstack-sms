@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 327
+
+- Hardened aliased descriptor/prototype lookup body-reader authorization coverage for Run 327.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes local aliases for `Object.getOwnPropertyDescriptor`, `Reflect.getOwnPropertyDescriptor`, `Object.getPrototypeOf`, and `Reflect.getPrototypeOf` before descriptor-derived body-reader checks, so aliased descriptor/prototype lookup calls cannot parse a request body before a mutating handler's top-level `requireApiRole`.
+- Updated the testing contract and testing docs to name the aliased descriptor/prototype lookup boundary.
+- Focused auth coverage and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 324
 
 - Hardened TypeScript const-asserted body-reader property alias authorization coverage for Run 324.

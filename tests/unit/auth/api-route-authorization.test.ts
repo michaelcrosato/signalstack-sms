@@ -196,23 +196,55 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
     String.raw`(?:Object|Reflect)\s*(?:(?:\.|\?\.)\s*${memberName}|(?:\?\.)?\[\s*["'\`]${memberName}["'\`]\s*\])\s*(?:\?\.)?`;
   const descriptorLookupPattern = objectOrReflectMemberPattern("getOwnPropertyDescriptor");
   const prototypeLookupPattern = objectOrReflectMemberPattern("getPrototypeOf");
+  const descriptorLookupAliases = new Set<string>();
+  const prototypeLookupAliases = new Set<string>();
+  const descriptorLookupAliasPattern = new RegExp(
+    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${descriptorLookupPattern}${variableDeclaratorEnd}`,
+    "g"
+  );
+  const assignedDescriptorLookupAliasPattern = new RegExp(
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${descriptorLookupPattern}\\s*(?=;|\\r?\\n)`,
+    "g"
+  );
+  const prototypeLookupAliasPattern = new RegExp(
+    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${prototypeLookupPattern}${variableDeclaratorEnd}`,
+    "g"
+  );
+  const assignedPrototypeLookupAliasPattern = new RegExp(
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${prototypeLookupPattern}\\s*(?=;|\\r?\\n)`,
+    "g"
+  );
+  for (const match of [
+    ...bodySlice.matchAll(descriptorLookupAliasPattern),
+    ...bodySlice.matchAll(assignedDescriptorLookupAliasPattern)
+  ]) {
+    descriptorLookupAliases.add(match[1]);
+  }
+  for (const match of [
+    ...bodySlice.matchAll(prototypeLookupAliasPattern),
+    ...bodySlice.matchAll(assignedPrototypeLookupAliasPattern)
+  ]) {
+    prototypeLookupAliases.add(match[1]);
+  }
+  const descriptorLookupCallPattern = `(?:${descriptorLookupPattern}|${[...descriptorLookupAliases].map(escapeRegExp).join("|") || "(?!)"})`;
+  const prototypeLookupCallPattern = `(?:${prototypeLookupPattern}|${[...prototypeLookupAliases].map(escapeRegExp).join("|") || "(?!)"})`;
   const optionalReflectGetReceiverArgument = `(?:\\s*,\\s*${simpleCallArguments})?`;
   const descriptorReaderAliases = new Map<string, string>();
-  const descriptorAliasTargetPattern = String.raw`(?:Request\s*\.\s*prototype|${prototypeLookupPattern}\s*\(\s*([^)]*?)\s*\))`;
+  const descriptorAliasTargetPattern = String.raw`(?:Request\s*\.\s*prototype|${prototypeLookupCallPattern}\s*\(\s*([^)]*?)\s*\))`;
   const descriptorReaderAliasPattern = new RegExp(
-    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${descriptorLookupPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)${variableDeclaratorEnd}`,
+    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${descriptorLookupCallPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)${variableDeclaratorEnd}`,
     "g"
   );
   const assignedDescriptorReaderAliasPattern = new RegExp(
-    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${descriptorLookupPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)\\s*(?=;|\\r?\\n)`,
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${descriptorLookupCallPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)\\s*(?=;|\\r?\\n)`,
     "g"
   );
   const descriptorPropertyAliasPattern = new RegExp(
-    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${descriptorLookupPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)${variableDeclaratorEnd}`,
+    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${descriptorLookupCallPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)${variableDeclaratorEnd}`,
     "g"
   );
   const assignedDescriptorPropertyAliasPattern = new RegExp(
-    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${descriptorLookupPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*(?=;|\\r?\\n)`,
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${descriptorLookupCallPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*(?=;|\\r?\\n)`,
     "g"
   );
   const descriptorAliasMatches = [
@@ -248,19 +280,19 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   }
   const descriptorValueReaderAliases = new Map<string, string>();
   const descriptorValueAliasPattern = new RegExp(
-    `${variableDeclaratorStart}\\{([^}]+)\\}\\s*(?::[^=;,\\n]+)?=\\s*${descriptorLookupPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)\\s*!?${variableDeclaratorEnd}`,
+    `${variableDeclaratorStart}\\{([^}]+)\\}\\s*(?::[^=;,\\n]+)?=\\s*${descriptorLookupCallPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)\\s*!?${variableDeclaratorEnd}`,
     "g"
   );
   const assignedDescriptorValueAliasPattern = new RegExp(
-    `(?:^|[;\\r\\n])\\s*\\(\\s*\\{([^}]+)\\}\\s*=\\s*${descriptorLookupPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)\\s*!?\\s*\\)\\s*(?=;|\\r?\\n)`,
+    `(?:^|[;\\r\\n])\\s*\\(\\s*\\{([^}]+)\\}\\s*=\\s*${descriptorLookupCallPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)\\s*!?\\s*\\)\\s*(?=;|\\r?\\n)`,
     "g"
   );
   const descriptorValuePropertyAliasPattern = new RegExp(
-    `${variableDeclaratorStart}\\{([^}]+)\\}\\s*(?::[^=;,\\n]+)?=\\s*${descriptorLookupPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*!?${variableDeclaratorEnd}`,
+    `${variableDeclaratorStart}\\{([^}]+)\\}\\s*(?::[^=;,\\n]+)?=\\s*${descriptorLookupCallPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*!?${variableDeclaratorEnd}`,
     "g"
   );
   const assignedDescriptorValuePropertyAliasPattern = new RegExp(
-    `(?:^|[;\\r\\n])\\s*\\(\\s*\\{([^}]+)\\}\\s*=\\s*${descriptorLookupPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*!?\\s*\\)\\s*(?=;|\\r?\\n)`,
+    `(?:^|[;\\r\\n])\\s*\\(\\s*\\{([^}]+)\\}\\s*=\\s*${descriptorLookupCallPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*!?\\s*\\)\\s*(?=;|\\r?\\n)`,
     "g"
   );
   const descriptorValueAliasMatches = [
@@ -318,21 +350,21 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
     )
     .replace(
       new RegExp(
-        `(${descriptorLookupPattern}\\s*\\(\\s*[^,]+?,\\s*)\\(\\s*(["'\`])(${requestBodyReaderNames})\\2\\s*\\)`,
+        `(${descriptorLookupCallPattern}\\s*\\(\\s*[^,]+?,\\s*)\\(\\s*(["'\`])(${requestBodyReaderNames})\\2\\s*\\)`,
         "g"
       ),
       "$1$2$3$2"
     )
     .replace(
       new RegExp(
-        `${descriptorLookupPattern}\\s*\\(\\s*Request\\s*\\.\\s*prototype\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)\\s*${descriptorValueAccessPattern}`,
+        `${descriptorLookupCallPattern}\\s*\\(\\s*Request\\s*\\.\\s*prototype\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)\\s*${descriptorValueAccessPattern}`,
         "g"
       ),
       "Request.prototype.$1"
     )
     .replace(
       new RegExp(
-        `${descriptorLookupPattern}\\s*\\(\\s*Request\\s*\\.\\s*prototype\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*${descriptorValueAccessPattern}`,
+        `${descriptorLookupCallPattern}\\s*\\(\\s*Request\\s*\\.\\s*prototype\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*${descriptorValueAccessPattern}`,
         "g"
       ),
       (match, propertyAlias: string) => {
@@ -342,14 +374,14 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
     )
     .replace(
       new RegExp(
-        `${descriptorLookupPattern}\\s*\\(\\s*${prototypeLookupPattern}\\s*\\(\\s*([^)]*?)\\s*\\)\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)\\s*${descriptorValueAccessPattern}`,
+        `${descriptorLookupCallPattern}\\s*\\(\\s*${prototypeLookupCallPattern}\\s*\\(\\s*([^)]*?)\\s*\\)\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)\\s*${descriptorValueAccessPattern}`,
         "g"
       ),
       "Object.getPrototypeOf($1).$2"
     )
     .replace(
       new RegExp(
-        `${descriptorLookupPattern}\\s*\\(\\s*${prototypeLookupPattern}\\s*\\(\\s*([^)]*?)\\s*\\)\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*${descriptorValueAccessPattern}`,
+        `${descriptorLookupCallPattern}\\s*\\(\\s*${prototypeLookupCallPattern}\\s*\\(\\s*([^)]*?)\\s*\\)\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*${descriptorValueAccessPattern}`,
         "g"
       ),
       (match, target: string, propertyAlias: string) => {
@@ -3147,6 +3179,65 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDescriptorSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafePrototypeDescriptorSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "DELETE")).toBe(false);
+  });
+
+  it("treats aliased descriptor and prototype lookup calls as body parsing for role-gate ordering", () => {
+    const unsafeDescriptorAliasSource = `
+      export async function POST(req: Request) {
+        const getDescriptor = Object.getOwnPropertyDescriptor;
+        const payload = await getDescriptor(Request.prototype, "json")?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeAssignedReflectDescriptorAliasSource = `
+      export async function PATCH(req: Request) {
+        let getDescriptor;
+        getDescriptor = Reflect.getOwnPropertyDescriptor;
+        const descriptor = getDescriptor(Request.prototype, "text");
+        const payload = await descriptor?.["value"].call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafePrototypeAliasSource = `
+      export async function PUT(req: Request) {
+        const getPrototype = Object.getPrototypeOf;
+        const payload = await Object.getOwnPropertyDescriptor(getPrototype(req), "formData")?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeDescriptorAndPrototypeAliasSource = `
+      export async function DELETE(req: Request) {
+        const readerName = "blob";
+        const getDescriptor = Reflect.getOwnPropertyDescriptor;
+        const getPrototype = Reflect.getPrototypeOf;
+        const { value: readBlob } = getDescriptor(getPrototype(req), readerName)!;
+        const payload = await readBlob.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const getDescriptor = Object.getOwnPropertyDescriptor;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await getDescriptor(Request.prototype, "arrayBuffer")?.value.call(req);
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDescriptorAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedReflectDescriptorAliasSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafePrototypeAliasSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDescriptorAndPrototypeAliasSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
   it("ignores comment and string mentions of requireApiRole before body-reader ordering checks", () => {
