@@ -4,6 +4,6 @@
                            "docs/AXIOMS.md":  "3a7375fc015e4aa82524b8ba5d78d016131ee286472691ae75d5649c2d6007b3",
                            "scripts/local-gate.ps1":  "a9421481ac8379caf9b606c23574afec9a9f1c43a8a428e229a0b283073c0091",
                            "scripts/assert-gate-integrity.ps1":  "0161f99db8d68edbc6c415b75d88e614426c5aa69873dabe5fafac90860e402b",
-                           "scripts/run-codex-yolo-loop.ps1":  "27ff56f336f00abf0529155b519b51b031df00ddc1e67958dcf39b04eb85f9e2"
+                           "scripts/run-codex-yolo-loop.ps1":  "7654c68ab34062f8a389431eb6883152b5319910494a90684785cbfaf2830d78"
                        }
 }

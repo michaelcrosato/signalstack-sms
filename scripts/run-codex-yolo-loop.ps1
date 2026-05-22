@@ -1,6 +1,7 @@
 param(
   [string]$Repo = "",
   [int]$FuseMinutes = 0,
+  [int]$GateRetryDelaySeconds = 15,
   [switch]$FullYolo,
   [switch]$DryRun,
   [switch]$DryIteration,
@@ -22,26 +23,45 @@ $fuseMinutes = if ($FuseMinutes -gt 0) {
 } elseif ($env:CODEX_YOLO_FUSE_MINUTES) {
   [int]$env:CODEX_YOLO_FUSE_MINUTES
 } else {
-  720
+  0
 }
 $startedAt = Get-Date
-$deadline = $startedAt.AddMinutes($fuseMinutes)
+$deadline = if ($fuseMinutes -gt 0) {
+  $startedAt.AddMinutes($fuseMinutes)
+} else {
+  $null
+}
 
 Write-Host "SignalStack Codex yolo loop"
-Write-Host "Fuse minutes: $fuseMinutes"
+if ($null -eq $deadline) {
+  Write-Host "Fuse minutes: none"
+} else {
+  Write-Host "Fuse minutes: $fuseMinutes"
+}
 Write-Host "Codex command: codex exec"
 Write-Host "Operating prompt: docs/AXIOMS.md + docs/AGENT-LOOP.md"
 Write-Host "Unattended runs must keep production credentials and destructive live-world actions out of scope."
 
+function Test-FuseExpired {
+  $null -ne $deadline -and (Get-Date) -ge $deadline
+}
+
+function Wait-BeforeNextIteration {
+  Start-Sleep -Seconds $GateRetryDelaySeconds
+}
+
 while ($true) {
-  if ((Get-Date) -ge $deadline) {
+  if (Test-FuseExpired) {
     Write-Error "Cost/time fuse reached after $fuseMinutes minutes. Human restart required."
     exit 1
   }
 
   & (Join-Path $PSScriptRoot "assert-gate-integrity.ps1")
-  if (-not $?) {
-    exit 1
+  $integrityExitCode = $LASTEXITCODE
+  if ($integrityExitCode -ne 0) {
+    Write-Warning "Gate integrity check exited $integrityExitCode. Waiting before the next loop attempt."
+    Wait-BeforeNextIteration
+    continue
   }
 
   $prompt = @"
@@ -56,7 +76,11 @@ Do not use production credentials or destructive live-world actions.
     Write-Host "Dry run: would invoke Codex for one loop iteration with the operating prompt."
     Write-Host $prompt
     & (Join-Path $PSScriptRoot "local-gate.ps1")
-    exit $LASTEXITCODE
+    $dryGateExitCode = $LASTEXITCODE
+    if ($dryGateExitCode -ne 0) {
+      Write-Warning "Dry iteration local gate exited $dryGateExitCode."
+    }
+    exit $dryGateExitCode
   }
 
   $codexArgs = @("exec", "-C", $repoRoot)
@@ -68,12 +92,28 @@ Do not use production credentials or destructive live-world actions.
   }
 
   & codex @codexArgs $prompt
-  if ($LASTEXITCODE -ne 0) {
-    exit $LASTEXITCODE
+  $codexExitCode = $LASTEXITCODE
+  if ($codexExitCode -ne 0) {
+    if (Test-FuseExpired) {
+      Write-Error "Codex exited $codexExitCode at the fuse deadline. Human restart required."
+      exit $codexExitCode
+    }
+
+    Write-Warning "Codex exited $codexExitCode. Starting a fresh loop iteration; repository truth and the protected gate still govern commits."
+    Wait-BeforeNextIteration
+    continue
   }
 
   & (Join-Path $PSScriptRoot "local-gate.ps1")
-  if ($LASTEXITCODE -ne 0) {
-    exit $LASTEXITCODE
+  $gateExitCode = $LASTEXITCODE
+  if ($gateExitCode -ne 0) {
+    if (Test-FuseExpired) {
+      Write-Error "Protected local gate exited $gateExitCode at the fuse deadline. Human restart required."
+      exit $gateExitCode
+    }
+
+    Write-Warning "Protected local gate exited $gateExitCode. Starting a fresh loop iteration; failed gates are not treated as green."
+    Wait-BeforeNextIteration
+    continue
   }
 }

@@ -62,9 +62,11 @@ Next:         <one line>
 The gate is protected by construction, not prose: gate scripts and AXIOMS.md live outside the
 agent's write scope and are integrity-checked before each run. The agent may propose gate
 changes; only a human approves them. No production credentials or irreversible live actions in
-unattended runs. A cost/time fuse caps unattended spend  that fuse is the real backstop for
-"Never Stop."
+unattended runs. The default loop keeps running until a hard interruption; an optional
+cost/time fuse can cap unattended spend when explicitly configured.
 
 Single-agent now: one agent works the loop and commits to main only after the protected gate
-passes. Promoter later: each agent works a branch, one deterministic promoter re-validates
-against HEAD and fast-forwards main. Build the promoter only when you go multi-agent.
+passes. The local PowerShell loop is endless by default and only stops on hard interruption;
+set `-FuseMinutes` or `CODEX_YOLO_FUSE_MINUTES` when a time cap is wanted. Promoter later:
+each agent works a branch, one deterministic promoter re-validates against HEAD and
+fast-forwards main. Build the promoter only when you go multi-agent.
