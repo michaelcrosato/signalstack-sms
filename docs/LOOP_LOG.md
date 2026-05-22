@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 289  GREEN  comma-declared-body-reader-scan  2026-05-21 23:14
+Objective:    Prevent comma-declared request aliases from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to treat comma-separated variable declarators as alias declarations for request, cloned request, detached reader, bound reader, and destructured reader checks.
+- Added synthetic auth unit coverage proving comma-declared body-reader aliases fail before the role gate and pass after it.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the comma-declared body-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 287  GREEN  bracket-bound-body-reader-scan  2026-05-21 23:05
 Objective:    Prevent bracket-notation bound request body readers from bypassing mutating-route role-gate ordering checks.
 Changed:

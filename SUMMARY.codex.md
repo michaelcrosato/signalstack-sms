@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 289
+
+- Hardened comma-declared request body-reader authorization coverage for Run 289.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now treats request aliases, cloned request aliases, detached reader aliases, bound reader aliases, and destructured reader aliases declared in comma-separated variable declarations as body parsing that must remain behind each mutating handler's own top-level `requireApiRole` call.
+- Updated the testing contract to name comma-declared request-reader alias coverage.
+- Focused auth coverage and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 288
 
 - Hardened template-interpolation body-reader authorization coverage for Run 288.
