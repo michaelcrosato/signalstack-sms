@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 286
+
+- Hardened direct request-alias body-reader authorization coverage for Run 286.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now treats direct request object aliases such as `const bodySource = req; await bodySource.json()` and cloned readers from those aliases as body parsing that must remain behind each mutating handler's own top-level `requireApiRole` call.
+- Updated the testing contract to name direct request object alias coverage.
+- Focused auth coverage, typecheck, contracts check, lint, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 285
 
 - Hardened nested-helper role-gate authorization coverage for Run 285.

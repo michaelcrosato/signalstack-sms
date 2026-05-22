@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 286  GREEN  request-object-alias-body-reader-scan  2026-05-21 22:55
+Objective:    Prevent direct request object aliases from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to follow direct request aliases before direct, cloned, detached, or destructured body-reader checks.
+- Added synthetic auth unit coverage proving `const bodySource = req; await bodySource.json()` and cloned readers from request aliases fail before the role gate and pass after it.
+- Updated the testing contract, SUMMARY, and BLOCKERS for the direct request-alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 285  GREEN  nested-helper-role-gate-scan  2026-05-21 22:50
 Objective:    Prevent nested helper `requireApiRole` mentions from masking mutating-route body parsing before authorization.
 Changed:
