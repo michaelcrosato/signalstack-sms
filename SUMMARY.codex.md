@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 329
+
+- Hardened parenthesized descriptor-alias body-reader authorization coverage for Run 329.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes descriptor object aliases and destructured descriptor `value` aliases whose body-reader property name is a parenthesized or const-asserted literal, so those descriptor-derived readers cannot parse a mutating route request body before the handler's top-level `requireApiRole`.
+- Updated the testing contract and testing docs to name the parenthesized/const-asserted descriptor-alias boundary.
+- Focused auth coverage and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 327
 
 - Hardened aliased descriptor/prototype lookup body-reader authorization coverage for Run 327.

@@ -256,11 +256,11 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   const descriptorReaderAliases = new Map<string, string>();
   const descriptorAliasTargetPattern = String.raw`(?:Request\s*\.\s*prototype|${prototypeLookupCallPattern}\s*\(\s*([^)]*?)\s*\))`;
   const descriptorReaderAliasPattern = new RegExp(
-    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${descriptorLookupCallPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)${variableDeclaratorEnd}`,
+    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${descriptorLookupCallPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*${literalBodyReaderNamePattern}\\s*\\)${variableDeclaratorEnd}`,
     "g"
   );
   const assignedDescriptorReaderAliasPattern = new RegExp(
-    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${descriptorLookupCallPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)\\s*(?=;|\\r?\\n)`,
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${descriptorLookupCallPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*${literalBodyReaderNamePattern}\\s*\\)\\s*(?=;|\\r?\\n)`,
     "g"
   );
   const descriptorPropertyAliasPattern = new RegExp(
@@ -304,11 +304,11 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   }
   const descriptorValueReaderAliases = new Map<string, string>();
   const descriptorValueAliasPattern = new RegExp(
-    `${variableDeclaratorStart}\\{([^}]+)\\}\\s*(?::[^=;,\\n]+)?=\\s*${descriptorLookupCallPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)\\s*!?${variableDeclaratorEnd}`,
+    `${variableDeclaratorStart}\\{([^}]+)\\}\\s*(?::[^=;,\\n]+)?=\\s*${descriptorLookupCallPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*${literalBodyReaderNamePattern}\\s*\\)\\s*!?${variableDeclaratorEnd}`,
     "g"
   );
   const assignedDescriptorValueAliasPattern = new RegExp(
-    `(?:^|[;\\r\\n])\\s*\\(\\s*\\{([^}]+)\\}\\s*=\\s*${descriptorLookupCallPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\)\\s*!?\\s*\\)\\s*(?=;|\\r?\\n)`,
+    `(?:^|[;\\r\\n])\\s*\\(\\s*\\{([^}]+)\\}\\s*=\\s*${descriptorLookupCallPattern}\\s*\\(\\s*${descriptorAliasTargetPattern}\\s*,\\s*${literalBodyReaderNamePattern}\\s*\\)\\s*!?\\s*\\)\\s*(?=;|\\r?\\n)`,
     "g"
   );
   const descriptorValuePropertyAliasPattern = new RegExp(
@@ -1971,6 +1971,25 @@ describe("API route authorization coverage", () => {
         return Response.json({ size: payload.size });
       }
     `;
+    const unsafeParenthesizedLiteralAliasSource = `
+      export async function POST(req: Request) {
+        const descriptor = Object.getOwnPropertyDescriptor(Request.prototype, ("json"));
+        const payload = await descriptor?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeAssignedConstAssertedAliasSource = `
+      export async function PATCH(req: Request) {
+        let descriptor;
+        descriptor = Reflect.getOwnPropertyDescriptor(Object.getPrototypeOf(req), ("text") as const);
+        const payload = await descriptor?.["value"].call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
     const safeSource = `
       export async function POST(req: Request) {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
@@ -1985,6 +2004,8 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedDescriptorAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafePrototypeDescriptorAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeReflectPrototypePropertyAliasSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedLiteralAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedConstAssertedAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
@@ -2027,6 +2048,25 @@ describe("API route authorization coverage", () => {
         return Response.json(payload);
       }
     `;
+    const unsafeParenthesizedLiteralSource = `
+      export async function POST(req: Request) {
+        const { value: readJson } = Object.getOwnPropertyDescriptor(Request.prototype, ("json"))!;
+        const payload = await readJson.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeAssignedConstAssertedSource = `
+      export async function PATCH(req: Request) {
+        let readText;
+        ({ value: readText } = Reflect.getOwnPropertyDescriptor(Object.getPrototypeOf(req), ("text") as const)!);
+        const payload = await readText.apply(req, []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
     const safeSource = `
       export async function POST(req: Request) {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
@@ -2041,6 +2081,8 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafePrototypeSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafePropertyAliasSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedLiteralSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedConstAssertedSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 

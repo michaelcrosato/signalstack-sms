@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 329  GREEN  parenthesized-descriptor-alias-body-reader-scan  2026-05-22 03:13
+Objective:    Prevent parenthesized or const-asserted descriptor-alias property names from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize parenthesized and const-asserted literal body-reader property names captured in descriptor object aliases and destructured descriptor `value` aliases.
+- Added synthetic auth unit coverage proving those descriptor aliases fail before `requireApiRole` and pass after it.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the parenthesized descriptor-alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 324  GREEN  const-asserted-reader-alias-scan  2026-05-22 02:40
 Objective:    Prevent TypeScript const-asserted body-reader property aliases from bypassing mutating-route role-gate ordering checks.
 Changed:
