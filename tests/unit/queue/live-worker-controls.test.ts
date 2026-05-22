@@ -1791,6 +1791,39 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects invisible unicode-padded deployment class strings before inspecting supplied controls", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("unicode-padded worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("unicode-padded worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("unicode-padded worker classes must not inspect control evidence");
+      }
+    });
+
+    for (const workerDeploymentClass of [
+      `\u00a0${reservedLiveWorkerDeploymentClass}`,
+      `${reservedLiveWorkerDeploymentClass}\u2007`,
+      `\u202f${reservedLiveWorkerDeploymentClass}`,
+      `${reservedLiveWorkerDeploymentClass}\ufeff`,
+      `\u200b${reservedLiveWorkerDeploymentClass}\u200b`
+    ]) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects blank deployment class strings before inspecting supplied controls", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {

@@ -4008,3 +4008,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 445  GREEN  live-worker-unicode-padding-evidence  2026-05-22 15:02
+Objective:    Prove invisible Unicode escape-padded deployment-class strings cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker authorization coverage for non-breaking-space, figure-space, narrow-no-break-space, byte-order-mark, and zero-width-space padded `production-live-campaign` strings.
+- Updated queue/testing contracts, production-worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the invisible Unicode padding deployment-class boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
