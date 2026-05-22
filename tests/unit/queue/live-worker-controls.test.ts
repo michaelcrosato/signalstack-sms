@@ -759,6 +759,41 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects proxy-invalid control-entry field descriptors without throwing", () => {
+    const implementedControls = implementedFrozenControls();
+    const invalidDescriptorControl = new Proxy(Object.freeze({ ...implementedControls[0] }), {
+      getOwnPropertyDescriptor: (target, property) => {
+        if (property === "id") {
+          return {
+            value: implementedControls[0].id,
+            enumerable: true,
+            writable: true,
+            configurable: true
+          };
+        }
+
+        return Reflect.getOwnPropertyDescriptor(target, property);
+      }
+    });
+    const controls = Object.freeze(
+      implementedControls.map((control, index) =>
+        index === 0 ? invalidDescriptorControl : Object.freeze({ ...control })
+      )
+    );
+
+    expect(() => liveWorkerControlIdsMatchRequiredChecklist(controls)).not.toThrow();
+    expect(() => liveWorkerControlsExposeOnlyPublicFields(controls)).not.toThrow();
+    expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).not.toThrow();
+    expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
+    expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(false);
+    expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(false);
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+    ).toBe(false);
+  });
+
   it("rejects accessor-backed public fields without reading getters", () => {
     const implementedControls = implementedFrozenControls();
     const accessorBackedControl = Object.freeze(

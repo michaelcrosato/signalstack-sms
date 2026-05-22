@@ -1,5 +1,25 @@
 # Codex Summary
 
+Run number: 405
+
+- Latest live-worker control coverage proves proxy-invalid supplied control-entry public-field descriptors deny cleanly without leaking descriptor invariant errors or authorizing the reserved `production-live-campaign` class.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 428 tests, Playwright smoke, and build green.
+- Updated queue/testing contracts, production-worker/testing docs, NEXT_PROMPTS, LOOP_LOG, BLOCKERS, and current state matrix for the proxy-invalid public-field-descriptor boundary.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
+Run number: 404
+
+- Latest live-worker duplicate-entry-key coverage proves proxy-backed `production-live-campaign` control entries that report duplicate public keys deny cleanly before the reserved live worker class can authorize.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 427 tests, Playwright smoke, and build green.
+- Updated queue/testing contracts, production-worker/testing docs, NEXT_PROMPTS, LOOP_LOG, BLOCKERS, and current state matrix for the duplicate-entry-key boundary.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 403
 
 - Latest live-worker control coverage proves proxy-invalid configurable supplied control-array `length` descriptors deny cleanly without leaking descriptor invariant errors or reading indexed controls.
