@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 226
+
+- No blocker from the live-worker control array-shape hardening. Future `production-live-campaign` authorization now rejects frozen supplied control arrays with extra string, symbol, or hidden array-level fields before checking implemented status; the reserved class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.
+
 Run number: 225
 
 - No blocker from the live-worker control frozen-metadata hardening. Future `production-live-campaign` authorization now rejects mutable control arrays and mutable control entries before checking implemented status; the reserved class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.

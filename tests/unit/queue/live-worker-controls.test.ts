@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   liveWorkerControlsAreFrozen,
+  liveWorkerControlArrayExposesOnlyIndexedEntries,
   liveWorkerControlIdsMatchRequiredChecklist,
   liveWorkerControlsExposeOnlyPublicFields,
   liveWorkerControlsAreImplemented,
@@ -100,6 +101,38 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerControlsAreFrozen(mutableEntryControls)).toBe(false);
     expect(liveWorkerControlsAreImplemented(mutableEntryControls)).toBe(false);
     expect(liveWorkerControlsAreImplemented(implementedControls)).toBe(true);
+  });
+
+  it("rejects decorated control arrays before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const symbolField = Symbol("unsafe-live-worker-array-field");
+    const extraStringFieldControls = Object.freeze(
+      Object.assign([...implementedControls], {
+        reviewerBypass: true
+      })
+    );
+    const extraSymbolFieldControls = [...implementedControls];
+    Object.defineProperty(extraSymbolFieldControls, symbolField, {
+      value: true,
+      enumerable: true
+    });
+    Object.freeze(extraSymbolFieldControls);
+    const hiddenExtraFieldControls = [...implementedControls];
+    Object.defineProperty(hiddenExtraFieldControls, "hiddenReviewerBypass", {
+      value: true,
+      enumerable: false
+    });
+    Object.freeze(hiddenExtraFieldControls);
+
+    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(productionLiveCampaignWorkerControls)).toBe(true);
+    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls)).toBe(true);
+    expect(liveWorkerControlsAreImplemented(implementedControls)).toBe(true);
+    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(extraStringFieldControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(extraStringFieldControls)).toBe(false);
+    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(extraSymbolFieldControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(extraSymbolFieldControls)).toBe(false);
+    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(hiddenExtraFieldControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(hiddenExtraFieldControls)).toBe(false);
   });
 
   it("rejects control arrays with non-public fields before live-worker authorization", () => {

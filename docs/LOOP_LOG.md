@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 226  GREEN  live-worker-control-array-shape  2026-05-21 17:38
+Objective:    Reject decorated supplied control arrays before future live worker authorization can pass.
+Changed:
+- Added `liveWorkerControlArrayExposesOnlyIndexedEntries` and required it before `production-live-campaign` controls can be treated as implemented.
+- Added unit coverage proving frozen arrays with extra string, symbol, or hidden array-level fields remain unauthorized.
+- Updated queue/testing contracts, production worker policy docs/checks, README, roadmap, state matrix, and handoff docs.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live campaign workers blocked while continuing executable control hardening or product demo stabilization.
+
 ## Run 225  GREEN  live-worker-control-frozen-metadata  2026-05-21 17:23
 Objective:    Require frozen supplied control metadata before future live worker authorization can pass.
 Changed:

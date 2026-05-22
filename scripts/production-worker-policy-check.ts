@@ -68,6 +68,10 @@ const requiredTexts: RequiredText[] = [
   },
   {
     file: "lib/queue/live-worker-controls.ts",
+    text: "liveWorkerControlArrayExposesOnlyIndexedEntries"
+  },
+  {
+    file: "lib/queue/live-worker-controls.ts",
     text: "liveWorkerControlsExposeOnlyPublicFields"
   },
   {
@@ -109,6 +113,10 @@ const requiredTexts: RequiredText[] = [
   {
     file: "tests/unit/queue/live-worker-controls.test.ts",
     text: "keeps live-worker control statuses inside the exported vocabulary"
+  },
+  {
+    file: "tests/unit/queue/live-worker-controls.test.ts",
+    text: "rejects decorated control arrays before live-worker authorization"
   },
   {
     file: "tests/unit/queue/live-worker-controls.test.ts",

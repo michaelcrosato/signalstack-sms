@@ -93,6 +93,32 @@ function controlArrayIsDense(controls: readonly LiveWorkerControl[]) {
   return true;
 }
 
+export function liveWorkerControlArrayExposesOnlyIndexedEntries(controls: unknown) {
+  if (!isReadonlyControlArray(controls) || !controlArrayIsDense(controls)) {
+    return false;
+  }
+
+  const ownKeys = Reflect.ownKeys(controls);
+  const expectedKeys = [...Array.from({ length: controls.length }, (_, index) => String(index)), "length"];
+  if (ownKeys.length !== expectedKeys.length || !expectedKeys.every((key) => ownKeys.includes(key))) {
+    return false;
+  }
+
+  const lengthDescriptor = Object.getOwnPropertyDescriptor(controls, "length");
+  if (lengthDescriptor === undefined || !("value" in lengthDescriptor) || lengthDescriptor.enumerable) {
+    return false;
+  }
+
+  for (let index = 0; index < controls.length; index += 1) {
+    const descriptor = Object.getOwnPropertyDescriptor(controls, String(index));
+    if (descriptor === undefined || !("value" in descriptor) || descriptor.enumerable !== true) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 export function liveWorkerControlIdsMatchRequiredChecklist(controls: unknown) {
   if (!isReadonlyControlArray(controls) || !controlArrayIsDense(controls)) {
     return false;
@@ -160,6 +186,7 @@ export function liveWorkerControlsAreImplemented(controls: unknown = productionL
 
   return (
     liveWorkerControlsAreFrozen(controls) &&
+    liveWorkerControlArrayExposesOnlyIndexedEntries(controls) &&
     liveWorkerControlsExposeOnlyPublicFields(controls) &&
     liveWorkerControlsUseSupportedStatuses(controls) &&
     liveWorkerControlIdsMatchRequiredChecklist(controls) &&
