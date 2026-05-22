@@ -760,6 +760,11 @@ describe("production live campaign worker controls", () => {
         requirement: implementedControls[0].requirement
       }),
       Object.freeze({
+        id: Object.freeze(new String(implementedControls[0].id)) as unknown as string,
+        status: "implemented" as const,
+        requirement: implementedControls[0].requirement
+      }),
+      Object.freeze({
         id: implementedControls[0].id,
         status: Object.freeze(new String("implemented")) as LiveWorkerControl["status"],
         requirement: implementedControls[0].requirement
@@ -768,6 +773,11 @@ describe("production live campaign worker controls", () => {
         id: implementedControls[0].id,
         status: "implemented" as const,
         requirement: hostileValue
+      }),
+      Object.freeze({
+        id: implementedControls[0].id,
+        status: "implemented" as const,
+        requirement: Object.freeze(new String(implementedControls[0].requirement)) as unknown as string
       })
     ];
 

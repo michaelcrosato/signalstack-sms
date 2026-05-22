@@ -80,6 +80,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
 
+## Run 425  GREEN  live-worker-boxed-public-field-evidence  2026-05-22 13:07
+Objective:    Prove boxed string control-entry identity fields cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for boxed string `id` and `requirement` public-field values on otherwise implemented supplied controls.
+- Updated queue/testing contracts, testing docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the boxed public-field non-coercion boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 390  GREEN  live-worker-mismatched-length-evidence  2026-05-22 09:09
 Objective:    Prove mismatched safe-integer supplied control-array length descriptors cannot authorize the reserved live worker class.
 Changed:
