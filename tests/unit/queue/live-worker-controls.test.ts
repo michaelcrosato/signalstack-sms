@@ -977,8 +977,30 @@ describe("production live campaign worker controls", () => {
     const extraKeyWrapper = new Proxy(baseWrapper, {
       ownKeys: () => ["workerDeploymentClass", "controls", "reviewerBypass"]
     });
+    const hiddenExtraKeyWrapper = Object.freeze(
+      Object.defineProperty(
+        {
+          workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+          controls: throwingEvidence
+        },
+        "reviewerBypass",
+        {
+          value: true,
+          enumerable: false
+        }
+      )
+    );
+    const symbolExtraKeyWrapper = Object.freeze(
+      Object.assign(
+        {
+          workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+          controls: throwingEvidence
+        },
+        { [Symbol("unsafe-live-worker-wrapper-key")]: true }
+      )
+    );
 
-    for (const input of [reorderedKeyWrapper, extraKeyWrapper]) {
+    for (const input of [reorderedKeyWrapper, extraKeyWrapper, hiddenExtraKeyWrapper, symbolExtraKeyWrapper]) {
       expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
       expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
     }

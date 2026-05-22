@@ -2246,3 +2246,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 250  GREEN  live-worker-wrapper-extra-keys  2026-05-21 20:04
+Objective:    Prove hidden and symbol authorization-wrapper keys deny before inspecting supplied live-worker controls.
+Changed:
+- Added queue unit coverage using hostile supplied control evidence behind hidden and symbol extra wrapper keys.
+- Updated SUMMARY and BLOCKERS to record that the change is local metadata/test coverage only.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
