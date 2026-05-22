@@ -3745,6 +3745,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
 
+## Run 424  GREEN  live-worker-status-primitive-evidence  2026-05-22 13:04
+Objective:    Prove primitive non-string control-entry status values cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for boolean, bigint, and symbol `status` values on otherwise valid supplied controls.
+- Updated testing contract, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the malformed primitive status-value boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 416  GREEN  live-worker-hidden-wrapper-string-evidence  2026-05-22 12:21
 Objective:    Prove hidden string metadata on authorization wrappers cannot authorize the reserved live worker class.
 Changed:

@@ -829,6 +829,44 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects malformed primitive control status values before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const malformedControls = [
+      Object.freeze({
+        id: implementedControls[0].id,
+        status: false as unknown as LiveWorkerControl["status"],
+        requirement: implementedControls[0].requirement
+      }),
+      Object.freeze({
+        id: implementedControls[0].id,
+        status: 1n as unknown as LiveWorkerControl["status"],
+        requirement: implementedControls[0].requirement
+      }),
+      Object.freeze({
+        id: implementedControls[0].id,
+        status: Symbol("implemented") as unknown as LiveWorkerControl["status"],
+        requirement: implementedControls[0].requirement
+      })
+    ];
+
+    for (const malformedControl of malformedControls) {
+      const controls = Object.freeze(
+        implementedControls.map((control, index) => (index === 0 ? malformedControl : Object.freeze({ ...control })))
+      );
+
+      expect(() => liveWorkerControlIdsMatchRequiredChecklist(controls)).not.toThrow();
+      expect(() => liveWorkerControlsUseSupportedStatuses(controls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
+      expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(true);
+      expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(true);
+      expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).toBe(false);
+    }
+  });
+
   it("rejects hidden string metadata on control entries before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const hiddenMetadataControl = Object.freeze(
