@@ -2896,6 +2896,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
 
+## Run 332  GREEN  non-code-mutating-export-auth-scan  2026-05-22 03:32
+Objective:    Prevent comments, strings, and non-executable template literals from creating false mutating-route authorization scan entries.
+Changed:
+- Tightened mutating API route authorization discovery to mask non-code before collecting exported `POST`, `PATCH`, `PUT`, and `DELETE` handlers.
+- Added synthetic auth coverage proving commented, quoted, and template-literal export mentions are ignored while real named-export handlers remain covered.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the non-code mutating route export discovery boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 312  GREEN  bound-reader-call-apply-alias-scan  2026-05-22 02:08
 Objective:    Prevent bound request body-reader aliases invoked through `.call()` or `.apply()` from bypassing mutating-route role-gate ordering checks.
 Changed:

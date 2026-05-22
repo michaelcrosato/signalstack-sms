@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 332
+
+- Hardened non-code export discovery for mutating API authorization coverage.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now masks comments, quoted strings, and non-executable template literals before discovering exported `POST`, `PATCH`, `PUT`, and `DELETE` handlers, while still tracking real named exports such as `export { updateContact as PATCH }`.
+- Updated the testing contract and testing docs to name the non-code mutating route export discovery boundary.
+- Focused auth coverage, contracts check, typecheck, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 331
 
 - Hardened bracket destructured descriptor-value authorization coverage for Run 331.

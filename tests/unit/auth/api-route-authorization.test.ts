@@ -24,16 +24,18 @@ function routeFiles(directory: string): string[] {
 }
 
 function exportedMutatingMethods(source: string) {
+  const maskedSource = maskNonCodeTokens(source);
   return mutatingMethods.filter((method) =>
     new RegExp(
       `export\\s+(?:(?:async\\s+)?function\\s+${method}\\b|const\\s+${method}\\b(?:\\s*:[\\s\\S]*?)?\\s*=\\s*(?:async\\s+)?(?:function\\b)?)`
-    ).test(source) || exportedHandlerLocalName(source, method) !== null
+    ).test(maskedSource) || exportedHandlerLocalName(source, method) !== null
   );
 }
 
 function exportedHandlerLocalName(source: string, method: (typeof mutatingMethods)[number]) {
+  const maskedSource = maskNonCodeTokens(source);
   const namedExportPattern = /export\s*\{([^}]+)\}/g;
-  for (const match of source.matchAll(namedExportPattern)) {
+  for (const match of maskedSource.matchAll(namedExportPattern)) {
     const exportedNames = match[1].split(",");
     for (const exportedName of exportedNames) {
       const aliasMatch = /^\s*([A-Za-z_$][\w$]*)\s+as\s+([A-Za-z_$][\w$]*)\s*$/.exec(exportedName);
@@ -52,8 +54,9 @@ function exportedHandlerLocalName(source: string, method: (typeof mutatingMethod
 }
 
 function exportedHandlerSignatureStart(source: string, method: (typeof mutatingMethods)[number]) {
+  const maskedSource = maskNonCodeTokens(source);
   const functionDeclaration = new RegExp(`export\\s+(?:async\\s+)?function\\s+${method}\\b`);
-  const functionMatch = functionDeclaration.exec(source);
+  const functionMatch = functionDeclaration.exec(maskedSource);
   if (functionMatch !== null) {
     return source.indexOf("(", functionMatch.index);
   }
@@ -61,7 +64,7 @@ function exportedHandlerSignatureStart(source: string, method: (typeof mutatingM
   const constDeclaration = new RegExp(
     `export\\s+const\\s+${method}\\b(?:\\s*:[\\s\\S]*?)?\\s*=\\s*(?:async\\s+)?(?:function\\b\\s*)?`
   );
-  const constMatch = constDeclaration.exec(source);
+  const constMatch = constDeclaration.exec(maskedSource);
   if (constMatch === null) {
     const localHandlerName = exportedHandlerLocalName(source, method);
     if (localHandlerName === null) {
@@ -69,7 +72,7 @@ function exportedHandlerSignatureStart(source: string, method: (typeof mutatingM
     }
 
     const localFunctionDeclaration = new RegExp(`(?:^|[\\r\\n;])\\s*(?:async\\s+)?function\\s+${localHandlerName}\\b`);
-    const localFunctionMatch = localFunctionDeclaration.exec(source);
+    const localFunctionMatch = localFunctionDeclaration.exec(maskedSource);
     if (localFunctionMatch !== null) {
       return source.indexOf("(", localFunctionMatch.index);
     }
@@ -77,7 +80,7 @@ function exportedHandlerSignatureStart(source: string, method: (typeof mutatingM
     const localConstDeclaration = new RegExp(
       `(?:^|[\\r\\n;])\\s*const\\s+${localHandlerName}\\b(?:\\s*:[\\s\\S]*?)?\\s*=\\s*(?:async\\s+)?(?:function\\b\\s*)?`
     );
-    const localConstMatch = localConstDeclaration.exec(source);
+    const localConstMatch = localConstDeclaration.exec(maskedSource);
     if (localConstMatch === null) {
       return -1;
     }
@@ -1222,6 +1225,48 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeLocalConstSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectNamedConstSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "PUT")).toBe(false);
+  });
+
+  it("ignores non-code mutating route export mentions while discovering handlers", () => {
+    const commentOnlySource = `
+      // export async function POST(request: Request) {
+      //   const payload = await request.json();
+      // }
+      export async function GET() {
+        return Response.json({ ok: true });
+      }
+    `;
+    const stringOnlySource = `
+      const example = "export const PATCH = async (request: Request) => request.json()";
+      export async function GET() {
+        return Response.json({ ok: true });
+      }
+    `;
+    const templateOnlySource = `
+      const example = \`export { updateContact as PUT }\`;
+      async function updateContact(request: Request) {
+        const payload = await request.json();
+        return Response.json(payload);
+      }
+      export async function GET() {
+        return Response.json({ ok: true });
+      }
+    `;
+    const safeNamedExportSource = `
+      async function updateContact(request: Request) {
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await request.json();
+        return Response.json(payload);
+      }
+      export { updateContact as PATCH };
+    `;
+
+    expect(exportedMutatingMethods(commentOnlySource)).toEqual([]);
+    expect(exportedMutatingMethods(stringOnlySource)).toEqual([]);
+    expect(exportedMutatingMethods(templateOnlySource)).toEqual([]);
+    expect(exportedMutatingMethods(safeNamedExportSource)).toEqual(["PATCH"]);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeNamedExportSource, "PATCH")).toBe(false);
   });
 
   it("treats cloned request body readers as body parsing for role-gate ordering", () => {
