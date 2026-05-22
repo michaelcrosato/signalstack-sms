@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 371
+
+- Hardened live-worker control evidence coverage for malformed supplied control-array `length` descriptors.
+- Latest repo truth: `production-live-campaign` remains unsupported, and supplied future authorization evidence now has explicit unit coverage proving hostile or invalid array `length` descriptor traps deny cleanly before live-worker authorization.
+- Updated the testing contract, testing docs, and current state matrix for the array length descriptor boundary.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts`.
+- `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-22 07:25 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 unit test files / 405 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 369
 
 - Hardened mutating-route authorization coverage for TypeScript non-null assertions on `Request`, `globalThis.Request`, and `Request.prototype` aliases.

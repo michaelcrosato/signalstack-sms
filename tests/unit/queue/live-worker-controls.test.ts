@@ -530,6 +530,27 @@ describe("production live campaign worker controls", () => {
 
   it("rejects proxy-backed control evidence without throwing", () => {
     const implementedControls = implementedFrozenControls();
+    const throwingArrayLengthDescriptorProxy = new Proxy([...implementedControls], {
+      getOwnPropertyDescriptor: (_target, property) => {
+        if (property === "length") {
+          throw new Error("array length descriptor trap must not escape");
+        }
+        return Reflect.getOwnPropertyDescriptor(_target, property);
+      }
+    });
+    const invalidArrayLengthDescriptorProxy = new Proxy([...implementedControls], {
+      getOwnPropertyDescriptor: (_target, property) => {
+        if (property === "length") {
+          return {
+            value: "not-a-safe-length",
+            enumerable: false,
+            configurable: false,
+            writable: false
+          };
+        }
+        return Reflect.getOwnPropertyDescriptor(_target, property);
+      }
+    });
     const throwingArrayPrototypeProxy = new Proxy([...implementedControls], {
       getPrototypeOf: () => {
         throw new Error("array prototype trap must not escape");
@@ -574,6 +595,8 @@ describe("production live campaign worker controls", () => {
       }
     });
     const proxyInputs = [
+      throwingArrayLengthDescriptorProxy,
+      invalidArrayLengthDescriptorProxy,
       throwingArrayPrototypeProxy,
       throwingArrayDescriptorProxy,
       throwingArrayKeysProxy,

@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 371  GREEN  live-worker-array-length-descriptor  2026-05-22 07:25
+Objective:    Prove malformed supplied live-worker control array length descriptors deny cleanly before future live-worker authorization.
+Changed:
+- Added queue unit coverage for hostile and invalid supplied control-array `length` descriptors in `production-live-campaign` authorization evidence.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the array length descriptor boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep Phase 0 live-worker, API authorization, provider, billing, live AI, notification, and secret gates stable.
+
 ## Run 370  GREEN  assigned-non-null-request-alias-auth-scan  2026-05-22 07:18
 Objective:    Prevent assigned TypeScript non-null `Request` constructor/prototype aliases from hiding body readers before mutating-route role gates.
 Changed:
