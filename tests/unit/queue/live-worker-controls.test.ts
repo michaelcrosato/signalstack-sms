@@ -529,6 +529,33 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("does not inspect supplied controls for unsupported deployment classes", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("unsupported worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("unsupported worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("unsupported worker classes must not inspect control evidence");
+      }
+    });
+
+    expect(() =>
+      liveWorkerDeploymentClassIsAuthorized({
+        workerDeploymentClass: "production-live",
+        controls: throwingEvidence
+      })
+    ).not.toThrow();
+    expect(
+      liveWorkerDeploymentClassIsAuthorized({
+        workerDeploymentClass: "production-live",
+        controls: throwingEvidence
+      })
+    ).toBe(false);
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 

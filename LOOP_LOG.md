@@ -2041,7 +2041,7 @@ Changed:
 - Added unit coverage proving partial, reordered, or renamed control arrays remain unauthorized for `production-live-campaign`.
 - Updated queue/testing/production-worker policy docs and the production worker policy check.
 Gate:         passed
-Commit/Saved: pending
+Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue production-live-campaign control hardening without enabling live workers.
 
 ## Run 216  GREEN  live-worker-control-field-shape  2026-05-21 17:26
@@ -2081,4 +2081,13 @@ Changed:
 - Recorded that the change is local metadata coverage only and does not execute production workers or live external actions.
 Gate:         passed
 Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing production-live-campaign control hardening without enabling live sends.
+
+## Run 233  GREEN  live-worker-unsupported-class-short-circuit  2026-05-21 18:15
+Objective:    Prove unsupported worker deployment classes deny before inspecting supplied live-worker control evidence.
+Changed:
+- Added live-worker control unit coverage using throwing proxy evidence against an unsupported deployment class.
+- Updated production worker policy, queue/testing contracts, README, state matrix, and next-prompt handoff text for the short-circuit boundary.
+Gate:         passed
+Commit/Saved: pending
 Next:         Keep live workers blocked while continuing production-live-campaign control hardening without enabling live sends.

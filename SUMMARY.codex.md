@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 233
+
+- Hardened live-worker authorization short-circuit coverage for Run 233.
+- Latest repo truth: unsupported worker deployment classes now have unit coverage proving they deny before supplied control evidence is inspected; the reserved `production-live-campaign` class remains outside supported worker classes.
+- Focused live-worker control tests, typecheck, production worker policy check, `git diff --check`, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 232
 
 - Hardened live-worker control malformed-evidence handling for Run 232.
