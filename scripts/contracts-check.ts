@@ -15,7 +15,7 @@ const required = [
 ];
 
 const appApiRoot = path.join("app", "api");
-export const supportedRouteMethods = ["GET", "POST", "PATCH", "DELETE", "PUT"] as const;
+export const supportedRouteMethods = ["GET", "POST", "PATCH", "DELETE", "PUT", "HEAD", "OPTIONS"] as const;
 
 export function extractExportedRouteMethods(source: string) {
   return supportedRouteMethods.filter((method) => {

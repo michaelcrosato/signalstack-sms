@@ -45,10 +45,16 @@ describe("contracts-check route method extraction", () => {
         return Response.json({});
       }
 
-      export { removeContact as DELETE, PUT };
+      export function HEAD() {
+        return new Response(null, { status: 204 });
+      }
+
+      const optionsHandler = () => new Response(null, { status: 204 });
+
+      export { removeContact as DELETE, PUT, optionsHandler as OPTIONS };
     `;
 
-    expect(extractExportedRouteMethods(source)).toEqual(["GET", "POST", "PATCH", "DELETE", "PUT"]);
+    expect(extractExportedRouteMethods(source)).toEqual(["GET", "POST", "PATCH", "DELETE", "PUT", "HEAD", "OPTIONS"]);
   });
 
   it("collects route-method docs keys for non-function export styles", () => {

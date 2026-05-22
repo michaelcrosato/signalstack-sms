@@ -2895,3 +2895,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 324  GREEN  head-options-contract-route-scan  2026-05-22 02:48
+Objective:    Prevent `HEAD` and `OPTIONS` API route exports from bypassing contract drift checks.
+Changed:
+- Extended the contract route-method scanner to include Next `HEAD` and `OPTIONS` handlers.
+- Added focused contract-check coverage for direct `HEAD` exports and named-export `OPTIONS` handlers.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the expanded contract route-method boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 contract drift checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
