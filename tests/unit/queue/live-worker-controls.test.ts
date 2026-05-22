@@ -496,6 +496,9 @@ describe("production live campaign worker controls", () => {
         throw new Error("array keys trap must not escape");
       }
     });
+    const reorderedArrayKeysProxy = new Proxy(implementedControls, {
+      ownKeys: () => ["length", ...implementedControls.map((_, index) => String(index))]
+    });
     const throwingArrayFrozenStateProxy = new Proxy([...implementedControls], {
       isExtensible: () => {
         throw new Error("array frozen-state trap must not escape");
@@ -525,6 +528,7 @@ describe("production live campaign worker controls", () => {
       throwingArrayPrototypeProxy,
       throwingArrayDescriptorProxy,
       throwingArrayKeysProxy,
+      reorderedArrayKeysProxy,
       throwingArrayFrozenStateProxy,
       Object.freeze(
         implementedControls.map((control, index) =>

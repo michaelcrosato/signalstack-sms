@@ -197,7 +197,7 @@ export function liveWorkerControlArrayExposesOnlyIndexedEntries(controls: unknow
   }
 
   const expectedKeys = [...Array.from({ length }, (_, index) => String(index)), "length"];
-  if (ownKeys.length !== expectedKeys.length || !expectedKeys.every((key) => ownKeys.includes(key))) {
+  if (ownKeys.length !== expectedKeys.length || !expectedKeys.every((key, index) => ownKeys[index] === key)) {
     return false;
   }
 

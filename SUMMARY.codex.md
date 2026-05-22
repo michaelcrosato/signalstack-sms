@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 247
+
+- Hardened live-worker supplied control array key-order validation for Run 247.
+- Latest repo truth: `liveWorkerControlArrayExposesOnlyIndexedEntries` now requires exact ordinary array key order (`0..n`, then `length`), and unit coverage proves reordered proxy keys cannot authorize the reserved `production-live-campaign` class.
+- Focused live-worker control tests passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 246
 
 - Hardened live-worker control-entry proxy trap coverage for Run 246.
