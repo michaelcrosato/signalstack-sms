@@ -360,6 +360,10 @@ function authorizationInputExposesOnlyPublicFields(input: unknown) {
     return false;
   }
 
+  if (!safeIsFrozen(input)) {
+    return false;
+  }
+
   const ownKeys = safeOwnKeys(input);
   if (ownKeys === null || ownKeys.length !== liveWorkerAuthorizationPublicFields.length) {
     return false;

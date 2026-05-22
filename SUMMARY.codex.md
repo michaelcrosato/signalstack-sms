@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 242
+
+- Hardened live-worker authorization wrapper frozen-object handling for Run 242.
+- Latest repo truth: `liveWorkerDeploymentClassIsAuthorized` now requires authorization wrapper input itself to be frozen, so an extensible object with otherwise frozen `workerDeploymentClass` and `controls` data descriptors cannot authorize the reserved `production-live-campaign` class.
+- Focused live-worker control tests, the production worker policy check, `git diff --check`, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 241
 
 - Hardened live-worker authorization wrapper prototype-boundary coverage for Run 241.

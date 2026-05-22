@@ -595,10 +595,29 @@ describe("production live campaign worker controls", () => {
       controls: implementedControls,
       workerDeploymentClass: reservedLiveWorkerDeploymentClass
     });
+    const extensibleWrapperWithFrozenFields = Object.defineProperties(
+      {},
+      {
+        workerDeploymentClass: {
+          value: reservedLiveWorkerDeploymentClass,
+          enumerable: true,
+          writable: false,
+          configurable: false
+        },
+        controls: {
+          value: implementedControls,
+          enumerable: true,
+          writable: false,
+          configurable: false
+        }
+      }
+    );
 
     expect(liveWorkerDeploymentClassIsAuthorized(mutableWrapper)).toBe(false);
     expect(liveWorkerDeploymentClassIsAuthorized(sealedWrapper)).toBe(false);
     expect(liveWorkerDeploymentClassIsAuthorized(reorderedWrapper)).toBe(false);
+    expect(Object.isFrozen(extensibleWrapperWithFrozenFields)).toBe(false);
+    expect(liveWorkerDeploymentClassIsAuthorized(extensibleWrapperWithFrozenFields)).toBe(false);
     expect(
       liveWorkerDeploymentClassIsAuthorized(
         frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 242  GREEN  live-worker-wrapper-frozen-object  2026-05-21 19:03
+Objective:    Require frozen authorization wrapper objects before reserved live-worker authorization can pass.
+Changed:
+- Tightened `liveWorkerDeploymentClassIsAuthorized` so wrapper input must be frozen, not only expose frozen public field descriptors.
+- Added unit coverage proving extensible wrappers with frozen-looking fields cannot authorize `production-live-campaign`.
+- Updated queue/testing contracts, production worker policy docs, roadmap/state/handoff notes, README, SUMMARY, and BLOCKERS.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 241  GREEN  live-worker-wrapper-prototype-boundary  2026-05-21 18:57
 Objective:    Prove inherited authorization wrapper fields cannot authorize the reserved live worker class.
 Changed:
