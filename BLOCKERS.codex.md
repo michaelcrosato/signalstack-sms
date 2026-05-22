@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 245
+
+- No blocker from the live-worker non-enumerable index-slot coverage. Supplied control arrays with non-enumerable index slots now have explicit denial coverage for the reserved `production-live-campaign` class; the reserved class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.
+
 Run number: 243
 
 - No blocker from the live-worker proxy frozen-state trap coverage. Proxy-backed control evidence and authorization wrappers with hostile frozen-state traps now deny cleanly for the reserved `production-live-campaign` class; the reserved class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.

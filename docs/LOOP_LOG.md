@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 245  GREEN  live-worker-non-enumerable-index-slot  2026-05-21 19:18
+Objective:    Prove non-enumerable supplied control array slots cannot authorize the reserved live worker class.
+Changed:
+- Added unit coverage showing `production-live-campaign` control evidence with a non-enumerable array index slot fails indexed-entry, frozen-descriptor, implemented-control, and authorization checks.
+- Updated queue/testing contracts, production worker policy docs, state matrix, testing notes, handoff notes, SUMMARY, and BLOCKERS for the enumerable index-slot boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 242  GREEN  live-worker-wrapper-frozen-object  2026-05-21 19:03
 Objective:    Require frozen authorization wrapper objects before reserved live-worker authorization can pass.
 Changed:

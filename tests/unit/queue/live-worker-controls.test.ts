@@ -131,6 +131,12 @@ describe("production live campaign worker controls", () => {
       enumerable: false
     });
     Object.freeze(hiddenExtraFieldControls);
+    const nonEnumerableIndexControls = [...implementedControls];
+    Object.defineProperty(nonEnumerableIndexControls, "0", {
+      value: implementedControls[0],
+      enumerable: false
+    });
+    Object.freeze(nonEnumerableIndexControls);
 
     expect(liveWorkerControlArrayExposesOnlyIndexedEntries(productionLiveCampaignWorkerControls)).toBe(true);
     expect(liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls)).toBe(true);
@@ -141,6 +147,14 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerControlsAreImplemented(extraSymbolFieldControls)).toBe(false);
     expect(liveWorkerControlArrayExposesOnlyIndexedEntries(hiddenExtraFieldControls)).toBe(false);
     expect(liveWorkerControlsAreImplemented(hiddenExtraFieldControls)).toBe(false);
+    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(nonEnumerableIndexControls)).toBe(false);
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(nonEnumerableIndexControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(nonEnumerableIndexControls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, nonEnumerableIndexControls)
+      )
+    ).toBe(false);
   });
 
   it("rejects array subclass evidence before live-worker authorization", () => {
