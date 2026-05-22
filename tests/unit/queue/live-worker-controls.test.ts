@@ -665,6 +665,53 @@ describe("production live campaign worker controls", () => {
     ).toBe(true);
   });
 
+  it("rejects non-frozen authorization wrapper descriptors before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const writableClassWrapper = Object.preventExtensions(
+      Object.defineProperties(
+        {},
+        {
+          workerDeploymentClass: {
+            value: reservedLiveWorkerDeploymentClass,
+            enumerable: true,
+            writable: true,
+            configurable: false
+          },
+          controls: {
+            value: implementedControls,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          }
+        }
+      )
+    );
+    const configurableControlsWrapper = Object.preventExtensions(
+      Object.defineProperties(
+        {},
+        {
+          workerDeploymentClass: {
+            value: reservedLiveWorkerDeploymentClass,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          },
+          controls: {
+            value: implementedControls,
+            enumerable: true,
+            writable: false,
+            configurable: true
+          }
+        }
+      )
+    );
+
+    expect(Object.isFrozen(writableClassWrapper)).toBe(false);
+    expect(Object.isFrozen(configurableControlsWrapper)).toBe(false);
+    expect(liveWorkerDeploymentClassIsAuthorized(writableClassWrapper)).toBe(false);
+    expect(liveWorkerDeploymentClassIsAuthorized(configurableControlsWrapper)).toBe(false);
+  });
+
   it("rejects malformed authorization inputs without throwing", () => {
     const implementedControls = implementedFrozenControls();
     const mutableInput = {
