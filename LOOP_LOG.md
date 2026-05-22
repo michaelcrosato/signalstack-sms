@@ -2885,3 +2885,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 323  GREEN  bracket-call-apply-bind-body-reader-scan  2026-05-22 02:44
+Objective:    Prevent bracket-notation `call`/`apply`/`bind` body-reader invocations from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize bracket-notation invocation helpers such as `req.json["call"](req)` and `req.formData["bind"](req)()`.
+- Added synthetic auth unit coverage proving bracketed call/apply/bind reader invocations and bound-alias calls fail before the role gate and pass after it.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the bracket-notation call/apply/bind body-reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
