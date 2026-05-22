@@ -23,6 +23,16 @@ export type MessageStatusTransition = {
   failedAt?: Date;
 };
 
+function normalizeRequiredProviderValue(value: string | undefined) {
+  const normalized = value?.trim();
+  return normalized ? normalized : undefined;
+}
+
+function normalizeOptionalProviderValue(value: string | undefined) {
+  const normalized = value?.trim();
+  return normalized ? normalized : undefined;
+}
+
 export function formDataToRecord(formData: FormData): Record<string, string> {
   const payload: Record<string, string> = {};
   for (const [key, value] of formData.entries()) {
@@ -52,7 +62,7 @@ export function validateTwilioSignature(input: {
 }
 
 export function normalizeTwilioInbound(payload: TwilioWebhookPayload): NormalizedTwilioInbound | null {
-  const providerMessageId = payload.MessageSid ?? payload.SmsSid;
+  const providerMessageId = normalizeRequiredProviderValue(payload.MessageSid ?? payload.SmsSid);
   if (!payload.From || !payload.Body || !providerMessageId) {
     return null;
   }
@@ -67,7 +77,7 @@ export function normalizeTwilioInbound(payload: TwilioWebhookPayload): Normalize
 }
 
 export function normalizeTwilioStatus(payload: TwilioWebhookPayload): NormalizedTwilioStatus | null {
-  const providerMessageId = payload.MessageSid ?? payload.SmsSid;
+  const providerMessageId = normalizeRequiredProviderValue(payload.MessageSid ?? payload.SmsSid);
   const rawStatus = payload.MessageStatus ?? payload.SmsStatus;
   if (!providerMessageId || !rawStatus) {
     return null;
@@ -78,21 +88,24 @@ export function normalizeTwilioStatus(payload: TwilioWebhookPayload): Normalized
     return null;
   }
 
+  const errorCode = normalizeOptionalProviderValue(payload.ErrorCode);
+
   return {
     providerMessageId,
     status,
-    errorCode: payload.ErrorCode,
-    idempotencyKey: `twilio:status:${providerMessageId}:${status}:${payload.ErrorCode ?? "none"}`
+    errorCode,
+    idempotencyKey: `twilio:status:${providerMessageId}:${status}:${errorCode ?? "none"}`
   };
 }
 
 export function twilioStatusTransition(input: { status: string; errorCode?: string; now?: Date }): MessageStatusTransition {
-  const status = input.status.toLowerCase();
+  const status = input.status.trim().toLowerCase();
+  const errorCode = normalizeOptionalProviderValue(input.errorCode);
   const now = input.now ?? new Date();
 
   return {
     providerStatus: status,
-    providerErrorCode: input.errorCode ?? null,
+    providerErrorCode: errorCode ?? null,
     ...(status === "delivered" ? { deliveredAt: now } : {}),
     ...(status === "failed" || status === "undelivered" ? { failedAt: now } : {})
   };

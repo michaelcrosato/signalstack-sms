@@ -3152,3 +3152,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep product demo and Phase 0 safety gates green while live sends, provider calls, billing, live AI, notifications, and secrets remain blocked.
+
+## Run 386  GREEN  twilio-webhook-idempotency-normalization  2026-05-22 08:48
+Objective:    Prevent Twilio webhook retry formatting drift in message IDs or error codes from creating duplicate local events.
+Changed:
+- Trimmed Twilio inbound/status provider message IDs before deriving local webhook idempotency keys.
+- Trimmed status webhook error codes and blanked whitespace-only values before deriving local status idempotency keys and message transitions.
+- Added focused webhook helper coverage and updated webhook/testing docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep webhook idempotency, product demo, live-worker, provider, billing, live AI, notification, and secret gates stable.
