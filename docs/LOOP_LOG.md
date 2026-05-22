@@ -2862,3 +2862,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 345  GREEN  reflective-helper-call-apply-auth-scan  2026-05-22 04:42
+Objective:    Prevent `.call`/`.apply` invocations of reflective helper aliases from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize `Reflect.get.call`, `Reflect.apply.apply`, descriptor lookup `.call`, and prototype lookup `.apply` forms before body-reader checks.
+- Added synthetic auth unit coverage proving direct and aliased reflective helper `.call`/`.apply` forms fail before the role gate while post-gate reads remain allowed.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the reflective helper call/apply boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.

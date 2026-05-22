@@ -587,13 +587,87 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
     }
   }
   const reflectMethodAliasBodySlice = [...reflectGetAliases].reduce(
-    (source, alias) => source.replace(new RegExp(`\\b${escapeRegExp(alias)}\\s*\\(`, "g"), "Reflect.get("),
+    (source, alias) =>
+      source
+        .replace(
+          new RegExp(
+            `\\b${escapeRegExp(alias)}\\s*\\.\\s*call\\s*\\(\\s*Reflect\\s*,\\s*(${simpleCallArguments})\\s*,\\s*(${simpleCallArguments})\\s*\\)`,
+            "g"
+          ),
+          "Reflect.get($1, $2)"
+        )
+        .replace(
+          new RegExp(
+            `\\b${escapeRegExp(alias)}\\s*\\.\\s*apply\\s*\\(\\s*Reflect\\s*,\\s*\\[\\s*(${simpleCallArguments})\\s*,\\s*(${simpleCallArguments})\\s*\\]\\s*\\)`,
+            "g"
+          ),
+          "Reflect.get($1, $2)"
+        )
+        .replace(new RegExp(`\\b${escapeRegExp(alias)}\\s*\\(`, "g"), "Reflect.get("),
     [...reflectApplyAliases].reduce(
-      (source, alias) => source.replace(new RegExp(`\\b${escapeRegExp(alias)}\\s*\\(`, "g"), "Reflect.apply("),
+      (source, alias) =>
+        source
+          .replace(
+            new RegExp(
+              `\\b${escapeRegExp(alias)}\\s*\\.\\s*call\\s*\\(\\s*Reflect\\s*,\\s*(${simpleCallArguments})\\s*,\\s*(${simpleCallArguments})\\s*,\\s*(${simpleCallArguments})\\s*\\)`,
+              "g"
+            ),
+            "Reflect.apply($1, $2, $3)"
+          )
+          .replace(
+            new RegExp(
+              `\\b${escapeRegExp(alias)}\\s*\\.\\s*apply\\s*\\(\\s*Reflect\\s*,\\s*\\[\\s*(${simpleCallArguments})\\s*,\\s*(${simpleCallArguments})\\s*,\\s*(${simpleCallArguments})\\s*\\]\\s*\\)`,
+              "g"
+            ),
+            "Reflect.apply($1, $2, $3)"
+          )
+          .replace(new RegExp(`\\b${escapeRegExp(alias)}\\s*\\(`, "g"), "Reflect.apply("),
       bodySlice
     )
   );
   const reflectedBodySlice = reflectMethodAliasBodySlice
+    .replace(
+      new RegExp(
+        `\\bReflect\\s*\\.\\s*get\\s*\\.\\s*call\\s*\\(\\s*Reflect\\s*,\\s*(${simpleCallArguments})\\s*,\\s*(${simpleCallArguments})\\s*\\)`,
+        "g"
+      ),
+      "Reflect.get($1, $2)"
+    )
+    .replace(
+      new RegExp(
+        `\\bReflect\\s*\\.\\s*get\\s*\\.\\s*apply\\s*\\(\\s*Reflect\\s*,\\s*\\[\\s*(${simpleCallArguments})\\s*,\\s*(${simpleCallArguments})\\s*\\]\\s*\\)`,
+        "g"
+      ),
+      "Reflect.get($1, $2)"
+    )
+    .replace(
+      new RegExp(
+        `\\bReflect\\s*\\.\\s*apply\\s*\\.\\s*call\\s*\\(\\s*Reflect\\s*,\\s*(${simpleCallArguments})\\s*,\\s*(${simpleCallArguments})\\s*,\\s*(${simpleCallArguments})\\s*\\)`,
+        "g"
+      ),
+      "Reflect.apply($1, $2, $3)"
+    )
+    .replace(
+      new RegExp(
+        `\\bReflect\\s*\\.\\s*apply\\s*\\.\\s*apply\\s*\\(\\s*Reflect\\s*,\\s*\\[\\s*(${simpleCallArguments})\\s*,\\s*(${simpleCallArguments})\\s*,\\s*(${simpleCallArguments})\\s*\\]\\s*\\)`,
+        "g"
+      ),
+      "Reflect.apply($1, $2, $3)"
+    )
+    .replace(
+      new RegExp(
+        `\\b((?:${descriptorLookupCallPattern}|${prototypeLookupCallPattern}))\\s*\\.\\s*call\\s*\\(\\s*(?:Object|Reflect)\\s*,\\s*(${simpleCallArguments})\\s*\\)`,
+        "g"
+      ),
+      "$1($2)"
+    )
+    .replace(
+      new RegExp(
+        `\\b((?:${descriptorLookupCallPattern}|${prototypeLookupCallPattern}))\\s*\\.\\s*apply\\s*\\(\\s*(?:Object|Reflect)\\s*,\\s*\\[\\s*(${simpleCallArguments})\\s*\\]\\s*\\)`,
+        "g"
+      ),
+      "$1($2)"
+    )
     .replace(/\bReflect\s*(?:\?\.\s*)?\[\s*["'`]get["'`]\s*\]\s*(?:\?\.)?\s*\(/g, "Reflect.get(")
     .replace(/\bReflect\s*(?:\?\.\s*)?\[\s*["'`]apply["'`]\s*\]\s*(?:\?\.)?\s*\(/g, "Reflect.apply(")
     .replace(/\bReflect\s*\?\.\s*get\s*\(/g, "Reflect.get(")
@@ -3881,6 +3955,59 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedComputedReflectApplyAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedObjectDescriptorAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedReflectPrototypeAliasSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("treats call and apply invocations of reflective helper aliases as body parsing for role-gate ordering", () => {
+    const unsafeReflectGetCallAliasSource = `
+      export async function POST(req: Request) {
+        const reflectGet = Reflect.get;
+        const payload = await reflectGet.call(Reflect, req, "json").call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeReflectApplyApplyAliasSource = `
+      export async function PATCH(req: Request) {
+        const reflectApply = Reflect.apply;
+        const payload = await reflectApply.apply(Reflect, [req.clone().text, req.clone(), []]);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeDescriptorCallAliasSource = `
+      export async function PUT(req: Request) {
+        const getDescriptor = Object.getOwnPropertyDescriptor;
+        const payload = await getDescriptor.call(Object, Request.prototype, "formData")?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const unsafePrototypeApplyAliasSource = `
+      export async function DELETE(req: Request) {
+        const payload = await Reflect.getPrototypeOf.apply(Reflect, [req]).blob.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const reflectGet = Reflect.get;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await reflectGet.call(Reflect, req, "arrayBuffer").call(req);
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeReflectGetCallAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeReflectApplyApplyAliasSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDescriptorCallAliasSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafePrototypeApplyAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
