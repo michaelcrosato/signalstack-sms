@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 428
+
+- Latest live-worker length-descriptor coverage proves proxy-invalid enumerable supplied control-array `length` descriptors deny before indexed controls are read and without leaking descriptor invariant errors.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 54 tests.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 440 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 427
 
 - Latest contract truth sync records the already-tested boxed string `id`, `status`, and `requirement` live-worker public-field denial in the queue/testing contracts and current state matrix.
