@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 239
+
+- No blocker from the live-worker authorization wrapper field-order hardening. Authorization wrappers for the reserved `production-live-campaign` class now require frozen public fields in the exact `workerDeploymentClass`, then `controls` order; the reserved class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.
+
 Run number: 238
 
 - No blocker from the live-worker null-prototype wrapper coverage. Null-prototype authorization wrappers for the reserved `production-live-campaign` class now have explicit denial coverage; the reserved class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.

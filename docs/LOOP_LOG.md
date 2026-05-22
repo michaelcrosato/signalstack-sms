@@ -2144,3 +2144,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing production-live-campaign control hardening without enabling live sends.
+
+## Run 239  GREEN  live-worker-wrapper-field-order  2026-05-21 18:46
+Objective:    Require exact authorization wrapper public-field order before future live worker authorization can pass.
+Changed:
+- Tightened `liveWorkerDeploymentClassIsAuthorized` so wrapper evidence must expose frozen `workerDeploymentClass` and `controls` fields in that exact order.
+- Added unit coverage proving reordered frozen wrappers remain unauthorized for the reserved `production-live-campaign` class.
+- Updated queue/testing/production-worker policy docs, roadmap/state/handoff notes, SUMMARY, and BLOCKERS.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing production-live-campaign control hardening without enabling live sends.

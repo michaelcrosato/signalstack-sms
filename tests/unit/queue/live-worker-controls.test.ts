@@ -554,9 +554,14 @@ describe("production live campaign worker controls", () => {
       workerDeploymentClass: reservedLiveWorkerDeploymentClass,
       controls: implementedControls
     });
+    const reorderedWrapper = Object.freeze({
+      controls: implementedControls,
+      workerDeploymentClass: reservedLiveWorkerDeploymentClass
+    });
 
     expect(liveWorkerDeploymentClassIsAuthorized(mutableWrapper)).toBe(false);
     expect(liveWorkerDeploymentClassIsAuthorized(sealedWrapper)).toBe(false);
+    expect(liveWorkerDeploymentClassIsAuthorized(reorderedWrapper)).toBe(false);
     expect(
       liveWorkerDeploymentClassIsAuthorized(
         frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
