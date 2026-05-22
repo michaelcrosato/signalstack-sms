@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 390
+
+- No blocker from live-worker mismatched length-descriptor evidence hardening. Focused queue coverage and the protected local gate passed. The change tightens local unit coverage plus queue/testing contract docs only and does not execute workers, enqueue jobs, call Redis, use production credentials, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production database actions.
+
 Run number: 389
 
 - No blocker from the latest API external-impact safety-copy hardening. Focused API operations coverage and the protected local gate passed for Run 389. The change is local inventory test/docs coverage only and does not call Twilio, use production credentials, send SMS, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, execute workers, enqueue jobs, call Redis, hard-delete data, or perform destructive production actions.

@@ -421,6 +421,44 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects mismatched safe-integer control-array length descriptors before authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const mismatchedLengthValues = [0, implementedControls.length - 1, implementedControls.length + 1];
+
+    for (const lengthValue of mismatchedLengthValues) {
+      const mismatchedLengthControls = new Proxy([...implementedControls], {
+        getOwnPropertyDescriptor: (target, property) => {
+          if (property === "length") {
+            return {
+              value: lengthValue,
+              enumerable: false,
+              writable: false,
+              configurable: false
+            };
+          }
+
+          if (property === "0") {
+            throw new Error("mismatched length evidence must deny before trusting indexed controls");
+          }
+
+          return Reflect.getOwnPropertyDescriptor(target, property);
+        }
+      });
+
+      expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(mismatchedLengthControls)).not.toThrow();
+      expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(mismatchedLengthControls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(mismatchedLengthControls)).not.toThrow();
+      expect(liveWorkerControlArrayExposesOnlyIndexedEntries(mismatchedLengthControls)).toBe(false);
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(mismatchedLengthControls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(mismatchedLengthControls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, mismatchedLengthControls)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects control arrays with non-public fields before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const symbolField = Symbol("unsafe-live-worker-field");
