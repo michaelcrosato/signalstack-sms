@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 236
+
+- Hardened live-worker authorization evidence handling for Run 236.
+- Latest repo truth: `liveWorkerDeploymentClassIsAuthorized` now requires the wrapper `controls` field to contain actual supplied evidence; explicit `null` or `undefined` controls no longer fall back to built-in metadata for the reserved `production-live-campaign` class.
+- Focused live-worker control tests passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 235
 
 - Hardened live-worker authorization wrapper shape handling for Run 235.

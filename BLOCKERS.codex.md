@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 236
+
+- No blocker from the live-worker nullish-control-evidence hardening. Authorization wrappers for the reserved `production-live-campaign` class now deny explicit `null` or `undefined` controls instead of falling back to built-in metadata; the reserved class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.
+
 Run number: 235
 
 - No blocker from the live-worker authorization wrapper shape hardening. Authorization wrapper inputs now must expose only `workerDeploymentClass` and `controls` as public data fields before the reserved `production-live-campaign` evidence path can be evaluated; the reserved class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.

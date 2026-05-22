@@ -385,7 +385,5 @@ export function liveWorkerDeploymentClassIsAuthorized(input: {
   }
 
   const controls = authorizationInputDataFieldValue(input, "controls");
-  return (
-    liveWorkerControlsAreImplemented(controls ?? productionLiveCampaignWorkerControls)
-  );
+  return liveWorkerControlsAreImplemented(controls);
 }

@@ -626,6 +626,14 @@ describe("production live campaign worker controls", () => {
       }),
       Object.freeze({
         workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: null
+      }),
+      Object.freeze({
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: undefined
+      }),
+      Object.freeze({
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
         controls: implementedControls,
         reviewerBypass: true
       }),

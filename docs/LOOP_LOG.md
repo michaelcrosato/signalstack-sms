@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 236  GREEN  live-worker-nullish-control-evidence  2026-05-21 18:30
+Objective:    Require actual supplied control evidence before future live-worker authorization can pass.
+Changed:
+- Tightened `liveWorkerDeploymentClassIsAuthorized` so explicit `null` or `undefined` `controls` evidence does not fall back to built-in metadata.
+- Added unit coverage proving nullish controls in an otherwise valid authorization wrapper cannot authorize `production-live-campaign`.
+- Updated queue/testing contracts, production worker policy docs, roadmap state, README, SUMMARY, and BLOCKERS.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 235  GREEN  live-worker-authorization-wrapper-shape  2026-05-21 18:30
 Objective:    Require exact public authorization wrapper fields before future live-worker authorization can pass.
 Changed:
