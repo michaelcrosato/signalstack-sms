@@ -670,6 +670,31 @@ describe("production live campaign worker controls", () => {
         controls: implementedControls
       })
     );
+    const inheritedFieldInput = Object.freeze(
+      Object.create({
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: implementedControls
+      })
+    );
+    const inheritedExtraFieldInput = Object.freeze(
+      Object.create(
+        { reviewerBypass: true },
+        {
+          workerDeploymentClass: {
+            value: reservedLiveWorkerDeploymentClass,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          },
+          controls: {
+            value: implementedControls,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          }
+        }
+      )
+    );
     class AuthorizationWrapper {
       workerDeploymentClass = reservedLiveWorkerDeploymentClass;
       controls = implementedControls;
@@ -701,6 +726,8 @@ describe("production live campaign worker controls", () => {
       hiddenExtraFieldInput,
       symbolExtraFieldInput,
       nullPrototypeInput,
+      inheritedFieldInput,
+      inheritedExtraFieldInput,
       Object.freeze(new AuthorizationWrapper()),
       accessorBackedInput,
       descriptorThrowingInput

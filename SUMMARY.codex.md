@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 241
+
+- Hardened live-worker authorization wrapper prototype-boundary coverage for Run 241.
+- Latest repo truth: `liveWorkerDeploymentClassIsAuthorized` now has explicit unit coverage proving inherited `workerDeploymentClass`/`controls` fields and wrappers with inherited extra bypass fields deny for the reserved `production-live-campaign` class, even when supplied controls are otherwise implemented.
+- Focused live-worker control tests, the production worker policy check, `git diff --check`, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 240
 
 - Hardened live-worker malformed deployment-class short-circuit coverage for Run 240.

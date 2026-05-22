@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 241
+
+- No blocker from the live-worker authorization wrapper prototype-boundary coverage. Inherited authorization fields and prototype-decorated wrapper input now have explicit denial coverage for the reserved `production-live-campaign` class; the reserved class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.
+
 Run number: 240
 
 - No blocker from the live-worker malformed deployment-class short-circuit coverage. Non-string, nullish, symbol, array, and object worker deployment class values now have explicit denial coverage before supplied controls are inspected; the reserved `production-live-campaign` class remains unsupported and the change does not authorize live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature flags.

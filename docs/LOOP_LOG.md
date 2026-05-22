@@ -1,5 +1,14 @@
 # LOOP_LOG
 
+## Run 241  GREEN  live-worker-wrapper-prototype-boundary  2026-05-21 18:57
+Objective:    Prove inherited authorization wrapper fields cannot authorize the reserved live worker class.
+Changed:
+- Added unit coverage showing inherited `workerDeploymentClass`/`controls` fields and prototype-decorated wrapper input deny for `production-live-campaign`.
+- Updated the production worker policy and queue/testing docs/contracts to name inherited wrapper boundaries explicitly.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 238  GREEN  live-worker-wrapper-null-prototype  2026-05-21 18:44
 Objective:    Prove null-prototype authorization wrappers cannot authorize the reserved live worker class.
 Changed:
