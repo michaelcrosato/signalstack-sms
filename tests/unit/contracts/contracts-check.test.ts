@@ -69,4 +69,26 @@ describe("contracts-check route method extraction", () => {
       "PATCH /api/contacts/:contactId"
     ]);
   });
+
+  it("ignores route method export mentions in comments and strings", () => {
+    const source = `
+      // export async function POST() {}
+      /*
+        export const PATCH = async () => Response.json({});
+        export { removeContact as DELETE };
+      */
+      const example = "export function PUT() {}";
+      const template = \`export { optionsHandler as OPTIONS }\`;
+
+      export async function GET() {
+        return Response.json({});
+      }
+
+      export function HEAD() {
+        return new Response(null, { status: 204 });
+      }
+    `;
+
+    expect(extractExportedRouteMethods(source)).toEqual(["GET", "HEAD"]);
+  });
 });

@@ -2906,6 +2906,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 contract drift checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
 
+## Run 326  GREEN  contract-route-non-code-mask  2026-05-22 03:00
+Objective:    Prevent comments, strings, and template literals from creating false API route-method entries in contract drift checks.
+Changed:
+- Added non-code masking to the contract route-method scanner before direct and named route exports are extracted.
+- Added focused contract-check coverage proving commented, quoted, and template-literal route export examples are ignored while real `GET` and `HEAD` handlers are still detected.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the non-code route export boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 contract drift checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 325  GREEN  parenthesized-call-apply-body-reader-scan  2026-05-22 02:52
 Objective:    Prevent parenthesized `call`/`apply` request body-reader invocations from bypassing mutating-route role-gate ordering checks.
 Changed:

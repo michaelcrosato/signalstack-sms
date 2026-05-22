@@ -17,17 +17,106 @@ const required = [
 const appApiRoot = path.join("app", "api");
 export const supportedRouteMethods = ["GET", "POST", "PATCH", "DELETE", "PUT", "HEAD", "OPTIONS"] as const;
 
+function maskNonCode(source: string) {
+  let masked = "";
+  let index = 0;
+  let state: "code" | "line-comment" | "block-comment" | "single-quote" | "double-quote" | "template" = "code";
+
+  while (index < source.length) {
+    const current = source[index];
+    const next = source[index + 1];
+
+    if (state === "code") {
+      if (current === "/" && next === "/") {
+        masked += "  ";
+        index += 2;
+        state = "line-comment";
+        continue;
+      }
+      if (current === "/" && next === "*") {
+        masked += "  ";
+        index += 2;
+        state = "block-comment";
+        continue;
+      }
+      if (current === "'") {
+        masked += " ";
+        index += 1;
+        state = "single-quote";
+        continue;
+      }
+      if (current === "\"") {
+        masked += " ";
+        index += 1;
+        state = "double-quote";
+        continue;
+      }
+      if (current === "`") {
+        masked += " ";
+        index += 1;
+        state = "template";
+        continue;
+      }
+
+      masked += current;
+      index += 1;
+      continue;
+    }
+
+    if (state === "line-comment") {
+      masked += current === "\n" || current === "\r" ? current : " ";
+      index += 1;
+      if (current === "\n" || current === "\r") {
+        state = "code";
+      }
+      continue;
+    }
+
+    if (state === "block-comment") {
+      masked += current === "\n" || current === "\r" ? current : " ";
+      index += 1;
+      if (current === "*" && next === "/") {
+        masked += " ";
+        index += 1;
+        state = "code";
+      }
+      continue;
+    }
+
+    masked += current === "\n" || current === "\r" ? current : " ";
+    index += 1;
+    if (current === "\\") {
+      if (index < source.length) {
+        masked += source[index] === "\n" || source[index] === "\r" ? source[index] : " ";
+        index += 1;
+      }
+      continue;
+    }
+    if (
+      (state === "single-quote" && current === "'") ||
+      (state === "double-quote" && current === "\"") ||
+      (state === "template" && current === "`")
+    ) {
+      state = "code";
+    }
+  }
+
+  return masked;
+}
+
 export function extractExportedRouteMethods(source: string) {
+  const codeOnlySource = maskNonCode(source);
+
   return supportedRouteMethods.filter((method) => {
     const directExportPattern = new RegExp(
       `export\\s+(?:(?:async\\s+)?function\\s+${method}\\b|const\\s+${method}\\b(?:\\s*:[\\s\\S]*?)?\\s*=)`
     );
-    if (directExportPattern.test(source)) {
+    if (directExportPattern.test(codeOnlySource)) {
       return true;
     }
 
     const namedExportPattern = /export\s*\{([^}]+)\}/g;
-    for (const match of source.matchAll(namedExportPattern)) {
+    for (const match of codeOnlySource.matchAll(namedExportPattern)) {
       const exportedNames = match[1].split(",");
       for (const exportedName of exportedNames) {
         const aliasMatch = /^\s*([A-Za-z_$][\w$]*)\s+as\s+([A-Za-z_$][\w$]*)\s*$/.exec(exportedName);
