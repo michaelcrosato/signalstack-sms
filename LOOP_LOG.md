@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 351  GREEN  const-asserted-globalthis-request-auth-scan  2026-05-22 05:18
+Objective:    Prevent const-asserted `globalThis["Request" as const]` and prototype bracket names from hiding mutating-route request body readers before authorization.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize const-asserted inline `Request` constructor and `prototype` bracket names before `Request.prototype` body-reader checks.
+- Added synthetic auth unit coverage proving both direct `globalThis?.["Request" as const]?.["prototype" as const]` reads and local `RequestCtor["prototype" as const]` aliases fail before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the const-asserted global Request/prototype boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 350  GREEN  parenthesized-globalthis-request-alias-auth-scan  2026-05-22 05:11
 Objective:    Prevent parenthesized local `globalThis.Request` constructor aliases from hiding mutating-route request body readers before authorization.
 Changed:

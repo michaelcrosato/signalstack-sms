@@ -298,7 +298,7 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
     requestConstructorPropertyAliases.add(match[1]);
   }
   const requestConstructorPropertyPattern = () =>
-    `(?:["'\`]Request["'\`]${
+    `(?:${literalRequestConstructorNamePattern}${
       requestConstructorPropertyAliases.size > 0
         ? `|${[...requestConstructorPropertyAliases].map(escapeRegExp).join("|")}`
         : ""
@@ -353,7 +353,13 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
   }
   for (const alias of requestConstructorAliases) {
     bodySlice = bodySlice
-      .replace(new RegExp(`\\b${escapeRegExp(alias)}\\s*(?:\\?\\.)?\\[\\s*["'\`]prototype["'\`]\\s*\\]`, "g"), "Request.prototype")
+      .replace(
+        new RegExp(
+          `\\b${escapeRegExp(alias)}\\s*(?:\\?\\.)?\\[\\s*\\(?\\s*["'\`]prototype["'\`]\\s*(?:\\)?\\s+as\\s+const\\s*\\)?|\\)?)\\s*\\]`,
+          "g"
+        ),
+        "Request.prototype"
+      )
       .replace(new RegExp(`\\b${escapeRegExp(alias)}\\s*\\??\\.\\s*prototype\\b`, "g"), "Request.prototype");
   }
   const literalBodyReaderNamePattern = `\\(?\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*(?:\\)?\\s+as\\s+const\\s*\\)?|\\)?)`;
@@ -848,9 +854,9 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
   const normalizedReflectedBodySlice = reflectedDescriptorValueAliasBodySlice
     .replace(new RegExp(`\\[\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\]\\s*:`, "g"), "$1:")
     .replace(new RegExp(`\\[\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\]`, "g"), ".$1")
-    .replace(/\bglobalThis\s*(?:\?\.)?\[\s*["'`]Request["'`]\s*\]/g, "Request")
+    .replace(new RegExp(`\\bglobalThis\\s*(?:\\?\\.)?\\[\\s*${literalRequestConstructorNamePattern}\\s*\\]`, "g"), "Request")
     .replace(/\bglobalThis\s*\??\.\s*Request\b/g, "Request")
-    .replace(/\bRequest\s*\[\s*["'`]prototype["'`]\s*\]/g, "Request.prototype")
+    .replace(/\bRequest\s*\[\s*\(?\s*["'`]prototype["'`]\s*(?:\)?\s+as\s+const\s*\)?|\)?)\s*\]/g, "Request.prototype")
     .replace(/\[\s*["'`]clone["'`]\s*\]/g, ".clone")
     .replace(/\[\s*["'`](call|apply|bind)["'`]\s*\]/g, ".$1")
     .replace(/\.\s*clone\s*\?\.\s*\(/g, ".clone(")
@@ -1956,6 +1962,23 @@ describe("API route authorization coverage", () => {
         return Response.json({ ok: Boolean(payload) });
       }
     `;
+    const unsafeConstAssertedGlobalThisRequestAliasSource = `
+      export async function DELETE(req: Request) {
+        const RequestCtor = globalThis["Request" as const];
+        const payload = await RequestCtor["prototype" as const].arrayBuffer.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+    const unsafeDirectConstAssertedGlobalThisRequestSource = `
+      export async function PATCH(req: Request) {
+        const payload = await globalThis?.["Request" as const]?.["prototype" as const]?.blob.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
     const unsafeDirectReflectSource = `
       export async function POST(req: Request) {
         const cloned = req.clone();
@@ -1989,6 +2012,8 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedGlobalThisAliasRequestSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedGlobalThisComputedRequestSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedGlobalThisDestructuredRequestSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeConstAssertedGlobalThisRequestAliasSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectConstAssertedGlobalThisRequestSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectReflectSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
