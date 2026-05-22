@@ -274,6 +274,40 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerControlsAreImplemented(frozenArrayWithMutableEntry)).toBe(false);
   });
 
+  it("rejects writable or configurable indexed control-array descriptors before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const writableIndexControls = [...implementedControls];
+    Object.defineProperty(writableIndexControls, "0", {
+      value: implementedControls[0],
+      enumerable: true,
+      writable: true,
+      configurable: false
+    });
+    Object.preventExtensions(writableIndexControls);
+
+    const configurableIndexControls = [...implementedControls];
+    Object.defineProperty(configurableIndexControls, "0", {
+      value: implementedControls[0],
+      enumerable: true,
+      writable: false,
+      configurable: true
+    });
+    Object.preventExtensions(configurableIndexControls);
+
+    for (const controls of [writableIndexControls, configurableIndexControls]) {
+      expect(liveWorkerControlArrayExposesOnlyIndexedEntries(controls)).toBe(true);
+      expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(true);
+      expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(true);
+      expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(true);
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).toBe(false);
+      expect(liveWorkerControlsAreFrozen(controls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).toBe(false);
+    }
+  });
+
   it("rejects control arrays with non-public fields before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const symbolField = Symbol("unsafe-live-worker-field");

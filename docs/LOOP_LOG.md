@@ -3097,3 +3097,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 380  GREEN  live-worker-index-descriptor-evidence  2026-05-22 08:12
+Objective:    Prove writable or configurable supplied control-array index descriptors cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker control coverage for writable and configurable indexed array data descriptors.
+- Updated the testing contract, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the index-descriptor boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.

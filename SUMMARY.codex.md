@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 380
+
+- Hardened live-worker control coverage so writable or configurable supplied control-array index descriptors cannot authorize the reserved `production-live-campaign` class.
+- Latest repo truth: `production-live-campaign` remains unsupported, and future control evidence must use own enumerable frozen indexed array data descriptors.
+- Updated the testing contract, NEXT_PROMPTS, and current state matrix for the writable/configurable index-descriptor boundary.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts`.
+- Protected local gate passed on 2026-05-22 08:13: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 410 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 379
 
 - Hardened live-worker control coverage so inherited supplied control-array index slots cannot authorize the reserved `production-live-campaign` class or execute prototype getters.
