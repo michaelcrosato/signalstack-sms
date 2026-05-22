@@ -11,6 +11,7 @@ import {
   apiOperationRoutes,
   getApiOperationsStatus
 } from "@/lib/operations/api-operations";
+import { extractExportedRouteMethods } from "@/scripts/contracts-check";
 
 const publicApiOperationRouteFields = ["method", "path", "area", "mutates", "externalImpact", "safety"];
 const publicApiOperationsStatusFields = [
@@ -49,12 +50,8 @@ function collectImplementedApiRouteMethods(root: string) {
         const relativeRoute = relative(join(process.cwd(), "app"), fullPath).split(sep).join("/").replace(/\/route\.ts$/, "");
         const routePath = `/${relativeRoute}`;
 
-        for (const method of allowedApiOperationMethods) {
-          const methodExportPattern = new RegExp(`export\\s+(?:async\\s+)?function\\s+${method}\\b|export\\s+const\\s+${method}\\b`);
-
-          if (methodExportPattern.test(source)) {
-            routeMethods.push(`${method} ${routePath}`);
-          }
+        for (const method of extractExportedRouteMethods(source)) {
+          routeMethods.push(`${method} ${routePath}`);
         }
       }
     }

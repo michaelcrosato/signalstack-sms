@@ -20,6 +20,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
 
+## Run 429  GREEN  api-operations-shared-route-scanner  2026-05-22 13:33
+Objective:    Align API operations implemented-route reverse coverage with the shared contract route-method extractor.
+Changed:
+- Reused `extractExportedRouteMethods` in API operations inventory tests instead of a local route-export regex.
+- Updated the testing contract to require the shared contract extractor for implemented-route reverse coverage.
+- Kept the change to local static test/docs coverage; no API handlers, providers, billing, notifications, SMS, email, live AI, workers, Redis, secrets, live flags, destructive actions, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo and release-safety gates stable; continue shared gate hardening only where it removes scanner drift.
+
 ## Run 398  GREEN  twilio-string-form-payload  2026-05-22 09:46
 Objective:    Reject unsupported non-string Twilio webhook form parts before signature validation or raw payload trust.
 Changed:

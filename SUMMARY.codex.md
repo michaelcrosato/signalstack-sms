@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 429
+
+- API operations reverse-coverage now reuses the shared `scripts/contracts-check.ts` route-method extractor instead of a local regex parser, so `/settings/api` inventory tests see the same named-export, typed const, and non-code-masked route methods as the contract gate.
+- Updated `contracts/CONTRACT-TESTING.md` to make that shared extractor the documented expectation for implemented-route reverse coverage.
+- Focused coverage passed: `npm run test -- tests/unit/operations/api-operations.test.ts tests/unit/contracts/contracts-check.test.ts`; `npm run contracts:check` passed.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 440 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 428
 
 - Latest live-worker length-descriptor coverage proves proxy-invalid enumerable supplied control-array `length` descriptors deny before indexed controls are read and without leaking descriptor invariant errors.
