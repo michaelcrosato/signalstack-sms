@@ -2312,3 +2312,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo and live-worker boundaries remain stable.
+## Run 262  GREEN  live-worker-control-field-order  2026-05-21 20:43
+Objective:    Require exact public-field order on supplied live-worker control entries.
+Changed:
+- Tightened live-worker control evidence so entries must expose `id`, `status`, and `requirement` in exact order.
+- Added queue unit coverage proving reordered control-entry fields remain unauthorized even with matching IDs, requirements, and implemented statuses.
+- Updated queue contract, production worker policy docs, roadmap/state/handoff notes, SUMMARY, and BLOCKERS.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 correctness checks green while product demo and live-worker boundaries remain stable.

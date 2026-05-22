@@ -251,10 +251,10 @@ export function liveWorkerControlsExposeOnlyPublicFields(controls: unknown) {
 
     return (
       ownKeys.length === liveWorkerControlPublicFields.length &&
-      liveWorkerControlPublicFields.every((field) => {
+      liveWorkerControlPublicFields.every((field, index) => {
         const descriptor = safeGetOwnPropertyDescriptor(control, field);
         return (
-          ownKeys.includes(field) &&
+          ownKeys[index] === field &&
           descriptor !== undefined &&
           "value" in descriptor &&
           descriptor.enumerable === true

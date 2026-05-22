@@ -377,6 +377,27 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("requires live-worker control public fields in exact order", () => {
+    const implementedControls = implementedFrozenControls();
+    const reorderedFieldControl = Object.freeze({
+      status: "implemented" as const,
+      id: implementedControls[0].id,
+      requirement: implementedControls[0].requirement
+    });
+    const controls = Object.freeze(
+      implementedControls.map((control, index) => (index === 0 ? reorderedFieldControl : Object.freeze({ ...control })))
+    );
+
+    expect(liveWorkerControlsExposeOnlyPublicFields(implementedControls)).toBe(true);
+    expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(true);
+    expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(true);
+    expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+    ).toBe(false);
+  });
+
   it("rejects accessor-backed public fields without reading getters", () => {
     const implementedControls = implementedFrozenControls();
     const accessorBackedControl = Object.freeze(
