@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 334
+
+- Hardened `globalThis` reflective built-in body-reader authorization coverage.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes `globalThis.Object` and `globalThis.Reflect` access paths before reflective mutating-route body-reader checks, including dot, optional-dot, and bracket access to those built-ins.
+- Updated the testing contract and testing docs to name the `globalThis` reflective built-in boundary.
+- Focused auth coverage, contracts check, typecheck, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 333
 
 - Kept the quick repo-truth handoff current after a protected local-gate pass.

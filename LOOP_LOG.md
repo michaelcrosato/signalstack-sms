@@ -2571,6 +2571,16 @@ Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 correctness checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
 
+## Run 334  GREEN  globalthis-reflect-body-reader-scan  2026-05-22 03:40
+Objective:    Prevent `globalThis.Object` and `globalThis.Reflect` body-reader access paths from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize dot, optional-dot, and bracket `globalThis.Object`/`globalThis.Reflect` built-in access before reflective body-reader checks.
+- Added synthetic auth coverage proving `globalThis.Reflect.get`, bracketed `globalThis["Reflect"].apply`, `globalThis.Object.getOwnPropertyDescriptor`, and optional `globalThis?.Object.getPrototypeOf` body-reader forms fail before the role gate while post-gate reads remain allowed.
+- Updated the testing contract, testing docs, SUMMARY, and BLOCKERS for the `globalThis` reflective built-in boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 259  GREEN  mutating-api-role-gate-scan  2026-05-21 20:32
 Objective:    Prevent local mutating API routes from losing role checks.
 Changed:
