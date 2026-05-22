@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 235  GREEN  live-worker-authorization-wrapper-shape  2026-05-21 18:30
+Objective:    Require exact public authorization wrapper fields before future live-worker authorization can pass.
+Changed:
+- Tightened `liveWorkerDeploymentClassIsAuthorized` so wrapper input must be an ordinary object exposing only `workerDeploymentClass` and `controls` as public data fields.
+- Added unit coverage proving missing-field, extra-field, hidden-field, symbol-field, class-instance, accessor-backed, descriptor-trap, and primitive wrapper inputs deny without authorizing `production-live-campaign`.
+- Updated queue/testing contracts, production worker policy docs, roadmap state, README, SUMMARY, and BLOCKERS.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 232  GREEN  live-worker-control-proxy-traps  2026-05-21 18:10
 Objective:    Deny proxy-backed malformed live-worker control evidence cleanly before future authorization.
 Changed:

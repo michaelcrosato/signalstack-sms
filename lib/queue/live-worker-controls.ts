@@ -71,6 +71,7 @@ const liveWorkerControls = [
 const requiredLiveWorkerControlIds = liveWorkerControls.map((control) => control.id);
 const requiredLiveWorkerControlRequirements = liveWorkerControls.map((control) => control.requirement);
 const liveWorkerControlPublicFields = Object.freeze(["id", "status", "requirement"] as const);
+const liveWorkerAuthorizationPublicFields = Object.freeze(["workerDeploymentClass", "controls"] as const);
 
 export const productionLiveCampaignWorkerControls = Object.freeze(
   liveWorkerControls.map((control) => Object.freeze({ ...control }))
@@ -354,10 +355,30 @@ function authorizationInputDataFieldValue(input: unknown, field: "workerDeployme
   return descriptor !== undefined && "value" in descriptor ? descriptor.value : undefined;
 }
 
+function authorizationInputExposesOnlyPublicFields(input: unknown) {
+  if (input === null || typeof input !== "object" || safeGetPrototypeOf(input) !== Object.prototype) {
+    return false;
+  }
+
+  const ownKeys = safeOwnKeys(input);
+  if (ownKeys === null || ownKeys.length !== liveWorkerAuthorizationPublicFields.length) {
+    return false;
+  }
+
+  return liveWorkerAuthorizationPublicFields.every((field) => {
+    const descriptor = safeGetOwnPropertyDescriptor(input, field);
+    return ownKeys.includes(field) && descriptor !== undefined && "value" in descriptor && descriptor.enumerable === true;
+  });
+}
+
 export function liveWorkerDeploymentClassIsAuthorized(input: {
   workerDeploymentClass?: string;
   controls?: unknown;
 } = {}) {
+  if (!authorizationInputExposesOnlyPublicFields(input)) {
+    return false;
+  }
+
   const workerDeploymentClass = authorizationInputDataFieldValue(input, "workerDeploymentClass");
   if (workerDeploymentClass !== reservedLiveWorkerDeploymentClass) {
     return false;

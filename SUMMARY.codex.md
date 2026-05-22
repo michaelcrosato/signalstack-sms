@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 235
+
+- Hardened live-worker authorization wrapper shape handling for Run 235.
+- Latest repo truth: `liveWorkerDeploymentClassIsAuthorized` now denies authorization wrappers unless they are ordinary public-field records exposing only `workerDeploymentClass` and `controls`; missing, extra, hidden, symbol, accessor-backed, descriptor-trap, primitive, and class-instance wrapper inputs cannot authorize the reserved `production-live-campaign` class.
+- Focused live-worker control tests, typecheck, production worker policy check, and `git diff --check` passed before the protected local gate.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, or protected gate-script edits were used.
+
+## Previous Run
+
 Run number: 234
 
 - Hardened live-worker authorization wrapper input handling for Run 234.

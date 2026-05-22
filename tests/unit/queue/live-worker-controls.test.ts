@@ -588,6 +588,32 @@ describe("production live campaign worker controls", () => {
         }
       }
     );
+    const hiddenExtraFieldInput = Object.freeze(
+      Object.defineProperty(
+        {
+          workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+          controls: implementedControls
+        },
+        "reviewerBypass",
+        {
+          value: true,
+          enumerable: false
+        }
+      )
+    );
+    const symbolExtraFieldInput = Object.freeze(
+      Object.assign(
+        {
+          workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+          controls: implementedControls
+        },
+        { [Symbol("unsafe-live-worker-authorization")]: true }
+      )
+    );
+    class AuthorizationWrapper {
+      workerDeploymentClass = reservedLiveWorkerDeploymentClass;
+      controls = implementedControls;
+    }
 
     const malformedInputs = [
       null,
@@ -595,6 +621,17 @@ describe("production live campaign worker controls", () => {
       "production-live-campaign",
       reservedLiveWorkerDeploymentClass,
       Object.freeze({}),
+      Object.freeze({
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass
+      }),
+      Object.freeze({
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: implementedControls,
+        reviewerBypass: true
+      }),
+      hiddenExtraFieldInput,
+      symbolExtraFieldInput,
+      Object.freeze(new AuthorizationWrapper()),
       accessorBackedInput,
       descriptorThrowingInput
     ];
