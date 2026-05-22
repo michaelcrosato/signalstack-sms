@@ -3283,3 +3283,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 366  GREEN  assigned-satisfies-alias-auth-scan  2026-05-22 06:54
+Objective:    Prevent assigned TypeScript `satisfies` aliases from hiding mutating-route request body readers before authorization.
+Changed:
+- Added synthetic mutating-route auth coverage for assigned `satisfies` aliases of `globalThis`, `Object`, `Request`, and `Request.prototype`.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the assigned `satisfies` alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.

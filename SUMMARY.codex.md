@@ -1,5 +1,17 @@
 # Codex Summary
 
+Run number: 366
+
+- Hardened mutating-route authorization coverage for assigned TypeScript `satisfies` aliases.
+- Latest repo truth: the static body-reader scanner is now explicitly covered for assigned `satisfies` aliases of `globalThis`, `Object`, `Request`, and `Request.prototype`, so those aliases cannot hide request body parsing before a handler's top-level `requireApiRole`.
+- Added synthetic auth coverage for `RequestCtor = Request satisfies typeof Request`, `requestPrototype = Request.prototype satisfies typeof Request.prototype`, `root = globalThis satisfies typeof globalThis`, and `ObjectBuiltin = Object satisfies typeof Object`.
+- Updated the testing contract, testing docs, and current state matrix for the assigned TypeScript `satisfies` alias boundary.
+- Focused auth coverage passed: `npm run test -- tests/unit/auth/api-route-authorization.test.ts`.
+- `npm run contracts:check`, `npm run typecheck`, and `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-22 06:54 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 unit test files / 405 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 365
 
 - Hardened mutating-route authorization coverage for TypeScript `satisfies` aliases.
