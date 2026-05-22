@@ -1,5 +1,13 @@
 # Codex Blockers
 
+Run number: 387
+
+- No blocker from the latest Twilio inbound address normalization or this handoff truth sync. Focused webhook helper coverage and the protected local gate passed for Run 387. This loop only reconciles docs/handoff truth and does not call Twilio, use production credentials, send SMS, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, execute workers, enqueue jobs, call Redis, hard-delete data, or perform destructive production actions.
+
+Run number: 386
+
+- No blocker from Twilio webhook idempotency normalization. The change was local webhook parsing and test/docs coverage only; it did not call Twilio, use production credentials, send SMS, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, execute workers, enqueue jobs, call Redis, hard-delete data, or perform destructive production actions.
+
 Run number: 379
 
 - No blocker from live-worker inherited-index evidence hardening. Focused queue coverage and the protected local gate passed. The change tightens local unit coverage plus queue/testing contract docs only and does not execute workers, enqueue jobs, call Redis, use production credentials, mutate product records beyond validation behavior, send SMS or email, call providers, bill, notify, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production database actions.

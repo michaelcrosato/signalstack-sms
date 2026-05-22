@@ -1,24 +1,21 @@
 # Codex Summary
 
-Run number: 385
+Run number: 387
 
-- Latest API operations visibility work makes `/settings/api` display a route-level external-impact label for every listed API route and keeps `POST /api/demo/live-test-sms` visibly marked as the only external-impact route.
-- Updated seeded investor demo coverage to assert the live-test SMS route row renders both its external-impact classification and Twilio allowlist-gate safety copy.
-- Updated testing docs/contracts, NEXT_PROMPTS, and current state matrix for the API external-impact visibility boundary.
-- Focused checks passed: `npm run typecheck`, `npm run lint`, `npm run test -- tests/unit/operations/api-operations.test.ts`, and `$env:PLAYWRIGHT_PORT='3111'; npm run test:e2e:demo`.
-- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 413 tests, Playwright smoke, and build green.
+- Latest Twilio inbound address normalization trims inbound `From`/`To` address whitespace before local contact/message creation and rejects blank `From` values.
+- Focused webhook helper coverage and the protected local gate passed for the inbound normalization work.
+- Updated webhook contract, NEXT_PROMPTS, BLOCKERS, root loop log, and current state matrix for the inbound address normalization boundary.
+- This run reconciles the docs loop log and active Codex handoff header with the already committed Run 387 repo truth.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 416 tests, Playwright smoke, and build green.
 - No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
 
 ## Previous Run
 
-Run number: 384
+Run number: 386
 
-- Latest live-worker length coercion coverage proves supplied `production-live-campaign` control arrays with hostile non-primitive `length` descriptor values deny without coercing descriptor values or reading indexed controls. Focused unit coverage and the protected local gate passed; no workers, providers, billing, notifications, SMS, email, live AI, secrets, protected gate scripts, or destructive production actions were used.
-- Hardened live-worker control coverage so writable or configurable supplied control-array index descriptors cannot authorize the reserved `production-live-campaign` class.
-- Latest repo truth: `production-live-campaign` remains unsupported, and future control evidence must use own enumerable frozen indexed array data descriptors.
-- Updated the testing contract, NEXT_PROMPTS, and current state matrix for the writable/configurable index-descriptor boundary.
-- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts`.
-- Protected local gate passed on 2026-05-22 08:13: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 410 tests, Playwright smoke, and build green.
+- Latest Twilio webhook idempotency normalization trims provider message IDs and status error codes before local idempotency behavior.
+- Focused webhook helper coverage and the protected local gate passed for Run 386.
+- The change was local webhook parsing and test/docs coverage only.
 - No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
 
 ## Previous Run

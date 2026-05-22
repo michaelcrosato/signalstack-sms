@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 387  GREEN  twilio-inbound-address-normalization  2026-05-22 08:50
+Objective:    Normalize Twilio inbound webhook address fields before local contact/message creation.
+Changed:
+- Trimmed inbound webhook `From` and `To` values in the local Twilio normalization helper and reject blank normalized `From` values.
+- Added focused webhook helper coverage for trimmed inbound addresses and blank sender rejection.
+- Updated webhook contract, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the inbound address normalization boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep webhook normalization, product demo, live-worker, provider, billing, live AI, notification, and secret gates stable.
+
 ## Run 379  GREEN  live-worker-inherited-index-evidence  2026-05-22 08:07
 Objective:    Prove inherited supplied control-array index slots cannot authorize the reserved live worker class.
 Changed:
