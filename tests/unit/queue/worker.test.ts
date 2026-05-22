@@ -80,6 +80,33 @@ describe("local queue worker", () => {
     ).toEqual({ allowed: false, reason: "production-worker-blocked" });
   });
 
+  it("denies malformed worker deployment class values without provider fallthrough", () => {
+    const malformedValues = [
+      null,
+      42,
+      true,
+      Symbol("production-live-campaign"),
+      Object.freeze(["local-demo"]),
+      Object.freeze({ value: "local-demo" })
+    ];
+
+    for (const workerDeploymentClass of malformedValues) {
+      expect(() =>
+        workerDeploymentClassIsAllowed({
+          workerDeploymentClass
+        })
+      ).not.toThrow();
+      expect(workerDeploymentClassIsAllowed({ workerDeploymentClass })).toBe(false);
+      expect(
+        localWorkerReadiness({
+          workerDeploymentClass,
+          liveMessagingEnabled: "true",
+          messagingProvider: "twilio"
+        })
+      ).toEqual({ allowed: false, reason: "production-worker-blocked" });
+    }
+  });
+
   it("builds campaign template values without leaking nulls", () => {
     expect(
       campaignMessageValues({

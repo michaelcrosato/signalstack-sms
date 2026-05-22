@@ -376,7 +376,7 @@ function authorizationInputExposesOnlyPublicFields(input: unknown) {
 }
 
 export function liveWorkerDeploymentClassIsAuthorized(input: {
-  workerDeploymentClass?: string;
+  workerDeploymentClass?: unknown;
   controls?: unknown;
 } = {}) {
   if (!authorizationInputExposesOnlyPublicFields(input)) {

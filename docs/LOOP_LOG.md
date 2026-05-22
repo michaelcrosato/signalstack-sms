@@ -2191,3 +2191,12 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing production-live-campaign control hardening without enabling live sends.
+## Run 244  GREEN  worker-readiness-malformed-class  2026-05-21 19:13
+Objective:    Deny malformed public worker deployment-class values before provider fallthrough.
+Changed:
+- Changed worker safety input and live-worker authorization typing to accept runtime-unknown deployment-class values safely.
+- Added queue unit coverage proving null, primitive, symbol, array, and object deployment-class values do not throw, do not authorize workers, and return `production-worker-blocked` before provider checks.
+- Updated queue/testing contracts, production worker policy docs, roadmap/state/handoff notes, README, SUMMARY, and BLOCKERS.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.

@@ -9,13 +9,13 @@ import { preflightCampaignRecipients } from "@/lib/messaging/send-preflight";
 import { scheduledCampaignJobSchema } from "@/lib/queue/jobs";
 
 export type WorkerSafetyInput = {
-  liveMessagingEnabled?: string;
-  messagingProvider?: string;
-  workerDeploymentClass?: string;
-  nodeEnv?: string;
-  vercelEnv?: string;
-  deploymentEnv?: string;
-  appEnv?: string;
+  liveMessagingEnabled?: unknown;
+  messagingProvider?: unknown;
+  workerDeploymentClass?: unknown;
+  nodeEnv?: unknown;
+  vercelEnv?: unknown;
+  deploymentEnv?: unknown;
+  appEnv?: unknown;
 };
 
 export type WorkerMode = "once" | "continuous";
@@ -71,19 +71,24 @@ export function localWorkerProviderIsAllowed(input: WorkerSafetyInput) {
 
 export function workerDeploymentClassIsAllowed(input: WorkerSafetyInput) {
   return (
-    !input.workerDeploymentClass ||
+    input.workerDeploymentClass === undefined ||
+    input.workerDeploymentClass === "" ||
     supportedWorkerDeploymentClasses.includes(input.workerDeploymentClass as "local-demo") ||
     liveWorkerDeploymentClassIsAuthorized({ workerDeploymentClass: input.workerDeploymentClass })
   );
 }
 
+function stringEnvValue(value: unknown) {
+  return typeof value === "string" ? value : undefined;
+}
+
 export function localWorkerReadiness(input: WorkerSafetyInput): WorkerReadinessResult {
   if (
     environmentIsProductionLike({
-      NODE_ENV: input.nodeEnv,
-      VERCEL_ENV: input.vercelEnv,
-      DEPLOYMENT_ENV: input.deploymentEnv,
-      APP_ENV: input.appEnv
+      NODE_ENV: stringEnvValue(input.nodeEnv),
+      VERCEL_ENV: stringEnvValue(input.vercelEnv),
+      DEPLOYMENT_ENV: stringEnvValue(input.deploymentEnv),
+      APP_ENV: stringEnvValue(input.appEnv)
     })
   ) {
     return { allowed: false, reason: "production-worker-blocked" };
