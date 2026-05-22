@@ -1348,51 +1348,88 @@ describe("production live campaign worker controls", () => {
         throw new Error("non-frozen wrapper descriptors must not inspect control evidence");
       }
     });
-    const writableClassWrapper = Object.preventExtensions(
-      Object.defineProperties(
-        {},
-        {
-          workerDeploymentClass: {
-            value: reservedLiveWorkerDeploymentClass,
-            enumerable: true,
-            writable: true,
-            configurable: false
-          },
-          controls: {
-            value: throwingEvidence,
-            enumerable: true,
-            writable: false,
-            configurable: false
-          }
+    const descriptorVariants = [
+      {
+        name: "writable worker class",
+        workerDeploymentClass: {
+          value: reservedLiveWorkerDeploymentClass,
+          enumerable: true,
+          writable: true,
+          configurable: false
+        },
+        controls: {
+          value: throwingEvidence,
+          enumerable: true,
+          writable: false,
+          configurable: false
         }
-      )
-    );
-    const configurableControlsWrapper = Object.preventExtensions(
-      Object.defineProperties(
-        {},
-        {
-          workerDeploymentClass: {
-            value: reservedLiveWorkerDeploymentClass,
-            enumerable: true,
-            writable: false,
-            configurable: false
-          },
-          controls: {
-            value: throwingEvidence,
-            enumerable: true,
-            writable: false,
-            configurable: true
-          }
+      },
+      {
+        name: "writable controls",
+        workerDeploymentClass: {
+          value: reservedLiveWorkerDeploymentClass,
+          enumerable: true,
+          writable: false,
+          configurable: false
+        },
+        controls: {
+          value: throwingEvidence,
+          enumerable: true,
+          writable: true,
+          configurable: false
         }
-      )
-    );
+      },
+      {
+        name: "configurable worker class",
+        workerDeploymentClass: {
+          value: reservedLiveWorkerDeploymentClass,
+          enumerable: true,
+          writable: false,
+          configurable: true
+        },
+        controls: {
+          value: throwingEvidence,
+          enumerable: true,
+          writable: false,
+          configurable: false
+        }
+      },
+      {
+        name: "configurable controls",
+        workerDeploymentClass: {
+          value: reservedLiveWorkerDeploymentClass,
+          enumerable: true,
+          writable: false,
+          configurable: false
+        },
+        controls: {
+          value: throwingEvidence,
+          enumerable: true,
+          writable: false,
+          configurable: true
+        }
+      }
+    ] satisfies Array<{
+      name: string;
+      workerDeploymentClass: PropertyDescriptor;
+      controls: PropertyDescriptor;
+    }>;
 
-    expect(Object.isFrozen(writableClassWrapper)).toBe(false);
-    expect(Object.isFrozen(configurableControlsWrapper)).toBe(false);
-    expect(() => liveWorkerDeploymentClassIsAuthorized(writableClassWrapper)).not.toThrow();
-    expect(() => liveWorkerDeploymentClassIsAuthorized(configurableControlsWrapper)).not.toThrow();
-    expect(liveWorkerDeploymentClassIsAuthorized(writableClassWrapper)).toBe(false);
-    expect(liveWorkerDeploymentClassIsAuthorized(configurableControlsWrapper)).toBe(false);
+    for (const variant of descriptorVariants) {
+      const wrapper = Object.preventExtensions(
+        Object.defineProperties(
+          {},
+          {
+            workerDeploymentClass: variant.workerDeploymentClass,
+            controls: variant.controls
+          }
+        )
+      );
+
+      expect(Object.isFrozen(wrapper), variant.name).toBe(false);
+      expect(() => liveWorkerDeploymentClassIsAuthorized(wrapper), variant.name).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(wrapper), variant.name).toBe(false);
+    }
   });
 
   it("rejects proxy-invalid authorization wrapper field descriptors without throwing", () => {

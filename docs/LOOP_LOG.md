@@ -3391,3 +3391,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 412  GREEN  live-worker-wrapper-field-descriptor-evidence  2026-05-22 11:58
+Objective:    Prove writable or configurable authorization-wrapper public fields cannot authorize the reserved live worker class.
+Changed:
+- Expanded live-worker wrapper descriptor coverage across both `workerDeploymentClass` and `controls` public fields.
+- Updated NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the symmetric wrapper-field descriptor boundary.
+- Kept `production-live-campaign` unsupported; no product features, live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
