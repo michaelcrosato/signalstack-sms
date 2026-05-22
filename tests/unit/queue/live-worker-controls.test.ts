@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   liveWorkerControlsAreFrozen,
   liveWorkerControlArrayExposesOnlyIndexedEntries,
+  liveWorkerControlEvidenceUsesFrozenDataDescriptors,
   liveWorkerControlIdsMatchRequiredChecklist,
   liveWorkerControlsExposeOnlyPublicFields,
   liveWorkerControlsAreImplemented,
@@ -157,6 +158,39 @@ describe("production live campaign worker controls", () => {
         controls: subclassControls
       })
     ).toBe(false);
+  });
+
+  it("requires frozen data descriptors before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const mutableImplementedControls = productionLiveCampaignWorkerControls.map((control) => ({
+      ...control,
+      status: "implemented" as const
+    }));
+    const mutableEntryControls = Object.freeze(
+      productionLiveCampaignWorkerControls.map((control) => ({
+        ...control,
+        status: "implemented" as const
+      }))
+    );
+    const frozenArrayWithMutableEntry = Object.freeze(
+      implementedControls.map((control, index) =>
+        index === 0
+          ? {
+              ...control
+            }
+          : Object.freeze({ ...control })
+      )
+    );
+
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(productionLiveCampaignWorkerControls)).toBe(true);
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls)).toBe(true);
+    expect(liveWorkerControlsAreImplemented(implementedControls)).toBe(true);
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(mutableImplementedControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(mutableImplementedControls)).toBe(false);
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(mutableEntryControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(mutableEntryControls)).toBe(false);
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(frozenArrayWithMutableEntry)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(frozenArrayWithMutableEntry)).toBe(false);
   });
 
   it("rejects control arrays with non-public fields before live-worker authorization", () => {
@@ -331,6 +365,7 @@ describe("production live campaign worker controls", () => {
 
     for (const controls of malformedInputs) {
       expect(liveWorkerControlsAreFrozen(controls)).toBe(false);
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).toBe(false);
       expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(false);
       expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(false);
       expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(false);

@@ -179,6 +179,45 @@ export function liveWorkerControlsAreFrozen(controls: unknown) {
   return Object.isFrozen(controls) && controls.every((control) => isControlRecord(control) && Object.isFrozen(control));
 }
 
+function descriptorIsFrozenDataField(
+  descriptor: PropertyDescriptor | undefined,
+  options: { enumerable: boolean }
+) {
+  return (
+    descriptor !== undefined &&
+    "value" in descriptor &&
+    descriptor.enumerable === options.enumerable &&
+    descriptor.writable === false &&
+    descriptor.configurable === false
+  );
+}
+
+export function liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls: unknown) {
+  if (!isReadonlyControlArray(controls) || !controlArrayIsDense(controls)) {
+    return false;
+  }
+
+  if (!descriptorIsFrozenDataField(Object.getOwnPropertyDescriptor(controls, "length"), { enumerable: false })) {
+    return false;
+  }
+
+  for (let index = 0; index < controls.length; index += 1) {
+    if (!descriptorIsFrozenDataField(Object.getOwnPropertyDescriptor(controls, String(index)), { enumerable: true })) {
+      return false;
+    }
+  }
+
+  return controls.every((control) => {
+    if (!isControlRecord(control)) {
+      return false;
+    }
+
+    return liveWorkerControlPublicFields.every((field) =>
+      descriptorIsFrozenDataField(Object.getOwnPropertyDescriptor(control, field), { enumerable: true })
+    );
+  });
+}
+
 export function liveWorkerControlsAreImplemented(controls: unknown = productionLiveCampaignWorkerControls) {
   if (!isReadonlyControlArray(controls)) {
     return false;
@@ -186,6 +225,7 @@ export function liveWorkerControlsAreImplemented(controls: unknown = productionL
 
   return (
     liveWorkerControlsAreFrozen(controls) &&
+    liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls) &&
     liveWorkerControlArrayExposesOnlyIndexedEntries(controls) &&
     liveWorkerControlsExposeOnlyPublicFields(controls) &&
     liveWorkerControlsUseSupportedStatuses(controls) &&
