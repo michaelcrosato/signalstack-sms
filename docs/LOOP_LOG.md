@@ -2882,3 +2882,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 352  GREEN  optional-request-prototype-auth-scan  2026-05-22 05:23
+Objective:    Prevent optional direct `Request?.prototype` body-reader forms from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize optional direct `Request?.prototype` and `Request?.["prototype"]` access before prototype body-reader checks.
+- Added synthetic auth unit coverage proving both optional direct prototype forms fail before the role gate while post-gate readers remain allowed.
+- Updated the testing contract, SUMMARY, BLOCKERS, and current state matrix for the optional Request prototype boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.

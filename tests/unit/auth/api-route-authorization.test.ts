@@ -856,6 +856,7 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
     .replace(new RegExp(`\\[\\s*["'\`](${requestBodyReaderNames})["'\`]\\s*\\]`, "g"), ".$1")
     .replace(new RegExp(`\\bglobalThis\\s*(?:\\?\\.)?\\[\\s*${literalRequestConstructorNamePattern}\\s*\\]`, "g"), "Request")
     .replace(/\bglobalThis\s*\??\.\s*Request\b/g, "Request")
+    .replace(/\bRequest\s*\??\.\s*prototype\b/g, "Request.prototype")
     .replace(/\bRequest\s*\[\s*\(?\s*["'`]prototype["'`]\s*(?:\)?\s+as\s+const\s*\)?|\)?)\s*\]/g, "Request.prototype")
     .replace(/\[\s*["'`]clone["'`]\s*\]/g, ".clone")
     .replace(/\[\s*["'`](call|apply|bind)["'`]\s*\]/g, ".$1")
@@ -1892,6 +1893,22 @@ describe("API route authorization coverage", () => {
         return Response.json({ size: payload.byteLength });
       }
     `;
+    const unsafeOptionalRequestPrototypeSource = `
+      export async function POST(req: Request) {
+        const payload = await Request?.prototype?.text.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeOptionalBracketRequestPrototypeSource = `
+      export async function PATCH(req: Request) {
+        const payload = await Request?.["prototype"]?.["json"]?.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
     const unsafeGlobalThisRequestAliasSource = `
       export async function PATCH(req: Request) {
         const RequestCtor = globalThis.Request;
@@ -2005,6 +2022,8 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeBracketPrototypeSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalThisPrototypeSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalGlobalThisPrototypeSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalRequestPrototypeSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalBracketRequestPrototypeSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalThisRequestAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedGlobalThisRequestAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedGlobalThisRequestAliasSource, "POST")).toBe(true);
