@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 353
+
+- Hardened `Request.prototype` object-alias body-reader authorization coverage.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now normalizes direct, assigned, destructured, and computed-destructured aliases of `Request.prototype` before standard body-reader checks, so `requestPrototype.json.call(req)` paths cannot parse a mutating-route request body before the handler's top-level `requireApiRole`.
+- Updated the testing contract, testing docs, and current state matrix for the `Request.prototype` object-alias boundary.
+- Focused auth coverage passed: `npm run test -- tests/unit/auth/api-route-authorization.test.ts`.
+- `.\scripts\local-gate.ps1` passed on 2026-05-22 05:35 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 46 unit test files / 391 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 352
 
 - Hardened direct `Request` constructor-alias body-reader authorization coverage.

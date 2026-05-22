@@ -2892,3 +2892,13 @@ Changed:
 Gate:         passed
 Commit/Saved: this commit
 Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
+## Run 353  GREEN  request-prototype-object-alias-auth-scan  2026-05-22 05:35
+Objective:    Prevent local `Request.prototype` object aliases from hiding body-reader calls before mutating-route role gates.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize direct, assigned, destructured, and computed-destructured aliases of `Request.prototype`.
+- Added synthetic auth unit coverage proving `requestPrototype.json.call(req)`, assigned bracket aliases, destructured aliases, and computed destructured aliases fail before the role gate.
+- Updated the testing contract, testing docs, SUMMARY, BLOCKERS, and current state matrix for the `Request.prototype` object-alias boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
