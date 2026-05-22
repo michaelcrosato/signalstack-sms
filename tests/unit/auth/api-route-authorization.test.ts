@@ -142,10 +142,10 @@ function bodySliceParsesRequestBody(bodySlice: string, requestParameterName = de
   }
 
   const destructuredReaderAliasPattern = new RegExp(
-    `\\b(?:const|let|var)\\s*\\{([^}]+)\\}\\s*=\\s*${escapedRequestParameterName}\\s*(?:;|\\r?\\n)`,
+    `\\b(?:const|let|var)\\s*\\{([^}]+)\\}\\s*=\\s*${escapedRequestParameterName}\\s*(?:\\.\\s*clone\\s*\\(\\s*\\))?\\s*(?:;|\\r?\\n)`,
     "g"
   );
-  const destructuredAliases = [...maskedBodySlice.matchAll(destructuredReaderAliasPattern)].flatMap((match) =>
+  const destructuredAliases = [...normalizedBodySlice.matchAll(destructuredReaderAliasPattern)].flatMap((match) =>
     match[1].split(",").flatMap((field) => {
       const fieldMatch = new RegExp(`^\\s*(${requestBodyReaderNames})\\s*(?::\\s*([A-Za-z_$][\\w$]*))?\\s*$`).exec(
         field
@@ -531,6 +531,40 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAliasSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("treats destructured cloned request body readers as body parsing for role-gate ordering", () => {
+    const unsafeDirectSource = `
+      export async function PATCH(req: Request) {
+        const { json } = req.clone();
+        const payload = await json.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeAliasSource = `
+      export async function PATCH(req: Request) {
+        const { text: readText } = req?.["clone"]?.();
+        const payload = await readText.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const safeSource = `
+      export async function PATCH(req: Request) {
+        const { formData: readFormData } = req.clone();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await readFormData.call(req);
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDirectSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAliasSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "PATCH")).toBe(false);
   });
 
   it("ignores comment and string mentions of requireApiRole before body-reader ordering checks", () => {

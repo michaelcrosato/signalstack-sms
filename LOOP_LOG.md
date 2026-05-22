@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 283  GREEN  destructured-cloned-request-body-reader-scan  2026-05-21 22:43
+Objective:    Prevent destructured cloned request body readers from bypassing mutating-route role-gate ordering checks.
+Changed:
+- Tightened the static mutating API authorization scanner to treat destructured standard `Request` body readers taken from `request.clone()` as body parsing.
+- Added synthetic auth unit coverage proving direct and optional-chained destructured cloned readers fail before the role gate and pass after it.
+- Updated the testing contract for the destructured cloned request reader boundary.
+Gate:         passed
+Commit/Saved: this commit
+Next:         Keep Phase 0 API authorization checks green while product demo, live-worker, provider, billing, live AI, notification, and secret gates remain stable.
+
 ## Run 277  GREEN  non-default-request-body-reader-scan  2026-05-21 22:13
 Objective:    Keep mutating API body-reader role-gate scans effective when handlers use non-default request parameter names.
 Changed:

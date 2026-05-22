@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 283
+
+- Hardened destructured cloned request body-reader authorization coverage for Run 283.
+- Latest repo truth: `tests/unit/auth/api-route-authorization.test.ts` now treats destructured standard `Request` body readers taken from `request.clone()` or optional-chained clone calls as body parsing that must remain after each mutating handler's own `requireApiRole` call, with signed Twilio webhook handlers remaining the only exception.
+- Updated the testing contract to name destructured cloned request-reader coverage.
+- Focused auth coverage, typecheck, contracts check, lint, and the protected local gate passed.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, Redis calls, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 281
 
 - Hardened comment/string role-gate marker authorization coverage for Run 281.
