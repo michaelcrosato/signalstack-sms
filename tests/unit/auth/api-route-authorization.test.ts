@@ -1978,6 +1978,55 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(safePropertyAliasSource, "DELETE")).toBe(false);
   });
 
+  it("treats direct request aliases with body-reader property aliases as body parsing for role-gate ordering", () => {
+    const unsafeRequestAliasPropertySource = `
+      export async function POST(req: Request) {
+        const bodySource = req;
+        const readerName = "json";
+        const payload = await bodySource[readerName]();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeAssignedPropertyAliasSource = `
+      export async function PATCH(req: Request) {
+        let readerName;
+        readerName = "arrayBuffer";
+        const payload = await req[readerName]?.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+    const unsafeCloneAliasPropertySource = `
+      export async function PUT(req: Request) {
+        const bodySource = req;
+        const cloned = bodySource.clone();
+        const readerName = ("text");
+        const payload = await cloned[readerName]();
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const safeRequestAliasPropertySource = `
+      export async function DELETE(req: Request) {
+        const bodySource = req;
+        const readerName = "formData";
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await bodySource[readerName]();
+        return Response.json(payload);
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeRequestAliasPropertySource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedPropertyAliasSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCloneAliasPropertySource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeRequestAliasPropertySource, "DELETE")).toBe(false);
+  });
+
   it("treats semicolonless cloned request aliases as body parsing for role-gate ordering", () => {
     const unsafeSource = `
       export async function POST(req: Request) {

@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 470
+
+- Added mutating API authorization coverage for direct request aliases with body-reader property names, including `bodySource[readerName]()`, assigned reader-name aliases, cloned request aliases, and a post-gate safe control.
+- Updated testing contracts/docs, NEXT_PROMPTS, and current state matrix for the request-alias property-reader boundary.
+- Focused check passed: `npm run test -- tests/unit/auth/api-route-authorization.test.ts`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 516 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 467
 
 - Added focused provider credential rotation API route coverage for `GET /api/settings/provider/rotations` and `GET /api/settings/provider/rotations/export`.

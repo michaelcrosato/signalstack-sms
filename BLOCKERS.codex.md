@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 470
+
+- No blocker from direct request-alias body-reader property coverage. Focused auth coverage and the protected local gate passed, proving `bodySource[readerName]()`, assigned reader-name aliases, cloned request aliases, and safe post-gate controls are classified correctly without executing API handlers, calling providers, billing, notifications, SMS, email, live AI, mutations, secrets, protected gate-script edits, destructive production actions, or live feature enablement.
+
 Run number: 467
 
 - No blocker from provider credential rotation route query coverage. Focused route coverage passed and proved unsupported JSON/CSV export filters stop before local rotation-history reads or CSV serialization, while supported bounded filters read only tenant-scoped redacted credential metadata without provider calls, token exposure, billing, notifications, SMS, email, live AI, mutations, secrets, protected gate-script edits, destructive production actions, or live feature enablement.

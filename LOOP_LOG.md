@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 470  GREEN  request-alias-reader-property-auth  2026-05-22 22:52
+Objective:    Prove direct request-alias body-reader property reads stay behind mutating-route role gates.
+Changed:
+- Added mutating API authorization coverage for `bodySource[readerName]()` and cloned request aliases before `requireApiRole`.
+- Added assigned reader-name alias coverage and a post-gate safe control for direct bracket property readers.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the request-alias property-reader boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable or continue static gate hardening without enabling live sends.
+
 ## Run 466  GREEN  readiness-audit-route-query-safety  2026-05-22 22:26
 Objective:    Prove readiness audit JSON and CSV export query validation stops unsafe filters before local reads or serialization.
 Changed:
