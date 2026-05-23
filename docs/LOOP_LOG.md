@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 551  GREEN  live-worker-revoked-webcrypto-controls-traps  2026-05-23 08:01
+Objective:    Prove revoked proxy-backed runtime-supported Web Crypto records cannot authorize the reserved live worker class as controls evidence without object-trap inspection.
+Changed:
+- Tightened live-worker unit coverage so revoked proxy-backed Web Crypto controls evidence denies without inspecting get, prototype, descriptor, or key traps.
+- Updated testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the revoked Web Crypto controls-evidence trap boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 549  GREEN  live-worker-webassembly-controls-evidence  2026-05-23 07:50
 Objective:    Prove runtime-supported WebAssembly records cannot authorize the reserved live worker class as controls evidence.
 Changed:

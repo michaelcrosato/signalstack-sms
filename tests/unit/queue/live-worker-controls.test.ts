@@ -2843,6 +2843,15 @@ describe("production live campaign worker controls", () => {
       const { proxy, revoke } = Proxy.revocable(target, {
         get: () => {
           throw new Error("revoked web crypto proxy controls get trap must not be read");
+        },
+        getPrototypeOf: () => {
+          throw new Error("revoked web crypto proxy controls prototype trap must not be read");
+        },
+        getOwnPropertyDescriptor: () => {
+          throw new Error("revoked web crypto proxy controls descriptor trap must not be read");
+        },
+        ownKeys: () => {
+          throw new Error("revoked web crypto proxy controls keys trap must not be read");
         }
       });
       revoke();
