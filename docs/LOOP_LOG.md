@@ -40,6 +40,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.
 
+## Run 469  GREEN  direct-request-reader-property-alias-auth  2026-05-22 22:49
+Objective:    Prove direct request body-reader property aliases stay behind mutating-route role gates.
+Changed:
+- Tightened the static mutating API authorization scanner to normalize body-reader property aliases such as `req[readerName]()` without breaking computed destructuring coverage.
+- Added coverage for direct, optional, cloned, and post-gate-safe request body-reader property alias forms.
+- Updated testing contract/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the property-alias boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 463  GREEN  provider-settings-update-route-safety  2026-05-22 22:04
 Objective:    Prove provider credential metadata updates stay authorization-gated and local-only.
 Changed:
