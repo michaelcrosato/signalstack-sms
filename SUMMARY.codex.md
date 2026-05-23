@@ -1,5 +1,13 @@
 # Codex Summary
 
+Run number: 484
+
+- Restored the missing append-only `docs/LOOP_LOG.md` entry for Run 483, aligning loop truth with `SUMMARY.codex.md`, `BLOCKERS.codex.md`, `docs/CURRENT_STATE_MATRIX.md`, and `docs/NEXT_PROMPTS.md`.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 520 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution outside validation, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 483
 
 - Added live-worker authorization-wrapper coverage proving extensible wrapper objects with frozen-looking public fields deny before supplied controls are inspected for the reserved `production-live-campaign` class.

@@ -3880,3 +3880,23 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 483  GREEN  live-worker-extensible-wrapper-evidence  2026-05-23 00:22
+Objective:    Prove extensible authorization wrappers cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker authorization-wrapper coverage proving extensible objects with frozen-looking public fields deny before supplied controls are inspected.
+- Updated NEXT_PROMPTS, current state matrix, blockers, and summary for the extensible-wrapper boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 484  GREEN  loop-log-run-483-truth-sync  2026-05-23 00:28
+Objective:    Restore append-only loop-log truth for the latest completed run.
+Changed:
+- Added the missing `docs/LOOP_LOG.md` Run 483 entry so the loop log matches the summary, blockers, current state matrix, and NEXT_PROMPTS truth.
+- Updated SUMMARY, BLOCKERS, current state matrix, and NEXT_PROMPTS for this Run 484 documentation truth sync.
+- Kept source behavior, product features, live sends, providers, billing, secrets, workers, Redis, protected gate scripts, and destructive production actions untouched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable or continue hardening static gates/live-worker controls without enabling live sends.
