@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 522  GREEN  codex-handoff-date-wrapper-sync  2026-05-23 05:08
+Objective:    Make top-level Codex handoff files lead with current repo truth after Run 521.
+Changed:
+- Updated SUMMARY, BLOCKERS, NEXT_PROMPTS, current state matrix, and root/docs loop logs so the latest handoff reflects the Date-shaped authorization-wrapper boundary.
+- Kept source behavior unchanged and `production-live-campaign` unsupported.
+- No live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 521  GREEN  live-worker-date-shaped-wrappers  2026-05-23 04:58
 Objective:    Prove Date-shaped authorization-wrapper impostors cannot authorize the reserved live worker class.
 Changed:

@@ -1,5 +1,24 @@
 # Codex Summary
 
+Run number: 522
+
+- Synchronized top-level Codex handoff truth after Run 521 so `SUMMARY.codex.md`, `BLOCKERS.codex.md`, `docs/NEXT_PROMPTS.md`, `docs/CURRENT_STATE_MATRIX.md`, and both loop logs lead with the current Date-shaped authorization-wrapper boundary.
+- No source behavior changed; `production-live-campaign` remains unsupported and live SMS, providers, billing, notifications, live AI, real secrets, worker execution, protected gate scripts, and destructive production actions stayed untouched.
+- Focused checks passed: `npm run contracts:check`, `npm run production-worker:check`, and `git diff --check`.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 548 tests, Playwright smoke, and build green.
+
+## Previous Run
+
+Run number: 521
+
+- Added live-worker unit coverage proving Date-shaped authorization-wrapper impostors cannot authorize the reserved `production-live-campaign` worker class.
+- Proved ordinary, exact-field frozen, proxy-backed, reflection-trapped, and revoked proxy-backed Date-shaped wrapper evidence denies before supplied controls are inspected; `production-live-campaign` remains unsupported.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, BLOCKERS, and current state matrix for the Date-shaped authorization-wrapper boundary.
+- Focused queue coverage passed; the protected local gate passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 548 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 519
 
 - Added live-worker unit coverage proving ArrayBuffer and runtime-supported SharedArrayBuffer authorization-wrapper impostors cannot authorize the reserved `production-live-campaign` worker class.

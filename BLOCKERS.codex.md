@@ -1,5 +1,13 @@
 # Codex Blockers
 
+Run number: 522
+
+- No blocker from top-level Codex handoff truth synchronization after Run 521. This docs/log-only iteration does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+Run number: 521
+
+- No blocker from Date-shaped authorization-wrapper impostor coverage. Focused queue coverage and the protected local gate passed. The change adds local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
 Run number: 519
 
 - No blocker from ArrayBuffer and SharedArrayBuffer authorization-wrapper impostor coverage. Focused queue coverage, typecheck, and the protected local gate passed. The change adds local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
