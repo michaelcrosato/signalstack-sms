@@ -1,11 +1,11 @@
 # Codex Summary
 
-Run number: 546
+Run number: 547
 
-- Added live-worker unit coverage proving accessor-backed `workerDeploymentClass` or `controls` public fields on otherwise frozen authorization wrappers cannot authorize the reserved `production-live-campaign` worker class.
-- Covered denial before supplied controls are inspected and without reading wrapper public-field getters.
-- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 109 tests.
-- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 561 tests, Playwright smoke, and build green.
+- Added live-worker unit coverage proving runtime-supported Web-platform records cannot authorize the reserved `production-live-campaign` worker class as ordinary or proxy-backed `controls` evidence.
+- The proxy-backed evidence case denies without inspecting `get`, prototype, descriptor, or key traps.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 111 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 563 tests, Playwright smoke, and build green.
 - No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
 
 ## Previous Run
@@ -4287,3 +4287,4 @@ Latest live-worker duplicate-entry-key coverage proves proxy-backed `production-
 - Latest live-worker Date-shaped wrapper hardening proves `Date` authorization-wrapper impostors deny in ordinary, exact-field frozen, proxy-backed, reflection-trapped, and revoked proxy-backed forms before supplied controls are inspected. Focused unit coverage passed; the change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
 - Latest live-worker boxed primitive wrapper hardening proves boxed `Symbol` and boxed `BigInt` authorization-wrapper impostors deny in ordinary, exact-field frozen, proxy-backed, reflection-trapped, and revoked proxy-backed forms before supplied controls are inspected. Focused unit coverage passed; the change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
 - Latest live-worker boxed primitive deployment-class hardening proves boxed `Symbol` and boxed `BigInt` records cannot impersonate `workerDeploymentClass` for the reserved `production-live-campaign` worker class and deny before supplied controls are inspected. Focused unit coverage and the protected local gate passed; the change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+- Latest live-worker Web-platform controls-evidence coverage proves runtime-supported Web-platform records deny as ordinary or proxy-backed `controls` evidence before the reserved `production-live-campaign` worker class can authorize, without inspecting proxy object traps. Focused unit coverage passed; the change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

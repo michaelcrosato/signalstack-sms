@@ -1,8 +1,8 @@
 # Codex Blockers
 
-Run number: 546
+Run number: 547
 
-- No blocker from accessor-backed authorization-wrapper public-field live-worker coverage. Focused queue coverage and the protected local gate passed. The change adds local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+- No blocker from Web-platform controls-evidence live-worker coverage. Focused queue coverage and the protected local gate passed. The change adds local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
 
 Run number: 545
 
@@ -1390,3 +1390,4 @@ No blocker from the latest contract route inventory hardening. The change tighte
 - No blocker from the latest live-worker Date-shaped wrapper hardening. The change adds local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
 - No blocker from the latest live-worker boxed primitive wrapper hardening. The change adds local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
 - No blocker from the latest live-worker boxed primitive deployment-class hardening. Boxed `Symbol` and boxed `BigInt` deployment-class impostors remain unauthorized before supplied controls are inspected; the protected local gate passed. The change adds local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+- No blocker from the latest live-worker Web-platform controls-evidence coverage. Focused unit coverage passed; the change adds local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

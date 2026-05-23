@@ -4894,3 +4894,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 547  GREEN  live-worker-web-platform-controls-evidence  2026-05-23 07:40
+Objective:    Prove runtime-supported Web-platform records cannot authorize the reserved live worker class as controls evidence.
+Changed:
+- Added live-worker unit coverage showing runtime-supported Web-platform records deny as ordinary `controls` evidence.
+- Added proxy-backed Web-platform controls-evidence coverage proving proxy object traps are not inspected before denial.
+- Updated NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the Web-platform controls-evidence boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

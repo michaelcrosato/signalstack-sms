@@ -2624,6 +2624,54 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects runtime-supported Web-platform controls evidence without authorizing", () => {
+    for (const controls of webPlatformBuiltInTargets()) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).toBe(false);
+    }
+  });
+
+  it("rejects proxy-backed Web-platform controls evidence without inspecting object traps", () => {
+    const proxyControlsEvidence = webPlatformBuiltInTargets().map(
+      (target) =>
+        new Proxy(target, {
+          get: () => {
+            throw new Error("web-platform proxy controls get trap must not be read");
+          },
+          getPrototypeOf: () => {
+            throw new Error("web-platform proxy controls prototype trap must not be read");
+          },
+          getOwnPropertyDescriptor: () => {
+            throw new Error("web-platform proxy controls descriptor trap must not be read");
+          },
+          ownKeys: () => {
+            throw new Error("web-platform proxy controls keys trap must not be read");
+          }
+        })
+    );
+
+    for (const controls of proxyControlsEvidence) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects runtime-supported Web Crypto controls evidence without authorizing", async () => {
     const cryptoTargets = await webCryptoBuiltInTargets();
 
