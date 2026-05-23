@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 451
+
+- No blocker from schema-invalid campaign schedule JSON coverage. Focused route coverage and the protected local gate passed and proved no local queue scheduling or BullMQ enqueue helpers run for invalid schedule payloads. No workers, live sends, provider calls, Redis effects, billing, notifications, live AI, secrets, live feature enablement, protected gate-script edits, hard deletion, or destructive production actions were used.
+
 Run number: 450
 
 - No blocker from malformed campaign schedule JSON coverage. Focused route coverage and the protected local gate passed and proved no local queue scheduling or BullMQ enqueue helpers run for malformed request bodies. No workers, live sends, provider calls, Redis effects, billing, notifications, live AI, secrets, live feature enablement, protected gate-script edits, hard deletion, or destructive production actions were used.
