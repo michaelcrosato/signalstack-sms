@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 525 note: live-worker authorization now denies boxed `Symbol` and boxed `BigInt` authorization-wrapper impostors in ordinary, exact-field frozen, proxy-backed, reflection-trapped, and revoked proxy-backed forms before supplied controls are inspected.
+
 Run 524 note: live-worker authorization now denies URL-shaped `controls` evidence, including `URL` and `URLSearchParams`, in ordinary, proxy-backed, and revoked proxy-backed forms before supplied controls can be treated as the future live-worker checklist.
 
 Run 523 note: live-worker authorization now denies URL-shaped authorization-wrapper impostors, including `URL` and `URLSearchParams`, in ordinary, exact-field frozen, proxy-backed, reflection-trapped, and revoked proxy-backed forms before supplied controls are inspected.
@@ -64,7 +66,7 @@ Run 495 note: live-worker authorization now denies built-in object-shaped deploy
 
 Run 494 note: live-worker authorization now evaluates exact frozen control-entry evidence without reading inherited `Object.prototype` accessors for `id`, `status`, or `requirement`.
 
-Latest protected local gate for Run 524: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 548 tests, Playwright smoke, and build green.
+Latest protected local gate for Run 525: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 548 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 

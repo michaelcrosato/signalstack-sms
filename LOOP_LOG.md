@@ -4677,3 +4677,12 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+## Run 525  GREEN  live-worker-boxed-symbol-bigint-wrappers  2026-05-23 05:23
+Objective:    Prove boxed `Symbol` and boxed `BigInt` authorization-wrapper impostors cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing boxed `Symbol` and boxed `BigInt` wrapper evidence denies in ordinary, exact-field frozen, proxy-backed, reflection-trapped, and revoked proxy-backed forms before supplied controls are inspected.
+- Updated queue contract, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the boxed primitive authorization-wrapper boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
