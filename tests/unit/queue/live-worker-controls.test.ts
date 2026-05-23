@@ -3358,6 +3358,66 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerDeploymentClassIsAuthorized(taggedWrapper)).toBe(false);
   });
 
+  it("rejects accessor-backed authorization wrapper public fields before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("accessor-backed authorization wrappers must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("accessor-backed authorization wrappers must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("accessor-backed authorization wrappers must not inspect control evidence");
+      }
+    });
+    const accessorClassWrapper = Object.freeze(
+      Object.defineProperties(
+        {},
+        {
+          workerDeploymentClass: {
+            enumerable: true,
+            configurable: false,
+            get: () => {
+              throw new Error("worker deployment class getter must not be read");
+            }
+          },
+          controls: {
+            value: throwingEvidence,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          }
+        }
+      )
+    );
+    const accessorControlsWrapper = Object.freeze(
+      Object.defineProperties(
+        {},
+        {
+          workerDeploymentClass: {
+            value: reservedLiveWorkerDeploymentClass,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          },
+          controls: {
+            enumerable: true,
+            configurable: false,
+            get: () => {
+              throw new Error("controls getter must not be read");
+            }
+          }
+        }
+      )
+    );
+
+    for (const input of [accessorClassWrapper, accessorControlsWrapper]) {
+      expect(Object.isFrozen(input)).toBe(true);
+      expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
+    }
+  });
+
   it("rejects non-frozen authorization wrapper descriptors before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const throwingEvidence = new Proxy(implementedControls, {

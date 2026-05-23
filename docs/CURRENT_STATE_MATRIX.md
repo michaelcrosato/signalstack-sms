@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 546 note: live-worker authorization now denies accessor-backed `workerDeploymentClass` or `controls` public fields on otherwise frozen authorization wrappers before supplied controls are inspected or getters are read.
+
 Run 545 note: top-level loop truth now records that root `LOOP_LOG.md` preserved Run 543 while `docs/LOOP_LOG.md` skipped that entry before Run 544; the discrepancy is documented without rewriting prior log entries.
 
 Run 544 note: live-worker authorization now denies sealed-but-writable authorization wrappers before supplied controls are inspected.
@@ -106,7 +108,7 @@ Run 495 note: live-worker authorization now denies built-in object-shaped deploy
 
 Run 494 note: live-worker authorization now evaluates exact frozen control-entry evidence without reading inherited `Object.prototype` accessors for `id`, `status`, or `requirement`.
 
-Latest protected local gate for Run 545: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 560 tests, Playwright smoke, and build green.
+Latest protected local gate for Run 546: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 561 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 

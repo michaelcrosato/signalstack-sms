@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 546
+
+- Added live-worker unit coverage proving accessor-backed `workerDeploymentClass` or `controls` public fields on otherwise frozen authorization wrappers cannot authorize the reserved `production-live-campaign` worker class.
+- Covered denial before supplied controls are inspected and without reading wrapper public-field getters.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 109 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 561 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 545
 
 - Synchronized top-level handoff truth after finding root `LOOP_LOG.md` contains Run 543 while `docs/LOOP_LOG.md` skipped from Run 542 to Run 544.

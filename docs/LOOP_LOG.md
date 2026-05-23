@@ -4348,3 +4348,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 546  GREEN  live-worker-accessor-wrapper-fields  2026-05-23 07:36
+Objective:    Prove accessor-backed authorization-wrapper public fields cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing accessor-backed `workerDeploymentClass` and `controls` public fields on otherwise frozen authorization wrappers deny before supplied controls are inspected or getters are read.
+- Updated TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the accessor-backed wrapper-field boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
