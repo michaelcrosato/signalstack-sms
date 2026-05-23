@@ -4428,3 +4428,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 554  GREEN  live-worker-proxy-typed-array-class  2026-05-23 08:22
+Objective:    Prove proxy-backed and revoked proxy-backed typed-array values cannot authorize the reserved live worker class as deployment-class evidence.
+Changed:
+- Added live-worker unit coverage showing proxy-backed runtime-supported typed-array constructor values deny without inspecting get, prototype, descriptor, or key traps.
+- Added revoked proxy-backed typed-array deployment-class coverage showing denial stays clean before supplied controls are inspected.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the proxy typed-array deployment-class boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

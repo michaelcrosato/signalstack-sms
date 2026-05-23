@@ -3233,6 +3233,59 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects proxy-backed typed-array deployment class impostors before inspecting supplied controls", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("proxy-backed typed-array worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("proxy-backed typed-array worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("proxy-backed typed-array worker classes must not inspect control evidence");
+      }
+    });
+    const proxiedTypedArrayClasses = typedArrayBuiltInTargets().map(
+      (target) =>
+        new Proxy(Object.freeze(target), {
+          get: () => {
+            throw new Error("proxy-backed typed-array worker class values must not be read");
+          },
+          getPrototypeOf: () => {
+            throw new Error("proxy-backed typed-array worker class prototypes must not be read");
+          },
+          getOwnPropertyDescriptor: () => {
+            throw new Error("proxy-backed typed-array worker class descriptors must not be read");
+          },
+          ownKeys: () => {
+            throw new Error("proxy-backed typed-array worker class keys must not be read");
+          }
+        })
+    );
+    const revokedTypedArrayClasses = typedArrayBuiltInTargets().map((target) => {
+      const { proxy, revoke } = Proxy.revocable(Object.freeze(target), {
+        get: () => {
+          throw new Error("revoked typed-array worker class values must not be read");
+        }
+      });
+      revoke();
+      return proxy;
+    });
+
+    for (const workerDeploymentClass of [...proxiedTypedArrayClasses, ...revokedTypedArrayClasses]) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("does not read deployment class toStringTag accessors before denying authorization", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {
