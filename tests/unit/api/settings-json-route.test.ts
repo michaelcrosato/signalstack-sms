@@ -4,7 +4,7 @@ import { POST as preflightCampaignRoute } from "@/app/api/campaigns/[campaignId]
 import { POST as liveTestSmsRoute } from "@/app/api/demo/live-test-sms/route";
 import { PATCH as updateComplianceRoute } from "@/app/api/settings/compliance/route";
 import { POST as upsertNumberRoute } from "@/app/api/settings/numbers/route";
-import { PATCH as updateProviderRoute } from "@/app/api/settings/provider/route";
+import { DELETE as deleteProviderRoute, PATCH as updateProviderRoute } from "@/app/api/settings/provider/route";
 
 const mocks = vi.hoisted(() => ({
   getOrCreateComplianceProfile: vi.fn(),
@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
   recordUsageEvent: vi.fn(),
   requireApiRole: vi.fn(),
   sendLiveTestSms: vi.fn(),
+  deleteProviderCredentialMetadata: vi.fn(),
   updateComplianceProfile: vi.fn(),
   upsertProviderCredentialMetadata: vi.fn(),
   upsertProviderPhoneNumber: vi.fn()
@@ -50,7 +51,7 @@ vi.mock("@/lib/db/repositories/compliance", () => ({
 }));
 
 vi.mock("@/lib/db/repositories/provider-credentials", () => ({
-  deleteProviderCredentialMetadata: vi.fn(),
+  deleteProviderCredentialMetadata: mocks.deleteProviderCredentialMetadata,
   getProviderCredential: mocks.getProviderCredential,
   upsertProviderCredentialMetadata: mocks.upsertProviderCredentialMetadata
 }));
@@ -151,6 +152,59 @@ describe("settings and operations JSON mutation routes", () => {
     });
     expect(mocks.upsertProviderCredentialMetadata).not.toHaveBeenCalled();
     expect(mocks.getProviderSettings).not.toHaveBeenCalled();
+  });
+
+  it("denies provider metadata deletion before clearing local credentials", async () => {
+    const denial = Response.json({ error: "Forbidden" }, { status: 403 });
+    mocks.requireApiRole.mockReturnValue(denial);
+
+    const response = await deleteProviderRoute();
+
+    expect(response.status).toBe(403);
+    expect(mocks.deleteProviderCredentialMetadata).not.toHaveBeenCalled();
+    expect(mocks.getOrCreateComplianceProfile).not.toHaveBeenCalled();
+    expect(mocks.getProviderSettings).not.toHaveBeenCalled();
+  });
+
+  it("clears only local provider metadata before rendering secret-safe settings", async () => {
+    mocks.getOrCreateComplianceProfile.mockResolvedValue({
+      id: "compliance_demo",
+      orgId: "org_demo",
+      businessName: "SignalStack Demo",
+      messagingUseCase: "Demo updates",
+      optInDescription: "Website form",
+      privacyPolicyUrl: "https://example.com/privacy",
+      termsOfServiceUrl: "https://example.com/terms",
+      a2pRegistrationStatus: "PENDING"
+    });
+    mocks.getProviderSettings.mockReturnValue({
+      selectedProvider: "dummy",
+      liveMessagingAllowed: false,
+      twilio: { configured: false }
+    });
+
+    const response = await deleteProviderRoute();
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      providerSettings: {
+        selectedProvider: "dummy",
+        liveMessagingAllowed: false,
+        twilio: { configured: false }
+      }
+    });
+    expect(mocks.deleteProviderCredentialMetadata).toHaveBeenCalledWith("org_demo", "twilio", {
+      actorUserId: "user_demo"
+    });
+    expect(mocks.getProviderSettings).toHaveBeenCalledWith(
+      expect.objectContaining({
+        demoMode: true,
+        liveMessagingEnabled: false,
+        messagingProvider: "dummy",
+        providerCredential: null
+      })
+    );
+    expect(mocks.upsertProviderCredentialMetadata).not.toHaveBeenCalled();
   });
 
   it("rejects malformed live-test SMS JSON without attempting the gated send path", async () => {

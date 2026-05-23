@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 461  GREEN  provider-settings-delete-route-safety  2026-05-22 21:50
+Objective:    Prove provider credential metadata deletion stays authorization-gated and local-only.
+Changed:
+- Added route-level coverage for denied provider settings deletion returning before local credential metadata is cleared.
+- Added successful deletion coverage proving only local Twilio metadata is cleared before rendering secret-safe provider settings with no credential upsert.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the provider metadata deletion safety boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.
+
 ## Run 451  GREEN  campaign-schedule-invalid-schema  2026-05-22
 Objective:    Prove schema-invalid campaign schedule JSON cannot create local queue work.
 Changed:

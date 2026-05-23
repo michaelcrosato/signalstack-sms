@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 461
+
+- No blocker from provider settings delete route safety coverage. Focused route coverage and the protected local gate passed and proved denied roles do not clear local credential metadata, while successful deletion clears only local Twilio credential metadata before rendering secret-safe provider settings. No live sends, provider calls, Redis effects, billing provider calls, notifications, live AI, secrets, live feature enablement, protected gate-script edits, hard deletion, or destructive production actions were used.
+
 Run number: 460
 
 - No blocker from malformed settings/operations JSON hardening. Focused route coverage and the protected local gate passed and proved malformed billing usage, campaign preflight, compliance settings, provider number metadata, provider settings, and live-test SMS request bodies return `400` before local usage records, local preflight repository work, compliance updates, readiness audit writes, provider metadata writes, provider settings rendering, or gated live-test send helpers can run. No live sends, provider calls, Redis effects, billing provider calls, notifications, live AI, secrets, live feature enablement, protected gate-script edits, hard deletion, or destructive production actions were used.

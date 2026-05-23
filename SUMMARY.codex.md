@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 461
+
+- Added focused provider settings delete route coverage proving role denials return before local credential metadata is cleared.
+- Added successful delete coverage proving `DELETE /api/settings/provider` clears only local Twilio credential metadata, passes `providerCredential: null` into the secret-safe provider settings renderer, and does not upsert credentials.
+- Updated testing contracts/docs, NEXT_PROMPTS, and current state matrix for the provider metadata deletion safety boundary.
+- Focused checks passed: `npm run test -- tests/unit/api/settings-json-route.test.ts`, `npm run contracts:check`, and `npm run typecheck`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 55 Vitest files / 486 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 460
 
 - Hardened billing usage, campaign preflight, compliance settings, provider number metadata, provider settings, and live-test SMS mutation routes so malformed JSON returns `400` with the documented invalid payload shape instead of throwing or falling through to local work.
