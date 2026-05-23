@@ -1856,6 +1856,29 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects revoked proxy-backed non-array controls evidence without throwing", () => {
+    const { proxy: revokedProxyControls, revoke } = Proxy.revocable(
+      {
+        0: implementedFrozenControls()[0],
+        length: productionLiveCampaignWorkerControls.length
+      },
+      {}
+    );
+
+    revoke();
+
+    expect(() =>
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, revokedProxyControls)
+      )
+    ).not.toThrow();
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, revokedProxyControls)
+      )
+    ).toBe(false);
+  });
+
   it("rejects proxy-backed control evidence without throwing", () => {
     const implementedControls = implementedFrozenControls();
     const throwingArrayLengthDescriptorProxy = new Proxy([...implementedControls], {
