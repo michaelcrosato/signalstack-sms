@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 492
+
+- Removed an inherited-iterator dependency from live-worker control-array key evaluation so exact frozen `production-live-campaign` evidence is checked through descriptors, not ambient array iteration.
+- Added live-worker authorization coverage proving a poisoned inherited `Array.prototype[Symbol.iterator]` is not read while exact frozen control evidence still evaluates correctly.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, and current state matrix for the inherited array-iterator boundary.
+- Focused check passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 74 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 526 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 491
 
 - Added live-worker authorization coverage proving custom iterator metadata on otherwise valid-looking supplied control arrays cannot authorize the reserved `production-live-campaign` class and is not invoked.

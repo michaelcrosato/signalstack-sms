@@ -3950,3 +3950,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 492  GREEN  live-worker-inherited-array-iterator  2026-05-23 01:25
+Objective:    Prove inherited array iterator hooks cannot influence exact frozen live-worker control evidence evaluation.
+Changed:
+- Removed array-spread key construction from live-worker control-array evidence checks so the helper does not read ambient `Array.prototype[Symbol.iterator]`.
+- Added queue unit coverage proving a poisoned inherited array iterator is not read while exact frozen `production-live-campaign` evidence still evaluates through descriptors.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the inherited array-iterator boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
