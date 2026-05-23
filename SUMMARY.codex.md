@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 482
+
+- Added live-worker authorization-wrapper coverage proving tampered-prototype wrapper objects cannot satisfy the frozen ordinary-object evidence contract for the reserved `production-live-campaign` class.
+- Updated the queue contract, production worker policy, NEXT_PROMPTS, current state matrix, blockers, and loop log for the tampered-prototype wrapper boundary.
+- Focused checks passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts`, `npm run production-worker:check`, `npm run contracts:check`, and `npm run typecheck`.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 519 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution outside validation, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 480
 
 - Added live-worker authorization-wrapper coverage proving symbol-keyed `workerDeploymentClass`/`controls` impersonators do not satisfy the required string public fields and deny before supplied controls are inspected.

@@ -2840,6 +2840,47 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects tampered authorization wrapper prototypes before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("tampered wrapper prototypes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("tampered wrapper prototypes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("tampered wrapper prototypes must not inspect control evidence");
+      }
+    });
+    const customPrototypeWrapper = Object.freeze(
+      Object.create(
+        {
+          reviewerBypass() {
+            return true;
+          }
+        },
+        {
+          workerDeploymentClass: {
+            value: reservedLiveWorkerDeploymentClass,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          },
+          controls: {
+            value: throwingEvidence,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          }
+        }
+      )
+    );
+
+    expect(Object.isFrozen(customPrototypeWrapper)).toBe(true);
+    expect(() => liveWorkerDeploymentClassIsAuthorized(customPrototypeWrapper)).not.toThrow();
+    expect(liveWorkerDeploymentClassIsAuthorized(customPrototypeWrapper)).toBe(false);
+  });
+
   it("does not execute authorization wrapper get traps while denying unsupported classes", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       get: () => {
