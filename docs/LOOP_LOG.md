@@ -3721,12 +3721,23 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.
+
 ## Run 458  GREEN  inbox-json-malformed-mutations  2026-05-22 21:30
 Objective:    Prove malformed inbox/demo inbound JSON cannot throw past local validation or mutate inbox records.
 Changed:
 - Hardened inbox/demo inbound mutation routes to return documented `400` invalid payload responses for malformed JSON.
 - Added route-level coverage proving malformed conversation create, demo inbound, message create, assign, note, and resolve bodies do not call local inbox repository mutations.
 - Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the malformed inbox JSON mutation boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.
+
+## Run 459  GREEN  ai-json-malformed-mutations  2026-05-22 21:36
+Objective:    Prove malformed fake-AI request JSON cannot throw past local validation or meter AI usage.
+Changed:
+- Hardened fake-AI mutation routes to return documented `400` invalid AI payload responses for malformed JSON.
+- Added route-level coverage proving malformed campaign-copy, reply-suggestion, conversation-summary, and lead-qualification bodies do not run fake provider logic, resolve conversation messages, or record local `AI_REQUEST` usage.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the malformed fake-AI JSON boundary.
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.

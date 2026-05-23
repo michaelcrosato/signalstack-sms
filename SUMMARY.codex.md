@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 459
+
+- Hardened fake AI mutation routes so malformed JSON returns `400` with the documented invalid AI payload shape instead of throwing before validation.
+- Added route-level coverage proving malformed `POST /api/ai/campaign-copy`, `POST /api/ai/reply-suggestion`, `POST /api/ai/conversation-summary`, and `POST /api/ai/lead-qualification` bodies do not run fake provider logic, resolve conversation messages, or meter local `AI_REQUEST` usage.
+- Updated the testing contract, testing docs, NEXT_PROMPTS, and current state matrix for the malformed fake-AI JSON boundary.
+- Focused checks passed: `npm run test -- tests/unit/api/ai-json-route.test.ts tests/unit/ai/api-usage-metering.test.ts tests/unit/ai/fake-ai-provider.test.ts`, `npm run contracts:check`, and `npm run typecheck`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 54 Vitest files / 478 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 457
 
 - Hardened contact create/update/merge/import routes so malformed JSON returns `400` with the documented invalid contact/import payload shape instead of throwing before validation.

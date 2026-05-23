@@ -14,7 +14,8 @@ export async function POST(request: Request) {
     return roleResponse;
   }
 
-  const payload = conversationAiRequestSchema.safeParse(await request.json());
+  const rawPayload = await request.json().catch(() => undefined);
+  const payload = conversationAiRequestSchema.safeParse(rawPayload);
 
   if (!payload.success) {
     return NextResponse.json({ error: "Invalid reply suggestion payload.", issues: payload.error.issues }, { status: 400 });
