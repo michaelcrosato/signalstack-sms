@@ -5788,6 +5788,52 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerDeploymentClassIsAuthorized(wrapper)).toBe(false);
   });
 
+  it("rejects authorization wrappers with own coercion metadata before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("own coercion wrapper metadata must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("own coercion wrapper metadata must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("own coercion wrapper metadata must not inspect control evidence");
+      }
+    });
+    const wrapper = Object.freeze(
+      Object.defineProperties(
+        {
+          workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+          controls: throwingEvidence
+        },
+        {
+          [Symbol.toPrimitive]: {
+            enumerable: false,
+            value: () => {
+              throw new Error("own wrapper Symbol.toPrimitive must not be invoked");
+            }
+          },
+          toString: {
+            enumerable: false,
+            value: () => {
+              throw new Error("own wrapper toString must not be invoked");
+            }
+          },
+          valueOf: {
+            enumerable: false,
+            value: () => {
+              throw new Error("own wrapper valueOf must not be invoked");
+            }
+          }
+        }
+      )
+    );
+
+    expect(Object.isFrozen(wrapper)).toBe(true);
+    expect(() => liveWorkerDeploymentClassIsAuthorized(wrapper)).not.toThrow();
+    expect(liveWorkerDeploymentClassIsAuthorized(wrapper)).toBe(false);
+  });
+
   it("does not execute authorization wrapper get traps while denying unsupported classes", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       get: () => {

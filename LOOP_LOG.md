@@ -5134,3 +5134,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 571  GREEN  live-worker-own-coercion-wrapper  2026-05-23 10:07
+Objective:    Prove authorization wrappers with own coercion metadata deny before hostile supplied controls are inspected.
+Changed:
+- Added live-worker unit coverage showing own `Symbol.toPrimitive`, `toString`, and `valueOf` wrapper hooks are not invoked and hostile controls are not inspected.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the own-coercion wrapper boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
