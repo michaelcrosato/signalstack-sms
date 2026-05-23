@@ -3271,6 +3271,66 @@ describe("production live campaign worker controls", () => {
     ).toBe(true);
   });
 
+  it("does not read inherited control-entry accessors while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const objectPrototype = Object.prototype as Record<string, unknown>;
+    const originalIdDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "id");
+    const originalStatusDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "status");
+    const originalRequirementDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "requirement");
+
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperties(Object.prototype, {
+        id: {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited control-entry id getter must not be read");
+          }
+        },
+        status: {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited control-entry status getter must not be read");
+          }
+        },
+        requirement: {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited control-entry requirement getter must not be read");
+          }
+        }
+      });
+
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalIdDescriptor === undefined) {
+        delete objectPrototype.id;
+      } else {
+        Object.defineProperty(Object.prototype, "id", originalIdDescriptor);
+      }
+
+      if (originalStatusDescriptor === undefined) {
+        delete objectPrototype.status;
+      } else {
+        Object.defineProperty(Object.prototype, "status", originalStatusDescriptor);
+      }
+
+      if (originalRequirementDescriptor === undefined) {
+        delete objectPrototype.requirement;
+      } else {
+        Object.defineProperty(Object.prototype, "requirement", originalRequirementDescriptor);
+      }
+    }
+
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 

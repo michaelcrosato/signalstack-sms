@@ -3970,3 +3970,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 494  GREEN  live-worker-inherited-control-entry-accessors  2026-05-23 01:41
+Objective:    Prove inherited `Object.prototype` control-entry accessors cannot influence exact frozen live-worker control evidence.
+Changed:
+- Added queue unit coverage proving inherited `id`, `status`, and `requirement` getters on `Object.prototype` are not read while exact frozen supplied controls evaluate through own descriptors.
+- Updated queue/testing contracts, production worker policy, PLAN, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the inherited control-entry accessor boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
