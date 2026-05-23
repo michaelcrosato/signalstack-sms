@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 505
+
+- Added live-worker unit coverage proving proxy-backed typed-array `controls` evidence cannot authorize the reserved `production-live-campaign` worker class.
+- Proved the proxy-backed typed-array evidence denies without reading `get`, prototype, descriptor, or key traps; `production-live-campaign` remains unsupported.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, and current state matrix for the proxy-backed typed-array controls-evidence boundary.
+- Focused check passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 84 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 536 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 504
 
 - Added live-worker unit coverage proving revoked proxy-backed array-prototype impostor `controls` evidence cannot authorize the reserved `production-live-campaign` worker class.
