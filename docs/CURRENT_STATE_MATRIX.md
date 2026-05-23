@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 542 note: live-worker authorization now denies exact-field non-ordinary authorization-wrapper impostors, including frozen null-prototype and class-instance wrappers with exact public data descriptors, before supplied controls are inspected.
+
 Run 541 note: live-worker authorization now denies revoked proxy-backed non-ordinary authorization-wrapper impostors, including null-prototype and class-instance wrappers, before supplied controls are inspected or wrapper fields are read.
 
 Run 540 note: live-worker authorization now denies proxy-backed non-ordinary authorization-wrapper impostors, including null-prototype and class-instance wrappers, before supplied controls are inspected or wrapper fields are read.
@@ -98,7 +100,7 @@ Run 495 note: live-worker authorization now denies built-in object-shaped deploy
 
 Run 494 note: live-worker authorization now evaluates exact frozen control-entry evidence without reading inherited `Object.prototype` accessors for `id`, `status`, or `requirement`.
 
-Latest protected local gate for Run 541: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 558 tests, Playwright smoke, and build green.
+Latest protected local gate for Run 542: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 559 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 

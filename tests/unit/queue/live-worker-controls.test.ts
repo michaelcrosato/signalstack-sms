@@ -4155,6 +4155,48 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects exact-field non-ordinary authorization wrappers before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("exact-field non-ordinary wrappers must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("exact-field non-ordinary wrappers must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("exact-field non-ordinary wrappers must not inspect control evidence");
+      }
+    });
+    const defineExactWrapperFields = <T extends object>(target: T) =>
+      Object.freeze(
+        Object.defineProperties(target, {
+          workerDeploymentClass: {
+            value: reservedLiveWorkerDeploymentClass,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          },
+          controls: {
+            value: throwingEvidence,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          }
+        })
+      );
+    const nullPrototypeWrapper = defineExactWrapperFields(Object.create(null) as Record<string, unknown>);
+
+    class AuthorizationWrapper {}
+
+    const classInstanceWrapper = defineExactWrapperFields(new AuthorizationWrapper());
+
+    for (const input of [nullPrototypeWrapper, classInstanceWrapper]) {
+      expect(Object.isFrozen(input)).toBe(true);
+      expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
+    }
+  });
+
   it("rejects proxy-backed non-ordinary authorization wrappers before inspecting controls", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       getPrototypeOf: () => {
