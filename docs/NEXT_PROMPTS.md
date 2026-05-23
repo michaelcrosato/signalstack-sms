@@ -14,7 +14,7 @@ This file is the handoff for the next automated loop. It should stay short enoug
 
 ## Current State
 
-- Latest run: Run 527 extends live-worker controls-evidence coverage to ordinary `ArrayBuffer` and runtime-supported `SharedArrayBuffer` objects so array-buffer evidence cannot authorize the reserved live-worker class.
+- Latest run: Run 528 extends revoked proxy-backed built-in controls-evidence coverage to typed arrays, data views, and weak collections so those revoked built-in records cannot authorize the reserved live-worker class.
 - The backend foundation is strong: tenant helpers, contacts, campaigns, queue jobs, inbox, compliance gates, fake AI, local billing/analytics, provider metadata, Twilio webhook foundations, readiness audit, operations inventory, and validation gates.
 - The settings operations pages use compact related-link headers; keep those surfaces read-only and do not expand operations UI unless it directly supports release safety or product work.
 - The browser product now has an initial `/dashboard` shell, `/dashboard/contacts` list/import workflow with archived restore links, `/dashboard/contacts/:contactId` local detail/edit/archive/restore/merge workflow, `/dashboard/campaigns` compose/preflight/local schedule workflow, `/dashboard/campaigns/:campaignId` local draft edit and queued cancel workflow, `/dashboard/inbox` local thread workflow, `/dashboard/templates` local template create/list workflow, `/dashboard/templates/:templateId` local detail/edit workflow, `/dashboard/analytics` local overview detail, and `/dashboard/compliance` local readiness detail.
@@ -35,7 +35,7 @@ This file is the handoff for the next automated loop. It should stay short enoug
 - URL-shaped built-in controls-evidence coverage proves `URL` and `URLSearchParams` deny in ordinary, proxy-backed, and revoked proxy-backed forms without fallback or object-trap inspection.
 - Boxed primitive authorization-wrapper coverage now explicitly includes boxed `Symbol` and boxed `BigInt` evidence across ordinary, exact-field frozen, proxy-backed, reflection-trapped, and revoked proxy-backed forms before supplied live-worker controls are inspected.
 - Boxed primitive controls-evidence coverage now explicitly includes boxed `Symbol` and boxed `BigInt` evidence across ordinary, proxy-backed, and revoked proxy-backed forms before controls can be treated as the future live-worker checklist.
-- Array-buffer controls-evidence coverage now explicitly includes ordinary `ArrayBuffer`, runtime-supported ordinary `SharedArrayBuffer`, proxy-backed array buffers, proxy-backed shared array buffers, and revoked proxy-backed built-in forms before controls can be treated as the future live-worker checklist.
+- Revoked proxy-backed built-in controls-evidence coverage now explicitly includes typed arrays, data views, weak collections, array buffers, shared array buffers when runtime-supported, URL-shaped records, boxed `Symbol`/`BigInt` records, weak references, and finalization registries before controls can be treated as the future live-worker checklist.
 
 ## Next Best Work
 
