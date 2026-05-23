@@ -3704,6 +3704,60 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects exact-field built-in authorization-wrapper impostors before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("exact-field built-in wrapper impostors must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("exact-field built-in wrapper impostors must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("exact-field built-in wrapper impostors must not inspect control evidence");
+      }
+    });
+    const defineWrapperFields = <T extends object>(target: T) =>
+      Object.freeze(
+        Object.defineProperties(target, {
+          workerDeploymentClass: {
+            value: reservedLiveWorkerDeploymentClass,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          },
+          controls: {
+            value: throwingEvidence,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          }
+        })
+      );
+    const exactFieldBuiltInWrapperImpostors = [
+      defineWrapperFields(new Map()),
+      defineWrapperFields(new Set()),
+      defineWrapperFields(new WeakMap()),
+      defineWrapperFields(new WeakSet()),
+      defineWrapperFields(new Uint8Array(0)),
+      defineWrapperFields(new DataView(new ArrayBuffer(8))),
+      defineWrapperFields(Promise.resolve(implementedFrozenControls())),
+      defineWrapperFields(new String(reservedLiveWorkerDeploymentClass)),
+      defineWrapperFields(new Number(1)),
+      defineWrapperFields(new Boolean(true)),
+      defineWrapperFields(/production-live-campaign/),
+      defineWrapperFields(new Error("production-live-campaign")),
+      defineWrapperFields(new WeakRef(implementedFrozenControls()[0])),
+      defineWrapperFields(new FinalizationRegistry(() => undefined))
+    ];
+
+    for (const input of exactFieldBuiltInWrapperImpostors) {
+      const authorizationInput = input as { workerDeploymentClass?: unknown; controls?: unknown };
+      expect(Object.isFrozen(input)).toBe(true);
+      expect(() => liveWorkerDeploymentClassIsAuthorized(authorizationInput)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(authorizationInput)).toBe(false);
+    }
+  });
+
   it("rejects proxy-backed built-in authorization-wrapper impostors before inspecting controls", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       getPrototypeOf: () => {
