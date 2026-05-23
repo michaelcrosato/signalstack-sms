@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 574 note: live-worker authorization now denies control arrays with own `Symbol.toPrimitive`, `toString`, or `valueOf` metadata without reading or invoking those hooks.
+
 Run 573 note: live-worker authorization now denies control entries with own `Symbol.toStringTag`, `Symbol.toPrimitive`, `toString`, or `valueOf` metadata without reading or invoking those hooks.
 
 Run 572 note: live-worker authorization now denies own accessor-backed `Symbol.toStringTag` metadata on authorization wrappers before hostile supplied controls are inspected and without reading the getter.
@@ -160,7 +162,7 @@ Run 495 note: live-worker authorization now denies built-in object-shaped deploy
 
 Run 494 note: live-worker authorization now evaluates exact frozen control-entry evidence without reading inherited `Object.prototype` accessors for `id`, `status`, or `requirement`.
 
-Latest protected local gate for Run 572: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 59 Vitest files / 590 tests, Playwright smoke, and build green.
+Latest protected local gate for Run 574: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 59 Vitest files / 592 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 

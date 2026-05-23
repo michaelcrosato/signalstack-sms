@@ -4568,3 +4568,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 574  GREEN  live-worker-control-array-coercion  2026-05-23 10:23
+Objective:    Prove control arrays with own coercion metadata cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing otherwise matching control arrays with own `Symbol.toPrimitive`, `toString`, or `valueOf` metadata deny without reading or invoking those hooks.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the control-array coercion metadata boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
