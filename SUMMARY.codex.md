@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 493
+
+- Added live-worker authorization-wrapper coverage proving inherited `Object.prototype` accessors for `workerDeploymentClass` and `controls` are not read while exact frozen wrapper evidence is evaluated.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, and current state matrix for the inherited wrapper-accessor boundary.
+- Focused check passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 75 tests.
+- Focused checks passed: `npm run contracts:check`, `npm run production-worker:check`, and `npm run typecheck`.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 527 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution outside validation, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 492
 
 - Removed an inherited-iterator dependency from live-worker control-array key evaluation so exact frozen `production-live-campaign` evidence is checked through descriptors, not ambient array iteration.

@@ -2,13 +2,13 @@
 
 Last updated: 2026-05-23.
 
-Run 492 note: live-worker authorization now evaluates exact frozen control-array evidence without reading inherited `Array.prototype` iterator hooks for the reserved `production-live-campaign` class.
+Run 493 note: live-worker authorization now evaluates exact frozen authorization-wrapper evidence without reading inherited `Object.prototype` accessors for `workerDeploymentClass` or `controls`.
 
-Latest protected local gate for Run 492: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 526 tests, Playwright smoke, and build green.
+Latest protected local gate for Run 493: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 527 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 
-Tests/Gates addendum: mutating-route auth coverage now includes assigned and whole-parenthesized type-asserted or `satisfies` direct `Request` constructor and `Request.prototype` aliases, parenthesized and whole-parenthesized type-asserted `globalThis` root member access for `Request` and `Reflect`, parenthesized `satisfies` local/root `globalThis` aliases for reflective body-reader paths, plus type-asserted and `satisfies` destructured local-`globalThis` `Object`/`Reflect`/`Request` aliases before body-reader checks.
+Tests/Gates addendum: mutating-route auth coverage now includes assigned and whole-parenthesized type-asserted or `satisfies` direct `Request` constructor and `Request.prototype` aliases, parenthesized and whole-parenthesized type-asserted `globalThis` root member access for `Request` and `Reflect`, parenthesized `satisfies` local/root `globalThis` aliases for reflective body-reader paths, plus type-asserted and `satisfies` destructured local-`globalThis` `Object`/`Reflect`/`Request` aliases before body-reader checks. Live-worker authorization-wrapper coverage now proves inherited `Object.prototype` accessors cannot influence exact frozen wrapper evidence.
 
 | Area | Backend/API State | Browser State | Main Gap | Next Action |
 | --- | --- | --- | --- | --- |

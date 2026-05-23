@@ -3190,6 +3190,54 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerDeploymentClassIsAuthorized(exactClassInput)).toBe(true);
   });
 
+  it("does not read inherited authorization wrapper accessors while evaluating wrapper evidence", () => {
+    const objectPrototype = Object.prototype as Record<string, unknown>;
+    const originalClassDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "workerDeploymentClass");
+    const originalControlsDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "controls");
+
+    try {
+      Object.defineProperties(Object.prototype, {
+        workerDeploymentClass: {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited workerDeploymentClass getter must not be read");
+          }
+        },
+        controls: {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited controls getter must not be read");
+          }
+        }
+      });
+
+      const exactClassInput = frozenAuthorizationWrapper(
+        reservedLiveWorkerDeploymentClass,
+        implementedFrozenControls()
+      );
+      const missingControlsInput = Object.freeze({
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass
+      });
+
+      expect(() => liveWorkerDeploymentClassIsAuthorized(exactClassInput)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(exactClassInput)).toBe(true);
+      expect(() => liveWorkerDeploymentClassIsAuthorized(missingControlsInput)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(missingControlsInput)).toBe(false);
+    } finally {
+      if (originalClassDescriptor === undefined) {
+        delete objectPrototype.workerDeploymentClass;
+      } else {
+        Object.defineProperty(Object.prototype, "workerDeploymentClass", originalClassDescriptor);
+      }
+
+      if (originalControlsDescriptor === undefined) {
+        delete objectPrototype.controls;
+      } else {
+        Object.defineProperty(Object.prototype, "controls", originalControlsDescriptor);
+      }
+    }
+  });
+
   it("does not execute control evidence get traps while authorizing exact frozen evidence", () => {
     const implementedControlsWithEntryGetTraps = Object.freeze(
       implementedFrozenControls().map(
