@@ -3430,6 +3430,63 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects proxy-backed Date deployment class impostors before inspecting supplied controls", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("proxy-backed Date worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("proxy-backed Date worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("proxy-backed Date worker classes must not inspect control evidence");
+      }
+    });
+    const dateClasses = [
+      Object.freeze(new Date(0)),
+      Object.freeze(new Date("2026-05-23T09:10:00.000Z"))
+    ];
+    const proxyBackedDateClasses = dateClasses.map(
+      (target) =>
+        new Proxy(target, {
+          get: () => {
+            throw new Error("proxy-backed Date worker class values must not be read");
+          },
+          getPrototypeOf: () => {
+            throw new Error("proxy-backed Date worker class prototypes must not be read");
+          },
+          getOwnPropertyDescriptor: () => {
+            throw new Error("proxy-backed Date worker class descriptors must not be read");
+          },
+          ownKeys: () => {
+            throw new Error("proxy-backed Date worker class keys must not be read");
+          }
+        })
+    );
+    const revokedDateClasses = dateClasses.map((target) => {
+      const { proxy, revoke } = Proxy.revocable(target, {
+        get: () => {
+          throw new Error("revoked Date worker class values must not be read");
+        }
+      });
+      revoke();
+      return proxy;
+    });
+
+    for (const workerDeploymentClass of [...proxyBackedDateClasses, ...revokedDateClasses]) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects proxy-backed URL and weak-reference deployment class impostors before inspecting supplied controls", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {

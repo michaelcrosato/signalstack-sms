@@ -5044,3 +5044,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 562  GREEN  live-worker-proxy-date-class  2026-05-23 09:10
+Objective:    Prove proxy-backed Date deployment-class values cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing Date deployment-class values deny in proxy-backed and revoked proxy-backed form before supplied controls are inspected.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the proxy Date deployment-class boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
