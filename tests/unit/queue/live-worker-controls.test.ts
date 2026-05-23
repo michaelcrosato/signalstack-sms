@@ -6374,6 +6374,40 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not read inherited control-entry toStringTag metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const objectPrototype = Object.prototype as {
+      [Symbol.toStringTag]?: unknown;
+    };
+    const originalToStringTagDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, Symbol.toStringTag);
+
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperty(Object.prototype, Symbol.toStringTag, {
+        configurable: true,
+        get: () => {
+          throw new Error("inherited control-entry toStringTag must not be read");
+        }
+      });
+
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalToStringTagDescriptor === undefined) {
+        delete objectPrototype[Symbol.toStringTag];
+      } else {
+        Object.defineProperty(Object.prototype, Symbol.toStringTag, originalToStringTagDescriptor);
+      }
+    }
+
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 

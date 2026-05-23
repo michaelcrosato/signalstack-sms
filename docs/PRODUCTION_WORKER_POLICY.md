@@ -76,6 +76,7 @@ malformed authorization wrapper input must deny without executing accessor-backe
 Inherited `Object.prototype` authorization-wrapper coercion metadata, including `Symbol.toPrimitive`, `toString`, or `valueOf`, must not be invoked while exact frozen wrapper evidence is evaluated.
 Inherited `Object.prototype` control-entry accessors for `id`, `status`, or `requirement` must not be read while exact frozen supplied control evidence is evaluated.
 Inherited `Object.prototype` control-entry coercion metadata, including `Symbol.toPrimitive`, `toString`, or `valueOf`, must not be invoked while exact frozen supplied control evidence is evaluated.
+Inherited `Object.prototype` control-entry `Symbol.toStringTag` metadata must not be read while exact frozen supplied control evidence is evaluated.
 Whitespace-padded deployment class evidence includes leading spaces, trailing spaces, tabs, newlines, carriage returns, CRLF pairs, vertical tabs, form feeds, invisible Unicode escape padding, and Unicode line/paragraph separator padding, and must deny before supplied controls are inspected.
 
 ## Non-Requirements For Current Demo Deployments
