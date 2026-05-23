@@ -2565,6 +2565,33 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects mixed symbol-keyed authorization wrapper public-field impersonators before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("mixed symbol wrapper fields must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("mixed symbol wrapper fields must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("mixed symbol wrapper fields must not inspect control evidence");
+      }
+    });
+    const symbolClassWrapper = Object.freeze({
+      [Symbol("workerDeploymentClass")]: reservedLiveWorkerDeploymentClass,
+      controls: throwingEvidence
+    });
+    const symbolControlsWrapper = Object.freeze({
+      workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+      [Symbol("controls")]: throwingEvidence
+    });
+
+    for (const input of [symbolClassWrapper, symbolControlsWrapper]) {
+      expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
+    }
+  });
+
   it("rejects malformed authorization wrapper shapes before inspecting controls", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       getPrototypeOf: () => {

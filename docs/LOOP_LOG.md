@@ -3871,3 +3871,12 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+## Run 481  GREEN  live-worker-mixed-symbol-wrapper-fields  2026-05-23 00:08
+Objective:    Prove mixed string/symbol-keyed authorization-wrapper public-field impersonators cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage for wrappers that provide only one real required public field and one symbol-keyed `workerDeploymentClass` or `controls` impersonator.
+- Updated queue contract/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the mixed symbol-keyed wrapper boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
