@@ -5054,3 +5054,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 563  GREEN  campaign-cancel-scheduled-only  2026-05-23 09:18
+Objective:    Prevent local campaign cancellation from rewriting non-scheduled campaign lifecycle states.
+Changed:
+- Restricted `cancelCampaign` to return without queue or campaign mutations unless the tenant-scoped campaign is `SCHEDULED`.
+- Added repository unit coverage for missing campaigns, draft/paused/completed no-op cancellation, and scheduled local queue cancellation.
+- Updated TESTING, current state, SUMMARY, BLOCKERS, and loop logs for the scheduled-only cancellation invariant.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

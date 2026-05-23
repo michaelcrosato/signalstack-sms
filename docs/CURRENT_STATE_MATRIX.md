@@ -2,7 +2,7 @@
 
 Last updated: 2026-05-23.
 
-Run 562 note: live-worker authorization now denies proxy-backed and revoked proxy-backed `Date` deployment-class evidence before inspecting supplied controls.
+Run 563 note: campaign cancellation now only pauses scheduled campaigns; missing, draft, paused, and completed campaigns return without queue or campaign mutations.
 
 Run 561 note: live-worker authorization now denies proxy-backed and revoked proxy-backed `Map`, `Set`, `WeakMap`, and `WeakSet` deployment-class evidence before inspecting supplied controls.
 
@@ -140,7 +140,7 @@ Run 495 note: live-worker authorization now denies built-in object-shaped deploy
 
 Run 494 note: live-worker authorization now evaluates exact frozen control-entry evidence without reading inherited `Object.prototype` accessors for `id`, `status`, or `requirement`.
 
-Latest protected local gate for Run 562: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 579 tests, Playwright smoke, and build green.
+Latest protected local gate for Run 563: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 59 Vitest files / 582 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 
@@ -149,7 +149,7 @@ Tests/Gates addendum: mutating-route auth coverage now includes assigned and who
 | Area | Backend/API State | Browser State | Main Gap | Next Action |
 | --- | --- | --- | --- | --- |
 | Contacts | Tenant-scoped contacts, consent fields, CSV import, tags/lists/segments foundations. | Product dashboard summary, `/dashboard/contacts` list/import plus archived restore links, `/dashboard/contacts/:contactId` local detail/edit/archive/restore/merge workspace, read-only operations views, and demo path coverage. | Merge is local-only and intentionally preserves source rows through soft archive; no advanced conflict review UI yet. | Keep merge local-only; revisit conflict review after product demo feedback. |
-| Campaigns | Drafts, recipients, preflight, schedule/cancel records, queue jobs, dummy worker path. | Product dashboard summary plus `/dashboard/campaigns` composer with fake-AI copy assist, recipient selection, preflight, local schedule, status table, `/dashboard/campaigns/:campaignId` draft edit/queued-cancel workflow, and product demo coverage. | No advanced campaign history or send-result drilldown beyond local lifecycle state. | Keep live sends blocked; add deeper reporting only after product demo feedback. |
+| Campaigns | Drafts, recipients, preflight, schedule/cancel records, scheduled-only local cancellation, queue jobs, dummy worker path. | Product dashboard summary plus `/dashboard/campaigns` composer with fake-AI copy assist, recipient selection, preflight, local schedule, status table, `/dashboard/campaigns/:campaignId` draft edit/queued-cancel workflow, and product demo coverage. | No advanced campaign history or send-result drilldown beyond local lifecycle state. | Keep live sends blocked; add deeper reporting only after product demo feedback. |
 | Inbox | Conversations, messages, assignment, notes, resolve/reopen, demo inbound, STOP/HELP parsing, and deterministic fake-AI summary/lead qualification endpoints. | Product dashboard summary, `/dashboard/inbox` list/thread workflow, local demo inbound, fake-AI insights, notes, assignment, resolve/reopen, read-only operations view, and product demo coverage. | No outbound reply send path, intentionally blocked until live/provider gates mature. | Keep product inbox local-only; revisit outbound reply UX only after live/provider gates mature. |
 | Templates | Template model and APIs exist, including tenant-scoped detail/update. | Product dashboard summary, `/dashboard/templates` create/list workflow, `/dashboard/templates/:templateId` local detail/edit workflow, and read-only template operations view. | No delete/archive workflow, intentionally deferred until template lifecycle needs are clearer. | Keep local-only template edits; revisit lifecycle controls after product demo feedback. |
 | Compliance | Profile/checklist APIs, readiness audit, opt-out foundations, central messaging gates. | Product dashboard summary, `/dashboard/compliance` readiness detail, compliance and readiness audit operations pages. | A2P, quiet-hours, consent evidence, and live-send policy still need production implementation. | Keep live campaign sends blocked; revisit production compliance depth only after product demo feedback. |

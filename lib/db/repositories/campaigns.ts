@@ -159,6 +159,9 @@ export async function cancelCampaign(orgId: string, campaignId: string) {
     if (!campaign) {
       return null;
     }
+    if (campaign.status !== CampaignStatus.SCHEDULED) {
+      return null;
+    }
 
     await tx.queueJob.updateMany({
       where: { orgId, campaignId, status: QueueJobStatus.QUEUED },
