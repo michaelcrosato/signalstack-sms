@@ -2037,6 +2037,66 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects proxy-backed built-in object controls evidence without inspecting object traps", () => {
+    const proxyControlsEvidence = [
+      new Proxy(new Date(0), {
+        get: () => {
+          throw new Error("date proxy controls get trap must not be read");
+        },
+        getPrototypeOf: () => {
+          throw new Error("date proxy controls prototype trap must not be read");
+        },
+        getOwnPropertyDescriptor: () => {
+          throw new Error("date proxy controls descriptor trap must not be read");
+        },
+        ownKeys: () => {
+          throw new Error("date proxy controls keys trap must not be read");
+        }
+      }),
+      new Proxy(/unsafe-controls/, {
+        get: () => {
+          throw new Error("regexp proxy controls get trap must not be read");
+        },
+        getPrototypeOf: () => {
+          throw new Error("regexp proxy controls prototype trap must not be read");
+        },
+        getOwnPropertyDescriptor: () => {
+          throw new Error("regexp proxy controls descriptor trap must not be read");
+        },
+        ownKeys: () => {
+          throw new Error("regexp proxy controls keys trap must not be read");
+        }
+      }),
+      new Proxy(new Error("unsafe controls"), {
+        get: () => {
+          throw new Error("error proxy controls get trap must not be read");
+        },
+        getPrototypeOf: () => {
+          throw new Error("error proxy controls prototype trap must not be read");
+        },
+        getOwnPropertyDescriptor: () => {
+          throw new Error("error proxy controls descriptor trap must not be read");
+        },
+        ownKeys: () => {
+          throw new Error("error proxy controls keys trap must not be read");
+        }
+      })
+    ];
+
+    for (const controls of proxyControlsEvidence) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects revoked proxy-backed array-prototype impostor controls evidence without throwing", () => {
     const arrayPrototypeImpostor = Object.create(Array.prototype) as Record<PropertyKey, unknown>;
     const { proxy: revokedProxyControls, revoke } = Proxy.revocable(arrayPrototypeImpostor, {

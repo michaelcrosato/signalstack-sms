@@ -4109,3 +4109,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 509  GREEN  live-worker-proxy-built-in-controls  2026-05-23 03:34
+Objective:    Prove proxy-backed date, RegExp, and Error controls evidence cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing proxy-backed date, RegExp, and Error `controls` evidence denies without reading object `get`, prototype, descriptor, or key traps.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the proxy-backed built-in object controls-evidence boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
