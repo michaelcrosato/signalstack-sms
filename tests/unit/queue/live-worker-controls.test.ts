@@ -6553,6 +6553,38 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not read inherited control-array unscopables metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as Record<PropertyKey, unknown>;
+    const originalUnscopablesDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, Symbol.unscopables);
+
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperty(Array.prototype, Symbol.unscopables, {
+        configurable: true,
+        get: () => {
+          throw new Error("inherited control-array unscopables metadata must not be read");
+        }
+      });
+
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalUnscopablesDescriptor === undefined) {
+        delete arrayPrototype[Symbol.unscopables];
+      } else {
+        Object.defineProperty(Array.prototype, Symbol.unscopables, originalUnscopablesDescriptor);
+      }
+    }
+
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 
