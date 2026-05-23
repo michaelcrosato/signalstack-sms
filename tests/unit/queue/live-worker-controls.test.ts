@@ -1641,8 +1641,17 @@ describe("production live campaign worker controls", () => {
     const controlsEvidence = [
       Object.freeze(new Map([["0", implementedFrozenControls()[0]]])),
       Object.freeze(new Set(implementedFrozenControls())),
+      Object.freeze(new WeakMap([[implementedFrozenControls()[0], "implemented"]])),
+      Object.freeze(new WeakSet([implementedFrozenControls()[0]])),
       new Uint8Array([1, 2, 3]),
+      new DataView(new ArrayBuffer(8)),
       Object.freeze(Promise.resolve(implementedFrozenControls())),
+      Object.freeze(new String("implemented")),
+      Object.freeze(new Number(productionLiveCampaignWorkerControls.length)),
+      Object.freeze(new Boolean(true)),
+      Object.freeze(new Date(0)),
+      Object.freeze(/implemented/),
+      Object.freeze(new Error("implemented controls")),
       Object.freeze({
         0: implementedFrozenControls()[0],
         length: productionLiveCampaignWorkerControls.length
