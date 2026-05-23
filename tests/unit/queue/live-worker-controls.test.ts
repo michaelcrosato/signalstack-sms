@@ -1981,6 +1981,34 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects proxy-backed array-buffer controls evidence without inspecting object traps", () => {
+    const proxyControls = new Proxy(new ArrayBuffer(8), {
+      get: () => {
+        throw new Error("array-buffer proxy controls get trap must not be read");
+      },
+      getPrototypeOf: () => {
+        throw new Error("array-buffer proxy controls prototype trap must not be read");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("array-buffer proxy controls descriptor trap must not be read");
+      },
+      ownKeys: () => {
+        throw new Error("array-buffer proxy controls keys trap must not be read");
+      }
+    });
+
+    expect(() =>
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, proxyControls)
+      )
+    ).not.toThrow();
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, proxyControls)
+      )
+    ).toBe(false);
+  });
+
   it("rejects proxy-backed promise controls evidence without inspecting object traps", () => {
     const proxyControls = new Proxy(Promise.resolve(implementedFrozenControls()), {
       get: () => {

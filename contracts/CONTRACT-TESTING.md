@@ -41,6 +41,7 @@ Post-MVP local operations status:
 - Unit tests must verify that local worker readiness fails closed for runtime-unknown or malformed `LIVE_MESSAGING_ENABLED` values, allowing only unset, empty, or exactly `false` live-messaging flags with the dummy provider.
 - Queue worker unit tests must verify that both the database worker and BullMQ worker reject every production-like runtime marker (`NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, and `APP_ENV`) before provider or future live-worker-class checks can fall through.
 - Queue live-worker control tests must verify that authorization-wrapper evidence is evaluated through own frozen data descriptors without executing proxy `get` traps or inherited `Object.prototype` accessors for `workerDeploymentClass` or `controls`.
+- Queue live-worker control tests must verify that proxy-backed `ArrayBuffer` controls evidence cannot authorize the reserved live worker class and denies without inspecting object traps.
 - Campaign create/update route unit tests must verify malformed JSON returns a `400` validation response before local campaign create/update repository mutations run.
 - Contact create/update/merge/import route unit tests must verify malformed JSON returns a `400` validation response before local contact upsert/update/merge, CSV parsing, or import repository mutations run.
 - Inbox/demo inbound route unit tests must verify malformed JSON returns a `400` validation response before local inbound message, conversation message, assignment, note, or resolve repository mutations run.
