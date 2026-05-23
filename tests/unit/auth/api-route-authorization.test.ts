@@ -178,6 +178,11 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
     previousGlobalThisBodySlice = normalizedGlobalThisBodySlice;
     normalizedGlobalThisBodySlice = normalizedGlobalThisBodySlice
       .replace(/\(\s*globalThis\s+(?:as|satisfies)\s+typeof\s+globalThis\s*\)/g, "globalThis")
+      .replace(/\(\s*Request\s+(?:as|satisfies)\s+typeof\s+Request\s*\)/g, "Request")
+      .replace(
+        /\(\s*(Request\s*(?:\.|\?\.)\s*prototype)\s+(?:as|satisfies)\s+typeof\s+Request\s*\.\s*prototype\s*\)/g,
+        "$1"
+      )
       .replace(/\(\s*globalThis\s*\)/g, "globalThis")
       .replace(/\(\s*(Object|Reflect|Request)\s*\)/g, "$1")
       .replace(/\b(Object|Reflect|Request|globalThis)\s*!\s*(?=\.|\?\.|\[|,|;|\r?\n|\))/g, "$1");
@@ -2206,6 +2211,15 @@ describe("API route authorization coverage", () => {
         return Response.json({ size: payload.byteLength });
       }
     `;
+    const unsafeWholeParenthesizedTypeAssertedDirectRequestAliasSource = `
+      export async function PUT(req: Request) {
+        const RequestCtor = (Request as typeof Request);
+        const payload = await RequestCtor.prototype.arrayBuffer.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
     const unsafeSatisfiesDirectRequestAliasSource = `
       export async function DELETE(req: Request) {
         const RequestCtor = Request satisfies typeof Request;
@@ -2219,6 +2233,16 @@ describe("API route authorization coverage", () => {
       export async function POST(req: Request) {
         let RequestCtor;
         RequestCtor = Request satisfies typeof Request;
+        const payload = await RequestCtor.prototype.json.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeAssignedWholeParenthesizedSatisfiesDirectRequestAliasSource = `
+      export async function POST(req: Request) {
+        let RequestCtor;
+        RequestCtor = (Request satisfies typeof Request);
         const payload = await RequestCtor.prototype.json.call(req);
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
         if (roleResponse) return roleResponse;
@@ -2469,6 +2493,15 @@ describe("API route authorization coverage", () => {
         return Response.json({ payload });
       }
     `;
+    const unsafeWholeParenthesizedTypeAssertedDirectPrototypeAliasSource = `
+      export async function PATCH(req: Request) {
+        const requestPrototype = (Request.prototype as typeof Request.prototype);
+        const payload = await requestPrototype.text.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
     const unsafeSatisfiesDirectPrototypeAliasSource = `
       export async function PUT(req: Request) {
         const requestPrototype = Request.prototype satisfies typeof Request.prototype;
@@ -2482,6 +2515,16 @@ describe("API route authorization coverage", () => {
       export async function POST(req: Request) {
         let requestPrototype;
         requestPrototype = Request.prototype satisfies typeof Request.prototype;
+        const payload = await requestPrototype.formData.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const unsafeAssignedWholeParenthesizedSatisfiesDirectPrototypeAliasSource = `
+      export async function POST(req: Request) {
+        let requestPrototype;
+        requestPrototype = (Request.prototype satisfies typeof Request.prototype);
         const payload = await requestPrototype.formData.call(req);
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
         if (roleResponse) return roleResponse;
@@ -2560,8 +2603,10 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNestedParenthesizedDirectRequestAliasSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTypeAssertedDirectRequestAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedTypeAssertedDirectRequestAliasSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeWholeParenthesizedTypeAssertedDirectRequestAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSatisfiesDirectRequestAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedSatisfiesDirectRequestAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedWholeParenthesizedSatisfiesDirectRequestAliasSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNonNullDirectRequestAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedNonNullDirectRequestAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalThisRequestAliasSource, "PATCH")).toBe(true);
@@ -2595,8 +2640,10 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeWholeParenthesizedDirectPrototypeAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTypeAssertedDirectPrototypeAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedTypeAssertedDirectPrototypeAliasSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeWholeParenthesizedTypeAssertedDirectPrototypeAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSatisfiesDirectPrototypeAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedSatisfiesDirectPrototypeAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedWholeParenthesizedSatisfiesDirectPrototypeAliasSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNonNullDirectPrototypeAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedNonNullDirectPrototypeAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedPrototypeAliasSource, "PATCH")).toBe(true);

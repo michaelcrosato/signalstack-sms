@@ -2,13 +2,13 @@
 
 Last updated: 2026-05-22.
 
-Run 477 note: assigned type-asserted direct `Request` constructor and `Request.prototype` alias coverage now proves forms such as `RequestCtor = Request as typeof Request` and `requestPrototype = Request.prototype as typeof Request.prototype` are normalized before mutating API body-reader role-gate checks.
+Run 478 note: whole-parenthesized type-asserted and `satisfies` direct `Request` constructor and `Request.prototype` alias coverage now proves forms such as `RequestCtor = (Request as typeof Request)`, `RequestCtor = (Request satisfies typeof Request)`, `requestPrototype = (Request.prototype as typeof Request.prototype)`, and `requestPrototype = (Request.prototype satisfies typeof Request.prototype)` are normalized before mutating API body-reader role-gate checks.
 
-Latest protected local gate for Run 477: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-22 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 516 tests, Playwright smoke, and build green.
+Latest protected local gate for Run 478: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-22 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, Vitest, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 
-Tests/Gates addendum: mutating-route auth coverage now includes assigned type-asserted direct `Request` constructor and `Request.prototype` aliases, parenthesized and whole-parenthesized type-asserted `globalThis` root member access for `Request` and `Reflect`, parenthesized `satisfies` local/root `globalThis` aliases for reflective body-reader paths, plus type-asserted and `satisfies` destructured local-`globalThis` `Object`/`Reflect`/`Request` aliases before body-reader checks.
+Tests/Gates addendum: mutating-route auth coverage now includes assigned and whole-parenthesized type-asserted or `satisfies` direct `Request` constructor and `Request.prototype` aliases, parenthesized and whole-parenthesized type-asserted `globalThis` root member access for `Request` and `Reflect`, parenthesized `satisfies` local/root `globalThis` aliases for reflective body-reader paths, plus type-asserted and `satisfies` destructured local-`globalThis` `Object`/`Reflect`/`Request` aliases before body-reader checks.
 
 | Area | Backend/API State | Browser State | Main Gap | Next Action |
 | --- | --- | --- | --- | --- |

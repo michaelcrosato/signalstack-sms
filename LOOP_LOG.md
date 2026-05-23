@@ -4289,6 +4289,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
 
+## Run 478  GREEN  whole-parenthesized-request-alias-auth  2026-05-22 23:45
+Objective:    Prove whole-parenthesized type-asserted and `satisfies` direct `Request` constructor/prototype aliases cannot hide mutating-route body readers before role gates.
+Changed:
+- Normalized `(Request as typeof Request)` and `(Request satisfies typeof Request)` before mutating API body-reader role-gate checks.
+- Normalized `(Request.prototype as typeof Request.prototype)` and `(Request.prototype satisfies typeof Request.prototype)` before mutating API body-reader role-gate checks.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the whole-parenthesized direct `Request` alias boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 475  GREEN  whole-parenthesized-globalthis-root-members  2026-05-22 23:26
 Objective:    Prove whole-parenthesized type-asserted `globalThis` root member aliases cannot hide mutating-route body readers before role gates.
 Changed:
