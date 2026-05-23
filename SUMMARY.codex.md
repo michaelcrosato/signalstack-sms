@@ -1,5 +1,18 @@
 # Codex Summary
 
+Run number: 448
+
+- Rehydrated the transferred laptop/home workspace and confirmed the protected local gate is green with the demo-safe local `.env`, running Docker Postgres/Redis, Prisma generation, typecheck, lint, unit tests, Playwright smoke, and build.
+- Preserved the interrupted local fixes for invalid campaign schedule JSON handling, campaign composer status timing, uncontrolled contact-import fields, and Playwright navigation stability in the demo/product paths.
+- Added live-worker control coverage proving exact-length frozen `production-live-campaign` control arrays with malformed primitive indexed entries deny cleanly before the reserved class can authorize.
+- Updated queue/testing contracts, production-worker/testing docs, NEXT_PROMPTS, and current state matrix for the primitive control-entry evidence boundary.
+- Focused check passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 63 tests.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 451 tests, Playwright smoke, and build green.
+- Seeded browser checks passed after the home resume: `npm run test:e2e:product-demo` with 10 tests and `npm run test:e2e:demo` with the investor demo path.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 442
 
 - Added live-worker authorization coverage proving malformed primitive `bigint` deployment-class values deny before supplied `production-live-campaign` controls are inspected.

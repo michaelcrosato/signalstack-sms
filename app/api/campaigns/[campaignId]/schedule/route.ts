@@ -17,7 +17,14 @@ export async function POST(request: Request, { params }: CampaignParams) {
     return roleResponse;
   }
 
-  const payload = campaignScheduleSchema.safeParse(await request.json());
+  let requestBody: unknown;
+  try {
+    requestBody = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid schedule payload.", issues: [] }, { status: 400 });
+  }
+
+  const payload = campaignScheduleSchema.safeParse(requestBody);
 
   if (!payload.success) {
     return NextResponse.json({ error: "Invalid schedule payload.", issues: payload.error.issues }, { status: 400 });

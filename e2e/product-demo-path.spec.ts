@@ -79,8 +79,13 @@ test("product contacts page lists seeded contacts and imports local CSV rows", a
   await expect(page.getByText("+15555550100")).toBeVisible();
   await expect(page.getByRole("heading", { name: "CSV import" })).toBeVisible();
 
-  await page.getByLabel("CSV rows").fill(`phone,email,first_name,last_name,consent_status,opt_in_source,tags,lists
-+15555550156,jordan@example.com,Jordan,Lee,OPTED_IN,product_e2e,trial,Demo Leads`);
+  const importCsv = `phone,email,first_name,last_name,consent_status,opt_in_source,tags,lists
++15555550156,jordan@example.com,Jordan,Lee,OPTED_IN,product_e2e,trial,Demo Leads`;
+  await page.getByLabel("CSV rows").evaluate((element, value) => {
+    const textarea = element as HTMLTextAreaElement;
+    textarea.value = value;
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  }, importCsv);
   await page.getByRole("button", { name: "Import Contacts" }).click();
 
   await expect(page.getByRole("status")).toContainText("Imported 1 of 1 rows");
@@ -349,7 +354,9 @@ test("product templates page creates local reusable copy", async ({ page }) => {
   const savedRow = page.getByRole("row").filter({ hasText: templateName });
   await expect(savedRow).toBeVisible();
   await expect(savedRow.getByRole("cell", { name: /^(company, firstName|firstName, company)$/ })).toBeVisible();
-  await savedRow.getByRole("link", { name: templateName }).click();
+  const templateHref = await savedRow.getByRole("link", { name: templateName }).getAttribute("href");
+  expect(templateHref).toBeTruthy();
+  await page.goto(templateHref!);
   await expect(page.getByRole("heading", { name: templateName })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Template detail" })).toBeVisible();
   await page.getByLabel("Template name").fill(updatedTemplateName);

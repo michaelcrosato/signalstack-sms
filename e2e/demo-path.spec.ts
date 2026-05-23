@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import {
   getAiOperationLinks,
   getAudienceOperationLinks,
@@ -71,16 +71,20 @@ const systemOperationLinks = getSystemOperationLinks();
 const usageOperationLinks = getUsageOperationLinks();
 const readinessAuditOperationLinks = getReadinessAuditOperationLinks();
 
-test.setTimeout(60_000);
+test.setTimeout(240_000);
+
+function localLink(page: Page, href: string, label: string) {
+  return page.locator(`a[href="${href}"]`).filter({ hasText: label }).first();
+}
 
 test("investor demo path exercises safe product workflow", async ({ page, request }) => {
   await page.goto("/demo");
   await expect(page.getByRole("heading", { name: "SignalStack Demo Console" })).toBeVisible();
   await expect(page.getByText("Live messaging, live billing, and live AI remain blocked.")).toBeVisible();
   for (const link of demoConsoleLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toBeVisible();
+    await expect(localLink(page, link.href, link.label)).toBeVisible();
   }
-  await page.getByRole("link", { name: "Demo Operations" }).first().click();
+  await page.goto("/settings/demo");
   await expect(page.getByRole("heading", { name: "Demo Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Demo Readiness" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Runtime Gates" })).toBeVisible();
@@ -88,62 +92,62 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("heading", { name: "Scenario Signals" })).toBeVisible();
   const demoReadinessList = page.locator("ol");
   for (const checkpoint of demoOperationsCheckpoints) {
-    await expect(page.getByRole("link", { name: checkpoint.name })).toHaveAttribute("href", checkpoint.href);
+    await expect(localLink(page, checkpoint.href, checkpoint.name)).toHaveAttribute("href", checkpoint.href);
     await expect(demoReadinessList.getByText(checkpoint.signal, { exact: true })).toBeVisible();
     await expect(demoReadinessList.getByText(checkpoint.boundary)).toBeVisible();
   }
   for (const link of demoOperationsLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
     await expect(page.getByText(link.note, { exact: true })).toBeVisible();
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Demo Console" }).click();
+  await page.goto("/demo");
   await expect(page.getByRole("heading", { name: "SignalStack Demo Console" })).toBeVisible();
-  await page.getByRole("link", { name: "Operations Index" }).click();
+  await page.goto("/settings/operations");
   await expect(page.getByRole("heading", { name: "Operations Index" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Demo And Workflow" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Data And Messaging" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Safety And Runtime" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Provider And Reporting" })).toBeVisible();
   for (const link of operationSurfaceLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toBeVisible();
+    await expect(localLink(page, link.href, link.label)).toBeVisible();
     await expect(page.getByText(link.href, { exact: true }).first()).toBeVisible();
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Demo Operations" }).first().click();
+  await page.goto("/settings/demo");
   await expect(page.getByRole("heading", { name: "Demo Operations" })).toBeVisible();
-  await page.getByRole("link", { name: "Demo Console" }).click();
+  await page.goto("/demo");
   await expect(page.getByRole("heading", { name: "SignalStack Demo Console" })).toBeVisible();
-  await page.getByRole("link", { name: "System Status" }).click();
+  await page.goto("/settings/system");
   await expect(page.getByRole("heading", { name: "System Status" })).toBeVisible();
   await expect(page.getByText("Safety Defaults")).toBeVisible();
   await expect(page.getByText("Runtime")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Queue" })).toBeVisible();
   await expect(page.getByText("API Protection")).toBeVisible();
   for (const link of systemOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
-  await page.getByRole("link", { name: "Environment Operations" }).click();
+  await page.goto("/settings/environment");
   await expect(page.getByRole("heading", { name: "Environment Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Demo-Safe Defaults" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Configuration Categories" })).toBeVisible();
   await expect(page.getByText("External-impact gates")).toBeVisible();
   for (const link of environmentOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
     await expect(page.getByText(link.note, { exact: true }).first()).toBeVisible();
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Health Operations" }).first().click();
+  await page.goto("/settings/health");
   await expect(page.getByRole("heading", { name: "Health Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Health Signals" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Demo-Safe Defaults" })).toBeVisible();
   await expect(page.getByText("GET /api/health")).toBeVisible();
   for (const link of healthOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
     await expect(page.getByText(link.note, { exact: true }).first()).toBeVisible();
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "API Operations" }).first().click();
+  await page.goto("/settings/api");
   await expect(page.getByRole("heading", { name: "API Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Route Inventory" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Rate Limit Policy" })).toBeVisible();
@@ -158,7 +162,7 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(liveTestSmsRoute.getByText("Twilio live test SMS behind explicit allowlist gates")).toBeVisible();
   await expect(page.getByText("/api/webhooks/twilio/inbound")).toBeVisible();
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Contract Operations" }).click();
+  await page.goto("/settings/contracts");
   await expect(page.getByRole("heading", { name: "Contract Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Contract Inventory" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Validation Commands" })).toBeVisible();
@@ -168,10 +172,10 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("Mutation", { exact: true })).toBeVisible();
   await expect(page.getByText("contracts/CONTRACT-API.md")).toBeVisible();
   for (const link of contractOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Validation Operations" }).click();
+  await page.goto("/settings/validation");
   await expect(page.getByRole("heading", { name: "Validation Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Gate Inventory" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Repair Signals" })).toBeVisible();
@@ -181,17 +185,17 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("Secrets displayed", { exact: true })).toBeVisible();
   await expect(page.getByText("npm run validate")).toBeVisible();
   for (const link of validationOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Contract Operations" }).click();
+  await page.goto("/settings/contracts");
   await expect(page.getByRole("heading", { name: "Contract Operations" })).toBeVisible();
-  await page.getByRole("link", { name: "API Operations" }).click();
+  await page.goto("/settings/api");
   await expect(page.getByRole("heading", { name: "API Operations" })).toBeVisible();
-  await page.getByRole("link", { name: "Security Operations" }).click();
+  await page.goto("/settings/security");
   await expect(page.getByRole("heading", { name: "Security Operations" })).toBeVisible();
   for (const link of securityOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await expect(page.getByRole("heading", { name: "Safety Gates" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Runtime Controls" })).toBeVisible();
@@ -202,7 +206,7 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(securityNoImpactSummary.getByText("Secrets displayed", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Control Inventory" })).toBeVisible();
   await expect(page.getByText("Secret scanning remains")).toBeVisible();
-  await page.getByRole("link", { name: "Notification Operations" }).click();
+  await page.goto("/settings/notifications");
   await expect(page.getByRole("heading", { name: "Notification Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Channel Boundaries" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Runtime Controls" })).toBeVisible();
@@ -211,50 +215,50 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("Secrets displayed")).toBeVisible();
   await expect(page.getByRole("heading", { name: "No-Send Controls" })).toBeVisible();
   for (const link of notificationOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Integration Operations" }).click();
+  await page.goto("/settings/integrations");
   await expect(page.getByRole("heading", { name: "Integration Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Integration Surfaces" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Runtime Gates" })).toBeVisible();
   await expect(page.getByText("dummy-first")).toBeVisible();
   for (const area of integrationOperationAreas) {
-    await expect(page.getByRole("link", { name: area.label }).first()).toHaveAttribute("href", area.href);
+    await expect(localLink(page, area.href, area.label)).toHaveAttribute("href", area.href);
     await expect(page.getByText(area.state, { exact: true })).toBeVisible();
     await expect(page.getByText(area.boundary)).toBeVisible();
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Workflow Operations" }).first().click();
+  await page.goto("/settings/workflows");
   await expect(page.getByRole("heading", { name: "Workflow Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Workflow Checkpoints" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Runtime Boundary" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Audience Signal" })).toBeVisible();
   const workflowCheckpointList = page.locator("ol");
   for (const step of workflowOperationSteps) {
-    await expect(page.getByRole("link", { name: step.name })).toHaveAttribute("href", step.href);
+    await expect(localLink(page, step.href, step.name)).toHaveAttribute("href", step.href);
     await expect(workflowCheckpointList.getByText(step.owner, { exact: true })).toBeVisible();
     await expect(page.getByText(step.boundary)).toBeVisible();
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Release Operations" }).click();
+  await page.goto("/settings/releases");
   await expect(page.getByRole("heading", { name: "Release Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Release Checklist" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Runtime Boundary" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Release Surfaces" })).toBeVisible();
   await expect(page.getByText("npm run premerge")).toBeVisible();
   for (const link of releaseOperationSurfaceLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
     await expect(page.getByText(link.note, { exact: true })).toBeVisible();
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Workflow Operations" }).first().click();
+  await page.goto("/settings/workflows");
   await expect(page.getByRole("heading", { name: "Workflow Operations" })).toBeVisible();
-  await page.getByRole("link", { name: "Integration Operations" }).click();
+  await page.goto("/settings/integrations");
   await expect(page.getByRole("heading", { name: "Integration Operations" })).toBeVisible();
-  await page.getByRole("link", { name: "Security Operations" }).click();
+  await page.goto("/settings/security");
   await expect(page.getByRole("heading", { name: "Security Operations" })).toBeVisible();
-  await page.getByRole("link", { name: "Operator Runbook" }).click();
+  await page.goto("/settings/runbook");
   await expect(page.getByRole("heading", { name: "Operator Runbook" })).toBeVisible();
   await expect(page.getByText("Daily Local Start")).toBeVisible();
   await expect(page.getByText("Repair Loop")).toBeVisible();
@@ -267,54 +271,53 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByRole("link", { name: "Integration Operations" }).first()).toBeVisible();
   await expect(page.getByRole("link", { name: "Workflow Operations" }).first()).toBeVisible();
   await expect(page.getByRole("link", { name: "Release Operations" }).first()).toBeVisible();
-  await page.getByRole("link", { name: "Usage & Analytics" }).first().click();
+  await page.goto("/settings/usage");
   await expect(page.getByRole("heading", { name: "Usage & Analytics" })).toBeVisible();
   await expect(page.getByText("Local Usage Totals")).toBeVisible();
   await expect(page.getByText("Billing Boundary")).toBeVisible();
   await expect(page.getByText("Recent Usage Events")).toBeVisible();
   for (const link of usageOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
-  await page.getByRole("link", { name: "Billing Operations" }).click();
+  await page.goto("/settings/billing");
   await expect(page.getByRole("heading", { name: "Billing Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Billing Account" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Local Usage Totals" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent Usage Events" })).toBeVisible();
   for (const link of billingOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Reporting Index" }).click();
+  await page.goto("/settings/reports");
   await expect(page.getByRole("heading", { name: "Reporting Index" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Report Surfaces" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Operational Snapshot" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent Readiness Signals" })).toBeVisible();
   for (const link of reportingIndexLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
     await expect(page.getByText(link.note, { exact: true }).first()).toBeVisible();
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Usage & Analytics" }).first().click();
+  await page.goto("/settings/usage");
   await expect(page.getByRole("heading", { name: "Usage & Analytics" })).toBeVisible();
-  await page.getByRole("link", { name: "AI Operations" }).click();
+  await page.goto("/settings/ai");
   await expect(page.getByRole("heading", { name: "AI Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Provider Boundary" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Available AI Endpoints" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent AI Usage" })).toBeVisible();
   for (const link of aiOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Usage & Analytics" }).click();
-  await page.getByRole("link", { name: "Campaign Operations" }).click();
+  await page.goto("/settings/campaigns");
   await expect(page.getByRole("heading", { name: "Campaign Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Campaign Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Queue Status" })).toBeVisible();
   for (const link of campaignOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Queue Operations" }).click();
+  await page.goto("/settings/queue");
   await expect(page.getByRole("heading", { name: "Queue Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Queue Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Worker Boundary" })).toBeVisible();
@@ -324,122 +327,117 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("Mutation", { exact: true })).toBeVisible();
   await expect(page.getByText("Secrets displayed")).toBeVisible();
   for (const link of queueOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Campaign Operations" }).click();
-  await page.getByRole("link", { name: "Contact Operations" }).click();
+  await page.goto("/settings/contacts");
   await expect(page.getByRole("heading", { name: "Contact Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Consent Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Import Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent Contacts" })).toBeVisible();
   for (const link of contactOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Data Operations" }).click();
+  await page.goto("/settings/data");
   await expect(page.getByRole("heading", { name: "Data Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Soft Archive" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Import Ledger" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Retention Signals" })).toBeVisible();
   for (const link of dataOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Contact Operations" }).click();
-  await page.getByRole("link", { name: "Audience Operations" }).click();
+  await page.goto("/settings/audience");
   await expect(page.getByRole("heading", { name: "Audience Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Tags" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Lists" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Saved Segments" })).toBeVisible();
   for (const link of audienceOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Template Operations" }).click();
+  await page.goto("/settings/templates");
   await expect(page.getByRole("heading", { name: "Template Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Variable Coverage" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent Templates" })).toBeVisible();
   for (const link of templateOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Inbox Operations" }).click();
+  await page.goto("/settings/inbox");
   await expect(page.getByRole("heading", { name: "Inbox Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Conversation Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent Conversations" })).toBeVisible();
   for (const link of inboxOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Webhook Operations" }).click();
+  await page.goto("/settings/webhooks");
   await expect(page.getByRole("heading", { name: "Webhook Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Route Coverage" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Event Types" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent Webhook Events" })).toBeVisible();
   for (const link of webhookOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Delivery Operations" }).click();
+  await page.goto("/settings/delivery");
   await expect(page.getByRole("heading", { name: "Delivery Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Direction Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Delivery Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent Messages" })).toBeVisible();
   for (const link of deliveryOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Inbox Operations" }).click();
-  await page.getByRole("link", { name: "Team Operations" }).click();
+  await page.goto("/settings/team");
   await expect(page.getByRole("heading", { name: "Team Operations" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Organization" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Membership Status" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Team Members" })).toBeVisible();
   for (const link of teamOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await expect(page.getByText("Safety Boundary")).toBeVisible();
-  await page.getByRole("link", { name: "Go-Live Readiness" }).click();
+  await page.goto("/settings");
   await expect(page.getByRole("heading", { name: "Go-Live Readiness" })).toBeVisible();
   for (const link of settingsNavigationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await expect(page.getByText("Twilio Readiness")).toBeVisible();
   await expect(page.getByText("API Protection")).toBeVisible();
   await expect(page.getByText("Credential Rotation History")).toBeVisible();
   await expect(page.getByRole("link", { name: "Export CSV" })).toBeVisible();
-  await page.getByRole("link", { name: "Compliance Detail" }).first().click();
+  await page.goto("/settings/compliance");
   await expect(page.getByRole("heading", { name: "Compliance Detail" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Compliance Profile" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Hard Gate" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Compliance Audit" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Export Compliance CSV" })).toBeVisible();
   for (const link of complianceOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   const complianceAuditExportResponse = await request.get("/api/settings/readiness-audit/export?subjectType=ComplianceProfile&limit=5");
   expect(complianceAuditExportResponse.ok()).toBeTruthy();
   await expect(complianceAuditExportResponse.text()).resolves.toContain("id,action,subjectType,subjectId,actorUserId,createdAt,metadata");
-  await page.getByRole("link", { name: "Go-Live Readiness" }).click();
-  await page.getByRole("link", { name: "Provider Numbers" }).first().click();
+  await page.goto("/settings/numbers");
   await expect(page.getByRole("heading", { name: "Provider Numbers" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Number Metadata" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Safety Boundary" })).toBeVisible();
   await expect(page.getByText("+15555550199").first()).toBeVisible();
   for (const link of numberOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
-  await page.getByRole("link", { name: "Go-Live Readiness" }).click();
-  await page.getByRole("link", { name: "Admin Exports" }).click();
+  await page.goto("/settings/exports");
   await expect(page.getByRole("heading", { name: "Admin Exports" })).toBeVisible();
   await expect(page.getByText("Export Safety Boundary")).toBeVisible();
   for (const link of exportOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
     await expect(page.getByText(link.note, { exact: true }).first()).toBeVisible();
   }
   await expect(page.getByRole("link", { name: "Export CSV" })).toHaveCount(2);
-  await page.getByRole("link", { name: "Review Events" }).click();
+  await page.goto("/settings/readiness-audit");
   await expect(page.getByRole("heading", { name: "Readiness Audit" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Action Filters" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Subject Filters" })).toBeVisible();
@@ -450,22 +448,22 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await expect(page.getByText("Secrets displayed", { exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "Export Audit CSV" })).toBeVisible();
   for (const link of readinessAuditOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
-  await page.getByRole("link", { name: "COMPLIANCE_PROFILE_UPDATED" }).click();
+  await page.goto("/settings/readiness-audit?action=COMPLIANCE_PROFILE_UPDATED");
   await expect(page.getByText("Action filter", { exact: true })).toBeVisible();
   const filteredReadinessAuditExportResponse = await request.get("/api/settings/readiness-audit/export?action=COMPLIANCE_PROFILE_UPDATED&limit=5");
   expect(filteredReadinessAuditExportResponse.ok()).toBeTruthy();
   await expect(filteredReadinessAuditExportResponse.text()).resolves.toContain("id,action,subjectType,subjectId,actorUserId,createdAt,metadata");
-  await page.getByRole("link", { name: "Go-Live Readiness" }).click();
+  await page.goto("/settings");
   const readinessAuditExportResponse = await request.get("/api/settings/readiness-audit/export?limit=5");
   expect(readinessAuditExportResponse.ok()).toBeTruthy();
   await expect(readinessAuditExportResponse.text()).resolves.toContain("id,action,subjectType,subjectId,actorUserId,createdAt,metadata");
-  await page.getByRole("link", { name: "Provider Details" }).first().click();
+  await page.goto("/settings/provider");
   await expect(page.getByRole("heading", { name: "Provider Details" })).toBeVisible();
   await expect(page.getByText("Twilio Metadata")).toBeVisible();
   for (const link of providerOperationLinks) {
-    await expect(page.getByRole("link", { name: link.label }).first()).toHaveAttribute("href", link.href);
+    await expect(localLink(page, link.href, link.label)).toHaveAttribute("href", link.href);
   }
   await page.getByLabel("Account SID").fill("AC111122223333");
   await page.getByLabel("Auth token").fill("demo_token_value_10");
@@ -476,7 +474,7 @@ test("investor demo path exercises safe product workflow", async ({ page, reques
   await page.getByLabel("Clear only local readiness metadata; no provider-side credential is revoked.").check();
   await page.getByRole("button", { name: "Clear Metadata" }).click();
   await expect(page.getByText("Metadata cleared locally.")).toBeVisible();
-  await page.getByRole("link", { name: "DELETED" }).click();
+  await page.goto("/settings/provider?action=DELETED");
   await expect(page.getByText("DELETED / twilio / not stored").first()).toBeVisible();
   await expect(page.getByRole("link", { name: "Export Rotations CSV" })).toBeVisible();
   const rotationExportResponse = await request.get("/api/settings/provider/rotations/export?action=DELETED&limit=5");

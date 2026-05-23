@@ -15,14 +15,15 @@ type ImportSummary = {
 
 export function ContactImportForm() {
   const router = useRouter();
-  const [csv, setCsv] = useState(sampleCsv);
-  const [filename, setFilename] = useState("product-contacts.csv");
   const [summary, setSummary] = useState<ImportSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const submittedFilename = String(formData.get("filename") ?? "product-contacts.csv");
+    const submittedCsv = String(formData.get("csv") ?? sampleCsv);
     setPending(true);
     setError(null);
     setSummary(null);
@@ -30,7 +31,7 @@ export function ContactImportForm() {
     const response = await fetch("/api/contacts/imports", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ filename, csv })
+      body: JSON.stringify({ filename: submittedFilename, csv: submittedCsv })
     });
     const payload = await response.json();
 
@@ -51,18 +52,16 @@ export function ContactImportForm() {
         Filename
         <input
           className="rounded border border-slate-300 px-3 py-2 text-slate-950"
+          defaultValue="product-contacts.csv"
           name="filename"
-          onChange={(event) => setFilename(event.target.value)}
-          value={filename}
         />
       </label>
       <label className="grid gap-2 text-sm font-medium text-slate-700">
         CSV rows
         <textarea
           className="min-h-40 rounded border border-slate-300 px-3 py-2 font-mono text-sm text-slate-950"
+          defaultValue={sampleCsv}
           name="csv"
-          onChange={(event) => setCsv(event.target.value)}
-          value={csv}
         />
       </label>
       <div className="flex flex-wrap items-center gap-3">

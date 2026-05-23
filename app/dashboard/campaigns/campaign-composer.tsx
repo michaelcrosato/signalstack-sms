@@ -112,7 +112,6 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
 
     const nextCampaignId = payload.campaign.id as string;
     setCampaignId(nextCampaignId);
-    setStatus("Draft saved. Preflight is ready.");
 
     const preflightResponse = await fetch(`/api/campaigns/${nextCampaignId}/preflight`, {
       method: "POST",
@@ -128,6 +127,7 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
     }
 
     setPreflight(preflightPayload.preflight);
+    setStatus("Draft saved. Preflight is ready.");
     setPending(false);
     router.refresh();
   }

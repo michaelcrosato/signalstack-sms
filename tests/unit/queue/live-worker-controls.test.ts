@@ -1488,6 +1488,38 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects malformed primitive control entries without coercion", () => {
+    const implementedControls = implementedFrozenControls();
+
+    for (const malformedControl of [
+      null,
+      undefined,
+      false,
+      0,
+      1n,
+      "implemented",
+      Symbol("implemented-live-worker-control")
+    ]) {
+      const controls = Object.freeze(
+        implementedControls.map((control, index) => (index === 0 ? malformedControl : control))
+      );
+
+      expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).not.toThrow();
+      expect(() => liveWorkerControlsExposeOnlyPublicFields(controls)).not.toThrow();
+      expect(() => liveWorkerControlsUseSupportedStatuses(controls)).not.toThrow();
+      expect(() => liveWorkerControlIdsMatchRequiredChecklist(controls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).toBe(false);
+      expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(false);
+      expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(false);
+      expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).toBe(false);
+    }
+  });
+
   it("does not coerce malformed controls evidence before denying authorization", () => {
     const hostileControlsEvidence = Object.freeze({
       [Symbol.toPrimitive]: () => {
@@ -1511,6 +1543,42 @@ describe("production live campaign worker controls", () => {
         frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, hostileControlsEvidence)
       )
     ).toBe(false);
+  });
+
+  it("rejects malformed wrapper controls evidence without fallback or coercion", () => {
+    const hostileControlsEvidence = Object.freeze({
+      [Symbol.toPrimitive]: () => {
+        throw new Error("malformed wrapper controls evidence must not be coerced");
+      },
+      toString: () => {
+        throw new Error("malformed wrapper controls evidence toString must not be called");
+      },
+      valueOf: () => {
+        throw new Error("malformed wrapper controls evidence valueOf must not be called");
+      }
+    });
+
+    for (const controls of [
+      null,
+      undefined,
+      false,
+      0,
+      1n,
+      "implemented",
+      Symbol("implemented-live-worker-controls"),
+      hostileControlsEvidence
+    ]) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).toBe(false);
+    }
   });
 
   it("rejects proxy-backed control evidence without throwing", () => {

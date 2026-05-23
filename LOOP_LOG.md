@@ -1,5 +1,17 @@
 # LOOP_LOG
 
+## Run 448  GREEN  live-worker-primitive-entry-evidence  2026-05-22
+Objective:    Prove malformed primitive supplied control entries cannot authorize the reserved live worker class.
+Changed:
+- Rehydrated the home laptop workspace and confirmed the protected local gate is green with demo-safe local env and Docker-backed local Postgres/Redis.
+- Preserved interrupted stability fixes for schedule JSON validation, campaign composer status timing, contact import form submission, and Playwright demo/product navigation.
+- Added live-worker coverage for exact-length frozen `production-live-campaign` control arrays whose indexed entry is nullish or primitive, keeping the reserved class unauthorized without coercion.
+- Updated queue/testing contracts, production-worker/testing docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the primitive control-entry boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, production workers, protected gate scripts, or live feature flags were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: working tree
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 434  GREEN  live-worker-hidden-symbol-entry-evidence  2026-05-22 14:00
 Objective:    Prove hidden symbol metadata on supplied control entries cannot authorize the reserved live worker class.
 Changed:
