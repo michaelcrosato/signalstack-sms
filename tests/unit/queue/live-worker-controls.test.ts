@@ -524,6 +524,73 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("does not invoke inherited array coercion metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as {
+      [Symbol.toPrimitive]?: unknown;
+      toString?: unknown;
+      valueOf?: unknown;
+    };
+    const originalToPrimitiveDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, Symbol.toPrimitive);
+    const originalToStringDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, "toString");
+    const originalValueOfDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, "valueOf");
+
+    try {
+      Object.defineProperties(Array.prototype, {
+        [Symbol.toPrimitive]: {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited control-array Symbol.toPrimitive must not be read");
+          }
+        },
+        toString: {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited control-array toString must not be read");
+          }
+        },
+        valueOf: {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited control-array valueOf must not be read");
+          }
+        }
+      });
+
+      expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls)).not.toThrow();
+      expect(() => liveWorkerControlsAreFrozen(implementedControls)).not.toThrow();
+      expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(implementedControls)).not.toThrow();
+      expect(liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls)).toBe(true);
+      expect(liveWorkerControlsAreFrozen(implementedControls)).toBe(true);
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls)).toBe(true);
+      expect(liveWorkerControlsAreImplemented(implementedControls)).toBe(true);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+        )
+      ).toBe(true);
+    } finally {
+      if (originalToPrimitiveDescriptor === undefined) {
+        delete arrayPrototype[Symbol.toPrimitive];
+      } else {
+        Object.defineProperty(Array.prototype, Symbol.toPrimitive, originalToPrimitiveDescriptor);
+      }
+
+      if (originalToStringDescriptor === undefined) {
+        delete arrayPrototype.toString;
+      } else {
+        Object.defineProperty(Array.prototype, "toString", originalToStringDescriptor);
+      }
+
+      if (originalValueOfDescriptor === undefined) {
+        delete arrayPrototype.valueOf;
+      } else {
+        Object.defineProperty(Array.prototype, "valueOf", originalValueOfDescriptor);
+      }
+    }
+  });
+
   it("rejects array subclass evidence before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
 

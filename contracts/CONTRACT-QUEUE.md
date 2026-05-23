@@ -45,6 +45,7 @@ Own or inherited accessor-backed `Symbol.toStringTag` authorization-wrapper meta
 Inherited accessor-backed `Symbol.toStringTag` deployment-class metadata must deny before supplied controls are inspected and without reading the tag getter.
 Control entries with own `Symbol.toStringTag`, `Symbol.toPrimitive`, `toString`, or `valueOf` metadata must deny without reading or invoking those hooks.
 Control arrays with own `Symbol.toPrimitive`, `toString`, or `valueOf` metadata must deny without reading or invoking those hooks.
+Exact frozen control-array evidence must remain authorized without reading inherited `Array.prototype` `Symbol.toPrimitive`, `toString`, or `valueOf` metadata.
 
 - The worker uses validated version-1 scheduled campaign payloads.
 - Invalid payloads or missing scheduled campaigns are marked `FAILED`.

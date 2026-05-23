@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 575  GREEN  live-worker-inherited-array-coercion  2026-05-23 10:33
+Objective:    Prove inherited `Array.prototype` coercion metadata cannot influence exact frozen live-worker control-array evidence.
+Changed:
+- Added live-worker unit coverage showing exact frozen control arrays authorize without reading inherited `Array.prototype` `Symbol.toPrimitive`, `toString`, or `valueOf` metadata.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the inherited array coercion metadata boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 551  GREEN  live-worker-revoked-webcrypto-controls-traps  2026-05-23 08:01
 Objective:    Prove revoked proxy-backed runtime-supported Web Crypto records cannot authorize the reserved live worker class as controls evidence without object-trap inspection.
 Changed:
