@@ -2021,6 +2021,41 @@ describe("production live campaign worker controls", () => {
     ).toBe(true);
   });
 
+  it("rejects extensible authorization wrappers before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("extensible authorization wrappers must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("extensible authorization wrappers must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("extensible authorization wrappers must not inspect control evidence");
+      }
+    });
+    const extensibleWrapperWithFrozenFields = Object.defineProperties(
+      {},
+      {
+        workerDeploymentClass: {
+          value: reservedLiveWorkerDeploymentClass,
+          enumerable: true,
+          writable: false,
+          configurable: false
+        },
+        controls: {
+          value: throwingEvidence,
+          enumerable: true,
+          writable: false,
+          configurable: false
+        }
+      }
+    );
+
+    expect(Object.isFrozen(extensibleWrapperWithFrozenFields)).toBe(false);
+    expect(() => liveWorkerDeploymentClassIsAuthorized(extensibleWrapperWithFrozenFields)).not.toThrow();
+    expect(liveWorkerDeploymentClassIsAuthorized(extensibleWrapperWithFrozenFields)).toBe(false);
+  });
+
   it("rejects non-frozen authorization wrapper descriptors before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const throwingEvidence = new Proxy(implementedControls, {

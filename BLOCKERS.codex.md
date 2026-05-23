@@ -1,8 +1,8 @@
 # Codex Blockers
 
-Run number: 482
+Run number: 483
 
-- No blocker from tampered-prototype live-worker authorization-wrapper coverage. Focused queue coverage, production worker policy check, contracts check, typecheck, and the protected local gate passed; the change is local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+- No blocker from extensible-wrapper live-worker authorization-wrapper coverage. Focused queue coverage and the protected local gate passed; the change is local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
 
 Run number: 480
 
@@ -1192,3 +1192,4 @@ No blocker from the latest contract route inventory hardening. The change tighte
 - No blocker from the latest campaign cancel route safety coverage. The route now has focused unit coverage for role denial before local cancellation, missing-campaign `404`, and successful local paused-campaign responses without providers, BullMQ enqueueing, worker execution, billing, notifications, SMS, email, live AI, secret exposure, live feature enablement, protected gate-script edits, or destructive production actions.
 - No blocker from the latest inbox JSON mutation hardening. The change is local route validation/test/docs coverage only and does not call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
 - No blocker from the latest type-asserted destructured `globalThis` alias hardening. Focused auth coverage and the protected local gate passed; the change tightens local static API authorization coverage only and does not execute API handlers, use production credentials, call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
+- No blocker from the latest live-worker extensible-wrapper coverage. The change adds local unit coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.

@@ -1,11 +1,11 @@
 # Codex Summary
 
-Run number: 482
+Run number: 483
 
-- Added live-worker authorization-wrapper coverage proving tampered-prototype wrapper objects cannot satisfy the frozen ordinary-object evidence contract for the reserved `production-live-campaign` class.
-- Updated the queue contract, production worker policy, NEXT_PROMPTS, current state matrix, blockers, and loop log for the tampered-prototype wrapper boundary.
-- Focused checks passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts`, `npm run production-worker:check`, `npm run contracts:check`, and `npm run typecheck`.
-- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 519 tests, Playwright smoke, and build green.
+- Added live-worker authorization-wrapper coverage proving extensible wrapper objects with frozen-looking public fields deny before supplied controls are inspected for the reserved `production-live-campaign` class.
+- Updated NEXT_PROMPTS, current state matrix, blockers, and loop log for the extensible-wrapper boundary.
+- Focused check passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts`.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 520 tests, Playwright smoke, and build green.
 - No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution outside validation, protected gate-script edits, or live feature enablement were used.
 
 ## Previous Run
@@ -3807,3 +3807,4 @@ Latest live-worker duplicate-entry-key coverage proves proxy-backed `production-
 - Latest campaign cancel route safety coverage proves role denials return before local cancellation, missing campaigns return `404`, and successful cancellation returns the locally paused campaign. Focused unit coverage passed; the change is local route test/docs coverage only and does not call providers, enqueue BullMQ work, execute workers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
 - Latest inbox JSON mutation hardening makes inbox/demo inbound mutation routes return `400` validation responses for malformed JSON before local inbound message, conversation message, assignment, note, or resolve repository mutations can run. Focused unit coverage passed without live SMS, provider calls, billing, notifications, live AI, secrets, protected gate-script edits, or destructive production actions.
 - Latest type-asserted destructured `globalThis` alias hardening normalizes `Object`, `Reflect`, and `Request` aliases destructured from `globalThis as typeof globalThis` or `globalThis satisfies typeof globalThis` before mutating-route body-reader role-gate checks. Focused auth coverage and the protected local gate passed; the change is local static test coverage only and does not execute API handlers, use production credentials, call providers, bill, notify, send SMS/email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
+- Latest live-worker extensible-wrapper coverage proves authorization wrappers with frozen-looking public fields but extensible object state deny before hostile supplied controls are inspected. Focused unit coverage and the protected local gate passed; the change is local unit coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.

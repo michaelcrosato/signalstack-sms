@@ -2,9 +2,9 @@
 
 Last updated: 2026-05-23.
 
-Run 482 note: reserved `production-live-campaign` authorization-wrapper coverage now proves tampered-prototype wrapper objects cannot satisfy the frozen ordinary-object evidence contract or inspect supplied controls before denial.
+Run 483 note: reserved `production-live-campaign` authorization-wrapper coverage now proves extensible wrapper objects with frozen-looking public fields deny before supplied controls are inspected.
 
-Latest protected local gate for Run 482: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 519 tests, Playwright smoke, and build green.
+Latest protected local gate for Run 483: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 520 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 
