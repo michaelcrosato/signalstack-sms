@@ -27,7 +27,8 @@ export async function PATCH(request: Request, { params }: ContactParams) {
     return roleResponse;
   }
 
-  const payload = contactUpdateSchema.safeParse(await request.json());
+  const rawPayload = await request.json().catch(() => undefined);
+  const payload = contactUpdateSchema.safeParse(rawPayload);
 
   if (!payload.success) {
     return NextResponse.json({ error: "Invalid contact payload.", issues: payload.error.issues }, { status: 400 });

@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 457
+
+- Hardened contact create/update/merge/import routes so malformed JSON returns `400` with the documented invalid contact/import payload shape instead of throwing before validation.
+- Added route-level coverage proving malformed `POST /api/contacts`, `PATCH /api/contacts/:contactId`, `POST /api/contacts/:contactId/merge`, and `POST /api/contacts/imports` bodies do not call local contact upsert/update/merge, CSV parsing, or import repository mutations.
+- Updated the testing contract, testing docs, NEXT_PROMPTS, and current state matrix for the malformed contact JSON mutation boundary.
+- Focused check passed: `npm run test -- tests/unit/api/contact-json-route.test.ts tests/unit/api/campaign-json-route.test.ts tests/unit/api/template-json-route.test.ts` with 8 tests.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 52 Vitest files / 468 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 455
 
 - Hardened campaign create/update routes so malformed JSON returns `400` with the documented invalid campaign payload shape instead of throwing before validation.

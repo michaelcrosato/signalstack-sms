@@ -16,7 +16,8 @@ export async function POST(request: Request, { params }: ContactMergeParams) {
     return roleResponse;
   }
 
-  const payload = contactMergeSchema.safeParse(await request.json());
+  const rawPayload = await request.json().catch(() => undefined);
+  const payload = contactMergeSchema.safeParse(rawPayload);
 
   if (!payload.success) {
     return NextResponse.json({ error: "Invalid contact merge payload.", issues: payload.error.issues }, { status: 400 });

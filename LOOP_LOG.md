@@ -4130,3 +4130,12 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.
+## Run 457  GREEN  contact-json-malformed-mutations  2026-05-22 21:22
+Objective:    Prove malformed contact mutation JSON cannot throw past local validation or mutate contacts/imports.
+Changed:
+- Hardened `POST /api/contacts`, `PATCH /api/contacts/:contactId`, `POST /api/contacts/:contactId/merge`, and `POST /api/contacts/imports` to return documented `400` invalid payload responses for malformed JSON.
+- Added route-level coverage proving malformed contact create/update/merge/import bodies do not call local contact upsert/update/merge, CSV parsing, or import repository mutations.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the malformed contact JSON mutation boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.
