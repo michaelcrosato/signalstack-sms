@@ -3368,6 +3368,68 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects proxy-backed URL and weak-reference deployment class impostors before inspecting supplied controls", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("proxy-backed URL and weak-reference worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("proxy-backed URL and weak-reference worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("proxy-backed URL and weak-reference worker classes must not inspect control evidence");
+      }
+    });
+    const urlAndWeakReferenceClasses = [
+      Object.freeze(new URL("https://signalstack.local/production-live-campaign")),
+      Object.freeze(new URLSearchParams("workerDeploymentClass=production-live-campaign")),
+      Object.freeze(new WeakRef(implementedFrozenControls()[0])),
+      Object.freeze(new FinalizationRegistry(() => undefined))
+    ];
+    const proxyBackedUrlAndWeakReferenceClasses = urlAndWeakReferenceClasses.map(
+      (target) =>
+        new Proxy(target, {
+          get: () => {
+            throw new Error("proxy-backed URL and weak-reference worker class values must not be read");
+          },
+          getPrototypeOf: () => {
+            throw new Error("proxy-backed URL and weak-reference worker class prototypes must not be read");
+          },
+          getOwnPropertyDescriptor: () => {
+            throw new Error("proxy-backed URL and weak-reference worker class descriptors must not be read");
+          },
+          ownKeys: () => {
+            throw new Error("proxy-backed URL and weak-reference worker class keys must not be read");
+          }
+        })
+    );
+    const revokedUrlAndWeakReferenceClasses = urlAndWeakReferenceClasses.map((target) => {
+      const { proxy, revoke } = Proxy.revocable(target, {
+        get: () => {
+          throw new Error("revoked URL and weak-reference worker class values must not be read");
+        }
+      });
+      revoke();
+      return proxy;
+    });
+
+    for (const workerDeploymentClass of [
+      ...proxyBackedUrlAndWeakReferenceClasses,
+      ...revokedUrlAndWeakReferenceClasses
+    ]) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects every runtime-supported typed-array deployment class impostor before inspecting supplied controls", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {

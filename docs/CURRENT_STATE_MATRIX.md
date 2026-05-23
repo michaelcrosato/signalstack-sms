@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 559 note: live-worker authorization now denies proxy-backed and revoked proxy-backed URL-shaped, weak-reference, and finalization-registry deployment-class values before supplied controls are inspected, without reading object traps.
+
 Run 558 note: live-worker authorization now denies proxy-backed and revoked proxy-backed array-buffer-shaped deployment-class values before supplied controls are inspected, without reading object traps.
 
 Run 557 note: live-worker authorization now denies proxy-backed and revoked proxy-backed boxed primitive deployment-class values before supplied controls are inspected, without reading object traps.
