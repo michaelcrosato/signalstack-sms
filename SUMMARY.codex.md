@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 466
+
+- Added focused readiness audit API route coverage for `GET /api/settings/readiness-audit` and `GET /api/settings/readiness-audit/export`.
+- The new tests prove unsupported action/subject filters return `400` before local audit event reads or CSV serialization, while supported bounded filters call only the tenant-scoped local audit repository and serializer.
+- Updated testing contracts/docs and NEXT_PROMPTS for the readiness audit route query boundary.
+- Focused checks passed: `npm run test -- tests/unit/api/readiness-audit-route.test.ts`, `npm run typecheck`, and `npm run contracts:check`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 465
 
 - Added a frozen `lib/operations/webhook-operations.ts` inventory for `/settings/webhooks` route coverage, event-type vocabularies, no-impact summary states, and safety boundaries.

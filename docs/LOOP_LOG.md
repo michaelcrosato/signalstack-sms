@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 466  GREEN  readiness-audit-route-query-safety  2026-05-22 22:26
+Objective:    Prove readiness audit JSON and CSV export query validation stops unsafe filters before local reads or serialization.
+Changed:
+- Added route-level coverage for unsupported readiness-audit list/export filters returning `400` before local audit event reads or CSV serialization.
+- Added successful bounded-filter coverage for JSON and CSV export routes using tenant-scoped local audit metadata only.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, and BLOCKERS for the readiness audit route query boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable or continue hardening local route safety without enabling live sends.
+
 ## Run 465  GREEN  webhook-operations-inventory  2026-05-22 22:18
 Objective:    Move `/settings/webhooks` route and safety metadata into tested frozen operations inventory.
 Changed:
