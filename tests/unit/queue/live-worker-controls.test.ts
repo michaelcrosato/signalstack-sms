@@ -3009,6 +3009,43 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects built-in object authorization-wrapper impostors before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("built-in wrapper impostors must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("built-in wrapper impostors must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("built-in wrapper impostors must not inspect control evidence");
+      }
+    });
+    const wrapperFields = {
+      workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+      controls: throwingEvidence
+    };
+    const builtInWrapperImpostors = [
+      Object.freeze(Object.assign(new Map(), wrapperFields)),
+      Object.freeze(Object.assign(new Set(), wrapperFields)),
+      Object.freeze(Object.assign(new WeakMap(), wrapperFields)),
+      Object.freeze(Object.assign(new WeakSet(), wrapperFields)),
+      Object.freeze(Object.assign(new Uint8Array(0), wrapperFields)),
+      Object.freeze(Object.assign(new DataView(new ArrayBuffer(8)), wrapperFields)),
+      Object.freeze(Object.assign(Promise.resolve(implementedFrozenControls()), wrapperFields)),
+      Object.freeze(Object.assign(new String(reservedLiveWorkerDeploymentClass), wrapperFields)),
+      Object.freeze(Object.assign(new Number(1), wrapperFields)),
+      Object.freeze(Object.assign(new Boolean(true), wrapperFields)),
+      Object.freeze(Object.assign(/production-live-campaign/, wrapperFields)),
+      Object.freeze(Object.assign(new Error("production-live-campaign"), wrapperFields))
+    ];
+
+    for (const input of builtInWrapperImpostors) {
+      expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
+    }
+  });
+
   it("rejects tampered authorization wrapper prototypes before inspecting controls", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       getPrototypeOf: () => {

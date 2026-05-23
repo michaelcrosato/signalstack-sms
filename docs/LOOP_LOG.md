@@ -3930,3 +3930,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 490  GREEN  live-worker-built-in-wrapper-impostors  2026-05-23 01:12
+Objective:    Prove built-in object-shaped authorization-wrapper impostors cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage for maps, sets, weak collections, typed arrays, data views, promises, boxed primitives, regular expressions, and errors carrying `workerDeploymentClass` and `controls` public fields.
+- Proved those non-ordinary wrappers deny before hostile supplied controls are inspected.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the built-in wrapper-impostor boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
