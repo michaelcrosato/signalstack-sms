@@ -3206,6 +3206,33 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects every runtime-supported typed-array deployment class impostor before inspecting supplied controls", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("typed-array worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("typed-array worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("typed-array worker classes must not inspect control evidence");
+      }
+    });
+
+    for (const workerDeploymentClass of typedArrayBuiltInTargets().map((target) => Object.freeze(target))) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("does not read deployment class toStringTag accessors before denying authorization", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {
