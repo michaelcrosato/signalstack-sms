@@ -554,6 +554,41 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("does not read inherited array async-iterator metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as Record<PropertyKey, unknown>;
+    const originalAsyncIteratorDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, Symbol.asyncIterator);
+
+    try {
+      Object.defineProperty(Array.prototype, Symbol.asyncIterator, {
+        configurable: true,
+        get: () => {
+          throw new Error("inherited control-array async iterator must not be read");
+        }
+      });
+
+      expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls)).not.toThrow();
+      expect(() => liveWorkerControlsAreFrozen(implementedControls)).not.toThrow();
+      expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(implementedControls)).not.toThrow();
+      expect(liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls)).toBe(true);
+      expect(liveWorkerControlsAreFrozen(implementedControls)).toBe(true);
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls)).toBe(true);
+      expect(liveWorkerControlsAreImplemented(implementedControls)).toBe(true);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+        )
+      ).toBe(true);
+    } finally {
+      if (originalAsyncIteratorDescriptor === undefined) {
+        delete arrayPrototype[Symbol.asyncIterator];
+      } else {
+        Object.defineProperty(Array.prototype, Symbol.asyncIterator, originalAsyncIteratorDescriptor);
+      }
+    }
+  });
+
   it("does not invoke inherited array coercion metadata while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const arrayPrototype = Array.prototype as unknown as {
