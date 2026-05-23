@@ -7,6 +7,8 @@ import { POST as upsertNumberRoute } from "@/app/api/settings/numbers/route";
 import { DELETE as deleteProviderRoute, PATCH as updateProviderRoute } from "@/app/api/settings/provider/route";
 
 const mocks = vi.hoisted(() => ({
+  complianceProfileIsComplete: vi.fn(),
+  evaluateMessagingHardGate: vi.fn(),
   getOrCreateComplianceProfile: vi.fn(),
   getOrCreateCurrentOrg: vi.fn(),
   getProviderCredential: vi.fn(),
@@ -37,8 +39,8 @@ vi.mock("@/lib/billing/metering", () => ({
 }));
 
 vi.mock("@/lib/compliance/gates", () => ({
-  complianceProfileIsComplete: vi.fn(),
-  evaluateMessagingHardGate: vi.fn()
+  complianceProfileIsComplete: mocks.complianceProfileIsComplete,
+  evaluateMessagingHardGate: mocks.evaluateMessagingHardGate
 }));
 
 vi.mock("@/lib/db/repositories/campaigns", () => ({
@@ -92,6 +94,11 @@ describe("settings and operations JSON mutation routes", () => {
       demoMode: true
     });
     mocks.requireApiRole.mockReturnValue(null);
+    mocks.complianceProfileIsComplete.mockReturnValue(false);
+    mocks.evaluateMessagingHardGate.mockReturnValue({
+      allowed: false,
+      reasons: ["Live messaging is disabled."]
+    });
   });
 
   it("rejects malformed billing usage JSON without recording local usage", async () => {
@@ -130,6 +137,91 @@ describe("settings and operations JSON mutation routes", () => {
     });
     expect(mocks.updateComplianceProfile).not.toHaveBeenCalled();
     expect(mocks.recordLiveReadinessAuditEvent).not.toHaveBeenCalled();
+  });
+
+  it("denies compliance profile updates before parsing request bodies", async () => {
+    const denial = Response.json({ error: "Forbidden" }, { status: 403 });
+    mocks.requireApiRole.mockReturnValue(denial);
+
+    const response = await updateComplianceRoute(malformedJsonRequest("/api/settings/compliance", "PATCH"));
+
+    expect(response.status).toBe(403);
+    expect(mocks.updateComplianceProfile).not.toHaveBeenCalled();
+    expect(mocks.recordLiveReadinessAuditEvent).not.toHaveBeenCalled();
+    expect(mocks.evaluateMessagingHardGate).not.toHaveBeenCalled();
+  });
+
+  it("updates only local compliance metadata and readiness audit for valid admin requests", async () => {
+    const profile = {
+      id: "compliance_demo",
+      orgId: "org_demo",
+      businessName: "SignalStack Demo",
+      messagingUseCase: "Customer updates",
+      optInDescription: "Website opt-in form",
+      privacyPolicyUrl: "https://example.com/privacy",
+      termsOfServiceUrl: "https://example.com/terms",
+      a2pRegistrationStatus: "PENDING"
+    };
+    mocks.updateComplianceProfile.mockResolvedValue(profile);
+    mocks.complianceProfileIsComplete.mockReturnValue(true);
+    mocks.evaluateMessagingHardGate.mockReturnValue({
+      allowed: false,
+      reasons: ["Live messaging is disabled."]
+    });
+
+    const response = await updateComplianceRoute(
+      new Request("http://localhost/api/settings/compliance", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          businessName: "SignalStack Demo",
+          messagingUseCase: "Customer updates",
+          optInDescription: "Website opt-in form",
+          privacyPolicyUrl: "https://example.com/privacy",
+          termsOfServiceUrl: "https://example.com/terms",
+          a2pRegistrationStatus: "PENDING"
+        })
+      })
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      profile,
+      checklist: {
+        complete: true,
+        liveMessagingAllowed: false,
+        blockers: ["Live messaging is disabled."]
+      }
+    });
+    expect(mocks.updateComplianceProfile).toHaveBeenCalledWith("org_demo", {
+      businessName: "SignalStack Demo",
+      messagingUseCase: "Customer updates",
+      optInDescription: "Website opt-in form",
+      privacyPolicyUrl: "https://example.com/privacy",
+      termsOfServiceUrl: "https://example.com/terms",
+      a2pRegistrationStatus: "PENDING"
+    });
+    expect(mocks.recordLiveReadinessAuditEvent).toHaveBeenCalledWith("org_demo", {
+      actorUserId: "user_demo",
+      action: "COMPLIANCE_PROFILE_UPDATED",
+      subjectType: "ComplianceProfile",
+      subjectId: "compliance_demo",
+      metadata: {
+        a2pRegistrationStatus: "PENDING",
+        complete: true
+      }
+    });
+    expect(mocks.evaluateMessagingHardGate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        demoMode: true,
+        liveMessagingEnabled: false,
+        messagingProvider: "dummy",
+        complianceProfile: profile
+      })
+    );
+    expect(mocks.upsertProviderPhoneNumber).not.toHaveBeenCalled();
+    expect(mocks.upsertProviderCredentialMetadata).not.toHaveBeenCalled();
+    expect(mocks.sendLiveTestSms).not.toHaveBeenCalled();
   });
 
   it("rejects malformed provider number JSON without upserting local metadata", async () => {

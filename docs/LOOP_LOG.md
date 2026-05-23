@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 464  GREEN  compliance-settings-route-safety  2026-05-22 22:18
+Objective:    Prove compliance settings updates stay authorization-gated and local-only.
+Changed:
+- Added route-level coverage for denied compliance profile updates returning before request-body parsing or local compliance/readiness audit writes.
+- Added successful admin coverage proving only local compliance profile metadata and readiness audit records are written before evaluating the local messaging hard gate, with no provider metadata or live-test SMS side effects.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the compliance settings route safety boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.
+
 ## Run 463  GREEN  provider-settings-update-route-safety  2026-05-22 22:04
 Objective:    Prove provider credential metadata updates stay authorization-gated and local-only.
 Changed:
