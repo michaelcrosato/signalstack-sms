@@ -1663,6 +1663,63 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects hostile array-like controls evidence without reading getters or iterators", () => {
+    const hostileArrayLikeControls = Object.freeze(
+      Object.defineProperties(
+        {},
+        {
+          0: {
+            enumerable: true,
+            get: () => {
+              throw new Error("array-like control index getter must not be read");
+            }
+          },
+          length: {
+            enumerable: true,
+            get: () => {
+              throw new Error("array-like control length getter must not be read");
+            }
+          },
+          [Symbol.iterator]: {
+            enumerable: true,
+            get: () => {
+              throw new Error("array-like controls iterator must not be read");
+            }
+          }
+        }
+      )
+    );
+    const arrayPrototypeImpostor = Object.freeze(
+      Object.defineProperties(Object.create(Array.prototype) as Record<PropertyKey, unknown>, {
+        0: {
+          enumerable: true,
+          get: () => {
+            throw new Error("array-prototype impostor index getter must not be read");
+          }
+        },
+        length: {
+          enumerable: true,
+          get: () => {
+            throw new Error("array-prototype impostor length getter must not be read");
+          }
+        }
+      })
+    );
+
+    for (const controls of [hostileArrayLikeControls, arrayPrototypeImpostor]) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects proxy-backed control evidence without throwing", () => {
     const implementedControls = implementedFrozenControls();
     const throwingArrayLengthDescriptorProxy = new Proxy([...implementedControls], {
