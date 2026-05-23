@@ -4268,3 +4268,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 473  GREEN  type-asserted-globalthis-destructuring-auth  2026-05-22 23:10
+Objective:    Prove type-asserted destructured `globalThis` aliases cannot hide mutating-route body readers before role gates.
+Changed:
+- Normalized destructured `Object`, `Reflect`, and `Request` aliases from `globalThis as typeof globalThis` and `globalThis satisfies typeof globalThis` in the static mutating API authorization scanner.
+- Added regression coverage for type-asserted and `satisfies` destructured global built-in aliases before `requireApiRole`.
+- Updated testing contract/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the new auth-ordering boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
