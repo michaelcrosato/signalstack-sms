@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 556
+
+- Tightened focused live-worker unit coverage proving deployment-class objects with inherited coercion hooks cannot authorize the reserved `production-live-campaign` worker class.
+- Covered denial before hostile supplied controls can be inspected, without invoking inherited `Symbol.toPrimitive`, `toString`, or `valueOf`.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 121 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`.
+- No API handlers were executed by the focused test; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 555
 
 - Tightened focused live-worker unit coverage proving proxy-backed and revoked proxy-backed runtime-supported Web-platform, WebAssembly, and Web Crypto records cannot authorize the reserved `production-live-campaign` worker class as deployment-class evidence.

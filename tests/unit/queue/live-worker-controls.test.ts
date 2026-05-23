@@ -3151,6 +3151,44 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("does not read inherited deployment class coercion hooks before denying authorization", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("inherited-coercion worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("inherited-coercion worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("inherited-coercion worker classes must not inspect control evidence");
+      }
+    });
+    const inheritedCoercionClass = Object.freeze(
+      Object.create({
+        [Symbol.toPrimitive]: () => {
+          throw new Error("inherited worker deployment class coercion hook must not be read");
+        },
+        toString: () => {
+          throw new Error("inherited worker deployment class toString must not be called");
+        },
+        valueOf: () => {
+          throw new Error("inherited worker deployment class valueOf must not be called");
+        }
+      })
+    );
+
+    expect(() =>
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(inheritedCoercionClass as unknown as string, throwingEvidence)
+      )
+    ).not.toThrow();
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(inheritedCoercionClass as unknown as string, throwingEvidence)
+      )
+    ).toBe(false);
+  });
+
   it("rejects object-shaped deployment class impostors before inspecting supplied controls", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {
