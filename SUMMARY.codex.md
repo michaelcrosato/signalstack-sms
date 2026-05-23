@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 532
+
+- Extended live-worker unit coverage proving runtime-supported WebAssembly records cannot authorize the reserved `production-live-campaign` worker class.
+- Covered WebAssembly module, memory, global, and table records when the runtime exposes them, across controls-evidence and authorization-wrapper paths.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the WebAssembly impostor boundary.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 96 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, Vitest, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 531
 
 - Extended live-worker unit coverage proving runtime-supported Web-platform channel/port, compression stream, queueing strategy, URL pattern, and performance observer records cannot authorize the reserved `production-live-campaign` worker class.

@@ -10,6 +10,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
 
+## Run 532  GREEN  live-worker-webassembly-impostors  2026-05-23 06:16
+Objective:    Prove runtime-supported WebAssembly records cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage for WebAssembly module, memory, global, and table records where the runtime supports them as controls evidence and authorization-wrapper impostors.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the WebAssembly impostor boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 523  GREEN  live-worker-url-wrapper-impostors  2026-05-23 05:05
 Objective:    Prove URL-shaped authorization-wrapper impostors cannot authorize the reserved live worker class.
 Changed:

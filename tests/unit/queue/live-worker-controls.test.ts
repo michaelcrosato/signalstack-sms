@@ -172,6 +172,40 @@ describe("production live campaign worker controls", () => {
     return targets;
   }
 
+  function webAssemblyBuiltInTargets() {
+    const targets: object[] = [];
+
+    if (typeof WebAssembly === "undefined") {
+      return targets;
+    }
+
+    try {
+      targets.push(new WebAssembly.Module(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0])));
+    } catch {
+      // Runtime support varies; skip unsupported WebAssembly constructors.
+    }
+
+    try {
+      targets.push(new WebAssembly.Memory({ initial: 1 }));
+    } catch {
+      // Runtime support varies; skip unsupported WebAssembly constructors.
+    }
+
+    try {
+      targets.push(new WebAssembly.Global({ value: "i32", mutable: false }, 0));
+    } catch {
+      // Runtime support varies; skip unsupported WebAssembly constructors.
+    }
+
+    try {
+      targets.push(new WebAssembly.Table({ initial: 0, element: "externref" }));
+    } catch {
+      // Runtime support varies; skip unsupported WebAssembly constructors.
+    }
+
+    return targets;
+  }
+
   it("keeps the reserved production class outside the currently supported worker class list", () => {
     expect(reservedLiveWorkerDeploymentClass).toBe("production-live-campaign");
     expect(supportedWorkerDeploymentClasses).toEqual(["local-demo"]);
@@ -1845,6 +1879,7 @@ describe("production live campaign worker controls", () => {
       Object.freeze(new URLSearchParams("controls=implemented")),
       Object.freeze(new WeakRef(implementedFrozenControls()[0])),
       Object.freeze(new FinalizationRegistry(() => undefined)),
+      ...webAssemblyBuiltInTargets().map((target) => Object.freeze(target)),
       Object.freeze({
         0: implementedFrozenControls()[0],
         length: productionLiveCampaignWorkerControls.length
@@ -2340,7 +2375,24 @@ describe("production live campaign worker controls", () => {
         ownKeys: () => {
           throw new Error("finalization registry proxy controls keys trap must not be read");
         }
-      })
+      }),
+      ...webAssemblyBuiltInTargets().map(
+        (target) =>
+          new Proxy(target, {
+            get: () => {
+              throw new Error("webassembly proxy controls get trap must not be read");
+            },
+            getPrototypeOf: () => {
+              throw new Error("webassembly proxy controls prototype trap must not be read");
+            },
+            getOwnPropertyDescriptor: () => {
+              throw new Error("webassembly proxy controls descriptor trap must not be read");
+            },
+            ownKeys: () => {
+              throw new Error("webassembly proxy controls keys trap must not be read");
+            }
+          })
+      )
     ];
 
     for (const controls of proxyControlsEvidence) {
@@ -2470,7 +2522,8 @@ describe("production live campaign worker controls", () => {
       new WeakRef(implementedFrozenControls()[0]),
       new FinalizationRegistry(() => undefined),
       new ArrayBuffer(8),
-      ...webPlatformBuiltInTargets()
+      ...webPlatformBuiltInTargets(),
+      ...webAssemblyBuiltInTargets()
     ];
 
     if (typeof SharedArrayBuffer === "function") {
@@ -3884,7 +3937,8 @@ describe("production live campaign worker controls", () => {
       Object.freeze(Object.assign(new URLSearchParams("workerDeploymentClass=production-live-campaign"), wrapperFields)),
       Object.freeze(Object.assign(new WeakRef(implementedFrozenControls()[0]), wrapperFields)),
       Object.freeze(Object.assign(new FinalizationRegistry(() => undefined), wrapperFields)),
-      ...webPlatformBuiltInTargets().map((target) => Object.freeze(Object.assign(target, wrapperFields)))
+      ...webPlatformBuiltInTargets().map((target) => Object.freeze(Object.assign(target, wrapperFields))),
+      ...webAssemblyBuiltInTargets().map((target) => Object.freeze(Object.assign(target, wrapperFields)))
     ];
 
     for (const input of builtInWrapperImpostors) {
@@ -3944,7 +3998,8 @@ describe("production live campaign worker controls", () => {
       defineWrapperFields(new URLSearchParams("workerDeploymentClass=production-live-campaign")),
       defineWrapperFields(new WeakRef(implementedFrozenControls()[0])),
       defineWrapperFields(new FinalizationRegistry(() => undefined)),
-      ...webPlatformBuiltInTargets().map(defineWrapperFields)
+      ...webPlatformBuiltInTargets().map(defineWrapperFields),
+      ...webAssemblyBuiltInTargets().map(defineWrapperFields)
     ];
 
     for (const input of exactFieldBuiltInWrapperImpostors) {
@@ -3993,7 +4048,8 @@ describe("production live campaign worker controls", () => {
       Object.assign(new URLSearchParams("workerDeploymentClass=production-live-campaign"), wrapperFields),
       Object.assign(new WeakRef(implementedFrozenControls()[0]), wrapperFields),
       Object.assign(new FinalizationRegistry(() => undefined), wrapperFields),
-      ...webPlatformBuiltInTargets().map((target) => Object.assign(target, wrapperFields))
+      ...webPlatformBuiltInTargets().map((target) => Object.assign(target, wrapperFields)),
+      ...webAssemblyBuiltInTargets().map((target) => Object.assign(target, wrapperFields))
     ].map(
       (target) =>
         new Proxy(Object.freeze(target), {
@@ -4047,7 +4103,8 @@ describe("production live campaign worker controls", () => {
       Object.assign(new URLSearchParams("workerDeploymentClass=production-live-campaign"), wrapperFields),
       Object.assign(new WeakRef(implementedFrozenControls()[0]), wrapperFields),
       Object.assign(new FinalizationRegistry(() => undefined), wrapperFields),
-      ...webPlatformBuiltInTargets().map((target) => Object.assign(target, wrapperFields))
+      ...webPlatformBuiltInTargets().map((target) => Object.assign(target, wrapperFields)),
+      ...webAssemblyBuiltInTargets().map((target) => Object.assign(target, wrapperFields))
     ].map(
       (target) =>
         new Proxy(target, {
@@ -4113,7 +4170,8 @@ describe("production live campaign worker controls", () => {
       Object.assign(new URLSearchParams("workerDeploymentClass=production-live-campaign"), wrapperFields),
       Object.assign(new WeakRef(implementedFrozenControls()[0]), wrapperFields),
       Object.assign(new FinalizationRegistry(() => undefined), wrapperFields),
-      ...webPlatformBuiltInTargets().map((target) => Object.assign(target, wrapperFields))
+      ...webPlatformBuiltInTargets().map((target) => Object.assign(target, wrapperFields)),
+      ...webAssemblyBuiltInTargets().map((target) => Object.assign(target, wrapperFields))
     ].map((target) => {
       const { proxy, revoke } = Proxy.revocable(Object.freeze(target), {
         get: () => {

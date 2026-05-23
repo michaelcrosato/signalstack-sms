@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 532 note: live-worker authorization now denies runtime-supported WebAssembly records as controls evidence and authorization-wrapper impostors before the reserved worker class can authorize.
+
 Run 531 note: live-worker authorization now denies runtime-supported Web-platform channel/port, compression stream, queueing strategy, URL pattern, and performance observer records as controls evidence and authorization-wrapper impostors before the reserved worker class can authorize.
 
 Run 530 note: live-worker authorization now denies additional runtime-supported Web-platform stream, encoding-stream, event, and DOM exception records as controls evidence and authorization-wrapper impostors before the reserved worker class can authorize.
