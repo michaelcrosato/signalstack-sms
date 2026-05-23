@@ -2,9 +2,9 @@
 
 Last updated: 2026-05-22.
 
-Run 467 note: provider credential rotation JSON and CSV export route coverage now proves unsupported action filters return `400` before local rotation-history reads or CSV serialization, while supported bounded filters read only tenant-scoped redacted credential metadata.
+Run 468 note: optional-bracket reflective helper route-authorization coverage now proves `Object?.["getOwnPropertyDescriptor"]?.(...)`, `Reflect?.["getOwnPropertyDescriptor"]?.(...)`, and optional bracket prototype lookup forms are treated as request body parsing before each mutating API handler's top-level role gate.
 
-Latest protected local gate for Run 467: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-22 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 513 tests, Playwright smoke, and build green.
+Latest protected local gate for Run 468: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-22 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 514 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 

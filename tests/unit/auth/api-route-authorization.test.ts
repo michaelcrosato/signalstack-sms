@@ -4980,6 +4980,50 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "DELETE")).toBe(false);
   });
 
+  it("treats optional bracket reflective helper calls as body parsing for role-gate ordering", () => {
+    const unsafeOptionalObjectDescriptorSource = `
+      export async function POST(req: Request) {
+        const payload = await Object?.["getOwnPropertyDescriptor"]?.(Request.prototype, "json")?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeOptionalReflectDescriptorSource = `
+      export async function PATCH(req: Request) {
+        const descriptor = Reflect?.["getOwnPropertyDescriptor"]?.(Request.prototype, "text");
+        const payload = await descriptor?.["value"].call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeOptionalObjectPrototypeSource = `
+      export async function PUT(req: Request) {
+        const payload = await Object?.["getOwnPropertyDescriptor"]?.(
+          Object?.["getPrototypeOf"]?.(req),
+          "formData"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const safeSource = `
+      export async function DELETE(req: Request) {
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await Reflect?.["getOwnPropertyDescriptor"]?.(Request.prototype, "blob")?.value.call(req);
+        return Response.json({ size: payload.size });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalObjectDescriptorSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalReflectDescriptorSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalObjectPrototypeSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "DELETE")).toBe(false);
+  });
+
   it("treats aliased descriptor and prototype lookup calls as body parsing for role-gate ordering", () => {
     const unsafeDescriptorAliasSource = `
       export async function POST(req: Request) {

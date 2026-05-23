@@ -4218,3 +4218,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.
+
+## Run 468  GREEN  optional-bracket-reflective-auth  2026-05-22 22:40
+Objective:    Prove optional-bracket reflective descriptor/prototype helpers are treated as request body parsing before mutating-route role gates.
+Changed:
+- Added mutating API authorization coverage for `Object?.["getOwnPropertyDescriptor"]?.(...)`, `Reflect?.["getOwnPropertyDescriptor"]?.(...)`, and optional bracket prototype lookup forms before `requireApiRole`.
+- Updated testing contract, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix top notes for the optional-bracket reflective helper boundary.
+- Kept the change local to static tests/docs; no API handlers were executed, no live SMS/provider/billing/notification/live-AI path was enabled, and protected gate scripts were untouched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
