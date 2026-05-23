@@ -3291,6 +3291,29 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerDeploymentClassIsAuthorized(extensibleWrapperWithFrozenFields)).toBe(false);
   });
 
+  it("rejects sealed-but-writable authorization wrappers before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("sealed authorization wrappers must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("sealed authorization wrappers must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("sealed authorization wrappers must not inspect control evidence");
+      }
+    });
+    const sealedWrapper = Object.seal({
+      workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+      controls: throwingEvidence
+    });
+
+    expect(Object.isExtensible(sealedWrapper)).toBe(false);
+    expect(Object.isFrozen(sealedWrapper)).toBe(false);
+    expect(() => liveWorkerDeploymentClassIsAuthorized(sealedWrapper)).not.toThrow();
+    expect(liveWorkerDeploymentClassIsAuthorized(sealedWrapper)).toBe(false);
+  });
+
   it("rejects tagged authorization wrappers before inspecting controls or reading tag accessors", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       getPrototypeOf: () => {
