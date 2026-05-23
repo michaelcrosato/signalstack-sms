@@ -3691,3 +3691,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
+## Run 452  GREEN  campaign-schedule-auth-before-body  2026-05-22 20:52
+Objective:    Prove campaign schedule role denials return before request-body parsing or queue work.
+Changed:
+- Added route-level coverage for denied schedule requests with malformed JSON returning the role denial instead of parsing the body.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the authorization-before-body-parse boundary.
+- Kept live sends, providers, billing, notifications, live AI, secrets, worker execution, protected gate scripts, and destructive production actions untouched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

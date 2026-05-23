@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 452
+
+- Added campaign schedule route coverage proving role denials return before malformed request bodies are parsed.
+- Updated the testing contract, testing docs, NEXT_PROMPTS, and current state matrix for the schedule authorization-before-body-parse boundary.
+- Focused check passed: `npm run test -- tests/unit/api/campaign-schedule-route.test.ts` with 3 tests.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 48 Vitest files / 455 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 451
 
 - Expanded campaign schedule route coverage to prove schema-invalid JSON returns `400` before `scheduleCampaign` or BullMQ enqueue helpers can run.

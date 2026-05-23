@@ -31,6 +31,24 @@ describe("campaign schedule route", () => {
     mocks.requireApiRole.mockReturnValue(null);
   });
 
+  it("returns role denials before parsing request bodies or scheduling work", async () => {
+    mocks.requireApiRole.mockReturnValue(new Response(JSON.stringify({ error: "Forbidden." }), { status: 403 }));
+
+    const response = await POST(
+      new Request("http://localhost/api/campaigns/campaign_demo/schedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{"
+      }),
+      { params: Promise.resolve({ campaignId: "campaign_demo" }) }
+    );
+
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toEqual({ error: "Forbidden." });
+    expect(mocks.scheduleCampaign).not.toHaveBeenCalled();
+    expect(mocks.enqueueScheduledCampaignBullMqJob).not.toHaveBeenCalled();
+  });
+
   it("rejects malformed JSON without scheduling or enqueueing work", async () => {
     const response = await POST(
       new Request("http://localhost/api/campaigns/campaign_demo/schedule", {
