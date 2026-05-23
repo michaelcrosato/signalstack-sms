@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 545
+
+- Synchronized top-level handoff truth after finding root `LOOP_LOG.md` contains Run 543 while `docs/LOOP_LOG.md` skipped from Run 542 to Run 544.
+- Preserved prior log entries and recorded the discrepancy as repo truth instead of rewriting history.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 560 tests, Playwright smoke, and build green.
+- This run is docs/log only. It does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 544
 
 - Added live-worker unit coverage proving sealed-but-writable authorization wrappers cannot authorize the reserved `production-live-campaign` worker class.
