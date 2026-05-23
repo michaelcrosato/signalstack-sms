@@ -3244,6 +3244,69 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects proxy-backed boxed primitive deployment class impostors before inspecting supplied controls", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("proxy-backed boxed primitive worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("proxy-backed boxed primitive worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("proxy-backed boxed primitive worker classes must not inspect control evidence");
+      }
+    });
+    const boxedPrimitiveClasses = [
+      Object.freeze(new String(reservedLiveWorkerDeploymentClass)),
+      Object.freeze(new Boolean(true)),
+      Object.freeze(new Number(1)),
+      Object.freeze(Object(Symbol("production-live-campaign"))),
+      Object.freeze(Object(1n))
+    ];
+    const proxyBackedBoxedPrimitiveClasses = boxedPrimitiveClasses.map(
+      (target) =>
+        new Proxy(target, {
+          get: () => {
+            throw new Error("proxy-backed boxed primitive worker class values must not be read");
+          },
+          getPrototypeOf: () => {
+            throw new Error("proxy-backed boxed primitive worker class prototypes must not be read");
+          },
+          getOwnPropertyDescriptor: () => {
+            throw new Error("proxy-backed boxed primitive worker class descriptors must not be read");
+          },
+          ownKeys: () => {
+            throw new Error("proxy-backed boxed primitive worker class keys must not be read");
+          }
+        })
+    );
+    const revokedBoxedPrimitiveClasses = boxedPrimitiveClasses.map((target) => {
+      const { proxy, revoke } = Proxy.revocable(target, {
+        get: () => {
+          throw new Error("revoked boxed primitive worker class values must not be read");
+        }
+      });
+      revoke();
+      return proxy;
+    });
+
+    for (const workerDeploymentClass of [
+      ...proxyBackedBoxedPrimitiveClasses,
+      ...revokedBoxedPrimitiveClasses
+    ]) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects every runtime-supported typed-array deployment class impostor before inspecting supplied controls", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {
