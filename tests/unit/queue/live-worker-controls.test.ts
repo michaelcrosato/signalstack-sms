@@ -1877,6 +1877,43 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects object-shaped deployment class impostors before inspecting supplied controls", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("object-shaped worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("object-shaped worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("object-shaped worker classes must not inspect control evidence");
+      }
+    });
+    const functionClass = Object.freeze(() => reservedLiveWorkerDeploymentClass);
+    const taggedObjectClass = Object.freeze({
+      [Symbol.toStringTag]: reservedLiveWorkerDeploymentClass
+    });
+
+    for (const workerDeploymentClass of [
+      Object.freeze(new Boolean(true)),
+      Object.freeze(new Number(1)),
+      Object.freeze(new Date(0)),
+      functionClass,
+      taggedObjectClass
+    ]) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("does not normalize deployment class strings before denying authorization", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {

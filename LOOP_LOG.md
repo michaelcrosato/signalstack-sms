@@ -50,6 +50,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
 
+## Run 485  GREEN  live-worker-object-shaped-deployment-class  2026-05-23 00:32
+Objective:    Prove object-shaped deployment-class impostors cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage for boxed boolean/number, date, function, and tagged-object deployment-class impostors.
+- Proved those malformed deployment-class objects deny before supplied controls are inspected.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the object-shaped deployment-class boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 471  GREEN  non-null-globalthis-reflective-auth  2026-05-22 23:00
 Objective:    Prove non-null local `globalThis` aliases are normalized before reflective request body-reader checks.
 Changed:
