@@ -1708,6 +1708,8 @@ describe("production live campaign worker controls", () => {
       Object.freeze(new Set(implementedFrozenControls())),
       Object.freeze(new WeakMap([[implementedFrozenControls()[0], "implemented"]])),
       Object.freeze(new WeakSet([implementedFrozenControls()[0]])),
+      Object.freeze(new ArrayBuffer(8)),
+      ...whenSharedArrayBufferExists(() => Object.freeze(new SharedArrayBuffer(8))),
       new Uint8Array([1, 2, 3]),
       new DataView(new ArrayBuffer(8)),
       Object.freeze(Promise.resolve(implementedFrozenControls())),

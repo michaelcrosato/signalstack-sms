@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 527
+
+- Added live-worker unit coverage proving ordinary `ArrayBuffer` and runtime-supported `SharedArrayBuffer` controls evidence cannot authorize the reserved `production-live-campaign` worker class.
+- Proved array-buffer controls evidence denies before it can be treated as the future live-worker checklist; `production-live-campaign` remains unsupported.
+- Updated NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the ordinary array-buffer controls-evidence boundary.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 96 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 548 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 526
 
 - Added live-worker unit coverage proving boxed `Symbol` and boxed `BigInt` controls evidence cannot authorize the reserved `production-live-campaign` worker class.
