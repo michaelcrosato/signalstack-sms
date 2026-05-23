@@ -4100,3 +4100,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 454  GREEN  campaign-cancel-route-safety  2026-05-22 21:02
+Objective:    Prove campaign cancellation stays authorization-gated and local-only.
+Changed:
+- Added route-level coverage for role denials returning before local cancellation.
+- Added missing-campaign and successful paused-campaign response coverage for `POST /api/campaigns/:campaignId/cancel`.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the cancel-route safety boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.
