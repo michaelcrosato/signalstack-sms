@@ -1,10 +1,11 @@
 # Codex Summary
 
-Run number: 580
+Run number: 581
 
+- Tightened focused live-worker unit coverage proving exact frozen control-array evidence remains authorized without reading inherited `Array.prototype` indexed accessors beyond the frozen checklist entries.
 - Tightened focused live-worker unit coverage proving exact frozen authorization-wrapper evidence remains authorized without reading inherited `Object.prototype` `Symbol.toStringTag` metadata.
-- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 142 tests.
-- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 59 Vitest files / 598 tests, Playwright smoke, and build green.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 143 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 59 Vitest files / 599 tests, Playwright smoke, and build green.
 - No API handlers were executed by the focused test; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
 
 ## Previous Run

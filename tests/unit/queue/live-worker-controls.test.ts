@@ -6438,6 +6438,39 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not read inherited control-array index accessors while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const inheritedIndex = String(requiredControlIds.length);
+    const arrayPrototype = Array.prototype as unknown as Record<string, unknown>;
+    const originalIndexDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, inheritedIndex);
+
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperty(Array.prototype, inheritedIndex, {
+        configurable: true,
+        get: () => {
+          throw new Error("inherited control-array index getter must not be read");
+        }
+      });
+
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalIndexDescriptor === undefined) {
+        delete arrayPrototype[inheritedIndex];
+      } else {
+        Object.defineProperty(Array.prototype, inheritedIndex, originalIndexDescriptor);
+      }
+    }
+
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 
