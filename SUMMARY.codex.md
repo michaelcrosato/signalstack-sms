@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 449
+
+- Added live-worker control coverage proving non-ordinary array, Date, and function-shaped control entries carrying valid-looking public fields cannot authorize the reserved `production-live-campaign` class.
+- Updated queue/testing contracts, production-worker/testing docs, NEXT_PROMPTS, and current state matrix for the non-ordinary control-entry evidence boundary.
+- Focused check passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 64 tests.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 47 Vitest files / 452 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 448
 
 - Rehydrated the transferred laptop/home workspace and confirmed the protected local gate is green with the demo-safe local `.env`, running Docker Postgres/Redis, Prisma generation, typecheck, lint, unit tests, Playwright smoke, and build.

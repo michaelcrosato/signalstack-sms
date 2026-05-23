@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 449  GREEN  live-worker-non-ordinary-entry-evidence  2026-05-22
+Objective:    Prove non-ordinary object-shaped supplied control entries cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker authorization-path coverage for array, Date, and function-shaped control entries carrying valid-looking `id`, `status`, and `requirement` fields.
+- Updated queue/testing contracts, production-worker/testing docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the non-ordinary control-entry boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, production workers, protected gate scripts, or live feature flags were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: working tree
+Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
+
 ## Run 448  GREEN  live-worker-primitive-entry-evidence  2026-05-22
 Objective:    Prove malformed primitive supplied control entries cannot authorize the reserved live worker class.
 Changed:

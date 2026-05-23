@@ -1450,6 +1450,36 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects non-ordinary object-shaped control entries before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const entryFields = {
+      id: implementedControls[0].id,
+      status: "implemented" as const,
+      requirement: implementedControls[0].requirement
+    };
+    const arrayEntry = Object.freeze(Object.assign([], entryFields)) as unknown as LiveWorkerControl;
+    const dateEntry = Object.freeze(Object.assign(new Date(0), entryFields)) as unknown as LiveWorkerControl;
+    const functionEntry = Object.freeze(
+      Object.assign(() => "implemented", entryFields)
+    ) as unknown as LiveWorkerControl;
+
+    for (const controlEntry of [arrayEntry, dateEntry, functionEntry]) {
+      const controls = Object.freeze(
+        implementedControls.map((control, index) => (index === 0 ? controlEntry : control))
+      );
+
+      expect(() => liveWorkerControlsExposeOnlyPublicFields(controls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
+      expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(false);
+      expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(false);
+      expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).toBe(false);
+    }
+  });
+
   it("rejects malformed control evidence without throwing", () => {
     const sparseControls = Array<LiveWorkerControl>(2);
     sparseControls[0] = Object.freeze({ ...productionLiveCampaignWorkerControls[0], status: "implemented" as const });
