@@ -3291,6 +3291,50 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerDeploymentClassIsAuthorized(extensibleWrapperWithFrozenFields)).toBe(false);
   });
 
+  it("rejects tagged authorization wrappers before inspecting controls or reading tag accessors", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("tagged authorization wrappers must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("tagged authorization wrappers must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("tagged authorization wrappers must not inspect control evidence");
+      }
+    });
+    const taggedWrapper = Object.freeze(
+      Object.defineProperties(
+        {},
+        {
+          workerDeploymentClass: {
+            value: reservedLiveWorkerDeploymentClass,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          },
+          controls: {
+            value: throwingEvidence,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          },
+          [Symbol.toStringTag]: {
+            enumerable: false,
+            configurable: false,
+            get: () => {
+              throw new Error("authorization wrapper toStringTag getter must not be read");
+            }
+          }
+        }
+      )
+    );
+
+    expect(Object.isFrozen(taggedWrapper)).toBe(true);
+    expect(() => liveWorkerDeploymentClassIsAuthorized(taggedWrapper)).not.toThrow();
+    expect(liveWorkerDeploymentClassIsAuthorized(taggedWrapper)).toBe(false);
+  });
+
   it("rejects non-frozen authorization wrapper descriptors before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const throwingEvidence = new Proxy(implementedControls, {

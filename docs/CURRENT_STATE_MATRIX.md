@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 539 note: live-worker authorization now denies accessor-backed `Symbol.toStringTag` authorization-wrapper metadata without reading the tag getter or inspecting supplied controls before the reserved worker class can authorize.
+
 Run 538 note: live-worker authorization now denies accessor-backed `Symbol.toStringTag` controls-evidence impostors without reading tag, index, or length getters before the reserved worker class can authorize.
 
 Run 537 note: live-worker authorization now denies deployment-class impostor objects with throwing `Symbol.toStringTag` accessors before supplied controls are inspected and without reading the accessor.
@@ -92,7 +94,7 @@ Run 495 note: live-worker authorization now denies built-in object-shaped deploy
 
 Run 494 note: live-worker authorization now evaluates exact frozen control-entry evidence without reading inherited `Object.prototype` accessors for `id`, `status`, or `requirement`.
 
-Latest protected local gate for Run 536: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, Vitest, Playwright smoke, and build green.
+Latest protected local gate for Run 539: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 556 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 

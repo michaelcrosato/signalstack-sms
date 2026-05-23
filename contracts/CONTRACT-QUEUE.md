@@ -37,6 +37,7 @@ Runtime-supported Web Crypto records must also deny as controls evidence and aut
 Exact frozen supplied control entries must also be evaluated from own descriptors without reading inherited `Object.prototype` accessors for `id`, `status`, or `requirement`.
 Whitespace-padded deployment class evidence includes leading spaces, trailing spaces, tabs, newlines, carriage returns, CRLF pairs, vertical tabs, form feeds, invisible Unicode escape padding, and Unicode line/paragraph separator padding, and must deny before supplied controls are inspected.
 `Symbol.toStringTag` controls-evidence impostors with accessor-backed tag metadata must deny without reading the tag, index, or length getters.
+Accessor-backed `Symbol.toStringTag` authorization-wrapper metadata must deny before supplied controls are inspected and without reading the tag getter.
 
 - The worker uses validated version-1 scheduled campaign payloads.
 - Invalid payloads or missing scheduled campaigns are marked `FAILED`.
