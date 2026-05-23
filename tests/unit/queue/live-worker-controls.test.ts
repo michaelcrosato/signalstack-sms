@@ -2920,6 +2920,8 @@ describe("production live campaign worker controls", () => {
     for (const workerDeploymentClass of [
       Object.freeze(new Boolean(true)),
       Object.freeze(new Number(1)),
+      Object.freeze(Object(Symbol("production-live-campaign"))),
+      Object.freeze(Object(1n)),
       Object.freeze(new Date(0)),
       Object.freeze(new Map([["workerDeploymentClass", reservedLiveWorkerDeploymentClass]])),
       Object.freeze(new Set([reservedLiveWorkerDeploymentClass])),
