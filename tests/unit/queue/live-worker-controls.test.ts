@@ -48,6 +48,10 @@ describe("production live campaign worker controls", () => {
     });
   }
 
+  function whenSharedArrayBufferExists<T>(buildValue: () => T) {
+    return typeof SharedArrayBuffer === "undefined" ? [] : [buildValue()];
+  }
+
   it("keeps the reserved production class outside the currently supported worker class list", () => {
     expect(reservedLiveWorkerDeploymentClass).toBe("production-live-campaign");
     expect(supportedWorkerDeploymentClasses).toEqual(["local-demo"]);
@@ -3686,6 +3690,8 @@ describe("production live campaign worker controls", () => {
       Object.freeze(Object.assign(new Set(), wrapperFields)),
       Object.freeze(Object.assign(new WeakMap(), wrapperFields)),
       Object.freeze(Object.assign(new WeakSet(), wrapperFields)),
+      Object.freeze(Object.assign(new ArrayBuffer(8), wrapperFields)),
+      ...whenSharedArrayBufferExists(() => Object.freeze(Object.assign(new SharedArrayBuffer(8), wrapperFields))),
       Object.freeze(Object.assign(new Uint8Array(0), wrapperFields)),
       Object.freeze(Object.assign(new DataView(new ArrayBuffer(8)), wrapperFields)),
       Object.freeze(Object.assign(Promise.resolve(implementedFrozenControls()), wrapperFields)),
@@ -3738,6 +3744,8 @@ describe("production live campaign worker controls", () => {
       defineWrapperFields(new Set()),
       defineWrapperFields(new WeakMap()),
       defineWrapperFields(new WeakSet()),
+      defineWrapperFields(new ArrayBuffer(8)),
+      ...whenSharedArrayBufferExists(() => defineWrapperFields(new SharedArrayBuffer(8))),
       defineWrapperFields(new Uint8Array(0)),
       defineWrapperFields(new DataView(new ArrayBuffer(8))),
       defineWrapperFields(Promise.resolve(implementedFrozenControls())),
@@ -3779,6 +3787,8 @@ describe("production live campaign worker controls", () => {
       Object.assign(new Set(), wrapperFields),
       Object.assign(new WeakMap(), wrapperFields),
       Object.assign(new WeakSet(), wrapperFields),
+      Object.assign(new ArrayBuffer(8), wrapperFields),
+      ...whenSharedArrayBufferExists(() => Object.assign(new SharedArrayBuffer(8), wrapperFields)),
       Object.assign(new Uint8Array(0), wrapperFields),
       Object.assign(new DataView(new ArrayBuffer(8)), wrapperFields),
       Object.assign(Promise.resolve(implementedFrozenControls()), wrapperFields),
@@ -3825,6 +3835,8 @@ describe("production live campaign worker controls", () => {
       Object.assign(new Set(), wrapperFields),
       Object.assign(new WeakMap(), wrapperFields),
       Object.assign(new WeakSet(), wrapperFields),
+      Object.assign(new ArrayBuffer(8), wrapperFields),
+      ...whenSharedArrayBufferExists(() => Object.assign(new SharedArrayBuffer(8), wrapperFields)),
       Object.assign(new Uint8Array(0), wrapperFields),
       Object.assign(new DataView(new ArrayBuffer(8)), wrapperFields),
       Object.assign(Promise.resolve(implementedFrozenControls()), wrapperFields),
