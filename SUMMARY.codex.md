@@ -1,5 +1,24 @@
 # Codex Summary
 
+Run number: 479
+
+- Added live-worker control-entry coverage proving symbol-keyed `id`/`status`/`requirement` impersonators do not satisfy the required string public fields and cannot authorize the reserved `production-live-campaign` worker class.
+- Updated the queue contract, NEXT_PROMPTS, current state matrix, blockers, and loop logs for the symbol-keyed public-field impersonator boundary.
+- Focused checks passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts`, `npm run typecheck`, and `npm run contracts:check`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 517 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
+Run number: 478
+
+- Added mutating API authorization coverage for whole-parenthesized type-asserted and `satisfies` direct `Request` constructor and `Request.prototype` aliases before body-reader role-gate checks.
+- Updated testing contracts/docs, NEXT_PROMPTS, and current state matrix for the whole-parenthesized direct `Request` alias boundary.
+- Focused auth coverage and the protected local gate passed.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 477
 
 - Added mutating API authorization coverage for assigned type-asserted direct `Request` constructor and `Request.prototype` aliases before body-reader role-gate checks.

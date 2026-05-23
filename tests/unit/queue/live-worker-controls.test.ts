@@ -818,6 +818,32 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects symbol-keyed control field impersonators before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const symbolKeyedControl = Object.freeze({
+      [Symbol("id")]: implementedControls[0].id,
+      [Symbol("status")]: "implemented",
+      [Symbol("requirement")]: implementedControls[0].requirement
+    }) as unknown as LiveWorkerControl;
+    const controls = Object.freeze(
+      implementedControls.map((control, index) =>
+        index === 0 ? symbolKeyedControl : Object.freeze({ ...control })
+      )
+    );
+
+    expect(() => liveWorkerControlsExposeOnlyPublicFields(controls)).not.toThrow();
+    expect(() => liveWorkerControlIdsMatchRequiredChecklist(controls)).not.toThrow();
+    expect(() => liveWorkerControlsUseSupportedStatuses(controls)).not.toThrow();
+    expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
+    expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(false);
+    expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(false);
+    expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+    ).toBe(false);
+  });
+
   it("rejects non-primitive control public-field values without coercion", () => {
     const implementedControls = implementedFrozenControls();
     const hostileValue = Object.freeze({

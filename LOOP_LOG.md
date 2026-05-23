@@ -4318,3 +4318,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 479  GREEN  live-worker-symbol-field-impersonators  2026-05-22 23:51
+Objective:    Prove symbol-keyed control fields cannot impersonate required live-worker control public fields.
+Changed:
+- Added queue unit coverage showing symbol-keyed `id`/`status`/`requirement` entries do not satisfy required string public fields.
+- Updated queue contract/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the symbol-keyed control-entry boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
