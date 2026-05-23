@@ -6217,6 +6217,36 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not read inherited authorization wrapper toStringTag metadata while evaluating exact frozen evidence", () => {
+    const objectPrototype = Object.prototype as {
+      [Symbol.toStringTag]?: unknown;
+    };
+    const originalToStringTagDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, Symbol.toStringTag);
+
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperty(Object.prototype, Symbol.toStringTag, {
+        configurable: true,
+        get: () => {
+          throw new Error("inherited authorization-wrapper toStringTag must not be read");
+        }
+      });
+
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedFrozenControls())
+      );
+    } finally {
+      if (originalToStringTagDescriptor === undefined) {
+        delete objectPrototype[Symbol.toStringTag];
+      } else {
+        Object.defineProperty(Object.prototype, Symbol.toStringTag, originalToStringTagDescriptor);
+      }
+    }
+
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("does not execute control evidence get traps while authorizing exact frozen evidence", () => {
     const implementedControlsWithEntryGetTraps = Object.freeze(
       implementedFrozenControls().map(

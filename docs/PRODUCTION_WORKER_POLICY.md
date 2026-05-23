@@ -74,6 +74,7 @@ Control entries with own `Symbol.toStringTag`, `Symbol.toPrimitive`, `toString`,
 Control arrays with own `Symbol.toPrimitive`, `toString`, or `valueOf` metadata must deny without reading or invoking those hooks before the reserved worker class can authorize. Exact frozen control-array evidence must remain independent from inherited `Array.prototype` coercion or `Symbol.toStringTag` metadata.
 malformed authorization wrapper input must deny without executing accessor-backed fields, and inherited `Object.prototype` wrapper accessors for `workerDeploymentClass` or `controls` must not be read while exact frozen wrapper evidence is evaluated.
 Inherited `Object.prototype` authorization-wrapper coercion metadata, including `Symbol.toPrimitive`, `toString`, or `valueOf`, must not be invoked while exact frozen wrapper evidence is evaluated.
+Inherited `Object.prototype` authorization-wrapper `Symbol.toStringTag` metadata must not be read while exact frozen wrapper evidence is evaluated.
 Inherited `Object.prototype` control-entry accessors for `id`, `status`, or `requirement` must not be read while exact frozen supplied control evidence is evaluated.
 Inherited `Object.prototype` control-entry coercion metadata, including `Symbol.toPrimitive`, `toString`, or `valueOf`, must not be invoked while exact frozen supplied control evidence is evaluated.
 Inherited `Object.prototype` control-entry `Symbol.toStringTag` metadata must not be read while exact frozen supplied control evidence is evaluated.
