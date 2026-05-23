@@ -37,7 +37,8 @@ export async function PATCH(request: Request) {
     return roleResponse;
   }
 
-  const payload = providerSettingsUpdateSchema.safeParse(await request.json());
+  const rawPayload = await request.json().catch(() => undefined);
+  const payload = providerSettingsUpdateSchema.safeParse(rawPayload);
 
   if (!payload.success) {
     return NextResponse.json({ error: "Invalid provider settings payload.", issues: payload.error.flatten() }, { status: 400 });

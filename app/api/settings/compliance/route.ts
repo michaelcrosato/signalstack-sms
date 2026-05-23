@@ -34,7 +34,8 @@ export async function PATCH(request: Request) {
     return roleResponse;
   }
 
-  const payload = complianceProfileUpdateSchema.safeParse(await request.json());
+  const rawPayload = await request.json().catch(() => undefined);
+  const payload = complianceProfileUpdateSchema.safeParse(rawPayload);
 
   if (!payload.success) {
     return NextResponse.json({ error: "Invalid compliance profile payload.", issues: payload.error.issues }, { status: 400 });

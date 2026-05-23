@@ -16,7 +16,8 @@ export async function POST(request: Request, { params }: CampaignParams) {
     return roleResponse;
   }
 
-  const payload = campaignPreflightSchema.safeParse(await request.json().catch(() => ({})));
+  const rawPayload = await request.json().catch(() => undefined);
+  const payload = campaignPreflightSchema.safeParse(rawPayload);
 
   if (!payload.success) {
     return NextResponse.json({ error: "Invalid preflight payload.", issues: payload.error.issues }, { status: 400 });

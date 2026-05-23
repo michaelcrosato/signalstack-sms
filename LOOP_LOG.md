@@ -4148,3 +4148,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.
+
+## Run 460  GREEN  settings-json-malformed-mutations  2026-05-22 21:44
+Objective:    Prove malformed settings/operations JSON cannot throw past validation or trigger local side effects.
+Changed:
+- Hardened billing usage, campaign preflight, compliance settings, provider number metadata, provider settings, and live-test SMS mutation routes to return documented `400` invalid payload responses for malformed JSON.
+- Added route-level coverage proving malformed bodies do not record usage, run local preflight, update compliance, write readiness audit events, persist provider metadata, render provider settings, or attempt the gated live-test SMS helper.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the malformed settings/operations JSON boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.

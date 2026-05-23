@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 460
+
+- Hardened billing usage, campaign preflight, compliance settings, provider number metadata, provider settings, and live-test SMS mutation routes so malformed JSON returns `400` with the documented invalid payload shape instead of throwing or falling through to local work.
+- Added route-level coverage proving malformed request bodies do not record local usage, run local preflight repository work, update compliance, write readiness audit events, persist provider metadata, render provider settings, or attempt the gated live-test SMS send helper.
+- Updated the testing contract, testing docs, NEXT_PROMPTS, and current state matrix for the malformed settings/operations JSON boundary.
+- Focused checks passed: `npm run test -- tests/unit/api/settings-json-route.test.ts tests/unit/api/campaign-schedule-route.test.ts tests/unit/api/ai-json-route.test.ts`, `npm run contracts:check`, and `npm run typecheck`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 55 Vitest files / 484 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 459
 
 - Hardened fake AI mutation routes so malformed JSON returns `400` with the documented invalid AI payload shape instead of throwing before validation.

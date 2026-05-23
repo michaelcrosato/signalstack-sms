@@ -18,7 +18,8 @@ export async function POST(request: Request) {
     return roleResponse;
   }
 
-  const payload = liveTestSmsSchema.safeParse(await request.json());
+  const rawPayload = await request.json().catch(() => undefined);
+  const payload = liveTestSmsSchema.safeParse(rawPayload);
 
   if (!payload.success) {
     return NextResponse.json({ error: "Invalid live test SMS payload.", issues: payload.error.flatten() }, { status: 400 });
