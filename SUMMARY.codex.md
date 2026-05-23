@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 586
+
+- Latest live-worker inherited control-array string-method symbol coverage proves exact frozen `production-live-campaign` control-array evidence is evaluated without reading inherited `Array.prototype` `Symbol.match`, `Symbol.matchAll`, `Symbol.replace`, `Symbol.search`, or `Symbol.split` metadata. Focused queue coverage passed with 148 tests, and the protected local gate passed with 59 Vitest files / 604 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 585
 
 - Latest live-worker inherited control-array concat-spreadable coverage proves exact frozen `production-live-campaign` control-array evidence is evaluated without reading inherited `Array.prototype[Symbol.isConcatSpreadable]` metadata. Focused queue coverage passed with 147 tests, and the protected local gate passed with 59 Vitest files / 603 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
