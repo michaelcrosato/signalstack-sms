@@ -5084,3 +5084,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 566  GREEN  live-worker-inherited-deployment-tag  2026-05-23 09:42
+Objective:    Prove inherited `Symbol.toStringTag` deployment-class metadata cannot influence reserved live-worker authorization.
+Changed:
+- Added live-worker unit coverage showing object-shaped `workerDeploymentClass` evidence with inherited `Symbol.toStringTag` accessors denies without reading the tag getter.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the inherited deployment-class tag boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

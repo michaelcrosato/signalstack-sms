@@ -41,6 +41,7 @@ Exact frozen supplied control entries must also be evaluated from own descriptor
 Whitespace-padded deployment class evidence includes leading spaces, trailing spaces, tabs, newlines, carriage returns, CRLF pairs, vertical tabs, form feeds, invisible Unicode escape padding, and Unicode line/paragraph separator padding, and must deny before supplied controls are inspected.
 `Symbol.toStringTag` controls-evidence impostors with own or inherited accessor-backed tag metadata must deny without reading the tag, index, or length getters.
 Own or inherited accessor-backed `Symbol.toStringTag` authorization-wrapper metadata must deny before supplied controls are inspected and without reading the tag getter.
+Inherited accessor-backed `Symbol.toStringTag` deployment-class metadata must deny before supplied controls are inspected and without reading the tag getter.
 
 - The worker uses validated version-1 scheduled campaign payloads.
 - Invalid payloads or missing scheduled campaigns are marked `FAILED`.

@@ -14,7 +14,7 @@ This file is the handoff for the next automated loop. It should stay short enoug
 
 ## Current State
 
-- Latest run: Run 565 tightened live-worker `Symbol.toStringTag` impostor coverage so inherited tag accessors on controls evidence or authorization-wrapper metadata deny without getter execution and without inspecting hostile controls.
+- Latest run: Run 566 tightened live-worker `Symbol.toStringTag` impostor coverage so inherited tag accessors on deployment-class evidence deny without getter execution and without inspecting hostile controls.
 - The backend foundation is strong: tenant helpers, contacts, campaigns, queue jobs, inbox, compliance gates, fake AI, local billing/analytics, provider metadata, Twilio webhook foundations, readiness audit, operations inventory, and validation gates.
 - The settings operations pages use compact related-link headers; keep those surfaces read-only and do not expand operations UI unless it directly supports release safety or product work.
 - The browser product now has an initial `/dashboard` shell, `/dashboard/contacts` list/import workflow with archived restore links, `/dashboard/contacts/:contactId` local detail/edit/archive/restore/merge workflow, `/dashboard/campaigns` compose/preflight/local schedule workflow, `/dashboard/campaigns/:campaignId` local draft edit and queued cancel workflow, `/dashboard/inbox` local thread workflow, `/dashboard/templates` local template create/list workflow, `/dashboard/templates/:templateId` local detail/edit workflow, `/dashboard/analytics` local overview detail, and `/dashboard/compliance` local readiness detail.
@@ -50,7 +50,7 @@ This file is the handoff for the next automated loop. It should stay short enoug
 - Proxy-backed and revoked proxy-backed Date deployment-class impostor coverage proves Date records deny before supplied controls are inspected, without reading object traps.
 - Proxy-backed and revoked proxy-backed promise and error-shaped deployment-class impostor coverage proves `Promise`, `RegExp`, `Error`, and `TypeError` records deny before supplied controls are inspected, without reading object traps.
 - Array-buffer, URL-shaped, weak-reference, and finalization-registry deployment-class impostor coverage proves those object-shaped values deny before supplied live-worker controls are inspected.
-- Tagged-accessor deployment-class impostor coverage proves object-shaped values with throwing `Symbol.toStringTag` accessors deny before supplied live-worker controls are inspected or the accessor is read.
+- Tagged-accessor deployment-class impostor coverage proves object-shaped values with own or inherited throwing `Symbol.toStringTag` accessors deny before supplied live-worker controls are inspected or the accessor is read.
 
 ## Next Best Work
 
