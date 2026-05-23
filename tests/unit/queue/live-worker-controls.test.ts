@@ -2127,6 +2127,57 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects control entries with own metadata hooks without invoking them", () => {
+    const implementedControls = implementedFrozenControls();
+    const metadataControls = Object.freeze([
+      Object.freeze(
+        Object.defineProperties(
+          { ...implementedControls[0] },
+          {
+            [Symbol.toStringTag]: {
+              enumerable: false,
+              get: () => {
+                throw new Error("control-entry toStringTag getter must not be read");
+              }
+            },
+            [Symbol.toPrimitive]: {
+              enumerable: false,
+              value: () => {
+                throw new Error("control-entry Symbol.toPrimitive must not be invoked");
+              }
+            },
+            toString: {
+              enumerable: false,
+              value: () => {
+                throw new Error("control-entry toString must not be invoked");
+              }
+            },
+            valueOf: {
+              enumerable: false,
+              value: () => {
+                throw new Error("control-entry valueOf must not be invoked");
+              }
+            }
+          }
+        )
+      ),
+      ...implementedControls.slice(1)
+    ]);
+
+    expect(() => liveWorkerControlsAreImplemented(metadataControls)).not.toThrow();
+    expect(liveWorkerControlsAreImplemented(metadataControls)).toBe(false);
+    expect(() =>
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, metadataControls)
+      )
+    ).not.toThrow();
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, metadataControls)
+      )
+    ).toBe(false);
+  });
+
   it("rejects function-shaped controls evidence without invoking it", () => {
     const callableControls = Object.freeze(
       Object.assign(

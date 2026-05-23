@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 573 note: live-worker authorization now denies control entries with own `Symbol.toStringTag`, `Symbol.toPrimitive`, `toString`, or `valueOf` metadata without reading or invoking those hooks.
+
 Run 572 note: live-worker authorization now denies own accessor-backed `Symbol.toStringTag` metadata on authorization wrappers before hostile supplied controls are inspected and without reading the getter.
 
 Run 571 note: live-worker authorization now denies authorization wrappers with own coercion metadata before hostile supplied controls are inspected and without invoking own `Symbol.toPrimitive`, `toString`, or `valueOf`.

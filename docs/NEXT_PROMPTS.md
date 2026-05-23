@@ -14,7 +14,7 @@ This file is the handoff for the next automated loop. It should stay short enoug
 
 ## Current State
 
-- Latest run: Run 572 tightened live-worker authorization-wrapper own `Symbol.toStringTag` metadata coverage so wrappers with own accessor-backed tag metadata deny before hostile supplied controls are inspected and without reading the tag getter.
+- Latest run: Run 573 tightened live-worker control-entry metadata coverage so otherwise matching entries with own `Symbol.toStringTag`, `Symbol.toPrimitive`, `toString`, or `valueOf` metadata deny without reading or invoking those hooks.
 - The backend foundation is strong: tenant helpers, contacts, campaigns, queue jobs, inbox, compliance gates, fake AI, local billing/analytics, provider metadata, Twilio webhook foundations, readiness audit, operations inventory, and validation gates.
 - The settings operations pages use compact related-link headers; keep those surfaces read-only and do not expand operations UI unless it directly supports release safety or product work.
 - The browser product now has an initial `/dashboard` shell, `/dashboard/contacts` list/import workflow with archived restore links, `/dashboard/contacts/:contactId` local detail/edit/archive/restore/merge workflow, `/dashboard/campaigns` compose/preflight/local schedule workflow, `/dashboard/campaigns/:campaignId` local draft edit and queued cancel workflow, `/dashboard/inbox` local thread workflow, `/dashboard/templates` local template create/list workflow, `/dashboard/templates/:templateId` local detail/edit workflow, `/dashboard/analytics` local overview detail, and `/dashboard/compliance` local readiness detail.

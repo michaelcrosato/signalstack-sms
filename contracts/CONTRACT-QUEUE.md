@@ -43,6 +43,7 @@ Whitespace-padded deployment class evidence includes leading spaces, trailing sp
 `Symbol.toStringTag` controls-evidence impostors with own or inherited accessor-backed tag metadata must deny without reading the tag, index, or length getters.
 Own or inherited accessor-backed `Symbol.toStringTag` authorization-wrapper metadata must deny before supplied controls are inspected and without reading the tag getter.
 Inherited accessor-backed `Symbol.toStringTag` deployment-class metadata must deny before supplied controls are inspected and without reading the tag getter.
+Control entries with own `Symbol.toStringTag`, `Symbol.toPrimitive`, `toString`, or `valueOf` metadata must deny without reading or invoking those hooks.
 
 - The worker uses validated version-1 scheduled campaign payloads.
 - Invalid payloads or missing scheduled campaigns are marked `FAILED`.

@@ -46,6 +46,7 @@ Post-MVP local operations status:
 - Queue live-worker control tests must verify that own and inherited accessor-backed `Symbol.toStringTag` controls-evidence impostors deny without reading tag, index, or length getters.
 - Queue live-worker control tests must verify that own and inherited accessor-backed `Symbol.toStringTag` authorization-wrapper metadata denies before supplied controls are inspected and without reading the tag getter.
 - Queue live-worker control tests must verify that inherited accessor-backed `Symbol.toStringTag` deployment-class metadata denies before supplied controls are inspected and without reading the tag getter.
+- Queue live-worker control tests must verify that control entries with own `Symbol.toStringTag`, `Symbol.toPrimitive`, `toString`, or `valueOf` metadata deny without reading or invoking those hooks.
 - Queue live-worker control tests must verify that authorization wrappers with own coercion metadata deny before hostile supplied controls are inspected and without invoking `Symbol.toPrimitive`, `toString`, or `valueOf`.
 - Queue live-worker control tests must verify that exact-field, proxy-backed, and revoked proxy-backed non-ordinary authorization wrappers, including null-prototype and class-instance wrappers, deny before supplied controls are inspected and without reading wrapper field getters.
 - Campaign create/update route unit tests must verify malformed JSON returns a `400` validation response before local campaign create/update repository mutations run.
