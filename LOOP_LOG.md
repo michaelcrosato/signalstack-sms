@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 496  GREEN  codex-handoff-truth-sync  2026-05-23 02:05
+Objective:    Make top-level Codex handoff files lead with current repo truth after Run 495.
+Changed:
+- Updated SUMMARY, BLOCKERS, NEXT_PROMPTS, current state matrix, and root/docs loop logs so the latest handoff reflects the built-in deployment-class impostor boundary.
+- Kept source behavior unchanged and `production-live-campaign` unsupported.
+- No live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 476  GREEN  satisfies-globalthis-auth  2026-05-22 23:33
 Objective:    Prove parenthesized `satisfies` `globalThis` aliases stay behind mutating-route role gates.
 Changed:

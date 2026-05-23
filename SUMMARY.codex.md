@@ -1,5 +1,23 @@
 # Codex Summary
 
+Run number: 496
+
+- Synchronized top-level Codex handoff truth after Run 495 so `SUMMARY.codex.md`, `BLOCKERS.codex.md`, `docs/NEXT_PROMPTS.md`, `docs/CURRENT_STATE_MATRIX.md`, and both loop logs lead with the current built-in deployment-class impostor boundary.
+- No source behavior changed; `production-live-campaign` remains unsupported and live SMS, providers, billing, notifications, live AI, real secrets, worker execution, protected gate scripts, and destructive production actions stayed untouched.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`.
+
+## Previous Run
+
+Run number: 495
+
+- Added live-worker unit coverage proving maps, sets, typed arrays, data views, promises, regular expressions, and errors cannot impersonate the reserved `production-live-campaign` deployment class.
+- Proved those malformed class values deny before hostile supplied controls are inspected.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the built-in deployment-class boundary.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution outside validation, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 493
 
 - Added live-worker authorization-wrapper coverage proving inherited `Object.prototype` accessors for `workerDeploymentClass` and `controls` are not read while exact frozen wrapper evidence is evaluated.
