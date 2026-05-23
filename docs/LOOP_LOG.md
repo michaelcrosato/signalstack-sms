@@ -4259,3 +4259,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 531  GREEN  live-worker-web-platform-channels  2026-05-23 06:07
+Objective:    Prove additional runtime-supported Web-platform records cannot authorize the reserved live worker class.
+Changed:
+- Extended live-worker Web-platform impostor coverage to channel/port records, compression streams, queueing strategies, URL patterns, and performance observers wherever the runtime supports them.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the expanded Web-platform boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

@@ -1,21 +1,21 @@
 # Codex Summary
 
-Run number: 529
+Run number: 531
 
-- Added live-worker unit coverage proving runtime-supported Web-platform controls evidence and authorization-wrapper impostors cannot authorize the reserved `production-live-campaign` worker class.
-- Covered `Blob`, `File`, `FormData`, `Headers`, `Request`, `Response`, `AbortController`, `AbortSignal`, `ReadableStream`, `TextEncoder`, and `TextDecoder` when the runtime exposes them, across ordinary, exact-field frozen, proxy-backed, reflection-trapped, and revoked proxy-backed wrapper paths plus revoked controls-evidence paths.
-- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the Web-platform impostor boundary.
+- Extended live-worker unit coverage proving runtime-supported Web-platform channel/port, compression stream, queueing strategy, URL pattern, and performance observer records cannot authorize the reserved `production-live-campaign` worker class.
+- Covered `MessageChannel`, `MessagePort`, `BroadcastChannel`, `CompressionStream`, `DecompressionStream`, `CountQueuingStrategy`, `ByteLengthQueuingStrategy`, `URLPattern`, and `PerformanceObserver` when the runtime exposes them, across controls-evidence and authorization-wrapper paths.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the expanded Web-platform impostor boundary.
 - Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 96 tests.
 - Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 548 tests, Playwright smoke, and build green.
 - No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
 
 ## Previous Run
 
-Run number: 528
+Run number: 530
 
-- Added live-worker unit coverage proving revoked proxy-backed typed-array, data-view, and weak-collection controls evidence cannot authorize the reserved `production-live-campaign` worker class.
-- Proved those revoked built-in controls deny cleanly before they can be treated as the future live-worker checklist; `production-live-campaign` remains unsupported.
-- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the revoked built-in controls-evidence boundary.
+- Extended live-worker Web-platform impostor coverage to additional stream, encoding-stream, event, and DOM exception records.
+- Proved those runtime-supported records cannot authorize the reserved class as controls evidence or authorization wrappers; `production-live-campaign` remains unsupported.
+- Updated queue/testing docs, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the stream/event Web-platform boundary.
 - Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 96 tests.
 - Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 548 tests, Playwright smoke, and build green.
 - No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
@@ -4084,6 +4084,7 @@ Latest worker readiness malformed-class hardening changed public worker safety i
 - Latest live-worker wrapper extra-key short-circuit coverage proves hidden and symbol extra wrapper keys deny before hostile supplied controls are inspected. The check is local unit coverage only and does not execute workers, enqueue jobs, call Redis, call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
 - Latest live-worker inherited-class wrapper coverage proves authorization wrappers with an inherited `workerDeploymentClass` and hostile supplied controls deny before inspecting control evidence. The check is local unit coverage only and does not execute workers, enqueue jobs, call Redis, call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
 - Latest live-worker exact-wrapper get-trap coverage proves exact frozen `production-live-campaign` authorization evidence is evaluated through descriptors without executing authorization-wrapper `get` traps. The check is local unit coverage only and does not execute workers, enqueue jobs, call Redis, call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
+- Latest live-worker Web-platform hardening extends runtime-supported impostor coverage to channel/port, compression stream, queueing strategy, URL pattern, and performance observer records as both controls evidence and authorization-wrapper input. Focused unit coverage passed; the change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
 - Latest live-worker inherited-extra wrapper coverage proves authorization wrappers with inherited extra fields deny before hostile supplied controls are inspected. Focused unit coverage and the protected local gate passed; the change is local unit coverage only and does not execute workers, enqueue jobs, call Redis, call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
 - Latest live-worker control field-order hardening requires supplied `production-live-campaign` control entries to expose `id`, `status`, and `requirement` in exact public-field order before the reserved class can authorize. Focused unit coverage, policy check, typecheck, lint, whitespace diff check, and the protected local gate passed without executing workers, enqueueing jobs, calling Redis/providers, billing, notifying, sending SMS or email, calling live AI, exposing secrets, enabling live features, editing protected gate scripts, or performing destructive database actions.
 - Latest product inbox STOP visibility work adds selected-thread consent status to `/dashboard/inbox` and extends the seeded product demo path to submit a local STOP reply and verify `OPTED_OUT` is browser-visible. Focused checks, seeded product E2E, and the protected local gate passed without live SMS, provider calls, billing, notifications, live AI, credential exposure, worker execution, or destructive production actions.

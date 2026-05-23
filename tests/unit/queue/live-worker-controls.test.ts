@@ -124,6 +124,51 @@ describe("production live campaign worker controls", () => {
       targets.push(new DOMException("unsafe-controls", "UnsafeControls"));
     }
 
+    if (typeof MessageChannel !== "undefined") {
+      const channel = new MessageChannel();
+      channel.port1.close();
+      channel.port2.close();
+      targets.push(channel, channel.port1, channel.port2);
+    }
+
+    if (typeof BroadcastChannel !== "undefined") {
+      const channel = new BroadcastChannel("unsafe-controls");
+      channel.close();
+      targets.push(channel);
+    }
+
+    if (typeof CompressionStream !== "undefined") {
+      targets.push(new CompressionStream("gzip"));
+    }
+
+    if (typeof DecompressionStream !== "undefined") {
+      targets.push(new DecompressionStream("gzip"));
+    }
+
+    if (typeof CountQueuingStrategy !== "undefined") {
+      targets.push(new CountQueuingStrategy({ highWaterMark: 1 }));
+    }
+
+    if (typeof ByteLengthQueuingStrategy !== "undefined") {
+      targets.push(new ByteLengthQueuingStrategy({ highWaterMark: 1 }));
+    }
+
+    const URLPatternConstructor = (
+      globalThis as typeof globalThis & {
+        URLPattern?: new (init: { pathname: string }) => object;
+      }
+    ).URLPattern;
+
+    if (URLPatternConstructor !== undefined) {
+      targets.push(new URLPatternConstructor({ pathname: "/unsafe-controls" }));
+    }
+
+    if (typeof PerformanceObserver !== "undefined") {
+      const observer = new PerformanceObserver(() => undefined);
+      observer.disconnect();
+      targets.push(observer);
+    }
+
     return targets;
   }
 

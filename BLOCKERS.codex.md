@@ -1,8 +1,8 @@
 # Codex Blockers
 
-Run number: 529
+Run number: 531
 
-- No blocker from Web-platform live-worker impostor coverage. Focused queue coverage and the protected local gate passed. The change adds local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+- No blocker from expanded Web-platform live-worker impostor coverage. Focused queue coverage and the protected local gate passed. The change adds local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
 
 Run number: 528
 
@@ -1272,6 +1272,7 @@ No blocker from the latest aliased cloned body-reader hardening. The change tigh
 No blocker from the latest typed cloned body-reader hardening. The change tightens local static API authorization coverage only and does not execute API handlers, use production credentials, call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
 No blocker from the latest non-default request parameter hardening. The change tightens local static API authorization coverage only and does not execute API handlers, use production credentials, call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
 No blocker from the latest destructured request body-reader hardening. The change tightens local static API authorization coverage only and does not execute API handlers, use production credentials, call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
+- No blocker from the latest live-worker Web-platform channel/port hardening. The change adds local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
 No blocker from the latest bound request body-reader hardening. The change tightens local static API authorization coverage only and does not execute API handlers, use production credentials, call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
 No blocker from the latest bracket-bound request body-reader hardening. The change tightens local static API authorization coverage only and does not execute API handlers, use production credentials, call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
 No blocker from the latest direct call/apply request body-reader hardening. Focused auth coverage and the protected local gate passed; the change tightens local static API authorization coverage only and does not execute API handlers, use production credentials, call providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
