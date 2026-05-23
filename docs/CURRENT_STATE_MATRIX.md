@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 578 note: live-worker authorization now evaluates exact frozen control-array evidence without reading inherited `Array.prototype` `Symbol.toStringTag` metadata.
+
 Run 577 note: live-worker authorization now evaluates exact frozen authorization-wrapper evidence without invoking inherited `Object.prototype` `Symbol.toPrimitive`, `toString`, or `valueOf` metadata.
 
 Run 576 note: live-worker authorization now evaluates exact frozen control-entry evidence without invoking inherited `Object.prototype` `Symbol.toPrimitive`, `toString`, or `valueOf` metadata.

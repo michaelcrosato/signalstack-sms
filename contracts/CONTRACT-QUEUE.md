@@ -42,12 +42,12 @@ Exact frozen supplied control entries must also be evaluated from own descriptor
 Exact frozen supplied control entries must also remain independent from inherited `Object.prototype` `Symbol.toPrimitive`, `toString`, or `valueOf` coercion metadata.
 Exact frozen authorization-wrapper evidence must also remain independent from inherited `Object.prototype` `Symbol.toPrimitive`, `toString`, or `valueOf` coercion metadata.
 Whitespace-padded deployment class evidence includes leading spaces, trailing spaces, tabs, newlines, carriage returns, CRLF pairs, vertical tabs, form feeds, invisible Unicode escape padding, and Unicode line/paragraph separator padding, and must deny before supplied controls are inspected.
-`Symbol.toStringTag` controls-evidence impostors with own or inherited accessor-backed tag metadata must deny without reading the tag, index, or length getters.
+`Symbol.toStringTag` controls-evidence impostors with own or inherited accessor-backed tag metadata must deny without reading the tag, index, or length getters. Exact frozen control-array evidence must remain authorized without reading inherited `Array.prototype` `Symbol.toStringTag` metadata.
 Own or inherited accessor-backed `Symbol.toStringTag` authorization-wrapper metadata must deny before supplied controls are inspected and without reading the tag getter.
 Inherited accessor-backed `Symbol.toStringTag` deployment-class metadata must deny before supplied controls are inspected and without reading the tag getter.
 Control entries with own `Symbol.toStringTag`, `Symbol.toPrimitive`, `toString`, or `valueOf` metadata must deny without reading or invoking those hooks.
 Control arrays with own `Symbol.toPrimitive`, `toString`, or `valueOf` metadata must deny without reading or invoking those hooks.
-Exact frozen control-array evidence must remain authorized without reading inherited `Array.prototype` `Symbol.toPrimitive`, `toString`, or `valueOf` metadata.
+Exact frozen control-array evidence must remain authorized without reading inherited `Array.prototype` `Symbol.toPrimitive`, `toString`, `valueOf`, or `Symbol.toStringTag` metadata.
 
 - The worker uses validated version-1 scheduled campaign payloads.
 - Invalid payloads or missing scheduled campaigns are marked `FAILED`.

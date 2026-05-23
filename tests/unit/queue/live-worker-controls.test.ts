@@ -591,6 +591,43 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("does not read inherited array toStringTag metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as {
+      [Symbol.toStringTag]?: unknown;
+    };
+    const originalToStringTagDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, Symbol.toStringTag);
+
+    try {
+      Object.defineProperty(Array.prototype, Symbol.toStringTag, {
+        configurable: true,
+        get: () => {
+          throw new Error("inherited control-array toStringTag must not be read");
+        }
+      });
+
+      expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls)).not.toThrow();
+      expect(() => liveWorkerControlsAreFrozen(implementedControls)).not.toThrow();
+      expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(implementedControls)).not.toThrow();
+      expect(liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls)).toBe(true);
+      expect(liveWorkerControlsAreFrozen(implementedControls)).toBe(true);
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls)).toBe(true);
+      expect(liveWorkerControlsAreImplemented(implementedControls)).toBe(true);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+        )
+      ).toBe(true);
+    } finally {
+      if (originalToStringTagDescriptor === undefined) {
+        delete arrayPrototype[Symbol.toStringTag];
+      } else {
+        Object.defineProperty(Array.prototype, Symbol.toStringTag, originalToStringTagDescriptor);
+      }
+    }
+  });
+
   it("rejects array subclass evidence before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
 
