@@ -1713,6 +1713,8 @@ describe("production live campaign worker controls", () => {
       Object.freeze(new Date(0)),
       Object.freeze(/implemented/),
       Object.freeze(new Error("implemented controls")),
+      Object.freeze(new WeakRef(implementedFrozenControls()[0])),
+      Object.freeze(new FinalizationRegistry(() => undefined)),
       Object.freeze({
         0: implementedFrozenControls()[0],
         length: productionLiveCampaignWorkerControls.length
@@ -2141,6 +2143,34 @@ describe("production live campaign worker controls", () => {
         ownKeys: () => {
           throw new Error("error proxy controls keys trap must not be read");
         }
+      }),
+      new Proxy(new WeakRef(implementedFrozenControls()[0]), {
+        get: () => {
+          throw new Error("weakref proxy controls get trap must not be read");
+        },
+        getPrototypeOf: () => {
+          throw new Error("weakref proxy controls prototype trap must not be read");
+        },
+        getOwnPropertyDescriptor: () => {
+          throw new Error("weakref proxy controls descriptor trap must not be read");
+        },
+        ownKeys: () => {
+          throw new Error("weakref proxy controls keys trap must not be read");
+        }
+      }),
+      new Proxy(new FinalizationRegistry(() => undefined), {
+        get: () => {
+          throw new Error("finalization registry proxy controls get trap must not be read");
+        },
+        getPrototypeOf: () => {
+          throw new Error("finalization registry proxy controls prototype trap must not be read");
+        },
+        getOwnPropertyDescriptor: () => {
+          throw new Error("finalization registry proxy controls descriptor trap must not be read");
+        },
+        ownKeys: () => {
+          throw new Error("finalization registry proxy controls keys trap must not be read");
+        }
       })
     ];
 
@@ -2257,6 +2287,8 @@ describe("production live campaign worker controls", () => {
       new Map([["0", implementedFrozenControls()[0]]]),
       new Set(implementedFrozenControls()),
       Promise.resolve(implementedFrozenControls()),
+      new WeakRef(implementedFrozenControls()[0]),
+      new FinalizationRegistry(() => undefined),
       new ArrayBuffer(8)
     ];
 

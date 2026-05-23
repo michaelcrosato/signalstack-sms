@@ -10,6 +10,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
 
+## Run 514  GREEN  live-worker-weak-ref-controls  2026-05-23 04:14
+Objective:    Prove WeakRef and FinalizationRegistry-shaped controls evidence cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing WeakRef and FinalizationRegistry `controls` evidence denies in ordinary, proxy-backed, and revoked proxy-backed forms.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the weak-reference/finalization-registry controls-evidence boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 496  GREEN  codex-handoff-truth-sync  2026-05-23 02:05
 Objective:    Make top-level Codex handoff files lead with current repo truth after Run 495.
 Changed:

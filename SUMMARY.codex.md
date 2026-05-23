@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 514
+
+- Added live-worker unit coverage proving weak-reference and finalization-registry `controls` evidence cannot authorize the reserved `production-live-campaign` worker class.
+- Proved ordinary, proxy-backed, and revoked proxy-backed WeakRef/FinalizationRegistry-shaped controls evidence denies without object trap reads, throwing, or falling back to built-in control metadata; `production-live-campaign` remains unsupported.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, BLOCKERS, and current state matrix for the weak-reference/finalization-registry controls-evidence boundary.
+- Focused check passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 92 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 544 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 513
 
 - Added live-worker unit coverage proving revoked proxy-backed built-in `controls` evidence cannot authorize the reserved `production-live-campaign` worker class.
