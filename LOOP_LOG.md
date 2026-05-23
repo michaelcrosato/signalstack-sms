@@ -50,6 +50,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
 
+## Run 486  GREEN  live-worker-object-controls-evidence  2026-05-23 00:40
+Objective:    Prove object-shaped non-array controls evidence cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage for map, set, typed-array, promise, and array-like object controls evidence.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the object-shaped controls-evidence boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, or protected gate scripts were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 485  GREEN  live-worker-object-shaped-deployment-class  2026-05-23 00:32
 Objective:    Prove object-shaped deployment-class impostors cannot authorize the reserved live worker class.
 Changed:

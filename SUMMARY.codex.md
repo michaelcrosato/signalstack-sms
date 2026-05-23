@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 486
+
+- Added live-worker authorization coverage proving object-shaped non-array `controls` evidence, including maps, sets, typed arrays, promises, and array-like records, cannot authorize the reserved `production-live-campaign` class.
+- Focused check passed after repairing the typed-array fixture: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 70 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 522 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution outside validation, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 485
 
 - Added live-worker authorization coverage proving object-shaped deployment-class impostors, including boxed booleans/numbers, dates, functions, and tagged objects, deny before supplied controls are inspected for the reserved `production-live-campaign` class.

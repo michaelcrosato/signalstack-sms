@@ -1637,6 +1637,32 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects object-shaped non-array controls evidence without reading entries", () => {
+    const controlsEvidence = [
+      Object.freeze(new Map([["0", implementedFrozenControls()[0]]])),
+      Object.freeze(new Set(implementedFrozenControls())),
+      new Uint8Array([1, 2, 3]),
+      Object.freeze(Promise.resolve(implementedFrozenControls())),
+      Object.freeze({
+        0: implementedFrozenControls()[0],
+        length: productionLiveCampaignWorkerControls.length
+      })
+    ];
+
+    for (const controls of controlsEvidence) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects proxy-backed control evidence without throwing", () => {
     const implementedControls = implementedFrozenControls();
     const throwingArrayLengthDescriptorProxy = new Proxy([...implementedControls], {
