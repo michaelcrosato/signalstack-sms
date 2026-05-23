@@ -2059,6 +2059,8 @@ describe("production live campaign worker controls", () => {
       Object.freeze(new Date(0)),
       Object.freeze(new Map([["workerDeploymentClass", reservedLiveWorkerDeploymentClass]])),
       Object.freeze(new Set([reservedLiveWorkerDeploymentClass])),
+      Object.freeze(new WeakMap([[{}, reservedLiveWorkerDeploymentClass]])),
+      Object.freeze(new WeakSet([{}])),
       Object.freeze(new Uint8Array(0)),
       Object.freeze(new DataView(new ArrayBuffer(8))),
       promiseClass,

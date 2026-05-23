@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 497
+
+- No blocker from weak collection deployment-class impostor coverage. Focused queue coverage and the protected local gate passed; the change adds local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
 Run number: 496
 
 - No blocker from top-level Codex handoff truth synchronization. The protected local gate passed; the change is docs/log only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.

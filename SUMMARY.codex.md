@@ -1,5 +1,14 @@
 # Codex Summary
 
+Run number: 497
+
+- Added live-worker unit coverage proving weak collections cannot impersonate the reserved `production-live-campaign` deployment class.
+- Proved those malformed class values deny before hostile supplied controls are inspected; `production-live-campaign` remains unsupported.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 496
 
 - Synchronized top-level Codex handoff truth after Run 495 so `SUMMARY.codex.md`, `BLOCKERS.codex.md`, `docs/NEXT_PROMPTS.md`, `docs/CURRENT_STATE_MATRIX.md`, and both loop logs lead with the current built-in deployment-class impostor boundary.
@@ -10,7 +19,7 @@ Run number: 496
 
 Run number: 495
 
-- Added live-worker unit coverage proving maps, sets, typed arrays, data views, promises, regular expressions, and errors cannot impersonate the reserved `production-live-campaign` deployment class.
+- Added live-worker unit coverage proving maps, sets, weak collections, typed arrays, data views, promises, regular expressions, and errors cannot impersonate the reserved `production-live-campaign` deployment class.
 - Proved those malformed class values deny before hostile supplied controls are inspected.
 - Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the built-in deployment-class boundary.
 - Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`.
@@ -3888,4 +3897,4 @@ Latest live-worker duplicate-entry-key coverage proves proxy-backed `production-
 - Latest live-worker iterable controls coverage proves hostile iterable object `controls` evidence cannot authorize the reserved `production-live-campaign` worker class and denies without invoking iterator functions. Focused unit coverage and the protected local gate passed; the change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
 - Latest live-worker built-in object controls coverage proves weak collections, data views, boxed primitives, dates, regular expressions, and errors cannot impersonate `controls` evidence for the reserved `production-live-campaign` worker class. Focused unit coverage and the protected local gate passed; the change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
 - Latest live-worker built-in object wrapper coverage proves maps, sets, weak collections, typed arrays, data views, promises, boxed primitives, regular expressions, and errors cannot impersonate authorization wrappers for the reserved `production-live-campaign` worker class, even when they carry public wrapper field names. Focused unit coverage passed; the change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
-- Latest live-worker built-in deployment-class coverage proves maps, sets, typed arrays, data views, promises, regular expressions, and errors cannot impersonate the reserved `production-live-campaign` worker class and deny before hostile supplied controls are inspected. Focused unit coverage and the protected local gate passed; the change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
+- Latest live-worker built-in deployment-class coverage proves maps, sets, weak collections, typed arrays, data views, promises, regular expressions, and errors cannot impersonate the reserved `production-live-campaign` worker class and deny before hostile supplied controls are inspected. Focused unit coverage and the protected local gate passed; the change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive database actions.
