@@ -1705,8 +1705,13 @@ describe("production live campaign worker controls", () => {
         }
       })
     );
+    const iterableObjectControls = Object.freeze({
+      [Symbol.iterator]: () => {
+        throw new Error("iterable object controls iterator must not be invoked");
+      }
+    });
 
-    for (const controls of [hostileArrayLikeControls, arrayPrototypeImpostor]) {
+    for (const controls of [hostileArrayLikeControls, arrayPrototypeImpostor, iterableObjectControls]) {
       expect(() =>
         liveWorkerDeploymentClassIsAuthorized(
           frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
