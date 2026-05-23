@@ -143,6 +143,59 @@ describe("settings and operations JSON mutation routes", () => {
     expect(mocks.upsertProviderPhoneNumber).not.toHaveBeenCalled();
   });
 
+  it("denies provider number metadata upserts before parsing request bodies", async () => {
+    const denial = Response.json({ error: "Forbidden" }, { status: 403 });
+    mocks.requireApiRole.mockReturnValue(denial);
+
+    const response = await upsertNumberRoute(malformedJsonRequest("/api/settings/numbers"));
+
+    expect(response.status).toBe(403);
+    expect(mocks.upsertProviderPhoneNumber).not.toHaveBeenCalled();
+  });
+
+  it("upserts only local provider number metadata for valid admin requests", async () => {
+    const number = {
+      id: "number_demo",
+      orgId: "org_demo",
+      phoneNumber: "+15555550199",
+      label: "Demo line",
+      provider: "dummy",
+      status: "DEMO",
+      capabilities: ["sms"],
+      isDefault: true
+    };
+    mocks.upsertProviderPhoneNumber.mockResolvedValue(number);
+
+    const response = await upsertNumberRoute(
+      new Request("http://localhost/api/settings/numbers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phoneNumber: "+15555550199",
+          label: "Demo line",
+          isDefault: true
+        })
+      })
+    );
+
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toEqual({ number });
+    expect(mocks.upsertProviderPhoneNumber).toHaveBeenCalledWith(
+      "org_demo",
+      {
+        phoneNumber: "+15555550199",
+        label: "Demo line",
+        provider: "dummy",
+        capabilities: ["sms"],
+        isDefault: true
+      },
+      { actorUserId: "user_demo" }
+    );
+    expect(mocks.getProviderSettings).not.toHaveBeenCalled();
+    expect(mocks.upsertProviderCredentialMetadata).not.toHaveBeenCalled();
+    expect(mocks.sendLiveTestSms).not.toHaveBeenCalled();
+  });
+
   it("rejects malformed provider settings JSON without persisting credential metadata", async () => {
     const response = await updateProviderRoute(malformedJsonRequest("/api/settings/provider", "PATCH"));
 

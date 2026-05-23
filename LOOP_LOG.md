@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 462  GREEN  provider-number-route-safety  2026-05-22 21:55
+Objective:    Prove provider number metadata upserts stay authorization-gated and local-only.
+Changed:
+- Added route-level coverage for denied provider number upserts returning before request-body parsing or local metadata writes.
+- Added successful admin coverage proving only local provider number metadata is upserted with dummy defaults and no provider settings, credential, or live-test SMS side effects.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the provider number route safety boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.
+
 ## Run 461  GREEN  provider-settings-delete-route-safety  2026-05-22 21:50
 Objective:    Prove provider credential metadata deletion stays authorization-gated and local-only.
 Changed:
