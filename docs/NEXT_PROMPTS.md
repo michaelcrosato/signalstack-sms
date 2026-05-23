@@ -14,7 +14,7 @@ This file is the handoff for the next automated loop. It should stay short enoug
 
 ## Current State
 
-- Latest run: Run 529 extends live-worker Web-platform impostor coverage so runtime-supported `Blob`, `FormData`, `Headers`, `Request`, `Response`, and related records cannot authorize the reserved live-worker class as controls evidence or authorization wrappers.
+- Latest run: Run 530 extends live-worker Web-platform impostor coverage so runtime-supported stream, encoding-stream, event, and DOM exception records cannot authorize the reserved live-worker class as controls evidence or authorization wrappers.
 - The backend foundation is strong: tenant helpers, contacts, campaigns, queue jobs, inbox, compliance gates, fake AI, local billing/analytics, provider metadata, Twilio webhook foundations, readiness audit, operations inventory, and validation gates.
 - The settings operations pages use compact related-link headers; keep those surfaces read-only and do not expand operations UI unless it directly supports release safety or product work.
 - The browser product now has an initial `/dashboard` shell, `/dashboard/contacts` list/import workflow with archived restore links, `/dashboard/contacts/:contactId` local detail/edit/archive/restore/merge workflow, `/dashboard/campaigns` compose/preflight/local schedule workflow, `/dashboard/campaigns/:campaignId` local draft edit and queued cancel workflow, `/dashboard/inbox` local thread workflow, `/dashboard/templates` local template create/list workflow, `/dashboard/templates/:templateId` local detail/edit workflow, `/dashboard/analytics` local overview detail, and `/dashboard/compliance` local readiness detail.
@@ -36,7 +36,7 @@ This file is the handoff for the next automated loop. It should stay short enoug
 - Boxed primitive authorization-wrapper coverage now explicitly includes boxed `Symbol` and boxed `BigInt` evidence across ordinary, exact-field frozen, proxy-backed, reflection-trapped, and revoked proxy-backed forms before supplied live-worker controls are inspected.
 - Boxed primitive controls-evidence coverage now explicitly includes boxed `Symbol` and boxed `BigInt` evidence across ordinary, proxy-backed, and revoked proxy-backed forms before controls can be treated as the future live-worker checklist.
 - Revoked proxy-backed built-in controls-evidence coverage now explicitly includes typed arrays, data views, weak collections, array buffers, shared array buffers when runtime-supported, URL-shaped records, boxed `Symbol`/`BigInt` records, weak references, and finalization registries before controls can be treated as the future live-worker checklist.
-- Runtime-supported Web-platform impostor coverage now includes `Blob`, `File`, `FormData`, `Headers`, `Request`, `Response`, `AbortController`, `AbortSignal`, `ReadableStream`, `TextEncoder`, and `TextDecoder` as controls evidence and authorization wrappers before the reserved live-worker class can inspect or authorize supplied controls.
+- Runtime-supported Web-platform impostor coverage now includes `Blob`, `File`, `FormData`, `Headers`, `Request`, `Response`, `AbortController`, `AbortSignal`, `ReadableStream`, `WritableStream`, `TransformStream`, `TextEncoder`, `TextDecoder`, `TextEncoderStream`, `TextDecoderStream`, `EventTarget`, `Event`, and `DOMException` as controls evidence and authorization wrappers before the reserved live-worker class can inspect or authorize supplied controls.
 
 ## Next Best Work
 

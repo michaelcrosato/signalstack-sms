@@ -88,12 +88,40 @@ describe("production live campaign worker controls", () => {
       targets.push(new ReadableStream());
     }
 
+    if (typeof WritableStream !== "undefined") {
+      targets.push(new WritableStream());
+    }
+
+    if (typeof TransformStream !== "undefined") {
+      targets.push(new TransformStream());
+    }
+
     if (typeof TextEncoder !== "undefined") {
       targets.push(new TextEncoder());
     }
 
     if (typeof TextDecoder !== "undefined") {
       targets.push(new TextDecoder());
+    }
+
+    if (typeof TextEncoderStream !== "undefined") {
+      targets.push(new TextEncoderStream());
+    }
+
+    if (typeof TextDecoderStream !== "undefined") {
+      targets.push(new TextDecoderStream());
+    }
+
+    if (typeof EventTarget !== "undefined") {
+      targets.push(new EventTarget());
+    }
+
+    if (typeof Event !== "undefined") {
+      targets.push(new Event("unsafe-controls"));
+    }
+
+    if (typeof DOMException !== "undefined") {
+      targets.push(new DOMException("unsafe-controls", "UnsafeControls"));
     }
 
     return targets;
