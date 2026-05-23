@@ -28,11 +28,15 @@ export async function PATCH(request: Request, { params }: TemplateParams) {
     return roleResponse;
   }
 
-  const rawPayload = await request.json();
-  const payload = templateCreateSchema.safeParse({
-    ...rawPayload,
-    variables: rawPayload.variables ?? extractTemplateVariables(rawPayload.body ?? "")
-  });
+  const rawPayload = await request.json().catch(() => undefined);
+  const payload = templateCreateSchema.safeParse(
+    rawPayload && typeof rawPayload === "object"
+      ? {
+          ...rawPayload,
+          variables: "variables" in rawPayload ? rawPayload.variables : extractTemplateVariables("body" in rawPayload ? rawPayload.body : "")
+        }
+      : rawPayload
+  );
 
   if (!payload.success) {
     return NextResponse.json({ error: "Invalid template payload.", issues: payload.error.issues }, { status: 400 });

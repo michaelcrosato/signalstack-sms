@@ -4120,3 +4120,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.
+
+## Run 456  GREEN  template-json-malformed-create-update  2026-05-22 21:15
+Objective:    Prove malformed template create/update JSON cannot throw past local validation or mutate templates.
+Changed:
+- Hardened `POST /api/templates` and `PATCH /api/templates/:templateId` to return `400` invalid template payload responses for malformed JSON.
+- Added route-level coverage proving malformed template create/update bodies do not call local upsert/update repository mutations.
+- Updated TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the malformed template JSON mutation boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.
