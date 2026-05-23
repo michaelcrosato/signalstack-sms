@@ -2544,6 +2544,10 @@ describe("production live campaign worker controls", () => {
         }
       )
     );
+    const symbolKeyedPublicFieldWrapper = Object.freeze({
+      [Symbol("workerDeploymentClass")]: reservedLiveWorkerDeploymentClass,
+      [Symbol("controls")]: throwingEvidence
+    });
 
     for (const input of [
       reorderedKeyWrapper,
@@ -2553,7 +2557,8 @@ describe("production live campaign worker controls", () => {
       hiddenExtraKeyWrapper,
       hiddenStringExtraKeyWrapper,
       symbolExtraKeyWrapper,
-      hiddenSymbolExtraKeyWrapper
+      hiddenSymbolExtraKeyWrapper,
+      symbolKeyedPublicFieldWrapper
     ]) {
       expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
       expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);

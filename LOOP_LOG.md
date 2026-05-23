@@ -4249,6 +4249,16 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.
+## Run 480  GREEN  live-worker-wrapper-symbol-field-impersonators  2026-05-23 00:01
+Objective:    Prove symbol-keyed authorization-wrapper fields cannot impersonate required live-worker wrapper public fields.
+Changed:
+- Added queue unit coverage showing symbol-keyed `workerDeploymentClass`/`controls` wrapper entries do not satisfy required string public fields.
+- Updated queue contract/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the authorization-wrapper symbol-keyed public-field boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, external notifications, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 458  GREEN  inbox-json-malformed-mutations  2026-05-22 21:30
 Objective:    Prove malformed inbox/demo inbound JSON cannot throw past local validation or mutate inbox records.
 Changed:
