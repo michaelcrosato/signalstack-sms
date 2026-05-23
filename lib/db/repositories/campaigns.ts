@@ -160,7 +160,7 @@ export async function cancelCampaign(orgId: string, campaignId: string) {
       return null;
     }
     if (campaign.status !== CampaignStatus.SCHEDULED) {
-      return null;
+      throw new Error("Only scheduled campaigns can be canceled.");
     }
 
     await tx.queueJob.updateMany({

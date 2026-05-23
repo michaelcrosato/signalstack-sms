@@ -33,7 +33,7 @@ Milestone 3:
 Milestone 4:
 
 - `POST /api/campaigns/:campaignId/schedule`: stores a queued scheduled-campaign job after preflight.
-- `POST /api/campaigns/:campaignId/cancel`: cancels queued jobs and pauses the campaign.
+- `POST /api/campaigns/:campaignId/cancel`: cancels queued jobs and pauses scheduled campaigns; existing non-scheduled campaigns return `409` without mutation.
 
 Milestone 5:
 

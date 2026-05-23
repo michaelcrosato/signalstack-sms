@@ -300,4 +300,4 @@ Post-MVP delivery operations view:
 
 Post-MVP campaign route safety:
 
-- Unit tests must verify `POST /api/campaigns/:campaignId/cancel` returns role denials before local cancellation, returns `404` for missing tenant-scoped campaigns, and returns the locally paused campaign after successful cancellation without provider calls, BullMQ enqueueing, worker execution, billing, notifications, SMS, or live feature enablement.
+- Unit tests must verify `POST /api/campaigns/:campaignId/cancel` returns role denials before local cancellation, returns `404` for missing tenant-scoped campaigns, returns `409` for existing non-scheduled campaigns without queue or campaign mutations, and returns the locally paused campaign after successful cancellation without provider calls, BullMQ enqueueing, worker execution, billing, notifications, SMS, or live feature enablement.

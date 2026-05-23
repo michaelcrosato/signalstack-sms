@@ -14,7 +14,7 @@ Queue job records are persisted in `QueueJob` before any worker/provider behavio
 - `payload`: validated JSON payload
 - `runAt`: scheduled execution time
 
-`POST /api/campaigns/:campaignId/schedule` creates or updates a queued job only after campaign preflight passes. `POST /api/campaigns/:campaignId/cancel` marks queued jobs cancelled and pauses the campaign.
+`POST /api/campaigns/:campaignId/schedule` creates or updates a queued job only after campaign preflight passes. `POST /api/campaigns/:campaignId/cancel` marks queued jobs cancelled and pauses scheduled campaigns only; missing campaigns return not found, and existing non-scheduled campaigns reject without queue or campaign mutations.
 
 Milestone 4 does not call live providers.
 

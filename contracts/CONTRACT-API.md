@@ -110,7 +110,7 @@ Runs preflight, marks a campaign `SCHEDULED`, and stores a queued job record. Th
 
 ### `POST /api/campaigns/:campaignId/cancel`
 
-Marks queued campaign jobs `CANCELLED` and returns the paused campaign.
+Marks queued campaign jobs `CANCELLED` and returns the paused campaign. Missing tenant-scoped campaigns return `404`; existing non-scheduled campaigns return `409` without queue or campaign mutations.
 
 ### `GET /api/inbox/conversations`
 

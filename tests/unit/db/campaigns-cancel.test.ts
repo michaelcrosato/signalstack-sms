@@ -40,7 +40,7 @@ describe("cancelCampaign", () => {
     expect(mocks.campaignUpdate).not.toHaveBeenCalled();
   });
 
-  it("does not pause draft or completed campaigns", async () => {
+  it("rejects draft, paused, or completed campaigns without queue mutations", async () => {
     for (const status of [CampaignStatus.DRAFT, CampaignStatus.PAUSED, CampaignStatus.COMPLETED]) {
       vi.clearAllMocks();
       mocks.transaction.mockImplementation((callback) =>
@@ -56,7 +56,9 @@ describe("cancelCampaign", () => {
       );
       mocks.campaignFindFirst.mockResolvedValue({ id: `campaign_${status.toLowerCase()}`, status });
 
-      await expect(cancelCampaign("org_demo", `campaign_${status.toLowerCase()}`)).resolves.toBeNull();
+      await expect(cancelCampaign("org_demo", `campaign_${status.toLowerCase()}`)).rejects.toThrow(
+        "Only scheduled campaigns can be canceled."
+      );
 
       expect(mocks.queueJobUpdateMany).not.toHaveBeenCalled();
       expect(mocks.campaignUpdate).not.toHaveBeenCalled();

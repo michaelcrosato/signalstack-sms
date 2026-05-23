@@ -15,11 +15,15 @@ export async function POST(_request: Request, { params }: CampaignParams) {
     return roleResponse;
   }
 
-  const campaign = await cancelCampaign(currentOrg.orgId, campaignId);
+  try {
+    const campaign = await cancelCampaign(currentOrg.orgId, campaignId);
 
-  if (!campaign) {
-    return NextResponse.json({ error: "Campaign not found." }, { status: 404 });
+    if (!campaign) {
+      return NextResponse.json({ error: "Campaign not found." }, { status: 404 });
+    }
+
+    return NextResponse.json({ campaign });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Campaign cancel failed." }, { status: 409 });
   }
-
-  return NextResponse.json({ campaign });
 }

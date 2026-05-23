@@ -4508,3 +4508,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 564  GREEN  campaign-cancel-conflict  2026-05-23 09:26
+Objective:    Distinguish existing non-scheduled campaign cancellation from missing campaigns while preserving no-mutation safety.
+Changed:
+- Updated `cancelCampaign` to reject existing non-scheduled campaigns with a conflict instead of returning the missing-campaign path.
+- Added route and repository unit coverage for `409` non-scheduled cancellation, missing `404`, and scheduled local cancellation.
+- Updated API/queue/testing contracts, current state, NEXT_PROMPTS, SUMMARY, BLOCKERS, and loop logs for the conflict boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

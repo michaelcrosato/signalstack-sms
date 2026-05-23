@@ -50,6 +50,18 @@ describe("campaign cancel route", () => {
     expect(mocks.cancelCampaign).toHaveBeenCalledWith("org_demo", "missing_campaign");
   });
 
+  it("returns conflict when an existing campaign is not scheduled", async () => {
+    mocks.cancelCampaign.mockRejectedValue(new Error("Only scheduled campaigns can be canceled."));
+
+    const response = await POST(new Request("http://localhost/api/campaigns/campaign_draft/cancel", { method: "POST" }), {
+      params: Promise.resolve({ campaignId: "campaign_draft" })
+    });
+
+    expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toEqual({ error: "Only scheduled campaigns can be canceled." });
+    expect(mocks.cancelCampaign).toHaveBeenCalledWith("org_demo", "campaign_draft");
+  });
+
   it("returns the locally paused campaign after canceling queued jobs", async () => {
     const campaign = {
       id: "campaign_demo",
