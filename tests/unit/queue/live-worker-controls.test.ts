@@ -3244,6 +3244,68 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects proxy-backed collection deployment class impostors before inspecting supplied controls", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("proxy-backed collection worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("proxy-backed collection worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("proxy-backed collection worker classes must not inspect control evidence");
+      }
+    });
+    const collectionClasses = [
+      Object.freeze(new Map([["workerDeploymentClass", reservedLiveWorkerDeploymentClass]])),
+      Object.freeze(new Set([reservedLiveWorkerDeploymentClass])),
+      Object.freeze(new WeakMap([[implementedFrozenControls()[0], "implemented"]])),
+      Object.freeze(new WeakSet([implementedFrozenControls()[0]]))
+    ];
+    const proxyBackedCollectionClasses = collectionClasses.map(
+      (target) =>
+        new Proxy(target, {
+          get: () => {
+            throw new Error("proxy-backed collection worker class values must not be read");
+          },
+          getPrototypeOf: () => {
+            throw new Error("proxy-backed collection worker class prototypes must not be read");
+          },
+          getOwnPropertyDescriptor: () => {
+            throw new Error("proxy-backed collection worker class descriptors must not be read");
+          },
+          ownKeys: () => {
+            throw new Error("proxy-backed collection worker class keys must not be read");
+          }
+        })
+    );
+    const revokedCollectionClasses = collectionClasses.map((target) => {
+      const { proxy, revoke } = Proxy.revocable(target, {
+        get: () => {
+          throw new Error("revoked collection worker class values must not be read");
+        }
+      });
+      revoke();
+      return proxy;
+    });
+
+    for (const workerDeploymentClass of [
+      ...proxyBackedCollectionClasses,
+      ...revokedCollectionClasses
+    ]) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects proxy-backed boxed primitive deployment class impostors before inspecting supplied controls", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {

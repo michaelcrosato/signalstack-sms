@@ -1,5 +1,25 @@
 # Codex Summary
 
+Run number: 561
+
+- Tightened focused live-worker unit coverage proving proxy-backed and revoked proxy-backed collection deployment-class values cannot authorize the reserved `production-live-campaign` worker class.
+- Covered `Map`, `Set`, `WeakMap`, and `WeakSet` records denying before hostile supplied controls can be inspected, without reading object `get`, prototype, descriptor, or key traps.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 126 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 578 tests, Playwright smoke, and build green.
+- No API handlers were executed by the focused test; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
+Run number: 560
+
+- Tightened focused live-worker unit coverage proving proxy-backed and revoked proxy-backed promise and error-shaped deployment-class values cannot authorize the reserved `production-live-campaign` worker class.
+- Covered `Promise`, `RegExp`, `Error`, and `TypeError` records denying before hostile supplied controls can be inspected, without reading object `get`, prototype, descriptor, or key traps.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 125 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 577 tests, Playwright smoke, and build green.
+- No API handlers were executed by the focused test; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 559
 
 - Tightened focused live-worker unit coverage proving proxy-backed and revoked proxy-backed URL-shaped, weak-reference, and finalization-registry deployment-class values cannot authorize the reserved `production-live-campaign` worker class.

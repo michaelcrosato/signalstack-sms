@@ -1,5 +1,13 @@
 # Codex Blockers
 
+Run number: 561
+
+- No blocker from proxy-backed and revoked proxy-backed collection deployment-class live-worker coverage. Focused queue coverage and the protected local gate passed. The change adds local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+Run number: 560
+
+- No blocker from proxy-backed and revoked proxy-backed promise/error deployment-class live-worker coverage. Focused queue coverage and the protected local gate passed. The change adds local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
 Run number: 559
 
 - No blocker from proxy-backed and revoked proxy-backed URL-shaped, weak-reference, and finalization-registry deployment-class live-worker coverage. Focused queue coverage and the protected local gate passed. The change adds local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
