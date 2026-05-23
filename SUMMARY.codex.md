@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 517
+
+- Added live-worker unit coverage proving revoked proxy-backed built-in authorization-wrapper impostors cannot authorize the reserved `production-live-campaign` worker class.
+- Proved revoked proxy-backed maps, sets, weak collections, typed arrays, data views, promises, boxed primitives, regular expressions, errors, weak references, and finalization registries carrying public wrapper fields deny before supplied controls are inspected or built-in metadata can be used as fallback evidence; `production-live-campaign` remains unsupported.
+- Updated queue contract, production worker policy, NEXT_PROMPTS, and current state matrix for the revoked proxy-backed built-in authorization-wrapper boundary.
+- Focused check passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 94 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 546 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 516
 
 - Added live-worker unit coverage proving proxy-backed built-in authorization-wrapper impostors cannot authorize the reserved `production-live-campaign` worker class.
@@ -7,17 +18,6 @@ Run number: 516
 - Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, BLOCKERS, and current state matrix for the proxy-backed built-in authorization-wrapper boundary.
 - Focused check passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 93 tests.
 - Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 545 tests, Playwright smoke, and build green.
-- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
-
-## Previous Run
-
-Run number: 515
-
-- Added live-worker unit coverage proving WeakRef and FinalizationRegistry authorization-wrapper impostors cannot authorize the reserved `production-live-campaign` worker class.
-- Proved built-in wrapper impostors carrying public `workerDeploymentClass` and `controls` fields deny before supplied controls are inspected; `production-live-campaign` remains unsupported.
-- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, BLOCKERS, and current state matrix for the WeakRef/FinalizationRegistry authorization-wrapper boundary.
-- Focused check passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 92 tests.
-- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 544 tests, Playwright smoke, and build green.
 - No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
 
 ## Previous Run

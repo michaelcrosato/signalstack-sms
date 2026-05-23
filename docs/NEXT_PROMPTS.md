@@ -14,7 +14,7 @@ This file is the handoff for the next automated loop. It should stay short enoug
 
 ## Current State
 
-- Latest run: Run 516 adds coverage proving proxy-backed built-in authorization-wrapper impostors cannot authorize the reserved live worker class before supplied controls are inspected.
+- Latest run: Run 517 adds coverage proving revoked proxy-backed built-in authorization-wrapper impostors cannot authorize the reserved live worker class before supplied controls are inspected or built-in metadata can be used as fallback evidence.
 - The backend foundation is strong: tenant helpers, contacts, campaigns, queue jobs, inbox, compliance gates, fake AI, local billing/analytics, provider metadata, Twilio webhook foundations, readiness audit, operations inventory, and validation gates.
 - The settings operations pages use compact related-link headers; keep those surfaces read-only and do not expand operations UI unless it directly supports release safety or product work.
 - The browser product now has an initial `/dashboard` shell, `/dashboard/contacts` list/import workflow with archived restore links, `/dashboard/contacts/:contactId` local detail/edit/archive/restore/merge workflow, `/dashboard/campaigns` compose/preflight/local schedule workflow, `/dashboard/campaigns/:campaignId` local draft edit and queued cancel workflow, `/dashboard/inbox` local thread workflow, `/dashboard/templates` local template create/list workflow, `/dashboard/templates/:templateId` local detail/edit workflow, `/dashboard/analytics` local overview detail, and `/dashboard/compliance` local readiness detail.
@@ -28,6 +28,7 @@ This file is the handoff for the next automated loop. It should stay short enoug
 - Live campaign sending, live billing, live AI, production auth, production secrets, and production deployment remain blocked.
 - Exact deployment-class string coverage includes leading spaces, trailing spaces, tabs, newlines, carriage returns, CRLF pairs, vertical tabs, form feeds, invisible Unicode escape padding, and Unicode line/paragraph separator padding before supplied live-worker controls can be inspected.
 - Built-in object-shaped deployment-class impostor coverage now includes maps, sets, weak collections, typed arrays, data views, promises, regular expressions, errors, and proxy-backed or revoked proxy object values, and proves those malformed class values deny before supplied live-worker controls are inspected.
+- Revoked proxy-backed built-in authorization-wrapper impostor coverage proves revoked map, set, weak collection, typed array, data view, promise, boxed primitive, RegExp, Error, WeakRef, and FinalizationRegistry wrapper evidence denies cleanly before supplied live-worker controls are inspected or built-in metadata can be used as fallback evidence.
 
 ## Next Best Work
 

@@ -3750,6 +3750,53 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects revoked proxy-backed built-in authorization-wrapper impostors without inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("revoked built-in wrapper impostors must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("revoked built-in wrapper impostors must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("revoked built-in wrapper impostors must not inspect control evidence");
+      }
+    });
+    const wrapperFields = {
+      workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+      controls: throwingEvidence
+    };
+    const revokedProxyBackedBuiltInWrapperImpostors = [
+      Object.assign(new Map(), wrapperFields),
+      Object.assign(new Set(), wrapperFields),
+      Object.assign(new WeakMap(), wrapperFields),
+      Object.assign(new WeakSet(), wrapperFields),
+      Object.assign(new Uint8Array(0), wrapperFields),
+      Object.assign(new DataView(new ArrayBuffer(8)), wrapperFields),
+      Object.assign(Promise.resolve(implementedFrozenControls()), wrapperFields),
+      Object.assign(new String(reservedLiveWorkerDeploymentClass), wrapperFields),
+      Object.assign(new Number(1), wrapperFields),
+      Object.assign(new Boolean(true), wrapperFields),
+      Object.assign(/production-live-campaign/, wrapperFields),
+      Object.assign(new Error("production-live-campaign"), wrapperFields),
+      Object.assign(new WeakRef(implementedFrozenControls()[0]), wrapperFields),
+      Object.assign(new FinalizationRegistry(() => undefined), wrapperFields)
+    ].map((target) => {
+      const { proxy, revoke } = Proxy.revocable(Object.freeze(target), {
+        get: () => {
+          throw new Error("revoked built-in wrapper fields must not be read");
+        }
+      });
+      revoke();
+      return proxy;
+    });
+
+    for (const input of revokedProxyBackedBuiltInWrapperImpostors) {
+      expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
+    }
+  });
+
   it("rejects tampered authorization wrapper prototypes before inspecting controls", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       getPrototypeOf: () => {
