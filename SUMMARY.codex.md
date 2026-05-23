@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 450
+
+- Added route-level campaign schedule coverage proving malformed JSON returns `400` before `scheduleCampaign` or BullMQ enqueue helpers can run.
+- Updated the testing contract and current state matrix for the malformed schedule JSON queue-mutation boundary.
+- Focused check passed: `npm run test -- tests/unit/api/campaign-schedule-route.test.ts`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 48 Vitest files / 453 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 449
 
 - Added live-worker control coverage proving non-ordinary array, Date, and function-shaped control entries carrying valid-looking public fields cannot authorize the reserved `production-live-campaign` class.

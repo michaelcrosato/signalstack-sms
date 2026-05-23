@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 450
+
+- No blocker from malformed campaign schedule JSON coverage. Focused route coverage and the protected local gate passed and proved no local queue scheduling or BullMQ enqueue helpers run for malformed request bodies. No workers, live sends, provider calls, Redis effects, billing, notifications, live AI, secrets, live feature enablement, protected gate-script edits, hard deletion, or destructive production actions were used.
+
 Run number: 449
 
 - No blocker from non-ordinary control-entry live-worker evidence. Focused unit coverage and the protected local gate passed, and the change adds local unit/docs coverage only without executing workers, enqueueing live work, calling Redis/providers for external effects, billing, notifying, sending SMS or email, calling live AI, exposing secrets, enabling live features, editing protected gate scripts, hard-deleting data, or performing destructive production actions.

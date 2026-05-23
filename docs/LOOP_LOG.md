@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 450  GREEN  campaign-schedule-malformed-json  2026-05-22
+Objective:    Prove malformed campaign schedule JSON cannot create local queue work.
+Changed:
+- Added a route-level unit test for `POST /api/campaigns/:campaignId/schedule` malformed JSON.
+- Verified malformed schedule bodies return `400` and do not call `scheduleCampaign` or BullMQ enqueue helpers.
+- Updated testing contract, SUMMARY, BLOCKERS, and current state matrix for the schedule JSON boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: working tree
+Next:         Continue stabilization without enabling live sends.
+
 ## Run 449  GREEN  live-worker-non-ordinary-entry-evidence  2026-05-22
 Objective:    Prove non-ordinary object-shaped supplied control entries cannot authorize the reserved live worker class.
 Changed:
