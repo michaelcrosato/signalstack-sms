@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 472  GREEN  globalthis-builtin-alias-auth  2026-05-22 23:06
+Objective:    Prove local aliases assigned from `globalThis.Object`/`globalThis.Reflect` stay behind mutating-route role gates.
+Changed:
+- Added scanner normalization for direct, bracketed, and computed local-`globalThis` `Object`/`Reflect` built-in aliases before reflective body-reader checks.
+- Added focused mutating API authorization coverage for `globalThis.Reflect`, `globalThis["Object"]`, and `root[builtInName]` alias forms before `requireApiRole`.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the direct globalThis built-in alias boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable or continue static gate hardening without enabling live sends.
+
 ## Run 470  GREEN  request-alias-reader-property-auth  2026-05-22 22:52
 Objective:    Prove direct request-alias body-reader property reads stay behind mutating-route role gates.
 Changed:

@@ -268,11 +268,41 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
     `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*\\(*\\s*(Object|Reflect)(?:\\s+(?:as|satisfies)\\s+typeof\\s+(?:Object|Reflect))?\\s*\\)*\\s*(?=;|\\r?\\n)`,
     "g"
   );
+  const directGlobalThisBuiltInObjectAliasPattern = new RegExp(
+    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${globalThisTargetPattern()}\\s*(?:(?:\\.|\\?\\.)\\s*(Object|Reflect)|(?:\\?\\.)?\\[\\s*${literalBuiltInNamePattern}\\s*\\])(?:\\s+(?:as|satisfies)\\s+typeof\\s+(?:Object|Reflect))?${variableDeclaratorEnd}`,
+    "g"
+  );
+  const assignedGlobalThisBuiltInObjectAliasPattern = new RegExp(
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${globalThisTargetPattern()}\\s*(?:(?:\\.|\\?\\.)\\s*(Object|Reflect)|(?:\\?\\.)?\\[\\s*${literalBuiltInNamePattern}\\s*\\])(?:\\s+(?:as|satisfies)\\s+typeof\\s+(?:Object|Reflect))?\\s*(?=;|\\r?\\n)`,
+    "g"
+  );
   for (const match of [
     ...normalizedGlobalThisBodySlice.matchAll(directBuiltInObjectAliasPattern),
     ...normalizedGlobalThisBodySlice.matchAll(assignedBuiltInObjectAliasPattern)
   ]) {
     builtInObjectAliases.set(match[1], match[2]);
+  }
+  for (const match of [
+    ...normalizedGlobalThisBodySlice.matchAll(directGlobalThisBuiltInObjectAliasPattern),
+    ...normalizedGlobalThisBodySlice.matchAll(assignedGlobalThisBuiltInObjectAliasPattern)
+  ]) {
+    builtInObjectAliases.set(match[1], match[2] ?? match[3]);
+  }
+  for (const [propertyAlias, builtInName] of builtInPropertyAliases) {
+    const directComputedGlobalThisBuiltInAliasPattern = new RegExp(
+      `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${globalThisTargetPattern()}\\s*(?:\\?\\.)?\\[\\s*${escapeRegExp(propertyAlias)}\\s*\\]${variableDeclaratorEnd}`,
+      "g"
+    );
+    const assignedComputedGlobalThisBuiltInAliasPattern = new RegExp(
+      `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${globalThisTargetPattern()}\\s*(?:\\?\\.)?\\[\\s*${escapeRegExp(propertyAlias)}\\s*\\]\\s*(?=;|\\r?\\n)`,
+      "g"
+    );
+    for (const match of [
+      ...normalizedGlobalThisBodySlice.matchAll(directComputedGlobalThisBuiltInAliasPattern),
+      ...normalizedGlobalThisBodySlice.matchAll(assignedComputedGlobalThisBuiltInAliasPattern)
+    ]) {
+      builtInObjectAliases.set(match[1], builtInName);
+    }
   }
   for (const match of [
     ...normalizedGlobalThisBodySlice.matchAll(destructuredGlobalThisBuiltInAliasPattern),
@@ -4627,6 +4657,39 @@ describe("API route authorization coverage", () => {
         return Response.json({ size: payload.size });
       }
     `;
+    const unsafeGlobalThisReflectAliasSource = `
+      export async function DELETE(req: Request) {
+        const ReflectBuiltin = globalThis.Reflect;
+        const payload = await ReflectBuiltin.get(req, "json").call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeAssignedGlobalThisBracketObjectAliasSource = `
+      export async function PATCH(req: Request) {
+        let ObjectBuiltin;
+        ObjectBuiltin = globalThis["Object"];
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          globalThis["Reflect"].getPrototypeOf(req),
+          "text"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeGlobalThisAliasComputedReflectAliasSource = `
+      export async function PUT(req: Request) {
+        const root = globalThis;
+        const builtInName = "Reflect" as const;
+        const ReflectBuiltin = root[builtInName];
+        const payload = await ReflectBuiltin.apply(req.clone().arrayBuffer, req.clone(), []);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
     const safeSource = `
       export async function POST(req: Request) {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
@@ -4671,6 +4734,9 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDestructuredGlobalReflectSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedDestructuredGlobalObjectSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedDestructuredGlobalObjectSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalThisReflectAliasSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedGlobalThisBracketObjectAliasSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalThisAliasComputedReflectAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 

@@ -2,13 +2,13 @@
 
 Last updated: 2026-05-22.
 
-Run 471 note: non-null local `globalThis` alias coverage now proves forms such as `const root = globalThis!` and `root = (globalThis)!` are normalized before reflective `Object`/`Reflect` request body-reader checks in mutating API role-gate ordering.
+Run 472 note: direct `globalThis.Object`/`globalThis.Reflect` local built-in alias coverage now proves forms such as `const ReflectBuiltin = globalThis.Reflect`, `ObjectBuiltin = globalThis["Object"]`, and `const ReflectBuiltin = root[builtInName]` are normalized before reflective request body-reader checks in mutating API role-gate ordering.
 
-Latest protected local gate for Run 471: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-22 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 516 tests, Playwright smoke, and build green.
+Latest protected local gate for Run 472: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-22 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 516 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 
-Tests/Gates addendum: mutating-route auth coverage now includes non-null local `globalThis` aliases before reflective `Object`/`Reflect` request body-reader checks.
+Tests/Gates addendum: mutating-route auth coverage now includes local aliases assigned from direct, bracketed, and computed local-`globalThis` `Object`/`Reflect` built-ins before reflective request body-reader checks.
 
 | Area | Backend/API State | Browser State | Main Gap | Next Action |
 | --- | --- | --- | --- | --- |

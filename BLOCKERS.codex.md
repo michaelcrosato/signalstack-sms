@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 472
+
+- No blocker from direct `globalThis.Object`/`globalThis.Reflect` built-in alias coverage. Focused auth coverage, typecheck, contracts check, and the protected local gate passed, proving local aliases assigned from direct, bracketed, and computed local-`globalThis` built-in paths are classified before mutating route role gates without executing API handlers, calling providers, billing, notifications, SMS, email, live AI, mutations, secrets, protected gate-script edits, destructive production actions, or live feature enablement.
+
 Run number: 470
 
 - No blocker from direct request-alias body-reader property coverage. Focused auth coverage and the protected local gate passed, proving `bodySource[readerName]()`, assigned reader-name aliases, cloned request aliases, and safe post-gate controls are classified correctly without executing API handlers, calling providers, billing, notifications, SMS, email, live AI, mutations, secrets, protected gate-script edits, destructive production actions, or live feature enablement.
