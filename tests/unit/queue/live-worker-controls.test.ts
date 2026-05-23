@@ -3307,6 +3307,67 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects proxy-backed array-buffer deployment class impostors before inspecting supplied controls", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("proxy-backed array-buffer worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("proxy-backed array-buffer worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("proxy-backed array-buffer worker classes must not inspect control evidence");
+      }
+    });
+    const arrayBufferClasses = [
+      Object.freeze(new ArrayBuffer(8)),
+      ...whenSharedArrayBufferExists(() => Object.freeze(new SharedArrayBuffer(8))),
+      Object.freeze(new DataView(new ArrayBuffer(8)))
+    ];
+    const proxyBackedArrayBufferClasses = arrayBufferClasses.map(
+      (target) =>
+        new Proxy(target, {
+          get: () => {
+            throw new Error("proxy-backed array-buffer worker class values must not be read");
+          },
+          getPrototypeOf: () => {
+            throw new Error("proxy-backed array-buffer worker class prototypes must not be read");
+          },
+          getOwnPropertyDescriptor: () => {
+            throw new Error("proxy-backed array-buffer worker class descriptors must not be read");
+          },
+          ownKeys: () => {
+            throw new Error("proxy-backed array-buffer worker class keys must not be read");
+          }
+        })
+    );
+    const revokedArrayBufferClasses = arrayBufferClasses.map((target) => {
+      const { proxy, revoke } = Proxy.revocable(target, {
+        get: () => {
+          throw new Error("revoked array-buffer worker class values must not be read");
+        }
+      });
+      revoke();
+      return proxy;
+    });
+
+    for (const workerDeploymentClass of [
+      ...proxyBackedArrayBufferClasses,
+      ...revokedArrayBufferClasses
+    ]) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects every runtime-supported typed-array deployment class impostor before inspecting supplied controls", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {
