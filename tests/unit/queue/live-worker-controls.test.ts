@@ -4665,11 +4665,21 @@ describe("production live campaign worker controls", () => {
   });
 
   it("rejects authorization wrapper proxy reflection traps without throwing", () => {
-    const implementedControls = implementedFrozenControls();
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("authorization wrapper reflection traps must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("authorization wrapper reflection traps must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("authorization wrapper reflection traps must not inspect control evidence");
+      }
+    });
     const prototypeThrowingInput = new Proxy(
       {
         workerDeploymentClass: reservedLiveWorkerDeploymentClass,
-        controls: implementedControls
+        controls: throwingEvidence
       },
       {
         getPrototypeOf: () => {
@@ -4680,7 +4690,7 @@ describe("production live campaign worker controls", () => {
     const descriptorThrowingInput = new Proxy(
       {
         workerDeploymentClass: reservedLiveWorkerDeploymentClass,
-        controls: implementedControls
+        controls: throwingEvidence
       },
       {
         getOwnPropertyDescriptor: () => {
@@ -4691,7 +4701,7 @@ describe("production live campaign worker controls", () => {
     const keysThrowingInput = new Proxy(
       {
         workerDeploymentClass: reservedLiveWorkerDeploymentClass,
-        controls: implementedControls
+        controls: throwingEvidence
       },
       {
         ownKeys: () => {
@@ -4702,7 +4712,7 @@ describe("production live campaign worker controls", () => {
     const frozenStateThrowingInput = new Proxy(
       {
         workerDeploymentClass: reservedLiveWorkerDeploymentClass,
-        controls: implementedControls
+        controls: throwingEvidence
       },
       {
         isExtensible: () => {

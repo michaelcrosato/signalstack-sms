@@ -4538,3 +4538,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 568  GREEN  live-worker-wrapper-traps-before-controls  2026-05-23 09:50
+Objective:    Prove authorization-wrapper reflection traps deny before hostile supplied controls are inspected.
+Changed:
+- Tightened live-worker unit coverage so wrapper prototype, descriptor, key, and frozen-state traps use hostile control evidence that would throw if inspected.
+- Updated NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the wrapper-trap-before-controls boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
