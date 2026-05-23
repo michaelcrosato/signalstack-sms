@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 549  GREEN  live-worker-webassembly-controls-evidence  2026-05-23 07:50
+Objective:    Prove runtime-supported WebAssembly records cannot authorize the reserved live worker class as controls evidence.
+Changed:
+- Added focused live-worker unit coverage showing runtime-supported WebAssembly controls evidence denies before the reserved worker class can authorize.
+- Updated testing contracts, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the focused WebAssembly controls-evidence boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 539  GREEN  live-worker-tagged-wrapper-metadata  2026-05-23 07:00
 Objective:    Prove accessor-backed `Symbol.toStringTag` authorization-wrapper metadata cannot authorize the reserved live worker class.
 Changed:

@@ -2706,6 +2706,21 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects runtime-supported WebAssembly controls evidence without authorizing", () => {
+    for (const controls of webAssemblyBuiltInTargets()) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects runtime-supported Web Crypto controls evidence without authorizing", async () => {
     const cryptoTargets = await webCryptoBuiltInTargets();
 

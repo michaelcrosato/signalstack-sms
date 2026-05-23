@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 549
+
+- Added focused live-worker unit coverage proving runtime-supported WebAssembly records cannot authorize the reserved `production-live-campaign` worker class as `controls` evidence.
+- The WebAssembly controls-evidence case stays local and denies without enabling the reserved worker class.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 113 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`.
+- No API handlers were executed by the focused test; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 548
 
 - Added live-worker unit coverage proving revoked proxy-backed runtime-supported Web-platform records cannot authorize the reserved `production-live-campaign` worker class as `controls` evidence.
