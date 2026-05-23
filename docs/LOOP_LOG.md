@@ -3782,6 +3782,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep live workers blocked while continuing product demo stabilization or future-control hardening without enabling live sends.
 
+## Run 477  GREEN  assigned-type-asserted-request-alias-auth  2026-05-22 23:39
+Objective:    Prove assigned type-asserted direct `Request` constructor/prototype aliases cannot hide mutating-route body readers before role gates.
+Changed:
+- Added mutating API authorization coverage for `RequestCtor = Request as typeof Request` before `RequestCtor.prototype.arrayBuffer.call(req)`.
+- Added mutating API authorization coverage for `requestPrototype = Request.prototype as typeof Request.prototype` before `requestPrototype.text.call(req)`.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the assigned type-asserted `Request` alias boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 452  GREEN  campaign-schedule-auth-before-body  2026-05-22 20:52
 Objective:    Prove campaign schedule role denials return before request-body parsing or queue work.
 Changed:

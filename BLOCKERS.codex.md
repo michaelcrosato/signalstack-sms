@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 477
+
+- No blocker from assigned type-asserted direct `Request` alias coverage. Focused auth coverage, typecheck, contracts check, and the protected local gate passed, proving `RequestCtor = Request as typeof Request` and `requestPrototype = Request.prototype as typeof Request.prototype` are classified before mutating route role gates without executing API handlers, calling providers, billing, notifications, SMS, email, live AI, mutations, secrets, protected gate-script edits, destructive production actions, or live feature enablement.
+
 Run number: 476
 
 - No blocker from parenthesized `satisfies` `globalThis` alias coverage. Focused auth coverage passed, proving parenthesized local aliases and whole-parenthesized root `Reflect` member aliases are classified before mutating route role gates without executing API handlers, calling providers, billing, notifications, SMS, email, live AI, mutations, secrets, protected gate-script edits, destructive production actions, or live feature enablement.
