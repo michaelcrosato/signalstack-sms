@@ -2088,6 +2088,45 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects inherited toStringTag accessor controls evidence without reading spoofed metadata", () => {
+    const toStringTagPrototype = Object.freeze(
+      Object.defineProperty({}, Symbol.toStringTag, {
+        enumerable: false,
+        get: () => {
+          throw new Error("inherited controls toStringTag getter must not be read");
+        }
+      })
+    );
+    const inheritedToStringTagControls = Object.freeze(
+      Object.defineProperties(Object.create(toStringTagPrototype) as Record<PropertyKey, unknown>, {
+        0: {
+          enumerable: true,
+          get: () => {
+            throw new Error("inherited toStringTag controls index getter must not be read");
+          }
+        },
+        length: {
+          enumerable: true,
+          get: () => {
+            throw new Error("inherited toStringTag controls length getter must not be read");
+          }
+        }
+      })
+    );
+
+    expect(Array.isArray(inheritedToStringTagControls)).toBe(false);
+    expect(() =>
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, inheritedToStringTagControls)
+      )
+    ).not.toThrow();
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, inheritedToStringTagControls)
+      )
+    ).toBe(false);
+  });
+
   it("rejects function-shaped controls evidence without invoking it", () => {
     const callableControls = Object.freeze(
       Object.assign(
@@ -5560,6 +5599,48 @@ describe("production live campaign worker controls", () => {
     expect(Object.isFrozen(customPrototypeWrapper)).toBe(true);
     expect(() => liveWorkerDeploymentClassIsAuthorized(customPrototypeWrapper)).not.toThrow();
     expect(liveWorkerDeploymentClassIsAuthorized(customPrototypeWrapper)).toBe(false);
+  });
+
+  it("rejects inherited toStringTag authorization-wrapper metadata before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("inherited toStringTag wrapper metadata must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("inherited toStringTag wrapper metadata must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("inherited toStringTag wrapper metadata must not inspect control evidence");
+      }
+    });
+    const toStringTagPrototype = Object.freeze(
+      Object.defineProperty({}, Symbol.toStringTag, {
+        enumerable: false,
+        get: () => {
+          throw new Error("inherited wrapper toStringTag getter must not be read");
+        }
+      })
+    );
+    const wrapper = Object.freeze(
+      Object.defineProperties(Object.create(toStringTagPrototype) as Record<PropertyKey, unknown>, {
+        workerDeploymentClass: {
+          value: reservedLiveWorkerDeploymentClass,
+          enumerable: true,
+          writable: false,
+          configurable: false
+        },
+        controls: {
+          value: throwingEvidence,
+          enumerable: true,
+          writable: false,
+          configurable: false
+        }
+      })
+    );
+
+    expect(Object.isFrozen(wrapper)).toBe(true);
+    expect(() => liveWorkerDeploymentClassIsAuthorized(wrapper)).not.toThrow();
+    expect(liveWorkerDeploymentClassIsAuthorized(wrapper)).toBe(false);
   });
 
   it("does not execute authorization wrapper get traps while denying unsupported classes", () => {

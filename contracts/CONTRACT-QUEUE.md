@@ -39,8 +39,8 @@ Runtime-supported Web Crypto records must also deny as controls evidence and aut
 Every runtime-supported typed-array constructor must deny as deployment-class evidence, including proxy-backed and revoked proxy-backed deployment-class evidence, direct controls evidence, and as an authorization-wrapper impostor before the reserved worker class can authorize.
 Exact frozen supplied control entries must also be evaluated from own descriptors without reading inherited `Object.prototype` accessors for `id`, `status`, or `requirement`.
 Whitespace-padded deployment class evidence includes leading spaces, trailing spaces, tabs, newlines, carriage returns, CRLF pairs, vertical tabs, form feeds, invisible Unicode escape padding, and Unicode line/paragraph separator padding, and must deny before supplied controls are inspected.
-`Symbol.toStringTag` controls-evidence impostors with accessor-backed tag metadata must deny without reading the tag, index, or length getters.
-Accessor-backed `Symbol.toStringTag` authorization-wrapper metadata must deny before supplied controls are inspected and without reading the tag getter.
+`Symbol.toStringTag` controls-evidence impostors with own or inherited accessor-backed tag metadata must deny without reading the tag, index, or length getters.
+Own or inherited accessor-backed `Symbol.toStringTag` authorization-wrapper metadata must deny before supplied controls are inspected and without reading the tag getter.
 
 - The worker uses validated version-1 scheduled campaign payloads.
 - Invalid payloads or missing scheduled campaigns are marked `FAILED`.

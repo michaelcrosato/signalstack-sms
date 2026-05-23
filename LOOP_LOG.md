@@ -5074,3 +5074,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 565  GREEN  live-worker-inherited-tag-accessors  2026-05-23 09:31
+Objective:    Prove inherited `Symbol.toStringTag` metadata cannot influence reserved live-worker authorization.
+Changed:
+- Added live-worker unit coverage showing inherited `Symbol.toStringTag` accessors on controls evidence deny without reading tag, index, or length getters.
+- Added authorization-wrapper coverage showing inherited `Symbol.toStringTag` metadata denies before hostile controls are inspected.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the inherited tag-accessor boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
