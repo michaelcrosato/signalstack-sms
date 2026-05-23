@@ -1795,6 +1795,45 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects toStringTag array impostor controls evidence without reading spoofed fields", () => {
+    const toStringTagArrayImpostor = Object.freeze(
+      Object.defineProperties(
+        {},
+        {
+          0: {
+            enumerable: true,
+            get: () => {
+              throw new Error("toStringTag array impostor index getter must not be read");
+            }
+          },
+          length: {
+            enumerable: true,
+            get: () => {
+              throw new Error("toStringTag array impostor length getter must not be read");
+            }
+          },
+          [Symbol.toStringTag]: {
+            value: "Array",
+            enumerable: false
+          }
+        }
+      )
+    );
+
+    expect(Object.prototype.toString.call(toStringTagArrayImpostor)).toBe("[object Array]");
+    expect(Array.isArray(toStringTagArrayImpostor)).toBe(false);
+    expect(() =>
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, toStringTagArrayImpostor)
+      )
+    ).not.toThrow();
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, toStringTagArrayImpostor)
+      )
+    ).toBe(false);
+  });
+
   it("rejects function-shaped controls evidence without invoking it", () => {
     const callableControls = Object.freeze(
       Object.assign(

@@ -4039,3 +4039,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 502  GREEN  live-worker-tostringtag-array-controls  2026-05-23 02:34
+Objective:    Prove `Symbol.toStringTag` array-impostor controls evidence cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing `controls` evidence tagged as `[object Array]` still denies without reading spoofed index or length getters.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the toStringTag array-impostor controls-evidence boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
