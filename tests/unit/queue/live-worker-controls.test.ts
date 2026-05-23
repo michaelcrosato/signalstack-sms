@@ -4735,9 +4735,20 @@ describe("production live campaign worker controls", () => {
     }
   });
 
-  it("rejects revoked proxy-backed authorization wrappers without throwing", () => {
+  it("rejects revoked proxy-backed authorization wrappers before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("revoked authorization wrappers must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("revoked authorization wrappers must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("revoked authorization wrappers must not inspect control evidence");
+      }
+    });
     const { proxy: revokedWrapper, revoke } = Proxy.revocable(
-      frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedFrozenControls()),
+      frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, throwingEvidence),
       {}
     );
 

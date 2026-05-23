@@ -4548,3 +4548,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 569  GREEN  live-worker-revoked-wrapper-before-controls  2026-05-23 09:59
+Objective:    Prove revoked proxy-backed authorization wrappers deny before hostile supplied controls are inspected.
+Changed:
+- Tightened live-worker unit coverage so revoked proxy-backed plain authorization wrappers wrap hostile control evidence that would throw if inspected.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the revoked-wrapper-before-controls boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

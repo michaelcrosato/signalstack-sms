@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 569 note: revoked proxy-backed authorization wrappers now deny before hostile supplied controls are inspected.
+
 Run 568 note: live-worker authorization-wrapper reflection traps now deny before hostile supplied controls are inspected.
 
 Run 567 note: live-worker authorization now denies reflection-trapped proxy object deployment-class evidence without reading get, prototype, descriptor, key, or frozen-state traps before supplied controls can be inspected.
@@ -150,7 +152,7 @@ Run 495 note: live-worker authorization now denies built-in object-shaped deploy
 
 Run 494 note: live-worker authorization now evaluates exact frozen control-entry evidence without reading inherited `Object.prototype` accessors for `id`, `status`, or `requirement`.
 
-Latest protected local gate for Run 568: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 59 Vitest files / 587 tests, Playwright smoke, and build green.
+Latest protected local gate for Run 569: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 59 Vitest files / 587 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 
