@@ -4528,3 +4528,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 567  GREEN  live-worker-reflection-trapped-class  2026-05-23 09:45
+Objective:    Prove reflection-trapped proxy object deployment-class values cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing reflection-trapped proxy object `workerDeploymentClass` evidence denies without reading get, prototype, descriptor, key, or frozen-state traps.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the reflection-trapped deployment-class boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

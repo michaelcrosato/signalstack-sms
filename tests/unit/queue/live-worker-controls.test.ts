@@ -3940,6 +3940,51 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects reflection-trapped deployment class impostors before inspecting supplied controls", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("reflection-trapped worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("reflection-trapped worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("reflection-trapped worker classes must not inspect control evidence");
+      }
+    });
+    const reflectionTrappedClass = new Proxy(
+      { workerDeploymentClass: reservedLiveWorkerDeploymentClass },
+      {
+        get: () => {
+          throw new Error("reflection-trapped worker class value must not be read");
+        },
+        getPrototypeOf: () => {
+          throw new Error("reflection-trapped worker class prototype must not be read");
+        },
+        getOwnPropertyDescriptor: () => {
+          throw new Error("reflection-trapped worker class descriptors must not be read");
+        },
+        ownKeys: () => {
+          throw new Error("reflection-trapped worker class keys must not be read");
+        },
+        isExtensible: () => {
+          throw new Error("reflection-trapped worker class frozen-state checks must not be read");
+        }
+      }
+    );
+
+    expect(() =>
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reflectionTrappedClass as unknown as string, throwingEvidence)
+      )
+    ).not.toThrow();
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reflectionTrappedClass as unknown as string, throwingEvidence)
+      )
+    ).toBe(false);
+  });
+
   it("does not normalize deployment class strings before denying authorization", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {
