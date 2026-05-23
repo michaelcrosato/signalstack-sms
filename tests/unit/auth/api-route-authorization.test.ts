@@ -182,8 +182,8 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
       .replace(/\(\s*(Object|Reflect|Request)\s*\)/g, "$1")
       .replace(/\b(Object|Reflect|Request|globalThis)\s*!\s*(?=\.|\?\.|\[|,|;|\r?\n|\))/g, "$1");
     normalizedGlobalThisBodySlice = normalizedGlobalThisBodySlice
-      .replace(/\(\s*(globalThis\s*(?:\.|\?\.)\s*Request)\s*\)/g, "$1")
-      .replace(/\(\s*(globalThis\s*(?:\?\.)?\[\s*["'`]Request["'`]\s*\])\s*\)/g, "$1")
+      .replace(/\(\s*(globalThis\s*(?:\.|\?\.)\s*(?:Object|Reflect|Request))\s*\)/g, "$1")
+      .replace(/\(\s*(globalThis\s*(?:\?\.)?\[\s*["'`](?:Object|Reflect|Request)["'`]\s*\])\s*\)/g, "$1")
       .replace(/\(\s*(Request\s*(?:\.|\?\.)\s*prototype)\s*\)/g, "$1")
       .replace(/\(\s*(Request\s*(?:\?\.)?\[\s*["'`]prototype["'`]\s*\])\s*\)/g, "$1")
       .replace(/(\bglobalThis\s*(?:\.|\?\.)\s*Request)\s*!\s*(?=\.|\?\.|\[|,|;|\r?\n|\))/g, "$1")
@@ -2270,6 +2270,15 @@ describe("API route authorization coverage", () => {
         return Response.json(payload);
       }
     `;
+    const unsafeWholeParenthesizedTypeAssertedGlobalThisRootRequestAliasSource = `
+      export async function DELETE(req: Request) {
+        const RequestCtor = ((globalThis as typeof globalThis).Request);
+        const payload = await RequestCtor.prototype.formData.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
     const unsafeNonNullGlobalThisRequestAliasSource = `
       export async function PUT(req: Request) {
         const RequestCtor = globalThis.Request!;
@@ -2540,6 +2549,12 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTypeAssertedGlobalThisRootRequestAliasSource, "DELETE")).toBe(
       true
     );
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeWholeParenthesizedTypeAssertedGlobalThisRootRequestAliasSource,
+        "DELETE"
+      )
+    ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNonNullGlobalThisRequestAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedNonNullGlobalThisRequestAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNestedParenthesizedGlobalThisRequestAliasSource, "POST")).toBe(true);
@@ -4730,6 +4745,15 @@ describe("API route authorization coverage", () => {
         return Response.json(payload);
       }
     `;
+    const unsafeWholeParenthesizedTypeAssertedGlobalThisRootReflectSource = `
+      export async function POST(req: Request) {
+        const ReflectBuiltin = ((globalThis as typeof globalThis).Reflect);
+        const payload = await ReflectBuiltin.get(req, "formData").call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
     const unsafeAssignedGlobalThisBracketObjectAliasSource = `
       export async function PATCH(req: Request) {
         let ObjectBuiltin;
@@ -4806,6 +4830,9 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTypeAssertedDestructuredGlobalRequestSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalThisReflectAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTypeAssertedGlobalThisRootReflectSource, "DELETE")).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(unsafeWholeParenthesizedTypeAssertedGlobalThisRootReflectSource, "POST")
+    ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedGlobalThisBracketObjectAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalThisAliasComputedReflectAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);

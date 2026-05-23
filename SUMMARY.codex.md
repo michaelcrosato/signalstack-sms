@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 475
+
+- Normalized whole-parenthesized `globalThis.Object`, `globalThis.Reflect`, and `globalThis.Request` member expressions before mutating API body-reader role-gate checks.
+- Added focused synthetic route coverage for `const RequestCtor = ((globalThis as typeof globalThis).Request)` and `const ReflectBuiltin = ((globalThis as typeof globalThis).Reflect)`, preserving safe after-gate controls.
+- Updated testing contracts/docs, NEXT_PROMPTS, and current state matrix for the whole-parenthesized type-asserted `globalThis` root member boundary.
+- Focused checks passed: `npm run test -- tests/unit/auth/api-route-authorization.test.ts`, `npm run typecheck`, and `npm run contracts:check`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 516 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 474
 
 - Normalized parenthesized type-asserted and `satisfies` `globalThis` root expressions before mutating API body-reader role-gate checks.
