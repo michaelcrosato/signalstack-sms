@@ -214,6 +214,33 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects custom iterator metadata on control arrays without invoking it", () => {
+    const implementedControls = implementedFrozenControls();
+    const iteratorMetadataControls = [...implementedControls];
+    Object.defineProperty(iteratorMetadataControls, Symbol.iterator, {
+      enumerable: false,
+      get: () => {
+        throw new Error("custom control-array iterator must not be read");
+      }
+    });
+    Object.freeze(iteratorMetadataControls);
+
+    expect(Object.isFrozen(iteratorMetadataControls)).toBe(true);
+    expect(() => liveWorkerControlsAreFrozen(iteratorMetadataControls)).not.toThrow();
+    expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(iteratorMetadataControls)).not.toThrow();
+    expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(iteratorMetadataControls)).not.toThrow();
+    expect(() => liveWorkerControlsAreImplemented(iteratorMetadataControls)).not.toThrow();
+    expect(liveWorkerControlsAreFrozen(iteratorMetadataControls)).toBe(true);
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(iteratorMetadataControls)).toBe(true);
+    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(iteratorMetadataControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(iteratorMetadataControls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, iteratorMetadataControls)
+      )
+    ).toBe(false);
+  });
+
   it("rejects array subclass evidence before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
 
