@@ -3693,7 +3693,9 @@ describe("production live campaign worker controls", () => {
       Object.freeze(Object.assign(new Number(1), wrapperFields)),
       Object.freeze(Object.assign(new Boolean(true), wrapperFields)),
       Object.freeze(Object.assign(/production-live-campaign/, wrapperFields)),
-      Object.freeze(Object.assign(new Error("production-live-campaign"), wrapperFields))
+      Object.freeze(Object.assign(new Error("production-live-campaign"), wrapperFields)),
+      Object.freeze(Object.assign(new WeakRef(implementedFrozenControls()[0]), wrapperFields)),
+      Object.freeze(Object.assign(new FinalizationRegistry(() => undefined), wrapperFields))
     ];
 
     for (const input of builtInWrapperImpostors) {

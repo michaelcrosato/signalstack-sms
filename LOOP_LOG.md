@@ -4587,3 +4587,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 515  GREEN  live-worker-weak-ref-wrapper-impostors  2026-05-23 04:15
+Objective:    Prove WeakRef and FinalizationRegistry authorization-wrapper impostors cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing WeakRef and FinalizationRegistry wrapper impostors carrying public wrapper fields deny before supplied controls are inspected.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the wrapper-impostor boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
