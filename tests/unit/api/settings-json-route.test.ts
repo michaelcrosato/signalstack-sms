@@ -207,6 +207,94 @@ describe("settings and operations JSON mutation routes", () => {
     expect(mocks.getProviderSettings).not.toHaveBeenCalled();
   });
 
+  it("denies provider metadata updates before parsing request bodies", async () => {
+    const denial = Response.json({ error: "Forbidden" }, { status: 403 });
+    mocks.requireApiRole.mockReturnValue(denial);
+
+    const response = await updateProviderRoute(malformedJsonRequest("/api/settings/provider", "PATCH"));
+
+    expect(response.status).toBe(403);
+    expect(mocks.upsertProviderCredentialMetadata).not.toHaveBeenCalled();
+    expect(mocks.getOrCreateComplianceProfile).not.toHaveBeenCalled();
+    expect(mocks.getProviderSettings).not.toHaveBeenCalled();
+  });
+
+  it("stores only local provider credential metadata before rendering secret-safe settings", async () => {
+    const credential = {
+      id: "credential_demo",
+      orgId: "org_demo",
+      provider: "twilio",
+      accountSidRedacted: "AC****************3456",
+      fromNumberRedacted: "+1******0199",
+      authTokenFingerprint: "fingerprint_demo",
+      configured: true,
+      source: "local-metadata"
+    };
+    mocks.upsertProviderCredentialMetadata.mockResolvedValue(credential);
+    mocks.getOrCreateComplianceProfile.mockResolvedValue({
+      id: "compliance_demo",
+      orgId: "org_demo",
+      businessName: "SignalStack Demo",
+      messagingUseCase: "Demo updates",
+      optInDescription: "Website form",
+      privacyPolicyUrl: "https://example.com/privacy",
+      termsOfServiceUrl: "https://example.com/terms",
+      a2pRegistrationStatus: "PENDING"
+    });
+    mocks.getProviderSettings.mockReturnValue({
+      selectedProvider: "dummy",
+      liveMessagingAllowed: false,
+      twilio: { configured: true }
+    });
+
+    const response = await updateProviderRoute(
+      new Request("http://localhost/api/settings/provider", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          provider: "twilio",
+          twilio: {
+            accountSid: "AC123456789",
+            authToken: "auth-token-demo",
+            fromNumber: "+15555550199"
+          }
+        })
+      })
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      providerSettings: {
+        selectedProvider: "dummy",
+        liveMessagingAllowed: false,
+        twilio: { configured: true }
+      }
+    });
+    expect(mocks.upsertProviderCredentialMetadata).toHaveBeenCalledWith(
+      "org_demo",
+      {
+        provider: "twilio",
+        twilio: {
+          accountSid: "AC123456789",
+          authToken: "auth-token-demo",
+          fromNumber: "+15555550199"
+        }
+      },
+      { actorUserId: "user_demo" }
+    );
+    expect(mocks.getProviderSettings).toHaveBeenCalledWith(
+      expect.objectContaining({
+        demoMode: true,
+        liveMessagingEnabled: false,
+        messagingProvider: "dummy",
+        providerCredential: credential
+      })
+    );
+    expect(mocks.upsertProviderPhoneNumber).not.toHaveBeenCalled();
+    expect(mocks.deleteProviderCredentialMetadata).not.toHaveBeenCalled();
+    expect(mocks.sendLiveTestSms).not.toHaveBeenCalled();
+  });
+
   it("denies provider metadata deletion before clearing local credentials", async () => {
     const denial = Response.json({ error: "Forbidden" }, { status: 403 });
     mocks.requireApiRole.mockReturnValue(denial);

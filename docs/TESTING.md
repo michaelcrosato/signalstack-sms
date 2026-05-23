@@ -13,6 +13,8 @@ Milestone 0 validation runs:
 
 Additional deterministic checks:
 
+- Provider settings update route tests verify role denials return before request-body parsing, and successful admin requests persist only local credential metadata before rendering secret-safe provider settings without provider number writes, credential deletion, or live-test SMS helpers.
+
 - Playwright starts the local Next.js test server on `127.0.0.1:3100` by default, separate from the normal dev port. Set `PLAYWRIGHT_PORT` to another integer port when a local process already uses that port. Existing-server reuse is opt-in with `PLAYWRIGHT_REUSE_EXISTING_SERVER=true`.
 - `npm run test:e2e:demo` runs the investor demo path after the local database has been migrated and seeded.
 - `npm run test:e2e:product-demo` runs the seeded product dashboard, contacts, campaign, campaign detail, inbox, template, analytics, and compliance paths for `/dashboard`, `/dashboard/contacts`, `/dashboard/campaigns`, `/dashboard/campaigns/:campaignId`, `/dashboard/inbox`, `/dashboard/templates`, `/dashboard/analytics`, and `/dashboard/compliance` after the local database has been migrated and seeded. The contacts path imports a local CSV row through `POST /api/contacts/imports`; the campaign path creates, preflights, schedules, edits a draft, and cancels a queued local campaign; the inbox path creates a local inbound reply, adds a note, and resolves/reopens a local thread; the template path creates reusable local copy; the analytics path reads existing local overview totals, including scheduled-campaign counts, without SMS, provider calls, billing, live AI, report execution, exports, mutations, or live messaging enablement.

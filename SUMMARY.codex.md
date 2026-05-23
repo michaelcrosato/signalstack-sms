@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 463
+
+- Added provider settings update route coverage proving role denials return before request-body parsing or local credential metadata writes.
+- Added successful admin coverage proving `PATCH /api/settings/provider` stores only local provider credential metadata before rendering secret-safe provider settings, without provider number writes, credential deletion, or live-test SMS helpers.
+- Updated testing contracts/docs, NEXT_PROMPTS, and current state matrix for the provider settings update safety boundary.
+- Focused check passed: `npm run test -- tests/unit/api/settings-json-route.test.ts`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 55 Vitest files / 490 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 462
 
 - Added provider number metadata route coverage proving role denials return before request-body parsing or local metadata upserts.

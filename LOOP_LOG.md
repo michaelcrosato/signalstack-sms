@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 463  GREEN  provider-settings-update-route-safety  2026-05-22 22:04
+Objective:    Prove provider credential metadata updates stay authorization-gated and local-only.
+Changed:
+- Added route-level coverage for denied provider settings updates returning before request-body parsing or local credential metadata writes.
+- Added successful admin coverage proving only local provider credential metadata is stored before rendering secret-safe provider settings, with no provider number writes, credential deletion, or live-test SMS side effects.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the provider settings update safety boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.
+
 ## Run 462  GREEN  provider-number-route-safety  2026-05-22 21:55
 Objective:    Prove provider number metadata upserts stay authorization-gated and local-only.
 Changed:
