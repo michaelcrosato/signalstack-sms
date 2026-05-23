@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 521  GREEN  live-worker-date-shaped-wrappers  2026-05-23 04:58
+Objective:    Prove Date-shaped authorization-wrapper impostors cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing Date-shaped authorization wrappers deny in ordinary, exact-field frozen, proxy-backed, reflection-trapped, and revoked proxy-backed forms before supplied controls are inspected.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the Date-shaped authorization-wrapper boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 519  GREEN  live-worker-array-buffer-wrappers  2026-05-23 04:45
 Objective:    Prove ArrayBuffer-shaped authorization-wrapper impostors cannot authorize the reserved live worker class.
 Changed:
