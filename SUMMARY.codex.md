@@ -1,5 +1,24 @@
 # Codex Summary
 
+Run number: 499
+
+- Added live-worker unit coverage proving function-shaped `controls` evidence cannot authorize the reserved `production-live-campaign` worker class and is not invoked.
+- Updated queue/testing contracts, production worker policy, testing docs, NEXT_PROMPTS, and current state matrix for the callable controls-evidence boundary.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 78 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
+Run number: 498
+
+- Added live-worker unit coverage proving proxy-backed and revoked proxy deployment-class impostors cannot authorize the reserved `production-live-campaign` worker class.
+- Proved those malformed class values deny before hostile supplied controls are inspected; `production-live-campaign` remains unsupported.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 497
 
 - Added live-worker unit coverage proving weak collections cannot impersonate the reserved `production-live-campaign` deployment class.

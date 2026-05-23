@@ -1,5 +1,13 @@
 # Codex Blockers
 
+Run number: 499
+
+- No blocker from function-shaped controls-evidence coverage. Focused queue coverage and the protected local gate passed; the change adds local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+Run number: 498
+
+- No blocker from proxy-backed deployment-class impostor coverage. Focused queue coverage and the protected local gate passed; the change adds local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
 Run number: 497
 
 - No blocker from weak collection deployment-class impostor coverage. Focused queue coverage and the protected local gate passed; the change adds local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.

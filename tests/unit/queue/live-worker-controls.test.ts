@@ -1795,6 +1795,33 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects function-shaped controls evidence without invoking it", () => {
+    const callableControls = Object.freeze(
+      Object.assign(
+        () => {
+          throw new Error("function-shaped controls evidence must not be invoked");
+        },
+        {
+          0: implementedFrozenControls()[0],
+          [Symbol.iterator]: () => {
+            throw new Error("function-shaped controls iterator must not be invoked");
+          }
+        }
+      )
+    );
+
+    expect(() =>
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, callableControls)
+      )
+    ).not.toThrow();
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, callableControls)
+      )
+    ).toBe(false);
+  });
+
   it("rejects proxy-backed control evidence without throwing", () => {
     const implementedControls = implementedFrozenControls();
     const throwingArrayLengthDescriptorProxy = new Proxy([...implementedControls], {
