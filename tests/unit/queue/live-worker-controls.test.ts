@@ -4189,8 +4189,10 @@ describe("production live campaign worker controls", () => {
     class AuthorizationWrapper {}
 
     const classInstanceWrapper = defineExactWrapperFields(new AuthorizationWrapper());
+    const arrayWrapper = defineExactWrapperFields([]);
+    const functionWrapper = defineExactWrapperFields(() => reservedLiveWorkerDeploymentClass);
 
-    for (const input of [nullPrototypeWrapper, classInstanceWrapper]) {
+    for (const input of [nullPrototypeWrapper, classInstanceWrapper, arrayWrapper, functionWrapper]) {
       expect(Object.isFrozen(input)).toBe(true);
       expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
       expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);

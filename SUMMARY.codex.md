@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 543
+
+- Extended live-worker unit coverage proving exact-field array-shaped and function-shaped authorization-wrapper impostors cannot authorize the reserved `production-live-campaign` worker class.
+- Covered frozen array and function wrapper inputs with exact public frozen data descriptors denying before supplied controls are inspected.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 107 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 559 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 542
 
 - Added live-worker unit coverage proving exact-field non-ordinary authorization-wrapper impostors cannot authorize the reserved `production-live-campaign` worker class.
