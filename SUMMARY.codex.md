@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 538
+
+- Added live-worker unit coverage proving accessor-backed `Symbol.toStringTag` controls-evidence impostors cannot authorize the reserved `production-live-campaign` worker class.
+- Covered the denial without reading tag, index, or length getters, so hostile non-array controls evidence cannot spoof array identity before the future live-worker checklist.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 103 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 555 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 537
 
 - Added live-worker unit coverage proving deployment-class impostor objects with throwing `Symbol.toStringTag` accessors cannot authorize the reserved `production-live-campaign` worker class.

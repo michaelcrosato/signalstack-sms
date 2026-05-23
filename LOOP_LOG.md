@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 538  GREEN  live-worker-tagged-accessor-controls  2026-05-23 06:53
+Objective:    Prove accessor-backed `Symbol.toStringTag` controls evidence cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing accessor-backed `Symbol.toStringTag` controls-evidence impostors deny without reading tag, index, or length getters.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the tagged-accessor controls-evidence boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 537  GREEN  live-worker-tagged-accessor-class-impostors  2026-05-23 06:44
 Objective:    Prove tagged-accessor deployment-class impostors cannot authorize the reserved live worker class.
 Changed:

@@ -2024,6 +2024,46 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects toStringTag accessor controls evidence without reading spoofed fields", () => {
+    const toStringTagAccessorControls = Object.freeze(
+      Object.defineProperties(
+        {},
+        {
+          0: {
+            enumerable: true,
+            get: () => {
+              throw new Error("toStringTag accessor controls index getter must not be read");
+            }
+          },
+          length: {
+            enumerable: true,
+            get: () => {
+              throw new Error("toStringTag accessor controls length getter must not be read");
+            }
+          },
+          [Symbol.toStringTag]: {
+            enumerable: false,
+            get: () => {
+              throw new Error("toStringTag accessor controls tag getter must not be read");
+            }
+          }
+        }
+      )
+    );
+
+    expect(Array.isArray(toStringTagAccessorControls)).toBe(false);
+    expect(() =>
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, toStringTagAccessorControls)
+      )
+    ).not.toThrow();
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, toStringTagAccessorControls)
+      )
+    ).toBe(false);
+  });
+
   it("rejects function-shaped controls evidence without invoking it", () => {
     const callableControls = Object.freeze(
       Object.assign(

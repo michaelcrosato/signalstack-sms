@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 538 note: live-worker authorization now denies accessor-backed `Symbol.toStringTag` controls-evidence impostors without reading tag, index, or length getters before the reserved worker class can authorize.
+
 Run 537 note: live-worker authorization now denies deployment-class impostor objects with throwing `Symbol.toStringTag` accessors before supplied controls are inspected and without reading the accessor.
 
 Run 536 note: live-worker authorization now denies array-buffer, URL-shaped, weak-reference, and finalization-registry records when they are supplied as deployment-class impostors before supplied controls are inspected.
