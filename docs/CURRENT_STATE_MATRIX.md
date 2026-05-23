@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 529 note: live-worker authorization now denies runtime-supported Web-platform controls evidence and authorization-wrapper impostors before they can authorize the reserved live-worker class or inspect supplied controls.
+
 Run 528 note: live-worker authorization now denies revoked proxy-backed typed-array, data-view, and weak-collection controls evidence before it can be treated as the future live-worker checklist.
 
 Run 527 note: live-worker authorization now denies ordinary `ArrayBuffer` and runtime-supported `SharedArrayBuffer` controls evidence before it can be treated as the future live-worker checklist.
@@ -72,7 +74,7 @@ Run 495 note: live-worker authorization now denies built-in object-shaped deploy
 
 Run 494 note: live-worker authorization now evaluates exact frozen control-entry evidence without reading inherited `Object.prototype` accessors for `id`, `status`, or `requirement`.
 
-Latest protected local gate for Run 528: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 548 tests, Playwright smoke, and build green.
+Latest protected local gate for Run 529: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 548 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 

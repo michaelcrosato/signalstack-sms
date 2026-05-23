@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 529
+
+- Added live-worker unit coverage proving runtime-supported Web-platform controls evidence and authorization-wrapper impostors cannot authorize the reserved `production-live-campaign` worker class.
+- Covered `Blob`, `File`, `FormData`, `Headers`, `Request`, `Response`, `AbortController`, `AbortSignal`, `ReadableStream`, `TextEncoder`, and `TextDecoder` when the runtime exposes them, across ordinary, exact-field frozen, proxy-backed, reflection-trapped, and revoked proxy-backed wrapper paths plus revoked controls-evidence paths.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the Web-platform impostor boundary.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 96 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 548 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 528
 
 - Added live-worker unit coverage proving revoked proxy-backed typed-array, data-view, and weak-collection controls evidence cannot authorize the reserved `production-live-campaign` worker class.

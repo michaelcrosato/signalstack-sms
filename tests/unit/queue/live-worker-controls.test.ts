@@ -52,6 +52,53 @@ describe("production live campaign worker controls", () => {
     return typeof SharedArrayBuffer === "undefined" ? [] : [buildValue()];
   }
 
+  function webPlatformBuiltInTargets() {
+    const targets: object[] = [];
+
+    if (typeof Blob !== "undefined") {
+      targets.push(new Blob(["unsafe-controls"]));
+    }
+
+    if (typeof File !== "undefined") {
+      targets.push(new File(["unsafe-controls"], "unsafe-controls.txt"));
+    }
+
+    if (typeof FormData !== "undefined") {
+      targets.push(new FormData());
+    }
+
+    if (typeof Headers !== "undefined") {
+      targets.push(new Headers([["x-signalstack", "unsafe-controls"]]));
+    }
+
+    if (typeof Request !== "undefined") {
+      targets.push(new Request("https://signalstack.local/unsafe-controls"));
+    }
+
+    if (typeof Response !== "undefined") {
+      targets.push(new Response("unsafe-controls"));
+    }
+
+    if (typeof AbortController !== "undefined") {
+      targets.push(new AbortController());
+      targets.push(new AbortController().signal);
+    }
+
+    if (typeof ReadableStream !== "undefined") {
+      targets.push(new ReadableStream());
+    }
+
+    if (typeof TextEncoder !== "undefined") {
+      targets.push(new TextEncoder());
+    }
+
+    if (typeof TextDecoder !== "undefined") {
+      targets.push(new TextDecoder());
+    }
+
+    return targets;
+  }
+
   it("keeps the reserved production class outside the currently supported worker class list", () => {
     expect(reservedLiveWorkerDeploymentClass).toBe("production-live-campaign");
     expect(supportedWorkerDeploymentClasses).toEqual(["local-demo"]);
@@ -2349,7 +2396,8 @@ describe("production live campaign worker controls", () => {
       new URLSearchParams("controls=unsafe"),
       new WeakRef(implementedFrozenControls()[0]),
       new FinalizationRegistry(() => undefined),
-      new ArrayBuffer(8)
+      new ArrayBuffer(8),
+      ...webPlatformBuiltInTargets()
     ];
 
     if (typeof SharedArrayBuffer === "function") {
@@ -3762,7 +3810,8 @@ describe("production live campaign worker controls", () => {
       Object.freeze(Object.assign(new URL("https://signalstack.local/production-live-campaign"), wrapperFields)),
       Object.freeze(Object.assign(new URLSearchParams("workerDeploymentClass=production-live-campaign"), wrapperFields)),
       Object.freeze(Object.assign(new WeakRef(implementedFrozenControls()[0]), wrapperFields)),
-      Object.freeze(Object.assign(new FinalizationRegistry(() => undefined), wrapperFields))
+      Object.freeze(Object.assign(new FinalizationRegistry(() => undefined), wrapperFields)),
+      ...webPlatformBuiltInTargets().map((target) => Object.freeze(Object.assign(target, wrapperFields)))
     ];
 
     for (const input of builtInWrapperImpostors) {
@@ -3821,7 +3870,8 @@ describe("production live campaign worker controls", () => {
       defineWrapperFields(new URL("https://signalstack.local/production-live-campaign")),
       defineWrapperFields(new URLSearchParams("workerDeploymentClass=production-live-campaign")),
       defineWrapperFields(new WeakRef(implementedFrozenControls()[0])),
-      defineWrapperFields(new FinalizationRegistry(() => undefined))
+      defineWrapperFields(new FinalizationRegistry(() => undefined)),
+      ...webPlatformBuiltInTargets().map(defineWrapperFields)
     ];
 
     for (const input of exactFieldBuiltInWrapperImpostors) {
@@ -3869,7 +3919,8 @@ describe("production live campaign worker controls", () => {
       Object.assign(new URL("https://signalstack.local/production-live-campaign"), wrapperFields),
       Object.assign(new URLSearchParams("workerDeploymentClass=production-live-campaign"), wrapperFields),
       Object.assign(new WeakRef(implementedFrozenControls()[0]), wrapperFields),
-      Object.assign(new FinalizationRegistry(() => undefined), wrapperFields)
+      Object.assign(new FinalizationRegistry(() => undefined), wrapperFields),
+      ...webPlatformBuiltInTargets().map((target) => Object.assign(target, wrapperFields))
     ].map(
       (target) =>
         new Proxy(Object.freeze(target), {
@@ -3922,7 +3973,8 @@ describe("production live campaign worker controls", () => {
       Object.assign(new URL("https://signalstack.local/production-live-campaign"), wrapperFields),
       Object.assign(new URLSearchParams("workerDeploymentClass=production-live-campaign"), wrapperFields),
       Object.assign(new WeakRef(implementedFrozenControls()[0]), wrapperFields),
-      Object.assign(new FinalizationRegistry(() => undefined), wrapperFields)
+      Object.assign(new FinalizationRegistry(() => undefined), wrapperFields),
+      ...webPlatformBuiltInTargets().map((target) => Object.assign(target, wrapperFields))
     ].map(
       (target) =>
         new Proxy(target, {
@@ -3987,7 +4039,8 @@ describe("production live campaign worker controls", () => {
       Object.assign(new URL("https://signalstack.local/production-live-campaign"), wrapperFields),
       Object.assign(new URLSearchParams("workerDeploymentClass=production-live-campaign"), wrapperFields),
       Object.assign(new WeakRef(implementedFrozenControls()[0]), wrapperFields),
-      Object.assign(new FinalizationRegistry(() => undefined), wrapperFields)
+      Object.assign(new FinalizationRegistry(() => undefined), wrapperFields),
+      ...webPlatformBuiltInTargets().map((target) => Object.assign(target, wrapperFields))
     ].map((target) => {
       const { proxy, revoke } = Proxy.revocable(Object.freeze(target), {
         get: () => {
