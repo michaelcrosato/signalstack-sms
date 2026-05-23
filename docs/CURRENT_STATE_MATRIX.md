@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 537 note: live-worker authorization now denies deployment-class impostor objects with throwing `Symbol.toStringTag` accessors before supplied controls are inspected and without reading the accessor.
+
 Run 536 note: live-worker authorization now denies array-buffer, URL-shaped, weak-reference, and finalization-registry records when they are supplied as deployment-class impostors before supplied controls are inspected.
 
 Run 535 note: live-worker authorization now denies boxed `Symbol` and boxed `BigInt` records when they are supplied as deployment-class impostors before supplied controls are inspected.

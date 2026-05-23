@@ -2954,6 +2954,39 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("does not read deployment class toStringTag accessors before denying authorization", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("tagged worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("tagged worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("tagged worker classes must not inspect control evidence");
+      }
+    });
+    const taggedAccessorClass = Object.freeze(
+      Object.defineProperty({}, Symbol.toStringTag, {
+        enumerable: false,
+        get: () => {
+          throw new Error("worker deployment class toStringTag getter must not be read");
+        }
+      })
+    );
+
+    expect(() =>
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(taggedAccessorClass as unknown as string, throwingEvidence)
+      )
+    ).not.toThrow();
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(taggedAccessorClass as unknown as string, throwingEvidence)
+      )
+    ).toBe(false);
+  });
+
   it("rejects runtime-supported platform deployment class impostors before inspecting supplied controls", async () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {
