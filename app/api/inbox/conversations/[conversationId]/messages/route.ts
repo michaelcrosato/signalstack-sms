@@ -27,7 +27,8 @@ export async function POST(request: Request, { params }: ConversationParams) {
     return roleResponse;
   }
 
-  const payload = conversationMessageCreateSchema.safeParse(await request.json());
+  const rawPayload = await request.json().catch(() => undefined);
+  const payload = conversationMessageCreateSchema.safeParse(rawPayload);
 
   if (!payload.success) {
     return NextResponse.json({ error: "Invalid message payload.", issues: payload.error.issues }, { status: 400 });
