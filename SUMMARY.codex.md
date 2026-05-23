@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 512
+
+- Added live-worker unit coverage proving proxy-backed `SharedArrayBuffer` `controls` evidence cannot authorize the reserved `production-live-campaign` worker class when the runtime exposes it.
+- Proved the proxy-backed shared-array-buffer evidence denies without reading `get`, prototype, descriptor, or key traps; `production-live-campaign` remains unsupported.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, and current state matrix for the proxy-backed shared-array-buffer controls-evidence boundary.
+- Focused check passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 91 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 543 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 511
 
 - Added live-worker unit coverage proving proxy-backed `ArrayBuffer` `controls` evidence cannot authorize the reserved `production-live-campaign` worker class.
@@ -7,17 +18,6 @@ Run number: 511
 - Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, and current state matrix for the proxy-backed array-buffer controls-evidence boundary.
 - Focused check passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 90 tests.
 - Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 542 tests, Playwright smoke, and build green.
-- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
-
-## Previous Run
-
-Run number: 509
-
-- Added live-worker unit coverage proving proxy-backed date, RegExp, and Error `controls` evidence cannot authorize the reserved `production-live-campaign` worker class.
-- Proved the proxy-backed built-in object evidence denies without reading `get`, prototype, descriptor, or key traps; `production-live-campaign` remains unsupported.
-- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, and current state matrix for the proxy-backed built-in object controls-evidence boundary.
-- Focused check passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 88 tests.
-- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 540 tests, Playwright smoke, and build green.
 - No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
 
 ## Previous Run
