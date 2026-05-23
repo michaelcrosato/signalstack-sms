@@ -4605,6 +4605,28 @@ describe("API route authorization coverage", () => {
         return Response.json({ payload });
       }
     `;
+    const unsafeParenthesizedSatisfiesGlobalAliasReflectGetSource = `
+      export async function PUT(req: Request) {
+        const root = ((globalThis satisfies typeof globalThis));
+        const payload = await root.Reflect.get(req, "arrayBuffer").call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+    const unsafeAssignedParenthesizedSatisfiesGlobalAliasDescriptorSource = `
+      export async function DELETE(req: Request) {
+        let root;
+        root = (globalThis satisfies typeof globalThis);
+        const payload = await root.Object.getOwnPropertyDescriptor(
+          root.Reflect.getPrototypeOf(req),
+          "blob"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
     const unsafeNonNullGlobalAliasReflectGetSource = `
       export async function POST(req: Request) {
         const root = globalThis!;
@@ -4754,6 +4776,15 @@ describe("API route authorization coverage", () => {
         return Response.json({ ok: Boolean(payload) });
       }
     `;
+    const unsafeWholeParenthesizedSatisfiesGlobalThisRootReflectSource = `
+      export async function PATCH(req: Request) {
+        const ReflectBuiltin = ((globalThis satisfies typeof globalThis).Reflect);
+        const payload = await ReflectBuiltin.get(req, "arrayBuffer").call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
     const unsafeAssignedGlobalThisBracketObjectAliasSource = `
       export async function PATCH(req: Request) {
         let ObjectBuiltin;
@@ -4815,6 +4846,12 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedSatisfiesGlobalAliasDescriptorSource, "DELETE")).toBe(
       true
     );
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedSatisfiesGlobalAliasReflectGetSource, "PUT")).toBe(
+      true
+    );
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedParenthesizedSatisfiesGlobalAliasDescriptorSource, "DELETE")
+    ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNonNullGlobalAliasReflectGetSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedNonNullGlobalAliasDescriptorSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalAliasComputedReflectGetSource, "POST")).toBe(true);
@@ -4832,6 +4869,9 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTypeAssertedGlobalThisRootReflectSource, "DELETE")).toBe(true);
     expect(
       mutatingMethodParsesBodyBeforeRoleGate(unsafeWholeParenthesizedTypeAssertedGlobalThisRootReflectSource, "POST")
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(unsafeWholeParenthesizedSatisfiesGlobalThisRootReflectSource, "PATCH")
     ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedGlobalThisBracketObjectAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalThisAliasComputedReflectAliasSource, "PUT")).toBe(true);

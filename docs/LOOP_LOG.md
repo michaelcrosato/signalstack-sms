@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 476  GREEN  satisfies-globalthis-auth  2026-05-22 23:33
+Objective:    Prove parenthesized `satisfies` `globalThis` aliases stay behind mutating-route role gates.
+Changed:
+- Added mutating API authorization coverage for `const root = ((globalThis satisfies typeof globalThis))` and assigned parenthesized `satisfies` local `globalThis` aliases before reflective body-reader checks.
+- Added whole-parenthesized `const ReflectBuiltin = ((globalThis satisfies typeof globalThis).Reflect)` root-member coverage before `requireApiRole`.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the parenthesized `satisfies` `globalThis` alias boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable or continue static gate hardening without enabling live sends.
+
 ## Run 470  GREEN  request-alias-reader-property-auth  2026-05-22 22:52
 Objective:    Prove direct request-alias body-reader property reads stay behind mutating-route role gates.
 Changed:
