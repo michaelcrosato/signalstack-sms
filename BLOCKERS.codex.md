@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 453
+
+- No blocker from campaign schedule success/not-found route coverage. Focused route coverage and the protected local gate passed and proved missing campaigns return `404` without BullMQ enqueue while valid schedules persist a local queue job before optional BullMQ enqueue. No workers, live sends, provider calls, Redis effects, billing, notifications, live AI, secrets, live feature enablement, protected gate-script edits, hard deletion, or destructive production actions were used.
+
 Run number: 452
 
 - No blocker from campaign schedule authorization-before-body-parse coverage. Focused route coverage and the protected local gate passed and proved denied roles return before malformed request bodies are parsed or any local queue scheduling/BullMQ enqueue helpers run. No workers, live sends, provider calls, Redis effects, billing, notifications, live AI, secrets, live feature enablement, protected gate-script edits, hard deletion, or destructive production actions were used.

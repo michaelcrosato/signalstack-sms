@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 453
+
+- Added campaign schedule route coverage for missing-campaign and valid-schedule branches.
+- Verified missing campaigns return `404` without BullMQ enqueue, and valid schedule payloads return the persisted queue job after `scheduleCampaign` runs before optional BullMQ enqueue.
+- Updated the testing contract, testing docs, NEXT_PROMPTS, and current state matrix for the schedule persistence-before-optional-enqueue boundary.
+- Focused check passed: `npm run test -- tests/unit/api/campaign-schedule-route.test.ts` with 5 tests.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 48 Vitest files / 457 tests, Playwright smoke, and build green.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 452
 
 - Added campaign schedule route coverage proving role denials return before malformed request bodies are parsed.

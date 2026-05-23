@@ -83,4 +83,68 @@ describe("campaign schedule route", () => {
     expect(mocks.scheduleCampaign).not.toHaveBeenCalled();
     expect(mocks.enqueueScheduledCampaignBullMqJob).not.toHaveBeenCalled();
   });
+
+  it("returns not found without enqueueing BullMQ work when no campaign is scheduled", async () => {
+    mocks.scheduleCampaign.mockResolvedValue(null);
+
+    const response = await POST(
+      new Request("http://localhost/api/campaigns/missing_campaign/schedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scheduledAt: "2026-05-23T18:00:00.000Z" })
+      }),
+      { params: Promise.resolve({ campaignId: "missing_campaign" }) }
+    );
+
+    expect(response.status).toBe(404);
+    await expect(response.json()).resolves.toEqual({ error: "Campaign not found." });
+    expect(mocks.scheduleCampaign).toHaveBeenCalledWith(
+      "org_demo",
+      "missing_campaign",
+      new Date("2026-05-23T18:00:00.000Z")
+    );
+    expect(mocks.enqueueScheduledCampaignBullMqJob).not.toHaveBeenCalled();
+  });
+
+  it("returns the persisted queue job and enqueues optional BullMQ work after a valid schedule", async () => {
+    const queueJob = {
+      id: "queue_job_demo",
+      idempotencyKey: "scheduled-campaign:org_demo:campaign_demo:2026-05-23T18:00:00.000Z",
+      payload: {
+        version: 1,
+        orgId: "org_demo",
+        campaignId: "campaign_demo",
+        scheduledAt: "2026-05-23T18:00:00.000Z"
+      },
+      runAt: new Date("2026-05-23T18:00:00.000Z")
+    };
+    mocks.scheduleCampaign.mockResolvedValue(queueJob);
+    mocks.enqueueScheduledCampaignBullMqJob.mockResolvedValue({ enqueued: false, reason: "backend-disabled" });
+
+    const response = await POST(
+      new Request("http://localhost/api/campaigns/campaign_demo/schedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scheduledAt: "2026-05-23T18:00:00.000Z" })
+      }),
+      { params: Promise.resolve({ campaignId: "campaign_demo" }) }
+    );
+
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toEqual({
+      queueJob: {
+        ...queueJob,
+        runAt: "2026-05-23T18:00:00.000Z"
+      }
+    });
+    expect(mocks.scheduleCampaign).toHaveBeenCalledWith(
+      "org_demo",
+      "campaign_demo",
+      new Date("2026-05-23T18:00:00.000Z")
+    );
+    expect(mocks.enqueueScheduledCampaignBullMqJob).toHaveBeenCalledWith(queueJob);
+    expect(mocks.scheduleCampaign.mock.invocationCallOrder[0]).toBeLessThan(
+      mocks.enqueueScheduledCampaignBullMqJob.mock.invocationCallOrder[0]
+    );
+  });
 });

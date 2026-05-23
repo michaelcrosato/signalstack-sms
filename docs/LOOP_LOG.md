@@ -3701,3 +3701,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 453  GREEN  campaign-schedule-success-not-found  2026-05-22 20:57
+Objective:    Prove campaign schedule success and missing-campaign branches keep BullMQ behind durable local queue persistence.
+Changed:
+- Added route-level coverage for missing campaigns returning `404` without BullMQ enqueue.
+- Added route-level coverage for valid schedule payloads returning the persisted queue job and calling optional BullMQ enqueue only after `scheduleCampaign`.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the persistence-before-optional-enqueue boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
