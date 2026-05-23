@@ -1717,6 +1717,8 @@ describe("production live campaign worker controls", () => {
       Object.freeze(new Date(0)),
       Object.freeze(/implemented/),
       Object.freeze(new Error("implemented controls")),
+      Object.freeze(new URL("https://signalstack.local/implemented-controls")),
+      Object.freeze(new URLSearchParams("controls=implemented")),
       Object.freeze(new WeakRef(implementedFrozenControls()[0])),
       Object.freeze(new FinalizationRegistry(() => undefined)),
       Object.freeze({
@@ -2148,6 +2150,34 @@ describe("production live campaign worker controls", () => {
           throw new Error("error proxy controls keys trap must not be read");
         }
       }),
+      new Proxy(new URL("https://signalstack.local/unsafe-controls"), {
+        get: () => {
+          throw new Error("url proxy controls get trap must not be read");
+        },
+        getPrototypeOf: () => {
+          throw new Error("url proxy controls prototype trap must not be read");
+        },
+        getOwnPropertyDescriptor: () => {
+          throw new Error("url proxy controls descriptor trap must not be read");
+        },
+        ownKeys: () => {
+          throw new Error("url proxy controls keys trap must not be read");
+        }
+      }),
+      new Proxy(new URLSearchParams("controls=unsafe"), {
+        get: () => {
+          throw new Error("url-search-params proxy controls get trap must not be read");
+        },
+        getPrototypeOf: () => {
+          throw new Error("url-search-params proxy controls prototype trap must not be read");
+        },
+        getOwnPropertyDescriptor: () => {
+          throw new Error("url-search-params proxy controls descriptor trap must not be read");
+        },
+        ownKeys: () => {
+          throw new Error("url-search-params proxy controls keys trap must not be read");
+        }
+      }),
       new Proxy(new WeakRef(implementedFrozenControls()[0]), {
         get: () => {
           throw new Error("weakref proxy controls get trap must not be read");
@@ -2291,6 +2321,8 @@ describe("production live campaign worker controls", () => {
       new Map([["0", implementedFrozenControls()[0]]]),
       new Set(implementedFrozenControls()),
       Promise.resolve(implementedFrozenControls()),
+      new URL("https://signalstack.local/unsafe-controls"),
+      new URLSearchParams("controls=unsafe"),
       new WeakRef(implementedFrozenControls()[0]),
       new FinalizationRegistry(() => undefined),
       new ArrayBuffer(8)
