@@ -4330,6 +4330,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening local route safety or live-worker controls without enabling live sends.
 
+## Run 498  GREEN  live-worker-proxy-deployment-class-impostors  2026-05-23 02:05
+Objective:    Prove proxy-backed and revoked proxy deployment-class impostors cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage for proxy-backed and revoked proxy object `workerDeploymentClass` values.
+- Proved those malformed class values deny before hostile supplied controls or class-value proxy traps are inspected.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the proxy deployment-class boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 468  GREEN  optional-bracket-reflective-auth  2026-05-22 22:40
 Objective:    Prove optional-bracket reflective descriptor/prototype helpers are treated as request body parsing before mutating-route role gates.
 Changed:
