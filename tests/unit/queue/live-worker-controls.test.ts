@@ -3704,6 +3704,52 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects proxy-backed built-in authorization-wrapper impostors before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("proxy-backed built-in wrapper impostors must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("proxy-backed built-in wrapper impostors must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("proxy-backed built-in wrapper impostors must not inspect control evidence");
+      }
+    });
+    const wrapperFields = {
+      workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+      controls: throwingEvidence
+    };
+    const proxyBackedBuiltInWrapperImpostors = [
+      Object.assign(new Map(), wrapperFields),
+      Object.assign(new Set(), wrapperFields),
+      Object.assign(new WeakMap(), wrapperFields),
+      Object.assign(new WeakSet(), wrapperFields),
+      Object.assign(new Uint8Array(0), wrapperFields),
+      Object.assign(new DataView(new ArrayBuffer(8)), wrapperFields),
+      Object.assign(Promise.resolve(implementedFrozenControls()), wrapperFields),
+      Object.assign(new String(reservedLiveWorkerDeploymentClass), wrapperFields),
+      Object.assign(new Number(1), wrapperFields),
+      Object.assign(new Boolean(true), wrapperFields),
+      Object.assign(/production-live-campaign/, wrapperFields),
+      Object.assign(new Error("production-live-campaign"), wrapperFields),
+      Object.assign(new WeakRef(implementedFrozenControls()[0]), wrapperFields),
+      Object.assign(new FinalizationRegistry(() => undefined), wrapperFields)
+    ].map(
+      (target) =>
+        new Proxy(Object.freeze(target), {
+          get: () => {
+            throw new Error("proxy-backed built-in wrapper fields must not be read");
+          }
+        })
+    );
+
+    for (const input of proxyBackedBuiltInWrapperImpostors) {
+      expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
+    }
+  });
+
   it("rejects tampered authorization wrapper prototypes before inspecting controls", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       getPrototypeOf: () => {

@@ -55,6 +55,7 @@ The public worker-readiness boundary must accept runtime-unknown safety input an
 
 Hidden string metadata on otherwise valid supplied control entries or authorization wrappers is also forbidden and must deny the reserved worker deployment class the same way hidden symbol metadata does.
 Built-in object-shaped deployment-class impostors, including maps, sets, weak collections, typed arrays, data views, promises, regular expressions, errors, and proxy-backed or revoked proxy object values, must deny before supplied controls are inspected.
+Proxy-backed built-in authorization-wrapper impostors must deny before supplied controls are inspected.
 Proxy-backed `ArrayBuffer`, `SharedArrayBuffer`, `WeakRef`, and `FinalizationRegistry` controls evidence must deny before object `get`, prototype, descriptor, or key traps are read.
 Revoked proxy-backed built-in `controls` evidence must deny cleanly without falling back to built-in control metadata.
 malformed authorization wrapper input must deny without executing accessor-backed fields, and inherited `Object.prototype` wrapper accessors for `workerDeploymentClass` or `controls` must not be read while exact frozen wrapper evidence is evaluated.

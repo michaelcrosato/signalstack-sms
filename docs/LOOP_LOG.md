@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 516  GREEN  live-worker-proxy-built-in-wrappers  2026-05-23 04:27
+Objective:    Prove proxy-backed built-in authorization-wrapper impostors cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing proxy-backed built-in authorization wrappers carrying public wrapper fields deny before supplied controls are inspected.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the proxy-backed built-in wrapper boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 497  GREEN  live-worker-weak-collection-deployment-class  2026-05-23 02:15
 Objective:    Prove weak collection deployment-class impostors cannot authorize the reserved live worker class.
 Changed:
