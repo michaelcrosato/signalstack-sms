@@ -3430,6 +3430,68 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects proxy-backed promise and error-shaped deployment class impostors before inspecting supplied controls", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("proxy-backed promise and error-shaped worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("proxy-backed promise and error-shaped worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("proxy-backed promise and error-shaped worker classes must not inspect control evidence");
+      }
+    });
+    const promiseAndErrorShapedClasses = [
+      Object.freeze(Promise.resolve(reservedLiveWorkerDeploymentClass)),
+      Object.freeze(/production-live-campaign/),
+      Object.freeze(new Error("production-live-campaign")),
+      Object.freeze(new TypeError("production-live-campaign"))
+    ];
+    const proxyBackedPromiseAndErrorShapedClasses = promiseAndErrorShapedClasses.map(
+      (target) =>
+        new Proxy(target, {
+          get: () => {
+            throw new Error("proxy-backed promise and error-shaped worker class values must not be read");
+          },
+          getPrototypeOf: () => {
+            throw new Error("proxy-backed promise and error-shaped worker class prototypes must not be read");
+          },
+          getOwnPropertyDescriptor: () => {
+            throw new Error("proxy-backed promise and error-shaped worker class descriptors must not be read");
+          },
+          ownKeys: () => {
+            throw new Error("proxy-backed promise and error-shaped worker class keys must not be read");
+          }
+        })
+    );
+    const revokedPromiseAndErrorShapedClasses = promiseAndErrorShapedClasses.map((target) => {
+      const { proxy, revoke } = Proxy.revocable(target, {
+        get: () => {
+          throw new Error("revoked promise and error-shaped worker class values must not be read");
+        }
+      });
+      revoke();
+      return proxy;
+    });
+
+    for (const workerDeploymentClass of [
+      ...proxyBackedPromiseAndErrorShapedClasses,
+      ...revokedPromiseAndErrorShapedClasses
+    ]) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects every runtime-supported typed-array deployment class impostor before inspecting supplied controls", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {

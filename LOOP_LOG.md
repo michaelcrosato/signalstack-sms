@@ -5024,3 +5024,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 560  GREEN  live-worker-proxy-promise-error-class  2026-05-23 09:00
+Objective:    Prove proxy-backed promise and error-shaped deployment-class values cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing `Promise`, `RegExp`, `Error`, and `TypeError` deployment-class values deny in proxy-backed and revoked proxy-backed form before supplied controls are inspected.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the proxy promise/error deployment-class boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
