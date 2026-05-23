@@ -2,11 +2,13 @@
 
 Last updated: 2026-05-22.
 
-Run 470 note: direct request-alias body-reader property coverage now proves forms such as `const bodySource = req; const readerName = "json"; await bodySource[readerName]()` and assigned reader-name aliases are treated as request body parsing before each mutating API handler's top-level role gate.
+Run 471 note: non-null local `globalThis` alias coverage now proves forms such as `const root = globalThis!` and `root = (globalThis)!` are normalized before reflective `Object`/`Reflect` request body-reader checks in mutating API role-gate ordering.
 
-Latest protected local gate for Run 470: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-22 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 516 tests, Playwright smoke, and build green.
+Latest protected local gate for Run 471: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-22 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 516 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
+
+Tests/Gates addendum: mutating-route auth coverage now includes non-null local `globalThis` aliases before reflective `Object`/`Reflect` request body-reader checks.
 
 | Area | Backend/API State | Browser State | Main Gap | Next Action |
 | --- | --- | --- | --- | --- |

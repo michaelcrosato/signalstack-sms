@@ -30,6 +30,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
 
+## Run 471  GREEN  non-null-globalthis-reflective-auth  2026-05-22 23:00
+Objective:    Prove non-null local `globalThis` aliases are normalized before reflective request body-reader checks.
+Changed:
+- Added mutating API authorization coverage for `const root = globalThis!` and `root = (globalThis)!` resolving `Object`/`Reflect` request body-reader paths before `requireApiRole`.
+- Updated testing contract, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the non-null local `globalThis` alias boundary.
+- Kept the change local to static tests/docs; no API handlers were executed, no live SMS/provider/billing/notification/live-AI path was enabled, and protected gate scripts were untouched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 469  GREEN  direct-request-reader-property-alias-auth  2026-05-22 22:49
 Objective:    Prove direct request body-reader property aliases stay behind mutating-route role gates.
 Changed:

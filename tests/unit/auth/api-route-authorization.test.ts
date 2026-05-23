@@ -4545,6 +4545,28 @@ describe("API route authorization coverage", () => {
         return Response.json({ payload });
       }
     `;
+    const unsafeNonNullGlobalAliasReflectGetSource = `
+      export async function POST(req: Request) {
+        const root = globalThis!;
+        const payload = await root.Reflect.get(req, "json").call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeAssignedNonNullGlobalAliasDescriptorSource = `
+      export async function PATCH(req: Request) {
+        let root;
+        root = (globalThis)!;
+        const payload = await root.Object.getOwnPropertyDescriptor(
+          root.Reflect.getPrototypeOf(req),
+          "text"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
     const unsafeGlobalAliasComputedReflectGetSource = `
       export async function POST(req: Request) {
         const root = globalThis;
@@ -4642,6 +4664,8 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedSatisfiesGlobalAliasDescriptorSource, "DELETE")).toBe(
       true
     );
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNonNullGlobalAliasReflectGetSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedNonNullGlobalAliasDescriptorSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalAliasComputedReflectGetSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalAliasComputedObjectDescriptorSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDestructuredGlobalReflectSource, "POST")).toBe(true);
