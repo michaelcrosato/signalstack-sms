@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 465  GREEN  webhook-operations-inventory  2026-05-22 22:18
+Objective:    Move `/settings/webhooks` route and safety metadata into tested frozen operations inventory.
+Changed:
+- Added frozen webhook operations route/event/no-impact metadata with unit coverage for public fields, detached snapshots, stable order, unique identifiers, clean copy, and no-replay/no-provider/no-mutation safety terms.
+- Updated `/settings/webhooks` to render route coverage and safety boundaries from the shared inventory.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the webhook operations inventory boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 464  GREEN  compliance-settings-route-safety  2026-05-22 22:18
 Objective:    Prove compliance settings updates stay authorization-gated and local-only.
 Changed:

@@ -1,5 +1,17 @@
 # Codex Summary
 
+Run number: 465
+
+- Added a frozen `lib/operations/webhook-operations.ts` inventory for `/settings/webhooks` route coverage, event-type vocabularies, no-impact summary states, and safety boundaries.
+- Updated `/settings/webhooks` to render route and safety-boundary copy from the shared operation inventory instead of inline page metadata.
+- Added unit coverage proving webhook operations metadata exposes only public fields, returns detached frozen snapshots with aligned counts, preserves stable order and unique identifiers, keeps clean copy, rejects command/secret-like literals, and names no-replay/no-provider/no-mutation boundaries.
+- Updated the testing contract, NEXT_PROMPTS, and current state matrix for the webhook operations inventory boundary.
+- Focused checks passed: `npm run test -- tests/unit/operations/webhook-operations.test.ts`, `npm run typecheck`, and `npm run contracts:check`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 464
 
 - Added compliance settings route coverage proving role denials return before request-body parsing or local compliance/audit writes.

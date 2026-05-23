@@ -2,26 +2,15 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { prisma } from "@/lib/db/prisma";
+import { getWebhookOperationsStatus } from "@/lib/operations/webhook-operations";
 import { getWebhookOperationLinks } from "@/lib/operations/operator-surfaces";
 
 export const dynamic = "force-dynamic";
 
-const webhookRoutes = [
-  {
-    label: "Twilio inbound",
-    path: "/api/webhooks/twilio/inbound",
-    behavior: "stores raw payloads and creates local inbound inbox messages"
-  },
-  {
-    label: "Twilio status",
-    path: "/api/webhooks/twilio/status",
-    behavior: "stores raw payloads and updates matching local delivery metadata"
-  }
-];
-
 export default async function WebhookOperationsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
   const operationLinks = getWebhookOperationLinks();
+  const webhookStatus = getWebhookOperationsStatus();
   const events = await prisma.webhookEvent.findMany({
     where: { orgId: currentOrg.orgId },
     orderBy: { receivedAt: "desc" },
@@ -55,13 +44,13 @@ export default async function WebhookOperationsPage() {
         <Metric label="Stored events" value={String(events.length)} />
         <Metric label="Processed" value={String(processedEvents.length)} />
         <Metric label="Providers" value={String(providers.size)} />
-        <Metric label="Webhook routes" value={String(webhookRoutes.length)} />
+        <Metric label="Webhook routes" value={String(webhookStatus.routeCount)} />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
         <Panel title="Route Coverage">
           <ul className="grid gap-3 text-sm">
-            {webhookRoutes.map((route) => (
+            {webhookStatus.routes.map((route) => (
               <li key={route.path} className="border-b border-slate-100 pb-3">
                 <p className="font-medium text-slate-950">{route.label}</p>
                 <p className="mt-1 break-words font-mono text-xs text-slate-800">{route.path}</p>
@@ -105,10 +94,9 @@ export default async function WebhookOperationsPage() {
 
       <Panel title="Safety Boundary">
         <ul className="grid gap-2 text-sm text-slate-700">
-          <li>Webhook signature validation remains in the API handlers, not this view.</li>
-          <li>Inbound and status callbacks remain idempotent through stored local keys.</li>
-          <li>This page cannot replay provider payloads or trigger outbound messages.</li>
-          <li>No provider calls, notifications, billing records, live SMS, mutations, or secrets are created.</li>
+          {webhookStatus.safetyBoundaries.map((boundary) => (
+            <li key={boundary}>{boundary}</li>
+          ))}
         </ul>
       </Panel>
     </main>

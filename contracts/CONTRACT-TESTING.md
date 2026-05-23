@@ -275,6 +275,7 @@ Post-MVP webhook operations view:
 - Webhook helper tests must verify blank `MessageSid`/`MessageStatus` values fall back to nonblank legacy `SmsSid`/`SmsStatus` aliases before deriving idempotency keys.
 - Webhook helper tests must verify inbound webhook bodies reject whitespace-only payloads while preserving nonblank body text exactly for local message creation.
 - Webhook helper tests must verify terminal Twilio delivery transitions clear the opposite terminal timestamp so local delivery metadata cannot show stale delivered and failed states at once.
+- Unit tests must verify that the static webhook operations inventory keeps Twilio route coverage, event-type vocabularies, no-impact summary states, public fields, frozen snapshots, detached returned arrays with aligned counts, stable order, unique identifiers, whitespace-clean copy, secret-like literal rejection, command-like literal rejection, and required no-replay/no-provider/no-mutation boundary terms stable before `/settings/webhooks` renders them.
 - The seeded investor demo path must verify that `/settings/webhooks` renders read-only Twilio route coverage, event-type summaries, recent local webhook metadata, and safety-boundary text without webhook replay, provider calls, outbound replies, message/contact mutation, notifications, billing records, SMS, or live messaging enablement.
 
 Post-MVP delivery operations view:
