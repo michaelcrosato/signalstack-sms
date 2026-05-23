@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 467
+
+- Added focused provider credential rotation API route coverage for `GET /api/settings/provider/rotations` and `GET /api/settings/provider/rotations/export`.
+- The new tests prove unsupported action filters return `400` before local rotation-history reads or CSV serialization, while supported bounded filters call only the tenant-scoped redacted credential metadata repository and serializer.
+- Updated testing contracts/docs and NEXT_PROMPTS for the provider credential rotation route query boundary.
+- Focused checks passed: `npm run test -- tests/unit/api/provider-rotations-route.test.ts`, `npm run typecheck`, and `npm run contracts:check`.
+- Protected local gate passed on 2026-05-22: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`.
+- No live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 466
 
 - Added focused readiness audit API route coverage for `GET /api/settings/readiness-audit` and `GET /api/settings/readiness-audit/export`.
