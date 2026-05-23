@@ -4507,3 +4507,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 504  GREEN  live-worker-revoked-array-prototype-controls  2026-05-23 02:52
+Objective:    Prove revoked proxy-backed array-prototype impostor controls evidence cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing revoked proxy-backed array-prototype impostor `controls` evidence denies without throwing or falling back to built-in control metadata.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the revoked proxy-backed array-prototype controls-evidence boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
