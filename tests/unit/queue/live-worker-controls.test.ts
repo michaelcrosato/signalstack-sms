@@ -6471,6 +6471,54 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not read inherited control-array metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const metadataSymbol = Symbol("inherited-control-array-metadata");
+    const arrayPrototype = Array.prototype as unknown as Record<PropertyKey, unknown>;
+    const originalStringMetadataDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, "reviewerBypass");
+    const originalSymbolMetadataDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, metadataSymbol);
+
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperties(Array.prototype, {
+        reviewerBypass: {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited control-array string metadata must not be read");
+          }
+        },
+        [metadataSymbol]: {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited control-array symbol metadata must not be read");
+          }
+        }
+      });
+
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalStringMetadataDescriptor === undefined) {
+        delete arrayPrototype.reviewerBypass;
+      } else {
+        Object.defineProperty(Array.prototype, "reviewerBypass", originalStringMetadataDescriptor);
+      }
+
+      if (originalSymbolMetadataDescriptor === undefined) {
+        delete arrayPrototype[metadataSymbol];
+      } else {
+        Object.defineProperty(Array.prototype, metadataSymbol, originalSymbolMetadataDescriptor);
+      }
+    }
+
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 
