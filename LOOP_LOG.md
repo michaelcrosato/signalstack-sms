@@ -4278,3 +4278,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 474  GREEN  type-asserted-globalthis-root-members  2026-05-22 23:21
+Objective:    Prove parenthesized type-asserted `globalThis` root member aliases cannot hide mutating-route body readers before role gates.
+Changed:
+- Normalized `(globalThis as typeof globalThis)` and `(globalThis satisfies typeof globalThis)` before mutating API authorization body-reader checks.
+- Added coverage for `Request` and `Reflect` aliases read through parenthesized type-asserted `globalThis` root member access.
+- Updated testing contracts/docs, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the parenthesized type-asserted `globalThis` root member boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
