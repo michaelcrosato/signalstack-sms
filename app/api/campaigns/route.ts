@@ -19,7 +19,8 @@ export async function POST(request: Request) {
     return roleResponse;
   }
 
-  const payload = campaignCreateSchema.safeParse(await request.json());
+  const rawPayload = await request.json().catch(() => undefined);
+  const payload = campaignCreateSchema.safeParse(rawPayload);
 
   if (!payload.success) {
     return NextResponse.json({ error: "Invalid campaign payload.", issues: payload.error.issues }, { status: 400 });

@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 455
+
+- No blocker from malformed campaign create/update JSON hardening. Focused route coverage and the protected local gate passed and proved malformed create/update bodies return `400` before local campaign repository mutations run. No live sends, provider calls, Redis effects, billing, notifications, live AI, secrets, live feature enablement, protected gate-script edits, hard deletion, or destructive production actions were used.
+
 Run number: 453
 
 - No blocker from campaign schedule success/not-found route coverage. Focused route coverage and the protected local gate passed and proved missing campaigns return `404` without BullMQ enqueue while valid schedules persist a local queue job before optional BullMQ enqueue. No workers, live sends, provider calls, Redis effects, billing, notifications, live AI, secrets, live feature enablement, protected gate-script edits, hard deletion, or destructive production actions were used.

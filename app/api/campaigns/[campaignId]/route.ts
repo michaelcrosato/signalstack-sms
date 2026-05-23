@@ -27,7 +27,8 @@ export async function PATCH(request: Request, { params }: CampaignParams) {
     return roleResponse;
   }
 
-  const payload = campaignUpdateSchema.safeParse(await request.json());
+  const rawPayload = await request.json().catch(() => undefined);
+  const payload = campaignUpdateSchema.safeParse(rawPayload);
 
   if (!payload.success) {
     return NextResponse.json({ error: "Invalid campaign payload.", issues: payload.error.issues }, { status: 400 });
