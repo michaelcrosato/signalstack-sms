@@ -2249,6 +2249,52 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects revoked proxy-backed built-in controls evidence without throwing", () => {
+    const builtInTargets: object[] = [
+      new Date(0),
+      /unsafe-controls/,
+      new Error("unsafe controls"),
+      new Map([["0", implementedFrozenControls()[0]]]),
+      new Set(implementedFrozenControls()),
+      Promise.resolve(implementedFrozenControls()),
+      new ArrayBuffer(8)
+    ];
+
+    if (typeof SharedArrayBuffer === "function") {
+      builtInTargets.push(new SharedArrayBuffer(8));
+    }
+
+    for (const target of builtInTargets) {
+      const { proxy: revokedProxyControls, revoke } = Proxy.revocable(target, {
+        get: () => {
+          throw new Error("revoked built-in proxy controls get trap must not be read");
+        },
+        getPrototypeOf: () => {
+          throw new Error("revoked built-in proxy controls prototype trap must not be read");
+        },
+        getOwnPropertyDescriptor: () => {
+          throw new Error("revoked built-in proxy controls descriptor trap must not be read");
+        },
+        ownKeys: () => {
+          throw new Error("revoked built-in proxy controls keys trap must not be read");
+        }
+      });
+
+      revoke();
+
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, revokedProxyControls)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, revokedProxyControls)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects proxy-backed control evidence without throwing", () => {
     const implementedControls = implementedFrozenControls();
     const throwingArrayLengthDescriptorProxy = new Proxy([...implementedControls], {
