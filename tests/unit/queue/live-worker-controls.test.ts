@@ -6120,6 +6120,66 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("does not invoke inherited authorization wrapper coercion metadata while evaluating exact frozen evidence", () => {
+    const objectPrototype = Object.prototype as {
+      [Symbol.toPrimitive]?: unknown;
+      toString?: unknown;
+      valueOf?: unknown;
+    };
+    const originalToPrimitiveDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, Symbol.toPrimitive);
+    const originalToStringDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "toString");
+    const originalValueOfDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "valueOf");
+
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperties(Object.prototype, {
+        [Symbol.toPrimitive]: {
+          configurable: true,
+          value: () => {
+            throw new Error("inherited authorization-wrapper Symbol.toPrimitive must not be invoked");
+          }
+        },
+        toString: {
+          configurable: true,
+          value: () => {
+            throw new Error("inherited authorization-wrapper toString must not be invoked");
+          }
+        },
+        valueOf: {
+          configurable: true,
+          value: () => {
+            throw new Error("inherited authorization-wrapper valueOf must not be invoked");
+          }
+        }
+      });
+
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedFrozenControls())
+      );
+    } finally {
+      if (originalToPrimitiveDescriptor === undefined) {
+        delete objectPrototype[Symbol.toPrimitive];
+      } else {
+        Object.defineProperty(Object.prototype, Symbol.toPrimitive, originalToPrimitiveDescriptor);
+      }
+
+      if (originalToStringDescriptor === undefined) {
+        delete objectPrototype.toString;
+      } else {
+        Object.defineProperty(Object.prototype, "toString", originalToStringDescriptor);
+      }
+
+      if (originalValueOfDescriptor === undefined) {
+        delete objectPrototype.valueOf;
+      } else {
+        Object.defineProperty(Object.prototype, "valueOf", originalValueOfDescriptor);
+      }
+    }
+
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("does not execute control evidence get traps while authorizing exact frozen evidence", () => {
     const implementedControlsWithEntryGetTraps = Object.freeze(
       implementedFrozenControls().map(

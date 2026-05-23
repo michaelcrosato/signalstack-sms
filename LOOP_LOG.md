@@ -5194,3 +5194,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 577  GREEN  live-worker-inherited-wrapper-coercion  2026-05-23 10:45
+Objective:    Prove inherited authorization-wrapper coercion metadata cannot influence exact frozen live-worker authorization evidence.
+Changed:
+- Added live-worker unit coverage showing exact frozen authorization-wrapper evidence authorizes without invoking inherited `Object.prototype` `Symbol.toPrimitive`, `toString`, or `valueOf` metadata.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the inherited wrapper-coercion boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
