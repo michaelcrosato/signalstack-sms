@@ -1822,6 +1822,40 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects proxy-backed non-array controls evidence without inspecting object traps", () => {
+    const proxyControls = new Proxy(
+      {
+        0: implementedFrozenControls()[0],
+        length: productionLiveCampaignWorkerControls.length
+      },
+      {
+        get: () => {
+          throw new Error("non-array controls get trap must not be read");
+        },
+        getPrototypeOf: () => {
+          throw new Error("non-array controls prototype trap must not be read");
+        },
+        getOwnPropertyDescriptor: () => {
+          throw new Error("non-array controls descriptor trap must not be read");
+        },
+        ownKeys: () => {
+          throw new Error("non-array controls keys trap must not be read");
+        }
+      }
+    );
+
+    expect(() =>
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, proxyControls)
+      )
+    ).not.toThrow();
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, proxyControls)
+      )
+    ).toBe(false);
+  });
+
   it("rejects proxy-backed control evidence without throwing", () => {
     const implementedControls = implementedFrozenControls();
     const throwingArrayLengthDescriptorProxy = new Proxy([...implementedControls], {
