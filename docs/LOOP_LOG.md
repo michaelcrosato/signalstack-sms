@@ -4308,3 +4308,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 541  GREEN  live-worker-revoked-non-ordinary-wrappers  2026-05-23 07:08
+Objective:    Prove revoked proxy-backed non-ordinary authorization-wrapper impostors cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing revoked proxy-backed null-prototype and class-instance authorization wrappers deny cleanly before supplied controls are inspected or wrapper fields are read.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the revoked proxy-backed non-ordinary wrapper boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

@@ -4195,6 +4195,47 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects revoked proxy-backed non-ordinary authorization wrappers before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("revoked non-ordinary wrappers must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("revoked non-ordinary wrappers must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("revoked non-ordinary wrappers must not inspect control evidence");
+      }
+    });
+    const nullPrototypeWrapper = Object.freeze(
+      Object.assign(Object.create(null) as Record<string, unknown>, {
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: throwingEvidence
+      })
+    );
+
+    class AuthorizationWrapper {
+      workerDeploymentClass = reservedLiveWorkerDeploymentClass;
+      controls = throwingEvidence;
+    }
+
+    const classInstanceWrapper = Object.freeze(new AuthorizationWrapper());
+    const revokedProxyBackedNonOrdinaryWrappers = [nullPrototypeWrapper, classInstanceWrapper].map((target) => {
+      const { proxy, revoke } = Proxy.revocable(target, {
+        get: () => {
+          throw new Error("revoked non-ordinary wrapper fields must not be read");
+        }
+      });
+      revoke();
+      return proxy;
+    });
+
+    for (const input of revokedProxyBackedNonOrdinaryWrappers) {
+      expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
+    }
+  });
+
   it("rejects built-in object authorization-wrapper impostors before inspecting controls", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       getPrototypeOf: () => {
