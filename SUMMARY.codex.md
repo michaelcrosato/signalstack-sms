@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 548
+
+- Added live-worker unit coverage proving revoked proxy-backed runtime-supported Web-platform records cannot authorize the reserved `production-live-campaign` worker class as `controls` evidence.
+- The revoked proxy-backed evidence case denies cleanly without falling back to built-in metadata.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 112 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 564 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 547
 
 - Added live-worker unit coverage proving runtime-supported Web-platform records cannot authorize the reserved `production-live-campaign` worker class as ordinary or proxy-backed `controls` evidence.

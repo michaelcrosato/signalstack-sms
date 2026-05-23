@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 548 note: live-worker authorization now denies revoked proxy-backed runtime-supported Web-platform records as `controls` evidence before the reserved worker class can authorize, without throwing or falling back to built-in metadata.
+
 Run 547 note: live-worker authorization now denies runtime-supported Web-platform records as ordinary or proxy-backed `controls` evidence before the reserved worker class can authorize, without inspecting proxy object traps.
 
 Run 546 note: live-worker authorization now denies accessor-backed `workerDeploymentClass` or `controls` public fields on otherwise frozen authorization wrappers before supplied controls are inspected or getters are read.

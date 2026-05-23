@@ -2672,6 +2672,40 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects revoked proxy-backed Web-platform controls evidence without throwing", () => {
+    const revokedProxyControlsEvidence = webPlatformBuiltInTargets().map((target) => {
+      const { proxy, revoke } = Proxy.revocable(target, {
+        get: () => {
+          throw new Error("revoked web-platform proxy controls get trap must not be read");
+        },
+        getPrototypeOf: () => {
+          throw new Error("revoked web-platform proxy controls prototype trap must not be read");
+        },
+        getOwnPropertyDescriptor: () => {
+          throw new Error("revoked web-platform proxy controls descriptor trap must not be read");
+        },
+        ownKeys: () => {
+          throw new Error("revoked web-platform proxy controls keys trap must not be read");
+        }
+      });
+      revoke();
+      return proxy;
+    });
+
+    for (const controls of revokedProxyControlsEvidence) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects runtime-supported Web Crypto controls evidence without authorizing", async () => {
     const cryptoTargets = await webCryptoBuiltInTargets();
 

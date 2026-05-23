@@ -10,6 +10,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
 
+## Run 548  GREEN  live-worker-revoked-web-platform-controls-evidence  2026-05-23 07:48
+Objective:    Prove revoked proxy-backed runtime-supported Web-platform records cannot authorize the reserved live worker class as controls evidence.
+Changed:
+- Added live-worker unit coverage showing revoked proxy-backed Web-platform controls evidence denies cleanly before the reserved worker class can authorize.
+- Updated NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the revoked Web-platform controls-evidence boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 536  GREEN  live-worker-buffer-url-class-impostors  2026-05-23 06:42
 Objective:    Prove array-buffer, URL-shaped, weak-reference, and finalization-registry deployment-class impostors cannot authorize the reserved live worker class.
 Changed:
