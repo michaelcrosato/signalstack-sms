@@ -2927,11 +2927,17 @@ describe("production live campaign worker controls", () => {
       Object.freeze(new Set([reservedLiveWorkerDeploymentClass])),
       Object.freeze(new WeakMap([[{}, reservedLiveWorkerDeploymentClass]])),
       Object.freeze(new WeakSet([{}])),
+      Object.freeze(new ArrayBuffer(8)),
+      ...whenSharedArrayBufferExists(() => Object.freeze(new SharedArrayBuffer(8))),
       Object.freeze(new Uint8Array(0)),
       Object.freeze(new DataView(new ArrayBuffer(8))),
       promiseClass,
       Object.freeze(/production-live-campaign/),
       Object.freeze(new Error("production-live-campaign")),
+      Object.freeze(new URL("https://signalstack.local/production-live-campaign")),
+      Object.freeze(new URLSearchParams("workerDeploymentClass=production-live-campaign")),
+      Object.freeze(new WeakRef(implementedFrozenControls()[0])),
+      Object.freeze(new FinalizationRegistry(() => undefined)),
       functionClass,
       taggedObjectClass
     ]) {
