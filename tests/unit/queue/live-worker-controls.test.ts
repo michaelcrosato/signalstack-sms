@@ -2946,6 +2946,38 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects runtime-supported platform deployment class impostors before inspecting supplied controls", async () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("platform worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("platform worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("platform worker classes must not inspect control evidence");
+      }
+    });
+    const platformClassImpostors = [
+      ...webPlatformBuiltInTargets(),
+      ...webAssemblyBuiltInTargets(),
+      ...(await webCryptoBuiltInTargets())
+    ];
+
+    for (const workerDeploymentClass of platformClassImpostors) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects proxy-backed deployment class impostors before inspecting supplied controls", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {

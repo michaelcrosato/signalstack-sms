@@ -4269,3 +4269,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 534  GREEN  live-worker-platform-deployment-class-impostors  2026-05-23 06:28
+Objective:    Prove runtime-supported platform records cannot authorize the reserved live worker class as deployment-class impostors.
+Changed:
+- Added live-worker unit coverage showing runtime-supported Web-platform, WebAssembly, and Web Crypto records deny as malformed `workerDeploymentClass` values before supplied controls are inspected.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the platform deployment-class impostor boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

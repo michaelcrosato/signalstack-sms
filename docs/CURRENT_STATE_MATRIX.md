@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 534 note: live-worker authorization now denies runtime-supported Web-platform, WebAssembly, and Web Crypto records when they are supplied as deployment-class impostors before supplied controls are inspected.
+
 Run 533 note: live-worker authorization now denies runtime-supported Web Crypto records as controls evidence and authorization-wrapper impostors before the reserved worker class can authorize.
 
 Run 532 note: live-worker authorization now denies runtime-supported WebAssembly records as controls evidence and authorization-wrapper impostors before the reserved worker class can authorize.
@@ -82,7 +84,7 @@ Run 495 note: live-worker authorization now denies built-in object-shaped deploy
 
 Run 494 note: live-worker authorization now evaluates exact frozen control-entry evidence without reading inherited `Object.prototype` accessors for `id`, `status`, or `requirement`.
 
-Latest protected local gate for Run 533: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 552 tests, Playwright smoke, and build green.
+Latest protected local gate for Run 534: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 553 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 
