@@ -4155,6 +4155,46 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects proxy-backed non-ordinary authorization wrappers before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("proxy-backed non-ordinary wrappers must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("proxy-backed non-ordinary wrappers must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("proxy-backed non-ordinary wrappers must not inspect control evidence");
+      }
+    });
+    const nullPrototypeWrapper = Object.freeze(
+      Object.assign(Object.create(null) as Record<string, unknown>, {
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: throwingEvidence
+      })
+    );
+
+    class AuthorizationWrapper {
+      workerDeploymentClass = reservedLiveWorkerDeploymentClass;
+      controls = throwingEvidence;
+    }
+
+    const classInstanceWrapper = Object.freeze(new AuthorizationWrapper());
+    const proxyBackedNonOrdinaryWrappers = [nullPrototypeWrapper, classInstanceWrapper].map(
+      (target) =>
+        new Proxy(target, {
+          get: () => {
+            throw new Error("proxy-backed non-ordinary wrapper fields must not be read");
+          }
+        })
+    );
+
+    for (const input of proxyBackedNonOrdinaryWrappers) {
+      expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
+    }
+  });
+
   it("rejects built-in object authorization-wrapper impostors before inspecting controls", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       getPrototypeOf: () => {
