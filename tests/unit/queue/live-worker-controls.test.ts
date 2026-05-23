@@ -2097,6 +2097,43 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects proxy-backed collection controls evidence without inspecting object traps", () => {
+    const collectionControls = [
+      { name: "map", target: new Map([["0", implementedFrozenControls()[0]]]) },
+      { name: "set", target: new Set(implementedFrozenControls()) },
+      { name: "weakmap", target: new WeakMap([[implementedFrozenControls()[0], "implemented"]]) },
+      { name: "weakset", target: new WeakSet([implementedFrozenControls()[0]]) }
+    ];
+
+    for (const { name, target } of collectionControls) {
+      const proxyControls = new Proxy(target, {
+        get: () => {
+          throw new Error(`${name} proxy controls get trap must not be read`);
+        },
+        getPrototypeOf: () => {
+          throw new Error(`${name} proxy controls prototype trap must not be read`);
+        },
+        getOwnPropertyDescriptor: () => {
+          throw new Error(`${name} proxy controls descriptor trap must not be read`);
+        },
+        ownKeys: () => {
+          throw new Error(`${name} proxy controls keys trap must not be read`);
+        }
+      });
+
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, proxyControls)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, proxyControls)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects revoked proxy-backed array-prototype impostor controls evidence without throwing", () => {
     const arrayPrototypeImpostor = Object.create(Array.prototype) as Record<PropertyKey, unknown>;
     const { proxy: revokedProxyControls, revoke } = Proxy.revocable(arrayPrototypeImpostor, {
