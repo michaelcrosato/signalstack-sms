@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 576  GREEN  live-worker-inherited-entry-coercion  2026-05-23 10:40
+Objective:    Prove inherited `Object.prototype` coercion metadata cannot influence exact frozen live-worker control-entry evidence.
+Changed:
+- Added live-worker unit coverage showing exact frozen control entries authorize without invoking inherited `Object.prototype` `Symbol.toPrimitive`, `toString`, or `valueOf` metadata.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the inherited control-entry coercion metadata boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 575  GREEN  live-worker-inherited-array-coercion  2026-05-23 10:33
 Objective:    Prove inherited `Array.prototype` coercion metadata cannot influence exact frozen live-worker control-array evidence.
 Changed:

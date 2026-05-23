@@ -74,6 +74,7 @@ Control entries with own `Symbol.toStringTag`, `Symbol.toPrimitive`, `toString`,
 Control arrays with own `Symbol.toPrimitive`, `toString`, or `valueOf` metadata must deny without reading or invoking those hooks before the reserved worker class can authorize. Exact frozen control-array evidence must remain independent from inherited `Array.prototype` coercion metadata.
 malformed authorization wrapper input must deny without executing accessor-backed fields, and inherited `Object.prototype` wrapper accessors for `workerDeploymentClass` or `controls` must not be read while exact frozen wrapper evidence is evaluated.
 Inherited `Object.prototype` control-entry accessors for `id`, `status`, or `requirement` must not be read while exact frozen supplied control evidence is evaluated.
+Inherited `Object.prototype` control-entry coercion metadata, including `Symbol.toPrimitive`, `toString`, or `valueOf`, must not be invoked while exact frozen supplied control evidence is evaluated.
 Whitespace-padded deployment class evidence includes leading spaces, trailing spaces, tabs, newlines, carriage returns, CRLF pairs, vertical tabs, form feeds, invisible Unicode escape padding, and Unicode line/paragraph separator padding, and must deny before supplied controls are inspected.
 
 ## Non-Requirements For Current Demo Deployments

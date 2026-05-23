@@ -6213,6 +6213,70 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not invoke inherited control-entry coercion metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const objectPrototype = Object.prototype as {
+      [Symbol.toPrimitive]?: unknown;
+      toString?: unknown;
+      valueOf?: unknown;
+    };
+    const originalToPrimitiveDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, Symbol.toPrimitive);
+    const originalToStringDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "toString");
+    const originalValueOfDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "valueOf");
+
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperties(Object.prototype, {
+        [Symbol.toPrimitive]: {
+          configurable: true,
+          value: () => {
+            throw new Error("inherited control-entry Symbol.toPrimitive must not be invoked");
+          }
+        },
+        toString: {
+          configurable: true,
+          value: () => {
+            throw new Error("inherited control-entry toString must not be invoked");
+          }
+        },
+        valueOf: {
+          configurable: true,
+          value: () => {
+            throw new Error("inherited control-entry valueOf must not be invoked");
+          }
+        }
+      });
+
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalToPrimitiveDescriptor === undefined) {
+        delete objectPrototype[Symbol.toPrimitive];
+      } else {
+        Object.defineProperty(Object.prototype, Symbol.toPrimitive, originalToPrimitiveDescriptor);
+      }
+
+      if (originalToStringDescriptor === undefined) {
+        delete objectPrototype.toString;
+      } else {
+        Object.defineProperty(Object.prototype, "toString", originalToStringDescriptor);
+      }
+
+      if (originalValueOfDescriptor === undefined) {
+        delete objectPrototype.valueOf;
+      } else {
+        Object.defineProperty(Object.prototype, "valueOf", originalValueOfDescriptor);
+      }
+    }
+
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 
