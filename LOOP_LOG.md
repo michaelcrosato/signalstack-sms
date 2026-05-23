@@ -4974,3 +4974,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 555  GREEN  live-worker-proxy-platform-class  2026-05-23 08:25
+Objective:    Prove proxy-backed and revoked proxy-backed runtime-supported platform records cannot authorize the reserved live worker class as deployment-class evidence.
+Changed:
+- Added live-worker unit coverage showing proxy-backed Web-platform, WebAssembly, and Web Crypto deployment-class records deny without inspecting get, prototype, descriptor, or key traps.
+- Added revoked proxy-backed platform deployment-class coverage showing denial stays clean before supplied controls are inspected.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the proxy platform deployment-class boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

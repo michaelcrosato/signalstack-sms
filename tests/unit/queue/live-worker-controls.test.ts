@@ -3351,6 +3351,64 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects proxy-backed platform deployment class impostors before inspecting supplied controls", async () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("proxy-backed platform worker classes must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("proxy-backed platform worker classes must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("proxy-backed platform worker classes must not inspect control evidence");
+      }
+    });
+    const platformClassImpostors = [
+      ...webPlatformBuiltInTargets(),
+      ...webAssemblyBuiltInTargets(),
+      ...(await webCryptoBuiltInTargets())
+    ];
+    const proxyBackedPlatformClasses = platformClassImpostors.map(
+      (target) =>
+        new Proxy(target, {
+          get: () => {
+            throw new Error("proxy-backed platform worker class values must not be read");
+          },
+          getPrototypeOf: () => {
+            throw new Error("proxy-backed platform worker class prototypes must not be read");
+          },
+          getOwnPropertyDescriptor: () => {
+            throw new Error("proxy-backed platform worker class descriptors must not be read");
+          },
+          ownKeys: () => {
+            throw new Error("proxy-backed platform worker class keys must not be read");
+          }
+        })
+    );
+    const revokedPlatformClasses = platformClassImpostors.map((target) => {
+      const { proxy, revoke } = Proxy.revocable(target, {
+        get: () => {
+          throw new Error("revoked platform worker class values must not be read");
+        }
+      });
+      revoke();
+      return proxy;
+    });
+
+    for (const workerDeploymentClass of [...proxyBackedPlatformClasses, ...revokedPlatformClasses]) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects proxy-backed deployment class impostors before inspecting supplied controls", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {
