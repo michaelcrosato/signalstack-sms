@@ -14,7 +14,7 @@ This file is the handoff for the next automated loop. It should stay short enoug
 
 ## Current State
 
-- Latest run: Run 522 synchronizes top-level Codex handoff truth so new loop agents see the current Run 521 Date-shaped authorization-wrapper boundary first.
+- Latest run: Run 523 extends live-worker authorization-wrapper coverage to URL-shaped built-ins so `URL` and `URLSearchParams` evidence denies before supplied controls are inspected.
 - The backend foundation is strong: tenant helpers, contacts, campaigns, queue jobs, inbox, compliance gates, fake AI, local billing/analytics, provider metadata, Twilio webhook foundations, readiness audit, operations inventory, and validation gates.
 - The settings operations pages use compact related-link headers; keep those surfaces read-only and do not expand operations UI unless it directly supports release safety or product work.
 - The browser product now has an initial `/dashboard` shell, `/dashboard/contacts` list/import workflow with archived restore links, `/dashboard/contacts/:contactId` local detail/edit/archive/restore/merge workflow, `/dashboard/campaigns` compose/preflight/local schedule workflow, `/dashboard/campaigns/:campaignId` local draft edit and queued cancel workflow, `/dashboard/inbox` local thread workflow, `/dashboard/templates` local template create/list workflow, `/dashboard/templates/:templateId` local detail/edit workflow, `/dashboard/analytics` local overview detail, and `/dashboard/compliance` local readiness detail.
@@ -31,6 +31,7 @@ This file is the handoff for the next automated loop. It should stay short enoug
 - Revoked proxy-backed built-in authorization-wrapper impostor coverage proves revoked map, set, weak collection, typed array, data view, promise, boxed primitive, Date, RegExp, Error, WeakRef, and FinalizationRegistry wrapper evidence denies cleanly before supplied live-worker controls are inspected or built-in metadata can be used as fallback evidence.
 - Exact-field built-in authorization-wrapper coverage proves map, set, weak collection, array buffer, shared array buffer when runtime-supported, typed array, data view, promise, boxed primitive, Date, RegExp, Error, WeakRef, and FinalizationRegistry wrapper evidence with exact-looking frozen public data descriptors denies before supplied live-worker controls are inspected.
 - Reflection-trapped built-in authorization-wrapper coverage proves map, set, weak collection, array buffer, shared array buffer when runtime-supported, typed array, data view, promise, boxed primitive, Date, RegExp, Error, WeakRef, and FinalizationRegistry wrapper evidence denies cleanly without inspecting hostile supplied controls or letting descriptor, key, prototype, frozen-state, or get traps escape.
+- URL-shaped built-in authorization-wrapper coverage proves `URL` and `URLSearchParams` evidence denies in ordinary, exact-field frozen, proxy-backed, reflection-trapped, and revoked proxy-backed forms before supplied live-worker controls are inspected.
 
 ## Next Best Work
 

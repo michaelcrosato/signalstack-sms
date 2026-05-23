@@ -3701,6 +3701,8 @@ describe("production live campaign worker controls", () => {
       Object.freeze(Object.assign(new Date(0), wrapperFields)),
       Object.freeze(Object.assign(/production-live-campaign/, wrapperFields)),
       Object.freeze(Object.assign(new Error("production-live-campaign"), wrapperFields)),
+      Object.freeze(Object.assign(new URL("https://signalstack.local/production-live-campaign"), wrapperFields)),
+      Object.freeze(Object.assign(new URLSearchParams("workerDeploymentClass=production-live-campaign"), wrapperFields)),
       Object.freeze(Object.assign(new WeakRef(implementedFrozenControls()[0]), wrapperFields)),
       Object.freeze(Object.assign(new FinalizationRegistry(() => undefined), wrapperFields))
     ];
@@ -3756,6 +3758,8 @@ describe("production live campaign worker controls", () => {
       defineWrapperFields(new Date(0)),
       defineWrapperFields(/production-live-campaign/),
       defineWrapperFields(new Error("production-live-campaign")),
+      defineWrapperFields(new URL("https://signalstack.local/production-live-campaign")),
+      defineWrapperFields(new URLSearchParams("workerDeploymentClass=production-live-campaign")),
       defineWrapperFields(new WeakRef(implementedFrozenControls()[0])),
       defineWrapperFields(new FinalizationRegistry(() => undefined))
     ];
@@ -3800,6 +3804,8 @@ describe("production live campaign worker controls", () => {
       Object.assign(new Date(0), wrapperFields),
       Object.assign(/production-live-campaign/, wrapperFields),
       Object.assign(new Error("production-live-campaign"), wrapperFields),
+      Object.assign(new URL("https://signalstack.local/production-live-campaign"), wrapperFields),
+      Object.assign(new URLSearchParams("workerDeploymentClass=production-live-campaign"), wrapperFields),
       Object.assign(new WeakRef(implementedFrozenControls()[0]), wrapperFields),
       Object.assign(new FinalizationRegistry(() => undefined), wrapperFields)
     ].map(
@@ -3849,6 +3855,8 @@ describe("production live campaign worker controls", () => {
       Object.assign(new Date(0), wrapperFields),
       Object.assign(/production-live-campaign/, wrapperFields),
       Object.assign(new Error("production-live-campaign"), wrapperFields),
+      Object.assign(new URL("https://signalstack.local/production-live-campaign"), wrapperFields),
+      Object.assign(new URLSearchParams("workerDeploymentClass=production-live-campaign"), wrapperFields),
       Object.assign(new WeakRef(implementedFrozenControls()[0]), wrapperFields),
       Object.assign(new FinalizationRegistry(() => undefined), wrapperFields)
     ].map(
@@ -3910,6 +3918,8 @@ describe("production live campaign worker controls", () => {
       Object.assign(new Date(0), wrapperFields),
       Object.assign(/production-live-campaign/, wrapperFields),
       Object.assign(new Error("production-live-campaign"), wrapperFields),
+      Object.assign(new URL("https://signalstack.local/production-live-campaign"), wrapperFields),
+      Object.assign(new URLSearchParams("workerDeploymentClass=production-live-campaign"), wrapperFields),
       Object.assign(new WeakRef(implementedFrozenControls()[0]), wrapperFields),
       Object.assign(new FinalizationRegistry(() => undefined), wrapperFields)
     ].map((target) => {

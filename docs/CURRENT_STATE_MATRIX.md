@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 523 note: live-worker authorization now denies URL-shaped authorization-wrapper impostors, including `URL` and `URLSearchParams`, in ordinary, exact-field frozen, proxy-backed, reflection-trapped, and revoked proxy-backed forms before supplied controls are inspected.
+
 Run 522 note: top-level Codex handoff truth now leads with the current Run 521 Date-shaped authorization-wrapper boundary.
 
 Run 521 note: live-worker authorization now denies Date-shaped built-in authorization-wrapper impostors in ordinary, exact-field frozen, proxy-backed, reflection-trapped, and revoked proxy-backed forms before supplied controls are inspected.
@@ -60,7 +62,7 @@ Run 495 note: live-worker authorization now denies built-in object-shaped deploy
 
 Run 494 note: live-worker authorization now evaluates exact frozen control-entry evidence without reading inherited `Object.prototype` accessors for `id`, `status`, or `requirement`.
 
-Latest protected local gate for Run 522: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 548 tests, Playwright smoke, and build green.
+Latest protected local gate for Run 523: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 548 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 

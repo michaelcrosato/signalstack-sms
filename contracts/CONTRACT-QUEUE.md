@@ -29,6 +29,7 @@ Proxy-backed built-in authorization-wrapper impostors must deny before supplied 
 Reflection-trapped built-in authorization-wrapper impostors must deny cleanly before supplied controls are inspected and without descriptor, key, prototype, frozen-state, or get traps escaping.
 ArrayBuffer and, when available, SharedArrayBuffer authorization-wrapper impostors must deny in ordinary, exact-field frozen, proxy-backed, and revoked proxy-backed forms before supplied controls are inspected.
 Built-in authorization-wrapper impostors, including `Date` objects, with exact-looking frozen public data descriptors must still deny before supplied controls are inspected.
+URL-shaped authorization-wrapper impostors, including `URL` and `URLSearchParams`, must deny in ordinary, exact-field frozen, proxy-backed, reflection-trapped, and revoked proxy-backed forms before supplied controls are inspected.
 Revoked proxy-backed built-in authorization-wrapper impostors must deny cleanly before supplied controls are inspected or built-in metadata can be used as fallback evidence.
 Proxy-backed non-array `controls` evidence, including array buffers, shared array buffers, weak references, and finalization registries, must deny before object `get`, prototype, descriptor, or key traps are read. Revoked proxy-backed built-in `controls` evidence must deny cleanly without falling back to built-in control metadata.
 Exact frozen supplied control entries must also be evaluated from own descriptors without reading inherited `Object.prototype` accessors for `id`, `status`, or `requirement`.
