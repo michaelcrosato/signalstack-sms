@@ -1714,6 +1714,8 @@ describe("production live campaign worker controls", () => {
       Object.freeze(new String("implemented")),
       Object.freeze(new Number(productionLiveCampaignWorkerControls.length)),
       Object.freeze(new Boolean(true)),
+      Object.freeze(Object(Symbol("implemented-controls"))),
+      Object.freeze(Object(1n)),
       Object.freeze(new Date(0)),
       Object.freeze(/implemented/),
       Object.freeze(new Error("implemented controls")),
@@ -2079,31 +2081,42 @@ describe("production live campaign worker controls", () => {
   });
 
   it("rejects proxy-backed boxed primitive controls evidence without inspecting object traps", () => {
-    const proxyControls = new Proxy(new String("unsafe-controls"), {
-      get: () => {
-        throw new Error("boxed primitive proxy controls get trap must not be read");
-      },
-      getPrototypeOf: () => {
-        throw new Error("boxed primitive proxy controls prototype trap must not be read");
-      },
-      getOwnPropertyDescriptor: () => {
-        throw new Error("boxed primitive proxy controls descriptor trap must not be read");
-      },
-      ownKeys: () => {
-        throw new Error("boxed primitive proxy controls keys trap must not be read");
-      }
-    });
+    const proxyControlsEvidence = [
+      new String("unsafe-controls"),
+      new Number(productionLiveCampaignWorkerControls.length),
+      new Boolean(true),
+      Object(Symbol("unsafe-controls")),
+      Object(1n)
+    ].map(
+      (target) =>
+        new Proxy(target, {
+          get: () => {
+            throw new Error("boxed primitive proxy controls get trap must not be read");
+          },
+          getPrototypeOf: () => {
+            throw new Error("boxed primitive proxy controls prototype trap must not be read");
+          },
+          getOwnPropertyDescriptor: () => {
+            throw new Error("boxed primitive proxy controls descriptor trap must not be read");
+          },
+          ownKeys: () => {
+            throw new Error("boxed primitive proxy controls keys trap must not be read");
+          }
+        })
+    );
 
-    expect(() =>
-      liveWorkerDeploymentClassIsAuthorized(
-        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, proxyControls)
-      )
-    ).not.toThrow();
-    expect(
-      liveWorkerDeploymentClassIsAuthorized(
-        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, proxyControls)
-      )
-    ).toBe(false);
+    for (const proxyControls of proxyControlsEvidence) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, proxyControls)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, proxyControls)
+        )
+      ).toBe(false);
+    }
   });
 
   it("rejects proxy-backed built-in object controls evidence without inspecting object traps", () => {
@@ -2320,6 +2333,11 @@ describe("production live campaign worker controls", () => {
       new Error("unsafe controls"),
       new Map([["0", implementedFrozenControls()[0]]]),
       new Set(implementedFrozenControls()),
+      new String("unsafe-controls"),
+      new Number(productionLiveCampaignWorkerControls.length),
+      new Boolean(true),
+      Object(Symbol("unsafe-controls")),
+      Object(1n),
       Promise.resolve(implementedFrozenControls()),
       new URL("https://signalstack.local/unsafe-controls"),
       new URLSearchParams("controls=unsafe"),
