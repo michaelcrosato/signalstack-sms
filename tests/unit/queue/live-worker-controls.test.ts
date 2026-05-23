@@ -206,6 +206,29 @@ describe("production live campaign worker controls", () => {
     return targets;
   }
 
+  async function webCryptoBuiltInTargets() {
+    const subtle = globalThis.crypto?.subtle;
+    if (subtle === undefined) {
+      return [];
+    }
+
+    try {
+      return [
+        await subtle.generateKey(
+          {
+            name: "HMAC",
+            hash: "SHA-256"
+          },
+          false,
+          ["sign"]
+        )
+      ];
+    } catch {
+      // Runtime support varies; skip unsupported Web Crypto constructors.
+      return [];
+    }
+  }
+
   it("keeps the reserved production class outside the currently supported worker class list", () => {
     expect(reservedLiveWorkerDeploymentClass).toBe("production-live-campaign");
     expect(supportedWorkerDeploymentClasses).toEqual(["local-demo"]);
@@ -2561,6 +2584,81 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects runtime-supported Web Crypto controls evidence without authorizing", async () => {
+    const cryptoTargets = await webCryptoBuiltInTargets();
+
+    for (const controls of cryptoTargets) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, Object.freeze(controls))
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, Object.freeze(controls))
+        )
+      ).toBe(false);
+    }
+  });
+
+  it("rejects proxy-backed Web Crypto controls evidence without inspecting object traps", async () => {
+    const proxyControlsEvidence = (await webCryptoBuiltInTargets()).map(
+      (target) =>
+        new Proxy(target, {
+          get: () => {
+            throw new Error("web crypto proxy controls get trap must not be read");
+          },
+          getPrototypeOf: () => {
+            throw new Error("web crypto proxy controls prototype trap must not be read");
+          },
+          getOwnPropertyDescriptor: () => {
+            throw new Error("web crypto proxy controls descriptor trap must not be read");
+          },
+          ownKeys: () => {
+            throw new Error("web crypto proxy controls keys trap must not be read");
+          }
+        })
+    );
+
+    for (const controls of proxyControlsEvidence) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).toBe(false);
+    }
+  });
+
+  it("rejects revoked proxy-backed Web Crypto controls evidence without throwing", async () => {
+    const revokedProxyControlsEvidence = (await webCryptoBuiltInTargets()).map((target) => {
+      const { proxy, revoke } = Proxy.revocable(target, {
+        get: () => {
+          throw new Error("revoked web crypto proxy controls get trap must not be read");
+        }
+      });
+      revoke();
+      return proxy;
+    });
+
+    for (const controls of revokedProxyControlsEvidence) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects proxy-backed control evidence without throwing", () => {
     const implementedControls = implementedFrozenControls();
     const throwingArrayLengthDescriptorProxy = new Proxy([...implementedControls], {
@@ -3619,8 +3717,9 @@ describe("production live campaign worker controls", () => {
       hiddenSymbolExtraKeyWrapper,
       symbolKeyedPublicFieldWrapper
     ]) {
-      expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
-      expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
+      const authorizationInput = input as { workerDeploymentClass?: unknown; controls?: unknown };
+      expect(() => liveWorkerDeploymentClassIsAuthorized(authorizationInput)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(authorizationInput)).toBe(false);
     }
   });
 
@@ -4185,6 +4284,95 @@ describe("production live campaign worker controls", () => {
     for (const input of revokedProxyBackedBuiltInWrapperImpostors) {
       expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
       expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
+    }
+  });
+
+  it("rejects runtime-supported Web Crypto authorization-wrapper impostors before inspecting controls", async () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("web crypto wrapper impostors must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("web crypto wrapper impostors must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("web crypto wrapper impostors must not inspect control evidence");
+      }
+    });
+    const wrapperFields = {
+      workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+      controls: throwingEvidence
+    };
+
+    const ordinaryWrapperImpostors = (await webCryptoBuiltInTargets()).map((target) =>
+      Object.freeze(Object.assign(target, wrapperFields))
+    );
+    const exactFieldWrapperImpostors = (await webCryptoBuiltInTargets()).map((target) =>
+      Object.freeze(
+        Object.defineProperties(target, {
+          workerDeploymentClass: {
+            value: reservedLiveWorkerDeploymentClass,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          },
+          controls: {
+            value: throwingEvidence,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          }
+        })
+      )
+    );
+    const proxyBackedWrapperImpostors = (await webCryptoBuiltInTargets()).map(
+      (target) =>
+        new Proxy(Object.freeze(Object.assign(target, wrapperFields)), {
+          get: () => {
+            throw new Error("proxy-backed web crypto wrapper fields must not be read");
+          }
+        })
+    );
+    const reflectionTrappedWrapperImpostors = (await webCryptoBuiltInTargets()).map(
+      (target) =>
+        new Proxy(Object.assign(target, wrapperFields), {
+          get: () => {
+            throw new Error("reflection-trapped web crypto wrapper fields must not be read");
+          },
+          getPrototypeOf: () => {
+            throw new Error("reflection-trapped web crypto wrapper prototypes must not escape");
+          },
+          getOwnPropertyDescriptor: () => {
+            throw new Error("reflection-trapped web crypto wrapper descriptors must not escape");
+          },
+          ownKeys: () => {
+            throw new Error("reflection-trapped web crypto wrapper keys must not escape");
+          },
+          isExtensible: () => {
+            throw new Error("reflection-trapped web crypto wrapper frozen-state checks must not escape");
+          }
+        })
+    );
+    const revokedWrapperImpostors = (await webCryptoBuiltInTargets()).map((target) => {
+      const { proxy, revoke } = Proxy.revocable(Object.freeze(Object.assign(target, wrapperFields)), {
+        get: () => {
+          throw new Error("revoked web crypto wrapper fields must not be read");
+        }
+      });
+      revoke();
+      return proxy;
+    });
+
+    for (const input of [
+      ...ordinaryWrapperImpostors,
+      ...exactFieldWrapperImpostors,
+      ...proxyBackedWrapperImpostors,
+      ...reflectionTrappedWrapperImpostors,
+      ...revokedWrapperImpostors
+    ]) {
+      const authorizationInput = input as { workerDeploymentClass?: unknown; controls?: unknown };
+      expect(() => liveWorkerDeploymentClassIsAuthorized(authorizationInput)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(authorizationInput)).toBe(false);
     }
   });
 

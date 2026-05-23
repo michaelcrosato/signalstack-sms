@@ -1,5 +1,16 @@
 # Codex Summary
 
+Run number: 533
+
+- Extended live-worker unit coverage proving runtime-supported Web Crypto records cannot authorize the reserved `production-live-campaign` worker class.
+- Covered `CryptoKey` records when the runtime exposes Web Crypto, across controls-evidence and authorization-wrapper paths.
+- Covered ordinary, proxy-backed, and revoked-proxy controls evidence plus ordinary, exact-field, proxy-backed, reflection-trapped, and revoked-proxy authorization-wrapper inputs.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 100 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 552 tests, Playwright smoke, and build green.
+- No API handlers were executed; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 532
 
 - Extended live-worker unit coverage proving runtime-supported WebAssembly records cannot authorize the reserved `production-live-campaign` worker class.

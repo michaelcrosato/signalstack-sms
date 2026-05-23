@@ -4756,3 +4756,12 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+## Run 533  GREEN  live-worker-web-crypto-impostors  2026-05-23 06:19
+Objective:    Prove runtime-supported Web Crypto records cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing `CryptoKey` records deny as controls evidence and authorization-wrapper impostors before the reserved worker class can authorize.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the Web Crypto impostor boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
