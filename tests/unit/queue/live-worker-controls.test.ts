@@ -2051,11 +2051,19 @@ describe("production live campaign worker controls", () => {
     const taggedObjectClass = Object.freeze({
       [Symbol.toStringTag]: reservedLiveWorkerDeploymentClass
     });
+    const promiseClass = Object.freeze(Promise.resolve(reservedLiveWorkerDeploymentClass));
 
     for (const workerDeploymentClass of [
       Object.freeze(new Boolean(true)),
       Object.freeze(new Number(1)),
       Object.freeze(new Date(0)),
+      Object.freeze(new Map([["workerDeploymentClass", reservedLiveWorkerDeploymentClass]])),
+      Object.freeze(new Set([reservedLiveWorkerDeploymentClass])),
+      Object.freeze(new Uint8Array(0)),
+      Object.freeze(new DataView(new ArrayBuffer(8))),
+      promiseClass,
+      Object.freeze(/production-live-campaign/),
+      Object.freeze(new Error("production-live-campaign")),
       functionClass,
       taggedObjectClass
     ]) {
