@@ -6585,6 +6585,41 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not read inherited control-array concat-spreadable metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as Record<PropertyKey, unknown>;
+    const originalConcatSpreadableDescriptor = Object.getOwnPropertyDescriptor(
+      Array.prototype,
+      Symbol.isConcatSpreadable
+    );
+
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperty(Array.prototype, Symbol.isConcatSpreadable, {
+        configurable: true,
+        get: () => {
+          throw new Error("inherited control-array concat-spreadable metadata must not be read");
+        }
+      });
+
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalConcatSpreadableDescriptor === undefined) {
+        delete arrayPrototype[Symbol.isConcatSpreadable];
+      } else {
+        Object.defineProperty(Array.prototype, Symbol.isConcatSpreadable, originalConcatSpreadableDescriptor);
+      }
+    }
+
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 

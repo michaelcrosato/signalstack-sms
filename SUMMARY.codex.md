@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 585
+
+- Latest live-worker inherited control-array concat-spreadable coverage proves exact frozen `production-live-campaign` control-array evidence is evaluated without reading inherited `Array.prototype[Symbol.isConcatSpreadable]` metadata. Focused queue coverage passed with 147 tests, and the protected local gate passed with 59 Vitest files / 603 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 584
 
 - Latest live-worker inherited control-array unscopables coverage proves exact frozen `production-live-campaign` control-array evidence is evaluated without reading inherited `Array.prototype[Symbol.unscopables]` metadata. Focused unit coverage passed; the change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

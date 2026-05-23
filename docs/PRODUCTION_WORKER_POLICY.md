@@ -78,7 +78,7 @@ Inherited `Object.prototype` authorization-wrapper `Symbol.toStringTag` metadata
 Inherited `Object.prototype` control-entry accessors for `id`, `status`, or `requirement` must not be read while exact frozen supplied control evidence is evaluated.
 Inherited `Object.prototype` control-entry coercion metadata, including `Symbol.toPrimitive`, `toString`, or `valueOf`, must not be invoked while exact frozen supplied control evidence is evaluated.
 Inherited `Object.prototype` control-entry `Symbol.toStringTag` metadata must not be read while exact frozen supplied control evidence is evaluated.
-Inherited `Array.prototype` indexed accessors beyond the frozen checklist entries, inherited non-index string or symbol metadata, inherited constructor metadata, and inherited `Symbol.unscopables` metadata must not be read while exact frozen control-array evidence is evaluated.
+Inherited `Array.prototype` indexed accessors beyond the frozen checklist entries, inherited non-index string or symbol metadata, inherited constructor metadata, inherited `Symbol.unscopables` metadata, and inherited `Symbol.isConcatSpreadable` metadata must not be read while exact frozen control-array evidence is evaluated.
 Whitespace-padded deployment class evidence includes leading spaces, trailing spaces, tabs, newlines, carriage returns, CRLF pairs, vertical tabs, form feeds, invisible Unicode escape padding, and Unicode line/paragraph separator padding, and must deny before supplied controls are inspected.
 
 ## Non-Requirements For Current Demo Deployments
