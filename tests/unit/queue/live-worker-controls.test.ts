@@ -6725,6 +6725,46 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not read inherited control-array iteration method metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as Record<string, unknown>;
+    const metadataMethods = ["entries", "keys", "values"];
+    const originalDescriptors = metadataMethods.map((method) => ({
+      method,
+      descriptor: Object.getOwnPropertyDescriptor(Array.prototype, method)
+    }));
+
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      for (const method of metadataMethods) {
+        Object.defineProperty(Array.prototype, method, {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited control-array iteration method metadata must not be read");
+          }
+        });
+      }
+
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      for (const { method, descriptor } of originalDescriptors) {
+        if (descriptor === undefined) {
+          delete arrayPrototype[method];
+        } else {
+          Object.defineProperty(Array.prototype, method, descriptor);
+        }
+      }
+    }
+
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 

@@ -1,5 +1,17 @@
 # Codex Summary
 
+Run number: 589
+
+- Latest live-worker inherited control-array iteration-method coverage proves exact frozen `production-live-campaign` control-array evidence is evaluated without reading inherited `Array.prototype.entries`, `Array.prototype.keys`, or `Array.prototype.values` metadata. Focused queue coverage passed with 151 tests, and the protected local gate passed with 59 Vitest files / 607 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
+Run number: 588
+
+- Latest live-worker inherited control-array async-iterator coverage proves exact frozen `production-live-campaign` control-array evidence is evaluated without reading inherited `Array.prototype` `Symbol.asyncIterator` metadata. Focused queue coverage and the protected local gate passed. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 587
 
 - Latest live-worker own control-array tag coverage proves otherwise valid `production-live-campaign` control arrays with accessor-backed `Symbol.toStringTag` metadata deny without reading the getter. Focused queue coverage and the protected local gate passed. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
