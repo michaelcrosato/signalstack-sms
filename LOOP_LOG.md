@@ -4944,3 +4944,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 552  GREEN  live-worker-typed-array-family  2026-05-23 08:08
+Objective:    Prove every runtime-supported typed-array constructor cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing each runtime-supported typed-array constructor denies as direct `controls` evidence.
+- Added matching authorization-wrapper impostor coverage for the typed-array family before supplied controls can be inspected.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the typed-array family boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

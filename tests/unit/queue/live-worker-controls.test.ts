@@ -229,6 +229,30 @@ describe("production live campaign worker controls", () => {
     }
   }
 
+  function typedArrayBuiltInTargets() {
+    const targets: object[] = [
+      new Int8Array(0),
+      new Uint8Array(0),
+      new Uint8ClampedArray(0),
+      new Int16Array(0),
+      new Uint16Array(0),
+      new Int32Array(0),
+      new Uint32Array(0),
+      new Float32Array(0),
+      new Float64Array(0)
+    ];
+
+    if (typeof BigInt64Array !== "undefined") {
+      targets.push(new BigInt64Array(0));
+    }
+
+    if (typeof BigUint64Array !== "undefined") {
+      targets.push(new BigUint64Array(0));
+    }
+
+    return targets;
+  }
+
   it("keeps the reserved production class outside the currently supported worker class list", () => {
     expect(reservedLiveWorkerDeploymentClass).toBe("production-live-campaign");
     expect(supportedWorkerDeploymentClasses).toEqual(["local-demo"]);
@@ -2181,6 +2205,21 @@ describe("production live campaign worker controls", () => {
         frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, proxyControls)
       )
     ).toBe(false);
+  });
+
+  it("rejects every runtime-supported typed-array controls evidence variant", () => {
+    for (const controls of typedArrayBuiltInTargets()) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).toBe(false);
+    }
   });
 
   it("rejects proxy-backed data-view controls evidence without inspecting object traps", () => {
@@ -4579,6 +4618,31 @@ describe("production live campaign worker controls", () => {
     ];
 
     for (const input of builtInWrapperImpostors) {
+      expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
+    }
+  });
+
+  it("rejects every runtime-supported typed-array authorization-wrapper impostor before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("typed-array wrapper impostors must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("typed-array wrapper impostors must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("typed-array wrapper impostors must not inspect control evidence");
+      }
+    });
+    const wrapperFields = {
+      workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+      controls: throwingEvidence
+    };
+
+    for (const input of typedArrayBuiltInTargets().map((target) =>
+      Object.freeze(Object.assign(target, wrapperFields))
+    )) {
       expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
       expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
     }

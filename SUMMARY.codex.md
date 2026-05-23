@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 552
+
+- Tightened focused live-worker unit coverage proving every runtime-supported typed-array constructor cannot authorize the reserved `production-live-campaign` worker class as direct `controls` evidence.
+- Added matching authorization-wrapper impostor coverage for the typed-array family, with denial before hostile supplied controls can be inspected.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 117 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 569 tests, Playwright smoke, and build green.
+- No API handlers were executed by the focused test; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 551
 
 - Tightened focused live-worker unit coverage proving revoked proxy-backed runtime-supported Web Crypto records cannot authorize the reserved `production-live-campaign` worker class as `controls` evidence.
