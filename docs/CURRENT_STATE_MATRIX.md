@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 550 note: live-worker authorization now has focused coverage denying proxy-backed and revoked proxy-backed runtime-supported WebAssembly records as `controls` evidence before the reserved worker class can authorize.
+
 Run 549 note: live-worker authorization now has focused coverage denying runtime-supported WebAssembly records as `controls` evidence before the reserved worker class can authorize.
 
 Run 548 note: live-worker authorization now denies revoked proxy-backed runtime-supported Web-platform records as `controls` evidence before the reserved worker class can authorize, without throwing or falling back to built-in metadata.
@@ -114,11 +116,11 @@ Run 495 note: live-worker authorization now denies built-in object-shaped deploy
 
 Run 494 note: live-worker authorization now evaluates exact frozen control-entry evidence without reading inherited `Object.prototype` accessors for `id`, `status`, or `requirement`.
 
-Latest protected local gate for Run 549: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, Vitest, Playwright smoke, and build green.
+Latest protected local gate for Run 550: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 58 Vitest files / 567 tests, Playwright smoke, and build green.
 
 This document is the quick reality check for planning. It complements `PLAN.md` and does not replace `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 
-Tests/Gates addendum: mutating-route auth coverage now includes assigned and whole-parenthesized type-asserted or `satisfies` direct `Request` constructor and `Request.prototype` aliases, parenthesized and whole-parenthesized type-asserted `globalThis` root member access for `Request` and `Reflect`, parenthesized `satisfies` local/root `globalThis` aliases for reflective body-reader paths, plus type-asserted and `satisfies` destructured local-`globalThis` `Object`/`Reflect`/`Request` aliases before body-reader checks. Live-worker control coverage now proves inherited `Object.prototype` accessors cannot influence exact frozen wrapper or control-entry evidence, runtime-supported Web-platform records cannot authorize as ordinary, proxy-backed, or revoked proxy-backed controls evidence, and runtime-supported WebAssembly records cannot authorize as focused controls evidence.
+Tests/Gates addendum: mutating-route auth coverage now includes assigned and whole-parenthesized type-asserted or `satisfies` direct `Request` constructor and `Request.prototype` aliases, parenthesized and whole-parenthesized type-asserted `globalThis` root member access for `Request` and `Reflect`, parenthesized `satisfies` local/root `globalThis` aliases for reflective body-reader paths, plus type-asserted and `satisfies` destructured local-`globalThis` `Object`/`Reflect`/`Request` aliases before body-reader checks. Live-worker control coverage now proves inherited `Object.prototype` accessors cannot influence exact frozen wrapper or control-entry evidence, runtime-supported Web-platform records cannot authorize as ordinary, proxy-backed, or revoked proxy-backed controls evidence, and runtime-supported WebAssembly records cannot authorize as ordinary, proxy-backed, or revoked proxy-backed controls evidence.
 
 | Area | Backend/API State | Browser State | Main Gap | Next Action |
 | --- | --- | --- | --- | --- |

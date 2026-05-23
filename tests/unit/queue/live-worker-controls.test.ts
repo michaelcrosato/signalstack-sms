@@ -2721,6 +2721,73 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects proxy-backed WebAssembly controls evidence without inspecting object traps", () => {
+    const proxyControlsEvidence = webAssemblyBuiltInTargets().map(
+      (target) =>
+        new Proxy(target, {
+          get: () => {
+            throw new Error("webassembly proxy controls get trap must not be read");
+          },
+          getPrototypeOf: () => {
+            throw new Error("webassembly proxy controls prototype trap must not be read");
+          },
+          getOwnPropertyDescriptor: () => {
+            throw new Error("webassembly proxy controls descriptor trap must not be read");
+          },
+          ownKeys: () => {
+            throw new Error("webassembly proxy controls keys trap must not be read");
+          }
+        })
+    );
+
+    for (const controls of proxyControlsEvidence) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).toBe(false);
+    }
+  });
+
+  it("rejects revoked proxy-backed WebAssembly controls evidence without throwing", () => {
+    const revokedProxyControlsEvidence = webAssemblyBuiltInTargets().map((target) => {
+      const { proxy, revoke } = Proxy.revocable(target, {
+        get: () => {
+          throw new Error("revoked webassembly proxy controls get trap must not be read");
+        },
+        getPrototypeOf: () => {
+          throw new Error("revoked webassembly proxy controls prototype trap must not be read");
+        },
+        getOwnPropertyDescriptor: () => {
+          throw new Error("revoked webassembly proxy controls descriptor trap must not be read");
+        },
+        ownKeys: () => {
+          throw new Error("revoked webassembly proxy controls keys trap must not be read");
+        }
+      });
+      revoke();
+      return proxy;
+    });
+
+    for (const controls of revokedProxyControlsEvidence) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects runtime-supported Web Crypto controls evidence without authorizing", async () => {
     const cryptoTargets = await webCryptoBuiltInTargets();
 

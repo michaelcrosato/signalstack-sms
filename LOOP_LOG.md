@@ -4924,3 +4924,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 550  GREEN  live-worker-webassembly-proxy-controls  2026-05-23 07:55
+Objective:    Prove proxy-backed and revoked proxy-backed WebAssembly records cannot authorize the reserved live worker class as controls evidence.
+Changed:
+- Added live-worker unit coverage showing proxy-backed runtime-supported WebAssembly records deny without inspecting get, prototype, descriptor, or key traps.
+- Added revoked proxy-backed WebAssembly controls-evidence coverage showing denial stays clean and does not fall back to built-in metadata.
+- Updated NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the proxy-backed WebAssembly controls-evidence boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
