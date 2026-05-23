@@ -5743,6 +5743,51 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerDeploymentClassIsAuthorized(wrapper)).toBe(false);
   });
 
+  it("rejects authorization wrappers with inherited coercion hooks before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("inherited coercion wrapper metadata must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("inherited coercion wrapper metadata must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("inherited coercion wrapper metadata must not inspect control evidence");
+      }
+    });
+    const coercionPrototype = Object.freeze({
+      [Symbol.toPrimitive]: () => {
+        throw new Error("inherited wrapper Symbol.toPrimitive must not be invoked");
+      },
+      toString: () => {
+        throw new Error("inherited wrapper toString must not be invoked");
+      },
+      valueOf: () => {
+        throw new Error("inherited wrapper valueOf must not be invoked");
+      }
+    });
+    const wrapper = Object.freeze(
+      Object.defineProperties(Object.create(coercionPrototype) as Record<PropertyKey, unknown>, {
+        workerDeploymentClass: {
+          value: reservedLiveWorkerDeploymentClass,
+          enumerable: true,
+          writable: false,
+          configurable: false
+        },
+        controls: {
+          value: throwingEvidence,
+          enumerable: true,
+          writable: false,
+          configurable: false
+        }
+      })
+    );
+
+    expect(Object.isFrozen(wrapper)).toBe(true);
+    expect(() => liveWorkerDeploymentClassIsAuthorized(wrapper)).not.toThrow();
+    expect(liveWorkerDeploymentClassIsAuthorized(wrapper)).toBe(false);
+  });
+
   it("does not execute authorization wrapper get traps while denying unsupported classes", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       get: () => {

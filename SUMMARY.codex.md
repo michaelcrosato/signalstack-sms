@@ -1,5 +1,15 @@
 # Codex Summary
 
+Run number: 570
+
+- Tightened focused live-worker unit coverage proving authorization wrappers with inherited coercion hooks cannot authorize the reserved `production-live-campaign` worker class.
+- Covered denial before hostile supplied controls can be inspected, without invoking inherited `Symbol.toPrimitive`, `toString`, or `valueOf`.
+- Focused queue coverage passed: `npm run test -- tests/unit/queue/live-worker-controls.test.ts` with 132 tests.
+- Protected local gate passed on 2026-05-23: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 59 Vitest files / 588 tests, Playwright smoke, and build green.
+- No API handlers were executed by the focused test; no live SMS, email, notifications, billing provider calls, live provider calls, live AI, real secrets, destructive production database actions, hard deletion, worker execution, protected gate-script edits, or live feature enablement were used.
+
+## Previous Run
+
 Run number: 569
 
 - Tightened focused live-worker unit coverage proving revoked proxy-backed plain authorization wrappers cannot authorize the reserved `production-live-campaign` worker class.
