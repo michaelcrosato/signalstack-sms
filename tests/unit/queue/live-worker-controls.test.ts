@@ -1895,6 +1895,36 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects proxy-backed array-prototype impostor controls evidence without inspecting object traps", () => {
+    const arrayPrototypeImpostor = Object.create(Array.prototype) as Record<PropertyKey, unknown>;
+    const proxyControls = new Proxy(arrayPrototypeImpostor, {
+      get: () => {
+        throw new Error("array-prototype proxy controls get trap must not be read");
+      },
+      getPrototypeOf: () => {
+        throw new Error("array-prototype proxy controls prototype trap must not be read");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("array-prototype proxy controls descriptor trap must not be read");
+      },
+      ownKeys: () => {
+        throw new Error("array-prototype proxy controls keys trap must not be read");
+      }
+    });
+
+    expect(Array.isArray(arrayPrototypeImpostor)).toBe(false);
+    expect(() =>
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, proxyControls)
+      )
+    ).not.toThrow();
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, proxyControls)
+      )
+    ).toBe(false);
+  });
+
   it("rejects revoked proxy-backed non-array controls evidence without throwing", () => {
     const { proxy: revokedProxyControls, revoke } = Proxy.revocable(
       {

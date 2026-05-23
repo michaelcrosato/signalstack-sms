@@ -4049,3 +4049,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 503  GREEN  live-worker-array-prototype-proxy-controls  2026-05-23 02:45
+Objective:    Prove proxy-backed array-prototype impostor controls evidence cannot authorize the reserved live worker class.
+Changed:
+- Added live-worker unit coverage showing array-prototype impostor `controls` evidence wrapped in a proxy denies without reading `get`, prototype, descriptor, or key traps.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the proxy-backed array-prototype controls-evidence boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
