@@ -5294,3 +5294,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 587  GREEN  live-worker-own-array-tag  2026-05-23 11:48
+Objective:    Prove own accessor-backed `Symbol.toStringTag` metadata cannot authorize otherwise valid live-worker control arrays.
+Changed:
+- Added live-worker unit coverage showing otherwise valid control arrays with own accessor-backed `Symbol.toStringTag` metadata deny without reading the getter.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the own control-array tag boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

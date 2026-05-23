@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 587 note: live-worker authorization now denies own accessor-backed `Symbol.toStringTag` metadata on otherwise valid control arrays without reading the getter.
+
 Run 586 note: live-worker authorization now evaluates exact frozen control-array evidence without reading inherited `Array.prototype` string-method symbol metadata.
 
 Run 585 note: live-worker authorization now evaluates exact frozen control-array evidence without reading inherited `Array.prototype[Symbol.isConcatSpreadable]` metadata.
@@ -211,6 +213,8 @@ Run 582 note: live-worker authorization now proves exact frozen control-array ev
 Run 583 note: live-worker authorization now proves exact frozen control-array evidence is evaluated without reading inherited `Array.prototype.constructor` metadata.
 
 Run 584 note: live-worker authorization now proves exact frozen control-array evidence is evaluated without reading inherited `Array.prototype[Symbol.unscopables]` metadata.
+
+Run 587 note: live-worker authorization now denies own accessor-backed `Symbol.toStringTag` metadata on otherwise valid control arrays without reading the getter.
 
 Run 586 note: live-worker authorization now proves exact frozen control-array evidence is evaluated without reading inherited `Array.prototype` string-method symbol metadata.
 
