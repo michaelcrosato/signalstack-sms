@@ -1,6 +1,6 @@
 # Codex Summary
 
-Run number: 570
+Run number: 572
 
 - Tightened focused live-worker unit coverage proving authorization wrappers with inherited coercion hooks cannot authorize the reserved `production-live-campaign` worker class.
 - Covered denial before hostile supplied controls can be inspected, without invoking inherited `Symbol.toPrimitive`, `toString`, or `valueOf`.
@@ -4455,3 +4455,4 @@ Latest live-worker duplicate-entry-key coverage proves proxy-backed `production-
 - Latest live-worker inherited `Symbol.toStringTag` hardening proves supplied controls evidence and authorization-wrapper metadata with inherited tag accessors deny without reading those getters or inspecting hostile controls. Focused unit coverage passed; no workers, providers, billing, notifications, SMS, email, live AI, secrets, protected gate scripts, or destructive production actions were used.
 - Latest live-worker inherited deployment-class tag coverage proves object-shaped `workerDeploymentClass` evidence with inherited `Symbol.toStringTag` accessors denies before supplied controls are inspected and without reading the tag getter. Focused unit coverage passed; no workers, providers, billing, notifications, SMS, email, live AI, secrets, protected gate scripts, or destructive production actions were used.
 - Latest live-worker authorization-wrapper reflection-trap coverage proves wrapper prototype, descriptor, key, and frozen-state traps deny before hostile supplied controls are inspected. Focused unit coverage passed; the change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+- Latest live-worker authorization-wrapper tag metadata coverage proves wrappers with own accessor-backed `Symbol.toStringTag` metadata deny before hostile supplied controls are inspected and without reading the tag getter. Focused unit coverage and the protected local gate passed; the change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

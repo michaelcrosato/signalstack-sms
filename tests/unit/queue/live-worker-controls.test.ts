@@ -5701,6 +5701,40 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerDeploymentClassIsAuthorized(customPrototypeWrapper)).toBe(false);
   });
 
+  it("rejects own toStringTag authorization-wrapper metadata before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("own toStringTag wrapper metadata must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("own toStringTag wrapper metadata must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("own toStringTag wrapper metadata must not inspect control evidence");
+      }
+    });
+    const wrapper = Object.freeze(
+      Object.defineProperties(
+        {
+          workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+          controls: throwingEvidence
+        },
+        {
+          [Symbol.toStringTag]: {
+            enumerable: false,
+            get: () => {
+              throw new Error("own wrapper toStringTag getter must not be read");
+            }
+          }
+        }
+      )
+    );
+
+    expect(Object.isFrozen(wrapper)).toBe(true);
+    expect(() => liveWorkerDeploymentClassIsAuthorized(wrapper)).not.toThrow();
+    expect(liveWorkerDeploymentClassIsAuthorized(wrapper)).toBe(false);
+  });
+
   it("rejects inherited toStringTag authorization-wrapper metadata before inspecting controls", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       getPrototypeOf: () => {
