@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 651 note: live-worker authorization now denies own object-valued control-entry `Symbol.toStringTag`, `Symbol.toPrimitive`, `toString`, and `valueOf` metadata with hostile coercion hooks without invoking those hooks.
+
 Run 650 note: live-worker authorization now denies own object-valued control-array tag, iterator, well-known symbol, and array method-name metadata with hostile coercion hooks without invoking those hooks.
 
 Run 649 note: live-worker authorization now denies own object-valued control-array `Symbol.toPrimitive`, `toString`, or `valueOf` metadata with hostile coercion hooks without invoking those hooks.

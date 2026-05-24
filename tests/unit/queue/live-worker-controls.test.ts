@@ -3570,6 +3570,56 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects object-valued control-entry metadata without coercing it", () => {
+    const implementedControls = implementedFrozenControls();
+
+    for (const metadataName of [Symbol.toStringTag, Symbol.toPrimitive, "toString", "valueOf"] as const) {
+      const metadataObject = Object.freeze({
+        [Symbol.toPrimitive]: () => {
+          throw new Error(`control-entry ${String(metadataName)} metadata object must not use Symbol.toPrimitive`);
+        },
+        toString: () => {
+          throw new Error(`control-entry ${String(metadataName)} metadata object must not use toString`);
+        },
+        valueOf: () => {
+          throw new Error(`control-entry ${String(metadataName)} metadata object must not use valueOf`);
+        }
+      });
+
+      const metadataControls = Object.freeze([
+        Object.freeze(
+          Object.defineProperty({ ...implementedControls[0] }, metadataName, {
+            enumerable: false,
+            value: metadataObject
+          })
+        ),
+        ...implementedControls.slice(1)
+      ]);
+
+      expect(Object.isFrozen(metadataControls[0])).toBe(true);
+      expect(() => liveWorkerControlsAreFrozen(metadataControls)).not.toThrow();
+      expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(metadataControls)).not.toThrow();
+      expect(() => liveWorkerControlsExposeOnlyPublicFields(metadataControls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(metadataControls)).not.toThrow();
+      expect(liveWorkerControlsAreFrozen(metadataControls)).toBe(true);
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(metadataControls)).toBe(true);
+      expect(liveWorkerControlsExposeOnlyPublicFields(metadataControls)).toBe(false);
+      expect(liveWorkerControlsUseSupportedStatuses(metadataControls)).toBe(true);
+      expect(liveWorkerControlIdsMatchRequiredChecklist(metadataControls)).toBe(true);
+      expect(liveWorkerControlsAreImplemented(metadataControls)).toBe(false);
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, metadataControls)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, metadataControls)
+        )
+      ).toBe(false);
+    }
+  });
+
   it("rejects function-shaped controls evidence without invoking it", () => {
     const callableControls = Object.freeze(
       Object.assign(
