@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 704  GREEN  auth-computed-non-null-optional-request-aliases  2026-05-24 12:06
+Objective:    Keep mutating-route auth scanner coverage aligned with computed optional non-null `globalThis?.[requestConstructorName]!` Request constructor aliases.
+Changed:
+- Added focused auth unit coverage proving direct computed optional non-null, assigned type-asserted, and assigned `satisfies` `globalThis?.[requestConstructorName]!` aliases before `Request.prototype` body-reader calls are treated as body parsing before `requireApiRole`.
+- Updated scanner constructor-alias normalization so computed optional globalThis Request aliases may carry a non-null marker and whole-expression type assertion or `satisfies` wrapper before alias checks.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the computed non-null optional globalThis Request alias boundary.
+- Kept live SMS, billing, providers, workers, Redis, notifications, live AI, secrets, protected gate scripts, and destructive production actions untouched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 703  GREEN  auth-non-null-asserted-optional-request-aliases  2026-05-24 12:01
 Objective:    Keep mutating-route auth scanner coverage aligned with non-null optional `globalThis?.Request!` constructor aliases followed by type assertions or `satisfies`.
 Changed:

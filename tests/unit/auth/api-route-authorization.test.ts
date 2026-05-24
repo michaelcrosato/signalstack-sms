@@ -401,12 +401,14 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
     `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*\\(?\\s*Request\\s*\\)?(?:\\s+(?:as|satisfies)\\s+typeof\\s+Request)?\\s*(?=;|\\r?\\n)`,
     "g"
   );
+  const globalThisRequestConstructorAccessPattern = `${globalThisTargetWithOptionalTypeAssertionPattern()}\\s*(?:(?:\\.|\\?\\.)\\s*Request|(?:\\?\\.)?\\[\\s*${requestConstructorPropertyPattern()}\\s*\\])\\s*!?`;
+  const globalThisRequestConstructorAliasValuePattern = `\\(?\\s*${globalThisRequestConstructorAccessPattern}(?:\\s+(?:as|satisfies)\\s+typeof\\s+Request)?\\s*\\)?`;
   const requestConstructorAliasPattern = new RegExp(
-    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${globalThisTargetWithOptionalTypeAssertionPattern()}\\s*(?:(?:\\.|\\?\\.)\\s*Request|(?:\\?\\.)?\\[\\s*${requestConstructorPropertyPattern()}\\s*\\])(?:\\s+(?:as|satisfies)\\s+typeof\\s+Request)?${variableDeclaratorEnd}`,
+    `${variableDeclaratorStart}([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${globalThisRequestConstructorAliasValuePattern}${variableDeclaratorEnd}`,
     "g"
   );
   const assignedRequestConstructorAliasPattern = new RegExp(
-    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${globalThisTargetWithOptionalTypeAssertionPattern()}\\s*(?:(?:\\.|\\?\\.)\\s*Request|(?:\\?\\.)?\\[\\s*${requestConstructorPropertyPattern()}\\s*\\])(?:\\s+(?:as|satisfies)\\s+typeof\\s+Request)?\\s*(?=;|\\r?\\n)`,
+    `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${globalThisRequestConstructorAliasValuePattern}\\s*(?=;|\\r?\\n)`,
     "g"
   );
   const collectGlobalThisRequestAliases = (fields: string) =>
@@ -2593,6 +2595,38 @@ describe("API route authorization coverage", () => {
         return Response.json({ size: payload.size });
       }
     `;
+    const unsafeComputedNonNullOptionalGlobalThisRequestAliasSource = `
+      export async function POST(req: Request) {
+        const requestConstructorName = "Request" as const;
+        const RequestCtor = globalThis?.[requestConstructorName]!;
+        const payload = await RequestCtor.prototype.text.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeAssignedComputedNonNullOptionalGlobalThisRequestAliasSource = `
+      export async function PUT(req: Request) {
+        const requestConstructorName = "Request";
+        let RequestCtor;
+        RequestCtor = (globalThis?.[requestConstructorName]! as typeof Request);
+        const payload = await RequestCtor.prototype.arrayBuffer.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+    const unsafeAssignedComputedSatisfiesNonNullOptionalGlobalThisRequestAliasSource = `
+      export async function DELETE(req: Request) {
+        const requestConstructorName = "Request";
+        let RequestCtor;
+        RequestCtor = (globalThis?.[requestConstructorName]! satisfies typeof Request);
+        const payload = await RequestCtor.prototype.formData.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
     const unsafeComputedDestructuredGlobalThisRequestAliasSource = `
       export async function DELETE(req: Request) {
         const requestConstructorName = "Request";
@@ -2939,6 +2973,18 @@ describe("API route authorization coverage", () => {
       mutatingMethodParsesBodyBeforeRoleGate(unsafeNonNullOptionalBracketGlobalThisRequestAliasSource, "DELETE")
     ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedGlobalThisRequestAliasSource, "POST")).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedNonNullOptionalGlobalThisRequestAliasSource, "POST")
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedComputedNonNullOptionalGlobalThisRequestAliasSource, "PUT")
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeAssignedComputedSatisfiesNonNullOptionalGlobalThisRequestAliasSource,
+        "DELETE"
+      )
+    ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedDestructuredGlobalThisRequestAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedGlobalThisAliasRequestSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNestedParenthesizedGlobalThisAliasRequestSource, "PATCH")).toBe(true);
