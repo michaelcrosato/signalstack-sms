@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 606 note: live-worker authorization now evaluates exact frozen control-array evidence without invoking data-backed inherited `Array.prototype[Symbol.iterator]` metadata.
+
 Run 605 note: live-worker authorization now denies own data-backed callable `Symbol.toStringTag` metadata on otherwise valid control arrays without invoking the metadata function.
 
 Run 604 note: live-worker authorization now denies own data-backed callable `Symbol.asyncIterator` metadata on otherwise valid control arrays without invoking the async iterator function.

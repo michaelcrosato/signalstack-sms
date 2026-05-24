@@ -935,6 +935,41 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("does not invoke data-backed inherited array iterators while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as {
+      [Symbol.iterator]?: unknown;
+    };
+    const originalIteratorDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, Symbol.iterator);
+
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperty(Array.prototype, Symbol.iterator, {
+        configurable: true,
+        value: () => {
+          throw new Error("data-backed inherited control-array iterator must not be invoked");
+        },
+        writable: true
+      });
+
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalIteratorDescriptor === undefined) {
+        delete arrayPrototype[Symbol.iterator];
+      } else {
+        Object.defineProperty(Array.prototype, Symbol.iterator, originalIteratorDescriptor);
+      }
+    }
+
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("does not read inherited array async-iterator metadata while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const arrayPrototype = Array.prototype as unknown as Record<PropertyKey, unknown>;
