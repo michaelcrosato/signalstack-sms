@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 721 note: mutating-route auth scanner coverage now includes assigned default-initialized destructured `globalThis` `Request` constructor aliases, including `({ Request: RequestCtor = Request } = globalThis)` and `({ [requestConstructorName]: RequestCtor = Request } = globalThis)`, before `Request.prototype` body-reader calls, proving those body readers must remain after each route handler's own top-level `requireApiRole`.
+
 Run 720 note: mutating-route auth scanner coverage now includes default-initialized destructured `globalThis` `Request` constructor aliases, including `const { Request: RequestCtor = Request } = globalThis` and `const { [requestConstructorName]: RequestCtor = Request } = globalThis`, before `Request.prototype` body-reader calls, proving those body readers must remain after each route handler's own top-level `requireApiRole`.
 
 Run 719 note: mutating-route auth scanner coverage now includes default-initialized destructured `globalThis` `Object`/`Reflect` aliases, including `const { Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = globalThis` and `const { [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = globalThis`, before descriptor/prototype body-reader calls, proving those body readers must remain after each route handler's own top-level `requireApiRole`.
