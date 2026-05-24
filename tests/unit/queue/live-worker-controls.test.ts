@@ -7717,6 +7717,94 @@ describe("production live campaign worker controls", () => {
     expect(dataBackedAuthorizedResult!).toBe(true);
   });
 
+  it("does not read or invoke inherited Object prototype-accessor metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const objectPrototype = Object.prototype as Record<string, unknown>;
+    const originalProtoDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "__proto__");
+
+    let accessorIndexedEntriesResult: boolean;
+    let accessorFrozenResult: boolean;
+    let accessorFrozenDescriptorResult: boolean;
+    let accessorPublicFieldsResult: boolean;
+    let accessorSupportedStatusesResult: boolean;
+    let accessorChecklistResult: boolean;
+    let accessorImplementedResult: boolean;
+    let accessorAuthorizedResult: boolean;
+    let dataBackedIndexedEntriesResult: boolean;
+    let dataBackedFrozenResult: boolean;
+    let dataBackedFrozenDescriptorResult: boolean;
+    let dataBackedPublicFieldsResult: boolean;
+    let dataBackedSupportedStatusesResult: boolean;
+    let dataBackedChecklistResult: boolean;
+    let dataBackedImplementedResult: boolean;
+    let dataBackedAuthorizedResult: boolean;
+
+    try {
+      Object.defineProperty(Object.prototype, "__proto__", {
+        configurable: true,
+        get: () => {
+          throw new Error("inherited Object __proto__ metadata must not be read");
+        },
+        set: () => {
+          throw new Error("inherited Object __proto__ metadata must not be written");
+        }
+      });
+
+      accessorIndexedEntriesResult = liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls);
+      accessorFrozenResult = liveWorkerControlsAreFrozen(implementedControls);
+      accessorFrozenDescriptorResult = liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls);
+      accessorPublicFieldsResult = liveWorkerControlsExposeOnlyPublicFields(implementedControls);
+      accessorSupportedStatusesResult = liveWorkerControlsUseSupportedStatuses(implementedControls);
+      accessorChecklistResult = liveWorkerControlIdsMatchRequiredChecklist(implementedControls);
+      accessorImplementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      accessorAuthorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+
+      Object.defineProperty(Object.prototype, "__proto__", {
+        configurable: true,
+        value: () => {
+          throw new Error("data-backed inherited Object __proto__ metadata must not be invoked");
+        },
+        writable: true
+      });
+
+      dataBackedIndexedEntriesResult = liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls);
+      dataBackedFrozenResult = liveWorkerControlsAreFrozen(implementedControls);
+      dataBackedFrozenDescriptorResult = liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls);
+      dataBackedPublicFieldsResult = liveWorkerControlsExposeOnlyPublicFields(implementedControls);
+      dataBackedSupportedStatusesResult = liveWorkerControlsUseSupportedStatuses(implementedControls);
+      dataBackedChecklistResult = liveWorkerControlIdsMatchRequiredChecklist(implementedControls);
+      dataBackedImplementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      dataBackedAuthorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalProtoDescriptor === undefined) {
+        delete objectPrototype.__proto__;
+      } else {
+        Object.defineProperty(Object.prototype, "__proto__", originalProtoDescriptor);
+      }
+    }
+
+    expect(accessorIndexedEntriesResult!).toBe(true);
+    expect(accessorFrozenResult!).toBe(true);
+    expect(accessorFrozenDescriptorResult!).toBe(true);
+    expect(accessorPublicFieldsResult!).toBe(true);
+    expect(accessorSupportedStatusesResult!).toBe(true);
+    expect(accessorChecklistResult!).toBe(true);
+    expect(accessorImplementedResult!).toBe(true);
+    expect(accessorAuthorizedResult!).toBe(true);
+    expect(dataBackedIndexedEntriesResult!).toBe(true);
+    expect(dataBackedFrozenResult!).toBe(true);
+    expect(dataBackedFrozenDescriptorResult!).toBe(true);
+    expect(dataBackedPublicFieldsResult!).toBe(true);
+    expect(dataBackedSupportedStatusesResult!).toBe(true);
+    expect(dataBackedChecklistResult!).toBe(true);
+    expect(dataBackedImplementedResult!).toBe(true);
+    expect(dataBackedAuthorizedResult!).toBe(true);
+  });
+
   it("does not read inherited control-array index accessors while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const inheritedIndex = String(requiredControlIds.length);

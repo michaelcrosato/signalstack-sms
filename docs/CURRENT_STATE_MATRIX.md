@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 626 note: live-worker authorization now evaluates exact frozen evidence without reading or invoking inherited `Object.prototype.__proto__` prototype-accessor metadata.
+
 Run 625 note: live-worker authorization now evaluates exact frozen evidence without reading or invoking inherited `Object.prototype` legacy accessor-helper metadata.
 
 Run 624 note: live-worker authorization now evaluates exact frozen evidence without reading or invoking inherited `Object.prototype.constructor` metadata.
@@ -295,3 +297,5 @@ Run 587 note: live-worker authorization now denies own accessor-backed `Symbol.t
 Run 586 note: live-worker authorization now proves exact frozen control-array evidence is evaluated without reading inherited `Array.prototype` string-method symbol metadata.
 
 Run 585 note: live-worker authorization now proves exact frozen control-array evidence is evaluated without reading inherited `Array.prototype[Symbol.isConcatSpreadable]` metadata.
+
+Run 626 addendum: exact frozen live-worker evidence stays authorized without reading accessor-backed inherited `Object.prototype.__proto__` metadata or invoking data-backed inherited `Object.prototype.__proto__` metadata.
