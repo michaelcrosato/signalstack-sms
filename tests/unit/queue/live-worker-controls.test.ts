@@ -7557,6 +7557,56 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not invoke data-backed inherited control-array lookup method metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as Record<string, unknown>;
+    const metadataMethods = [
+      "at",
+      "includes",
+      "indexOf",
+      "lastIndexOf",
+      "find",
+      "findIndex",
+      "findLast",
+      "findLastIndex"
+    ];
+    const originalDescriptors = metadataMethods.map((method) => ({
+      method,
+      descriptor: Object.getOwnPropertyDescriptor(Array.prototype, method)
+    }));
+
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      for (const method of metadataMethods) {
+        Object.defineProperty(Array.prototype, method, {
+          configurable: true,
+          value: () => {
+            throw new Error("data-backed inherited control-array lookup method metadata must not be invoked");
+          },
+          writable: true
+        });
+      }
+
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      for (const { method, descriptor } of originalDescriptors) {
+        if (descriptor === undefined) {
+          delete arrayPrototype[method];
+        } else {
+          Object.defineProperty(Array.prototype, method, descriptor);
+        }
+      }
+    }
+
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("does not read inherited control-array every metadata while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const arrayPrototype = Array.prototype as unknown as {
