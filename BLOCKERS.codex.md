@@ -1,5 +1,10 @@
 # Codex Blockers
 
+Run number: 647
+
+- No blocker from own `constructor` control-array metadata live-worker coverage. Focused queue coverage passed with 210 tests, and the protected local gate passed with 59 Vitest files / 666 tests, Playwright smoke, and build green. The change adds local unit/docs/log coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+- No blocker from restoring root loop truth for Run 646; the existing docs log already recorded the prior green run and the root log now matches it.
+
 Run number: 646
 
 - No blocker from own `toLocaleString` control-array metadata live-worker coverage. Focused queue coverage passed with 209 tests, and the protected local gate passed with 59 Vitest files / 665 tests, Playwright smoke, and build green. The change adds local unit/docs/log coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.

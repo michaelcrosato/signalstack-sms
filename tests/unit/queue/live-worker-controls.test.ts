@@ -615,6 +615,54 @@ describe("production live campaign worker controls", () => {
     expect(metadataInvoked).toBe(false);
   });
 
+  it("rejects own constructor metadata on control arrays without reading or invoking it", () => {
+    const implementedControls = implementedFrozenControls();
+    let metadataRead = false;
+    let metadataInvoked = false;
+    const accessorMetadataControls = [...implementedControls];
+    Object.defineProperty(accessorMetadataControls, "constructor", {
+      enumerable: false,
+      get: () => {
+        metadataRead = true;
+        throw new Error("control-array constructor getter must not be read");
+      }
+    });
+    Object.freeze(accessorMetadataControls);
+    const dataBackedMetadataControls = [...implementedControls];
+    Object.defineProperty(dataBackedMetadataControls, "constructor", {
+      enumerable: false,
+      value: () => {
+        metadataInvoked = true;
+        throw new Error("control-array constructor metadata must not be invoked");
+      }
+    });
+    Object.freeze(dataBackedMetadataControls);
+
+    for (const controls of [accessorMetadataControls, dataBackedMetadataControls]) {
+      expect(Object.isFrozen(controls)).toBe(true);
+      expect(() => liveWorkerControlsAreFrozen(controls)).not.toThrow();
+      expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).not.toThrow();
+      expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(controls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).not.toThrow();
+      expect(liveWorkerControlsAreFrozen(controls)).toBe(true);
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).toBe(true);
+      expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(true);
+      expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(true);
+      expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(true);
+      expect(liveWorkerControlArrayExposesOnlyIndexedEntries(controls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).toBe(false);
+    }
+
+    expect(metadataRead).toBe(false);
+    expect(metadataInvoked).toBe(false);
+  });
+
   it("rejects own toStringTag metadata on control arrays without reading it", () => {
     const implementedControls = implementedFrozenControls();
     const taggedControls = [...implementedControls];
