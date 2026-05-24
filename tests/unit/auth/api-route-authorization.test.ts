@@ -5496,6 +5496,34 @@ describe("API route authorization coverage", () => {
         return Response.json({ payload });
       }
     `;
+    const unsafeTypeAssertedComputedDestructuredGlobalBuiltinsSource = `
+      export async function DELETE(req: Request) {
+        const objectName = "Object" as const;
+        const reflectName = ("Reflect");
+        const { [objectName]: ObjectBuiltin, [reflectName]: ReflectBuiltin } = (globalThis as typeof globalThis);
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "blob"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const unsafeSatisfiesComputedDestructuredGlobalBuiltinsSource = `
+      export async function PATCH(req: Request) {
+        const objectName = ("Object");
+        const reflectName = "Reflect" as const;
+        const { [objectName]: ObjectBuiltin, [reflectName]: ReflectBuiltin } = (globalThis satisfies typeof globalThis);
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "arrayBuffer"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
     const unsafeAssignedTypeAssertedDestructuredGlobalObjectSource = `
       export async function PATCH(req: Request) {
         let ObjectBuiltin;
@@ -5674,6 +5702,12 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedDestructuredGlobalObjectSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTypeAssertedDestructuredGlobalReflectSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSatisfiesDestructuredGlobalObjectSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTypeAssertedComputedDestructuredGlobalBuiltinsSource, "DELETE")).toBe(
+      true
+    );
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSatisfiesComputedDestructuredGlobalBuiltinsSource, "PATCH")).toBe(
+      true
+    );
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedTypeAssertedDestructuredGlobalObjectSource, "PATCH")).toBe(
       true
     );
