@@ -14,7 +14,8 @@ This file is the handoff for the next automated loop. It should stay short enoug
 
 ## Current State
 
-- Latest run: Run 694 added mutating-route auth scanner coverage for optional-bracket `globalThis?.["Request"]` constructor aliases before `Request.prototype` body-reader calls, proving those reads must remain after each handler's own top-level `requireApiRole`.
+- Latest run: Run 695 restored root/docs loop-log parity by adding the missing Run 694 entry to `docs/LOOP_LOG.md`; this was coordination-only and did not change product, provider, worker, billing, AI, secret, or live-impact behavior.
+- Run 694 added mutating-route auth scanner coverage for optional-bracket `globalThis?.["Request"]` constructor aliases before `Request.prototype` body-reader calls, proving those reads must remain after each handler's own top-level `requireApiRole`.
 - The backend foundation is strong: tenant helpers, contacts, campaigns, queue jobs, inbox, compliance gates, fake AI, local billing/analytics, provider metadata, Twilio webhook foundations, readiness audit, operations inventory, and validation gates.
 - The settings operations pages use compact related-link headers; keep those surfaces read-only and do not expand operations UI unless it directly supports release safety or product work.
 - The browser product now has an initial `/dashboard` shell, `/dashboard/contacts` list/import workflow with archived restore links, `/dashboard/contacts/:contactId` local detail/edit/archive/restore/merge workflow, `/dashboard/campaigns` compose/preflight/local schedule workflow, `/dashboard/campaigns/:campaignId` local draft edit and queued cancel workflow, `/dashboard/inbox` local thread workflow, `/dashboard/templates` local template create/list workflow, `/dashboard/templates/:templateId` local detail/edit workflow, `/dashboard/analytics` local overview detail, and `/dashboard/compliance` local readiness detail.

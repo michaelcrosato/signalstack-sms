@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 695  GREEN  loop-log-parity  2026-05-24 11:08
+Objective:    Restore root/docs loop-log parity after Run 694.
+Changed:
+- Added the missing Run 694 entry to `docs/LOOP_LOG.md` so both loop logs agree on the latest validated run.
+- Updated NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for this coordination-only parity pass.
+- Kept live SMS, billing, providers, workers, Redis, notifications, live AI, secrets, protected gate scripts, and destructive production actions untouched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 694  GREEN  auth-optional-bracket-globalthis-request-alias  2026-05-24 11:04
 Objective:    Keep mutating-route auth scanner coverage aligned with optional-bracket `globalThis?.["Request"]` constructor aliases.
 Changed:
