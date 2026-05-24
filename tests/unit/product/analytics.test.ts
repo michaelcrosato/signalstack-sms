@@ -1,7 +1,7 @@
 import { UsageEventType } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { getAnalyticsOverview } from "@/lib/analytics/overview";
-import { getProductAnalytics, productAnalyticsUsageRows } from "@/lib/product/analytics";
+import { getProductAnalytics, productAnalyticsMetricRows, productAnalyticsUsageRows } from "@/lib/product/analytics";
 
 vi.mock("@/lib/analytics/overview", () => ({
   getAnalyticsOverview: vi.fn()
@@ -47,6 +47,12 @@ describe("product analytics", () => {
       totalUsageEvents: 10,
       fakeAiUsagePercent: 10
     });
+    expect(analytics.metrics).toEqual([
+      { key: "consentCoverage", label: "Consent Coverage", value: "75%", detail: "3/4 opted in" },
+      { key: "campaigns", label: "Campaigns", value: 4, detail: "local campaign records" },
+      { key: "inboxLoad", label: "Inbox Load", value: 2, detail: "11 local messages" },
+      { key: "usageEvents", label: "Usage Events", value: 10, detail: "local metering only" }
+    ]);
     expect(analytics.usageRows).toEqual([
       { type: UsageEventType.CONTACT_IMPORTED, label: "Contacts imported", quantity: 4 },
       { type: UsageEventType.MESSAGE_INBOUND, label: "Inbound messages", quantity: 3 },
@@ -93,6 +99,28 @@ describe("product analytics", () => {
         fakeAiUsagePercent: 0
       }
     });
+  });
+
+  it("freezes product analytics metric metadata before rendering", () => {
+    expect(Object.isFrozen(productAnalyticsMetricRows)).toBe(true);
+    expect(productAnalyticsMetricRows.every((row) => Object.isFrozen(row))).toBe(true);
+    expect(productAnalyticsMetricRows.map((row) => row.key)).toEqual([
+      "consentCoverage",
+      "campaigns",
+      "inboxLoad",
+      "usageEvents"
+    ]);
+
+    expect(() => {
+      (productAnalyticsMetricRows as unknown as Array<{ key: string; label: string }>).push({
+        key: "unsafe",
+        label: "Unsafe"
+      });
+    }).toThrow(TypeError);
+    expect(() => {
+      (productAnalyticsMetricRows[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productAnalyticsMetricRows[0].label).toBe("Consent Coverage");
   });
 
   it("freezes product analytics usage row metadata before rendering", () => {

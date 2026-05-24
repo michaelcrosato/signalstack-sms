@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 685
+
+- Latest product analytics metric-row hardening exports frozen `productAnalyticsMetricRows` metadata, uses it for the `/dashboard/analytics` top cards, and focused product analytics coverage now proves caller-side mutation of consent coverage, campaign, inbox-load, or usage-event labels/order is rejected before analytics renders. Focused product analytics coverage and typecheck passed, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/UI/test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 684
 
 - Latest product dashboard signal-row hardening exports frozen `productDashboardSignalRows` metadata, uses it for the `/dashboard` analytics pills, and focused product dashboard coverage now proves caller-side mutation of consent coverage, opt-in rate, scheduled work, inbox load, fake-AI request, or local usage labels/order is rejected before the dashboard renders. Focused product dashboard coverage, typecheck, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/UI/test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.

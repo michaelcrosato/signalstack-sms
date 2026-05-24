@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 685 note: product analytics metric metadata is now frozen at both array and entry level, with unit coverage proving caller-side mutation cannot drift consent coverage, campaign, inbox-load, or usage-event labels/order before `/dashboard/analytics` renders top metric cards.
+
 Run 684 note: product dashboard local signal metadata is now frozen at both array and entry level, with unit coverage proving caller-side mutation cannot drift consent coverage, opt-in rate, scheduled work, inbox load, fake-AI request, or local usage labels/order before `/dashboard` renders analytics pills.
 
 Run 683 note: product dashboard header action metadata is now frozen at both array and entry level, with unit coverage proving caller-side mutation cannot drift the demo-console or settings links before `/dashboard` renders them.

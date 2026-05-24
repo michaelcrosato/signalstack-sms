@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 685  GREEN  product-analytics-metrics-freeze  2026-05-24 09:53
+Objective:    Keep product analytics top metric labels stable against caller-side mutation.
+Changed:
+- Added frozen `productAnalyticsMetricRows` metadata for the `/dashboard/analytics` top metric cards.
+- Updated `/dashboard/analytics` to render consent coverage, campaign, inbox-load, and usage-event cards from the frozen product projection.
+- Added product analytics unit coverage proving metric labels, order, values, and caller-side mutation rejection stay stable before rendering.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the analytics metric-row immutability boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 684  GREEN  product-dashboard-signals-freeze  2026-05-24 09:46
 Objective:    Keep product dashboard local signal labels stable against caller-side mutation.
 Changed:

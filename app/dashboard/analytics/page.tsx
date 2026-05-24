@@ -43,10 +43,9 @@ export default async function AnalyticsPage() {
 
       <div className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-6">
         <section aria-label="Analytics metrics" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Metric label="Consent Coverage" value={`${analytics.derived.consentCoveragePercent}%`} detail={`${analytics.contacts.optedIn}/${analytics.contacts.total} opted in`} />
-          <Metric label="Campaigns" value={analytics.campaigns.total} detail="local campaign records" />
-          <Metric label="Inbox Load" value={analytics.conversations.open} detail={`${analytics.messages.total} local messages`} />
-          <Metric label="Usage Events" value={analytics.derived.totalUsageEvents} detail="local metering only" />
+          {analytics.metrics.map((metric) => (
+            <Metric key={metric.key} label={metric.label} value={metric.value} detail={metric.detail} />
+          ))}
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">

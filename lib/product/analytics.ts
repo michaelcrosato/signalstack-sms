@@ -1,6 +1,19 @@
 import { UsageEventType } from "@prisma/client";
 import { getAnalyticsOverview } from "@/lib/analytics/overview";
 
+const productAnalyticsMetricRowItems = [
+  { key: "consentCoverage", label: "Consent Coverage" },
+  { key: "campaigns", label: "Campaigns" },
+  { key: "inboxLoad", label: "Inbox Load" },
+  { key: "usageEvents", label: "Usage Events" }
+] as const;
+
+type ProductAnalyticsMetricKey = (typeof productAnalyticsMetricRowItems)[number]["key"];
+
+export const productAnalyticsMetricRows = Object.freeze(
+  productAnalyticsMetricRowItems.map((row) => Object.freeze({ ...row }))
+);
+
 const productAnalyticsUsageRowItems = [
   { type: UsageEventType.CONTACT_IMPORTED, label: "Contacts imported" },
   { type: UsageEventType.MESSAGE_INBOUND, label: "Inbound messages" },
@@ -25,20 +38,40 @@ export async function getProductAnalytics(orgId: string) {
   const totalUsageEvents = Object.values(overview.usage).reduce((total, quantity) => total + quantity, 0);
   const fakeAiUsagePercent =
     totalUsageEvents > 0 ? Math.round((overview.usage[UsageEventType.AI_REQUEST] / totalUsageEvents) * 100) : 0;
+  const derived = {
+    consentCoveragePercent,
+    optedOutPercent:
+      overview.contacts.total > 0 ? Math.round((overview.contacts.optedOut / overview.contacts.total) * 100) : 0,
+    scheduledCampaignPercent,
+    resolvedConversationPercent,
+    averageMessagesPerConversation:
+      overview.conversations.total > 0 ? Number((overview.messages.total / overview.conversations.total).toFixed(1)) : 0,
+    totalUsageEvents,
+    fakeAiUsagePercent
+  };
+  const metricValues: Record<ProductAnalyticsMetricKey, { value: number | string; detail: string }> = {
+    consentCoverage: {
+      value: `${derived.consentCoveragePercent}%`,
+      detail: `${overview.contacts.optedIn}/${overview.contacts.total} opted in`
+    },
+    campaigns: { value: overview.campaigns.total, detail: "local campaign records" },
+    inboxLoad: { value: overview.conversations.open, detail: `${overview.messages.total} local messages` },
+    usageEvents: { value: derived.totalUsageEvents, detail: "local metering only" }
+  };
 
   return {
     ...overview,
-    derived: {
-      consentCoveragePercent,
-      optedOutPercent:
-        overview.contacts.total > 0 ? Math.round((overview.contacts.optedOut / overview.contacts.total) * 100) : 0,
-      scheduledCampaignPercent,
-      resolvedConversationPercent,
-      averageMessagesPerConversation:
-        overview.conversations.total > 0 ? Number((overview.messages.total / overview.conversations.total).toFixed(1)) : 0,
-      totalUsageEvents,
-      fakeAiUsagePercent
-    },
+    derived,
+    metrics: productAnalyticsMetricRows.map((row) => {
+      const metric = metricValues[row.key];
+
+      return {
+        key: row.key,
+        label: row.label,
+        value: metric.value,
+        detail: metric.detail
+      };
+    }),
     usageRows: productAnalyticsUsageRows.map((row) => ({
       type: row.type,
       label: row.label,
