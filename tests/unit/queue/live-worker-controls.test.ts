@@ -663,6 +663,59 @@ describe("production live campaign worker controls", () => {
     expect(metadataInvoked).toBe(false);
   });
 
+  it("rejects own constructor or toLocaleString object metadata on control arrays without coercing it", () => {
+    const implementedControls = implementedFrozenControls();
+    let metadataCoerced = false;
+    const hostileMetadataValue = Object.freeze({
+      [Symbol.toPrimitive]: () => {
+        metadataCoerced = true;
+        throw new Error("control-array metadata object must not use Symbol.toPrimitive");
+      },
+      toString: () => {
+        metadataCoerced = true;
+        throw new Error("control-array metadata object must not use toString");
+      },
+      valueOf: () => {
+        metadataCoerced = true;
+        throw new Error("control-array metadata object must not use valueOf");
+      }
+    });
+
+    for (const metadataName of ["constructor", "toLocaleString"]) {
+      const dataBackedObjectMetadataControls = [...implementedControls];
+      Object.defineProperty(dataBackedObjectMetadataControls, metadataName, {
+        enumerable: false,
+        value: hostileMetadataValue
+      });
+      Object.freeze(dataBackedObjectMetadataControls);
+
+      expect(Object.isFrozen(dataBackedObjectMetadataControls)).toBe(true);
+      expect(() => liveWorkerControlsAreFrozen(dataBackedObjectMetadataControls)).not.toThrow();
+      expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(dataBackedObjectMetadataControls)).not.toThrow();
+      expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(dataBackedObjectMetadataControls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(dataBackedObjectMetadataControls)).not.toThrow();
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, dataBackedObjectMetadataControls)
+        )
+      ).not.toThrow();
+      expect(liveWorkerControlsAreFrozen(dataBackedObjectMetadataControls)).toBe(true);
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(dataBackedObjectMetadataControls)).toBe(true);
+      expect(liveWorkerControlsExposeOnlyPublicFields(dataBackedObjectMetadataControls)).toBe(true);
+      expect(liveWorkerControlsUseSupportedStatuses(dataBackedObjectMetadataControls)).toBe(true);
+      expect(liveWorkerControlIdsMatchRequiredChecklist(dataBackedObjectMetadataControls)).toBe(true);
+      expect(liveWorkerControlArrayExposesOnlyIndexedEntries(dataBackedObjectMetadataControls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(dataBackedObjectMetadataControls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, dataBackedObjectMetadataControls)
+        )
+      ).toBe(false);
+    }
+
+    expect(metadataCoerced).toBe(false);
+  });
+
   it("rejects own toStringTag metadata on control arrays without reading it", () => {
     const implementedControls = implementedFrozenControls();
     const taggedControls = [...implementedControls];

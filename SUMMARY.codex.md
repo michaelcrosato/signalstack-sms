@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 648
+
+- Latest live-worker own `constructor`/`toLocaleString` object-valued control-array metadata coverage proves hostile coercion hooks deny without being invoked. Focused queue coverage passed with 211 tests, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local unit/docs/log coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 647
 
 - Latest live-worker own `constructor` control-array metadata coverage proves accessor-backed or data-backed metadata on otherwise valid supplied control arrays denies without being read or invoked. Focused queue coverage passed with 210 tests, and the protected local gate passed with 59 Vitest files / 666 tests, Playwright smoke, and build green. The change is local unit/docs/log coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 648 note: live-worker authorization now denies own object-valued control-array `constructor` or `toLocaleString` metadata with hostile coercion hooks without invoking those hooks.
+
 Run 647 note: live-worker authorization now denies own control-array `constructor` metadata backed by accessors or callable data values without reading or invoking that metadata, and root loop truth again includes the prior Run 646 entry.
 
 Run 646 note: live-worker authorization now denies own control-array `toLocaleString` metadata backed by accessors or callable data values without reading or invoking that metadata.
