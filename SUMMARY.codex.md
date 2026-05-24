@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 617
+
+- Latest live-worker inherited control-array data-backed constructor coverage proves exact frozen `production-live-campaign` control-array evidence authorizes without invoking data-backed inherited `Array.prototype.constructor` metadata. Focused queue coverage passed with 179 tests, and the protected local gate passed with 59 Vitest files / 635 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 616
 
 - Latest live-worker inherited control-array data-backed copy-helper coverage proves exact frozen `production-live-campaign` control-array evidence authorizes without invoking data-backed inherited `Array.prototype.toReversed`, `toSorted`, `toSpliced`, or `with` metadata. Focused queue coverage passed with 178 tests, and the protected local gate passed with 59 Vitest files / 634 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
