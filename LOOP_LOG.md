@@ -5346,3 +5346,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 592  GREEN  live-worker-inherited-array-transform-reducers  2026-05-23 21:08
+Objective:    Prove inherited `Array.prototype` transform/reducer metadata cannot influence exact frozen live-worker control-array evidence.
+Changed:
+- Added live-worker unit coverage showing exact frozen control-array evidence authorizes without reading inherited `Array.prototype.filter`, `flatMap`, `map`, `reduce`, or `reduceRight` metadata.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the inherited transform/reducer boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
