@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 702  GREEN  auth-non-null-optional-request-aliases  2026-05-24 11:52
+Objective:    Keep mutating-route auth scanner coverage aligned with non-null optional `globalThis?.Request!` constructor aliases.
+Changed:
+- Added focused auth unit coverage proving direct `const` and assigned `globalThis?.Request!` and `globalThis?.["Request"]!` aliases before `Request.prototype` body-reader calls are treated as body parsing before `requireApiRole`.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the non-null optional globalThis Request alias boundary.
+- Kept live SMS, billing, providers, workers, Redis, notifications, live AI, secrets, protected gate scripts, and destructive production actions untouched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 701  GREEN  auth-direct-optional-request-aliases  2026-05-24 11:46
 Objective:    Keep mutating-route auth scanner coverage aligned with direct `const` type-asserted and `satisfies` optional `globalThis` Request constructor aliases.
 Changed:

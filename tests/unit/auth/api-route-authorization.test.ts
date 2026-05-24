@@ -2438,6 +2438,26 @@ describe("API route authorization coverage", () => {
         return Response.json({ size: payload.size });
       }
     `;
+    const unsafeAssignedNonNullOptionalDotGlobalThisRequestAliasSource = `
+      export async function PUT(req: Request) {
+        let RequestCtor;
+        RequestCtor = globalThis?.Request!;
+        const payload = await RequestCtor.prototype.arrayBuffer.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+    const unsafeAssignedNonNullOptionalBracketGlobalThisRequestAliasSource = `
+      export async function DELETE(req: Request) {
+        let RequestCtor;
+        RequestCtor = globalThis?.["Request"]!;
+        const payload = await RequestCtor.prototype.json.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
     const unsafeOptionalDotGlobalThisRequestAliasSource = `
       export async function PATCH(req: Request) {
         const RequestCtor = globalThis?.Request;
@@ -2490,6 +2510,24 @@ describe("API route authorization coverage", () => {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
         if (roleResponse) return roleResponse;
         return Response.json({ payload });
+      }
+    `;
+    const unsafeNonNullOptionalDotGlobalThisRequestAliasSource = `
+      export async function PATCH(req: Request) {
+        const RequestCtor = globalThis?.Request!;
+        const payload = await RequestCtor.prototype.blob.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const unsafeNonNullOptionalBracketGlobalThisRequestAliasSource = `
+      export async function DELETE(req: Request) {
+        const RequestCtor = globalThis?.["Request"]!;
+        const payload = await RequestCtor.prototype.formData.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
       }
     `;
     const unsafeComputedGlobalThisRequestAliasSource = `
@@ -2797,6 +2835,12 @@ describe("API route authorization coverage", () => {
         "PATCH"
       )
     ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedNonNullOptionalDotGlobalThisRequestAliasSource, "PUT")
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedNonNullOptionalBracketGlobalThisRequestAliasSource, "DELETE")
+    ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalDotGlobalThisRequestAliasSource, "PATCH")).toBe(true);
     expect(
       mutatingMethodParsesBodyBeforeRoleGate(unsafeTypeAssertedOptionalDotGlobalThisRequestAliasSource, "PATCH")
@@ -2810,6 +2854,12 @@ describe("API route authorization coverage", () => {
     ).toBe(true);
     expect(
       mutatingMethodParsesBodyBeforeRoleGate(unsafeSatisfiesOptionalBracketGlobalThisRequestAliasSource, "DELETE")
+    ).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNonNullOptionalDotGlobalThisRequestAliasSource, "PATCH")).toBe(
+      true
+    );
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(unsafeNonNullOptionalBracketGlobalThisRequestAliasSource, "DELETE")
     ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedGlobalThisRequestAliasSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedDestructuredGlobalThisRequestAliasSource, "DELETE")).toBe(true);
