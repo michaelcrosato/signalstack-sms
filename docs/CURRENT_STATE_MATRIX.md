@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 717 note: mutating-route auth scanner coverage now includes assigned `satisfies` computed destructured `globalThis` `Object`/`Reflect` aliases, including `({ [objectName]: ObjectBuiltin, [reflectName]: ReflectBuiltin } = (globalThis satisfies typeof globalThis))`, before descriptor/prototype body-reader calls, proving those body readers must remain after each route handler's own top-level `requireApiRole`.
+
 Run 716 note: mutating-route auth scanner coverage now includes assigned type-asserted computed destructured `globalThis` `Object`/`Reflect` aliases, including `({ [objectName]: ObjectBuiltin, [reflectName]: ReflectBuiltin } = (globalThis as typeof globalThis))`, before descriptor/prototype body-reader calls, proving those body readers must remain after each route handler's own top-level `requireApiRole`.
 
 Run 715 note: mutating-route auth scanner coverage now includes assigned `satisfies` destructured `globalThis` `Object`/`Reflect` aliases, including `({ [objectName]: ObjectBuiltin, Reflect: ReflectBuiltin } = (globalThis satisfies typeof globalThis))`, before descriptor/prototype body-reader calls, proving those body readers must remain after each route handler's own top-level `requireApiRole`.
