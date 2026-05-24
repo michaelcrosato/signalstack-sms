@@ -6814,6 +6814,58 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not read inherited control-array every metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as {
+      every?: unknown;
+    };
+    const originalEveryDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, "every");
+
+    let exposesOnlyIndexedEntriesResult: boolean;
+    let frozenResult: boolean;
+    let frozenDescriptorResult: boolean;
+    let publicFieldsResult: boolean;
+    let supportedStatusesResult: boolean;
+    let checklistResult: boolean;
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperty(Array.prototype, "every", {
+        configurable: true,
+        get: () => {
+          throw new Error("inherited control-array every metadata must not be read");
+        }
+      });
+
+      exposesOnlyIndexedEntriesResult = liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls);
+      frozenResult = liveWorkerControlsAreFrozen(implementedControls);
+      frozenDescriptorResult = liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls);
+      publicFieldsResult = liveWorkerControlsExposeOnlyPublicFields(implementedControls);
+      supportedStatusesResult = liveWorkerControlsUseSupportedStatuses(implementedControls);
+      checklistResult = liveWorkerControlIdsMatchRequiredChecklist(implementedControls);
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalEveryDescriptor === undefined) {
+        delete arrayPrototype.every;
+      } else {
+        Object.defineProperty(Array.prototype, "every", originalEveryDescriptor);
+      }
+    }
+
+    expect(exposesOnlyIndexedEntriesResult!).toBe(true);
+    expect(frozenResult!).toBe(true);
+    expect(frozenDescriptorResult!).toBe(true);
+    expect(publicFieldsResult!).toBe(true);
+    expect(supportedStatusesResult!).toBe(true);
+    expect(checklistResult!).toBe(true);
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 

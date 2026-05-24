@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 591
+
+- No blocker from inherited control-array `every` metadata live-worker coverage. The first focused run exposed my attempted `for...of` loop regression against the existing inherited-iterator guard; the evaluator now uses index loops on authorization paths, the focused rerun passed with 153 tests, and the protected local gate passed with 59 Vitest files / 609 tests, Playwright smoke, and build green. The change adds local source/unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
 Run number: 590
 
 - No blocker from inherited control-array lookup-method metadata live-worker coverage. The first focused run exposed an inherited `Array.prototype.includes` dependency in status matching; the helper now uses exact status string comparisons, the focused rerun passed with 152 tests, and the protected local gate passed with 59 Vitest files / 608 tests, Playwright smoke, and build green. The change adds local source/unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.

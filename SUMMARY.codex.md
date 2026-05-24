@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 591
+
+- Latest live-worker inherited control-array `every` metadata coverage proves exact frozen `production-live-campaign` control-array evidence is evaluated without reading inherited `Array.prototype.every` metadata. The first focused run exposed my attempted `for...of` loop regression against the existing inherited-iterator guard; the evaluator now uses index loops on authorization paths. Focused queue coverage passed with 153 tests, and the protected local gate passed with 59 Vitest files / 609 tests, Playwright smoke, and build green. The change is local source/unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 590
 
 - Latest live-worker inherited control-array lookup-method coverage proves exact frozen `production-live-campaign` control-array evidence is evaluated without reading inherited `Array.prototype.at`, `Array.prototype.includes`, `Array.prototype.indexOf`, `Array.prototype.lastIndexOf`, `Array.prototype.find`, `Array.prototype.findIndex`, `Array.prototype.findLast`, or `Array.prototype.findLastIndex` metadata. The status matcher now uses exact string comparisons instead of `Array.prototype.includes`, focused queue coverage passed with 152 tests, and the protected local gate passed with 59 Vitest files / 608 tests, Playwright smoke, and build green. The change is local source/unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

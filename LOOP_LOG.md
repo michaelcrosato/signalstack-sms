@@ -5335,3 +5335,14 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 591  GREEN  live-worker-inherited-array-every  2026-05-23 21:00
+Objective:    Prove inherited `Array.prototype.every` metadata cannot influence exact frozen live-worker control-array evidence.
+Changed:
+- Added live-worker unit coverage showing exact frozen control-array evidence authorizes without reading inherited `Array.prototype.every` metadata.
+- Replaced inherited `.every` and `for...of` use on live-worker authorization paths with explicit index loops after the first focused run exposed the iterator dependency.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the inherited array `every` boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

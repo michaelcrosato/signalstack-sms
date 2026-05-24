@@ -155,6 +155,20 @@ function isLiveWorkerControlStatus(status: unknown): status is LiveWorkerControl
   return status === "planned" || status === "implemented";
 }
 
+function propertyKeysMatchExactly(actual: readonly PropertyKey[], expected: readonly PropertyKey[]) {
+  if (actual.length !== expected.length) {
+    return false;
+  }
+
+  for (let index = 0; index < expected.length; index += 1) {
+    if (actual[index] !== expected[index]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 function controlArrayIsDense(controls: readonly LiveWorkerControl[]) {
   const length = arrayLengthFromDescriptor(controls);
   if (length === null) {
@@ -199,7 +213,7 @@ export function liveWorkerControlArrayExposesOnlyIndexedEntries(controls: unknow
   const expectedKeys = Array.from({ length: length + 1 }, (_, index) =>
     index === length ? "length" : String(index)
   );
-  if (ownKeys.length !== expectedKeys.length || !expectedKeys.every((key, index) => ownKeys[index] === key)) {
+  if (!propertyKeysMatchExactly(ownKeys, expectedKeys)) {
     return false;
   }
 
@@ -224,15 +238,22 @@ export function liveWorkerControlIdsMatchRequiredChecklist(controls: unknown) {
     return false;
   }
 
-  return (
-    controlValues.length === requiredLiveWorkerControlIds.length &&
-    controlValues.every(
-      (control, index) =>
-        isControlRecord(control) &&
-        controlDataFieldValue(control, "id") === requiredLiveWorkerControlIds[index] &&
-        controlDataFieldValue(control, "requirement") === requiredLiveWorkerControlRequirements[index]
-    )
-  );
+  if (controlValues.length !== requiredLiveWorkerControlIds.length) {
+    return false;
+  }
+
+  for (let index = 0; index < controlValues.length; index += 1) {
+    const control = controlValues[index];
+    if (
+      !isControlRecord(control) ||
+      controlDataFieldValue(control, "id") !== requiredLiveWorkerControlIds[index] ||
+      controlDataFieldValue(control, "requirement") !== requiredLiveWorkerControlRequirements[index]
+    ) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 export function liveWorkerControlsExposeOnlyPublicFields(controls: unknown) {
@@ -241,7 +262,8 @@ export function liveWorkerControlsExposeOnlyPublicFields(controls: unknown) {
     return false;
   }
 
-  return controlValues.every((control) => {
+  for (let controlIndex = 0; controlIndex < controlValues.length; controlIndex += 1) {
+    const control = controlValues[controlIndex];
     if (!isControlRecord(control)) {
       return false;
     }
@@ -251,19 +273,20 @@ export function liveWorkerControlsExposeOnlyPublicFields(controls: unknown) {
       return false;
     }
 
-    return (
-      ownKeys.length === liveWorkerControlPublicFields.length &&
-      liveWorkerControlPublicFields.every((field, index) => {
-        const descriptor = safeGetOwnPropertyDescriptor(control, field);
-        return (
-          ownKeys[index] === field &&
-          descriptor !== undefined &&
-          "value" in descriptor &&
-          descriptor.enumerable === true
-        );
-      })
-    );
-  });
+    if (!propertyKeysMatchExactly(ownKeys, liveWorkerControlPublicFields)) {
+      return false;
+    }
+
+    for (let fieldIndex = 0; fieldIndex < liveWorkerControlPublicFields.length; fieldIndex += 1) {
+      const field = liveWorkerControlPublicFields[fieldIndex];
+      const descriptor = safeGetOwnPropertyDescriptor(control, field);
+      if (descriptor === undefined || !("value" in descriptor) || descriptor.enumerable !== true) {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 export function liveWorkerControlsUseSupportedStatuses(controls: unknown) {
@@ -272,11 +295,14 @@ export function liveWorkerControlsUseSupportedStatuses(controls: unknown) {
     return false;
   }
 
-  return controlValues.every(
-    (control) =>
-      isControlRecord(control) &&
-      isLiveWorkerControlStatus(controlDataFieldValue(control, "status"))
-  );
+  for (let controlIndex = 0; controlIndex < controlValues.length; controlIndex += 1) {
+    const control = controlValues[controlIndex];
+    if (!isControlRecord(control) || !isLiveWorkerControlStatus(controlDataFieldValue(control, "status"))) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 export function liveWorkerControlsAreFrozen(controls: unknown) {
@@ -286,7 +312,18 @@ export function liveWorkerControlsAreFrozen(controls: unknown) {
   }
 
   const controlArray = controls as readonly LiveWorkerControl[];
-  return safeIsFrozen(controlArray) && controlValues.every((control) => isControlRecord(control) && safeIsFrozen(control));
+  if (!safeIsFrozen(controlArray)) {
+    return false;
+  }
+
+  for (let controlIndex = 0; controlIndex < controlValues.length; controlIndex += 1) {
+    const control = controlValues[controlIndex];
+    if (!isControlRecord(control) || !safeIsFrozen(control)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 function descriptorIsFrozenDataField(
@@ -319,15 +356,21 @@ export function liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls: unk
     }
   }
 
-  return controlValues.every((control) => {
+  for (let controlIndex = 0; controlIndex < controlValues.length; controlIndex += 1) {
+    const control = controlValues[controlIndex];
     if (!isControlRecord(control)) {
       return false;
     }
 
-    return liveWorkerControlPublicFields.every((field) =>
-      descriptorIsFrozenDataField(safeGetOwnPropertyDescriptor(control, field), { enumerable: true })
-    );
-  });
+    for (let fieldIndex = 0; fieldIndex < liveWorkerControlPublicFields.length; fieldIndex += 1) {
+      const field = liveWorkerControlPublicFields[fieldIndex];
+      if (!descriptorIsFrozenDataField(safeGetOwnPropertyDescriptor(control, field), { enumerable: true })) {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 export function liveWorkerControlsAreImplemented(controls: unknown = productionLiveCampaignWorkerControls) {
@@ -335,17 +378,30 @@ export function liveWorkerControlsAreImplemented(controls: unknown = productionL
     return false;
   }
 
-  return (
-    liveWorkerControlsAreFrozen(controls) &&
-    liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls) &&
-    liveWorkerControlArrayExposesOnlyIndexedEntries(controls) &&
-    liveWorkerControlsExposeOnlyPublicFields(controls) &&
-    liveWorkerControlsUseSupportedStatuses(controls) &&
-    liveWorkerControlIdsMatchRequiredChecklist(controls) &&
-    liveWorkerControlArrayValues(controls)?.every(
-      (control) => controlDataFieldValue(control, "status") === "implemented"
-    ) === true
-  );
+  if (
+    !liveWorkerControlsAreFrozen(controls) ||
+    !liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls) ||
+    !liveWorkerControlArrayExposesOnlyIndexedEntries(controls) ||
+    !liveWorkerControlsExposeOnlyPublicFields(controls) ||
+    !liveWorkerControlsUseSupportedStatuses(controls) ||
+    !liveWorkerControlIdsMatchRequiredChecklist(controls)
+  ) {
+    return false;
+  }
+
+  const controlValues = liveWorkerControlArrayValues(controls);
+  if (controlValues === null) {
+    return false;
+  }
+
+  for (let controlIndex = 0; controlIndex < controlValues.length; controlIndex += 1) {
+    const control = controlValues[controlIndex];
+    if (controlDataFieldValue(control, "status") !== "implemented") {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 function authorizationInputDataFieldValue(input: unknown, field: "workerDeploymentClass" | "controls") {
@@ -371,10 +427,19 @@ function authorizationInputExposesOnlyPublicFields(input: unknown) {
     return false;
   }
 
-  return liveWorkerAuthorizationPublicFields.every((field, index) => {
+  if (!propertyKeysMatchExactly(ownKeys, liveWorkerAuthorizationPublicFields)) {
+    return false;
+  }
+
+  for (let fieldIndex = 0; fieldIndex < liveWorkerAuthorizationPublicFields.length; fieldIndex += 1) {
+    const field = liveWorkerAuthorizationPublicFields[fieldIndex];
     const descriptor = safeGetOwnPropertyDescriptor(input, field);
-    return ownKeys[index] === field && descriptorIsFrozenDataField(descriptor, { enumerable: true });
-  });
+    if (!descriptorIsFrozenDataField(descriptor, { enumerable: true })) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 export function liveWorkerDeploymentClassIsAuthorized(input: {
