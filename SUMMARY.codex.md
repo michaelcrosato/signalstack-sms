@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 597
+
+- Latest live-worker own control-array method-name metadata coverage proves otherwise valid `production-live-campaign` control arrays with accessor-backed `entries`, `keys`, `values`, lookup, transform/reducer, mutator/visitor, and copy-helper method-name metadata deny without reading getters. Focused queue coverage passed with 159 tests, and the protected local gate passed with 59 Vitest files / 615 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 596
 
 - Latest live-worker own control-array well-known symbol metadata coverage proves otherwise valid `production-live-campaign` control arrays with accessor-backed `Symbol.unscopables`, `Symbol.isConcatSpreadable`, and string-method symbol metadata deny without reading getters. Focused queue coverage passed with 158 tests, and the protected local gate passed with 59 Vitest files / 614 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

@@ -589,6 +589,77 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects own array method-name metadata on control arrays without reading it", () => {
+    const implementedControls = implementedFrozenControls();
+    const methodMetadataControls = [...implementedControls];
+    const metadataMethods = [
+      "entries",
+      "keys",
+      "values",
+      "at",
+      "includes",
+      "indexOf",
+      "lastIndexOf",
+      "find",
+      "findIndex",
+      "findLast",
+      "findLastIndex",
+      "every",
+      "filter",
+      "flatMap",
+      "map",
+      "reduce",
+      "reduceRight",
+      "concat",
+      "copyWithin",
+      "fill",
+      "flat",
+      "forEach",
+      "join",
+      "pop",
+      "push",
+      "reverse",
+      "shift",
+      "slice",
+      "some",
+      "sort",
+      "splice",
+      "unshift",
+      "toReversed",
+      "toSorted",
+      "toSpliced",
+      "with"
+    ];
+
+    for (const method of metadataMethods) {
+      Object.defineProperty(methodMetadataControls, method, {
+        enumerable: false,
+        get: () => {
+          throw new Error("own control-array method-name metadata must not be read");
+        }
+      });
+    }
+    Object.freeze(methodMetadataControls);
+
+    expect(Object.isFrozen(methodMetadataControls)).toBe(true);
+    expect(() => liveWorkerControlsAreFrozen(methodMetadataControls)).not.toThrow();
+    expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(methodMetadataControls)).not.toThrow();
+    expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(methodMetadataControls)).not.toThrow();
+    expect(() => liveWorkerControlsAreImplemented(methodMetadataControls)).not.toThrow();
+    expect(liveWorkerControlsAreFrozen(methodMetadataControls)).toBe(true);
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(methodMetadataControls)).toBe(true);
+    expect(liveWorkerControlsExposeOnlyPublicFields(methodMetadataControls)).toBe(true);
+    expect(liveWorkerControlsUseSupportedStatuses(methodMetadataControls)).toBe(true);
+    expect(liveWorkerControlIdsMatchRequiredChecklist(methodMetadataControls)).toBe(true);
+    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(methodMetadataControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(methodMetadataControls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, methodMetadataControls)
+      )
+    ).toBe(false);
+  });
+
   it("does not invoke inherited array iterators while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const originalIteratorDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, Symbol.iterator);
