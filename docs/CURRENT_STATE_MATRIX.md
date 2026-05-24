@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 672 note: product inbox metric metadata is now frozen at both array and entry level, with unit coverage proving caller-side metric label/order mutation is rejected before `/dashboard/inbox` renders total, open, resolved, and recent-inbound thread metrics.
+
 Run 671 note: product campaign metric metadata is now frozen at both array and entry level, with unit coverage proving caller-side metric label/order mutation is rejected before `/dashboard/campaigns` renders total, draft, scheduled, and ready-recipient metrics.
 
 Run 670 note: product contact metric metadata is now frozen at both array and entry level, with unit coverage proving caller-side metric label/order mutation is rejected before `/dashboard/contacts` renders active, consent, and archived contact metrics.

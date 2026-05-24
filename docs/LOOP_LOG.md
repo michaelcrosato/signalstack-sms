@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 672  GREEN  product-inbox-metrics-deep-freeze  2026-05-24 08:24
+Objective:    Keep product inbox metric metadata stable against caller-side label or order mutation.
+Changed:
+- Exported frozen `productInboxMetricRows` metadata and deep-froze each inbox metric row.
+- Updated `/dashboard/inbox` to render total, open, resolved, and recent-inbound metric cards from the frozen projection.
+- Added product inbox unit coverage proving the metric metadata array and each row are frozen before `/dashboard/inbox` renders local thread metrics.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 671  GREEN  product-campaign-metrics-deep-freeze  2026-05-24 08:17
 Objective:    Keep product campaign metric metadata stable against caller-side label or order mutation.
 Changed:

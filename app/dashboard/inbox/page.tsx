@@ -43,10 +43,9 @@ export default async function InboxPage() {
 
       <div className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-6">
         <section aria-label="Inbox metrics" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Metric label="Total Threads" value={inbox.summary.total} />
-          <Metric label="Open Threads" value={inbox.summary.open} />
-          <Metric label="Resolved Threads" value={inbox.summary.resolved} />
-          <Metric label="Recent Inbound" value={inbox.summary.inboundMessages} />
+          {inbox.metrics.map((metric) => (
+            <Metric key={metric.key} label={metric.label} value={metric.value} />
+          ))}
         </section>
 
         <InboxWorkspace

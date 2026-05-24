@@ -1,6 +1,17 @@
 import { ConversationStatus } from "@prisma/client";
 import { listConversations, listConversationMessages } from "@/lib/db/repositories/inbox";
 
+const productInboxMetricRowItems = [
+  { key: "total", label: "Total Threads" },
+  { key: "open", label: "Open Threads" },
+  { key: "resolved", label: "Resolved Threads" },
+  { key: "inboundMessages", label: "Recent Inbound" }
+] as const;
+
+export const productInboxMetricRows = Object.freeze(
+  productInboxMetricRowItems.map((row) => Object.freeze({ ...row }))
+);
+
 function contactName(contact: {
   displayName?: string | null;
   firstName?: string | null;
@@ -19,19 +30,25 @@ export async function getProductInbox(orgId: string) {
   const conversations = await listConversations(orgId);
   const selectedConversation = conversations[0] ?? null;
   const messages = selectedConversation ? await listConversationMessages(orgId, selectedConversation.id) : [];
+  const summary = {
+    total: conversations.length,
+    open: conversations.filter((conversation) => conversation.status === ConversationStatus.OPEN).length,
+    resolved: conversations.filter((conversation) => conversation.status === ConversationStatus.RESOLVED).length,
+    inboundMessages: conversations.reduce(
+      (count, conversation) =>
+        count +
+        conversation.messages.filter((message) => message.direction === "INBOUND").length,
+      0
+    )
+  };
 
   return {
-    summary: {
-      total: conversations.length,
-      open: conversations.filter((conversation) => conversation.status === ConversationStatus.OPEN).length,
-      resolved: conversations.filter((conversation) => conversation.status === ConversationStatus.RESOLVED).length,
-      inboundMessages: conversations.reduce(
-        (count, conversation) =>
-          count +
-          conversation.messages.filter((message) => message.direction === "INBOUND").length,
-        0
-      )
-    },
+    summary,
+    metrics: productInboxMetricRows.map((row) => ({
+      key: row.key,
+      label: row.label,
+      value: summary[row.key]
+    })),
     conversations: conversations.map((conversation) => ({
       id: conversation.id,
       status: conversation.status,
