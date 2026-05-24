@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 595
+
+- Latest live-worker own control-array async-iterator metadata coverage proves otherwise valid `production-live-campaign` control arrays with accessor-backed `Symbol.asyncIterator` metadata deny without reading the getter. Focused queue coverage passed with 157 tests, and the protected local gate passed with 59 Vitest files / 613 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 594
 
 - Latest live-worker inherited control-array copy-helper metadata coverage proves exact frozen `production-live-campaign` control-array evidence is evaluated without reading inherited `Array.prototype.toReversed`, `toSorted`, `toSpliced`, or `with` metadata. Focused queue coverage passed with 156 tests, and the protected local gate passed with 59 Vitest files / 612 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

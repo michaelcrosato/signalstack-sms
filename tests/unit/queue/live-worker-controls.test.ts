@@ -520,6 +520,33 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects own async-iterator metadata on control arrays without reading it", () => {
+    const implementedControls = implementedFrozenControls();
+    const asyncIteratorMetadataControls = [...implementedControls];
+    Object.defineProperty(asyncIteratorMetadataControls, Symbol.asyncIterator, {
+      enumerable: false,
+      get: () => {
+        throw new Error("custom control-array async iterator must not be read");
+      }
+    });
+    Object.freeze(asyncIteratorMetadataControls);
+
+    expect(Object.isFrozen(asyncIteratorMetadataControls)).toBe(true);
+    expect(() => liveWorkerControlsAreFrozen(asyncIteratorMetadataControls)).not.toThrow();
+    expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(asyncIteratorMetadataControls)).not.toThrow();
+    expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(asyncIteratorMetadataControls)).not.toThrow();
+    expect(() => liveWorkerControlsAreImplemented(asyncIteratorMetadataControls)).not.toThrow();
+    expect(liveWorkerControlsAreFrozen(asyncIteratorMetadataControls)).toBe(true);
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(asyncIteratorMetadataControls)).toBe(true);
+    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(asyncIteratorMetadataControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(asyncIteratorMetadataControls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, asyncIteratorMetadataControls)
+      )
+    ).toBe(false);
+  });
+
   it("does not invoke inherited array iterators while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const originalIteratorDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, Symbol.iterator);

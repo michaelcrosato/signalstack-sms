@@ -5376,3 +5376,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 595  GREEN  live-worker-own-array-async-iterator  2026-05-23 21:40
+Objective:    Prove own accessor-backed `Symbol.asyncIterator` metadata cannot authorize otherwise valid live-worker control arrays.
+Changed:
+- Added live-worker unit coverage showing otherwise valid control arrays with own accessor-backed `Symbol.asyncIterator` metadata deny without reading the getter.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the own async-iterator boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
