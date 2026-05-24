@@ -8736,6 +8736,86 @@ describe("production live campaign worker controls", () => {
     expect(dataBackedResults!).toEqual(expectedExactEvidence);
   });
 
+  it("does not read or invoke inherited control-array legacy accessor-helper metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as Record<string, unknown>;
+    const legacyHelperNames = [
+      "__defineGetter__",
+      "__defineSetter__",
+      "__lookupGetter__",
+      "__lookupSetter__"
+    ] as const;
+    const originalDescriptors = legacyHelperNames.map((helperName) => ({
+      helperName,
+      descriptor: Object.getOwnPropertyDescriptor(Array.prototype, helperName)
+    }));
+
+    function evaluateExactFrozenEvidence() {
+      return {
+        indexedEntries: liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls),
+        frozen: liveWorkerControlsAreFrozen(implementedControls),
+        frozenDescriptors: liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls),
+        publicFields: liveWorkerControlsExposeOnlyPublicFields(implementedControls),
+        supportedStatuses: liveWorkerControlsUseSupportedStatuses(implementedControls),
+        checklist: liveWorkerControlIdsMatchRequiredChecklist(implementedControls),
+        implemented: liveWorkerControlsAreImplemented(implementedControls),
+        authorized: liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+        )
+      };
+    }
+
+    let accessorResults: ReturnType<typeof evaluateExactFrozenEvidence>;
+    let dataBackedResults: ReturnType<typeof evaluateExactFrozenEvidence>;
+
+    try {
+      for (const helperName of legacyHelperNames) {
+        Object.defineProperty(Array.prototype, helperName, {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited control-array legacy accessor-helper metadata must not be read");
+          }
+        });
+      }
+
+      accessorResults = evaluateExactFrozenEvidence();
+
+      for (const helperName of legacyHelperNames) {
+        Object.defineProperty(Array.prototype, helperName, {
+          configurable: true,
+          value: () => {
+            throw new Error("data-backed inherited control-array legacy accessor-helper metadata must not be invoked");
+          },
+          writable: true
+        });
+      }
+
+      dataBackedResults = evaluateExactFrozenEvidence();
+    } finally {
+      for (const { helperName, descriptor } of originalDescriptors) {
+        if (descriptor === undefined) {
+          delete arrayPrototype[helperName];
+        } else {
+          Object.defineProperty(Array.prototype, helperName, descriptor);
+        }
+      }
+    }
+
+    const expectedExactEvidence = {
+      indexedEntries: true,
+      frozen: true,
+      frozenDescriptors: true,
+      publicFields: true,
+      supportedStatuses: true,
+      checklist: true,
+      implemented: true,
+      authorized: true
+    };
+
+    expect(accessorResults!).toEqual(expectedExactEvidence);
+    expect(dataBackedResults!).toEqual(expectedExactEvidence);
+  });
+
   it("does not read inherited control-array metadata while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const metadataSymbol = Symbol("inherited-control-array-metadata");
