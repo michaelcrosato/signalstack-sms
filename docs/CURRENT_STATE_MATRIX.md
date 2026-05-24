@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 677 note: product template create-form defaults are now frozen, with unit coverage proving caller-side default name/body mutation is rejected before `/dashboard/templates` renders reusable local copy defaults.
+
 Run 676 note: product contact consent-option metadata is now frozen at both array and entry level, with unit coverage proving caller-side option value/order mutation is rejected before `/dashboard/contacts/:contactId` renders consent update choices.
 
 Run 675 note: product compliance blocker-copy metadata is now frozen, with unit coverage proving caller-side blocker description mutation is rejected before `/dashboard/compliance` renders runtime hard-gate blockers.

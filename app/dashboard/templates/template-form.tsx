@@ -2,13 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
-
-const sampleBody = "Hi {{firstName}}, your SignalStack demo is ready. Reply STOP to opt out.";
+import { productTemplateFormDefaults } from "@/lib/product/template-form-defaults";
 
 export function TemplateForm() {
   const router = useRouter();
-  const [name, setName] = useState("Product demo follow-up");
-  const [body, setBody] = useState(sampleBody);
+  const [name, setName] = useState<string>(productTemplateFormDefaults.name);
+  const [body, setBody] = useState<string>(productTemplateFormDefaults.body);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);

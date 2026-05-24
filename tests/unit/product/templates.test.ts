@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { productTemplateFormDefaults } from "@/lib/product/template-form-defaults";
 import { getProductTemplateDetail, getProductTemplates, productTemplateMetricRows } from "@/lib/product/templates";
 
 vi.mock("@/lib/db/prisma", () => ({
@@ -98,6 +99,22 @@ describe("getProductTemplates", () => {
       (productTemplateMetricRows[0] as { label: string }).label = "Unsafe";
     }).toThrow(TypeError);
     expect(productTemplateMetricRows[0].label).toBe("Saved Templates");
+  });
+
+  it("freezes template create-form defaults before rendering", () => {
+    expect(Object.isFrozen(productTemplateFormDefaults)).toBe(true);
+    expect(productTemplateFormDefaults).toEqual({
+      name: "Product demo follow-up",
+      body: "Hi {{firstName}}, your SignalStack demo is ready. Reply STOP to opt out."
+    });
+
+    expect(() => {
+      (productTemplateFormDefaults as { name: string }).name = "Unsafe";
+    }).toThrow(TypeError);
+    expect(() => {
+      (productTemplateFormDefaults as { body: string }).body = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productTemplateFormDefaults.name).toBe("Product demo follow-up");
   });
 });
 

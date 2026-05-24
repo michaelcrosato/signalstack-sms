@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 677  GREEN  product-template-form-defaults-freeze  2026-05-24 09:00
+Objective:    Keep product template create-form defaults stable against caller-side name/body mutation.
+Changed:
+- Added frozen `productTemplateFormDefaults` metadata for the `/dashboard/templates` create form.
+- Updated the product template form to render default local reusable-copy name and body from the frozen metadata.
+- Added product template unit coverage proving default name/body mutation is rejected before the create form renders.
+- Updated testing docs and contract notes for the template form-default immutability boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 676  GREEN  product-contact-consent-options-freeze  2026-05-24 08:52
 Objective:    Keep product contact consent update choices stable against caller-side value or order mutation.
 Changed:

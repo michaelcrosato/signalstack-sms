@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 677
+
+- Latest product template form-default hardening exports frozen `productTemplateFormDefaults` metadata, uses it for the `/dashboard/templates` create form, and focused product template coverage now proves caller-side default name/body mutation is rejected before the reusable-copy form renders. Focused product template coverage, typecheck, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 676
 
 - Latest product contact consent-option hardening exports frozen `productContactConsentOptions` metadata, uses it for the `/dashboard/contacts/:contactId` consent select, and focused product contact coverage now proves caller-side option value/order mutation is rejected before the contact detail workflow renders consent update choices. Focused product contact coverage, typecheck, contracts check, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
