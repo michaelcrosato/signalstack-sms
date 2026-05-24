@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 620 note: live-worker authorization now evaluates exact frozen authorization-wrapper and control-entry evidence without invoking data-backed inherited `Object.prototype[Symbol.toStringTag]` metadata.
+
 Run 619 note: live-worker authorization now evaluates exact frozen authorization-wrapper and control-entry evidence without invoking data-backed inherited `Object.prototype` public-field metadata.
 
 Run 618 note: live-worker authorization now evaluates exact frozen control-array evidence without invoking data-backed inherited non-index `Array.prototype` string or symbol metadata.

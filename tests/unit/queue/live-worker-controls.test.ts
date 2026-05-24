@@ -7289,6 +7289,55 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not invoke data-backed inherited Object toStringTag metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const objectPrototype = Object.prototype as {
+      [Symbol.toStringTag]?: unknown;
+    };
+    const originalToStringTagDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, Symbol.toStringTag);
+
+    let frozenResult: boolean;
+    let frozenDescriptorResult: boolean;
+    let publicFieldsResult: boolean;
+    let supportedStatusesResult: boolean;
+    let checklistResult: boolean;
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperty(Object.prototype, Symbol.toStringTag, {
+        configurable: true,
+        value: () => {
+          throw new Error("data-backed inherited Object toStringTag metadata must not be invoked");
+        }
+      });
+
+      frozenResult = liveWorkerControlsAreFrozen(implementedControls);
+      frozenDescriptorResult = liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls);
+      publicFieldsResult = liveWorkerControlsExposeOnlyPublicFields(implementedControls);
+      supportedStatusesResult = liveWorkerControlsUseSupportedStatuses(implementedControls);
+      checklistResult = liveWorkerControlIdsMatchRequiredChecklist(implementedControls);
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalToStringTagDescriptor === undefined) {
+        delete objectPrototype[Symbol.toStringTag];
+      } else {
+        Object.defineProperty(Object.prototype, Symbol.toStringTag, originalToStringTagDescriptor);
+      }
+    }
+
+    expect(frozenResult!).toBe(true);
+    expect(frozenDescriptorResult!).toBe(true);
+    expect(publicFieldsResult!).toBe(true);
+    expect(supportedStatusesResult!).toBe(true);
+    expect(checklistResult!).toBe(true);
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("does not read inherited control-array index accessors while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const inheritedIndex = String(requiredControlIds.length);
