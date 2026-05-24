@@ -3,21 +3,38 @@ import { getCampaign, listCampaigns } from "@/lib/db/repositories/campaigns";
 import { listContacts } from "@/lib/db/repositories/contacts";
 import { listTemplates } from "@/lib/db/repositories/templates";
 
+const productCampaignMetricRowItems = [
+  { key: "total", label: "Total Campaigns" },
+  { key: "draft", label: "Drafts" },
+  { key: "scheduled", label: "Scheduled" },
+  { key: "readyRecipients", label: "Ready Recipients" }
+] as const;
+
+export const productCampaignMetricRows = Object.freeze(
+  productCampaignMetricRowItems.map((row) => Object.freeze({ ...row }))
+);
+
 export async function getProductCampaigns(orgId: string) {
   const [campaigns, contacts, templates] = await Promise.all([
     listCampaigns(orgId),
     listContacts(orgId),
     listTemplates(orgId)
   ]);
+  const summary = {
+    total: campaigns.length,
+    draft: campaigns.filter((campaign) => campaign.status === CampaignStatus.DRAFT).length,
+    scheduled: campaigns.filter((campaign) => campaign.status === CampaignStatus.SCHEDULED).length,
+    readyRecipients: contacts.filter((contact) => contact.consentStatus === ConsentStatus.OPTED_IN && !contact.archivedAt)
+      .length
+  };
 
   return {
-    summary: {
-      total: campaigns.length,
-      draft: campaigns.filter((campaign) => campaign.status === CampaignStatus.DRAFT).length,
-      scheduled: campaigns.filter((campaign) => campaign.status === CampaignStatus.SCHEDULED).length,
-      readyRecipients: contacts.filter((contact) => contact.consentStatus === ConsentStatus.OPTED_IN && !contact.archivedAt)
-        .length
-    },
+    summary,
+    metrics: productCampaignMetricRows.map((row) => ({
+      key: row.key,
+      label: row.label,
+      value: summary[row.key]
+    })),
     campaigns: campaigns.map((campaign) => ({
       id: campaign.id,
       name: campaign.name,

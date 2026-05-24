@@ -1,6 +1,6 @@
 import { CampaignStatus, ConsentStatus } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
-import { getProductCampaignDetail, getProductCampaigns } from "@/lib/product/campaigns";
+import { getProductCampaignDetail, getProductCampaigns, productCampaignMetricRows } from "@/lib/product/campaigns";
 
 vi.mock("@/lib/db/repositories/campaigns", () => ({
   getCampaign: vi.fn(async (_orgId: string, campaignId: string) =>
@@ -91,6 +91,12 @@ describe("getProductCampaigns", () => {
       scheduled: 1,
       readyRecipients: 1
     });
+    expect(result.metrics).toEqual([
+      { key: "total", label: "Total Campaigns", value: 2 },
+      { key: "draft", label: "Drafts", value: 1 },
+      { key: "scheduled", label: "Scheduled", value: 1 },
+      { key: "readyRecipients", label: "Ready Recipients", value: 1 }
+    ]);
     expect(result.campaigns.map((campaign) => campaign.templateName)).toEqual(["Intro", "Custom copy"]);
     expect(result.contacts).toEqual([
       {
@@ -142,5 +148,27 @@ describe("getProductCampaigns", () => {
 
   it("returns null for missing campaign detail", async () => {
     await expect(getProductCampaignDetail("org_1", "missing")).resolves.toBeNull();
+  });
+
+  it("freezes campaign metric metadata before rendering", () => {
+    expect(Object.isFrozen(productCampaignMetricRows)).toBe(true);
+    expect(productCampaignMetricRows.every((row) => Object.isFrozen(row))).toBe(true);
+    expect(productCampaignMetricRows.map((row) => row.key)).toEqual([
+      "total",
+      "draft",
+      "scheduled",
+      "readyRecipients"
+    ]);
+
+    expect(() =>
+      (productCampaignMetricRows as unknown as Array<{ key: string; label: string }>).push({
+        key: "unsafe",
+        label: "Unsafe"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productCampaignMetricRows[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productCampaignMetricRows[0].label).toBe("Total Campaigns");
   });
 });

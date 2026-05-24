@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function CampaignsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
-  const { campaigns, contacts, summary, templates } = await getProductCampaigns(currentOrg.orgId);
+  const { campaigns, contacts, metrics, templates } = await getProductCampaigns(currentOrg.orgId);
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
@@ -43,10 +43,9 @@ export default async function CampaignsPage() {
 
       <div className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-6">
         <section aria-label="Campaign metrics" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Metric label="Total Campaigns" value={summary.total} />
-          <Metric label="Drafts" value={summary.draft} />
-          <Metric label="Scheduled" value={summary.scheduled} />
-          <Metric label="Ready Recipients" value={summary.readyRecipients} />
+          {metrics.map((metric) => (
+            <Metric key={metric.key} label={metric.label} value={metric.value} />
+          ))}
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">

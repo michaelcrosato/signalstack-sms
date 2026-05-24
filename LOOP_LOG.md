@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 671  GREEN  product-campaign-metrics-deep-freeze  2026-05-24 08:17
+Objective:    Keep product campaign metric metadata stable against caller-side label or order mutation.
+Changed:
+- Exported frozen `productCampaignMetricRows` metadata and deep-froze each campaign metric row.
+- Updated `/dashboard/campaigns` to render total, draft, scheduled, and ready-recipient metric cards from the frozen projection.
+- Added product campaign unit coverage proving the metric metadata array and each row are frozen before `/dashboard/campaigns` renders local campaign metrics.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 670  GREEN  product-contact-metrics-deep-freeze  2026-05-24 08:11
 Objective:    Keep product contacts metric metadata stable against caller-side label or order mutation.
 Changed:

@@ -221,6 +221,7 @@ Post-MVP AI operations view:
 - The seeded product demo path must verify `/dashboard/campaigns/:campaignId` renders the owner-facing campaign detail workflow and exercises local draft edit plus queued campaign cancellation without SMS, provider calls, worker execution, billing, live AI, notifications, secrets, hard deletion, preflight bypasses, or live feature enablement.
 - The seeded product demo path must verify `/dashboard/analytics` renders the owner-facing analytics detail workflow with tenant-scoped contact, campaign, inbox, and local usage totals from existing analytics APIs without report execution, exports, mutations, provider calls, Stripe calls, billing artifacts, live AI, SMS, secrets, or live feature enablement.
 - Unit tests must verify product contact metric metadata is runtime-frozen at both array and entry level before `/dashboard/contacts` renders active, consent, and archived contact metric rows.
+- Unit tests must verify product campaign metric metadata is runtime-frozen at both array and entry level before `/dashboard/campaigns` renders total, draft, scheduled, and ready-recipient metric rows.
 - Unit tests must verify product compliance checklist metadata is runtime-frozen at both array and entry level before `/dashboard/compliance` renders readiness fields.
 
 Post-MVP reporting index view:

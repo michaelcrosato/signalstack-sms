@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 671
+
+- Latest product campaign metric hardening exports frozen `productCampaignMetricRows` metadata and deep-freezes each row, and focused product campaign coverage now proves both the array and each row reject mutation before `/dashboard/campaigns` renders total, draft, scheduled, and ready-recipient metric labels/order. Focused product campaign coverage passed with 4 tests, focused product coverage passed with 20 tests, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/test/docs/log coverage only and does not execute API handlers, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 670
 
 - Latest product contact metric hardening exports frozen `productContactMetricRows` metadata and deep-freezes each row, and focused product contacts coverage now proves both the array and each row reject mutation before `/dashboard/contacts` renders active, consent, and archived metric labels/order. Focused product contacts coverage passed with 4 tests, focused product coverage passed with 19 tests, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/test/docs/log coverage only and does not execute API handlers, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
