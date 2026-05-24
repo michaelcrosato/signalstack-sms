@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 665
+
+- Latest live-worker inherited index-slot object metadata coverage proves sparse supplied `production-live-campaign` control arrays remain unauthorized when inherited `Array.prototype` index slots carry object-valued metadata with hostile coercion hooks, and those hooks are not coerced. Focused queue coverage passed with 228 tests, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local unit/docs/log coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 664
 
 - Latest live-worker inherited control-array object metadata coverage proves exact frozen `production-live-campaign` control-array evidence remains descriptor-based and does not coerce object-valued inherited `Array.prototype` metadata, including tag, iterator, well-known symbol, Object-helper, legacy accessor-helper, prototype-accessor, constructor, `toLocaleString`, method-name, hidden string or symbol, and coercion metadata. Focused queue coverage passed with 227 tests, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local unit/docs/log coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

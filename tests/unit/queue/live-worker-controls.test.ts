@@ -1748,6 +1748,60 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects object-valued inherited control-array index slots without coercing them", () => {
+    const implementedControls = implementedFrozenControls();
+    const sparseControls = [...implementedControls];
+    delete sparseControls[0];
+    Object.freeze(sparseControls);
+    const originalDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, "0");
+    let metadataCoerced = false;
+
+    const hostileInheritedIndexValue = Object.freeze({
+      [Symbol.toPrimitive]: () => {
+        metadataCoerced = true;
+        throw new Error("object-valued inherited control-array index slot must not use Symbol.toPrimitive");
+      },
+      toString: () => {
+        metadataCoerced = true;
+        throw new Error("object-valued inherited control-array index slot must not use toString");
+      },
+      valueOf: () => {
+        metadataCoerced = true;
+        throw new Error("object-valued inherited control-array index slot must not use valueOf");
+      }
+    });
+
+    try {
+      Object.defineProperty(Array.prototype, "0", {
+        configurable: true,
+        enumerable: true,
+        value: hostileInheritedIndexValue,
+        writable: true
+      });
+
+      expect(liveWorkerControlArrayExposesOnlyIndexedEntries(sparseControls)).toBe(false);
+      expect(liveWorkerControlsAreFrozen(sparseControls)).toBe(false);
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(sparseControls)).toBe(false);
+      expect(liveWorkerControlsExposeOnlyPublicFields(sparseControls)).toBe(false);
+      expect(liveWorkerControlsUseSupportedStatuses(sparseControls)).toBe(false);
+      expect(liveWorkerControlIdsMatchRequiredChecklist(sparseControls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(sparseControls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, sparseControls)
+        )
+      ).toBe(false);
+    } finally {
+      if (originalDescriptor === undefined) {
+        delete Array.prototype[0];
+      } else {
+        Object.defineProperty(Array.prototype, "0", originalDescriptor);
+      }
+    }
+
+    expect(metadataCoerced).toBe(false);
+  });
+
   it("requires frozen data descriptors before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const mutableImplementedControls = productionLiveCampaignWorkerControls.map((control) => ({

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 665  GREEN  live-worker-inherited-index-object-metadata  2026-05-24 07:37
+Objective:    Prove sparse supplied live-worker control arrays cannot be completed by object-valued inherited `Array.prototype` index slots.
+Changed:
+- Added live-worker unit coverage showing sparse `production-live-campaign` control arrays remain unauthorized when inherited `Array.prototype[0]` carries hostile object-valued coercion metadata.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the inherited object-valued index-slot boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 664  GREEN  live-worker-inherited-array-object-metadata  2026-05-24 07:29
 Objective:    Prove exact frozen control-array evidence cannot coerce object-valued inherited `Array.prototype` metadata.
 Changed:
