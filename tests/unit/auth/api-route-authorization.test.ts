@@ -183,6 +183,14 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
         /\(\s*(Request\s*(?:\.|\?\.)\s*prototype)\s+(?:as|satisfies)\s+typeof\s+Request\s*\.\s*prototype\s*\)/g,
         "$1"
       )
+      .replace(
+        /\(\s*(globalThis\s*(?:\.|\?\.)\s*(?:Object|Reflect|Request))\s+(?:as|satisfies)\s+typeof\s+(?:Object|Reflect|Request)\s*\)/g,
+        "$1"
+      )
+      .replace(
+        /\(\s*(globalThis\s*(?:\?\.)?\[\s*["'`](?:Object|Reflect|Request)["'`]\s*\])\s+(?:as|satisfies)\s+typeof\s+(?:Object|Reflect|Request)\s*\)/g,
+        "$1"
+      )
       .replace(/\(\s*globalThis\s*\)/g, "globalThis")
       .replace(/\(\s*(Object|Reflect|Request)\s*\)/g, "$1")
       .replace(/\b(Object|Reflect|Request|globalThis)\s*!\s*(?=\.|\?\.|\[|,|;|\r?\n|\))/g, "$1");
@@ -2370,6 +2378,16 @@ describe("API route authorization coverage", () => {
         return Response.json(payload);
       }
     `;
+    const unsafeAssignedWholeParenthesizedTypeAssertedOptionalBracketGlobalThisRequestAliasSource = `
+      export async function DELETE(req: Request) {
+        let RequestCtor;
+        RequestCtor = (globalThis?.["Request"] as typeof Request);
+        const payload = await RequestCtor.prototype.json.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
     const unsafeAssignedOptionalDotGlobalThisRequestAliasSource = `
       export async function PUT(req: Request) {
         let RequestCtor;
@@ -2384,6 +2402,16 @@ describe("API route authorization coverage", () => {
       export async function PATCH(req: Request) {
         let RequestCtor;
         RequestCtor = globalThis?.Request as typeof Request;
+        const payload = await RequestCtor.prototype.text.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeAssignedWholeParenthesizedTypeAssertedOptionalDotGlobalThisRequestAliasSource = `
+      export async function PATCH(req: Request) {
+        let RequestCtor;
+        RequestCtor = (globalThis?.Request as typeof Request);
         const payload = await RequestCtor.prototype.text.call(req);
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
         if (roleResponse) return roleResponse;
@@ -2680,12 +2708,24 @@ describe("API route authorization coverage", () => {
         "DELETE"
       )
     ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeAssignedWholeParenthesizedTypeAssertedOptionalBracketGlobalThisRequestAliasSource,
+        "DELETE"
+      )
+    ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedOptionalDotGlobalThisRequestAliasSource, "PUT")).toBe(
       true
     );
     expect(
       mutatingMethodParsesBodyBeforeRoleGate(
         unsafeAssignedTypeAssertedOptionalDotGlobalThisRequestAliasSource,
+        "PATCH"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeAssignedWholeParenthesizedTypeAssertedOptionalDotGlobalThisRequestAliasSource,
         "PATCH"
       )
     ).toBe(true);

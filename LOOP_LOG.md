@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 699  GREEN  auth-parenthesized-optional-request-aliases  2026-05-24 11:35
+Objective:    Keep mutating-route auth scanner coverage aligned with assigned whole-parenthesized type-asserted optional `globalThis` Request constructor aliases.
+Changed:
+- Added focused auth unit coverage proving `RequestCtor = (globalThis?.Request as typeof Request)` and `RequestCtor = (globalThis?.["Request"] as typeof Request)` before `Request.prototype` body-reader calls are treated as body parsing before `requireApiRole`.
+- Updated scanner normalization so whole-parenthesized type-asserted `globalThis` member access is normalized before constructor-alias checks.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the assigned whole-parenthesized optional globalThis Request alias boundary.
+- Kept live SMS, billing, providers, workers, Redis, notifications, live AI, secrets, protected gate scripts, and destructive production actions untouched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 698  GREEN  auth-assigned-type-asserted-optional-dot-request-alias  2026-05-24 11:28
 Objective:    Keep mutating-route auth scanner coverage aligned with assigned type-asserted optional-dot `globalThis?.Request` constructor aliases.
 Changed:
