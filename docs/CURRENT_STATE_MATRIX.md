@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 629 note: live-worker authorization now evaluates exact frozen evidence without reading or invoking inherited `Object.prototype[Symbol.iterator]` metadata through scratch arrays.
+
 Run 628 note: live-worker authorization now evaluates exact frozen live-worker evidence without invoking data-backed inherited `Object.prototype` coercion metadata.
 
 Run 627 note: live-worker authorization now evaluates exact frozen authorization-wrapper and control-entry evidence without reading inherited accessor-backed `Object.prototype` coercion metadata.
@@ -307,3 +309,5 @@ Run 626 addendum: exact frozen live-worker evidence stays authorized without rea
 Run 627 addendum: exact frozen live-worker evidence stays authorized without reading accessor-backed inherited `Object.prototype` `Symbol.toPrimitive`, `toString`, or `valueOf` metadata.
 
 Run 628 addendum: exact frozen live-worker evidence stays authorized without invoking data-backed inherited `Object.prototype` `Symbol.toPrimitive`, `toString`, or `valueOf` metadata.
+
+Run 629 addendum: exact frozen live-worker evidence stays authorized without reading accessor-backed inherited `Object.prototype[Symbol.iterator]` metadata or invoking data-backed inherited `Object.prototype[Symbol.iterator]` metadata.

@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 629  GREEN  live-worker-inherited-object-iterator  2026-05-24 02:47
+Objective:    Prove inherited `Object.prototype[Symbol.iterator]` metadata cannot influence exact frozen live-worker evidence through scratch arrays.
+Changed:
+- Replaced `Array.from({ length })` scratch construction in live-worker evidence checks with descriptor-defined own array slots so inherited iterator metadata and inherited indexed accessors cannot interfere.
+- Added live-worker unit coverage showing exact frozen evidence authorizes without reading accessor-backed or invoking data-backed inherited `Object.prototype[Symbol.iterator]` metadata.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the inherited Object iterator boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 628  GREEN  live-worker-inherited-object-coercion-data  2026-05-24 02:34
 Objective:    Prove data-backed inherited `Object.prototype` coercion metadata cannot influence exact frozen live-worker evidence.
 Changed:

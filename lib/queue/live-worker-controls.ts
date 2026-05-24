@@ -165,6 +165,15 @@ function propertyKeysMatchExactly(actual: readonly PropertyKey[], expected: read
   return true;
 }
 
+function defineScratchArrayValue<T>(values: T[], index: number, value: T) {
+  Object.defineProperty(values, String(index), {
+    value,
+    enumerable: true,
+    writable: true,
+    configurable: true
+  });
+}
+
 function controlArrayIsDense(controls: readonly LiveWorkerControl[]) {
   const length = arrayLengthFromDescriptor(controls);
   if (length === null) {
@@ -189,10 +198,12 @@ function liveWorkerControlArrayValues(controls: unknown) {
     return null;
   }
 
-  return Array.from({ length }, (_, index) => {
+  const values: Array<LiveWorkerControl | null> = [];
+  for (let index = 0; index < length; index += 1) {
     const descriptor = safeGetOwnPropertyDescriptor(controls, String(index));
-    return descriptor !== undefined && "value" in descriptor ? descriptor.value : null;
-  });
+    defineScratchArrayValue(values, index, descriptor !== undefined && "value" in descriptor ? descriptor.value : null);
+  }
+  return values;
 }
 
 export function liveWorkerControlArrayExposesOnlyIndexedEntries(controls: unknown) {
@@ -206,9 +217,11 @@ export function liveWorkerControlArrayExposesOnlyIndexedEntries(controls: unknow
     return false;
   }
 
-  const expectedKeys = Array.from({ length: length + 1 }, (_, index) =>
-    index === length ? "length" : String(index)
-  );
+  const expectedKeys: string[] = [];
+  for (let index = 0; index < length; index += 1) {
+    defineScratchArrayValue(expectedKeys, index, String(index));
+  }
+  defineScratchArrayValue(expectedKeys, length, "length");
   if (!propertyKeysMatchExactly(ownKeys, expectedKeys)) {
     return false;
   }
