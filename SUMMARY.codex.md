@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 594
+
+- Latest live-worker inherited control-array copy-helper metadata coverage proves exact frozen `production-live-campaign` control-array evidence is evaluated without reading inherited `Array.prototype.toReversed`, `toSorted`, `toSpliced`, or `with` metadata. Focused queue coverage passed with 156 tests, and the protected local gate passed with 59 Vitest files / 612 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 593
 
 - Latest live-worker inherited control-array mutator/visitor metadata coverage proves exact frozen `production-live-campaign` control-array evidence is evaluated without reading inherited `Array.prototype.concat`, `copyWithin`, `fill`, `flat`, `forEach`, `join`, `pop`, `push`, `reverse`, `shift`, `slice`, `some`, `sort`, `splice`, or `unshift` metadata. Focused queue coverage passed with 155 tests, and the protected local gate passed with 59 Vitest files / 611 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
