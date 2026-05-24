@@ -7460,6 +7460,56 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerDeploymentClassIsAuthorized(wrapper)).toBe(false);
   });
 
+  it("rejects object-valued authorization-wrapper metadata without coercing it or inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("object-valued wrapper metadata must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("object-valued wrapper metadata must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("object-valued wrapper metadata must not inspect control evidence");
+      }
+    });
+    let metadataCoerced = false;
+
+    function hostileMetadataValue(metadataName: PropertyKey) {
+      return Object.freeze({
+        [Symbol.toPrimitive]: () => {
+          metadataCoerced = true;
+          throw new Error(`authorization-wrapper ${String(metadataName)} metadata object must not use Symbol.toPrimitive`);
+        },
+        toString: () => {
+          metadataCoerced = true;
+          throw new Error(`authorization-wrapper ${String(metadataName)} metadata object must not use toString`);
+        },
+        valueOf: () => {
+          metadataCoerced = true;
+          throw new Error(`authorization-wrapper ${String(metadataName)} metadata object must not use valueOf`);
+        }
+      });
+    }
+
+    for (const metadataName of [Symbol.toStringTag, Symbol.toPrimitive, "toString", "valueOf"] as const) {
+      const wrapper = {
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: throwingEvidence
+      } as Record<PropertyKey, unknown>;
+      Object.defineProperty(wrapper, metadataName, {
+        enumerable: false,
+        value: hostileMetadataValue(metadataName)
+      });
+      Object.freeze(wrapper);
+
+      expect(Object.isFrozen(wrapper)).toBe(true);
+      expect(() => liveWorkerDeploymentClassIsAuthorized(wrapper)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(wrapper)).toBe(false);
+    }
+
+    expect(metadataCoerced).toBe(false);
+  });
+
   it("rejects authorization wrappers with accessor-backed own coercion metadata before inspecting controls", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       getPrototypeOf: () => {

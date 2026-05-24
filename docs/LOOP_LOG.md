@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 652  GREEN  live-worker-wrapper-object-metadata  2026-05-24 06:04
+Objective:    Prove own object-valued authorization-wrapper metadata cannot authorize, coerce, or inspect reserved live-worker controls.
+Changed:
+- Added live-worker unit coverage showing otherwise frozen authorization wrappers with object-valued `Symbol.toStringTag`, `Symbol.toPrimitive`, `toString`, or `valueOf` metadata deny without invoking hostile coercion hooks or inspecting supplied controls.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the object-valued authorization-wrapper metadata boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 651  GREEN  live-worker-entry-object-metadata  2026-05-24 05:58
 Objective:    Prove own object-valued control-entry metadata cannot authorize or coerce the reserved live-worker controls.
 Changed:
