@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 667  GREEN  product-navigation-deep-freeze  2026-05-24 07:52
+Objective:    Keep the product demo shell navigation metadata stable against caller-side item mutation.
+Changed:
+- Deep-froze shared `productNavigation` entries in addition to the navigation array.
+- Added product dashboard unit coverage proving the array and each navigation item are frozen before the product shell renders.
+- Updated TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the product navigation immutability boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 666  GREEN  live-worker-exact-index-object-metadata  2026-05-24 07:42
 Objective:    Prove exact frozen live-worker control arrays ignore object-valued inherited `Array.prototype` numeric index metadata.
 Changed:

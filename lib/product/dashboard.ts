@@ -2,7 +2,7 @@ import { UsageEventType } from "@prisma/client";
 import { aggregateUsageEvents } from "@/lib/billing/metering";
 import { prisma } from "@/lib/db/prisma";
 
-export const productNavigation = Object.freeze([
+const productNavigationItems = [
   { href: "/dashboard/contacts", label: "Contacts", note: "audience and consent" },
   { href: "/dashboard/campaigns", label: "Campaigns", note: "drafts and scheduling" },
   { href: "/dashboard/inbox", label: "Inbox", note: "open conversations" },
@@ -10,7 +10,9 @@ export const productNavigation = Object.freeze([
   { href: "/dashboard/analytics", label: "Analytics", note: "local performance" },
   { href: "/dashboard/compliance", label: "Compliance", note: "go-live readiness" },
   { href: "/settings", label: "Settings", note: "operator controls" }
-] as const);
+] as const;
+
+export const productNavigation = Object.freeze(productNavigationItems.map((item) => Object.freeze({ ...item })));
 
 export async function getProductDashboard(orgId: string) {
   const [

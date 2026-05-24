@@ -76,8 +76,9 @@ describe("product dashboard navigation", () => {
     ]);
   });
 
-  it("is frozen before the product shell renders navigation", () => {
+  it("is deeply frozen before the product shell renders navigation", () => {
     expect(Object.isFrozen(productNavigation)).toBe(true);
+    expect(productNavigation.every((item) => Object.isFrozen(item))).toBe(true);
     expect(() =>
       (productNavigation as unknown as Array<{ href: string; label: string; note: string }>).push({
         href: "#unsafe",
@@ -85,6 +86,9 @@ describe("product dashboard navigation", () => {
         note: "unsafe route"
       })
     ).toThrow(TypeError);
+    expect(() => {
+      (productNavigation[0] as { href: string }).href = "#unsafe";
+    }).toThrow(TypeError);
   });
 
   it("projects local usage totals for the product dashboard without live providers", async () => {

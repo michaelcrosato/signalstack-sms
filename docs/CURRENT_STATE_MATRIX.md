@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 667 note: shared product dashboard navigation metadata is now frozen at both array and entry level, with unit coverage proving caller-side item mutation is rejected before the product shell renders.
+
 Run 666 note: exact frozen control-array evidence now remains authorized when inherited `Array.prototype` numeric index metadata at occupied own checklist indexes or beyond the checklist is object-valued with hostile coercion hooks, and those hooks are not coerced.
 
 Run 665 note: sparse supplied live-worker control arrays now remain unauthorized when inherited `Array.prototype` index slots carry object-valued metadata with hostile coercion hooks, and those hooks are not coerced.
