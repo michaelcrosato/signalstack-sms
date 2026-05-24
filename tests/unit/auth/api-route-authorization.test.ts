@@ -2699,6 +2699,17 @@ describe("API route authorization coverage", () => {
         return Response.json({ size: payload.byteLength });
       }
     `;
+    const unsafeWholeParenthesizedGlobalThisAliasComputedNonNullTypeAssertedRequestSource = `
+      export async function DELETE(req: Request) {
+        const root = globalThis as typeof globalThis;
+        const requestConstructorName = "Request" as const;
+        const RequestCtor = (root?.[requestConstructorName]! as typeof Request);
+        const payload = await RequestCtor.prototype.json.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
     const unsafeGlobalThisAliasComputedNonNullSatisfiesRequestSource = `
       export async function DELETE(req: Request) {
         const root = globalThis as typeof globalThis;
@@ -2720,6 +2731,18 @@ describe("API route authorization coverage", () => {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
         if (roleResponse) return roleResponse;
         return Response.json({ payload });
+      }
+    `;
+    const unsafeAssignedWholeParenthesizedGlobalThisAliasComputedNonNullTypeAssertedRequestSource = `
+      export async function PATCH(req: Request) {
+        const root = globalThis;
+        const requestConstructorName = "Request";
+        let RequestCtor;
+        RequestCtor = (root?.[requestConstructorName]! as typeof Request);
+        const payload = await RequestCtor.prototype.arrayBuffer.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
       }
     `;
     const unsafeAssignedGlobalThisAliasComputedNonNullSatisfiesRequestSource = `
@@ -3075,6 +3098,12 @@ describe("API route authorization coverage", () => {
     ).toBe(true);
     expect(
       mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeWholeParenthesizedGlobalThisAliasComputedNonNullTypeAssertedRequestSource,
+        "DELETE"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
         unsafeGlobalThisAliasComputedNonNullSatisfiesRequestSource,
         "DELETE"
       )
@@ -3083,6 +3112,12 @@ describe("API route authorization coverage", () => {
       mutatingMethodParsesBodyBeforeRoleGate(
         unsafeAssignedGlobalThisAliasComputedNonNullTypeAssertedRequestSource,
         "PUT"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeAssignedWholeParenthesizedGlobalThisAliasComputedNonNullTypeAssertedRequestSource,
+        "PATCH"
       )
     ).toBe(true);
     expect(

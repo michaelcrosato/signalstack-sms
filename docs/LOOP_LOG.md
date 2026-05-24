@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 708  GREEN  auth-parenthesized-local-globalthis-computed-non-null-request-aliases  2026-05-24 12:28
+Objective:    Keep mutating-route auth scanner coverage aligned with whole-parenthesized type-asserted computed optional non-null `Request` constructor aliases reached through local `globalThis` aliases.
+Changed:
+- Added focused auth unit coverage proving `const RequestCtor = (root?.[requestConstructorName]! as typeof Request)` and `RequestCtor = (root?.[requestConstructorName]! as typeof Request)` aliases before `Request.prototype` body-reader calls are treated as body parsing before `requireApiRole`.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the whole-parenthesized local-globalThis computed optional non-null Request alias boundary.
+- Kept live SMS, billing, providers, workers, Redis, notifications, live AI, secrets, protected gate scripts, and destructive production actions untouched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 707  GREEN  auth-assigned-local-globalthis-computed-non-null-request-aliases  2026-05-24 12:22
 Objective:    Keep mutating-route auth scanner coverage aligned with assigned computed optional non-null `Request` constructor aliases reached through local `globalThis` aliases.
 Changed:
