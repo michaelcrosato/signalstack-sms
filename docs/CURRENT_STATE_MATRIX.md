@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 633 note: live-worker authorization now denies own data-backed control-entry `Symbol.toStringTag` metadata without invoking it.
+
 Run 632 note: live-worker authorization now denies own data-backed authorization-wrapper `Symbol.toStringTag` metadata without invoking it or inspecting controls.
 
 Run 631 note: live-worker authorization now evaluates exact frozen evidence without reading or invoking arbitrary inherited `Object.prototype` non-public string or symbol metadata.
@@ -321,5 +323,7 @@ Run 629 addendum: exact frozen live-worker evidence stays authorized without rea
 Run 630 addendum: exact frozen live-worker evidence stays authorized without reading accessor-backed inherited `Object.prototype.toLocaleString` metadata or invoking data-backed inherited `Object.prototype.toLocaleString` metadata.
 
 Run 631 addendum: exact frozen live-worker evidence stays authorized without reading accessor-backed or invoking data-backed arbitrary inherited `Object.prototype` non-public string or symbol metadata.
+
+Run 633 addendum: own data-backed control-entry `Symbol.toStringTag` metadata denies before the reserved live-worker class can authorize, and callable tag metadata is not invoked.
 
 Run 632 addendum: own data-backed authorization-wrapper `Symbol.toStringTag` metadata denies before supplied live-worker controls are inspected, and callable tag metadata is not invoked.
