@@ -47,10 +47,9 @@ export default async function DashboardPage() {
 
       <div className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-6">
         <section aria-label="Product metrics" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Metric label="Active Contacts" value={dashboard.contacts.total} detail={`${dashboard.contacts.optedIn} opted in`} />
-          <Metric label="Campaigns" value={dashboard.campaigns.total} detail={`${dashboard.campaigns.draft} drafts`} />
-          <Metric label="Open Conversations" value={dashboard.inbox.open} detail={`${dashboard.inbox.messages} messages`} />
-          <Metric label="Templates" value={dashboard.templates.total} detail="ready for campaign copy" />
+          {dashboard.metrics.map((metric) => (
+            <Metric key={metric.key} label={metric.label} value={metric.value} detail={metric.detail} />
+          ))}
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">

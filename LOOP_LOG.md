@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 674  GREEN  product-dashboard-metrics-deep-freeze  2026-05-24 08:37
+Objective:    Keep product dashboard metric metadata stable against caller-side label or order mutation.
+Changed:
+- Exported frozen `productDashboardMetricRows` metadata and deep-froze each dashboard metric row.
+- Updated `/dashboard` to render active-contact, campaign, open-conversation, and template metric cards from the frozen projection.
+- Added product dashboard unit coverage proving the metric metadata array and each row are frozen before `/dashboard` renders local product metrics.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 673  GREEN  product-template-metrics-deep-freeze  2026-05-24 08:31
 Objective:    Keep product template metric metadata stable against caller-side label or order mutation.
 Changed:

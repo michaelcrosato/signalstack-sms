@@ -1,6 +1,6 @@
 import { UsageEventType } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
-import { getProductDashboard, productNavigation } from "@/lib/product/dashboard";
+import { getProductDashboard, productDashboardMetricRows, productNavigation } from "@/lib/product/dashboard";
 
 vi.mock("@/lib/db/prisma", () => ({
   prisma: {
@@ -91,6 +91,28 @@ describe("product dashboard navigation", () => {
     }).toThrow(TypeError);
   });
 
+  it("freezes dashboard metric metadata before rendering", () => {
+    expect(Object.isFrozen(productDashboardMetricRows)).toBe(true);
+    expect(productDashboardMetricRows.every((row) => Object.isFrozen(row))).toBe(true);
+    expect(productDashboardMetricRows.map((row) => row.key)).toEqual([
+      "activeContacts",
+      "campaigns",
+      "openConversations",
+      "templates"
+    ]);
+
+    expect(() =>
+      (productDashboardMetricRows as unknown as Array<{ key: string; label: string }>).push({
+        key: "unsafe",
+        label: "Unsafe"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productDashboardMetricRows[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productDashboardMetricRows[0].label).toBe("Active Contacts");
+  });
+
   it("projects local usage totals for the product dashboard without live providers", async () => {
     await expect(getProductDashboard("org_1")).resolves.toMatchObject({
       contacts: {
@@ -107,7 +129,13 @@ describe("product dashboard navigation", () => {
       usage: {
         fakeAiRequests: 2,
         totalEvents: 3
-      }
+      },
+      metrics: [
+        { key: "activeContacts", label: "Active Contacts", value: 10, detail: "7 opted in" },
+        { key: "campaigns", label: "Campaigns", value: 5, detail: "3 drafts" },
+        { key: "openConversations", label: "Open Conversations", value: 4, detail: "12 messages" },
+        { key: "templates", label: "Templates", value: 6, detail: "ready for campaign copy" }
+      ]
     });
   });
 });

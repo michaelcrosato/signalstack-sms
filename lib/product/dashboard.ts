@@ -14,6 +14,17 @@ const productNavigationItems = [
 
 export const productNavigation = Object.freeze(productNavigationItems.map((item) => Object.freeze({ ...item })));
 
+const productDashboardMetricRowItems = [
+  { key: "activeContacts", label: "Active Contacts" },
+  { key: "campaigns", label: "Campaigns" },
+  { key: "openConversations", label: "Open Conversations" },
+  { key: "templates", label: "Templates" }
+] as const;
+
+export const productDashboardMetricRows = Object.freeze(
+  productDashboardMetricRowItems.map((row) => Object.freeze({ ...row }))
+);
+
 export async function getProductDashboard(orgId: string) {
   const [
     contacts,
@@ -52,7 +63,7 @@ export async function getProductDashboard(orgId: string) {
   const usage = aggregateUsageEvents(usageEvents);
   const optedInPercent = contacts > 0 ? Math.round((optedInContacts / contacts) * 100) : 0;
 
-  return {
+  const dashboard = {
     contacts: {
       total: contacts,
       optedIn: optedInContacts,
@@ -80,5 +91,26 @@ export async function getProductDashboard(orgId: string) {
       fakeAiRequests: usage[UsageEventType.AI_REQUEST],
       totalEvents: Object.values(usage).reduce((total, quantity) => total + quantity, 0)
     }
+  };
+
+  const metricValues = {
+    activeContacts: { value: dashboard.contacts.total, detail: `${dashboard.contacts.optedIn} opted in` },
+    campaigns: { value: dashboard.campaigns.total, detail: `${dashboard.campaigns.draft} drafts` },
+    openConversations: { value: dashboard.inbox.open, detail: `${dashboard.inbox.messages} messages` },
+    templates: { value: dashboard.templates.total, detail: "ready for campaign copy" }
+  };
+
+  return {
+    ...dashboard,
+    metrics: productDashboardMetricRows.map((row) => {
+      const metric = metricValues[row.key];
+
+      return {
+        key: row.key,
+        label: row.label,
+        value: metric.value,
+        detail: metric.detail
+      };
+    })
   };
 }
