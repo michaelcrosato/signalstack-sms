@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 624  GREEN  live-worker-inherited-object-constructor  2026-05-24 02:06
+Objective:    Prove inherited `Object.prototype.constructor` metadata cannot influence exact frozen live-worker evidence.
+Changed:
+- Added live-worker unit coverage showing exact frozen control arrays and authorization wrappers authorize without reading or invoking inherited `Object.prototype.constructor` metadata.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the inherited Object constructor boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 623  GREEN  live-worker-inherited-object-prototype-helper  2026-05-24 01:54
 Objective:    Prove inherited `Object.prototype.isPrototypeOf` metadata cannot influence exact frozen live-worker evidence.
 Changed:
