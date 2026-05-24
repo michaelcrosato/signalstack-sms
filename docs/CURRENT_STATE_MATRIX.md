@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-23.
 
+Run 605 note: live-worker authorization now denies own data-backed callable `Symbol.toStringTag` metadata on otherwise valid control arrays without invoking the metadata function.
+
 Run 604 note: live-worker authorization now denies own data-backed callable `Symbol.asyncIterator` metadata on otherwise valid control arrays without invoking the async iterator function.
 
 Run 603 note: live-worker authorization now denies own data-backed callable `Symbol.iterator` metadata on otherwise valid control arrays without invoking the iterator function.

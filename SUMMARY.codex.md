@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 605
+
+- Latest live-worker own control-array data-backed `Symbol.toStringTag` metadata coverage proves otherwise valid `production-live-campaign` control arrays with an own callable data property for `Symbol.toStringTag` deny without invoking the metadata function. Focused queue coverage passed with 167 tests, and the protected local gate passed with 59 Vitest files / 623 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 604
 
 - Latest live-worker own control-array data-backed async-iterator metadata coverage proves otherwise valid `production-live-campaign` control arrays with an own callable data property for `Symbol.asyncIterator` deny without invoking the async iterator function. Focused queue coverage passed with 166 tests, and the protected local gate passed with 59 Vitest files / 622 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
