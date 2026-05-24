@@ -1,6 +1,7 @@
 import { UsageEventType } from "@prisma/client";
 import { aggregateUsageEvents } from "@/lib/billing/metering";
 import { prisma } from "@/lib/db/prisma";
+import { productComplianceFields } from "@/lib/product/compliance-fields";
 
 const productNavigationItems = [
   { href: "/dashboard/contacts", label: "Contacts", note: "audience and consent" },
@@ -52,14 +53,7 @@ export async function getProductDashboard(orgId: string) {
     prisma.usageEvent.findMany({ where: { orgId }, select: { type: true, quantity: true } })
   ]);
 
-  const requiredComplianceFields = [
-    complianceProfile?.businessName,
-    complianceProfile?.messagingUseCase,
-    complianceProfile?.optInDescription,
-    complianceProfile?.privacyPolicyUrl,
-    complianceProfile?.termsOfServiceUrl
-  ];
-  const completeComplianceFields = requiredComplianceFields.filter(Boolean).length;
+  const completeComplianceFields = productComplianceFields.filter((field) => Boolean(complianceProfile?.[field.key])).length;
   const usage = aggregateUsageEvents(usageEvents);
   const optedInPercent = contacts > 0 ? Math.round((optedInContacts / contacts) * 100) : 0;
 
@@ -84,7 +78,7 @@ export async function getProductDashboard(orgId: string) {
     },
     compliance: {
       completeFields: completeComplianceFields,
-      requiredFields: requiredComplianceFields.length,
+      requiredFields: productComplianceFields.length,
       a2pRegistrationStatus: complianceProfile?.a2pRegistrationStatus ?? "NOT_STARTED"
     },
     usage: {

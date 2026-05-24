@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 682  GREEN  product-dashboard-compliance-counts  2026-05-24 09:32
+Objective:    Keep product dashboard compliance readiness counts aligned with the shared compliance checklist metadata.
+Changed:
+- Moved product compliance checklist metadata into a shared frozen product module while preserving the existing `productComplianceFields` export.
+- Updated `/dashboard` product projection to derive complete and required compliance profile field counts from the shared frozen checklist.
+- Added product dashboard unit coverage proving compliance field counts stay aligned with the shared checklist metadata.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the dashboard compliance-count alignment boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 681  GREEN  product-inbox-workspace-defaults-freeze  2026-05-24 09:24
 Objective:    Keep product inbox workspace defaults stable against caller-side mutation.
 Changed:

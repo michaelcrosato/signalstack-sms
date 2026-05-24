@@ -1,5 +1,6 @@
 import { UsageEventType } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
+import { productComplianceFields } from "@/lib/product/compliance";
 import { getProductDashboard, productDashboardMetricRows, productNavigation } from "@/lib/product/dashboard";
 
 vi.mock("@/lib/db/prisma", () => ({
@@ -129,6 +130,11 @@ describe("product dashboard navigation", () => {
       usage: {
         fakeAiRequests: 2,
         totalEvents: 3
+      },
+      compliance: {
+        completeFields: productComplianceFields.length,
+        requiredFields: productComplianceFields.length,
+        a2pRegistrationStatus: "NOT_STARTED"
       },
       metrics: [
         { key: "activeContacts", label: "Active Contacts", value: 10, detail: "7 opted in" },
