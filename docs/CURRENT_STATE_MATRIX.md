@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 664 note: exact frozen control-array evidence now evaluates without coercing object-valued inherited `Array.prototype` tag, iterator, well-known symbol, Object-helper, legacy accessor-helper, prototype-accessor, constructor, `toLocaleString`, method-name, hidden string or symbol, or coercion metadata.
+
 Run 663 note: exact frozen live-worker evidence now evaluates without coercing object-valued inherited `Object.prototype` tag, iterator, well-known symbol, Object-helper, legacy accessor-helper, prototype-accessor, constructor, `toLocaleString`, hidden string or symbol, or coercion metadata.
 
 Run 662 note: live-worker authorization now denies object-shaped deployment-class values with inherited hidden string or symbol metadata without reading accessor metadata, invoking callable metadata, coercing object-valued metadata, or inspecting supplied controls.

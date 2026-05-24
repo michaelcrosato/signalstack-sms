@@ -11325,6 +11325,141 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not coerce object-valued inherited control-array metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const metadataSymbol = Symbol("object-valued-inherited-control-array-metadata");
+    const arrayPrototype = Array.prototype as unknown as Record<PropertyKey, unknown>;
+    const metadataKeys: PropertyKey[] = [
+      Symbol.toStringTag,
+      Symbol.iterator,
+      Symbol.asyncIterator,
+      Symbol.unscopables,
+      Symbol.isConcatSpreadable,
+      Symbol.match,
+      Symbol.matchAll,
+      Symbol.replace,
+      Symbol.search,
+      Symbol.split,
+      Symbol.toPrimitive,
+      "toString",
+      "valueOf",
+      "constructor",
+      "toLocaleString",
+      "hasOwnProperty",
+      "propertyIsEnumerable",
+      "isPrototypeOf",
+      "__defineGetter__",
+      "__defineSetter__",
+      "__lookupGetter__",
+      "__lookupSetter__",
+      "__proto__",
+      "entries",
+      "keys",
+      "values",
+      "at",
+      "includes",
+      "indexOf",
+      "lastIndexOf",
+      "find",
+      "findIndex",
+      "findLast",
+      "findLastIndex",
+      "every",
+      "filter",
+      "flatMap",
+      "map",
+      "reduce",
+      "reduceRight",
+      "concat",
+      "copyWithin",
+      "fill",
+      "flat",
+      "forEach",
+      "join",
+      "pop",
+      "push",
+      "reverse",
+      "shift",
+      "slice",
+      "some",
+      "sort",
+      "splice",
+      "unshift",
+      "toReversed",
+      "toSorted",
+      "toSpliced",
+      "with",
+      metadataSymbol
+    ];
+    const originalDescriptors = metadataKeys.map((metadataKey) => ({
+      metadataKey,
+      descriptor: Object.getOwnPropertyDescriptor(Array.prototype, metadataKey)
+    }));
+
+    let exposesOnlyIndexedEntriesResult: boolean;
+    let frozenResult: boolean;
+    let frozenDescriptorResult: boolean;
+    let publicFieldsResult: boolean;
+    let supportedStatusesResult: boolean;
+    let checklistResult: boolean;
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    function hostileMetadata(metadataKey: PropertyKey) {
+      return Object.freeze({
+        [Symbol.toPrimitive]: () => {
+          throw new Error(`inherited control-array ${String(metadataKey)} metadata must not use Symbol.toPrimitive`);
+        },
+        toString: () => {
+          throw new Error(`inherited control-array ${String(metadataKey)} metadata must not use toString`);
+        },
+        valueOf: () => {
+          throw new Error(`inherited control-array ${String(metadataKey)} metadata must not use valueOf`);
+        }
+      });
+    }
+
+    try {
+      for (let index = 0; index < metadataKeys.length; index += 1) {
+        const metadataKey = metadataKeys[index];
+        Object.defineProperty(Array.prototype, metadataKey, {
+          configurable: true,
+          value: hostileMetadata(metadataKey),
+          writable: true
+        });
+      }
+
+      exposesOnlyIndexedEntriesResult = liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls);
+      frozenResult = liveWorkerControlsAreFrozen(implementedControls);
+      frozenDescriptorResult = liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls);
+      publicFieldsResult = liveWorkerControlsExposeOnlyPublicFields(implementedControls);
+      supportedStatusesResult = liveWorkerControlsUseSupportedStatuses(implementedControls);
+      checklistResult = liveWorkerControlIdsMatchRequiredChecklist(implementedControls);
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      for (let index = 0; index < originalDescriptors.length; index += 1) {
+        const { metadataKey, descriptor } = originalDescriptors[index];
+        if (descriptor === undefined) {
+          delete arrayPrototype[metadataKey];
+        } else {
+          Object.defineProperty(Array.prototype, metadataKey, descriptor);
+        }
+      }
+    }
+
+    expect(exposesOnlyIndexedEntriesResult!).toBe(true);
+    expect(frozenResult!).toBe(true);
+    expect(frozenDescriptorResult!).toBe(true);
+    expect(publicFieldsResult!).toBe(true);
+    expect(supportedStatusesResult!).toBe(true);
+    expect(checklistResult!).toBe(true);
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 
