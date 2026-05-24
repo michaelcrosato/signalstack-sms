@@ -7614,6 +7614,109 @@ describe("production live campaign worker controls", () => {
     expect(dataBackedAuthorizedResult!).toBe(true);
   });
 
+  it("does not read or invoke inherited Object legacy accessor-helper metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const legacyHelperNames = [
+      "__defineGetter__",
+      "__defineSetter__",
+      "__lookupGetter__",
+      "__lookupSetter__"
+    ] as const;
+    const objectPrototype = Object.prototype as Record<string, unknown>;
+    const originalDescriptors = legacyHelperNames.map((helperName) => ({
+      helperName,
+      descriptor: Object.getOwnPropertyDescriptor(Object.prototype, helperName)
+    }));
+
+    let accessorIndexedEntriesResult: boolean;
+    let accessorFrozenResult: boolean;
+    let accessorFrozenDescriptorResult: boolean;
+    let accessorPublicFieldsResult: boolean;
+    let accessorSupportedStatusesResult: boolean;
+    let accessorChecklistResult: boolean;
+    let accessorImplementedResult: boolean;
+    let accessorAuthorizedResult: boolean;
+    let dataBackedIndexedEntriesResult: boolean;
+    let dataBackedFrozenResult: boolean;
+    let dataBackedFrozenDescriptorResult: boolean;
+    let dataBackedPublicFieldsResult: boolean;
+    let dataBackedSupportedStatusesResult: boolean;
+    let dataBackedChecklistResult: boolean;
+    let dataBackedImplementedResult: boolean;
+    let dataBackedAuthorizedResult: boolean;
+
+    try {
+      for (let helperIndex = 0; helperIndex < legacyHelperNames.length; helperIndex += 1) {
+        const helperName = legacyHelperNames[helperIndex];
+        Object.defineProperty(Object.prototype, helperName, {
+          configurable: true,
+          get: () => {
+            throw new Error(`inherited Object ${helperName} metadata must not be read`);
+          }
+        });
+      }
+
+      accessorIndexedEntriesResult = liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls);
+      accessorFrozenResult = liveWorkerControlsAreFrozen(implementedControls);
+      accessorFrozenDescriptorResult = liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls);
+      accessorPublicFieldsResult = liveWorkerControlsExposeOnlyPublicFields(implementedControls);
+      accessorSupportedStatusesResult = liveWorkerControlsUseSupportedStatuses(implementedControls);
+      accessorChecklistResult = liveWorkerControlIdsMatchRequiredChecklist(implementedControls);
+      accessorImplementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      accessorAuthorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+
+      for (let helperIndex = 0; helperIndex < legacyHelperNames.length; helperIndex += 1) {
+        const helperName = legacyHelperNames[helperIndex];
+        Object.defineProperty(Object.prototype, helperName, {
+          configurable: true,
+          value: () => {
+            throw new Error(`data-backed inherited Object ${helperName} metadata must not be invoked`);
+          },
+          writable: true
+        });
+      }
+
+      dataBackedIndexedEntriesResult = liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls);
+      dataBackedFrozenResult = liveWorkerControlsAreFrozen(implementedControls);
+      dataBackedFrozenDescriptorResult = liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls);
+      dataBackedPublicFieldsResult = liveWorkerControlsExposeOnlyPublicFields(implementedControls);
+      dataBackedSupportedStatusesResult = liveWorkerControlsUseSupportedStatuses(implementedControls);
+      dataBackedChecklistResult = liveWorkerControlIdsMatchRequiredChecklist(implementedControls);
+      dataBackedImplementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      dataBackedAuthorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      for (let helperIndex = 0; helperIndex < originalDescriptors.length; helperIndex += 1) {
+        const { helperName, descriptor } = originalDescriptors[helperIndex];
+        if (descriptor === undefined) {
+          delete objectPrototype[helperName];
+        } else {
+          Object.defineProperty(Object.prototype, helperName, descriptor);
+        }
+      }
+    }
+
+    expect(accessorIndexedEntriesResult!).toBe(true);
+    expect(accessorFrozenResult!).toBe(true);
+    expect(accessorFrozenDescriptorResult!).toBe(true);
+    expect(accessorPublicFieldsResult!).toBe(true);
+    expect(accessorSupportedStatusesResult!).toBe(true);
+    expect(accessorChecklistResult!).toBe(true);
+    expect(accessorImplementedResult!).toBe(true);
+    expect(accessorAuthorizedResult!).toBe(true);
+    expect(dataBackedIndexedEntriesResult!).toBe(true);
+    expect(dataBackedFrozenResult!).toBe(true);
+    expect(dataBackedFrozenDescriptorResult!).toBe(true);
+    expect(dataBackedPublicFieldsResult!).toBe(true);
+    expect(dataBackedSupportedStatusesResult!).toBe(true);
+    expect(dataBackedChecklistResult!).toBe(true);
+    expect(dataBackedImplementedResult!).toBe(true);
+    expect(dataBackedAuthorizedResult!).toBe(true);
+  });
+
   it("does not read inherited control-array index accessors while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const inheritedIndex = String(requiredControlIds.length);

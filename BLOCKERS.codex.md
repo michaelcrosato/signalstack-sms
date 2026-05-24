@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 625
+
+- No blocker from inherited Object legacy accessor-helper live-worker coverage. Focused queue coverage passed with 188 tests, and the protected local gate passed with 59 Vitest files / 644 tests, Playwright smoke, and build green. The change adds local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
 Run number: 624
 
 - No blocker from inherited Object constructor live-worker coverage. Focused queue coverage passed with 187 tests, and the protected local gate passed with 59 Vitest files / 643 tests, Playwright smoke, and build green. The change adds local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
