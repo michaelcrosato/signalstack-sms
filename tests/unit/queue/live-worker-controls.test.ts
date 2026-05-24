@@ -6875,6 +6875,58 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("does not invoke data-backed inherited authorization wrapper public-field metadata while evaluating wrapper evidence", () => {
+    const objectPrototype = Object.prototype as Record<string, unknown>;
+    const originalClassDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "workerDeploymentClass");
+    const originalControlsDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "controls");
+
+    let authorizedResult: boolean;
+    let missingControlsResult: boolean;
+
+    try {
+      Object.defineProperties(Object.prototype, {
+        workerDeploymentClass: {
+          configurable: true,
+          enumerable: true,
+          value: () => {
+            throw new Error("data-backed inherited workerDeploymentClass metadata must not be invoked");
+          }
+        },
+        controls: {
+          configurable: true,
+          enumerable: true,
+          value: () => {
+            throw new Error("data-backed inherited controls metadata must not be invoked");
+          }
+        }
+      });
+
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedFrozenControls())
+      );
+      missingControlsResult = liveWorkerDeploymentClassIsAuthorized(
+        Object.freeze({
+          workerDeploymentClass: reservedLiveWorkerDeploymentClass
+        })
+      );
+    } finally {
+      if (originalClassDescriptor === undefined) {
+        delete objectPrototype.workerDeploymentClass;
+      } else {
+        Object.defineProperty(Object.prototype, "workerDeploymentClass", originalClassDescriptor);
+      }
+
+      if (originalControlsDescriptor === undefined) {
+        delete objectPrototype.controls;
+      } else {
+        Object.defineProperty(Object.prototype, "controls", originalControlsDescriptor);
+      }
+    }
+
+    expect(authorizedResult!).toBe(true);
+    expect(missingControlsResult!).toBe(false);
+  });
+
   it("does not invoke inherited authorization wrapper coercion metadata while evaluating exact frozen evidence", () => {
     const objectPrototype = Object.prototype as {
       [Symbol.toPrimitive]?: unknown;
@@ -7054,6 +7106,87 @@ describe("production live campaign worker controls", () => {
       }
     }
 
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
+  it("does not invoke data-backed inherited control-entry public-field metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const objectPrototype = Object.prototype as Record<string, unknown>;
+    const originalIdDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "id");
+    const originalStatusDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "status");
+    const originalRequirementDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "requirement");
+
+    let exposesOnlyIndexedEntriesResult: boolean;
+    let frozenResult: boolean;
+    let frozenDescriptorResult: boolean;
+    let publicFieldsResult: boolean;
+    let supportedStatusesResult: boolean;
+    let checklistResult: boolean;
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperties(Object.prototype, {
+        id: {
+          configurable: true,
+          enumerable: true,
+          value: () => {
+            throw new Error("data-backed inherited control-entry id metadata must not be invoked");
+          }
+        },
+        status: {
+          configurable: true,
+          enumerable: true,
+          value: () => {
+            throw new Error("data-backed inherited control-entry status metadata must not be invoked");
+          }
+        },
+        requirement: {
+          configurable: true,
+          enumerable: true,
+          value: () => {
+            throw new Error("data-backed inherited control-entry requirement metadata must not be invoked");
+          }
+        }
+      });
+
+      exposesOnlyIndexedEntriesResult = liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls);
+      frozenResult = liveWorkerControlsAreFrozen(implementedControls);
+      frozenDescriptorResult = liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls);
+      publicFieldsResult = liveWorkerControlsExposeOnlyPublicFields(implementedControls);
+      supportedStatusesResult = liveWorkerControlsUseSupportedStatuses(implementedControls);
+      checklistResult = liveWorkerControlIdsMatchRequiredChecklist(implementedControls);
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalIdDescriptor === undefined) {
+        delete objectPrototype.id;
+      } else {
+        Object.defineProperty(Object.prototype, "id", originalIdDescriptor);
+      }
+
+      if (originalStatusDescriptor === undefined) {
+        delete objectPrototype.status;
+      } else {
+        Object.defineProperty(Object.prototype, "status", originalStatusDescriptor);
+      }
+
+      if (originalRequirementDescriptor === undefined) {
+        delete objectPrototype.requirement;
+      } else {
+        Object.defineProperty(Object.prototype, "requirement", originalRequirementDescriptor);
+      }
+    }
+
+    expect(exposesOnlyIndexedEntriesResult!).toBe(true);
+    expect(frozenResult!).toBe(true);
+    expect(frozenDescriptorResult!).toBe(true);
+    expect(publicFieldsResult!).toBe(true);
+    expect(supportedStatusesResult!).toBe(true);
+    expect(checklistResult!).toBe(true);
     expect(implementedResult!).toBe(true);
     expect(authorizedResult!).toBe(true);
   });
