@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 688  GREEN  product-contact-detail-status-freeze  2026-05-24 10:16
+Objective:    Keep product contact detail status labels stable against caller-side mutation.
+Changed:
+- Added frozen `productContactDetailStatusRows` metadata for `/dashboard/contacts/:contactId` sidebar rows.
+- Updated contact detail projection and page rendering to use the frozen phone, consent, list, tag, and archived status rows.
+- Added product contact unit coverage proving detail status labels, order, values, and caller-side mutation rejection stay stable before rendering.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the contact detail status-row immutability boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 687  GREEN  product-template-detail-metrics-freeze  2026-05-24 10:10
 Objective:    Keep product template detail lifecycle metric labels stable against caller-side mutation.
 Changed:

@@ -70,11 +70,9 @@ export default async function ContactDetailPage({ params }: ContactDetailPagePro
           <section aria-label="Contact status" className="rounded border border-slate-200 bg-white p-5">
             <h2 className="text-xl font-semibold">Contact status</h2>
             <dl className="mt-4 grid gap-3 text-sm">
-              <StatusRow label="Phone" value={contact.phone} />
-              <StatusRow label="Consent" value={contact.consentStatus} />
-              <StatusRow label="Lists" value={contact.lists.join(", ") || "None"} />
-              <StatusRow label="Tags" value={contact.tags.join(", ") || "None"} />
-              <StatusRow label="Archived" value={contact.archived ? "yes" : "no"} />
+              {contact.statusRows.map((row) => (
+                <StatusRow key={row.key} label={row.label} value={row.value} />
+              ))}
             </dl>
           </section>
 

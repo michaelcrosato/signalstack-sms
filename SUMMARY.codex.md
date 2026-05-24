@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 688
+
+- Latest product contact detail status-row hardening exports frozen `productContactDetailStatusRows` metadata, uses it for the `/dashboard/contacts/:contactId` sidebar rows, and focused product contact coverage now proves caller-side mutation of phone, consent, list, tag, or archived labels/order is rejected before contact detail renders. Focused product contact coverage, typecheck, contracts check, diff whitespace check, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/UI/test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 687
 
 - Latest product template detail metric-row hardening exports frozen `productTemplateDetailMetricRows` metadata, uses it for the `/dashboard/templates/:templateId` lifecycle cards, and focused product template coverage now proves caller-side mutation of variable, campaign-usage, updated, or live-send labels/order is rejected before template detail renders. Focused product template coverage, typecheck, contracts check, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/UI/test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.

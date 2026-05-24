@@ -2,7 +2,12 @@ import { ConsentStatus } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { productContactConsentOptions } from "@/lib/product/contact-consent-options";
 import { productContactImportDefaults } from "@/lib/product/contact-import-defaults";
-import { getProductContactDetail, getProductContacts, productContactMetricRows } from "@/lib/product/contacts";
+import {
+  getProductContactDetail,
+  getProductContacts,
+  productContactDetailStatusRows,
+  productContactMetricRows
+} from "@/lib/product/contacts";
 
 vi.mock("@/lib/db/repositories/contacts", () => ({
   listArchivedContacts: vi.fn(async () => [
@@ -138,6 +143,13 @@ describe("getProductContacts", () => {
       tags: ["alpha", "vip"],
       lists: ["Customers"],
       archived: false,
+      statusRows: [
+        { key: "phone", label: "Phone", value: "+15555550104" },
+        { key: "consent", label: "Consent", value: ConsentStatus.OPTED_IN },
+        { key: "lists", label: "Lists", value: "Customers" },
+        { key: "tags", label: "Tags", value: "alpha, vip" },
+        { key: "archived", label: "Archived", value: "no" }
+      ],
       mergeCandidates: expect.arrayContaining([
         expect.objectContaining({
           id: "contact_2",
@@ -173,6 +185,29 @@ describe("getProductContacts", () => {
       (productContactMetricRows[0] as { label: string }).label = "Unsafe";
     }).toThrow(TypeError);
     expect(productContactMetricRows[0].label).toBe("Active Contacts");
+  });
+
+  it("freezes contact detail status metadata before rendering", () => {
+    expect(Object.isFrozen(productContactDetailStatusRows)).toBe(true);
+    expect(productContactDetailStatusRows.every((row) => Object.isFrozen(row))).toBe(true);
+    expect(productContactDetailStatusRows.map((row) => row.key)).toEqual([
+      "phone",
+      "consent",
+      "lists",
+      "tags",
+      "archived"
+    ]);
+
+    expect(() =>
+      (productContactDetailStatusRows as unknown as Array<{ key: string; label: string }>).push({
+        key: "unsafe",
+        label: "Unsafe"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productContactDetailStatusRows[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productContactDetailStatusRows[0].label).toBe("Phone");
   });
 
   it("freezes contact consent option metadata before rendering the detail workflow", () => {

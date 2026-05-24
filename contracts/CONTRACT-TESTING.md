@@ -226,6 +226,7 @@ Post-MVP AI operations view:
 - Unit tests must verify product dashboard local signal metadata is runtime-frozen at both array and entry level before `/dashboard` renders consent coverage, opt-in rate, scheduled work, inbox load, fake-AI request, and local usage signal rows.
 - Unit tests must verify product dashboard compliance readiness counts derive from the shared runtime-frozen product compliance checklist metadata before `/dashboard` renders required profile field counts.
 - Unit tests must verify product contact metric metadata is runtime-frozen at both array and entry level before `/dashboard/contacts` renders active, consent, and archived contact metric rows.
+- Unit tests must verify product contact detail status metadata is runtime-frozen at both array and entry level before `/dashboard/contacts/:contactId` renders phone, consent, list, tag, and archived status rows.
 - Unit tests must verify product contact consent option metadata is runtime-frozen at both array and entry level before `/dashboard/contacts/:contactId` renders consent update choices.
 - Unit tests must verify product contact import defaults are runtime-frozen before `/dashboard/contacts` renders the local CSV import workflow.
 - Unit tests must verify product campaign metric metadata is runtime-frozen at both array and entry level before `/dashboard/campaigns` renders total, draft, scheduled, and ready-recipient metric rows.

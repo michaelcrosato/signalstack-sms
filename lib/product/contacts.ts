@@ -9,9 +9,23 @@ const productContactMetricRowItems = [
   { key: "archived", label: "Archived" }
 ] as const;
 
+const productContactDetailStatusRowItems = [
+  { key: "phone", label: "Phone" },
+  { key: "consent", label: "Consent" },
+  { key: "lists", label: "Lists" },
+  { key: "tags", label: "Tags" },
+  { key: "archived", label: "Archived" }
+] as const;
+
 export const productContactMetricRows = Object.freeze(
   productContactMetricRowItems.map((row) => Object.freeze({ ...row }))
 );
+
+export const productContactDetailStatusRows = Object.freeze(
+  productContactDetailStatusRowItems.map((row) => Object.freeze({ ...row }))
+);
+
+type ProductContactDetailStatusKey = (typeof productContactDetailStatusRowItems)[number]["key"];
 
 export async function getProductContacts(orgId: string) {
   const [contacts, archivedContacts] = await Promise.all([listContacts(orgId), listArchivedContacts(orgId)]);
@@ -42,7 +56,7 @@ export async function getProductContactDetail(orgId: string, contactId: string) 
     return null;
   }
 
-  return {
+  const detail = {
     id: contact.id,
     displayName: contact.displayName ?? ([contact.firstName, contact.lastName].filter(Boolean).join(" ") || contact.phone),
     firstName: contact.firstName ?? "",
@@ -61,6 +75,15 @@ export async function getProductContactDetail(orgId: string, contactId: string) 
       .filter((candidate) => candidate.id !== contact.id)
       .map(contactListRow)
   };
+
+  return {
+    ...detail,
+    statusRows: productContactDetailStatusRows.map((row) => ({
+      key: row.key,
+      label: row.label,
+      value: getContactDetailStatusValue(row.key, detail)
+    }))
+  };
 }
 
 function contactListRow(contact: Awaited<ReturnType<typeof listContacts>>[number]) {
@@ -76,4 +99,28 @@ function contactListRow(contact: Awaited<ReturnType<typeof listContacts>>[number
     lists: contact.listLinks.map((link) => link.list.name).sort(),
     updatedAt: contact.updatedAt
   };
+}
+
+function getContactDetailStatusValue(
+  key: ProductContactDetailStatusKey,
+  contact: {
+    phone: string;
+    consentStatus: ConsentStatus;
+    lists: string[];
+    tags: string[];
+    archived: boolean;
+  }
+) {
+  switch (key) {
+    case "phone":
+      return contact.phone;
+    case "consent":
+      return contact.consentStatus;
+    case "lists":
+      return contact.lists.join(", ") || "None";
+    case "tags":
+      return contact.tags.join(", ") || "None";
+    case "archived":
+      return contact.archived ? "yes" : "no";
+  }
 }
