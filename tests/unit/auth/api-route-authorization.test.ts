@@ -6797,6 +6797,98 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
+  it("treats let and var mixed multi-hop local globalThis root aliases as body parsing for role-gate ordering", () => {
+    const unsafeLetVarMixedMultiHopRequestRootAliasSource = `
+      export async function POST(req: Request) {
+        let root = globalThis;
+        var platform = root;
+        let runtime;
+        runtime = platform;
+        const { Request: RequestCtor = Request } = runtime;
+        const payload = await RequestCtor.prototype.json.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeLetVarMixedMultiHopComputedRequestRootAliasSource = `
+      export async function PATCH(req: Request) {
+        const requestConstructorName = "Request" as const;
+        let root = (globalThis as typeof globalThis);
+        var platform = ((root)! satisfies typeof globalThis);
+        let runtime;
+        runtime = platform as typeof globalThis;
+        const { [requestConstructorName]: RequestCtor = Request } = runtime;
+        const payload = await RequestCtor.prototype.text.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeLetVarMixedMultiHopBuiltinsRootAliasSource = `
+      export async function PUT(req: Request) {
+        var root = globalThis satisfies typeof globalThis;
+        let platform = root!;
+        var runtime = platform! as typeof globalThis;
+        const { Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = runtime;
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "formData"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const unsafeLetVarMixedMultiHopComputedBuiltinsRootAliasSource = `
+      export async function DELETE(req: Request) {
+        const objectName = "Object" as const;
+        const reflectName = "Reflect" as const;
+        let root = ((globalThis as typeof globalThis)!);
+        var platform;
+        let ObjectBuiltin;
+        let ReflectBuiltin;
+        platform = ((root)! as typeof globalThis);
+        const runtime = ((platform)! satisfies typeof globalThis);
+        ({ [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = runtime);
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "blob"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        let root = globalThis;
+        var platform = root;
+        let runtime;
+        runtime = platform;
+        const { Request: RequestCtor = Request } = runtime;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await RequestCtor.prototype.arrayBuffer.call(req);
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeLetVarMixedMultiHopRequestRootAliasSource, "POST")).toBe(
+      true
+    );
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(unsafeLetVarMixedMultiHopComputedRequestRootAliasSource, "PATCH")
+    ).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeLetVarMixedMultiHopBuiltinsRootAliasSource, "PUT")).toBe(
+      true
+    );
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(unsafeLetVarMixedMultiHopComputedBuiltinsRootAliasSource, "DELETE")
+    ).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
   it("treats multi-hop assigned transitive local globalThis root aliases as body parsing for role-gate ordering", () => {
     const unsafeAssignedMultiHopRequestRootAliasSource = `
       export async function POST(req: Request) {
