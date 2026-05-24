@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 657  GREEN  live-worker-deployment-class-accessor-metadata  2026-05-24 06:39
+Objective:    Prove own accessor-backed deployment-class metadata cannot authorize, be read, or inspect reserved live-worker controls.
+Changed:
+- Added live-worker unit coverage showing object-shaped deployment-class values with own accessor-backed tag, iterator, well-known symbol, Object-helper, legacy accessor-helper, prototype-accessor, `constructor`, `toLocaleString`, or coercion metadata deny without reading metadata getters or inspecting supplied controls.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the accessor-backed deployment-class metadata boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 656  GREEN  live-worker-deployment-class-inherited-object-metadata  2026-05-24 06:30
 Objective:    Prove inherited object-valued deployment-class metadata cannot authorize, coerce, or inspect reserved live-worker controls.
 Changed:
