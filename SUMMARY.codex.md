@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 662
+
+- Latest live-worker inherited hidden deployment-class metadata coverage proves object-shaped `production-live-campaign` deployment-class values with inherited hidden string or symbol metadata backed by accessors, callables, or object-valued coercion hooks deny without reading, invoking, or coercing that metadata and without inspecting supplied controls. Focused queue coverage passed with 225 tests, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local unit/docs/log coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 661
 
 - Latest live-worker hidden deployment-class metadata coverage proves object-shaped `production-live-campaign` deployment-class values with hidden own string or symbol metadata backed by accessors, callables, or object-valued coercion hooks deny without reading, invoking, or coercing that metadata and without inspecting supplied controls. Focused queue coverage passed with 224 tests, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local unit/docs/log coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

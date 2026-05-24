@@ -4996,6 +4996,103 @@ describe("production live campaign worker controls", () => {
     expect(metadataCoerced).toBe(false);
   });
 
+  it("rejects inherited hidden deployment class metadata without reading, invoking, coercing it or inspecting controls", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("inherited hidden deployment class metadata must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("inherited hidden deployment class metadata must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("inherited hidden deployment class metadata must not inspect control evidence");
+      }
+    });
+    const hiddenSymbolMetadata = Symbol("inherited-hidden-live-worker-deployment-class");
+    let metadataRead = false;
+    let metadataInvoked = false;
+    let metadataCoerced = false;
+    const hostileObjectMetadata = (metadataName: PropertyKey) =>
+      Object.freeze({
+        [Symbol.toPrimitive]: () => {
+          metadataCoerced = true;
+          throw new Error(`inherited hidden deployment class ${String(metadataName)} metadata must not use Symbol.toPrimitive`);
+        },
+        toString: () => {
+          metadataCoerced = true;
+          throw new Error(`inherited hidden deployment class ${String(metadataName)} metadata must not use toString`);
+        },
+        valueOf: () => {
+          metadataCoerced = true;
+          throw new Error(`inherited hidden deployment class ${String(metadataName)} metadata must not use valueOf`);
+        }
+      });
+    const buildClassWithInheritedHiddenMetadata = (metadataDescriptors: PropertyDescriptorMap) => {
+      const deploymentClassPrototype = Object.create(null) as object;
+      Object.defineProperties(deploymentClassPrototype, metadataDescriptors);
+      return Object.freeze(Object.create(deploymentClassPrototype));
+    };
+    const accessorMetadataClass = buildClassWithInheritedHiddenMetadata({
+      reviewerBypass: {
+        enumerable: false,
+        get: () => {
+          metadataRead = true;
+          throw new Error("inherited hidden deployment class string metadata getter must not be read");
+        }
+      },
+      [hiddenSymbolMetadata]: {
+        enumerable: false,
+        get: () => {
+          metadataRead = true;
+          throw new Error("inherited hidden deployment class symbol metadata getter must not be read");
+        }
+      }
+    });
+    const callableMetadataClass = buildClassWithInheritedHiddenMetadata({
+      reviewerBypass: {
+        enumerable: false,
+        value: () => {
+          metadataInvoked = true;
+          throw new Error("inherited hidden deployment class string metadata must not be invoked");
+        }
+      },
+      [hiddenSymbolMetadata]: {
+        enumerable: false,
+        value: () => {
+          metadataInvoked = true;
+          throw new Error("inherited hidden deployment class symbol metadata must not be invoked");
+        }
+      }
+    });
+    const objectMetadataClass = buildClassWithInheritedHiddenMetadata({
+      reviewerBypass: {
+        enumerable: false,
+        value: hostileObjectMetadata("reviewerBypass")
+      },
+      [hiddenSymbolMetadata]: {
+        enumerable: false,
+        value: hostileObjectMetadata(hiddenSymbolMetadata)
+      }
+    });
+
+    for (const workerDeploymentClass of [accessorMetadataClass, callableMetadataClass, objectMetadataClass]) {
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+
+    expect(metadataRead).toBe(false);
+    expect(metadataInvoked).toBe(false);
+    expect(metadataCoerced).toBe(false);
+  });
+
   it("rejects inherited object-valued deployment class metadata without coercing it or inspecting controls", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {
