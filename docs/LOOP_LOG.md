@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 638  GREEN  live-worker-inherited-data-index-slots  2026-05-24 04:06
+Objective:    Prove data-backed inherited control-array index slots cannot complete sparse live-worker control evidence.
+Changed:
+- Added live-worker unit coverage showing sparse supplied control arrays remain unauthorized even when `Array.prototype[0]` carries a valid-looking implemented control data value.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the inherited data-backed index-slot boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 637  GREEN  live-worker-inherited-array-locale-string  2026-05-24 04:00
 Objective:    Prove inherited `Array.prototype.toLocaleString` metadata cannot influence exact frozen live-worker control-array evidence.
 Changed:

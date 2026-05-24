@@ -1342,6 +1342,42 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects data-backed inherited control-array index slots before live-worker authorization", () => {
+    const implementedControls = implementedFrozenControls();
+    const sparseControls = [...implementedControls];
+    delete sparseControls[0];
+    Object.freeze(sparseControls);
+    const originalDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, "0");
+
+    try {
+      Object.defineProperty(Array.prototype, "0", {
+        configurable: true,
+        enumerable: true,
+        value: implementedControls[0],
+        writable: true
+      });
+
+      expect(liveWorkerControlArrayExposesOnlyIndexedEntries(sparseControls)).toBe(false);
+      expect(liveWorkerControlsAreFrozen(sparseControls)).toBe(false);
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(sparseControls)).toBe(false);
+      expect(liveWorkerControlsExposeOnlyPublicFields(sparseControls)).toBe(false);
+      expect(liveWorkerControlsUseSupportedStatuses(sparseControls)).toBe(false);
+      expect(liveWorkerControlIdsMatchRequiredChecklist(sparseControls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(sparseControls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, sparseControls)
+        )
+      ).toBe(false);
+    } finally {
+      if (originalDescriptor === undefined) {
+        delete Array.prototype[0];
+      } else {
+        Object.defineProperty(Array.prototype, "0", originalDescriptor);
+      }
+    }
+  });
+
   it("requires frozen data descriptors before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
     const mutableImplementedControls = productionLiveCampaignWorkerControls.map((control) => ({
