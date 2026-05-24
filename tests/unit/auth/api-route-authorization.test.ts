@@ -2790,6 +2790,39 @@ describe("API route authorization coverage", () => {
         return Response.json({ ok: Boolean(payload) });
       }
     `;
+    const unsafeRootAliasDefaultedDestructuredGlobalThisRequestAliasSource = `
+      export async function DELETE(req: Request) {
+        const root = globalThis;
+        const { Request: RequestCtor = Request } = root;
+        const payload = await RequestCtor.prototype.blob.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const unsafeRootAliasDefaultedComputedDestructuredGlobalThisRequestAliasSource = `
+      export async function PUT(req: Request) {
+        const root = globalThis as typeof globalThis;
+        const requestConstructorName = "Request" as const;
+        const { [requestConstructorName]: RequestCtor = Request } = root;
+        const payload = await RequestCtor.prototype.text.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeAssignedRootAliasDefaultedDestructuredGlobalThisRequestAliasSource = `
+      export async function PATCH(req: Request) {
+        let root;
+        let RequestCtor;
+        root = (globalThis satisfies typeof globalThis);
+        ({ Request: RequestCtor = Request } = root);
+        const payload = await RequestCtor.prototype.formData.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
     const unsafeParenthesizedGlobalThisAliasRequestSource = `
       export async function POST(req: Request) {
         const root = globalThis;
@@ -3371,6 +3404,24 @@ describe("API route authorization coverage", () => {
     expect(
       mutatingMethodParsesBodyBeforeRoleGate(
         unsafeAssignedSatisfiesDefaultedComputedDestructuredGlobalThisRequestAliasSource,
+        "PATCH"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeRootAliasDefaultedDestructuredGlobalThisRequestAliasSource,
+        "DELETE"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeRootAliasDefaultedComputedDestructuredGlobalThisRequestAliasSource,
+        "PUT"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeAssignedRootAliasDefaultedDestructuredGlobalThisRequestAliasSource,
         "PATCH"
       )
     ).toBe(true);
@@ -5771,6 +5822,50 @@ describe("API route authorization coverage", () => {
         return Response.json(payload);
       }
     `;
+    const unsafeRootAliasDefaultedDestructuredGlobalBuiltinsSource = `
+      export async function POST(req: Request) {
+        const root = globalThis;
+        const { Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = root;
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "arrayBuffer"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+    const unsafeRootAliasDefaultedComputedDestructuredGlobalBuiltinsSource = `
+      export async function PATCH(req: Request) {
+        const root = globalThis as typeof globalThis;
+        const objectName = "Object" as const;
+        const reflectName = ("Reflect");
+        const { [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = root;
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "blob"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const unsafeAssignedRootAliasDefaultedDestructuredGlobalBuiltinsSource = `
+      export async function PUT(req: Request) {
+        let root;
+        let ObjectBuiltin;
+        let ReflectBuiltin;
+        root = (globalThis satisfies typeof globalThis);
+        ({ Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = root);
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "formData"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
     const unsafeAssignedTypeAssertedDestructuredGlobalObjectSource = `
       export async function PATCH(req: Request) {
         let ObjectBuiltin;
@@ -5987,6 +6082,21 @@ describe("API route authorization coverage", () => {
       mutatingMethodParsesBodyBeforeRoleGate(
         unsafeAssignedSatisfiesDefaultedComputedDestructuredGlobalBuiltinsSource,
         "DELETE"
+      )
+    ).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeRootAliasDefaultedDestructuredGlobalBuiltinsSource, "POST")).toBe(
+      true
+    );
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeRootAliasDefaultedComputedDestructuredGlobalBuiltinsSource,
+        "PATCH"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeAssignedRootAliasDefaultedDestructuredGlobalBuiltinsSource,
+        "PUT"
       )
     ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedTypeAssertedDestructuredGlobalObjectSource, "PATCH")).toBe(

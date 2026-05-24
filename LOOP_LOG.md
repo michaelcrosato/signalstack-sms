@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 724  GREEN  auth-root-defaulted-destructured-globalthis-aliases  2026-05-24 14:14
+Objective:    Keep mutating-route auth scanner coverage aligned with local-root default-initialized destructured `globalThis` aliases.
+Changed:
+- Added focused auth unit coverage proving defaulted destructuring through local `globalThis` root aliases resolves `Request`, `Object`, and `Reflect` before prototype/descriptor body-reader calls.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the local-root defaulted destructured globalThis alias boundary.
+- Kept live SMS, billing, providers, workers, Redis, notifications, live AI, secrets, protected gate scripts, and destructive production actions untouched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 723  GREEN  auth-defaulted-destructured-globalthis-builtins-assigned-asserted  2026-05-24 14:06
 Objective:    Keep mutating-route auth scanner coverage aligned with assigned, type-asserted, and `satisfies` default-initialized destructured `globalThis` `Object`/`Reflect` aliases.
 Changed:

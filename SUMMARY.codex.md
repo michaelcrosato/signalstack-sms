@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 724
+
+- Latest mutating-route auth hardening adds focused coverage for default-initialized destructuring through local `globalThis` root aliases for `Request`, `Object`, and `Reflect`, including `const root = globalThis; const { Request: RequestCtor = Request } = root`, `const root = globalThis as typeof globalThis; const { [requestConstructorName]: RequestCtor = Request } = root`, and `root = (globalThis satisfies typeof globalThis); ({ Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = root)`, before prototype/descriptor body-reader calls. Focused auth coverage passed; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 723
 
 - Latest mutating-route auth hardening adds focused coverage for assigned, type-asserted, and `satisfies` default-initialized destructured `globalThis` `Object`/`Reflect` aliases, including `({ Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = globalThis)`, `const { Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = (globalThis as typeof globalThis)`, and `({ [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = (globalThis satisfies typeof globalThis))`, before descriptor/prototype body-reader calls, so those body readers stay classified as parsing that must happen after each handler's own top-level `requireApiRole`. Focused auth coverage passed; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
