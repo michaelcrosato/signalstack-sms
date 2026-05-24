@@ -228,7 +228,7 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
     discoveredGlobalThisAlias = false;
     const globalThisAliasTargets =
       globalThisAliases.size > 0 ? `globalThis|${[...globalThisAliases].map(escapeRegExp).join("|")}` : "globalThis";
-    const globalThisAliasValuePattern = `\\(*\\s*(?:${globalThisAliasTargets})${optionalNonNullAssertionPattern}\\s*\\)*${optionalNonNullAssertionPattern}(?:\\s+(?:as|satisfies)\\s+typeof\\s+globalThis)?\\s*\\)*${optionalNonNullAssertionPattern}`;
+    const globalThisAliasValuePattern = `\\(*\\s*(?:${globalThisAliasTargets})${optionalNonNullAssertionPattern}\\s*\\)*${optionalNonNullAssertionPattern}(?:\\s+(?:as|satisfies)\\s+typeof\\s+globalThis)?\\s*\\)*${optionalNonNullAssertionPattern}\\s*\\)*`;
     const globalThisAliasPattern = new RegExp(
       `(?:\\b(?:const|let|var)\\s+|,\\s*)([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${globalThisAliasValuePattern}\\s*(?=,|;|\\r?\\n)`,
       "g"
@@ -280,7 +280,7 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
   const globalThisTargetPattern = () =>
     `(?:globalThis${globalThisAliases.size > 0 ? `|${[...globalThisAliases].map(escapeRegExp).join("|")}` : ""})`;
   const globalThisTargetWithOptionalTypeAssertionPattern = () =>
-    `\\(*\\s*${globalThisTargetPattern()}${optionalNonNullAssertionPattern}\\s*\\)*${optionalNonNullAssertionPattern}(?:\\s+(?:as|satisfies)\\s+typeof\\s+globalThis)?\\s*\\)*${optionalNonNullAssertionPattern}`;
+    `\\(*\\s*${globalThisTargetPattern()}${optionalNonNullAssertionPattern}\\s*\\)*${optionalNonNullAssertionPattern}(?:\\s+(?:as|satisfies)\\s+typeof\\s+globalThis)?\\s*\\)*${optionalNonNullAssertionPattern}\\s*\\)*`;
   const withoutDestructuringDefault = (field: string) => field.replace(/\s*=\s*[\s\S]*$/, "");
   const collectGlobalThisBuiltInAliases = (fields: string) =>
     fields.split(",").flatMap((field) => {
@@ -6463,8 +6463,19 @@ describe("API route authorization coverage", () => {
         return Response.json({ payload });
       }
     `;
-    const unsafeParenthesizedNonNullTransitiveBuiltinsRootAliasSource = `
+    const unsafeWholeParenthesizedAssertedNonNullTransitiveRequestRootAliasSource = `
       export async function PUT(req: Request) {
+        const root = globalThis;
+        const platform = ((root as typeof globalThis)!);
+        const { Request: RequestCtor = Request } = platform;
+        const payload = await RequestCtor.prototype.formData.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const unsafeParenthesizedNonNullTransitiveBuiltinsRootAliasSource = `
+      export async function PATCH(req: Request) {
         const root = globalThis as typeof globalThis;
         const platform = (root)! as typeof globalThis;
         const { Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = platform;
@@ -6475,6 +6486,26 @@ describe("API route authorization coverage", () => {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
         if (roleResponse) return roleResponse;
         return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const unsafeAssignedWholeParenthesizedAssertedNonNullTransitiveBuiltinsRootAliasSource = `
+      export async function DELETE(req: Request) {
+        const objectName = "Object" as const;
+        const reflectName = ("Reflect");
+        let root;
+        let platform;
+        let ObjectBuiltin;
+        let ReflectBuiltin;
+        root = globalThis;
+        platform = ((root satisfies typeof globalThis)!);
+        ({ [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = platform);
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "blob"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
       }
     `;
     const unsafeParenthesizedNonNullDestructuringTargetSource = `
@@ -6512,9 +6543,21 @@ describe("API route authorization coverage", () => {
     expect(
       mutatingMethodParsesBodyBeforeRoleGate(unsafeWholeParenthesizedNonNullTransitiveRequestRootAliasSource, "PATCH")
     ).toBe(true);
-    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedNonNullTransitiveBuiltinsRootAliasSource, "PUT")).toBe(
-      true
-    );
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeWholeParenthesizedAssertedNonNullTransitiveRequestRootAliasSource,
+        "PUT"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedNonNullTransitiveBuiltinsRootAliasSource, "PATCH")
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeAssignedWholeParenthesizedAssertedNonNullTransitiveBuiltinsRootAliasSource,
+        "DELETE"
+      )
+    ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedNonNullDestructuringTargetSource, "DELETE")).toBe(
       true
     );
