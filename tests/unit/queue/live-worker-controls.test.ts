@@ -7477,6 +7477,102 @@ describe("production live campaign worker controls", () => {
     });
   });
 
+  it("does not read or invoke inherited Object non-public metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const authorizationWrapper = frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls);
+    const metadataSymbol = Symbol("inherited-object-metadata");
+    const objectPrototype = Object.prototype as Record<PropertyKey, unknown>;
+    const originalStringMetadataDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "reviewerBypass");
+    const originalSymbolMetadataDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, metadataSymbol);
+
+    function evaluateExactFrozenEvidence() {
+      return {
+        indexedEntries: liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls),
+        frozen: liveWorkerControlsAreFrozen(implementedControls),
+        frozenDescriptors: liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls),
+        publicFields: liveWorkerControlsExposeOnlyPublicFields(implementedControls),
+        supportedStatuses: liveWorkerControlsUseSupportedStatuses(implementedControls),
+        checklist: liveWorkerControlIdsMatchRequiredChecklist(implementedControls),
+        implemented: liveWorkerControlsAreImplemented(implementedControls),
+        authorized: liveWorkerDeploymentClassIsAuthorized(authorizationWrapper)
+      };
+    }
+
+    let accessorResults: ReturnType<typeof evaluateExactFrozenEvidence>;
+    let dataBackedResults: ReturnType<typeof evaluateExactFrozenEvidence>;
+
+    try {
+      Object.defineProperties(Object.prototype, {
+        reviewerBypass: {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited Object string metadata must not be read");
+          }
+        },
+        [metadataSymbol]: {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited Object symbol metadata must not be read");
+          }
+        }
+      });
+
+      accessorResults = evaluateExactFrozenEvidence();
+
+      Object.defineProperties(Object.prototype, {
+        reviewerBypass: {
+          configurable: true,
+          value: () => {
+            throw new Error("data-backed inherited Object string metadata must not be invoked");
+          },
+          writable: true
+        },
+        [metadataSymbol]: {
+          configurable: true,
+          value: () => {
+            throw new Error("data-backed inherited Object symbol metadata must not be invoked");
+          },
+          writable: true
+        }
+      });
+
+      dataBackedResults = evaluateExactFrozenEvidence();
+    } finally {
+      if (originalStringMetadataDescriptor === undefined) {
+        delete objectPrototype.reviewerBypass;
+      } else {
+        Object.defineProperty(Object.prototype, "reviewerBypass", originalStringMetadataDescriptor);
+      }
+
+      if (originalSymbolMetadataDescriptor === undefined) {
+        delete objectPrototype[metadataSymbol];
+      } else {
+        Object.defineProperty(Object.prototype, metadataSymbol, originalSymbolMetadataDescriptor);
+      }
+    }
+
+    expect(accessorResults!).toEqual({
+      indexedEntries: true,
+      frozen: true,
+      frozenDescriptors: true,
+      publicFields: true,
+      supportedStatuses: true,
+      checklist: true,
+      implemented: true,
+      authorized: true
+    });
+    expect(dataBackedResults!).toEqual({
+      indexedEntries: true,
+      frozen: true,
+      frozenDescriptors: true,
+      publicFields: true,
+      supportedStatuses: true,
+      checklist: true,
+      implemented: true,
+      authorized: true
+    });
+  });
+
   it("does not read inherited control-entry toStringTag metadata while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const objectPrototype = Object.prototype as {
