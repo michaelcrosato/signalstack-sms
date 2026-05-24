@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 748  GREEN  auth-comma-expression-non-null-globalthis-aliases  2026-05-24 16:53
+Objective:    Prove parenthesized assignment comma-expression non-null local `globalThis` root aliases are classified before mutating-route body-reader role gates.
+Changed:
+- Added focused auth unit coverage for non-null/type-asserted comma-expression assignment chains feeding defaulted `Request`, `Object`, and `Reflect` destructuring before body-reader calls.
+- Updated testing docs/contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the non-null comma-expression assignment alias boundary.
+- Kept the change local to tests/docs/logs; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 747  GREEN  auth-parenthesized-assignment-comma-globalthis-aliases  2026-05-24 16:45
 Objective:    Prove parenthesized assignment comma-expression local `globalThis` root aliases are classified before mutating-route body-reader role gates.
 Changed:
