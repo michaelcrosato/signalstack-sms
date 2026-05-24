@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 637  GREEN  live-worker-inherited-array-locale-string  2026-05-24 04:00
+Objective:    Prove inherited `Array.prototype.toLocaleString` metadata cannot influence exact frozen live-worker control-array evidence.
+Changed:
+- Added live-worker unit coverage showing exact frozen control arrays authorize without reading accessor-backed or invoking data-backed inherited `Array.prototype.toLocaleString` metadata.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the inherited Array locale-string boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 636  GREEN  live-worker-hidden-entry-metadata  2026-05-24 03:50
 Objective:    Prove hidden control-entry metadata cannot authorize the reserved live-worker controls.
 Changed:

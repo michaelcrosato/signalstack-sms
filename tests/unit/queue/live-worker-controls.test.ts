@@ -8621,6 +8621,111 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not read inherited control-array toLocaleString metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as {
+      toLocaleString?: unknown;
+    };
+    const originalToLocaleStringDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, "toLocaleString");
+
+    let exposesOnlyIndexedEntriesResult: boolean;
+    let frozenResult: boolean;
+    let frozenDescriptorResult: boolean;
+    let publicFieldsResult: boolean;
+    let supportedStatusesResult: boolean;
+    let checklistResult: boolean;
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperty(Array.prototype, "toLocaleString", {
+        configurable: true,
+        get: () => {
+          throw new Error("inherited control-array toLocaleString metadata must not be read");
+        }
+      });
+
+      exposesOnlyIndexedEntriesResult = liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls);
+      frozenResult = liveWorkerControlsAreFrozen(implementedControls);
+      frozenDescriptorResult = liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls);
+      publicFieldsResult = liveWorkerControlsExposeOnlyPublicFields(implementedControls);
+      supportedStatusesResult = liveWorkerControlsUseSupportedStatuses(implementedControls);
+      checklistResult = liveWorkerControlIdsMatchRequiredChecklist(implementedControls);
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalToLocaleStringDescriptor === undefined) {
+        delete arrayPrototype.toLocaleString;
+      } else {
+        Object.defineProperty(Array.prototype, "toLocaleString", originalToLocaleStringDescriptor);
+      }
+    }
+
+    expect(exposesOnlyIndexedEntriesResult!).toBe(true);
+    expect(frozenResult!).toBe(true);
+    expect(frozenDescriptorResult!).toBe(true);
+    expect(publicFieldsResult!).toBe(true);
+    expect(supportedStatusesResult!).toBe(true);
+    expect(checklistResult!).toBe(true);
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
+  it("does not invoke data-backed inherited control-array toLocaleString metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as {
+      toLocaleString?: unknown;
+    };
+    const originalToLocaleStringDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, "toLocaleString");
+
+    let exposesOnlyIndexedEntriesResult: boolean;
+    let frozenResult: boolean;
+    let frozenDescriptorResult: boolean;
+    let publicFieldsResult: boolean;
+    let supportedStatusesResult: boolean;
+    let checklistResult: boolean;
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperty(Array.prototype, "toLocaleString", {
+        configurable: true,
+        value: () => {
+          throw new Error("data-backed inherited control-array toLocaleString metadata must not be invoked");
+        },
+        writable: true
+      });
+
+      exposesOnlyIndexedEntriesResult = liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls);
+      frozenResult = liveWorkerControlsAreFrozen(implementedControls);
+      frozenDescriptorResult = liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls);
+      publicFieldsResult = liveWorkerControlsExposeOnlyPublicFields(implementedControls);
+      supportedStatusesResult = liveWorkerControlsUseSupportedStatuses(implementedControls);
+      checklistResult = liveWorkerControlIdsMatchRequiredChecklist(implementedControls);
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalToLocaleStringDescriptor === undefined) {
+        delete arrayPrototype.toLocaleString;
+      } else {
+        Object.defineProperty(Array.prototype, "toLocaleString", originalToLocaleStringDescriptor);
+      }
+    }
+
+    expect(exposesOnlyIndexedEntriesResult!).toBe(true);
+    expect(frozenResult!).toBe(true);
+    expect(frozenDescriptorResult!).toBe(true);
+    expect(publicFieldsResult!).toBe(true);
+    expect(supportedStatusesResult!).toBe(true);
+    expect(checklistResult!).toBe(true);
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("does not read inherited control-array constructor metadata while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const arrayPrototype = Array.prototype as unknown as {

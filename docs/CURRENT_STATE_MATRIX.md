@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 637 note: live-worker authorization now evaluates exact frozen control-array evidence without reading or invoking inherited `Array.prototype.toLocaleString` metadata.
+
 Run 636 note: live-worker authorization now denies hidden accessor-backed or data-backed control-entry metadata without reading or invoking it.
 
 Run 635 note: live-worker authorization now denies hidden accessor-backed or data-backed authorization-wrapper metadata without reading or invoking it and before hostile supplied controls are inspected.
