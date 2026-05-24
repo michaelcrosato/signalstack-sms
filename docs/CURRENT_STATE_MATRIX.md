@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 639 note: live-worker authorization now evaluates exact frozen control-array evidence without invoking data-backed inherited index-slot metadata.
+
 Run 638 note: live-worker authorization now rejects data-backed inherited control-array index slots before the reserved class can authorize.
 
 Run 637 note: live-worker authorization now evaluates exact frozen control-array evidence without reading or invoking inherited `Array.prototype.toLocaleString` metadata.
