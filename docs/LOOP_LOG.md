@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 746  GREEN  auth-parenthesized-assignment-non-null-globalthis-aliases  2026-05-24 16:38
+Objective:    Prove parenthesized assignment-expression non-null multi-hop local `globalThis` root aliases are classified before mutating-route body-reader role gates.
+Changed:
+- Added focused auth unit coverage for parenthesized assignment chains with non-null/type-assertion wrappers feeding defaulted `Request`, `Object`, and `Reflect` destructuring before body-reader calls.
+- Updated testing docs/contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the parenthesized assignment non-null alias boundary.
+- Kept the change local to tests/docs/logs; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 745  GREEN  auth-parenthesized-assignment-globalthis-aliases  2026-05-24 16:32
 Objective:    Prove parenthesized assignment-expression multi-hop local `globalThis` root aliases are classified before mutating-route body-reader role gates.
 Changed:
