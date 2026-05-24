@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 684 note: product dashboard local signal metadata is now frozen at both array and entry level, with unit coverage proving caller-side mutation cannot drift consent coverage, opt-in rate, scheduled work, inbox load, fake-AI request, or local usage labels/order before `/dashboard` renders analytics pills.
+
 Run 683 note: product dashboard header action metadata is now frozen at both array and entry level, with unit coverage proving caller-side mutation cannot drift the demo-console or settings links before `/dashboard` renders them.
 
 Run 682 note: product dashboard compliance readiness counts now derive from the shared frozen product compliance checklist metadata, with unit coverage proving `/dashboard` and `/dashboard/compliance` stay aligned on required profile fields.

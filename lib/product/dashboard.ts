@@ -35,6 +35,21 @@ export const productDashboardMetricRows = Object.freeze(
   productDashboardMetricRowItems.map((row) => Object.freeze({ ...row }))
 );
 
+const productDashboardSignalRowItems = [
+  { key: "consentCoverage", label: "Consent coverage" },
+  { key: "optInRate", label: "Opt-in rate" },
+  { key: "scheduledWork", label: "Scheduled work" },
+  { key: "inboxLoad", label: "Inbox load" },
+  { key: "fakeAiRequests", label: "Fake AI requests" },
+  { key: "localUsageEvents", label: "Local usage events" }
+] as const;
+
+type ProductDashboardSignalKey = (typeof productDashboardSignalRowItems)[number]["key"];
+
+export const productDashboardSignalRows = Object.freeze(
+  productDashboardSignalRowItems.map((row) => Object.freeze({ ...row }))
+);
+
 export async function getProductDashboard(orgId: string) {
   const [
     contacts,
@@ -102,6 +117,14 @@ export async function getProductDashboard(orgId: string) {
     openConversations: { value: dashboard.inbox.open, detail: `${dashboard.inbox.messages} messages` },
     templates: { value: dashboard.templates.total, detail: "ready for campaign copy" }
   };
+  const signalValues: Record<ProductDashboardSignalKey, string> = {
+    consentCoverage: `${dashboard.contacts.optedIn}/${dashboard.contacts.total}`,
+    optInRate: `${dashboard.contacts.optedInPercent}%`,
+    scheduledWork: String(dashboard.campaigns.scheduled),
+    inboxLoad: String(dashboard.inbox.open),
+    fakeAiRequests: String(dashboard.usage.fakeAiRequests),
+    localUsageEvents: String(dashboard.usage.totalEvents)
+  };
 
   return {
     ...dashboard,
@@ -114,6 +137,11 @@ export async function getProductDashboard(orgId: string) {
         value: metric.value,
         detail: metric.detail
       };
-    })
+    }),
+    signals: productDashboardSignalRows.map((row) => ({
+      key: row.key,
+      label: row.label,
+      value: signalValues[row.key]
+    }))
   };
 }

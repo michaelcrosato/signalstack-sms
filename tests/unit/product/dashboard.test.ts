@@ -5,6 +5,7 @@ import {
   getProductDashboard,
   productDashboardActions,
   productDashboardMetricRows,
+  productDashboardSignalRows,
   productNavigation
 } from "@/lib/product/dashboard";
 
@@ -139,6 +140,38 @@ describe("product dashboard navigation", () => {
     expect(productDashboardActions[0].label).toBe("Demo Console");
   });
 
+  it("freezes dashboard local signal metadata before rendering", () => {
+    expect(Object.isFrozen(productDashboardSignalRows)).toBe(true);
+    expect(productDashboardSignalRows.every((signal) => Object.isFrozen(signal))).toBe(true);
+    expect(productDashboardSignalRows.map((signal) => signal.key)).toEqual([
+      "consentCoverage",
+      "optInRate",
+      "scheduledWork",
+      "inboxLoad",
+      "fakeAiRequests",
+      "localUsageEvents"
+    ]);
+    expect(productDashboardSignalRows.map((signal) => signal.label)).toEqual([
+      "Consent coverage",
+      "Opt-in rate",
+      "Scheduled work",
+      "Inbox load",
+      "Fake AI requests",
+      "Local usage events"
+    ]);
+
+    expect(() =>
+      (productDashboardSignalRows as unknown as Array<{ key: string; label: string }>).push({
+        key: "unsafe",
+        label: "Unsafe"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productDashboardSignalRows[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productDashboardSignalRows[0].label).toBe("Consent coverage");
+  });
+
   it("projects local usage totals for the product dashboard without live providers", async () => {
     await expect(getProductDashboard("org_1")).resolves.toMatchObject({
       contacts: {
@@ -166,6 +199,14 @@ describe("product dashboard navigation", () => {
         { key: "campaigns", label: "Campaigns", value: 5, detail: "3 drafts" },
         { key: "openConversations", label: "Open Conversations", value: 4, detail: "12 messages" },
         { key: "templates", label: "Templates", value: 6, detail: "ready for campaign copy" }
+      ],
+      signals: [
+        { key: "consentCoverage", label: "Consent coverage", value: "7/10" },
+        { key: "optInRate", label: "Opt-in rate", value: "70%" },
+        { key: "scheduledWork", label: "Scheduled work", value: "1" },
+        { key: "inboxLoad", label: "Inbox load", value: "4" },
+        { key: "fakeAiRequests", label: "Fake AI requests", value: "2" },
+        { key: "localUsageEvents", label: "Local usage events", value: "3" }
       ]
     });
   });
