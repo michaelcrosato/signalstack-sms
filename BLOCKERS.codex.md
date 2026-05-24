@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 645
+
+- No blocker from hidden control-array metadata live-worker coverage. Focused queue coverage passed with 208 tests. The change adds local unit/docs/log coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
 Run number: 644
 
 - No blocker from the seeded product-demo stability check. `npm run demo:seed`, `$env:PLAYWRIGHT_PORT='3112'; npm run test:e2e:product-demo`, and focused live-worker control coverage passed. The iteration records validation truth only and does not execute API handlers beyond local demo/test requests, run live workers, enqueue live jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.

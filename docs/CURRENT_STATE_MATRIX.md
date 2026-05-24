@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 645 note: live-worker authorization now denies hidden control-array metadata backed by accessors or callable data values without reading or invoking that metadata.
+
 Run 644 note: seeded product-demo browser coverage passed after demo seeding across dashboard, contacts, campaign, inbox, template, analytics, and compliance workflows.
 
 Run 643 note: live-worker authorization now evaluates exact frozen control-array evidence without reading accessor-backed or invoking data-backed inherited `Array.prototype.__proto__` prototype-accessor metadata.

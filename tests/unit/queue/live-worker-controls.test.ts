@@ -419,6 +419,66 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects hidden control-array metadata without reading or invoking it", () => {
+    const implementedControls = implementedFrozenControls();
+    const hiddenSymbolMetadata = Symbol("hidden-live-worker-array-bypass");
+    let hiddenAccessorRead = false;
+    let hiddenCallableInvoked = false;
+    const hiddenAccessorMetadataControls = [...implementedControls];
+    Object.defineProperties(hiddenAccessorMetadataControls, {
+      reviewerBypass: {
+        enumerable: false,
+        get: () => {
+          hiddenAccessorRead = true;
+          throw new Error("hidden control-array string metadata getter must not be read");
+        }
+      },
+      [hiddenSymbolMetadata]: {
+        enumerable: false,
+        get: () => {
+          hiddenAccessorRead = true;
+          throw new Error("hidden control-array symbol metadata getter must not be read");
+        }
+      }
+    });
+    Object.freeze(hiddenAccessorMetadataControls);
+    const hiddenCallableMetadataControls = [...implementedControls];
+    Object.defineProperties(hiddenCallableMetadataControls, {
+      reviewerBypass: {
+        enumerable: false,
+        value: () => {
+          hiddenCallableInvoked = true;
+          throw new Error("hidden control-array string metadata must not be invoked");
+        }
+      },
+      [hiddenSymbolMetadata]: {
+        enumerable: false,
+        value: () => {
+          hiddenCallableInvoked = true;
+          throw new Error("hidden control-array symbol metadata must not be invoked");
+        }
+      }
+    });
+    Object.freeze(hiddenCallableMetadataControls);
+
+    for (const controls of [hiddenAccessorMetadataControls, hiddenCallableMetadataControls]) {
+      expect(Object.isFrozen(controls)).toBe(true);
+      expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(controls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).not.toThrow();
+      expect(liveWorkerControlArrayExposesOnlyIndexedEntries(controls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).toBe(false);
+    }
+
+    expect(hiddenAccessorRead).toBe(false);
+    expect(hiddenCallableInvoked).toBe(false);
+  });
+
   it("rejects own coercion metadata on control arrays without invoking it", () => {
     const implementedControls = implementedFrozenControls();
     const coercionMetadataControls = [...implementedControls];

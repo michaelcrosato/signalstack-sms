@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 645  GREEN  live-worker-hidden-array-metadata  2026-05-24 05:13
+Objective:    Prove hidden control-array metadata cannot authorize or inspect the reserved live-worker controls.
+Changed:
+- Added live-worker unit coverage showing hidden string/symbol control-array metadata backed by accessors or callable data values denies without reading or invoking the hidden metadata.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the hidden control-array metadata boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 644  GREEN  product-demo-stability  2026-05-24 05:06
 Objective:    Verify the seeded product demo path remains green before adding more live-worker hardening.
 Changed:
