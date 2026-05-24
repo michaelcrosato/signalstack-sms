@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 673
+
+- Latest product template metric hardening exports frozen `productTemplateMetricRows` metadata and deep-freezes each row, and focused product template coverage now proves both the array and each row reject mutation before `/dashboard/templates` renders saved-template, variable, campaign-usage, and live-send blocker metric labels/order. Focused product template coverage, focused product coverage, typecheck, contracts check, diff whitespace check, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 672
 
 - Latest product inbox metric hardening exports frozen `productInboxMetricRows` metadata and deep-freezes each row, and focused product inbox coverage now proves both the array and each row reject mutation before `/dashboard/inbox` renders total, open, resolved, and recent-inbound thread metric labels/order. Focused product inbox coverage passed with 2 tests, focused product coverage passed with 21 tests, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

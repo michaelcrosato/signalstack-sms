@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 673  GREEN  product-template-metrics-deep-freeze  2026-05-24 08:31
+Objective:    Keep product template metric metadata stable against caller-side label or order mutation.
+Changed:
+- Exported frozen `productTemplateMetricRows` metadata and deep-froze each template metric row.
+- Updated `/dashboard/templates` to render saved-template, variable, campaign-usage, and live-send blocker metric cards from the frozen projection.
+- Added product template unit coverage proving the metric metadata array and each row are frozen before `/dashboard/templates` renders local template metrics.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 672  GREEN  product-inbox-metrics-deep-freeze  2026-05-24 08:24
 Objective:    Keep product inbox metric metadata stable against caller-side label or order mutation.
 Changed:

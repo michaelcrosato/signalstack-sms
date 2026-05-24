@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { getProductTemplateDetail, getProductTemplates } from "@/lib/product/templates";
+import { getProductTemplateDetail, getProductTemplates, productTemplateMetricRows } from "@/lib/product/templates";
 
 vi.mock("@/lib/db/prisma", () => ({
   prisma: {
@@ -48,8 +48,15 @@ describe("getProductTemplates", () => {
     expect(result.summary).toEqual({
       total: 2,
       variables: 1,
-      campaignUsage: 2
+      campaignUsage: 2,
+      liveSends: "blocked"
     });
+    expect(result.metrics).toEqual([
+      { key: "total", label: "Saved Templates", value: 2 },
+      { key: "variables", label: "Variables", value: 1 },
+      { key: "campaignUsage", label: "Campaign Usage", value: 2 },
+      { key: "liveSends", label: "Live Sends", value: "blocked" }
+    ]);
     expect(result.templates).toEqual([
       {
         id: "template_1",
@@ -69,6 +76,28 @@ describe("getProductTemplates", () => {
       }
     ]);
     expect(result.variableNames).toEqual(["firstName"]);
+  });
+
+  it("freezes template metric metadata before rendering", () => {
+    expect(Object.isFrozen(productTemplateMetricRows)).toBe(true);
+    expect(productTemplateMetricRows.every((row) => Object.isFrozen(row))).toBe(true);
+    expect(productTemplateMetricRows.map((row) => row.key)).toEqual([
+      "total",
+      "variables",
+      "campaignUsage",
+      "liveSends"
+    ]);
+
+    expect(() =>
+      (productTemplateMetricRows as unknown as Array<{ key: string; label: string }>).push({
+        key: "unsafe",
+        label: "Unsafe"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productTemplateMetricRows[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productTemplateMetricRows[0].label).toBe("Saved Templates");
   });
 });
 

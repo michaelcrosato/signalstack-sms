@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function TemplatesPage() {
   const currentOrg = await getOrCreateCurrentOrg();
-  const { summary, templates, variableNames } = await getProductTemplates(currentOrg.orgId);
+  const { metrics, templates, variableNames } = await getProductTemplates(currentOrg.orgId);
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
@@ -43,10 +43,9 @@ export default async function TemplatesPage() {
 
       <div className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-6">
         <section aria-label="Template metrics" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Metric label="Saved Templates" value={summary.total} />
-          <Metric label="Variables" value={summary.variables} />
-          <Metric label="Campaign Usage" value={summary.campaignUsage} />
-          <Metric label="Live Sends" value="blocked" />
+          {metrics.map((metric) => (
+            <Metric key={metric.key} label={metric.label} value={metric.value} />
+          ))}
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">

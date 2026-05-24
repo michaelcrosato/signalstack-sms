@@ -1,6 +1,17 @@
 import { prisma } from "@/lib/db/prisma";
 import { getTemplate } from "@/lib/db/repositories/templates";
 
+const productTemplateMetricRowItems = [
+  { key: "total", label: "Saved Templates" },
+  { key: "variables", label: "Variables" },
+  { key: "campaignUsage", label: "Campaign Usage" },
+  { key: "liveSends", label: "Live Sends" }
+] as const;
+
+export const productTemplateMetricRows = Object.freeze(
+  productTemplateMetricRowItems.map((row) => Object.freeze({ ...row }))
+);
+
 export async function getProductTemplates(orgId: string) {
   const templates = await prisma.messageTemplate.findMany({
     where: { orgId },
@@ -10,6 +21,12 @@ export async function getProductTemplates(orgId: string) {
 
   const variableNames = [...new Set(templates.flatMap((template) => normalizeVariables(template.variables)))].sort();
   const campaignUsage = templates.reduce((total, template) => total + template._count.campaigns, 0);
+  const summary = {
+    total: templates.length,
+    variables: variableNames.length,
+    campaignUsage,
+    liveSends: "blocked" as const
+  };
 
   return {
     templates: templates.map((template) => ({
@@ -20,11 +37,12 @@ export async function getProductTemplates(orgId: string) {
       campaignUsage: template._count.campaigns,
       updatedAt: template.updatedAt
     })),
-    summary: {
-      total: templates.length,
-      variables: variableNames.length,
-      campaignUsage
-    },
+    summary,
+    metrics: productTemplateMetricRows.map((row) => ({
+      key: row.key,
+      label: row.label,
+      value: summary[row.key]
+    })),
     variableNames
   };
 }
