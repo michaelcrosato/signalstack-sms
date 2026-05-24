@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 649 note: live-worker authorization now denies own object-valued control-array `Symbol.toPrimitive`, `toString`, or `valueOf` metadata with hostile coercion hooks without invoking those hooks.
+
 Run 648 note: live-worker authorization now denies own object-valued control-array `constructor` or `toLocaleString` metadata with hostile coercion hooks without invoking those hooks.
 
 Run 647 note: live-worker authorization now denies own control-array `constructor` metadata backed by accessors or callable data values without reading or invoking that metadata, and root loop truth again includes the prior Run 646 entry.
@@ -371,3 +373,5 @@ Run 643 addendum: exact frozen control-array evidence stays authorized without r
 Run 646 addendum: own accessor-backed or data-backed supplied control-array `toLocaleString` metadata denies before the reserved live-worker class can authorize, and that metadata is not read or invoked.
 
 Run 647 addendum: own accessor-backed or data-backed supplied control-array `constructor` metadata denies before the reserved live-worker class can authorize, and that metadata is not read or invoked.
+
+Run 649 addendum: own object-valued supplied control-array `Symbol.toPrimitive`, `toString`, or `valueOf` metadata denies before the reserved live-worker class can authorize, and hostile coercion hooks are not invoked.

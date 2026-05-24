@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 649
+
+- Latest live-worker own object-valued coercion metadata coverage proves otherwise valid `production-live-campaign` control arrays with own `Symbol.toPrimitive`, `toString`, or `valueOf` metadata carrying hostile coercion hooks deny without invoking those hooks. Focused queue coverage passed with 212 tests, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local unit/docs/log coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 648
 
 - Latest live-worker own `constructor`/`toLocaleString` object-valued control-array metadata coverage proves hostile coercion hooks deny without being invoked. Focused queue coverage passed with 211 tests, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local unit/docs/log coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 649  GREEN  live-worker-array-object-coercion  2026-05-24 05:41
+Objective:    Prove own object-valued `Symbol.toPrimitive`/`toString`/`valueOf` control-array metadata cannot authorize or coerce the reserved live-worker controls.
+Changed:
+- Added live-worker unit coverage showing otherwise valid supplied control arrays with object-valued coercion metadata carrying hostile hooks deny without invoking those hooks.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the object-valued control-array coercion boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 648  GREEN  live-worker-array-object-metadata  2026-05-24 05:37
 Objective:    Prove own object-valued `constructor`/`toLocaleString` control-array metadata cannot authorize or coerce the reserved live-worker controls.
 Changed:
