@@ -5,6 +5,7 @@ Owner: tests-quality.
 Milestone 0 required tests:
 
 - Vitest smoke test for demo-safe defaults and fake integrations.
+- Vitest smoke test for runtime-frozen demo-safe env defaults, so callers cannot mutate `DEMO_MODE`, `LIVE_MESSAGING_ENABLED`, `LIVE_BILLING_ENABLED`, `MESSAGING_PROVIDER`, or `AI_PROVIDER` before local UI, health, or compliance checks render them.
 - Playwright smoke test for the minimal home page.
 - Validation command that runs contracts, safety checks, lint, typecheck, Prisma validate/generate, tests, E2E smoke, and build.
 

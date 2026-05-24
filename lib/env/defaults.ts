@@ -1,10 +1,10 @@
-export const envDefaults = {
+export const envDefaults = Object.freeze({
   DEMO_MODE: "true",
   LIVE_MESSAGING_ENABLED: "false",
   LIVE_BILLING_ENABLED: "false",
   MESSAGING_PROVIDER: "dummy",
   AI_PROVIDER: "fake"
-} as const;
+} as const);
 
 export const localDatabaseUrl = "postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public";
 

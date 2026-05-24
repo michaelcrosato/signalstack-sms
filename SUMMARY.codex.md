@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 679
+
+- Latest demo env-default hardening runtime-freezes the shared `envDefaults` map, and smoke coverage now proves caller-side mutation is rejected before local UI, health, compliance, and defaulting helpers consume demo-safe defaults. Focused smoke coverage, typecheck, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local default metadata/test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 678
 
 - Latest product contact import-default hardening exports frozen `productContactImportDefaults` metadata, uses it for the `/dashboard/contacts` CSV import form, and focused product contact coverage now proves caller-side default filename/CSV mutation is rejected before the local import workflow renders. Focused product contact coverage, typecheck, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.

@@ -5,6 +5,7 @@ import { fakeCampaignCopy } from "@/lib/ai/fake-ai-provider";
 
 describe("Milestone 0 scaffold", () => {
   it("keeps demo-safe defaults", () => {
+    expect(Object.isFrozen(envDefaults)).toBe(true);
     expect(envDefaults).toEqual({
       DEMO_MODE: "true",
       LIVE_MESSAGING_ENABLED: "false",
@@ -12,6 +13,10 @@ describe("Milestone 0 scaffold", () => {
       MESSAGING_PROVIDER: "dummy",
       AI_PROVIDER: "fake"
     });
+    expect(() => {
+      (envDefaults as unknown as Record<string, string>).DEMO_MODE = "false";
+    }).toThrow(TypeError);
+    expect(envDefaults.DEMO_MODE).toBe("true");
   });
 
   it("uses deterministic fake integrations", async () => {

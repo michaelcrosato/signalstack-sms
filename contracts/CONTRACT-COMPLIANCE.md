@@ -8,6 +8,7 @@ Milestone 0 hard gates:
 - Live billing disabled by default.
 - Dummy messaging provider by default.
 - Fake AI provider by default.
+- Shared demo-safe runtime defaults are runtime-frozen before local UI, health, and compliance checks consume them.
 - No real credentials committed.
 
 Future campaign sends must check consent, opt-out state, provider readiness, and live-action flags.

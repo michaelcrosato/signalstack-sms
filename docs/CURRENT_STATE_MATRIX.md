@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 679 note: shared demo-safe runtime defaults are now frozen, with smoke coverage proving caller-side default mutation is rejected before local UI, health, and compliance checks consume them.
+
 Run 678 note: product contact import defaults are now frozen, with unit coverage proving caller-side default filename/CSV mutation is rejected before `/dashboard/contacts` renders the local CSV import workflow.
 
 Run 677 note: product template create-form defaults are now frozen, with unit coverage proving caller-side default name/body mutation is rejected before `/dashboard/templates` renders reusable local copy defaults.

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 679  GREEN  demo-env-defaults-freeze  2026-05-24 09:13
+Objective:    Keep shared demo-safe runtime defaults stable against caller-side mutation.
+Changed:
+- Runtime-froze the exported `envDefaults` map used by local UI, health, compliance, and defaulting helpers.
+- Added smoke coverage proving mutation of demo-safe defaults is rejected while values remain `DEMO_MODE=true`, live messaging/billing disabled, dummy messaging, and fake AI.
+- Updated testing/compliance contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the demo env-default immutability boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 678  GREEN  product-contact-import-defaults-freeze  2026-05-24 09:05
 Objective:    Keep product contact import defaults stable against caller-side filename/CSV mutation.
 Changed:
