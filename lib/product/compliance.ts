@@ -5,6 +5,19 @@ import { productComplianceFields } from "@/lib/product/compliance-fields";
 
 export { productComplianceFields };
 
+const productComplianceMetricRowItems = [
+  { key: "profileFields", label: "Profile Fields" },
+  { key: "a2pStatus", label: "A2P Status" },
+  { key: "liveMessaging", label: "Live Messaging" },
+  { key: "blockers", label: "Blockers" }
+] as const;
+
+type ProductComplianceMetricKey = (typeof productComplianceMetricRowItems)[number]["key"];
+
+export const productComplianceMetricRows = Object.freeze(
+  productComplianceMetricRowItems.map((row) => Object.freeze({ ...row }))
+);
+
 const productComplianceBlockerCopyItems = {
   LIVE_MESSAGING_DISABLED: "Live messaging flag is disabled.",
   DEMO_MODE_ENABLED: "Demo mode is enabled for this organization.",
@@ -43,19 +56,48 @@ export async function getProductCompliance(input: ProductComplianceInput) {
     status: profile[field.key] ? "present" : "missing"
   }));
   const completeFields = fields.filter((field) => field.complete).length;
+  const summary = {
+    complete: complianceProfileIsComplete(profile),
+    completeFields,
+    requiredFields: fields.length,
+    a2pRegistrationStatus: profile.a2pRegistrationStatus,
+    liveMessagingAllowed: gate.allowed,
+    blockerCount: gate.reasons.length,
+    demoMode: input.demoMode,
+    liveMessagingEnabled,
+    messagingProvider
+  };
+  const metricValues: Record<ProductComplianceMetricKey, { value: string; detail: string }> = {
+    profileFields: {
+      value: `${summary.completeFields}/${summary.requiredFields}`,
+      detail: summary.complete ? "complete" : "needs review"
+    },
+    a2pStatus: {
+      value: summary.a2pRegistrationStatus,
+      detail: "registration gate"
+    },
+    liveMessaging: {
+      value: summary.liveMessagingAllowed ? "review" : "blocked",
+      detail: summary.liveMessagingEnabled ? "flag enabled" : "flag disabled"
+    },
+    blockers: {
+      value: String(summary.blockerCount),
+      detail: "hard-gate reasons"
+    }
+  };
 
   return {
-    summary: {
-      complete: complianceProfileIsComplete(profile),
-      completeFields,
-      requiredFields: fields.length,
-      a2pRegistrationStatus: profile.a2pRegistrationStatus,
-      liveMessagingAllowed: gate.allowed,
-      blockerCount: gate.reasons.length,
-      demoMode: input.demoMode,
-      liveMessagingEnabled,
-      messagingProvider
-    },
+    summary,
+    metrics: productComplianceMetricRows.map((row) => {
+      const metric = metricValues[row.key];
+
+      return {
+        key: row.key,
+        label: row.label,
+        value: metric.value,
+        detail: metric.detail
+      };
+    }),
     fields,
     blockers: gate.reasons.map((reason) => ({
       reason,

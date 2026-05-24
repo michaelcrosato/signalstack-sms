@@ -46,18 +46,9 @@ export default async function DashboardCompliancePage() {
 
       <div className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-6">
         <section aria-label="Compliance metrics" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Metric
-            label="Profile Fields"
-            value={`${compliance.summary.completeFields}/${compliance.summary.requiredFields}`}
-            detail={compliance.summary.complete ? "complete" : "needs review"}
-          />
-          <Metric label="A2P Status" value={compliance.summary.a2pRegistrationStatus} detail="registration gate" />
-          <Metric
-            label="Live Messaging"
-            value={compliance.summary.liveMessagingAllowed ? "review" : "blocked"}
-            detail={compliance.summary.liveMessagingEnabled ? "flag enabled" : "flag disabled"}
-          />
-          <Metric label="Blockers" value={String(compliance.summary.blockerCount)} detail="hard-gate reasons" />
+          {compliance.metrics.map((metric) => (
+            <Metric key={metric.key} label={metric.label} value={metric.value} detail={metric.detail} />
+          ))}
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">

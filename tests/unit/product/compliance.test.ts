@@ -1,6 +1,11 @@
 import { A2pRegistrationStatus } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
-import { getProductCompliance, productComplianceBlockerCopy, productComplianceFields } from "@/lib/product/compliance";
+import {
+  getProductCompliance,
+  productComplianceBlockerCopy,
+  productComplianceFields,
+  productComplianceMetricRows
+} from "@/lib/product/compliance";
 
 vi.mock("@/lib/db/repositories/compliance", () => ({
   getOrCreateComplianceProfile: vi.fn(async () => ({
@@ -44,6 +49,12 @@ describe("getProductCompliance", () => {
       ["Privacy policy URL", "present"],
       ["Terms of service URL", "present"]
     ]);
+    expect(result.metrics).toEqual([
+      { key: "profileFields", label: "Profile Fields", value: "5/5", detail: "complete" },
+      { key: "a2pStatus", label: "A2P Status", value: A2pRegistrationStatus.NOT_STARTED, detail: "registration gate" },
+      { key: "liveMessaging", label: "Live Messaging", value: "blocked", detail: "flag disabled" },
+      { key: "blockers", label: "Blockers", value: "4", detail: "hard-gate reasons" }
+    ]);
     expect(result.blockers.map((blocker) => blocker.reason)).toEqual([
       "LIVE_MESSAGING_DISABLED",
       "DEMO_MODE_ENABLED",
@@ -72,6 +83,33 @@ describe("getProductCompliance", () => {
     expect(() => {
       (productComplianceFields[0] as { label: string }).label = "Unsafe";
     }).toThrow(TypeError);
+  });
+
+  it("freezes compliance metric metadata before rendering", () => {
+    expect(Object.isFrozen(productComplianceMetricRows)).toBe(true);
+    expect(productComplianceMetricRows.every((row) => Object.isFrozen(row))).toBe(true);
+    expect(productComplianceMetricRows.map((row) => row.key)).toEqual([
+      "profileFields",
+      "a2pStatus",
+      "liveMessaging",
+      "blockers"
+    ]);
+    expect(productComplianceMetricRows.map((row) => row.label)).toEqual([
+      "Profile Fields",
+      "A2P Status",
+      "Live Messaging",
+      "Blockers"
+    ]);
+    expect(() =>
+      (productComplianceMetricRows as unknown as Array<{ key: string; label: string }>).push({
+        key: "unsafe",
+        label: "Unsafe"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productComplianceMetricRows[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productComplianceMetricRows[0].label).toBe("Profile Fields");
   });
 
   it("freezes hard-gate blocker copy before rendering", () => {
