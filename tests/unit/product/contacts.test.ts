@@ -1,6 +1,6 @@
 import { ConsentStatus } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
-import { getProductContactDetail, getProductContacts } from "@/lib/product/contacts";
+import { getProductContactDetail, getProductContacts, productContactMetricRows } from "@/lib/product/contacts";
 
 vi.mock("@/lib/db/repositories/contacts", () => ({
   listArchivedContacts: vi.fn(async () => [
@@ -98,6 +98,13 @@ describe("getProductContacts", () => {
       optedOut: 1,
       unknown: 1
     });
+    expect(result.metrics).toEqual([
+      { key: "total", label: "Active Contacts", value: 3 },
+      { key: "optedIn", label: "Opted In", value: 1 },
+      { key: "optedOut", label: "Opted Out", value: 1 },
+      { key: "unknown", label: "Unknown Consent", value: 1 },
+      { key: "archived", label: "Archived", value: 1 }
+    ]);
     expect(result.contacts.map((contact) => contact.displayName)).toEqual([
       "Grace Hopper",
       "Ada Lovelace",
@@ -141,5 +148,28 @@ describe("getProductContacts", () => {
 
   it("returns null when the product contact detail is outside the tenant", async () => {
     await expect(getProductContactDetail("org_1", "missing")).resolves.toBeNull();
+  });
+
+  it("freezes contact metric metadata before rendering", () => {
+    expect(Object.isFrozen(productContactMetricRows)).toBe(true);
+    expect(productContactMetricRows.every((row) => Object.isFrozen(row))).toBe(true);
+    expect(productContactMetricRows.map((row) => row.key)).toEqual([
+      "total",
+      "optedIn",
+      "optedOut",
+      "unknown",
+      "archived"
+    ]);
+
+    expect(() =>
+      (productContactMetricRows as unknown as Array<{ key: string; label: string }>).push({
+        key: "unsafe",
+        label: "Unsafe"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productContactMetricRows[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productContactMetricRows[0].label).toBe("Active Contacts");
   });
 });

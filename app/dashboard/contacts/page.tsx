@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function ContactsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
-  const { archivedContacts, contacts, summary } = await getProductContacts(currentOrg.orgId);
+  const { archivedContacts, contacts, metrics } = await getProductContacts(currentOrg.orgId);
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
@@ -42,11 +42,9 @@ export default async function ContactsPage() {
 
       <div className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-6">
         <section aria-label="Contact metrics" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          <Metric label="Active Contacts" value={summary.total} />
-          <Metric label="Opted In" value={summary.optedIn} />
-          <Metric label="Opted Out" value={summary.optedOut} />
-          <Metric label="Unknown Consent" value={summary.unknown} />
-          <Metric label="Archived" value={summary.archived} />
+          {metrics.map((metric) => (
+            <Metric key={metric.key} label={metric.label} value={metric.value} />
+          ))}
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1fr_0.8fr]">

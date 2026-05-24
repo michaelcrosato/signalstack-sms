@@ -1,6 +1,18 @@
 import { ConsentStatus } from "@prisma/client";
 import { getContact, listArchivedContacts, listContacts } from "@/lib/db/repositories/contacts";
 
+const productContactMetricRowItems = [
+  { key: "total", label: "Active Contacts" },
+  { key: "optedIn", label: "Opted In" },
+  { key: "optedOut", label: "Opted Out" },
+  { key: "unknown", label: "Unknown Consent" },
+  { key: "archived", label: "Archived" }
+] as const;
+
+export const productContactMetricRows = Object.freeze(
+  productContactMetricRowItems.map((row) => Object.freeze({ ...row }))
+);
+
 export async function getProductContacts(orgId: string) {
   const [contacts, archivedContacts] = await Promise.all([listContacts(orgId), listArchivedContacts(orgId)]);
   const summary = {
@@ -13,6 +25,11 @@ export async function getProductContacts(orgId: string) {
 
   return {
     summary,
+    metrics: productContactMetricRows.map((row) => ({
+      key: row.key,
+      label: row.label,
+      value: summary[row.key]
+    })),
     contacts: contacts.map(contactListRow),
     archivedContacts: archivedContacts.map(contactListRow)
   };
