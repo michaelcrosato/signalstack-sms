@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 600
+
+- Latest live-worker own control-array data-backed method-name metadata coverage proves otherwise valid `production-live-campaign` control arrays with own callable data properties named like array methods deny without invoking those functions. Focused queue coverage passed with 162 tests, and the protected local gate passed with 59 Vitest files / 618 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 599
 
 - Latest live-worker authorization-wrapper accessor-backed coercion metadata coverage proves frozen-looking `production-live-campaign` authorization wrappers with own accessor-backed `Symbol.toPrimitive`, `toString`, or `valueOf` metadata deny before supplied controls are inspected and without reading getters. Focused queue coverage passed with 161 tests, and the protected local gate passed with 59 Vitest files / 617 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

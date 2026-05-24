@@ -5426,3 +5426,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 600  GREEN  live-worker-data-array-method-names  2026-05-23 22:25
+Objective:    Prove own data-backed array method-name metadata cannot authorize otherwise valid live-worker control arrays.
+Changed:
+- Added live-worker unit coverage showing otherwise valid control arrays with callable own data properties named like array methods deny without invoking those functions.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the data-backed array method-name metadata boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
