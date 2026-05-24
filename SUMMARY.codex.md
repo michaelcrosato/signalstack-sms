@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 687
+
+- Latest product template detail metric-row hardening exports frozen `productTemplateDetailMetricRows` metadata, uses it for the `/dashboard/templates/:templateId` lifecycle cards, and focused product template coverage now proves caller-side mutation of variable, campaign-usage, updated, or live-send labels/order is rejected before template detail renders. Focused product template coverage, typecheck, contracts check, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/UI/test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 686
 
 - Latest product campaign detail metric-row hardening exports frozen `productCampaignDetailMetricRows` metadata, uses it for the `/dashboard/campaigns/:campaignId` lifecycle cards, and focused product campaign coverage now proves caller-side mutation of status, recipient, template, or schedule labels/order is rejected before campaign detail renders. Focused product campaign coverage, typecheck, contracts check, diff whitespace check, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/UI/test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.

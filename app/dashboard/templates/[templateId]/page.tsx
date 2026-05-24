@@ -56,10 +56,9 @@ export default async function TemplateDetailPage({ params }: TemplateDetailPageP
 
       <div className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-6">
         <section aria-label="Template lifecycle" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Metric label="Variables" value={template.variables.length.toString()} />
-          <Metric label="Campaign Usage" value={template.campaignUsage.toString()} />
-          <Metric label="Updated" value={template.updatedAt.toLocaleString("en-US")} />
-          <Metric label="Live Sends" value="blocked" />
+          {template.metrics.map((metric) => (
+            <Metric key={metric.key} label={metric.label} value={metric.value} />
+          ))}
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1fr_0.8fr]">

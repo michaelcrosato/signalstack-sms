@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 687  GREEN  product-template-detail-metrics-freeze  2026-05-24 10:10
+Objective:    Keep product template detail lifecycle metric labels stable against caller-side mutation.
+Changed:
+- Added frozen `productTemplateDetailMetricRows` metadata for `/dashboard/templates/:templateId` lifecycle cards.
+- Updated the template detail projection and page rendering to use the frozen variable, campaign-usage, updated, and live-send metric rows.
+- Added product template unit coverage proving detail metric labels, order, values, and caller-side mutation rejection stay stable before rendering.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the template detail metric-row immutability boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 686  GREEN  product-campaign-detail-metrics-freeze  2026-05-24 10:00
 Objective:    Keep product campaign detail lifecycle metric labels stable against caller-side mutation.
 Changed:

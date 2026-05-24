@@ -12,6 +12,19 @@ export const productTemplateMetricRows = Object.freeze(
   productTemplateMetricRowItems.map((row) => Object.freeze({ ...row }))
 );
 
+const productTemplateDetailMetricRowItems = [
+  { key: "variables", label: "Variables" },
+  { key: "campaignUsage", label: "Campaign Usage" },
+  { key: "updated", label: "Updated" },
+  { key: "liveSends", label: "Live Sends" }
+] as const;
+
+type ProductTemplateDetailMetricKey = (typeof productTemplateDetailMetricRowItems)[number]["key"];
+
+export const productTemplateDetailMetricRows = Object.freeze(
+  productTemplateDetailMetricRowItems.map((row) => Object.freeze({ ...row }))
+);
+
 export async function getProductTemplates(orgId: string) {
   const templates = await prisma.messageTemplate.findMany({
     where: { orgId },
@@ -54,13 +67,28 @@ export async function getProductTemplateDetail(orgId: string, templateId: string
     return null;
   }
 
-  return {
+  const detail = {
     id: template.id,
     name: template.name,
     body: template.body,
     variables: normalizeVariables(template.variables),
     campaignUsage: template._count.campaigns,
     updatedAt: template.updatedAt
+  };
+  const metricValues: Record<ProductTemplateDetailMetricKey, string> = {
+    variables: detail.variables.length.toString(),
+    campaignUsage: detail.campaignUsage.toString(),
+    updated: detail.updatedAt.toLocaleString("en-US"),
+    liveSends: "blocked"
+  };
+
+  return {
+    ...detail,
+    metrics: productTemplateDetailMetricRows.map((row) => ({
+      key: row.key,
+      label: row.label,
+      value: metricValues[row.key]
+    }))
   };
 }
 

@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 import { productTemplateFormDefaults } from "@/lib/product/template-form-defaults";
-import { getProductTemplateDetail, getProductTemplates, productTemplateMetricRows } from "@/lib/product/templates";
+import {
+  getProductTemplateDetail,
+  getProductTemplates,
+  productTemplateDetailMetricRows,
+  productTemplateMetricRows
+} from "@/lib/product/templates";
 
 vi.mock("@/lib/db/prisma", () => ({
   prisma: {
@@ -120,17 +125,47 @@ describe("getProductTemplates", () => {
 
 describe("getProductTemplateDetail", () => {
   it("builds a tenant-scoped template detail projection", async () => {
+    const updatedAt = new Date("2026-01-02T00:00:00.000Z");
+
     await expect(getProductTemplateDetail("org_1", "template_1")).resolves.toEqual({
       id: "template_1",
       name: "Intro",
       body: "Hi {{firstName}} from {{company}}",
       variables: ["company", "firstName"],
       campaignUsage: 3,
-      updatedAt: new Date("2026-01-02T00:00:00.000Z")
+      updatedAt,
+      metrics: [
+        { key: "variables", label: "Variables", value: "2" },
+        { key: "campaignUsage", label: "Campaign Usage", value: "3" },
+        { key: "updated", label: "Updated", value: updatedAt.toLocaleString("en-US") },
+        { key: "liveSends", label: "Live Sends", value: "blocked" }
+      ]
     });
   });
 
   it("returns null for missing template detail", async () => {
     await expect(getProductTemplateDetail("org_1", "missing")).resolves.toBeNull();
+  });
+
+  it("freezes template detail metric metadata before rendering", () => {
+    expect(Object.isFrozen(productTemplateDetailMetricRows)).toBe(true);
+    expect(productTemplateDetailMetricRows.every((row) => Object.isFrozen(row))).toBe(true);
+    expect(productTemplateDetailMetricRows.map((row) => row.key)).toEqual([
+      "variables",
+      "campaignUsage",
+      "updated",
+      "liveSends"
+    ]);
+
+    expect(() =>
+      (productTemplateDetailMetricRows as unknown as Array<{ key: string; label: string }>).push({
+        key: "unsafe",
+        label: "Unsafe"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productTemplateDetailMetricRows[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productTemplateDetailMetricRows[0].label).toBe("Variables");
   });
 });
