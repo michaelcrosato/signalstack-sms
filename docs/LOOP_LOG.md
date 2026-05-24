@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 621  GREEN  live-worker-inherited-object-ownership-helper  2026-05-24 01:35
+Objective:    Prove inherited `Object.prototype.hasOwnProperty` metadata cannot influence exact frozen live-worker control-array density evidence.
+Changed:
+- Switched live-worker own-property checks from `Object.prototype.hasOwnProperty.call` to own-descriptor evidence.
+- Added live-worker unit coverage showing exact frozen control arrays authorize without reading or invoking inherited `Object.prototype.hasOwnProperty` metadata.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the inherited Object ownership-helper boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 576  GREEN  live-worker-inherited-entry-coercion  2026-05-23 10:40
 Objective:    Prove inherited `Object.prototype` coercion metadata cannot influence exact frozen live-worker control-entry evidence.
 Changed:

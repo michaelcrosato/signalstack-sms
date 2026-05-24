@@ -110,11 +110,7 @@ function safeOwnKeys(value: object) {
 }
 
 function safeHasOwnProperty(value: object, property: PropertyKey) {
-  try {
-    return Object.prototype.hasOwnProperty.call(value, property);
-  } catch {
-    return false;
-  }
+  return safeGetOwnPropertyDescriptor(value, property) !== undefined;
 }
 
 function safeIsFrozen(value: object) {

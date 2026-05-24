@@ -7338,6 +7338,62 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not read or invoke inherited Object ownership-helper metadata while evaluating exact frozen control-array evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const objectPrototype = Object.prototype as {
+      hasOwnProperty?: unknown;
+    };
+    const originalHasOwnPropertyDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "hasOwnProperty");
+
+    let accessorIndexedEntriesResult: boolean;
+    let accessorImplementedResult: boolean;
+    let accessorAuthorizedResult: boolean;
+    let dataBackedIndexedEntriesResult: boolean;
+    let dataBackedImplementedResult: boolean;
+    let dataBackedAuthorizedResult: boolean;
+
+    try {
+      Object.defineProperty(Object.prototype, "hasOwnProperty", {
+        configurable: true,
+        get: () => {
+          throw new Error("inherited Object hasOwnProperty metadata must not be read");
+        }
+      });
+
+      accessorIndexedEntriesResult = liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls);
+      accessorImplementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      accessorAuthorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+
+      Object.defineProperty(Object.prototype, "hasOwnProperty", {
+        configurable: true,
+        value: () => {
+          throw new Error("data-backed inherited Object hasOwnProperty metadata must not be invoked");
+        }
+      });
+
+      dataBackedIndexedEntriesResult = liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls);
+      dataBackedImplementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      dataBackedAuthorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalHasOwnPropertyDescriptor === undefined) {
+        delete objectPrototype.hasOwnProperty;
+      } else {
+        Object.defineProperty(Object.prototype, "hasOwnProperty", originalHasOwnPropertyDescriptor);
+      }
+    }
+
+    expect(accessorIndexedEntriesResult!).toBe(true);
+    expect(accessorImplementedResult!).toBe(true);
+    expect(accessorAuthorizedResult!).toBe(true);
+    expect(dataBackedIndexedEntriesResult!).toBe(true);
+    expect(dataBackedImplementedResult!).toBe(true);
+    expect(dataBackedAuthorizedResult!).toBe(true);
+  });
+
   it("does not read inherited control-array index accessors while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const inheritedIndex = String(requiredControlIds.length);
