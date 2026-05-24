@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 643 note: live-worker authorization now evaluates exact frozen control-array evidence without reading accessor-backed or invoking data-backed inherited `Array.prototype.__proto__` prototype-accessor metadata.
+
 Run 642 note: live-worker authorization now evaluates exact frozen control-array evidence without reading accessor-backed or invoking data-backed inherited `Array.prototype` legacy accessor-helper metadata.
 
 Run 641 note: live-worker authorization now evaluates exact frozen control-array evidence without reading accessor-backed or invoking data-backed inherited `Array.prototype` Object-helper metadata.
@@ -353,3 +355,5 @@ Run 635 addendum: hidden authorization-wrapper string/symbol metadata with acces
 Run 641 addendum: exact frozen control-array evidence stays authorized without reading accessor-backed or invoking data-backed inherited `Array.prototype.hasOwnProperty`, `Array.prototype.propertyIsEnumerable`, or `Array.prototype.isPrototypeOf` metadata.
 
 Run 642 addendum: exact frozen control-array evidence stays authorized without reading accessor-backed or invoking data-backed inherited `Array.prototype.__defineGetter__`, `Array.prototype.__defineSetter__`, `Array.prototype.__lookupGetter__`, or `Array.prototype.__lookupSetter__` metadata.
+
+Run 643 addendum: exact frozen control-array evidence stays authorized without reading accessor-backed or invoking data-backed inherited `Array.prototype.__proto__` prototype-accessor metadata.

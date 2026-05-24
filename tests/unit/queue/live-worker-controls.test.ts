@@ -8816,6 +8816,74 @@ describe("production live campaign worker controls", () => {
     expect(dataBackedResults!).toEqual(expectedExactEvidence);
   });
 
+  it("does not read or invoke inherited control-array prototype-accessor metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as Record<string, unknown>;
+    const originalProtoDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, "__proto__");
+
+    function evaluateExactFrozenEvidence() {
+      return {
+        indexedEntries: liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls),
+        frozen: liveWorkerControlsAreFrozen(implementedControls),
+        frozenDescriptors: liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls),
+        publicFields: liveWorkerControlsExposeOnlyPublicFields(implementedControls),
+        supportedStatuses: liveWorkerControlsUseSupportedStatuses(implementedControls),
+        checklist: liveWorkerControlIdsMatchRequiredChecklist(implementedControls),
+        implemented: liveWorkerControlsAreImplemented(implementedControls),
+        authorized: liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+        )
+      };
+    }
+
+    let accessorResults: ReturnType<typeof evaluateExactFrozenEvidence>;
+    let dataBackedResults: ReturnType<typeof evaluateExactFrozenEvidence>;
+
+    try {
+      Object.defineProperty(Array.prototype, "__proto__", {
+        configurable: true,
+        get: () => {
+          throw new Error("inherited control-array __proto__ metadata must not be read");
+        },
+        set: () => {
+          throw new Error("inherited control-array __proto__ metadata must not be written");
+        }
+      });
+
+      accessorResults = evaluateExactFrozenEvidence();
+
+      Object.defineProperty(Array.prototype, "__proto__", {
+        configurable: true,
+        value: () => {
+          throw new Error("data-backed inherited control-array __proto__ metadata must not be invoked");
+        },
+        writable: true
+      });
+
+      dataBackedResults = evaluateExactFrozenEvidence();
+    } finally {
+      if (originalProtoDescriptor === undefined) {
+        delete arrayPrototype.__proto__;
+      } else {
+        Object.defineProperty(Array.prototype, "__proto__", originalProtoDescriptor);
+      }
+    }
+
+    const expectedExactEvidence = {
+      indexedEntries: true,
+      frozen: true,
+      frozenDescriptors: true,
+      publicFields: true,
+      supportedStatuses: true,
+      checklist: true,
+      implemented: true,
+      authorized: true
+    };
+
+    expect(accessorResults!).toEqual(expectedExactEvidence);
+    expect(dataBackedResults!).toEqual(expectedExactEvidence);
+  });
+
   it("does not read inherited control-array metadata while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const metadataSymbol = Symbol("inherited-control-array-metadata");
