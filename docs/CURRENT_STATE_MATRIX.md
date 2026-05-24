@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 644 note: seeded product-demo browser coverage passed after demo seeding across dashboard, contacts, campaign, inbox, template, analytics, and compliance workflows.
+
 Run 643 note: live-worker authorization now evaluates exact frozen control-array evidence without reading accessor-backed or invoking data-backed inherited `Array.prototype.__proto__` prototype-accessor metadata.
 
 Run 642 note: live-worker authorization now evaluates exact frozen control-array evidence without reading accessor-backed or invoking data-backed inherited `Array.prototype` legacy accessor-helper metadata.

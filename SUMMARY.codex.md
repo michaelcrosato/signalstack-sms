@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 644
+
+- Latest product-demo stability check passed after demo seeding: 10 Chromium tests covered dashboard, contacts, contact detail/archive/restore/merge, campaign create/preflight/schedule, campaign detail edit/cancel, inbox thread actions, templates, analytics, and compliance. Focused live-worker control coverage also passed with 207 tests. The change is loop-truth/docs only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 643
 
 - Latest live-worker inherited `Array.prototype.__proto__` prototype-accessor coverage proves exact frozen `production-live-campaign` control-array evidence authorizes without reading accessor-backed or invoking data-backed inherited prototype-accessor metadata. Focused queue coverage passed with 207 tests. The change is local unit/docs/log coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

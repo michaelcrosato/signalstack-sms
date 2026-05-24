@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 644  GREEN  product-demo-stability  2026-05-24 05:06
+Objective:    Verify the seeded product demo path remains green before adding more live-worker hardening.
+Changed:
+- Ran the seeded product-demo browser path after demo seeding; all 10 Chromium tests passed across dashboard, contacts, contact detail/merge, campaigns, campaign detail/cancel, inbox, templates, analytics, and compliance.
+- Confirmed focused live-worker control coverage still passes with 207 tests.
+- Updated NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix with the validation result.
+- No product code, live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 643  GREEN  live-worker-inherited-array-proto-accessor  2026-05-24 05:00
 Objective:    Prove inherited `Array.prototype.__proto__` prototype-accessor metadata cannot influence exact frozen live-worker evidence.
 Changed:
