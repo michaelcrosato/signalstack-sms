@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 694 note: mutating-route auth scanner coverage now includes optional-bracket `globalThis?.["Request"]` constructor aliases before `Request.prototype` body-reader calls, proving those body readers must remain after each route handler's own top-level `requireApiRole`.
+
 Run 693 note: mutating-route auth scanner coverage now includes optional-dot `globalThis?.Request` constructor aliases before `Request.prototype` body-reader calls, proving those body readers must remain after each route handler's own top-level `requireApiRole`.
 
 Run 692 note: product campaign recipient snapshot metadata is now frozen at both array and entry level, with unit coverage proving caller-side mutation cannot drift Consent or Archive status labels/order before `/dashboard/campaigns/:campaignId` renders recipient snapshots.
