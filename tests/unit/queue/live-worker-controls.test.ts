@@ -6924,6 +6924,80 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not read inherited control-array mutator or visitor metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as Record<string, unknown>;
+    const metadataMethods = [
+      "concat",
+      "copyWithin",
+      "fill",
+      "flat",
+      "forEach",
+      "join",
+      "pop",
+      "push",
+      "reverse",
+      "shift",
+      "slice",
+      "some",
+      "sort",
+      "splice",
+      "unshift"
+    ];
+    const originalDescriptors = metadataMethods.map((method) => ({
+      method,
+      descriptor: Object.getOwnPropertyDescriptor(Array.prototype, method)
+    }));
+
+    let exposesOnlyIndexedEntriesResult: boolean;
+    let frozenResult: boolean;
+    let frozenDescriptorResult: boolean;
+    let publicFieldsResult: boolean;
+    let supportedStatusesResult: boolean;
+    let checklistResult: boolean;
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      for (const method of metadataMethods) {
+        Object.defineProperty(Array.prototype, method, {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited control-array mutator or visitor metadata must not be read");
+          }
+        });
+      }
+
+      exposesOnlyIndexedEntriesResult = liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls);
+      frozenResult = liveWorkerControlsAreFrozen(implementedControls);
+      frozenDescriptorResult = liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls);
+      publicFieldsResult = liveWorkerControlsExposeOnlyPublicFields(implementedControls);
+      supportedStatusesResult = liveWorkerControlsUseSupportedStatuses(implementedControls);
+      checklistResult = liveWorkerControlIdsMatchRequiredChecklist(implementedControls);
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      for (const { method, descriptor } of originalDescriptors) {
+        if (descriptor === undefined) {
+          delete arrayPrototype[method];
+        } else {
+          Object.defineProperty(Array.prototype, method, descriptor);
+        }
+      }
+    }
+
+    expect(exposesOnlyIndexedEntriesResult!).toBe(true);
+    expect(frozenResult!).toBe(true);
+    expect(frozenDescriptorResult!).toBe(true);
+    expect(publicFieldsResult!).toBe(true);
+    expect(supportedStatusesResult!).toBe(true);
+    expect(checklistResult!).toBe(true);
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("requires the exact frozen control checklist before controls can be treated as implemented", () => {
     const implementedControls = implementedFrozenControls();
 

@@ -5356,3 +5356,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 593  GREEN  live-worker-inherited-array-mutator-visitors  2026-05-23 21:17
+Objective:    Prove inherited `Array.prototype` mutator/visitor metadata cannot influence exact frozen live-worker control-array evidence.
+Changed:
+- Added live-worker unit coverage showing exact frozen control-array evidence authorizes without reading inherited `Array.prototype.concat`, `copyWithin`, `fill`, `flat`, `forEach`, `join`, `pop`, `push`, `reverse`, `shift`, `slice`, `some`, `sort`, `splice`, or `unshift` metadata.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the inherited mutator/visitor boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
