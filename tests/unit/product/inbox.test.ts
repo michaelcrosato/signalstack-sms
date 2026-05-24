@@ -1,7 +1,7 @@
 import { ConsentStatus, ConversationStatus } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { productInboxWorkspaceDefaults } from "@/lib/product/inbox-workspace-defaults";
-import { getProductInbox, productInboxMetricRows } from "@/lib/product/inbox";
+import { getProductInbox, productInboxMetricRows, productInboxThreadStatusRows } from "@/lib/product/inbox";
 
 vi.mock("@/lib/db/repositories/inbox", () => ({
   listConversations: vi.fn(async () => [
@@ -102,6 +102,10 @@ describe("getProductInbox", () => {
       body: "Interested in pricing.",
       authorName: "Demo Owner"
     });
+    expect(result.selectedConversation?.statusRows).toEqual([
+      { key: "thread", label: "Thread", value: ConversationStatus.OPEN },
+      { key: "consent", label: "Consent", value: ConsentStatus.OPTED_IN }
+    ]);
   });
 
   it("freezes inbox metric metadata before rendering", () => {
@@ -124,6 +128,24 @@ describe("getProductInbox", () => {
       (productInboxMetricRows[0] as { label: string }).label = "Unsafe";
     }).toThrow(TypeError);
     expect(productInboxMetricRows[0].label).toBe("Total Threads");
+  });
+
+  it("freezes inbox thread status metadata before rendering", () => {
+    expect(Object.isFrozen(productInboxThreadStatusRows)).toBe(true);
+    expect(productInboxThreadStatusRows.every((row) => Object.isFrozen(row))).toBe(true);
+    expect(productInboxThreadStatusRows.map((row) => row.key)).toEqual(["thread", "consent"]);
+    expect(productInboxThreadStatusRows.map((row) => row.label)).toEqual(["Thread", "Consent"]);
+
+    expect(() =>
+      (productInboxThreadStatusRows as unknown as Array<{ key: string; label: string }>).push({
+        key: "unsafe",
+        label: "Unsafe"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productInboxThreadStatusRows[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productInboxThreadStatusRows[0].label).toBe("Thread");
   });
 
   it("freezes inbox workspace defaults before rendering local reply and note forms", () => {

@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 689  GREEN  product-inbox-thread-status-freeze  2026-05-24 10:23
+Objective:    Keep product inbox selected-thread status labels stable against caller-side mutation.
+Changed:
+- Added frozen `productInboxThreadStatusRows` metadata for `/dashboard/inbox` selected-thread status rows.
+- Updated the inbox projection and workspace rendering to use the frozen Thread and Consent status rows while preserving local resolve/reopen display state.
+- Added product inbox unit coverage proving thread status labels, order, values, and caller-side mutation rejection stay stable before rendering.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the inbox thread status-row immutability boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 688  GREEN  product-contact-detail-status-freeze  2026-05-24 10:16
 Objective:    Keep product contact detail status labels stable against caller-side mutation.
 Changed:

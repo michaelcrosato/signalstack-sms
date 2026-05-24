@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 689 note: product inbox thread status metadata is now frozen at both array and entry level, with unit coverage proving caller-side mutation cannot drift selected-thread Thread or Consent labels/order before `/dashboard/inbox` renders thread status rows.
+
 Run 688 note: product contact detail status metadata is now frozen at both array and entry level, with unit coverage proving caller-side mutation cannot drift phone, consent, list, tag, or archived status labels/order before `/dashboard/contacts/:contactId` renders sidebar rows.
 
 Run 687 note: product template detail lifecycle metric metadata is now frozen at both array and entry level, with unit coverage proving caller-side mutation cannot drift variable, campaign-usage, updated, or live-send metric labels/order before `/dashboard/templates/:templateId` renders lifecycle cards.

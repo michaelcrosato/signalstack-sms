@@ -12,6 +12,17 @@ export const productInboxMetricRows = Object.freeze(
   productInboxMetricRowItems.map((row) => Object.freeze({ ...row }))
 );
 
+const productInboxThreadStatusRowItems = [
+  { key: "thread", label: "Thread" },
+  { key: "consent", label: "Consent" }
+] as const;
+
+type ProductInboxThreadStatusKey = (typeof productInboxThreadStatusRowItems)[number]["key"];
+
+export const productInboxThreadStatusRows = Object.freeze(
+  productInboxThreadStatusRowItems.map((row) => Object.freeze({ ...row }))
+);
+
 function contactName(contact: {
   displayName?: string | null;
   firstName?: string | null;
@@ -80,8 +91,31 @@ export async function getProductInbox(orgId: string) {
             body: message.body,
             providerStatus: message.providerStatus,
             createdAt: message.createdAt.toISOString()
+          })),
+          statusRows: productInboxThreadStatusRows.map((row) => ({
+            key: row.key,
+            label: row.label,
+            value: getInboxThreadStatusValue(row.key, {
+              status: selectedConversation.status,
+              consentStatus: selectedConversation.contact?.consentStatus ?? "UNKNOWN"
+            })
           }))
         }
       : null
   };
+}
+
+function getInboxThreadStatusValue(
+  key: ProductInboxThreadStatusKey,
+  conversation: {
+    status: string;
+    consentStatus: string;
+  }
+) {
+  switch (key) {
+    case "thread":
+      return conversation.status;
+    case "consent":
+      return conversation.consentStatus;
+  }
 }

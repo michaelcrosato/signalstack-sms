@@ -233,6 +233,7 @@ Post-MVP AI operations view:
 - Unit tests must verify product campaign detail lifecycle metric metadata is runtime-frozen at both array and entry level before `/dashboard/campaigns/:campaignId` renders status, recipient, template, and schedule metric rows.
 - Unit tests must verify product campaign composer defaults are runtime-frozen before `/dashboard/campaigns` renders local campaign name, fallback body, fake-AI prompt, business-name, and tone defaults.
 - Unit tests must verify product inbox metric metadata is runtime-frozen at both array and entry level before `/dashboard/inbox` renders total, open, resolved, and recent-inbound thread metric rows.
+- Unit tests must verify product inbox thread status metadata is runtime-frozen at both array and entry level before `/dashboard/inbox` renders selected-thread Thread and Consent status rows.
 - Unit tests must verify product inbox workspace defaults are runtime-frozen before `/dashboard/inbox` renders local reply and internal-note defaults.
 - Unit tests must verify product template metric metadata is runtime-frozen at both array and entry level before `/dashboard/templates` renders saved-template, variable, campaign-usage, and live-send blocker metric rows.
 - Unit tests must verify product template detail metric metadata is runtime-frozen at both array and entry level before `/dashboard/templates/:templateId` renders variable, campaign-usage, updated, and live-send blocker lifecycle metric rows.
