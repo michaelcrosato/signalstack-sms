@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 611
+
+- No blocker from inherited control-array data-backed iteration method live-worker coverage. Focused queue coverage passed with 173 tests, and the protected local gate passed with 59 Vitest files / 629 tests, Playwright smoke, and build green. The change adds local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
 Run number: 609
 
 - No blocker from inherited control-array data-backed `Symbol.toStringTag` live-worker coverage. Focused queue coverage passed with 171 tests, and the protected local gate passed with 59 Vitest files / 627 tests, Playwright smoke, and build green. The change adds local unit/docs coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
