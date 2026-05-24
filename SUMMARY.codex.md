@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 693
+
+- Latest mutating-route auth hardening adds focused coverage for optional-dot `globalThis?.Request` constructor aliases before `Request.prototype` body-reader calls, so those body readers stay classified as parsing that must happen after each handler's own top-level `requireApiRole`. Focused auth coverage, typecheck, contracts check, lint, diff whitespace check, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 692
 
 - Latest product campaign recipient snapshot hardening exports frozen `productCampaignRecipientStatusRows` metadata, uses it for the `/dashboard/campaigns/:campaignId` recipient Consent and Archive status rows, and focused product campaign coverage now proves caller-side mutation of those labels/order is rejected before campaign detail rendering. Focused product campaign coverage, typecheck, contracts check, lint, diff whitespace check, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/UI/test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
