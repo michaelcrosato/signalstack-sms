@@ -8661,6 +8661,81 @@ describe("production live campaign worker controls", () => {
     expect(dataBackedResults!).toEqual(expectedExactEvidence);
   });
 
+  it("does not read or invoke inherited control-array Object-helper metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as Record<string, unknown>;
+    const metadataMethods = ["hasOwnProperty", "propertyIsEnumerable", "isPrototypeOf"];
+    const originalDescriptors = metadataMethods.map((method) => ({
+      method,
+      descriptor: Object.getOwnPropertyDescriptor(Array.prototype, method)
+    }));
+
+    function evaluateExactFrozenEvidence() {
+      return {
+        indexedEntries: liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls),
+        frozen: liveWorkerControlsAreFrozen(implementedControls),
+        frozenDescriptors: liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls),
+        publicFields: liveWorkerControlsExposeOnlyPublicFields(implementedControls),
+        supportedStatuses: liveWorkerControlsUseSupportedStatuses(implementedControls),
+        checklist: liveWorkerControlIdsMatchRequiredChecklist(implementedControls),
+        implemented: liveWorkerControlsAreImplemented(implementedControls),
+        authorized: liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+        )
+      };
+    }
+
+    let accessorResults: ReturnType<typeof evaluateExactFrozenEvidence>;
+    let dataBackedResults: ReturnType<typeof evaluateExactFrozenEvidence>;
+
+    try {
+      for (const method of metadataMethods) {
+        Object.defineProperty(Array.prototype, method, {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited control-array Object-helper metadata must not be read");
+          }
+        });
+      }
+
+      accessorResults = evaluateExactFrozenEvidence();
+
+      for (const method of metadataMethods) {
+        Object.defineProperty(Array.prototype, method, {
+          configurable: true,
+          value: () => {
+            throw new Error("data-backed inherited control-array Object-helper metadata must not be invoked");
+          },
+          writable: true
+        });
+      }
+
+      dataBackedResults = evaluateExactFrozenEvidence();
+    } finally {
+      for (const { method, descriptor } of originalDescriptors) {
+        if (descriptor === undefined) {
+          delete arrayPrototype[method];
+        } else {
+          Object.defineProperty(Array.prototype, method, descriptor);
+        }
+      }
+    }
+
+    const expectedExactEvidence = {
+      indexedEntries: true,
+      frozen: true,
+      frozenDescriptors: true,
+      publicFields: true,
+      supportedStatuses: true,
+      checklist: true,
+      implemented: true,
+      authorized: true
+    };
+
+    expect(accessorResults!).toEqual(expectedExactEvidence);
+    expect(dataBackedResults!).toEqual(expectedExactEvidence);
+  });
+
   it("does not read inherited control-array metadata while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const metadataSymbol = Symbol("inherited-control-array-metadata");

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 641  GREEN  live-worker-inherited-array-object-helpers  2026-05-24 04:37
+Objective:    Prove inherited `Array.prototype` Object-helper metadata cannot influence exact frozen live-worker evidence.
+Changed:
+- Added live-worker unit coverage showing exact frozen control arrays authorize without reading accessor-backed or invoking data-backed inherited `Array.prototype.hasOwnProperty`, `Array.prototype.propertyIsEnumerable`, or `Array.prototype.isPrototypeOf` metadata.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the inherited Array Object-helper boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 640  GREEN  live-worker-inherited-occupied-index-slots  2026-05-24 04:32
 Objective:    Prove inherited occupied control-array index-slot metadata cannot influence exact frozen live-worker evidence.
 Changed:

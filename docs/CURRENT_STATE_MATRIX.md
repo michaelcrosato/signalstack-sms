@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 641 note: live-worker authorization now evaluates exact frozen control-array evidence without reading accessor-backed or invoking data-backed inherited `Array.prototype` Object-helper metadata.
+
 Run 640 note: live-worker authorization now evaluates exact frozen control-array evidence without reading accessor-backed or invoking data-backed inherited `Array.prototype` occupied index-slot metadata.
 
 Run 639 note: live-worker authorization now evaluates exact frozen control-array evidence without invoking data-backed inherited index-slot metadata.
@@ -345,3 +347,5 @@ Run 633 addendum: own data-backed control-entry `Symbol.toStringTag` metadata de
 Run 632 addendum: own data-backed authorization-wrapper `Symbol.toStringTag` metadata denies before supplied live-worker controls are inspected, and callable tag metadata is not invoked.
 
 Run 635 addendum: hidden authorization-wrapper string/symbol metadata with accessor getters or callable data values denies before supplied live-worker controls are inspected, and that hidden metadata is not read or invoked.
+
+Run 641 addendum: exact frozen control-array evidence stays authorized without reading accessor-backed or invoking data-backed inherited `Array.prototype.hasOwnProperty`, `Array.prototype.propertyIsEnumerable`, or `Array.prototype.isPrototypeOf` metadata.
