@@ -5,7 +5,8 @@ import {
   getProductCampaignDetail,
   getProductCampaigns,
   productCampaignDetailMetricRows,
-  productCampaignMetricRows
+  productCampaignMetricRows,
+  productCampaignRecipientStatusRows
 } from "@/lib/product/campaigns";
 
 vi.mock("@/lib/db/repositories/campaigns", () => ({
@@ -149,7 +150,11 @@ describe("getProductCampaigns", () => {
         displayName: "Ada Lovelace",
         phone: "+15555550100",
         consentStatus: ConsentStatus.OPTED_IN,
-        archived: false
+        archived: false,
+        statusRows: [
+          { key: "consent", label: "Consent", value: ConsentStatus.OPTED_IN },
+          { key: "archived", label: "Archive", value: "active" }
+        ]
       }
     ]);
     expect(result?.contacts.map((contact) => ({ id: contact.id, selected: contact.selected, disabled: contact.disabled }))).toEqual([
@@ -204,6 +209,24 @@ describe("getProductCampaigns", () => {
       (productCampaignDetailMetricRows[0] as { label: string }).label = "Unsafe";
     }).toThrow(TypeError);
     expect(productCampaignDetailMetricRows[0].label).toBe("Status");
+  });
+
+  it("freezes campaign recipient snapshot metadata before rendering", () => {
+    expect(Object.isFrozen(productCampaignRecipientStatusRows)).toBe(true);
+    expect(productCampaignRecipientStatusRows.every((row) => Object.isFrozen(row))).toBe(true);
+    expect(productCampaignRecipientStatusRows.map((row) => row.key)).toEqual(["consent", "archived"]);
+    expect(productCampaignRecipientStatusRows.map((row) => row.label)).toEqual(["Consent", "Archive"]);
+
+    expect(() =>
+      (productCampaignRecipientStatusRows as unknown as Array<{ key: string; label: string }>).push({
+        key: "unsafe",
+        label: "Unsafe"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productCampaignRecipientStatusRows[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productCampaignRecipientStatusRows[0].label).toBe("Consent");
   });
 
   it("freezes campaign composer defaults before rendering the local composer", () => {

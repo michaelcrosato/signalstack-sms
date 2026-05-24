@@ -232,6 +232,7 @@ Post-MVP AI operations view:
 - Unit tests must verify product contact import defaults are runtime-frozen before `/dashboard/contacts` renders the local CSV import workflow.
 - Unit tests must verify product campaign metric metadata is runtime-frozen at both array and entry level before `/dashboard/campaigns` renders total, draft, scheduled, and ready-recipient metric rows.
 - Unit tests must verify product campaign detail lifecycle metric metadata is runtime-frozen at both array and entry level before `/dashboard/campaigns/:campaignId` renders status, recipient, template, and schedule metric rows.
+- Unit tests must verify product campaign recipient snapshot metadata is runtime-frozen at both array and entry level before `/dashboard/campaigns/:campaignId` renders Consent and Archive status rows.
 - Unit tests must verify product campaign composer defaults are runtime-frozen before `/dashboard/campaigns` renders local campaign name, fallback body, fake-AI prompt, business-name, and tone defaults.
 - Unit tests must verify product inbox metric metadata is runtime-frozen at both array and entry level before `/dashboard/inbox` renders total, open, resolved, and recent-inbound thread metric rows.
 - Unit tests must verify product inbox thread status metadata is runtime-frozen at both array and entry level before `/dashboard/inbox` renders selected-thread Thread and Consent status rows.

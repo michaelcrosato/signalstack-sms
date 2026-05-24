@@ -27,6 +27,17 @@ export const productCampaignDetailMetricRows = Object.freeze(
   productCampaignDetailMetricRowItems.map((row) => Object.freeze({ ...row }))
 );
 
+const productCampaignRecipientStatusRowItems = [
+  { key: "consent", label: "Consent" },
+  { key: "archived", label: "Archive" }
+] as const;
+
+type ProductCampaignRecipientStatusKey = (typeof productCampaignRecipientStatusRowItems)[number]["key"];
+
+export const productCampaignRecipientStatusRows = Object.freeze(
+  productCampaignRecipientStatusRowItems.map((row) => Object.freeze({ ...row }))
+);
+
 export async function getProductCampaigns(orgId: string) {
   const [campaigns, contacts, templates] = await Promise.all([
     listCampaigns(orgId),
@@ -99,13 +110,22 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
     selectedContactIds: [...selectedContactIds],
     recipientRows: campaign.recipients.map((recipient) => {
       const contact = recipient.contact;
-      return {
+      const recipientDetail = {
         id: contact.id,
         displayName:
           contact.displayName ?? ([contact.firstName, contact.lastName].filter(Boolean).join(" ") || contact.phone),
         phone: contact.phone,
         consentStatus: contact.consentStatus,
         archived: Boolean(contact.archivedAt)
+      };
+
+      return {
+        ...recipientDetail,
+        statusRows: productCampaignRecipientStatusRows.map((row) => ({
+          key: row.key,
+          label: row.label,
+          value: getCampaignRecipientStatusValue(row.key, recipientDetail)
+        }))
       };
     }),
     contacts: contacts.map((contact) => ({
@@ -137,4 +157,19 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
       value: metricValues[row.key]
     }))
   };
+}
+
+function getCampaignRecipientStatusValue(
+  key: ProductCampaignRecipientStatusKey,
+  recipient: {
+    consentStatus: ConsentStatus;
+    archived: boolean;
+  }
+) {
+  switch (key) {
+    case "consent":
+      return recipient.consentStatus;
+    case "archived":
+      return recipient.archived ? "archived" : "active";
+  }
 }

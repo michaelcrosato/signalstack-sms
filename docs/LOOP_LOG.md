@@ -1,5 +1,27 @@
 # LOOP_LOG
 
+## Run 692  GREEN  product-campaign-recipient-status-freeze  2026-05-24 10:47
+Objective:    Keep campaign recipient snapshot status labels stable against caller-side mutation.
+Changed:
+- Added frozen `productCampaignRecipientStatusRows` metadata for `/dashboard/campaigns/:campaignId` recipient Consent and Archive status rows.
+- Updated the campaign detail projection and page rendering to use the frozen recipient status labels and ordering.
+- Added product campaign unit coverage proving recipient status metadata, projected values, and caller-side mutation rejection stay stable before rendering.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the campaign recipient snapshot immutability boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 691  GREEN  product-compliance-metrics-freeze  2026-05-24 10:38
+Objective:    Keep product compliance top metric labels stable against caller-side mutation.
+Changed:
+- Added frozen `productComplianceMetricRows` metadata for `/dashboard/compliance` profile-field, A2P, live-messaging, and blocker metric cards.
+- Updated the compliance projection and page rendering to use frozen metric labels and ordering.
+- Added product compliance unit coverage proving metric metadata, projected values, and caller-side mutation rejection stay stable before rendering.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the compliance metric-row immutability boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 690  GREEN  product-dashboard-sections-freeze  2026-05-24 10:32
 Objective:    Keep product dashboard summary section labels stable against caller-side mutation.
 Changed:

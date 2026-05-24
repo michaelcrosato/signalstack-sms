@@ -80,12 +80,14 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
                 <article className="rounded border border-slate-200 bg-slate-50 p-3" key={recipient.id}>
                   <div className="font-medium text-slate-950">{recipient.displayName}</div>
                   <div className="mt-1 text-sm text-slate-600">{recipient.phone}</div>
-                  <div className="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
-                    <span className="rounded border border-slate-300 bg-white px-2 py-1">{recipient.consentStatus}</span>
-                    <span className="rounded border border-slate-300 bg-white px-2 py-1">
-                      {recipient.archived ? "archived" : "active"}
-                    </span>
-                  </div>
+                  <dl className="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
+                    {recipient.statusRows.map((row) => (
+                      <div className="rounded border border-slate-300 bg-white px-2 py-1" key={row.key}>
+                        <dt className="inline text-slate-500">{row.label}: </dt>
+                        <dd className="inline text-slate-800">{row.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
                 </article>
               ))}
               {campaign.recipientRows.length === 0 ? (
