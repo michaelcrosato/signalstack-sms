@@ -8594,6 +8594,73 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not read or invoke inherited control-array occupied index slots while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const occupiedIndex = "0";
+    const arrayPrototype = Array.prototype as unknown as Record<string, unknown>;
+    const originalIndexDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, occupiedIndex);
+
+    function evaluateExactFrozenEvidence() {
+      return {
+        indexedEntries: liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls),
+        frozen: liveWorkerControlsAreFrozen(implementedControls),
+        frozenDescriptors: liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls),
+        publicFields: liveWorkerControlsExposeOnlyPublicFields(implementedControls),
+        supportedStatuses: liveWorkerControlsUseSupportedStatuses(implementedControls),
+        checklist: liveWorkerControlIdsMatchRequiredChecklist(implementedControls),
+        implemented: liveWorkerControlsAreImplemented(implementedControls),
+        authorized: liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+        )
+      };
+    }
+
+    let accessorResults: ReturnType<typeof evaluateExactFrozenEvidence>;
+    let dataBackedResults: ReturnType<typeof evaluateExactFrozenEvidence>;
+
+    try {
+      Object.defineProperty(Array.prototype, occupiedIndex, {
+        configurable: true,
+        get: () => {
+          throw new Error("inherited occupied control-array index getter must not be read");
+        }
+      });
+
+      accessorResults = evaluateExactFrozenEvidence();
+
+      Object.defineProperty(Array.prototype, occupiedIndex, {
+        configurable: true,
+        enumerable: true,
+        value: () => {
+          throw new Error("data-backed inherited occupied control-array index slot must not be invoked");
+        },
+        writable: true
+      });
+
+      dataBackedResults = evaluateExactFrozenEvidence();
+    } finally {
+      if (originalIndexDescriptor === undefined) {
+        delete arrayPrototype[occupiedIndex];
+      } else {
+        Object.defineProperty(Array.prototype, occupiedIndex, originalIndexDescriptor);
+      }
+    }
+
+    const expectedExactEvidence = {
+      indexedEntries: true,
+      frozen: true,
+      frozenDescriptors: true,
+      publicFields: true,
+      supportedStatuses: true,
+      checklist: true,
+      implemented: true,
+      authorized: true
+    };
+
+    expect(accessorResults!).toEqual(expectedExactEvidence);
+    expect(dataBackedResults!).toEqual(expectedExactEvidence);
+  });
+
   it("does not read inherited control-array metadata while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const metadataSymbol = Symbol("inherited-control-array-metadata");
