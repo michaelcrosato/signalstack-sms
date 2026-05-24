@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 710 note: mutating-route auth scanner coverage now includes assigned local `globalThis` root aliases feeding computed optional non-null `Request` constructor aliases, including `root = globalThis as typeof globalThis; const RequestCtor = root?.[requestConstructorName]! as typeof Request` and `root = (globalThis satisfies typeof globalThis); RequestCtor = root?.[requestConstructorName]! satisfies typeof Request`, before `Request.prototype` body-reader calls, proving those body readers must remain after each route handler's own top-level `requireApiRole`.
+
 Run 709 note: mutating-route auth scanner coverage now includes unparenthesized `satisfies` computed optional non-null `Request` constructor aliases through local `globalThis` aliases, including `const RequestCtor = root?.[requestConstructorName]! satisfies typeof Request` and `RequestCtor = root?.[requestConstructorName]! satisfies typeof Request`, before `Request.prototype` body-reader calls, proving those body readers must remain after each route handler's own top-level `requireApiRole`.
 
 Run 708 note: mutating-route auth scanner coverage now includes whole-parenthesized type-asserted computed optional non-null `Request` constructor aliases through local `globalThis` aliases, including `const RequestCtor = (root?.[requestConstructorName]! as typeof Request)` and `RequestCtor = (root?.[requestConstructorName]! as typeof Request)`, before `Request.prototype` body-reader calls, proving those body readers must remain after each route handler's own top-level `requireApiRole`.

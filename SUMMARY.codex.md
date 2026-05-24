@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 710
+
+- Latest mutating-route auth hardening adds focused coverage for assigned local `globalThis` root aliases feeding computed optional non-null `Request` constructor aliases, including `root = globalThis as typeof globalThis; const RequestCtor = root?.[requestConstructorName]! as typeof Request` and `root = (globalThis satisfies typeof globalThis); RequestCtor = root?.[requestConstructorName]! satisfies typeof Request`, before `Request.prototype` body-reader calls, so those body readers stay classified as parsing that must happen after each handler's own top-level `requireApiRole`. Focused auth coverage passed; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 709
 
 - Latest mutating-route auth hardening adds focused coverage for unparenthesized `satisfies` computed optional non-null `Request` constructor aliases through local `globalThis` aliases, including `const RequestCtor = root?.[requestConstructorName]! satisfies typeof Request` and `RequestCtor = root?.[requestConstructorName]! satisfies typeof Request`, before `Request.prototype` body-reader calls, so those body readers stay classified as parsing that must happen after each handler's own top-level `requireApiRole`. Focused auth coverage passed; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
