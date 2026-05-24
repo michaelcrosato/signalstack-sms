@@ -7404,6 +7404,79 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not read or invoke inherited Object locale-string metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const authorizationWrapper = frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls);
+    const objectPrototype = Object.prototype as {
+      toLocaleString?: unknown;
+    };
+    const originalToLocaleStringDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "toLocaleString");
+
+    function evaluateExactFrozenEvidence() {
+      return {
+        indexedEntries: liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls),
+        frozen: liveWorkerControlsAreFrozen(implementedControls),
+        frozenDescriptors: liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls),
+        publicFields: liveWorkerControlsExposeOnlyPublicFields(implementedControls),
+        supportedStatuses: liveWorkerControlsUseSupportedStatuses(implementedControls),
+        checklist: liveWorkerControlIdsMatchRequiredChecklist(implementedControls),
+        implemented: liveWorkerControlsAreImplemented(implementedControls),
+        authorized: liveWorkerDeploymentClassIsAuthorized(authorizationWrapper)
+      };
+    }
+
+    let accessorResults: ReturnType<typeof evaluateExactFrozenEvidence>;
+    let dataBackedResults: ReturnType<typeof evaluateExactFrozenEvidence>;
+
+    try {
+      Object.defineProperty(Object.prototype, "toLocaleString", {
+        configurable: true,
+        get: () => {
+          throw new Error("inherited Object toLocaleString metadata must not be read");
+        }
+      });
+
+      accessorResults = evaluateExactFrozenEvidence();
+
+      Object.defineProperty(Object.prototype, "toLocaleString", {
+        configurable: true,
+        value: () => {
+          throw new Error("data-backed inherited Object toLocaleString metadata must not be invoked");
+        },
+        writable: true
+      });
+
+      dataBackedResults = evaluateExactFrozenEvidence();
+    } finally {
+      if (originalToLocaleStringDescriptor === undefined) {
+        delete objectPrototype.toLocaleString;
+      } else {
+        Object.defineProperty(Object.prototype, "toLocaleString", originalToLocaleStringDescriptor);
+      }
+    }
+
+    expect(accessorResults!).toEqual({
+      indexedEntries: true,
+      frozen: true,
+      frozenDescriptors: true,
+      publicFields: true,
+      supportedStatuses: true,
+      checklist: true,
+      implemented: true,
+      authorized: true
+    });
+    expect(dataBackedResults!).toEqual({
+      indexedEntries: true,
+      frozen: true,
+      frozenDescriptors: true,
+      publicFields: true,
+      supportedStatuses: true,
+      checklist: true,
+      implemented: true,
+      authorized: true
+    });
+  });
+
   it("does not read inherited control-entry toStringTag metadata while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const objectPrototype = Object.prototype as {

@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 630
+
+- Latest live-worker inherited Object locale-string coverage proves exact frozen `production-live-campaign` evidence authorizes without reading accessor-backed inherited `Object.prototype.toLocaleString` metadata or invoking data-backed inherited `Object.prototype.toLocaleString` metadata. Focused queue coverage passed with 193 tests, and the protected local gate passed with 59 Vitest files / 649 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 629
 
 - Latest live-worker inherited Object iterator coverage proves exact frozen `production-live-campaign` evidence authorizes without reading accessor-backed inherited `Object.prototype[Symbol.iterator]` metadata or invoking data-backed inherited `Object.prototype[Symbol.iterator]` metadata through scratch arrays. The source path now defines scratch-array own slots explicitly instead of using `Array.from({ length })`, preserving the existing inherited indexed-accessor boundary. Focused queue coverage passed with 192 tests, and the protected local gate passed with 59 Vitest files / 648 tests, Playwright smoke, and build green. The change is local source/unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
