@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 741  GREEN  auth-comma-multihop-whole-parenthesized-non-null-root-globalthis  2026-05-24 16:09
+Objective:    Keep mutating-route auth scanner coverage aligned with multi-hop comma-declared whole-parenthesized non-null local `globalThis` root aliases.
+Changed:
+- Added focused auth unit coverage proving comma-declared alias chains such as `const root = (globalThis)!, platform = ((root)!), runtime = ((platform)!)` resolve before default-initialized `Request`, `Object`, and `Reflect` destructuring is checked for body-reader access.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the multi-hop comma-declared whole-parenthesized non-null local-root globalThis alias boundary.
+- Kept live SMS, billing, providers, workers, Redis, notifications, live AI, secrets, protected gate scripts, and destructive production actions untouched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 740  GREEN  auth-assigned-multihop-whole-parenthesized-non-null-root-globalthis  2026-05-24 16:02
 Objective:    Keep mutating-route auth scanner coverage aligned with multi-hop assigned whole-parenthesized non-null local `globalThis` root aliases.
 Changed:
