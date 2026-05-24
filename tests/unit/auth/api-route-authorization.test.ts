@@ -2829,6 +2829,31 @@ describe("API route authorization coverage", () => {
         return Response.json({ size: payload.size });
       }
     `;
+    const unsafeAssignedNonNullGlobalThisRootAliasComputedNonNullRequestSource = `
+      export async function PUT(req: Request) {
+        let root;
+        root = globalThis!;
+        const requestConstructorName = "Request" as const;
+        const RequestCtor = root?.[requestConstructorName]! as typeof Request;
+        const payload = await RequestCtor.prototype.arrayBuffer.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+    const unsafeAssignedParenthesizedNonNullGlobalThisRootAliasComputedNonNullRequestSource = `
+      export async function PATCH(req: Request) {
+        let root;
+        root = (globalThis)!;
+        const requestConstructorName = "Request" as const;
+        let RequestCtor;
+        RequestCtor = root?.[requestConstructorName]! satisfies typeof Request;
+        const payload = await RequestCtor.prototype.text.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
     const unsafeParenthesizedGlobalThisDestructuredRequestSource = `
       export async function DELETE(req: Request) {
         const root = globalThis;
@@ -3232,6 +3257,18 @@ describe("API route authorization coverage", () => {
       mutatingMethodParsesBodyBeforeRoleGate(
         unsafeAssignedUnparenthesizedSatisfiesGlobalThisRootAliasComputedNonNullRequestSource,
         "POST"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeAssignedNonNullGlobalThisRootAliasComputedNonNullRequestSource,
+        "PUT"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeAssignedParenthesizedNonNullGlobalThisRootAliasComputedNonNullRequestSource,
+        "PATCH"
       )
     ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedGlobalThisDestructuredRequestSource, "DELETE")).toBe(true);

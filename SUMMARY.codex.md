@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 712
+
+- Latest mutating-route auth hardening adds focused coverage for assigned local `globalThis` root aliases with non-null assertions, including `root = globalThis!; const RequestCtor = root?.[requestConstructorName]! as typeof Request` and `root = (globalThis)!; RequestCtor = root?.[requestConstructorName]! satisfies typeof Request`, before `Request.prototype` body-reader calls, so those body readers stay classified as parsing that must happen after each handler's own top-level `requireApiRole`. Focused auth coverage passed; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 711
 
 - Latest mutating-route auth hardening adds focused coverage for assigned local `globalThis` root aliases with parenthesized type assertions and unparenthesized `satisfies`, including `root = (globalThis as typeof globalThis); const RequestCtor = root?.[requestConstructorName]! as typeof Request` and `root = globalThis satisfies typeof globalThis; const RequestCtor = root?.[requestConstructorName]! satisfies typeof Request`, before `Request.prototype` body-reader calls, so those body readers stay classified as parsing that must happen after each handler's own top-level `requireApiRole`. Focused auth coverage passed; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
