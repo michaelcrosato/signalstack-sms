@@ -2185,6 +2185,81 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects hidden control-entry metadata without reading or invoking it", () => {
+    const implementedControls = implementedFrozenControls();
+    const hiddenSymbol = Symbol("hidden-live-worker-control-metadata");
+    const metadataControls = [
+      Object.freeze(
+        Object.defineProperties(
+          {
+            ...implementedControls[0]
+          },
+          {
+            hiddenLiveWorkerControlMetadata: {
+              enumerable: false,
+              get: () => {
+                throw new Error("hidden string control-entry metadata getter must not be read");
+              }
+            },
+            [hiddenSymbol]: {
+              enumerable: false,
+              get: () => {
+                throw new Error("hidden symbol control-entry metadata getter must not be read");
+              }
+            }
+          }
+        )
+      ),
+      Object.freeze(
+        Object.defineProperties(
+          {
+            ...implementedControls[0]
+          },
+          {
+            hiddenLiveWorkerControlMetadata: {
+              enumerable: false,
+              value: () => {
+                throw new Error("hidden string control-entry metadata must not be invoked");
+              }
+            },
+            [hiddenSymbol]: {
+              enumerable: false,
+              value: () => {
+                throw new Error("hidden symbol control-entry metadata must not be invoked");
+              }
+            }
+          }
+        )
+      )
+    ];
+
+    for (const hiddenMetadataControl of metadataControls) {
+      const controls = Object.freeze(
+        implementedControls.map((control, index) =>
+          index === 0 ? hiddenMetadataControl : Object.freeze({ ...control })
+        )
+      );
+
+      expect(Object.isFrozen(hiddenMetadataControl)).toBe(true);
+      expect(() => liveWorkerControlIdsMatchRequiredChecklist(controls)).not.toThrow();
+      expect(() => liveWorkerControlsUseSupportedStatuses(controls)).not.toThrow();
+      expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).not.toThrow();
+      expect(() => liveWorkerControlsExposeOnlyPublicFields(controls)).not.toThrow();
+      expect(() => liveWorkerControlsAreImplemented(controls)).not.toThrow();
+      expect(liveWorkerControlIdsMatchRequiredChecklist(controls)).toBe(true);
+      expect(liveWorkerControlsUseSupportedStatuses(controls)).toBe(true);
+      expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(controls)).toBe(true);
+      expect(liveWorkerControlsExposeOnlyPublicFields(controls)).toBe(false);
+      expect(liveWorkerControlsAreImplemented(controls)).toBe(false);
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, controls))
+      ).toBe(false);
+    }
+  });
+
   it("requires live-worker controls to expose own enumerable data fields", () => {
     const implementedControls = implementedFrozenControls();
     const accessorBackedControl = Object.freeze(

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 636  GREEN  live-worker-hidden-entry-metadata  2026-05-24 03:50
+Objective:    Prove hidden control-entry metadata cannot authorize the reserved live-worker controls.
+Changed:
+- Added live-worker unit coverage showing hidden string/symbol control-entry metadata backed by accessors or callable data values denies before authorization and without reading or invoking the hidden metadata.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the hidden control-entry metadata boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 635  GREEN  live-worker-hidden-wrapper-metadata  2026-05-24 03:39
 Objective:    Prove hidden authorization-wrapper metadata cannot authorize or inspect the reserved live-worker controls.
 Changed:

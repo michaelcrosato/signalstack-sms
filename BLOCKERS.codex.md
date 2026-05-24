@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 636
+
+- No blocker from hidden control-entry metadata live-worker coverage. Focused queue coverage passed with 199 tests, and the protected local gate passed with 59 Vitest files / 655 tests, Playwright smoke, and build green. The change adds local unit/docs/log coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
 Run number: 635
 
 - No blocker from hidden authorization-wrapper metadata live-worker coverage. Focused queue coverage passed with 198 tests, and the protected local gate passed with 59 Vitest files / 654 tests, Playwright smoke, and build green. The change adds local unit/docs/log coverage only and does not execute API handlers, run live workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.

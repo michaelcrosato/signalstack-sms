@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 636 note: live-worker authorization now denies hidden accessor-backed or data-backed control-entry metadata without reading or invoking it.
+
 Run 635 note: live-worker authorization now denies hidden accessor-backed or data-backed authorization-wrapper metadata without reading or invoking it and before hostile supplied controls are inspected.
 
 Run 634 note: live-worker authorization now denies own data-backed control-entry coercion metadata without invoking it.
