@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 675  GREEN  product-compliance-blocker-copy-freeze  2026-05-24 08:44
+Objective:    Keep product compliance hard-gate blocker copy stable against caller-side description mutation.
+Changed:
+- Exported frozen `productComplianceBlockerCopy` metadata for `/dashboard/compliance` blocker descriptions.
+- Updated the product compliance projection to render hard-gate blocker descriptions from the frozen copy map.
+- Added product compliance unit coverage proving blocker copy metadata is frozen before `/dashboard/compliance` renders runtime blockers.
+- Updated testing docs and contract notes for the compliance blocker-copy immutability boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 674  GREEN  product-dashboard-metrics-deep-freeze  2026-05-24 08:37
 Objective:    Keep product dashboard metric metadata stable against caller-side label or order mutation.
 Changed:

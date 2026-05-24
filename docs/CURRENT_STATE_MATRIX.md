@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 675 note: product compliance blocker-copy metadata is now frozen, with unit coverage proving caller-side blocker description mutation is rejected before `/dashboard/compliance` renders runtime hard-gate blockers.
+
 Run 674 note: product dashboard metric metadata is now frozen at both array and entry level, with unit coverage proving caller-side metric label/order mutation is rejected before `/dashboard` renders active-contact, campaign, open-conversation, and template metrics.
 
 Run 673 note: product template metric metadata is now frozen at both array and entry level, with unit coverage proving caller-side metric label/order mutation is rejected before `/dashboard/templates` renders saved-template, variable, campaign-usage, and live-send blocker metrics.

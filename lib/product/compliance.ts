@@ -34,7 +34,7 @@ export const productComplianceFields = Object.freeze(
   productComplianceFieldItems.map((field) => Object.freeze({ ...field }))
 );
 
-const blockerCopy = {
+const productComplianceBlockerCopyItems = {
   LIVE_MESSAGING_DISABLED: "Live messaging flag is disabled.",
   DEMO_MODE_ENABLED: "Demo mode is enabled for this organization.",
   DUMMY_PROVIDER_SELECTED: "Dummy provider is selected.",
@@ -44,6 +44,8 @@ const blockerCopy = {
   CONSENT_NOT_OPTED_IN: "Selected contact is not opted in.",
   CONTACT_OPTED_OUT: "Selected contact has opted out."
 } as const;
+
+export const productComplianceBlockerCopy = Object.freeze({ ...productComplianceBlockerCopyItems });
 
 type ProductComplianceInput = {
   orgId: string;
@@ -86,7 +88,9 @@ export async function getProductCompliance(input: ProductComplianceInput) {
     fields,
     blockers: gate.reasons.map((reason) => ({
       reason,
-      description: blockerCopy[reason as keyof typeof blockerCopy] ?? "Messaging hard gate is blocking live sends."
+      description:
+        productComplianceBlockerCopy[reason as keyof typeof productComplianceBlockerCopy] ??
+        "Messaging hard gate is blocking live sends."
     })),
     profile: pickProfileTimestamps(profile)
   };

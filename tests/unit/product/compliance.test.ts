@@ -1,6 +1,6 @@
 import { A2pRegistrationStatus } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
-import { getProductCompliance, productComplianceFields } from "@/lib/product/compliance";
+import { getProductCompliance, productComplianceBlockerCopy, productComplianceFields } from "@/lib/product/compliance";
 
 vi.mock("@/lib/db/repositories/compliance", () => ({
   getOrCreateComplianceProfile: vi.fn(async () => ({
@@ -71,6 +71,26 @@ describe("getProductCompliance", () => {
     ).toThrow(TypeError);
     expect(() => {
       (productComplianceFields[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+  });
+
+  it("freezes hard-gate blocker copy before rendering", () => {
+    expect(Object.isFrozen(productComplianceBlockerCopy)).toBe(true);
+    expect(productComplianceBlockerCopy.LIVE_MESSAGING_DISABLED).toBe("Live messaging flag is disabled.");
+    expect(productComplianceBlockerCopy.DEMO_MODE_ENABLED).toBe("Demo mode is enabled for this organization.");
+    expect(Object.keys(productComplianceBlockerCopy)).toEqual([
+      "LIVE_MESSAGING_DISABLED",
+      "DEMO_MODE_ENABLED",
+      "DUMMY_PROVIDER_SELECTED",
+      "COMPLIANCE_PROFILE_INCOMPLETE",
+      "A2P_NOT_APPROVED",
+      "CONTACT_ARCHIVED",
+      "CONSENT_NOT_OPTED_IN",
+      "CONTACT_OPTED_OUT"
+    ]);
+
+    expect(() => {
+      (productComplianceBlockerCopy as Record<string, string>).LIVE_MESSAGING_DISABLED = "Unsafe";
     }).toThrow(TypeError);
   });
 });
