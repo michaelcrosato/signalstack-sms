@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 601
+
+- Latest live-worker own control-array data-backed well-known symbol metadata coverage proves otherwise valid `production-live-campaign` control arrays with own callable data properties for `Symbol.unscopables`, `Symbol.isConcatSpreadable`, and string-method symbols deny without invoking those functions. Focused queue coverage passed with 163 tests, and the protected local gate passed with 59 Vitest files / 619 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 600
 
 - Latest live-worker own control-array data-backed method-name metadata coverage proves otherwise valid `production-live-campaign` control arrays with own callable data properties named like array methods deny without invoking those functions. Focused queue coverage passed with 162 tests, and the protected local gate passed with 59 Vitest files / 618 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
