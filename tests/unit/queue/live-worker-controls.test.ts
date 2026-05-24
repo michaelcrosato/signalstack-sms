@@ -7237,6 +7237,74 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not invoke data-backed inherited control-array metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const metadataSymbol = Symbol("data-backed-inherited-control-array-metadata");
+    const arrayPrototype = Array.prototype as unknown as Record<PropertyKey, unknown>;
+    const originalStringMetadataDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, "reviewerBypass");
+    const originalSymbolMetadataDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, metadataSymbol);
+
+    let exposesOnlyIndexedEntriesResult: boolean;
+    let frozenResult: boolean;
+    let frozenDescriptorResult: boolean;
+    let publicFieldsResult: boolean;
+    let supportedStatusesResult: boolean;
+    let checklistResult: boolean;
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperties(Array.prototype, {
+        reviewerBypass: {
+          configurable: true,
+          value: () => {
+            throw new Error("data-backed inherited control-array string metadata must not be invoked");
+          },
+          writable: true
+        },
+        [metadataSymbol]: {
+          configurable: true,
+          value: () => {
+            throw new Error("data-backed inherited control-array symbol metadata must not be invoked");
+          },
+          writable: true
+        }
+      });
+
+      exposesOnlyIndexedEntriesResult = liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls);
+      frozenResult = liveWorkerControlsAreFrozen(implementedControls);
+      frozenDescriptorResult = liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls);
+      publicFieldsResult = liveWorkerControlsExposeOnlyPublicFields(implementedControls);
+      supportedStatusesResult = liveWorkerControlsUseSupportedStatuses(implementedControls);
+      checklistResult = liveWorkerControlIdsMatchRequiredChecklist(implementedControls);
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalStringMetadataDescriptor === undefined) {
+        delete arrayPrototype.reviewerBypass;
+      } else {
+        Object.defineProperty(Array.prototype, "reviewerBypass", originalStringMetadataDescriptor);
+      }
+
+      if (originalSymbolMetadataDescriptor === undefined) {
+        delete arrayPrototype[metadataSymbol];
+      } else {
+        Object.defineProperty(Array.prototype, metadataSymbol, originalSymbolMetadataDescriptor);
+      }
+    }
+
+    expect(exposesOnlyIndexedEntriesResult!).toBe(true);
+    expect(frozenResult!).toBe(true);
+    expect(frozenDescriptorResult!).toBe(true);
+    expect(publicFieldsResult!).toBe(true);
+    expect(supportedStatusesResult!).toBe(true);
+    expect(checklistResult!).toBe(true);
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("does not read inherited control-array constructor metadata while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const arrayPrototype = Array.prototype as unknown as {
