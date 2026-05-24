@@ -222,15 +222,29 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
 
   const builtInPropertyAliases = new Map<string, string>();
   const globalThisAliases = new Set<string>();
-  const globalThisAliasPattern =
-    /(?:\b(?:const|let|var)\s+|,\s*)([A-Za-z_$][\w$]*)\s*(?::[^=;,\n]+)?=\s*\(*\s*globalThis(?:\s+(?:as|satisfies)\s+typeof\s+globalThis)?\s*\)*\s*(?=,|;|\r?\n)/g;
-  const assignedGlobalThisAliasPattern =
-    /(?:^|[;\r\n])\s*([A-Za-z_$][\w$]*)\s*=\s*\(*\s*globalThis(?:\s+(?:as|satisfies)\s+typeof\s+globalThis)?\s*\)*\s*(?=;|\r?\n)/g;
-  for (const match of [
-    ...normalizedGlobalThisBodySlice.matchAll(globalThisAliasPattern),
-    ...normalizedGlobalThisBodySlice.matchAll(assignedGlobalThisAliasPattern)
-  ]) {
-    globalThisAliases.add(match[1]);
+  let discoveredGlobalThisAlias = true;
+  while (discoveredGlobalThisAlias) {
+    discoveredGlobalThisAlias = false;
+    const globalThisAliasTargets =
+      globalThisAliases.size > 0 ? `globalThis|${[...globalThisAliases].map(escapeRegExp).join("|")}` : "globalThis";
+    const globalThisAliasValuePattern = `\\(*\\s*(?:${globalThisAliasTargets})(?:\\s+(?:as|satisfies)\\s+typeof\\s+globalThis)?\\s*\\)*`;
+    const globalThisAliasPattern = new RegExp(
+      `(?:\\b(?:const|let|var)\\s+|,\\s*)([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${globalThisAliasValuePattern}\\s*(?=,|;|\\r?\\n)`,
+      "g"
+    );
+    const assignedGlobalThisAliasPattern = new RegExp(
+      `(?:^|[;\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*=\\s*${globalThisAliasValuePattern}\\s*(?=;|\\r?\\n)`,
+      "g"
+    );
+    for (const match of [
+      ...normalizedGlobalThisBodySlice.matchAll(globalThisAliasPattern),
+      ...normalizedGlobalThisBodySlice.matchAll(assignedGlobalThisAliasPattern)
+    ]) {
+      if (!globalThisAliases.has(match[1])) {
+        globalThisAliases.add(match[1]);
+        discoveredGlobalThisAlias = true;
+      }
+    }
   }
   for (const alias of globalThisAliases) {
     let previousAliasBodySlice: string;
@@ -6254,6 +6268,86 @@ describe("API route authorization coverage", () => {
     ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedGlobalThisBracketObjectAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeGlobalThisAliasComputedReflectAliasSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("treats transitive local globalThis root aliases as body parsing for role-gate ordering", () => {
+    const unsafeTransitiveRequestRootAliasSource = `
+      export async function POST(req: Request) {
+        const root = globalThis;
+        const platform = root;
+        const { Request: RequestCtor = Request } = platform;
+        const payload = await RequestCtor.prototype.json.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeAssignedTransitiveRequestRootAliasSource = `
+      export async function PATCH(req: Request) {
+        const requestConstructorName = "Request" as const;
+        let root;
+        let platform;
+        let RequestCtor;
+        root = (globalThis satisfies typeof globalThis);
+        platform = root as typeof globalThis;
+        ({ [requestConstructorName]: RequestCtor = Request } = platform);
+        const payload = await RequestCtor.prototype.text.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeTransitiveBuiltinsRootAliasSource = `
+      export async function PUT(req: Request) {
+        const root = globalThis as typeof globalThis;
+        const platform = root;
+        const { Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = platform;
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "formData"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const unsafeAssignedTransitiveBuiltinsRootAliasSource = `
+      export async function DELETE(req: Request) {
+        const objectName = "Object" as const;
+        const reflectName = ("Reflect");
+        let root;
+        let platform;
+        let ObjectBuiltin;
+        let ReflectBuiltin;
+        root = (globalThis as typeof globalThis);
+        platform = root satisfies typeof globalThis;
+        ({ [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = platform);
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "blob"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const root = globalThis;
+        const platform = root;
+        const { Request: RequestCtor = Request } = platform;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await RequestCtor.prototype.arrayBuffer.call(req);
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTransitiveRequestRootAliasSource, "POST")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedTransitiveRequestRootAliasSource, "PATCH")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTransitiveBuiltinsRootAliasSource, "PUT")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedTransitiveBuiltinsRootAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 

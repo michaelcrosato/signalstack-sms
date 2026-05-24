@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 727 note: mutating-route auth scanner coverage now includes transitive local `globalThis` root aliases for both `Request` constructor aliases and `Object`/`Reflect` aliases, including `const root = globalThis; const platform = root; const { Request: RequestCtor = Request } = platform` and `platform = root as typeof globalThis; ({ [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = platform)`, before prototype/descriptor body-reader calls.
+
 Run 726 note: mutating-route auth scanner coverage now includes crossed assigned local `globalThis` root aliases followed by default-initialized destructuring for both `Request` constructor aliases and `Object`/`Reflect` aliases, including `root = (globalThis as typeof globalThis); ({ Request: RequestCtor = Request } = root)` and `root = (globalThis satisfies typeof globalThis); ({ [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = root)`, before prototype/descriptor body-reader calls.
 
 Run 725 note: mutating-route auth scanner coverage now includes assigned local `globalThis` root aliases followed by computed default-initialized destructuring for both `Request` constructor aliases and `Object`/`Reflect` aliases, including `root = (globalThis as typeof globalThis); ({ [requestConstructorName]: RequestCtor = Request } = root)` and `root = (globalThis as typeof globalThis); ({ [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = root)`, before prototype/descriptor body-reader calls.
