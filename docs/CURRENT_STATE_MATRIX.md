@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 683 note: product dashboard header action metadata is now frozen at both array and entry level, with unit coverage proving caller-side mutation cannot drift the demo-console or settings links before `/dashboard` renders them.
+
 Run 682 note: product dashboard compliance readiness counts now derive from the shared frozen product compliance checklist metadata, with unit coverage proving `/dashboard` and `/dashboard/compliance` stay aligned on required profile fields.
 
 Run 681 note: product inbox workspace defaults are now frozen, with unit coverage proving caller-side default demo inbound reply or internal-note copy mutation is rejected before `/dashboard/inbox` renders the local reply and note forms.

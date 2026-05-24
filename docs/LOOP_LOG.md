@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 683  GREEN  product-dashboard-actions-freeze  2026-05-24 09:40
+Objective:    Keep product dashboard header action links stable against caller-side mutation.
+Changed:
+- Added frozen `productDashboardActions` metadata for the `/dashboard` demo-console and settings header links.
+- Updated `/dashboard` to render header actions from the frozen product metadata.
+- Added product dashboard unit coverage proving action labels, route targets, and button intent stay stable and reject caller-side mutation.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the dashboard action-link immutability boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 682  GREEN  product-dashboard-compliance-counts  2026-05-24 09:32
 Objective:    Keep product dashboard compliance readiness counts aligned with the shared compliance checklist metadata.
 Changed:

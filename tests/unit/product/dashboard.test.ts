@@ -1,7 +1,12 @@
 import { UsageEventType } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { productComplianceFields } from "@/lib/product/compliance";
-import { getProductDashboard, productDashboardMetricRows, productNavigation } from "@/lib/product/dashboard";
+import {
+  getProductDashboard,
+  productDashboardActions,
+  productDashboardMetricRows,
+  productNavigation
+} from "@/lib/product/dashboard";
 
 vi.mock("@/lib/db/prisma", () => ({
   prisma: {
@@ -112,6 +117,26 @@ describe("product dashboard navigation", () => {
       (productDashboardMetricRows[0] as { label: string }).label = "Unsafe";
     }).toThrow(TypeError);
     expect(productDashboardMetricRows[0].label).toBe("Active Contacts");
+  });
+
+  it("freezes dashboard action metadata before rendering", () => {
+    expect(Object.isFrozen(productDashboardActions)).toBe(true);
+    expect(productDashboardActions.every((action) => Object.isFrozen(action))).toBe(true);
+    expect(productDashboardActions.map((action) => action.href)).toEqual(["/demo", "/settings"]);
+    expect(productDashboardActions.map((action) => action.label)).toEqual(["Demo Console", "Go-Live Settings"]);
+    expect(productDashboardActions.map((action) => action.style)).toEqual(["secondary", "primary"]);
+
+    expect(() =>
+      (productDashboardActions as unknown as Array<{ href: string; label: string; style: string }>).push({
+        href: "#unsafe",
+        label: "Unsafe",
+        style: "primary"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productDashboardActions[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productDashboardActions[0].label).toBe("Demo Console");
   });
 
   it("projects local usage totals for the product dashboard without live providers", async () => {

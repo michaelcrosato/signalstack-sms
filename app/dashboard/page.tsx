@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
-import { getProductDashboard, productNavigation } from "@/lib/product/dashboard";
+import { getProductDashboard, productDashboardActions, productNavigation } from "@/lib/product/dashboard";
 
 export const dynamic = "force-dynamic";
 
@@ -23,12 +23,19 @@ export default async function DashboardPage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-2 text-sm">
-              <Link className="rounded border border-slate-300 px-3 py-2 font-medium text-slate-700" href="/demo">
-                Demo Console
-              </Link>
-              <Link className="rounded border border-teal-700 px-3 py-2 font-medium text-teal-700" href="/settings">
-                Go-Live Settings
-              </Link>
+              {productDashboardActions.map((action) => (
+                <Link
+                  key={action.href}
+                  className={
+                    action.style === "primary"
+                      ? "rounded border border-teal-700 px-3 py-2 font-medium text-teal-700"
+                      : "rounded border border-slate-300 px-3 py-2 font-medium text-slate-700"
+                  }
+                  href={action.href}
+                >
+                  {action.label}
+                </Link>
+              ))}
             </div>
           </div>
           <nav aria-label="Product areas" className="flex gap-2 overflow-x-auto pb-1">

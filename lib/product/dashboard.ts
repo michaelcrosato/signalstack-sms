@@ -15,6 +15,15 @@ const productNavigationItems = [
 
 export const productNavigation = Object.freeze(productNavigationItems.map((item) => Object.freeze({ ...item })));
 
+const productDashboardActionItems = [
+  { href: "/demo", label: "Demo Console", style: "secondary" },
+  { href: "/settings", label: "Go-Live Settings", style: "primary" }
+] as const;
+
+export const productDashboardActions = Object.freeze(
+  productDashboardActionItems.map((action) => Object.freeze({ ...action }))
+);
+
 const productDashboardMetricRowItems = [
   { key: "activeContacts", label: "Active Contacts" },
   { key: "campaigns", label: "Campaigns" },
