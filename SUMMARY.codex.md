@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 635
+
+- Latest live-worker hidden authorization-wrapper metadata coverage proves the reserved `production-live-campaign` class denies wrappers carrying hidden string/symbol metadata backed by accessors or callable values before inspecting supplied controls, without reading getters or invoking callables. Focused queue coverage passed with 198 tests, and the protected local gate passed with 59 Vitest files / 654 tests, Playwright smoke, and build green. The change is local unit/docs/log coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 634
 
 - Latest live-worker own data-backed control-entry coercion coverage proves the reserved `production-live-campaign` class denies before authorization and without invoking callable `Symbol.toPrimitive`, `toString`, or `valueOf` metadata. Focused queue coverage passed with 197 tests, and the protected local gate passed with 59 Vitest files / 653 tests, Playwright smoke, and build green. The change is local unit/docs/log coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

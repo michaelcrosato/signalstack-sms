@@ -5819,6 +5819,71 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("rejects hidden authorization-wrapper metadata without reading or invoking it before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("hidden wrapper metadata must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("hidden wrapper metadata must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("hidden wrapper metadata must not inspect control evidence");
+      }
+    });
+    const hiddenSymbol = Symbol("hidden-live-worker-wrapper-metadata");
+    const accessorBackedWrapper = Object.freeze(
+      Object.defineProperties(
+        {
+          workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+          controls: throwingEvidence
+        },
+        {
+          hiddenLiveWorkerWrapperMetadata: {
+            enumerable: false,
+            get: () => {
+              throw new Error("hidden string wrapper metadata getter must not be read");
+            }
+          },
+          [hiddenSymbol]: {
+            enumerable: false,
+            get: () => {
+              throw new Error("hidden symbol wrapper metadata getter must not be read");
+            }
+          }
+        }
+      )
+    );
+    const dataBackedWrapper = Object.freeze(
+      Object.defineProperties(
+        {
+          workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+          controls: throwingEvidence
+        },
+        {
+          hiddenLiveWorkerWrapperMetadata: {
+            enumerable: false,
+            value: () => {
+              throw new Error("hidden string wrapper metadata must not be invoked");
+            }
+          },
+          [hiddenSymbol]: {
+            enumerable: false,
+            value: () => {
+              throw new Error("hidden symbol wrapper metadata must not be invoked");
+            }
+          }
+        }
+      )
+    );
+
+    for (const input of [accessorBackedWrapper, dataBackedWrapper]) {
+      expect(Object.isFrozen(input)).toBe(true);
+      expect(() => liveWorkerDeploymentClassIsAuthorized(input)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(input)).toBe(false);
+    }
+  });
+
   it("rejects mixed symbol-keyed authorization wrapper public-field impersonators before inspecting controls", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       getPrototypeOf: () => {

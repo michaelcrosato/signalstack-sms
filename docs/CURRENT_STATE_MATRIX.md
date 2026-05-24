@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 635 note: live-worker authorization now denies hidden accessor-backed or data-backed authorization-wrapper metadata without reading or invoking it and before hostile supplied controls are inspected.
+
 Run 634 note: live-worker authorization now denies own data-backed control-entry coercion metadata without invoking it.
 
 Run 633 note: live-worker authorization now denies own data-backed control-entry `Symbol.toStringTag` metadata without invoking it.
@@ -331,3 +333,5 @@ Run 634 addendum: own data-backed control-entry `Symbol.toPrimitive`, `toString`
 Run 633 addendum: own data-backed control-entry `Symbol.toStringTag` metadata denies before the reserved live-worker class can authorize, and callable tag metadata is not invoked.
 
 Run 632 addendum: own data-backed authorization-wrapper `Symbol.toStringTag` metadata denies before supplied live-worker controls are inspected, and callable tag metadata is not invoked.
+
+Run 635 addendum: hidden authorization-wrapper string/symbol metadata with accessor getters or callable data values denies before supplied live-worker controls are inspected, and that hidden metadata is not read or invoked.
