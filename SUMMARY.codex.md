@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 607
+
+- Latest live-worker inherited control-array data-backed async-iterator coverage proves exact frozen `production-live-campaign` control-array evidence authorizes without invoking data-backed inherited `Array.prototype[Symbol.asyncIterator]` metadata. Focused queue coverage passed with 169 tests, and the protected local gate passed with 59 Vitest files / 625 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 606
 
 - Latest live-worker inherited control-array data-backed iterator coverage proves exact frozen `production-live-campaign` control-array evidence authorizes without invoking data-backed inherited `Array.prototype[Symbol.iterator]` metadata. Focused queue coverage passed with 168 tests, and the protected local gate passed with 59 Vitest files / 624 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

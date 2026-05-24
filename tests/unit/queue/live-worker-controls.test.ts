@@ -1005,6 +1005,41 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("does not invoke data-backed inherited array async-iterators while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as {
+      [Symbol.asyncIterator]?: unknown;
+    };
+    const originalAsyncIteratorDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, Symbol.asyncIterator);
+
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperty(Array.prototype, Symbol.asyncIterator, {
+        configurable: true,
+        value: () => {
+          throw new Error("data-backed inherited control-array async iterator must not be invoked");
+        },
+        writable: true
+      });
+
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalAsyncIteratorDescriptor === undefined) {
+        delete arrayPrototype[Symbol.asyncIterator];
+      } else {
+        Object.defineProperty(Array.prototype, Symbol.asyncIterator, originalAsyncIteratorDescriptor);
+      }
+    }
+
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("does not invoke inherited array coercion metadata while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const arrayPrototype = Array.prototype as unknown as {
