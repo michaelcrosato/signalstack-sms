@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 697 note: mutating-route auth scanner coverage now includes assigned type-asserted optional-bracket `globalThis?.["Request"] as typeof Request` constructor aliases before `Request.prototype` body-reader calls, proving those body readers must remain after each route handler's own top-level `requireApiRole`.
+
 Run 696 note: mutating-route auth scanner coverage now includes assigned optional-dot `globalThis?.Request` constructor aliases before `Request.prototype` body-reader calls, proving those body readers must remain after each route handler's own top-level `requireApiRole`.
 
 Run 695 note: root and docs loop logs are back in parity after the missing Run 694 entry was added to `docs/LOOP_LOG.md`; this was coordination-only and did not change product, provider, worker, billing, AI, secret, or live-impact behavior.

@@ -2360,6 +2360,16 @@ describe("API route authorization coverage", () => {
         return Response.json({ ok: Boolean(payload) });
       }
     `;
+    const unsafeAssignedTypeAssertedOptionalBracketGlobalThisRequestAliasSource = `
+      export async function DELETE(req: Request) {
+        let RequestCtor;
+        RequestCtor = globalThis?.["Request"] as typeof Request;
+        const payload = await RequestCtor.prototype.json.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
     const unsafeAssignedOptionalDotGlobalThisRequestAliasSource = `
       export async function PUT(req: Request) {
         let RequestCtor;
@@ -2654,6 +2664,12 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNestedParenthesizedGlobalThisRequestAliasSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeNestedParenthesizedBracketGlobalThisRequestAliasSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedGlobalThisRequestAliasSource, "PUT")).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeAssignedTypeAssertedOptionalBracketGlobalThisRequestAliasSource,
+        "DELETE"
+      )
+    ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedOptionalDotGlobalThisRequestAliasSource, "PUT")).toBe(
       true
     );
