@@ -1,5 +1,6 @@
 import { CampaignStatus, ConsentStatus } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
+import { productCampaignComposerDefaults } from "@/lib/product/campaign-composer-defaults";
 import { getProductCampaignDetail, getProductCampaigns, productCampaignMetricRows } from "@/lib/product/campaigns";
 
 vi.mock("@/lib/db/repositories/campaigns", () => ({
@@ -170,5 +171,27 @@ describe("getProductCampaigns", () => {
       (productCampaignMetricRows[0] as { label: string }).label = "Unsafe";
     }).toThrow(TypeError);
     expect(productCampaignMetricRows[0].label).toBe("Total Campaigns");
+  });
+
+  it("freezes campaign composer defaults before rendering the local composer", () => {
+    expect(Object.isFrozen(productCampaignComposerDefaults)).toBe(true);
+    expect(productCampaignComposerDefaults).toEqual({
+      name: "Product demo campaign",
+      body: "Hi {{firstName}}, this is SignalStack Demo Co. Reply STOP to opt out.",
+      copyPrompt: "Invite opted-in leads to book a quick demo",
+      aiBusinessName: "SignalStack Demo Co",
+      aiTone: "concise"
+    });
+
+    expect(() => {
+      (productCampaignComposerDefaults as { name: string }).name = "Unsafe";
+    }).toThrow(TypeError);
+    expect(() => {
+      (productCampaignComposerDefaults as { copyPrompt: string }).copyPrompt = "Unsafe";
+    }).toThrow(TypeError);
+    expect(() => {
+      (productCampaignComposerDefaults as { aiTone: string }).aiTone = "unsafe";
+    }).toThrow(TypeError);
+    expect(productCampaignComposerDefaults.name).toBe("Product demo campaign");
   });
 });

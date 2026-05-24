@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
+import { productCampaignComposerDefaults } from "@/lib/product/campaign-composer-defaults";
 
 type ComposerContact = {
   id: string;
@@ -39,14 +40,14 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
   const router = useRouter();
   const firstTemplate = templates[0];
   const readyContacts = useMemo(() => contacts.filter((contact) => !contact.disabled), [contacts]);
-  const [name, setName] = useState("Product demo campaign");
-  const [body, setBody] = useState(firstTemplate?.body ?? "Hi {{firstName}}, this is SignalStack Demo Co. Reply STOP to opt out.");
+  const [name, setName] = useState<string>(productCampaignComposerDefaults.name);
+  const [body, setBody] = useState<string>(firstTemplate?.body ?? productCampaignComposerDefaults.body);
   const [templateId, setTemplateId] = useState(firstTemplate?.id ?? "");
   const [contactIds, setContactIds] = useState<string[]>(readyContacts.slice(0, 3).map((contact) => contact.id));
   const [campaignId, setCampaignId] = useState<string | null>(null);
   const [preflight, setPreflight] = useState<PreflightResult | null>(null);
   const [scheduledAt, setScheduledAt] = useState(defaultSchedule);
-  const [copyPrompt, setCopyPrompt] = useState("Invite opted-in leads to book a quick demo");
+  const [copyPrompt, setCopyPrompt] = useState<string>(productCampaignComposerDefaults.copyPrompt);
   const [copyVariants, setCopyVariants] = useState<string[]>([]);
   const [aiPending, setAiPending] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
@@ -75,7 +76,11 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
     const response = await fetch("/api/ai/campaign-copy", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: copyPrompt, businessName: "SignalStack Demo Co", tone: "concise" })
+      body: JSON.stringify({
+        prompt: copyPrompt,
+        businessName: productCampaignComposerDefaults.aiBusinessName,
+        tone: productCampaignComposerDefaults.aiTone
+      })
     });
     const payload = (await response.json()) as AiCopyResult | { error?: string };
 

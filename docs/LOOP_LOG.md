@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 680  GREEN  product-campaign-composer-defaults-freeze  2026-05-24 09:17
+Objective:    Keep product campaign composer defaults stable against caller-side mutation.
+Changed:
+- Added frozen `productCampaignComposerDefaults` metadata for the `/dashboard/campaigns` local composer.
+- Updated the campaign composer to render default campaign name, fallback body, fake-AI prompt, business-name, and tone from the frozen metadata.
+- Added product campaign unit coverage proving composer default mutation is rejected before the local composer renders.
+- Updated testing docs and contract notes for the campaign composer-default immutability boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 678  GREEN  product-contact-import-defaults-freeze  2026-05-24 09:05
 Objective:    Keep product contact import defaults stable against caller-side filename/CSV mutation.
 Changed:
