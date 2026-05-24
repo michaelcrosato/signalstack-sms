@@ -5,6 +5,7 @@ import {
   getProductDashboard,
   productDashboardActions,
   productDashboardMetricRows,
+  productDashboardSections,
   productDashboardSignalRows,
   productNavigation
 } from "@/lib/product/dashboard";
@@ -172,6 +173,57 @@ describe("product dashboard navigation", () => {
     expect(productDashboardSignalRows[0].label).toBe("Consent coverage");
   });
 
+  it("freezes dashboard section status metadata before rendering", () => {
+    expect(Object.isFrozen(productDashboardSections)).toBe(true);
+    expect(productDashboardSections.every((section) => Object.isFrozen(section))).toBe(true);
+    expect(productDashboardSections.every((section) => Object.isFrozen(section.rows))).toBe(true);
+    expect(productDashboardSections.every((section) => section.rows.every((row) => Object.isFrozen(row)))).toBe(true);
+    expect(productDashboardSections.map((section) => section.id)).toEqual([
+      "contacts",
+      "compliance",
+      "campaigns",
+      "inbox",
+      "templates"
+    ]);
+    expect(productDashboardSections.map((section) => section.title)).toEqual([
+      "Contacts",
+      "Compliance",
+      "Campaigns",
+      "Inbox",
+      "Templates"
+    ]);
+    expect(productDashboardSections[0].rows.map((row) => row.key)).toEqual([
+      "activeContacts",
+      "optedIn",
+      "optedOut"
+    ]);
+    expect(productDashboardSections[1].rows.map((row) => row.label)).toEqual([
+      "Profile fields",
+      "A2P status",
+      "Live messaging"
+    ]);
+
+    expect(() =>
+      (productDashboardSections as unknown as Array<{ id: string }>).push({
+        id: "unsafe"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productDashboardSections[0] as { title: string }).title = "Unsafe";
+    }).toThrow(TypeError);
+    expect(() =>
+      (productDashboardSections[0].rows as unknown as Array<{ key: string; label: string }>).push({
+        key: "unsafe",
+        label: "Unsafe"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productDashboardSections[0].rows[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productDashboardSections[0].title).toBe("Contacts");
+    expect(productDashboardSections[0].rows[0].label).toBe("Active contacts");
+  });
+
   it("projects local usage totals for the product dashboard without live providers", async () => {
     await expect(getProductDashboard("org_1")).resolves.toMatchObject({
       contacts: {
@@ -207,6 +259,58 @@ describe("product dashboard navigation", () => {
         { key: "inboxLoad", label: "Inbox load", value: "4" },
         { key: "fakeAiRequests", label: "Fake AI requests", value: "2" },
         { key: "localUsageEvents", label: "Local usage events", value: "3" }
+      ],
+      sections: [
+        {
+          id: "contacts",
+          title: "Contacts",
+          eyebrow: "Audience",
+          rows: [
+            { key: "activeContacts", label: "Active contacts", value: "10" },
+            { key: "optedIn", label: "Opted in", value: "7" },
+            { key: "optedOut", label: "Opted out", value: "2" }
+          ]
+        },
+        {
+          id: "compliance",
+          title: "Compliance",
+          eyebrow: "Readiness",
+          rows: [
+            { key: "profileFields", label: "Profile fields", value: `${productComplianceFields.length}/${productComplianceFields.length}` },
+            { key: "a2pStatus", label: "A2P status", value: "NOT_STARTED" },
+            { key: "liveMessaging", label: "Live messaging", value: "blocked by default" }
+          ]
+        },
+        {
+          id: "campaigns",
+          title: "Campaigns",
+          eyebrow: "Marketing",
+          rows: [
+            { key: "totalCampaigns", label: "Total campaigns", value: "5" },
+            { key: "drafts", label: "Drafts", value: "3" },
+            { key: "scheduled", label: "Scheduled", value: "1" }
+          ]
+        },
+        {
+          id: "inbox",
+          title: "Inbox",
+          eyebrow: "Response",
+          rows: [
+            { key: "openThreads", label: "Open threads", value: "4" },
+            { key: "localMessages", label: "Local messages", value: "12" },
+            { key: "providerSends", label: "Provider sends", value: "disabled" }
+          ]
+        },
+        {
+          id: "templates",
+          title: "Templates",
+          eyebrow: "Copy",
+          rows: [
+            { key: "savedTemplates", label: "Saved templates", value: "6" },
+            { key: "aiProvider", label: "AI provider", value: "fake by default" },
+            { key: "liveAi", label: "Live AI", value: "blocked" }
+          ]
+        }
       ]
     });
   });

@@ -50,6 +50,72 @@ export const productDashboardSignalRows = Object.freeze(
   productDashboardSignalRowItems.map((row) => Object.freeze({ ...row }))
 );
 
+const productDashboardSectionItems = [
+  {
+    id: "contacts",
+    title: "Contacts",
+    eyebrow: "Audience",
+    rows: [
+      { key: "activeContacts", label: "Active contacts" },
+      { key: "optedIn", label: "Opted in" },
+      { key: "optedOut", label: "Opted out" }
+    ]
+  },
+  {
+    id: "compliance",
+    title: "Compliance",
+    eyebrow: "Readiness",
+    rows: [
+      { key: "profileFields", label: "Profile fields" },
+      { key: "a2pStatus", label: "A2P status" },
+      { key: "liveMessaging", label: "Live messaging" }
+    ]
+  },
+  {
+    id: "campaigns",
+    title: "Campaigns",
+    eyebrow: "Marketing",
+    rows: [
+      { key: "totalCampaigns", label: "Total campaigns" },
+      { key: "drafts", label: "Drafts" },
+      { key: "scheduled", label: "Scheduled" }
+    ]
+  },
+  {
+    id: "inbox",
+    title: "Inbox",
+    eyebrow: "Response",
+    rows: [
+      { key: "openThreads", label: "Open threads" },
+      { key: "localMessages", label: "Local messages" },
+      { key: "providerSends", label: "Provider sends" }
+    ]
+  },
+  {
+    id: "templates",
+    title: "Templates",
+    eyebrow: "Copy",
+    rows: [
+      { key: "savedTemplates", label: "Saved templates" },
+      { key: "aiProvider", label: "AI provider" },
+      { key: "liveAi", label: "Live AI" }
+    ]
+  }
+] as const;
+
+type ProductDashboardSectionStatusKey = (typeof productDashboardSectionItems)[number]["rows"][number]["key"];
+
+export const productDashboardSections = Object.freeze(
+  productDashboardSectionItems.map((section) =>
+    Object.freeze({
+      id: section.id,
+      title: section.title,
+      eyebrow: section.eyebrow,
+      rows: Object.freeze(section.rows.map((row) => Object.freeze({ ...row })))
+    })
+  )
+);
+
 export async function getProductDashboard(orgId: string) {
   const [
     contacts,
@@ -125,6 +191,23 @@ export async function getProductDashboard(orgId: string) {
     fakeAiRequests: String(dashboard.usage.fakeAiRequests),
     localUsageEvents: String(dashboard.usage.totalEvents)
   };
+  const sectionStatusValues: Record<ProductDashboardSectionStatusKey, string> = {
+    activeContacts: String(dashboard.contacts.total),
+    optedIn: String(dashboard.contacts.optedIn),
+    optedOut: String(dashboard.contacts.optedOut),
+    profileFields: `${dashboard.compliance.completeFields}/${dashboard.compliance.requiredFields}`,
+    a2pStatus: dashboard.compliance.a2pRegistrationStatus,
+    liveMessaging: "blocked by default",
+    totalCampaigns: String(dashboard.campaigns.total),
+    drafts: String(dashboard.campaigns.draft),
+    scheduled: String(dashboard.campaigns.scheduled),
+    openThreads: String(dashboard.inbox.open),
+    localMessages: String(dashboard.inbox.messages),
+    providerSends: "disabled",
+    savedTemplates: String(dashboard.templates.total),
+    aiProvider: "fake by default",
+    liveAi: "blocked"
+  };
 
   return {
     ...dashboard,
@@ -142,6 +225,16 @@ export async function getProductDashboard(orgId: string) {
       key: row.key,
       label: row.label,
       value: signalValues[row.key]
+    })),
+    sections: productDashboardSections.map((section) => ({
+      id: section.id,
+      title: section.title,
+      eyebrow: section.eyebrow,
+      rows: section.rows.map((row) => ({
+        key: row.key,
+        label: row.label,
+        value: sectionStatusValues[row.key]
+      }))
     }))
   };
 }

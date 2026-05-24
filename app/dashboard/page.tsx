@@ -60,50 +60,27 @@ export default async function DashboardPage() {
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <ProductSection id="contacts" title="Contacts" eyebrow="Audience">
-            <dl className="grid gap-3 text-sm">
-              <StatusRow label="Active contacts" value={String(dashboard.contacts.total)} />
-              <StatusRow label="Opted in" value={String(dashboard.contacts.optedIn)} />
-              <StatusRow label="Opted out" value={String(dashboard.contacts.optedOut)} />
-            </dl>
-          </ProductSection>
-
-          <ProductSection id="compliance" title="Compliance" eyebrow="Readiness">
-            <dl className="grid gap-3 text-sm">
-              <StatusRow
-                label="Profile fields"
-                value={`${dashboard.compliance.completeFields}/${dashboard.compliance.requiredFields}`}
-              />
-              <StatusRow label="A2P status" value={dashboard.compliance.a2pRegistrationStatus} />
-              <StatusRow label="Live messaging" value="blocked by default" />
-            </dl>
-          </ProductSection>
+          {dashboard.sections.slice(0, 2).map((section) => (
+            <ProductSection id={section.id} title={section.title} eyebrow={section.eyebrow} key={section.id}>
+              <dl className="grid gap-3 text-sm">
+                {section.rows.map((row) => (
+                  <StatusRow key={row.key} label={row.label} value={row.value} />
+                ))}
+              </dl>
+            </ProductSection>
+          ))}
         </section>
 
         <section className="grid gap-6 lg:grid-cols-3">
-          <ProductSection id="campaigns" title="Campaigns" eyebrow="Marketing">
-            <dl className="grid gap-3 text-sm">
-              <StatusRow label="Total campaigns" value={String(dashboard.campaigns.total)} />
-              <StatusRow label="Drafts" value={String(dashboard.campaigns.draft)} />
-              <StatusRow label="Scheduled" value={String(dashboard.campaigns.scheduled)} />
-            </dl>
-          </ProductSection>
-
-          <ProductSection id="inbox" title="Inbox" eyebrow="Response">
-            <dl className="grid gap-3 text-sm">
-              <StatusRow label="Open threads" value={String(dashboard.inbox.open)} />
-              <StatusRow label="Local messages" value={String(dashboard.inbox.messages)} />
-              <StatusRow label="Provider sends" value="disabled" />
-            </dl>
-          </ProductSection>
-
-          <ProductSection id="templates" title="Templates" eyebrow="Copy">
-            <dl className="grid gap-3 text-sm">
-              <StatusRow label="Saved templates" value={String(dashboard.templates.total)} />
-              <StatusRow label="AI provider" value="fake by default" />
-              <StatusRow label="Live AI" value="blocked" />
-            </dl>
-          </ProductSection>
+          {dashboard.sections.slice(2).map((section) => (
+            <ProductSection id={section.id} title={section.title} eyebrow={section.eyebrow} key={section.id}>
+              <dl className="grid gap-3 text-sm">
+                {section.rows.map((row) => (
+                  <StatusRow key={row.key} label={row.label} value={row.value} />
+                ))}
+              </dl>
+            </ProductSection>
+          ))}
         </section>
 
         <ProductSection id="analytics" title="Analytics" eyebrow="Local Signals">

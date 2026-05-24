@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 690  GREEN  product-dashboard-sections-freeze  2026-05-24 10:32
+Objective:    Keep product dashboard summary section labels stable against caller-side mutation.
+Changed:
+- Added frozen `productDashboardSections` metadata for `/dashboard` contacts, compliance, campaigns, inbox, and templates summary sections.
+- Updated the dashboard projection and page rendering to use frozen section titles, eyebrows, and status row labels.
+- Added product dashboard unit coverage proving section metadata, nested row metadata, projected values, and caller-side mutation rejection stay stable before rendering.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the dashboard section/status immutability boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 689  GREEN  product-inbox-thread-status-freeze  2026-05-24 10:23
 Objective:    Keep product inbox selected-thread status labels stable against caller-side mutation.
 Changed:
