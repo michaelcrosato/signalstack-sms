@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 669 note: product analytics usage-row metadata is now frozen at both array and entry level, with unit coverage proving caller-side usage label/order mutation is rejected before `/dashboard/analytics` renders local usage rows.
+
 Run 668 note: product compliance checklist metadata is now frozen at both array and entry level, with unit coverage proving caller-side item mutation is rejected before `/dashboard/compliance` renders readiness fields.
 
 Run 667 note: shared product dashboard navigation metadata is now frozen at both array and entry level, with unit coverage proving caller-side item mutation is rejected before the product shell renders.

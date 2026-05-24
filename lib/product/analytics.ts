@@ -1,12 +1,16 @@
 import { UsageEventType } from "@prisma/client";
 import { getAnalyticsOverview } from "@/lib/analytics/overview";
 
-const usageLabels: Record<UsageEventType, string> = {
-  [UsageEventType.CONTACT_IMPORTED]: "Contacts imported",
-  [UsageEventType.MESSAGE_INBOUND]: "Inbound messages",
-  [UsageEventType.CAMPAIGN_SCHEDULED]: "Campaigns scheduled",
-  [UsageEventType.AI_REQUEST]: "Fake AI requests"
-};
+const productAnalyticsUsageRowItems = [
+  { type: UsageEventType.CONTACT_IMPORTED, label: "Contacts imported" },
+  { type: UsageEventType.MESSAGE_INBOUND, label: "Inbound messages" },
+  { type: UsageEventType.CAMPAIGN_SCHEDULED, label: "Campaigns scheduled" },
+  { type: UsageEventType.AI_REQUEST, label: "Fake AI requests" }
+] as const;
+
+export const productAnalyticsUsageRows = Object.freeze(
+  productAnalyticsUsageRowItems.map((row) => Object.freeze({ ...row }))
+);
 
 export async function getProductAnalytics(orgId: string) {
   const overview = await getAnalyticsOverview(orgId);
@@ -35,10 +39,10 @@ export async function getProductAnalytics(orgId: string) {
       totalUsageEvents,
       fakeAiUsagePercent
     },
-    usageRows: Object.values(UsageEventType).map((type) => ({
-      type,
-      label: usageLabels[type],
-      quantity: overview.usage[type]
+    usageRows: productAnalyticsUsageRows.map((row) => ({
+      type: row.type,
+      label: row.label,
+      quantity: overview.usage[row.type]
     }))
   };
 }

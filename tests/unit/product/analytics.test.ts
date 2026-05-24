@@ -1,7 +1,7 @@
 import { UsageEventType } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { getAnalyticsOverview } from "@/lib/analytics/overview";
-import { getProductAnalytics } from "@/lib/product/analytics";
+import { getProductAnalytics, productAnalyticsUsageRows } from "@/lib/product/analytics";
 
 vi.mock("@/lib/analytics/overview", () => ({
   getAnalyticsOverview: vi.fn()
@@ -93,5 +93,27 @@ describe("product analytics", () => {
         fakeAiUsagePercent: 0
       }
     });
+  });
+
+  it("freezes product analytics usage row metadata before rendering", () => {
+    expect(Object.isFrozen(productAnalyticsUsageRows)).toBe(true);
+    expect(productAnalyticsUsageRows.every((row) => Object.isFrozen(row))).toBe(true);
+    expect(productAnalyticsUsageRows.map((row) => row.type)).toEqual([
+      UsageEventType.CONTACT_IMPORTED,
+      UsageEventType.MESSAGE_INBOUND,
+      UsageEventType.CAMPAIGN_SCHEDULED,
+      UsageEventType.AI_REQUEST
+    ]);
+
+    expect(() => {
+      (productAnalyticsUsageRows as unknown as Array<{ type: UsageEventType; label: string }>).push({
+        type: UsageEventType.AI_REQUEST,
+        label: "Unsafe"
+      });
+    }).toThrow(TypeError);
+    expect(() => {
+      (productAnalyticsUsageRows[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productAnalyticsUsageRows[0].label).toBe("Contacts imported");
   });
 });
