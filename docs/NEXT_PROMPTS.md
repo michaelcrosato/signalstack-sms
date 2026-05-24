@@ -14,7 +14,8 @@ This file is the handoff for the next automated loop. It should stay short enoug
 
 ## Current State
 
-- Latest run: Run 700 added mutating-route auth scanner coverage for assigned whole-parenthesized `satisfies` optional-dot and optional-bracket `globalThis?.Request` constructor aliases before `Request.prototype` body-reader calls, proving those reads must remain after each handler's own top-level `requireApiRole`.
+- Latest run: Run 701 added mutating-route auth scanner coverage for direct `const` type-asserted and `satisfies` optional-dot and optional-bracket `globalThis?.Request` constructor aliases before `Request.prototype` body-reader calls, proving those reads must remain after each handler's own top-level `requireApiRole`.
+- Run 700 added mutating-route auth scanner coverage for assigned whole-parenthesized `satisfies` optional-dot and optional-bracket `globalThis?.Request` constructor aliases before `Request.prototype` body-reader calls, proving those reads must remain after each handler's own top-level `requireApiRole`.
 - Run 699 added mutating-route auth scanner coverage for assigned whole-parenthesized type-asserted optional-dot and optional-bracket `globalThis?.Request` constructor aliases before `Request.prototype` body-reader calls, proving those reads must remain after each handler's own top-level `requireApiRole`.
 - Run 698 added mutating-route auth scanner coverage for assigned type-asserted optional-dot `globalThis?.Request as typeof Request` constructor aliases before `Request.prototype` body-reader calls, proving those reads must remain after each handler's own top-level `requireApiRole`.
 - Run 697 added mutating-route auth scanner coverage for assigned type-asserted optional-bracket `globalThis?.["Request"] as typeof Request` constructor aliases before `Request.prototype` body-reader calls, proving those reads must remain after each handler's own top-level `requireApiRole`.
