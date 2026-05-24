@@ -463,6 +463,50 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects own data-backed coercion metadata on control arrays without invoking it", () => {
+    const implementedControls = implementedFrozenControls();
+    const coercionMetadataControls = [...implementedControls];
+    Object.defineProperties(coercionMetadataControls, {
+      [Symbol.toPrimitive]: {
+        enumerable: false,
+        value: () => {
+          throw new Error("control-array Symbol.toPrimitive metadata must not be invoked");
+        }
+      },
+      toString: {
+        enumerable: false,
+        value: () => {
+          throw new Error("control-array toString metadata must not be invoked");
+        }
+      },
+      valueOf: {
+        enumerable: false,
+        value: () => {
+          throw new Error("control-array valueOf metadata must not be invoked");
+        }
+      }
+    });
+    Object.freeze(coercionMetadataControls);
+
+    expect(Object.isFrozen(coercionMetadataControls)).toBe(true);
+    expect(() => liveWorkerControlsAreFrozen(coercionMetadataControls)).not.toThrow();
+    expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(coercionMetadataControls)).not.toThrow();
+    expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(coercionMetadataControls)).not.toThrow();
+    expect(() => liveWorkerControlsAreImplemented(coercionMetadataControls)).not.toThrow();
+    expect(liveWorkerControlsAreFrozen(coercionMetadataControls)).toBe(true);
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(coercionMetadataControls)).toBe(true);
+    expect(liveWorkerControlsExposeOnlyPublicFields(coercionMetadataControls)).toBe(true);
+    expect(liveWorkerControlsUseSupportedStatuses(coercionMetadataControls)).toBe(true);
+    expect(liveWorkerControlIdsMatchRequiredChecklist(coercionMetadataControls)).toBe(true);
+    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(coercionMetadataControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(coercionMetadataControls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, coercionMetadataControls)
+      )
+    ).toBe(false);
+  });
+
   it("rejects own toStringTag metadata on control arrays without reading it", () => {
     const implementedControls = implementedFrozenControls();
     const taggedControls = [...implementedControls];
