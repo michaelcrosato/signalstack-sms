@@ -2,9 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
-
-const sampleCsv = `phone,email,first_name,last_name,consent_status,opt_in_source,tags,lists
-+15555550155,casey@example.com,Casey,Rivera,OPTED_IN,demo_form,webinar,Demo Leads`;
+import { productContactImportDefaults } from "@/lib/product/contact-import-defaults";
 
 type ImportSummary = {
   totalRows: number;
@@ -22,8 +20,8 @@ export function ContactImportForm() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const submittedFilename = String(formData.get("filename") ?? "product-contacts.csv");
-    const submittedCsv = String(formData.get("csv") ?? sampleCsv);
+    const submittedFilename = String(formData.get("filename") ?? productContactImportDefaults.filename);
+    const submittedCsv = String(formData.get("csv") ?? productContactImportDefaults.csv);
     setPending(true);
     setError(null);
     setSummary(null);
@@ -52,7 +50,7 @@ export function ContactImportForm() {
         Filename
         <input
           className="rounded border border-slate-300 px-3 py-2 text-slate-950"
-          defaultValue="product-contacts.csv"
+          defaultValue={productContactImportDefaults.filename}
           name="filename"
         />
       </label>
@@ -60,7 +58,7 @@ export function ContactImportForm() {
         CSV rows
         <textarea
           className="min-h-40 rounded border border-slate-300 px-3 py-2 font-mono text-sm text-slate-950"
-          defaultValue={sampleCsv}
+          defaultValue={productContactImportDefaults.csv}
           name="csv"
         />
       </label>

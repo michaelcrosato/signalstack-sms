@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 678  GREEN  product-contact-import-defaults-freeze  2026-05-24 09:05
+Objective:    Keep product contact import defaults stable against caller-side filename/CSV mutation.
+Changed:
+- Added frozen `productContactImportDefaults` metadata for the `/dashboard/contacts` CSV import workflow.
+- Updated the contact import form to render the default demo filename and local opt-in CSV row from the frozen metadata.
+- Added product contact unit coverage proving default filename/CSV mutation is rejected before the import form renders.
+- Updated testing docs and contract notes for the contact import-default immutability boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 677  GREEN  product-template-form-defaults-freeze  2026-05-24 09:00
 Objective:    Keep product template create-form defaults stable against caller-side name/body mutation.
 Changed:

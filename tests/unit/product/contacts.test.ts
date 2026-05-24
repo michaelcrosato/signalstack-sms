@@ -1,6 +1,7 @@
 import { ConsentStatus } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { productContactConsentOptions } from "@/lib/product/contact-consent-options";
+import { productContactImportDefaults } from "@/lib/product/contact-import-defaults";
 import { getProductContactDetail, getProductContacts, productContactMetricRows } from "@/lib/product/contacts";
 
 vi.mock("@/lib/db/repositories/contacts", () => ({
@@ -193,5 +194,22 @@ describe("getProductContacts", () => {
       (productContactConsentOptions[0] as { label: string }).label = "Unsafe";
     }).toThrow(TypeError);
     expect(productContactConsentOptions[0].label).toBe("UNKNOWN");
+  });
+
+  it("freezes contact import defaults before rendering the local CSV import workflow", () => {
+    expect(Object.isFrozen(productContactImportDefaults)).toBe(true);
+    expect(productContactImportDefaults).toEqual({
+      filename: "product-contacts.csv",
+      csv: `phone,email,first_name,last_name,consent_status,opt_in_source,tags,lists
++15555550155,casey@example.com,Casey,Rivera,OPTED_IN,demo_form,webinar,Demo Leads`
+    });
+
+    expect(() => {
+      (productContactImportDefaults as { filename: string }).filename = "unsafe.csv";
+    }).toThrow(TypeError);
+    expect(() => {
+      (productContactImportDefaults as { csv: string }).csv = "phone";
+    }).toThrow(TypeError);
+    expect(productContactImportDefaults.filename).toBe("product-contacts.csv");
   });
 });
