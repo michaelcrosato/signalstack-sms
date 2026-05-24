@@ -1,10 +1,30 @@
 # LOOP_LOG
 
+## Run 632  GREEN  live-worker-own-data-wrapper-tostringtag  2026-05-24 03:12
+Objective:    Prove own data-backed authorization-wrapper `Symbol.toStringTag` metadata cannot authorize or inspect the reserved live-worker controls.
+Changed:
+- Added live-worker unit coverage showing own data-backed wrapper `Symbol.toStringTag` metadata denies before supplied controls are inspected and without invoking callable tag metadata.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the own data-backed wrapper tag boundary; restored the missing Run 630 entry in `docs/LOOP_LOG.md` from the root log.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 631  GREEN  live-worker-inherited-object-non-public-metadata  2026-05-24 03:07
 Objective:    Prove arbitrary inherited `Object.prototype` non-public string/symbol metadata cannot influence exact frozen live-worker evidence.
 Changed:
 - Added live-worker unit coverage showing exact frozen evidence authorizes without reading accessor-backed or invoking data-backed arbitrary inherited `Object.prototype` string/symbol metadata.
 - Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the inherited Object non-public metadata boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 630  GREEN  live-worker-inherited-object-locale-string  2026-05-24 02:54
+Objective:    Prove inherited `Object.prototype.toLocaleString` metadata cannot influence exact frozen live-worker evidence.
+Changed:
+- Added live-worker unit coverage showing exact frozen evidence authorizes without reading accessor-backed or invoking data-backed inherited `Object.prototype.toLocaleString` metadata.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the inherited Object locale-string boundary.
 - Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
