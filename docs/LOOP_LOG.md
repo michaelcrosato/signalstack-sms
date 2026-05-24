@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 646  GREEN  live-worker-own-array-locale-string  2026-05-24 05:22
+Objective:    Prove own `toLocaleString` control-array metadata cannot authorize or execute the reserved live-worker controls.
+Changed:
+- Added live-worker unit coverage showing otherwise valid supplied control arrays with accessor-backed or data-backed `toLocaleString` metadata deny without reading or invoking that metadata.
+- Updated queue/testing contracts, production worker policy, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the own control-array `toLocaleString` metadata boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 645  GREEN  live-worker-hidden-array-metadata  2026-05-24 05:13
 Objective:    Prove hidden control-array metadata cannot authorize or inspect the reserved live-worker controls.
 Changed:

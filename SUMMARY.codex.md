@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 646
+
+- Latest live-worker own `toLocaleString` control-array metadata coverage proves accessor-backed or data-backed metadata on otherwise valid supplied control arrays denies without being read or invoked. Focused queue coverage passed with 209 tests, and the protected local gate passed with 59 Vitest files / 665 tests, Playwright smoke, and build green. The change is local unit/docs/log coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 645
 
 - Latest live-worker hidden control-array metadata coverage proves accessor-backed or data-backed hidden string/symbol metadata on otherwise valid supplied control arrays denies without being read or invoked. Focused queue coverage passed with 208 tests. The change is local unit/docs/log coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

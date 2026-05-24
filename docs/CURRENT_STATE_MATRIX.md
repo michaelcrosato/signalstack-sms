@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 646 note: live-worker authorization now denies own control-array `toLocaleString` metadata backed by accessors or callable data values without reading or invoking that metadata.
+
 Run 645 note: live-worker authorization now denies hidden control-array metadata backed by accessors or callable data values without reading or invoking that metadata.
 
 Run 644 note: seeded product-demo browser coverage passed after demo seeding across dashboard, contacts, campaign, inbox, template, analytics, and compliance workflows.
@@ -361,3 +363,5 @@ Run 641 addendum: exact frozen control-array evidence stays authorized without r
 Run 642 addendum: exact frozen control-array evidence stays authorized without reading accessor-backed or invoking data-backed inherited `Array.prototype.__defineGetter__`, `Array.prototype.__defineSetter__`, `Array.prototype.__lookupGetter__`, or `Array.prototype.__lookupSetter__` metadata.
 
 Run 643 addendum: exact frozen control-array evidence stays authorized without reading accessor-backed or invoking data-backed inherited `Array.prototype.__proto__` prototype-accessor metadata.
+
+Run 646 addendum: own accessor-backed or data-backed supplied control-array `toLocaleString` metadata denies before the reserved live-worker class can authorize, and that metadata is not read or invoked.
