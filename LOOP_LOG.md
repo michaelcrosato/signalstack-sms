@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 681  GREEN  product-inbox-workspace-defaults-freeze  2026-05-24 09:24
+Objective:    Keep product inbox workspace defaults stable against caller-side mutation.
+Changed:
+- Added frozen `productInboxWorkspaceDefaults` metadata for the `/dashboard/inbox` local reply and note forms.
+- Updated the inbox workspace to render default demo inbound reply and internal-note copy from the frozen metadata.
+- Added product inbox unit coverage proving workspace default mutation is rejected before the local forms render.
+- Updated testing docs and contract notes for the inbox workspace-default immutability boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 680  GREEN  product-campaign-composer-defaults-freeze  2026-05-24 09:17
 Objective:    Keep product campaign composer defaults stable against caller-side mutation.
 Changed:

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
+import { productInboxWorkspaceDefaults } from "@/lib/product/inbox-workspace-defaults";
 
 type InboxConversationRow = {
   id: string;
@@ -58,8 +59,8 @@ export function InboxWorkspace({
   selectedConversation: SelectedConversation | null;
 }) {
   const router = useRouter();
-  const [messageBody, setMessageBody] = useState("YES, please send the starter plan details.");
-  const [noteBody, setNoteBody] = useState("Follow up with pricing context after demo.");
+  const [messageBody, setMessageBody] = useState<string>(productInboxWorkspaceDefaults.inboundReply);
+  const [noteBody, setNoteBody] = useState<string>(productInboxWorkspaceDefaults.internalNote);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);

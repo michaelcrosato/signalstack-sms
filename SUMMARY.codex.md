@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 681
+
+- Latest product inbox workspace-default hardening exports frozen `productInboxWorkspaceDefaults` metadata, uses it for the `/dashboard/inbox` local reply and note form initial state, and focused product inbox coverage now proves caller-side mutation of the default demo inbound reply and internal-note copy is rejected before the workspace renders. Focused product inbox coverage, typecheck, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 680
 
 - Latest product campaign composer-default hardening exports frozen `productCampaignComposerDefaults` metadata, uses it for the `/dashboard/campaigns` local composer, and focused product campaign coverage now proves caller-side mutation of the default campaign name, fallback body, fake-AI prompt, business-name, and tone is rejected before the composer renders. Focused product campaign coverage, typecheck, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.

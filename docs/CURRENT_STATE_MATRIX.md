@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 681 note: product inbox workspace defaults are now frozen, with unit coverage proving caller-side default demo inbound reply or internal-note copy mutation is rejected before `/dashboard/inbox` renders the local reply and note forms.
+
 Run 680 note: product campaign composer defaults are now frozen, with unit coverage proving caller-side campaign name, fallback body, fake-AI prompt, business-name, or tone mutation is rejected before `/dashboard/campaigns` renders the local composer.
 
 Run 679 note: shared demo-safe runtime defaults are now frozen, with smoke coverage proving caller-side default mutation is rejected before local UI, health, and compliance checks consume them.

@@ -1,5 +1,6 @@
 import { ConsentStatus, ConversationStatus } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
+import { productInboxWorkspaceDefaults } from "@/lib/product/inbox-workspace-defaults";
 import { getProductInbox, productInboxMetricRows } from "@/lib/product/inbox";
 
 vi.mock("@/lib/db/repositories/inbox", () => ({
@@ -123,5 +124,21 @@ describe("getProductInbox", () => {
       (productInboxMetricRows[0] as { label: string }).label = "Unsafe";
     }).toThrow(TypeError);
     expect(productInboxMetricRows[0].label).toBe("Total Threads");
+  });
+
+  it("freezes inbox workspace defaults before rendering local reply and note forms", () => {
+    expect(Object.isFrozen(productInboxWorkspaceDefaults)).toBe(true);
+    expect(productInboxWorkspaceDefaults).toEqual({
+      inboundReply: "YES, please send the starter plan details.",
+      internalNote: "Follow up with pricing context after demo."
+    });
+
+    expect(() => {
+      (productInboxWorkspaceDefaults as { inboundReply: string }).inboundReply = "Unsafe";
+    }).toThrow(TypeError);
+    expect(() => {
+      (productInboxWorkspaceDefaults as { internalNote: string }).internalNote = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productInboxWorkspaceDefaults.inboundReply).toBe("YES, please send the starter plan details.");
   });
 });
