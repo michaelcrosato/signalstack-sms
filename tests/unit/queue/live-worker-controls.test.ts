@@ -1211,6 +1211,41 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("does not invoke data-backed inherited array toStringTag metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as {
+      [Symbol.toStringTag]?: unknown;
+    };
+    const originalToStringTagDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, Symbol.toStringTag);
+
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperty(Array.prototype, Symbol.toStringTag, {
+        configurable: true,
+        value: () => {
+          throw new Error("data-backed inherited control-array toStringTag must not be invoked");
+        },
+        writable: true
+      });
+
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalToStringTagDescriptor === undefined) {
+        delete arrayPrototype[Symbol.toStringTag];
+      } else {
+        Object.defineProperty(Array.prototype, Symbol.toStringTag, originalToStringTagDescriptor);
+      }
+    }
+
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("rejects array subclass evidence before live-worker authorization", () => {
     const implementedControls = implementedFrozenControls();
 
