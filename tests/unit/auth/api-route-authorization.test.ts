@@ -6382,6 +6382,81 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
+  it("treats multi-hop comma-declared transitive local globalThis root aliases as body parsing for role-gate ordering", () => {
+    const unsafeCommaDeclaredMultiHopRequestRootAliasSource = `
+      export async function POST(req: Request) {
+        const root = globalThis, platform = root, runtime = platform;
+        const { Request: RequestCtor = Request } = runtime;
+        const payload = await RequestCtor.prototype.json.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeCommaDeclaredMultiHopComputedRequestRootAliasSource = `
+      export async function PATCH(req: Request) {
+        const requestConstructorName = "Request" as const;
+        const root = globalThis as typeof globalThis, platform = root, runtime = platform;
+        const { [requestConstructorName]: RequestCtor = Request } = runtime;
+        const payload = await RequestCtor.prototype.text.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeCommaDeclaredMultiHopBuiltinsRootAliasSource = `
+      export async function PUT(req: Request) {
+        const root = globalThis satisfies typeof globalThis, platform = root, runtime = platform;
+        const { Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = runtime;
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "formData"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const unsafeCommaDeclaredMultiHopComputedBuiltinsRootAliasSource = `
+      export async function DELETE(req: Request) {
+        const objectName = "Object" as const, reflectName = "Reflect" as const;
+        const root = globalThis, platform = root, runtime = platform;
+        const { [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = runtime;
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "blob"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        const root = globalThis, platform = root, runtime = platform;
+        const { Request: RequestCtor = Request } = runtime;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await RequestCtor.prototype.arrayBuffer.call(req);
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCommaDeclaredMultiHopRequestRootAliasSource, "POST")).toBe(
+      true
+    );
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(unsafeCommaDeclaredMultiHopComputedRequestRootAliasSource, "PATCH")
+    ).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCommaDeclaredMultiHopBuiltinsRootAliasSource, "PUT")).toBe(
+      true
+    );
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(unsafeCommaDeclaredMultiHopComputedBuiltinsRootAliasSource, "DELETE")
+    ).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
   it("treats non-null transitive local globalThis root aliases as body parsing for role-gate ordering", () => {
     const unsafeNonNullTransitiveRequestRootAliasSource = `
       export async function POST(req: Request) {
