@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 744 note: mutating-route auth scanner coverage now includes typed declaration multi-hop local `globalThis` root aliases for both `Request` constructor aliases and `Object`/`Reflect` aliases, including `const root: typeof globalThis = globalThis; let platform: typeof globalThis = root; var runtime: typeof globalThis = platform`, before prototype/descriptor body-reader calls.
+
 Run 743 note: mutating-route auth scanner coverage now includes `let` and `var` mixed declaration/assignment multi-hop local `globalThis` root aliases for both `Request` constructor aliases and `Object`/`Reflect` aliases, including `let root = globalThis; var platform = root; runtime = platform`, before prototype/descriptor body-reader calls.
 
 Run 742 note: mutating-route auth scanner coverage now includes mixed declaration and assignment multi-hop local `globalThis` root aliases for both `Request` constructor aliases and `Object`/`Reflect` aliases, including `const root = globalThis; platform = root; const runtime = platform`, before prototype/descriptor body-reader calls.

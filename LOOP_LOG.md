@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 744  GREEN  typed-globalthis-auth-aliases  2026-05-24 16:27
+Objective:    Prove typed declaration multi-hop local `globalThis` root aliases are classified before mutating-route body-reader role gates.
+Changed:
+- Added auth scanner unit coverage for typed `const`/`let`/`var` multi-hop `globalThis` root aliases feeding defaulted `Request`, `Object`, and `Reflect` destructuring before body-reader calls.
+- Updated testing contract, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the typed declaration alias boundary.
+- Kept the change local to tests/docs/logs; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 743  GREEN  auth-let-var-mixed-multihop-root-globalthis  2026-05-24 16:19
 Objective:    Keep mutating-route auth scanner coverage aligned with `let` and `var` mixed declaration/assignment multi-hop local `globalThis` root aliases.
 Changed:
