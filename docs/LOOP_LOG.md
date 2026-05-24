@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 715  GREEN  auth-assigned-satisfies-destructured-globalthis-builtins  2026-05-24 13:13
+Objective:    Keep mutating-route auth scanner coverage aligned with assigned `satisfies` destructured `globalThis` `Object`/`Reflect` aliases.
+Changed:
+- Added focused auth unit coverage proving `({ [objectName]: ObjectBuiltin, Reflect: ReflectBuiltin } = (globalThis satisfies typeof globalThis))` aliases before descriptor/prototype body-reader calls are treated as body parsing before `requireApiRole`.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the assigned satisfies destructured globalThis Object/Reflect alias boundary.
+- Kept live SMS, billing, providers, workers, Redis, notifications, live AI, secrets, protected gate scripts, and destructive production actions untouched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 714  GREEN  auth-assigned-asserted-destructured-globalthis-request-aliases  2026-05-24 13:07
 Objective:    Keep mutating-route auth scanner coverage aligned with assigned destructured `globalThis` `Request` aliases when the destructuring source is type-asserted or `satisfies`-asserted.
 Changed:

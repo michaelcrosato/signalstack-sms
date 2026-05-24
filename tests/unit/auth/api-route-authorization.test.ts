@@ -5506,6 +5506,21 @@ describe("API route authorization coverage", () => {
         return Response.json({ ok: Boolean(payload) });
       }
     `;
+    const unsafeAssignedSatisfiesDestructuredGlobalReflectSource = `
+      export async function DELETE(req: Request) {
+        const objectName = "Object" as const;
+        let ObjectBuiltin;
+        let ReflectBuiltin;
+        ({ [objectName]: ObjectBuiltin, Reflect: ReflectBuiltin } = (globalThis satisfies typeof globalThis));
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "arrayBuffer"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
     const unsafeTypeAssertedDestructuredGlobalRequestSource = `
       export async function PUT(req: Request) {
         const { Request: RequestBuiltin } = globalThis as typeof globalThis;
@@ -5628,6 +5643,9 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTypeAssertedDestructuredGlobalReflectSource, "DELETE")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSatisfiesDestructuredGlobalObjectSource, "POST")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedTypeAssertedDestructuredGlobalObjectSource, "PATCH")).toBe(
+      true
+    );
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedSatisfiesDestructuredGlobalReflectSource, "DELETE")).toBe(
       true
     );
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTypeAssertedDestructuredGlobalRequestSource, "PUT")).toBe(true);
