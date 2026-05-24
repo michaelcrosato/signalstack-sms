@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 700 note: mutating-route auth scanner coverage now includes assigned whole-parenthesized `satisfies` optional-dot and optional-bracket `globalThis?.Request` constructor aliases before `Request.prototype` body-reader calls, proving those body readers must remain after each route handler's own top-level `requireApiRole`.
+
 Run 699 note: mutating-route auth scanner coverage now includes assigned whole-parenthesized type-asserted optional-dot and optional-bracket `globalThis?.Request` constructor aliases before `Request.prototype` body-reader calls, proving those body readers must remain after each route handler's own top-level `requireApiRole`.
 
 Run 698 note: mutating-route auth scanner coverage now includes assigned type-asserted optional-dot `globalThis?.Request as typeof Request` constructor aliases before `Request.prototype` body-reader calls, proving those body readers must remain after each route handler's own top-level `requireApiRole`.

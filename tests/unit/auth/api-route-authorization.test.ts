@@ -2388,6 +2388,16 @@ describe("API route authorization coverage", () => {
         return Response.json(payload);
       }
     `;
+    const unsafeAssignedWholeParenthesizedSatisfiesOptionalBracketGlobalThisRequestAliasSource = `
+      export async function DELETE(req: Request) {
+        let RequestCtor;
+        RequestCtor = (globalThis?.["Request"] satisfies typeof Request);
+        const payload = await RequestCtor.prototype.formData.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
     const unsafeAssignedOptionalDotGlobalThisRequestAliasSource = `
       export async function PUT(req: Request) {
         let RequestCtor;
@@ -2416,6 +2426,16 @@ describe("API route authorization coverage", () => {
         const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
         if (roleResponse) return roleResponse;
         return Response.json({ payload });
+      }
+    `;
+    const unsafeAssignedWholeParenthesizedSatisfiesOptionalDotGlobalThisRequestAliasSource = `
+      export async function PATCH(req: Request) {
+        let RequestCtor;
+        RequestCtor = (globalThis?.Request satisfies typeof Request);
+        const payload = await RequestCtor.prototype.blob.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
       }
     `;
     const unsafeOptionalDotGlobalThisRequestAliasSource = `
@@ -2714,6 +2734,12 @@ describe("API route authorization coverage", () => {
         "DELETE"
       )
     ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeAssignedWholeParenthesizedSatisfiesOptionalBracketGlobalThisRequestAliasSource,
+        "DELETE"
+      )
+    ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedOptionalDotGlobalThisRequestAliasSource, "PUT")).toBe(
       true
     );
@@ -2726,6 +2752,12 @@ describe("API route authorization coverage", () => {
     expect(
       mutatingMethodParsesBodyBeforeRoleGate(
         unsafeAssignedWholeParenthesizedTypeAssertedOptionalDotGlobalThisRequestAliasSource,
+        "PATCH"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeAssignedWholeParenthesizedSatisfiesOptionalDotGlobalThisRequestAliasSource,
         "PATCH"
       )
     ).toBe(true);
