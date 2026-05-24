@@ -1,5 +1,16 @@
 # LOOP_LOG
 
+## Run 676  GREEN  product-contact-consent-options-freeze  2026-05-24 08:52
+Objective:    Keep product contact consent update choices stable against caller-side value or order mutation.
+Changed:
+- Added frozen `productContactConsentOptions` metadata for the `/dashboard/contacts/:contactId` consent select.
+- Updated the product contact detail form to render consent choices from the frozen option metadata.
+- Added product contact unit coverage proving the consent option array and entries are frozen before the detail workflow renders.
+- Updated testing docs and contract notes for the contact consent-option immutability boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 675  GREEN  product-compliance-blocker-copy-freeze  2026-05-24 08:44
 Objective:    Keep product compliance hard-gate blocker copy stable against caller-side description mutation.
 Changed:

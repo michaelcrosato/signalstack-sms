@@ -3,6 +3,7 @@
 import { ConsentStatus } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { productContactConsentOptions } from "@/lib/product/contact-consent-options";
 
 type ContactDetailFormProps = {
   contact: {
@@ -194,9 +195,9 @@ export function ContactDetailForm({ contact }: ContactDetailFormProps) {
             onChange={(event) => setConsentStatus(event.target.value as ConsentStatus)}
             value={consentStatus}
           >
-            {Object.values(ConsentStatus).map((statusValue) => (
-              <option key={statusValue} value={statusValue}>
-                {statusValue}
+            {productContactConsentOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
               </option>
             ))}
           </select>

@@ -1,5 +1,6 @@
 import { ConsentStatus } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
+import { productContactConsentOptions } from "@/lib/product/contact-consent-options";
 import { getProductContactDetail, getProductContacts, productContactMetricRows } from "@/lib/product/contacts";
 
 vi.mock("@/lib/db/repositories/contacts", () => ({
@@ -171,5 +172,26 @@ describe("getProductContacts", () => {
       (productContactMetricRows[0] as { label: string }).label = "Unsafe";
     }).toThrow(TypeError);
     expect(productContactMetricRows[0].label).toBe("Active Contacts");
+  });
+
+  it("freezes contact consent option metadata before rendering the detail workflow", () => {
+    expect(Object.isFrozen(productContactConsentOptions)).toBe(true);
+    expect(productContactConsentOptions.every((option) => Object.isFrozen(option))).toBe(true);
+    expect(productContactConsentOptions.map((option) => option.value)).toEqual([
+      ConsentStatus.UNKNOWN,
+      ConsentStatus.OPTED_IN,
+      ConsentStatus.OPTED_OUT
+    ]);
+
+    expect(() =>
+      (productContactConsentOptions as unknown as Array<{ value: ConsentStatus; label: string }>).push({
+        value: ConsentStatus.OPTED_IN,
+        label: "Unsafe"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productContactConsentOptions[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productContactConsentOptions[0].label).toBe("UNKNOWN");
   });
 });
