@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 613 note: live-worker authorization now evaluates exact frozen control-array evidence without invoking data-backed inherited `Array.prototype.every` metadata.
+
 Run 612 note: live-worker authorization now evaluates exact frozen control-array evidence without invoking data-backed inherited `Array.prototype` lookup method metadata.
 
 Run 611 note: live-worker authorization now evaluates exact frozen control-array evidence without invoking data-backed inherited `Array.prototype` iteration method metadata.
