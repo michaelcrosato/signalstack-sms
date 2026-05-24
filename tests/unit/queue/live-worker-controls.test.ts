@@ -10024,6 +10024,86 @@ describe("production live campaign worker controls", () => {
     expect(dataBackedResults!).toEqual(expectedExactEvidence);
   });
 
+  it("does not coerce object-valued inherited control-array index metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const inheritedIndexes = ["0", String(requiredControlIds.length)];
+    const arrayPrototype = Array.prototype as unknown as Record<string, unknown>;
+    const originalDescriptors = inheritedIndexes.map((inheritedIndex) => ({
+      inheritedIndex,
+      descriptor: Object.getOwnPropertyDescriptor(Array.prototype, inheritedIndex)
+    }));
+    let metadataCoerced = false;
+
+    function evaluateExactFrozenEvidence() {
+      return {
+        indexedEntries: liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls),
+        frozen: liveWorkerControlsAreFrozen(implementedControls),
+        frozenDescriptors: liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls),
+        publicFields: liveWorkerControlsExposeOnlyPublicFields(implementedControls),
+        supportedStatuses: liveWorkerControlsUseSupportedStatuses(implementedControls),
+        checklist: liveWorkerControlIdsMatchRequiredChecklist(implementedControls),
+        implemented: liveWorkerControlsAreImplemented(implementedControls),
+        authorized: liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+        )
+      };
+    }
+
+    const expectedExactEvidence = {
+      indexedEntries: true,
+      frozen: true,
+      frozenDescriptors: true,
+      publicFields: true,
+      supportedStatuses: true,
+      checklist: true,
+      implemented: true,
+      authorized: true
+    };
+
+    function hostileInheritedIndexValue(inheritedIndex: string) {
+      return Object.freeze({
+        [Symbol.toPrimitive]: () => {
+          metadataCoerced = true;
+          throw new Error(`inherited control-array index ${inheritedIndex} must not use Symbol.toPrimitive`);
+        },
+        toString: () => {
+          metadataCoerced = true;
+          throw new Error(`inherited control-array index ${inheritedIndex} must not use toString`);
+        },
+        valueOf: () => {
+          metadataCoerced = true;
+          throw new Error(`inherited control-array index ${inheritedIndex} must not use valueOf`);
+        }
+      });
+    }
+
+    let results: ReturnType<typeof evaluateExactFrozenEvidence>;
+
+    try {
+      for (const inheritedIndex of inheritedIndexes) {
+        Object.defineProperty(Array.prototype, inheritedIndex, {
+          configurable: true,
+          enumerable: true,
+          value: hostileInheritedIndexValue(inheritedIndex),
+          writable: true
+        });
+      }
+
+      results = evaluateExactFrozenEvidence();
+    } finally {
+      for (const { inheritedIndex, descriptor } of originalDescriptors) {
+        if (descriptor === undefined) {
+          delete arrayPrototype[inheritedIndex];
+        } else {
+          Object.defineProperty(Array.prototype, inheritedIndex, descriptor);
+        }
+      }
+    }
+
+    expect(results!).toEqual(expectedExactEvidence);
+    expect(metadataCoerced).toBe(false);
+  });
+
   it("does not read or invoke inherited control-array Object-helper metadata while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const arrayPrototype = Array.prototype as unknown as Record<string, unknown>;

@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 666  GREEN  live-worker-exact-index-object-metadata  2026-05-24 07:42
+Objective:    Prove exact frozen live-worker control arrays ignore object-valued inherited `Array.prototype` numeric index metadata.
+Changed:
+- Added live-worker unit coverage showing exact frozen `production-live-campaign` control arrays remain authorized when inherited `Array.prototype[0]` and post-checklist numeric metadata carry hostile object-valued coercion hooks.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the exact inherited object-valued index metadata boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 665  GREEN  live-worker-inherited-index-object-metadata  2026-05-24 07:37
 Objective:    Prove sparse supplied live-worker control arrays cannot be completed by object-valued inherited `Array.prototype` index slots.
 Changed:

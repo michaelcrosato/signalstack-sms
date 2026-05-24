@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 666 note: exact frozen control-array evidence now remains authorized when inherited `Array.prototype` numeric index metadata at occupied own checklist indexes or beyond the checklist is object-valued with hostile coercion hooks, and those hooks are not coerced.
+
 Run 665 note: sparse supplied live-worker control arrays now remain unauthorized when inherited `Array.prototype` index slots carry object-valued metadata with hostile coercion hooks, and those hooks are not coerced.
 
 Run 664 note: exact frozen control-array evidence now evaluates without coercing object-valued inherited `Array.prototype` tag, iterator, well-known symbol, Object-helper, legacy accessor-helper, prototype-accessor, constructor, `toLocaleString`, method-name, hidden string or symbol, or coercion metadata.
