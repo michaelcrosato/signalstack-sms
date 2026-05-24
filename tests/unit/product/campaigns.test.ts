@@ -1,7 +1,12 @@
 import { CampaignStatus, ConsentStatus } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { productCampaignComposerDefaults } from "@/lib/product/campaign-composer-defaults";
-import { getProductCampaignDetail, getProductCampaigns, productCampaignMetricRows } from "@/lib/product/campaigns";
+import {
+  getProductCampaignDetail,
+  getProductCampaigns,
+  productCampaignDetailMetricRows,
+  productCampaignMetricRows
+} from "@/lib/product/campaigns";
 
 vi.mock("@/lib/db/repositories/campaigns", () => ({
   getCampaign: vi.fn(async (_orgId: string, campaignId: string) =>
@@ -132,6 +137,12 @@ describe("getProductCampaigns", () => {
       canCancel: false,
       selectedContactIds: ["contact_1"]
     });
+    expect(result?.metrics).toEqual([
+      { key: "status", label: "Status", value: CampaignStatus.DRAFT },
+      { key: "recipients", label: "Recipients", value: "1" },
+      { key: "template", label: "Template", value: "Intro" },
+      { key: "schedule", label: "Schedule", value: "Not scheduled" }
+    ]);
     expect(result?.recipientRows).toEqual([
       {
         id: "contact_1",
@@ -171,6 +182,28 @@ describe("getProductCampaigns", () => {
       (productCampaignMetricRows[0] as { label: string }).label = "Unsafe";
     }).toThrow(TypeError);
     expect(productCampaignMetricRows[0].label).toBe("Total Campaigns");
+  });
+
+  it("freezes campaign detail metric metadata before rendering", () => {
+    expect(Object.isFrozen(productCampaignDetailMetricRows)).toBe(true);
+    expect(productCampaignDetailMetricRows.every((row) => Object.isFrozen(row))).toBe(true);
+    expect(productCampaignDetailMetricRows.map((row) => row.key)).toEqual([
+      "status",
+      "recipients",
+      "template",
+      "schedule"
+    ]);
+
+    expect(() =>
+      (productCampaignDetailMetricRows as unknown as Array<{ key: string; label: string }>).push({
+        key: "unsafe",
+        label: "Unsafe"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productCampaignDetailMetricRows[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productCampaignDetailMetricRows[0].label).toBe("Status");
   });
 
   it("freezes campaign composer defaults before rendering the local composer", () => {

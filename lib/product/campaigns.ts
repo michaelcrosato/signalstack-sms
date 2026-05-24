@@ -14,6 +14,19 @@ export const productCampaignMetricRows = Object.freeze(
   productCampaignMetricRowItems.map((row) => Object.freeze({ ...row }))
 );
 
+const productCampaignDetailMetricRowItems = [
+  { key: "status", label: "Status" },
+  { key: "recipients", label: "Recipients" },
+  { key: "template", label: "Template" },
+  { key: "schedule", label: "Schedule" }
+] as const;
+
+type ProductCampaignDetailMetricKey = (typeof productCampaignDetailMetricRowItems)[number]["key"];
+
+export const productCampaignDetailMetricRows = Object.freeze(
+  productCampaignDetailMetricRowItems.map((row) => Object.freeze({ ...row }))
+);
+
 export async function getProductCampaigns(orgId: string) {
   const [campaigns, contacts, templates] = await Promise.all([
     listCampaigns(orgId),
@@ -71,8 +84,7 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
   }
 
   const selectedContactIds = new Set(campaign.recipients.map((recipient) => recipient.contactId));
-
-  return {
+  const detail = {
     id: campaign.id,
     name: campaign.name,
     body: campaign.body,
@@ -108,6 +120,21 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
       id: template.id,
       name: template.name,
       body: template.body
+    }))
+  };
+  const metricValues: Record<ProductCampaignDetailMetricKey, string> = {
+    status: detail.status,
+    recipients: detail.recipientRows.length.toString(),
+    template: detail.templateName,
+    schedule: detail.scheduledAt ? new Date(detail.scheduledAt).toLocaleString("en-US") : "Not scheduled"
+  };
+
+  return {
+    ...detail,
+    metrics: productCampaignDetailMetricRows.map((row) => ({
+      key: row.key,
+      label: row.label,
+      value: metricValues[row.key]
     }))
   };
 }

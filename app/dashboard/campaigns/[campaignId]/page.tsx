@@ -56,13 +56,9 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
 
       <div className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-6">
         <section aria-label="Campaign lifecycle" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Metric label="Status" value={campaign.status} />
-          <Metric label="Recipients" value={campaign.recipientRows.length.toString()} />
-          <Metric label="Template" value={campaign.templateName} />
-          <Metric
-            label="Schedule"
-            value={campaign.scheduledAt ? new Date(campaign.scheduledAt).toLocaleString("en-US") : "Not scheduled"}
-          />
+          {campaign.metrics.map((metric) => (
+            <Metric key={metric.key} label={metric.label} value={metric.value} />
+          ))}
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1fr_0.8fr]">
