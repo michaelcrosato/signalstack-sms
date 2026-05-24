@@ -7560,6 +7560,76 @@ describe("production live campaign worker controls", () => {
     expect(metadataCoerced).toBe(false);
   });
 
+  it("rejects object-valued authorization-wrapper helper metadata without coercing it or inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("object-valued wrapper helper metadata must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("object-valued wrapper helper metadata must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("object-valued wrapper helper metadata must not inspect control evidence");
+      }
+    });
+    let metadataCoerced = false;
+
+    function hostileMetadataValue(metadataName: PropertyKey) {
+      return Object.freeze({
+        [Symbol.toPrimitive]: () => {
+          metadataCoerced = true;
+          throw new Error(`authorization-wrapper ${String(metadataName)} helper metadata must not use Symbol.toPrimitive`);
+        },
+        toString: () => {
+          metadataCoerced = true;
+          throw new Error(`authorization-wrapper ${String(metadataName)} helper metadata must not use toString`);
+        },
+        valueOf: () => {
+          metadataCoerced = true;
+          throw new Error(`authorization-wrapper ${String(metadataName)} helper metadata must not use valueOf`);
+        }
+      });
+    }
+
+    const metadataKeys: PropertyKey[] = [
+      Symbol.iterator,
+      Symbol.asyncIterator,
+      Symbol.unscopables,
+      Symbol.isConcatSpreadable,
+      Symbol.match,
+      Symbol.matchAll,
+      Symbol.replace,
+      Symbol.search,
+      Symbol.split,
+      "hasOwnProperty",
+      "propertyIsEnumerable",
+      "isPrototypeOf",
+      "__defineGetter__",
+      "__defineSetter__",
+      "__lookupGetter__",
+      "__lookupSetter__",
+      "__proto__"
+    ];
+
+    for (const metadataName of metadataKeys) {
+      const wrapper = {
+        workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+        controls: throwingEvidence
+      } as Record<PropertyKey, unknown>;
+      Object.defineProperty(wrapper, metadataName, {
+        enumerable: false,
+        value: hostileMetadataValue(metadataName)
+      });
+      Object.freeze(wrapper);
+
+      expect(Object.isFrozen(wrapper)).toBe(true);
+      expect(() => liveWorkerDeploymentClassIsAuthorized(wrapper)).not.toThrow();
+      expect(liveWorkerDeploymentClassIsAuthorized(wrapper)).toBe(false);
+    }
+
+    expect(metadataCoerced).toBe(false);
+  });
+
   it("rejects authorization wrappers with accessor-backed own coercion metadata before inspecting controls", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       getPrototypeOf: () => {

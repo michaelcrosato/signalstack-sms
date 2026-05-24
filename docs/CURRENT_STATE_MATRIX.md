@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 654 note: live-worker authorization now denies own object-valued authorization-wrapper iterator, well-known symbol, Object-helper, legacy accessor-helper, and `__proto__` metadata with hostile coercion hooks without invoking those hooks or inspecting supplied controls.
+
 Run 653 note: live-worker authorization now denies own object-valued authorization-wrapper `constructor` and `toLocaleString` metadata with hostile coercion hooks without invoking those hooks or inspecting supplied controls.
 
 Run 652 note: live-worker authorization now denies own object-valued authorization-wrapper `Symbol.toStringTag`, `Symbol.toPrimitive`, `toString`, and `valueOf` metadata with hostile coercion hooks without invoking those hooks or inspecting supplied controls.
