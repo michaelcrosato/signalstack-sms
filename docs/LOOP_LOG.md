@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 733  GREEN  auth-comma-parenthesized-non-null-root-globalthis  2026-05-24 15:17
+Objective:    Keep mutating-route auth scanner coverage aligned with comma-declared parenthesized non-null transitive local `globalThis` root aliases.
+Changed:
+- Added focused auth unit coverage proving comma-declared alias-of-alias roots such as `const root = globalThis, platform = (root)! as typeof globalThis` and `const root = globalThis, platform = ((root as typeof globalThis)!)` resolve before default-initialized `Request`, `Object`, and `Reflect` destructuring is checked for body-reader access.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the comma-declared parenthesized non-null transitive local-root globalThis alias boundary.
+- Kept live SMS, billing, providers, workers, Redis, notifications, live AI, secrets, protected gate scripts, and destructive production actions untouched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 732  GREEN  auth-comma-non-null-transitive-root-globalthis  2026-05-24 15:10
 Objective:    Keep mutating-route auth scanner coverage aligned with comma-declared non-null transitive local `globalThis` root aliases.
 Changed:
