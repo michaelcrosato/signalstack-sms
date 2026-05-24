@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 726
+
+- Latest mutating-route auth hardening adds focused coverage for crossed assigned local `globalThis` root aliases followed by default-initialized destructuring, including `root = (globalThis as typeof globalThis); ({ Request: RequestCtor = Request } = root)` and `root = (globalThis satisfies typeof globalThis); ({ [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = root)`, before prototype/descriptor body-reader calls. Focused auth coverage passed; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 725
 
 - Latest mutating-route auth hardening adds focused coverage for assigned local `globalThis` root aliases followed by computed default-initialized destructuring, including `root = (globalThis as typeof globalThis); ({ [requestConstructorName]: RequestCtor = Request } = root)` and `root = (globalThis as typeof globalThis); ({ [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = root)`, before prototype/descriptor body-reader calls. Focused auth coverage passed; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
