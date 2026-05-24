@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 732 note: mutating-route auth scanner coverage now includes comma-declared non-null transitive local `globalThis` root aliases for both `Request` constructor aliases and `Object`/`Reflect` aliases, including `const root = globalThis, platform = root!`, before prototype/descriptor body-reader calls.
+
 Run 731 note: mutating-route auth scanner coverage now includes comma-declared transitive local `globalThis` root aliases for both `Request` constructor aliases and `Object`/`Reflect` aliases, including `const root = globalThis, platform = root`, before prototype/descriptor body-reader calls.
 
 Run 730 note: mutating-route auth scanner coverage now includes whole-parenthesized asserted non-null transitive local `globalThis` root aliases for both `Request` constructor aliases and `Object`/`Reflect` aliases, including `const platform = ((root as typeof globalThis)!)` and `platform = ((root satisfies typeof globalThis)!)`, before prototype/descriptor body-reader calls.
