@@ -4790,3 +4790,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 598  GREEN  live-worker-entry-coercion-getters  2026-05-23 22:08
+Objective:    Prove own accessor-backed control-entry coercion metadata cannot authorize the reserved live-worker class.
+Changed:
+- Added live-worker unit coverage showing otherwise matching control entries with own accessor-backed `Symbol.toPrimitive`, `toString`, or `valueOf` metadata deny without reading getters.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the accessor-backed control-entry coercion metadata boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
