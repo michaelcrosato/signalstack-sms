@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 634  GREEN  live-worker-own-data-entry-coercion  2026-05-24 03:24
+Objective:    Prove own data-backed control-entry coercion metadata cannot authorize the reserved live-worker controls.
+Changed:
+- Added live-worker unit coverage showing own data-backed control-entry `Symbol.toPrimitive`, `toString`, and `valueOf` metadata denies before the reserved worker class can authorize and without invoking callable coercion metadata.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the own data-backed control-entry coercion boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 633  GREEN  live-worker-own-data-entry-tostringtag  2026-05-24 03:18
 Objective:    Prove own data-backed control-entry `Symbol.toStringTag` metadata cannot authorize the reserved live-worker controls.
 Changed:
