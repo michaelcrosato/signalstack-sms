@@ -4824,6 +4824,71 @@ describe("production live campaign worker controls", () => {
     expect(metadataRead).toBe(false);
   });
 
+  it("rejects data-backed callable deployment class metadata without invoking it or inspecting controls", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("data-backed callable deployment class metadata must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("data-backed callable deployment class metadata must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("data-backed callable deployment class metadata must not inspect control evidence");
+      }
+    });
+    let metadataInvoked = false;
+    const metadataKeys = [
+      Symbol.toStringTag,
+      Symbol.toPrimitive,
+      Symbol.iterator,
+      Symbol.asyncIterator,
+      Symbol.unscopables,
+      Symbol.isConcatSpreadable,
+      Symbol.match,
+      Symbol.matchAll,
+      Symbol.replace,
+      Symbol.search,
+      Symbol.split,
+      "constructor",
+      "toLocaleString",
+      "toString",
+      "valueOf",
+      "hasOwnProperty",
+      "propertyIsEnumerable",
+      "isPrototypeOf",
+      "__defineGetter__",
+      "__defineSetter__",
+      "__lookupGetter__",
+      "__lookupSetter__",
+      "__proto__"
+    ] as const;
+
+    for (const metadataName of metadataKeys) {
+      const workerDeploymentClass = {} as Record<PropertyKey, unknown>;
+      Object.defineProperty(workerDeploymentClass, metadataName, {
+        enumerable: false,
+        value: () => {
+          metadataInvoked = true;
+          throw new Error(`deployment class ${String(metadataName)} callable metadata must not be invoked`);
+        }
+      });
+      Object.freeze(workerDeploymentClass);
+
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+
+    expect(metadataInvoked).toBe(false);
+  });
+
   it("rejects inherited object-valued deployment class metadata without coercing it or inspecting controls", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {
