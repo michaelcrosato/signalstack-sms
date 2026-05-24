@@ -193,16 +193,31 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
       )
       .replace(/\(\s*globalThis\s*\)/g, "globalThis")
       .replace(/\(\s*(Object|Reflect|Request)\s*\)/g, "$1")
-      .replace(/\b(Object|Reflect|Request|globalThis)\s*!\s*(?=\.|\?\.|\[|,|;|\r?\n|\))/g, "$1");
+      .replace(
+        /\b(Object|Reflect|Request|globalThis)\s*!\s*(?=\.|\?\.|\[|,|;|\r?\n|\)|\s+(?:as|satisfies)\s+typeof\b)/g,
+        "$1"
+      );
     normalizedGlobalThisBodySlice = normalizedGlobalThisBodySlice
       .replace(/\(\s*(globalThis\s*(?:\.|\?\.)\s*(?:Object|Reflect|Request))\s*\)/g, "$1")
       .replace(/\(\s*(globalThis\s*(?:\?\.)?\[\s*["'`](?:Object|Reflect|Request)["'`]\s*\])\s*\)/g, "$1")
       .replace(/\(\s*(Request\s*(?:\.|\?\.)\s*prototype)\s*\)/g, "$1")
       .replace(/\(\s*(Request\s*(?:\?\.)?\[\s*["'`]prototype["'`]\s*\])\s*\)/g, "$1")
-      .replace(/(\bglobalThis\s*(?:\.|\?\.)\s*Request)\s*!\s*(?=\.|\?\.|\[|,|;|\r?\n|\))/g, "$1")
-      .replace(/(\bglobalThis\s*(?:\?\.)?\[\s*["'`]Request["'`]\s*\])\s*!\s*(?=\.|\?\.|\[|,|;|\r?\n|\))/g, "$1")
-      .replace(/(\bRequest\s*(?:\.|\?\.)\s*prototype)\s*!\s*(?=\.|\?\.|\[|,|;|\r?\n|\))/g, "$1")
-      .replace(/(\bRequest\s*(?:\?\.)?\[\s*["'`]prototype["'`]\s*\])\s*!\s*(?=\.|\?\.|\[|,|;|\r?\n|\))/g, "$1");
+      .replace(
+        /(\bglobalThis\s*(?:\.|\?\.)\s*Request)\s*!\s*(?=\.|\?\.|\[|,|;|\r?\n|\)|\s+(?:as|satisfies)\s+typeof\b)/g,
+        "$1"
+      )
+      .replace(
+        /(\bglobalThis\s*(?:\?\.)?\[\s*["'`]Request["'`]\s*\])\s*!\s*(?=\.|\?\.|\[|,|;|\r?\n|\)|\s+(?:as|satisfies)\s+typeof\b)/g,
+        "$1"
+      )
+      .replace(
+        /(\bRequest\s*(?:\.|\?\.)\s*prototype)\s*!\s*(?=\.|\?\.|\[|,|;|\r?\n|\)|\s+(?:as|satisfies)\s+typeof\b)/g,
+        "$1"
+      )
+      .replace(
+        /(\bRequest\s*(?:\?\.)?\[\s*["'`]prototype["'`]\s*\])\s*!\s*(?=\.|\?\.|\[|,|;|\r?\n|\)|\s+(?:as|satisfies)\s+typeof\b)/g,
+        "$1"
+      );
   } while (normalizedGlobalThisBodySlice !== previousGlobalThisBodySlice);
 
   const builtInPropertyAliases = new Map<string, string>();
@@ -2458,6 +2473,44 @@ describe("API route authorization coverage", () => {
         return Response.json(payload);
       }
     `;
+    const unsafeTypeAssertedNonNullOptionalDotGlobalThisRequestAliasSource = `
+      export async function PATCH(req: Request) {
+        const RequestCtor = globalThis?.Request! as typeof Request;
+        const payload = await RequestCtor.prototype.text.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeSatisfiesNonNullOptionalBracketGlobalThisRequestAliasSource = `
+      export async function DELETE(req: Request) {
+        const RequestCtor = (globalThis?.["Request"]! satisfies typeof Request);
+        const payload = await RequestCtor.prototype.formData.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const unsafeAssignedSatisfiesNonNullOptionalDotGlobalThisRequestAliasSource = `
+      export async function PUT(req: Request) {
+        let RequestCtor;
+        RequestCtor = (globalThis?.Request! satisfies typeof Request);
+        const payload = await RequestCtor.prototype.arrayBuffer.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+    const unsafeAssignedTypeAssertedNonNullOptionalBracketGlobalThisRequestAliasSource = `
+      export async function DELETE(req: Request) {
+        let RequestCtor;
+        RequestCtor = globalThis?.["Request"]! as typeof Request;
+        const payload = await RequestCtor.prototype.json.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
     const unsafeOptionalDotGlobalThisRequestAliasSource = `
       export async function PATCH(req: Request) {
         const RequestCtor = globalThis?.Request;
@@ -2840,6 +2893,30 @@ describe("API route authorization coverage", () => {
     ).toBe(true);
     expect(
       mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedNonNullOptionalBracketGlobalThisRequestAliasSource, "DELETE")
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeTypeAssertedNonNullOptionalDotGlobalThisRequestAliasSource,
+        "PATCH"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeSatisfiesNonNullOptionalBracketGlobalThisRequestAliasSource,
+        "DELETE"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeAssignedSatisfiesNonNullOptionalDotGlobalThisRequestAliasSource,
+        "PUT"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeAssignedTypeAssertedNonNullOptionalBracketGlobalThisRequestAliasSource,
+        "DELETE"
+      )
     ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeOptionalDotGlobalThisRequestAliasSource, "PATCH")).toBe(true);
     expect(
