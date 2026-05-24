@@ -7378,6 +7378,55 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not invoke data-backed inherited control-array well-known symbol metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as Record<PropertyKey, unknown>;
+    const metadataSymbols = [
+      Symbol.unscopables,
+      Symbol.isConcatSpreadable,
+      Symbol.match,
+      Symbol.matchAll,
+      Symbol.replace,
+      Symbol.search,
+      Symbol.split
+    ];
+    const originalDescriptors = metadataSymbols.map((symbol) => ({
+      symbol,
+      descriptor: Object.getOwnPropertyDescriptor(Array.prototype, symbol)
+    }));
+
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      for (const symbol of metadataSymbols) {
+        Object.defineProperty(Array.prototype, symbol, {
+          configurable: true,
+          value: () => {
+            throw new Error("data-backed inherited control-array well-known symbol metadata must not be invoked");
+          },
+          writable: true
+        });
+      }
+
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      for (const { symbol, descriptor } of originalDescriptors) {
+        if (descriptor === undefined) {
+          delete arrayPrototype[symbol];
+        } else {
+          Object.defineProperty(Array.prototype, symbol, descriptor);
+        }
+      }
+    }
+
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("does not read inherited control-array iteration method metadata while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const arrayPrototype = Array.prototype as unknown as Record<string, unknown>;
