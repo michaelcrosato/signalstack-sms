@@ -2805,6 +2805,30 @@ describe("API route authorization coverage", () => {
         return Response.json(payload);
       }
     `;
+    const unsafeAssignedParenthesizedTypeAssertedGlobalThisRootAliasComputedNonNullRequestSource = `
+      export async function DELETE(req: Request) {
+        let root;
+        root = (globalThis as typeof globalThis);
+        const requestConstructorName = "Request" as const;
+        const RequestCtor = root?.[requestConstructorName]! as typeof Request;
+        const payload = await RequestCtor.prototype.formData.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const unsafeAssignedUnparenthesizedSatisfiesGlobalThisRootAliasComputedNonNullRequestSource = `
+      export async function POST(req: Request) {
+        let root;
+        root = globalThis satisfies typeof globalThis;
+        const requestConstructorName = "Request" as const;
+        const RequestCtor = root?.[requestConstructorName]! satisfies typeof Request;
+        const payload = await RequestCtor.prototype.blob.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
     const unsafeParenthesizedGlobalThisDestructuredRequestSource = `
       export async function DELETE(req: Request) {
         const root = globalThis;
@@ -3196,6 +3220,18 @@ describe("API route authorization coverage", () => {
       mutatingMethodParsesBodyBeforeRoleGate(
         unsafeAssignedSatisfiesGlobalThisRootAliasComputedNonNullRequestSource,
         "PATCH"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeAssignedParenthesizedTypeAssertedGlobalThisRootAliasComputedNonNullRequestSource,
+        "DELETE"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeAssignedUnparenthesizedSatisfiesGlobalThisRootAliasComputedNonNullRequestSource,
+        "POST"
       )
     ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeParenthesizedGlobalThisDestructuredRequestSource, "DELETE")).toBe(true);
