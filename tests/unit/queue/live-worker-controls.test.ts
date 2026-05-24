@@ -6987,6 +6987,70 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not read inherited Object coercion accessors while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const objectPrototype = Object.prototype as {
+      [Symbol.toPrimitive]?: unknown;
+      toString?: unknown;
+      valueOf?: unknown;
+    };
+    const originalToPrimitiveDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, Symbol.toPrimitive);
+    const originalToStringDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "toString");
+    const originalValueOfDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "valueOf");
+
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperties(Object.prototype, {
+        [Symbol.toPrimitive]: {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited Object Symbol.toPrimitive accessor must not be read");
+          }
+        },
+        toString: {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited Object toString accessor must not be read");
+          }
+        },
+        valueOf: {
+          configurable: true,
+          get: () => {
+            throw new Error("inherited Object valueOf accessor must not be read");
+          }
+        }
+      });
+
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalToPrimitiveDescriptor === undefined) {
+        delete objectPrototype[Symbol.toPrimitive];
+      } else {
+        Object.defineProperty(Object.prototype, Symbol.toPrimitive, originalToPrimitiveDescriptor);
+      }
+
+      if (originalToStringDescriptor === undefined) {
+        delete objectPrototype.toString;
+      } else {
+        Object.defineProperty(Object.prototype, "toString", originalToStringDescriptor);
+      }
+
+      if (originalValueOfDescriptor === undefined) {
+        delete objectPrototype.valueOf;
+      } else {
+        Object.defineProperty(Object.prototype, "valueOf", originalValueOfDescriptor);
+      }
+    }
+
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("does not read inherited authorization wrapper toStringTag metadata while evaluating exact frozen evidence", () => {
     const objectPrototype = Object.prototype as {
       [Symbol.toStringTag]?: unknown;
