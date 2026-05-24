@@ -6326,6 +6326,52 @@ describe("production live campaign worker controls", () => {
     expect(liveWorkerDeploymentClassIsAuthorized(wrapper)).toBe(false);
   });
 
+  it("rejects authorization wrappers with accessor-backed own coercion metadata before inspecting controls", () => {
+    const throwingEvidence = new Proxy(implementedFrozenControls(), {
+      getPrototypeOf: () => {
+        throw new Error("accessor-backed own coercion wrapper metadata must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("accessor-backed own coercion wrapper metadata must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("accessor-backed own coercion wrapper metadata must not inspect control evidence");
+      }
+    });
+    const wrapper = Object.freeze(
+      Object.defineProperties(
+        {
+          workerDeploymentClass: reservedLiveWorkerDeploymentClass,
+          controls: throwingEvidence
+        },
+        {
+          [Symbol.toPrimitive]: {
+            enumerable: false,
+            get: () => {
+              throw new Error("accessor-backed own wrapper Symbol.toPrimitive getter must not be read");
+            }
+          },
+          toString: {
+            enumerable: false,
+            get: () => {
+              throw new Error("accessor-backed own wrapper toString getter must not be read");
+            }
+          },
+          valueOf: {
+            enumerable: false,
+            get: () => {
+              throw new Error("accessor-backed own wrapper valueOf getter must not be read");
+            }
+          }
+        }
+      )
+    );
+
+    expect(Object.isFrozen(wrapper)).toBe(true);
+    expect(() => liveWorkerDeploymentClassIsAuthorized(wrapper)).not.toThrow();
+    expect(liveWorkerDeploymentClassIsAuthorized(wrapper)).toBe(false);
+  });
+
   it("does not execute authorization wrapper get traps while denying unsupported classes", () => {
     const throwingEvidence = new Proxy(implementedFrozenControls(), {
       get: () => {

@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 599
+
+- Latest live-worker authorization-wrapper accessor-backed coercion metadata coverage proves frozen-looking `production-live-campaign` authorization wrappers with own accessor-backed `Symbol.toPrimitive`, `toString`, or `valueOf` metadata deny before supplied controls are inspected and without reading getters. Focused queue coverage passed with 161 tests, and the protected local gate passed with 59 Vitest files / 617 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 598
 
 - Latest live-worker own control-entry accessor-backed coercion metadata coverage proves otherwise matching `production-live-campaign` control entries with accessor-backed `Symbol.toPrimitive`, `toString`, or `valueOf` metadata deny without reading getters. Focused queue coverage passed with 160 tests, and the protected local gate passed with 59 Vitest files / 616 tests, Playwright smoke, and build green. The change is local unit/docs coverage only and does not execute workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
