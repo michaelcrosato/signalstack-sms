@@ -4890,3 +4890,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 608  GREEN  live-worker-inherited-data-coercion  2026-05-23 23:43
+Objective:    Prove data-backed inherited `Array.prototype` coercion metadata cannot influence exact frozen live-worker control-array evidence.
+Changed:
+- Added live-worker unit coverage showing exact frozen control arrays authorize without invoking data-backed inherited `Array.prototype[Symbol.toPrimitive]`, `Array.prototype.toString`, or `Array.prototype.valueOf` functions.
+- Updated queue/testing contracts, production worker policy, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state matrix for the inherited data-backed coercion boundary.
+- Kept `production-live-campaign` unsupported; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.

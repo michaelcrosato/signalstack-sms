@@ -1107,6 +1107,73 @@ describe("production live campaign worker controls", () => {
     }
   });
 
+  it("does not invoke data-backed inherited array coercion metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const arrayPrototype = Array.prototype as unknown as {
+      [Symbol.toPrimitive]?: unknown;
+      toString?: unknown;
+      valueOf?: unknown;
+    };
+    const originalToPrimitiveDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, Symbol.toPrimitive);
+    const originalToStringDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, "toString");
+    const originalValueOfDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, "valueOf");
+
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperties(Array.prototype, {
+        [Symbol.toPrimitive]: {
+          configurable: true,
+          value: () => {
+            throw new Error("data-backed inherited control-array Symbol.toPrimitive must not be invoked");
+          },
+          writable: true
+        },
+        toString: {
+          configurable: true,
+          value: () => {
+            throw new Error("data-backed inherited control-array toString must not be invoked");
+          },
+          writable: true
+        },
+        valueOf: {
+          configurable: true,
+          value: () => {
+            throw new Error("data-backed inherited control-array valueOf must not be invoked");
+          },
+          writable: true
+        }
+      });
+
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalToPrimitiveDescriptor === undefined) {
+        delete arrayPrototype[Symbol.toPrimitive];
+      } else {
+        Object.defineProperty(Array.prototype, Symbol.toPrimitive, originalToPrimitiveDescriptor);
+      }
+
+      if (originalToStringDescriptor === undefined) {
+        delete arrayPrototype.toString;
+      } else {
+        Object.defineProperty(Array.prototype, "toString", originalToStringDescriptor);
+      }
+
+      if (originalValueOfDescriptor === undefined) {
+        delete arrayPrototype.valueOf;
+      } else {
+        Object.defineProperty(Array.prototype, "valueOf", originalValueOfDescriptor);
+      }
+    }
+
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("does not read inherited array toStringTag metadata while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const arrayPrototype = Array.prototype as unknown as {
