@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 668  GREEN  product-compliance-deep-freeze  2026-05-24 07:58
+Objective:    Keep product compliance checklist metadata stable against caller-side field mutation.
+Changed:
+- Deep-froze shared `productComplianceFields` entries in addition to the checklist array.
+- Added product compliance unit coverage proving the checklist array and each checklist item are frozen before `/dashboard/compliance` renders readiness fields.
+- Updated TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the product compliance metadata immutability boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 667  GREEN  product-navigation-deep-freeze  2026-05-24 07:52
 Objective:    Keep the product demo shell navigation metadata stable against caller-side item mutation.
 Changed:

@@ -52,8 +52,9 @@ describe("getProductCompliance", () => {
     ]);
   });
 
-  it("keeps checklist field metadata frozen and stable for product navigation", () => {
+  it("keeps checklist field metadata deeply frozen for the compliance workspace", () => {
     expect(Object.isFrozen(productComplianceFields)).toBe(true);
+    expect(productComplianceFields.every((field) => Object.isFrozen(field))).toBe(true);
     expect(productComplianceFields.map((field) => field.key)).toEqual([
       "businessName",
       "messagingUseCase",
@@ -68,5 +69,8 @@ describe("getProductCompliance", () => {
         guidance: "unsafe"
       })
     ).toThrow(TypeError);
+    expect(() => {
+      (productComplianceFields[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
   });
 });

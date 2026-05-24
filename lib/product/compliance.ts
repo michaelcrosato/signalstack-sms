@@ -2,7 +2,7 @@ import type { ComplianceProfile } from "@prisma/client";
 import { complianceProfileIsComplete, evaluateMessagingHardGate } from "@/lib/compliance/gates";
 import { getOrCreateComplianceProfile } from "@/lib/db/repositories/compliance";
 
-export const productComplianceFields = Object.freeze([
+const productComplianceFieldItems = [
   {
     key: "businessName",
     label: "Business name",
@@ -28,7 +28,11 @@ export const productComplianceFields = Object.freeze([
     label: "Terms of service URL",
     guidance: "Public terms link required before live registration review."
   }
-] as const);
+] as const;
+
+export const productComplianceFields = Object.freeze(
+  productComplianceFieldItems.map((field) => Object.freeze({ ...field }))
+);
 
 const blockerCopy = {
   LIVE_MESSAGING_DISABLED: "Live messaging flag is disabled.",

@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 668
+
+- Latest product compliance checklist hardening deep-freezes shared `productComplianceFields` entries as well as the exported array, and focused product compliance coverage now proves both the array and each checklist item reject mutation before `/dashboard/compliance` renders readiness fields. Focused product coverage passed with 2 tests, focused product dashboard/compliance coverage passed with 5 tests, contracts check passed, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/test/docs/log coverage only and does not execute API handlers, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 667
 
 - Latest product navigation hardening deep-freezes shared `productNavigation` entries as well as the exported array, and focused product dashboard coverage now proves both the array and each navigation item reject mutation before the product shell renders. Focused product coverage passed with 3 tests, and the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local product metadata/test/docs/log coverage only and does not execute API handlers, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, or perform destructive production actions.

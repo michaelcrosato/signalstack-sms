@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 668 note: product compliance checklist metadata is now frozen at both array and entry level, with unit coverage proving caller-side item mutation is rejected before `/dashboard/compliance` renders readiness fields.
+
 Run 667 note: shared product dashboard navigation metadata is now frozen at both array and entry level, with unit coverage proving caller-side item mutation is rejected before the product shell renders.
 
 Run 666 note: exact frozen control-array evidence now remains authorized when inherited `Array.prototype` numeric index metadata at occupied own checklist indexes or beyond the checklist is object-valued with hostile coercion hooks, and those hooks are not coerced.
