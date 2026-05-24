@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 747  GREEN  auth-parenthesized-assignment-comma-globalthis-aliases  2026-05-24 16:45
+Objective:    Prove parenthesized assignment comma-expression local `globalThis` root aliases are classified before mutating-route body-reader role gates.
+Changed:
+- Added auth scanner alias discovery for comma-delimited assignment expressions in local `globalThis` root chains.
+- Added focused auth unit coverage for comma-expression chains feeding defaulted `Request`, `Object`, and `Reflect` destructuring before body-reader calls.
+- Updated testing docs/contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the comma-expression assignment alias boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 746  GREEN  auth-parenthesized-assignment-non-null-globalthis-aliases  2026-05-24 16:38
 Objective:    Prove parenthesized assignment-expression non-null multi-hop local `globalThis` root aliases are classified before mutating-route body-reader role gates.
 Changed:
