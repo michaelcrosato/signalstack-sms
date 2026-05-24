@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 658 note: live-worker authorization now denies object-shaped deployment-class values with inherited accessor-backed tag, iterator, well-known symbol, Object-helper, legacy accessor-helper, prototype-accessor, constructor, `toLocaleString`, or coercion metadata without reading metadata getters or inspecting supplied controls.
+
 Run 657 note: live-worker authorization now denies object-shaped deployment-class values with own accessor-backed tag, iterator, well-known symbol, Object-helper, legacy accessor-helper, prototype-accessor, constructor, `toLocaleString`, or coercion metadata without reading metadata getters or inspecting supplied controls.
 
 Run 656 note: live-worker authorization now denies object-shaped deployment-class values with inherited object-valued tag, iterator, well-known symbol, Object-helper, legacy accessor-helper, prototype-accessor, constructor, `toLocaleString`, or coercion metadata without invoking hostile coercion hooks or inspecting supplied controls.
