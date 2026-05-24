@@ -6333,6 +6333,30 @@ describe("API route authorization coverage", () => {
         return Response.json({ size: payload.size });
       }
     `;
+    const unsafeCommaDeclaredTransitiveRequestRootAliasSource = `
+      export async function POST(req: Request) {
+        const root = globalThis, platform = root;
+        const { Request: RequestCtor = Request } = platform;
+        const payload = await RequestCtor.prototype.arrayBuffer.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+    const unsafeCommaDeclaredTransitiveBuiltinsRootAliasSource = `
+      export async function PATCH(req: Request) {
+        const objectName = "Object" as const, reflectName = "Reflect" as const;
+        const root = globalThis as typeof globalThis, platform = root;
+        const { [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = platform;
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "text"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
     const safeSource = `
       export async function POST(req: Request) {
         const root = globalThis;
@@ -6349,6 +6373,12 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedTransitiveRequestRootAliasSource, "PATCH")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeTransitiveBuiltinsRootAliasSource, "PUT")).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedTransitiveBuiltinsRootAliasSource, "DELETE")).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCommaDeclaredTransitiveRequestRootAliasSource, "POST")).toBe(
+      true
+    );
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeCommaDeclaredTransitiveBuiltinsRootAliasSource, "PATCH")).toBe(
+      true
+    );
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
