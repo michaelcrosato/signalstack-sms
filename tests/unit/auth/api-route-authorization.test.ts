@@ -2605,6 +2605,26 @@ describe("API route authorization coverage", () => {
         return Response.json({ payload });
       }
     `;
+    const unsafeTypeAssertedComputedNonNullOptionalGlobalThisRequestAliasSource = `
+      export async function PATCH(req: Request) {
+        const requestConstructorName = "Request";
+        const RequestCtor = globalThis?.[requestConstructorName]! as typeof Request;
+        const payload = await RequestCtor.prototype.blob.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const unsafeSatisfiesComputedNonNullOptionalGlobalThisRequestAliasSource = `
+      export async function PATCH(req: Request) {
+        const requestConstructorName = "Request" as const;
+        const RequestCtor = (globalThis?.[requestConstructorName]! satisfies typeof Request);
+        const payload = await RequestCtor.prototype.json.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
     const unsafeAssignedComputedNonNullOptionalGlobalThisRequestAliasSource = `
       export async function PUT(req: Request) {
         const requestConstructorName = "Request";
@@ -2975,6 +2995,18 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedGlobalThisRequestAliasSource, "POST")).toBe(true);
     expect(
       mutatingMethodParsesBodyBeforeRoleGate(unsafeComputedNonNullOptionalGlobalThisRequestAliasSource, "POST")
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeTypeAssertedComputedNonNullOptionalGlobalThisRequestAliasSource,
+        "PATCH"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeSatisfiesComputedNonNullOptionalGlobalThisRequestAliasSource,
+        "PATCH"
+      )
     ).toBe(true);
     expect(
       mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedComputedNonNullOptionalGlobalThisRequestAliasSource, "PUT")

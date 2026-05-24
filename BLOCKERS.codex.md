@@ -1,5 +1,9 @@
 # Codex Blockers
 
+Run number: 705
+
+- No blocker from direct type-asserted and `satisfies` computed optional non-null `globalThis?.[requestConstructorName]!` auth scanner hardening. Focused auth coverage passed; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change adds local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
 Run number: 704
 
 - No blocker from computed optional non-null `globalThis?.[requestConstructorName]!` auth scanner hardening. Focused auth coverage passed; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change adds local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
