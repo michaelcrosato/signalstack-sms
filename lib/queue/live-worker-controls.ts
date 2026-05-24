@@ -152,7 +152,7 @@ function controlDataFieldValue(control: unknown, field: keyof LiveWorkerControl)
 }
 
 function isLiveWorkerControlStatus(status: unknown): status is LiveWorkerControlStatus {
-  return typeof status === "string" && supportedLiveWorkerControlStatuses.includes(status as LiveWorkerControlStatus);
+  return status === "planned" || status === "implemented";
 }
 
 function controlArrayIsDense(controls: readonly LiveWorkerControl[]) {
