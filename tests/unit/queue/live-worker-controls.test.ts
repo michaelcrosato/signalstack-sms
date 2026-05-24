@@ -4758,6 +4758,81 @@ describe("production live campaign worker controls", () => {
     expect(metadataCoerced).toBe(false);
   });
 
+  it("rejects inherited object-valued deployment class metadata without coercing it or inspecting controls", () => {
+    const throwingEvidence = new Proxy([...implementedFrozenControls()], {
+      getPrototypeOf: () => {
+        throw new Error("inherited object-valued deployment class metadata must not inspect control evidence");
+      },
+      getOwnPropertyDescriptor: () => {
+        throw new Error("inherited object-valued deployment class metadata must not inspect control evidence");
+      },
+      ownKeys: () => {
+        throw new Error("inherited object-valued deployment class metadata must not inspect control evidence");
+      }
+    });
+    let metadataCoerced = false;
+    const hostileMetadataValue = (metadataName: PropertyKey) =>
+      Object.freeze({
+        [Symbol.toPrimitive]: () => {
+          metadataCoerced = true;
+          throw new Error(`inherited deployment class ${String(metadataName)} metadata must not use Symbol.toPrimitive`);
+        },
+        toString: () => {
+          metadataCoerced = true;
+          throw new Error(`inherited deployment class ${String(metadataName)} metadata must not use toString`);
+        },
+        valueOf: () => {
+          metadataCoerced = true;
+          throw new Error(`inherited deployment class ${String(metadataName)} metadata must not use valueOf`);
+        }
+      });
+    const metadataKeys = [
+      Symbol.toStringTag,
+      Symbol.toPrimitive,
+      Symbol.iterator,
+      Symbol.asyncIterator,
+      Symbol.unscopables,
+      Symbol.isConcatSpreadable,
+      Symbol.match,
+      Symbol.matchAll,
+      Symbol.replace,
+      Symbol.search,
+      Symbol.split,
+      "constructor",
+      "toLocaleString",
+      "hasOwnProperty",
+      "propertyIsEnumerable",
+      "isPrototypeOf",
+      "__defineGetter__",
+      "__defineSetter__",
+      "__lookupGetter__",
+      "__lookupSetter__",
+      "__proto__"
+    ] as const;
+
+    for (const metadataName of metadataKeys) {
+      const deploymentClassPrototype = Object.create(null) as object;
+      Object.defineProperty(deploymentClassPrototype, metadataName, {
+        enumerable: false,
+        value: hostileMetadataValue(metadataName)
+      });
+      const workerDeploymentClass = Object.freeze(Object.create(deploymentClassPrototype));
+
+      expect(() =>
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).not.toThrow();
+      expect(
+        liveWorkerDeploymentClassIsAuthorized(
+          frozenAuthorizationWrapper(workerDeploymentClass as unknown as string, throwingEvidence)
+        )
+      ).toBe(false);
+    }
+
+    expect(metadataCoerced).toBe(false);
+  });
+
   it("does not read inherited deployment class coercion hooks before denying authorization", () => {
     const throwingEvidence = new Proxy([...implementedFrozenControls()], {
       getPrototypeOf: () => {
