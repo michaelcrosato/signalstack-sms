@@ -9080,6 +9080,109 @@ describe("production live campaign worker controls", () => {
     });
   });
 
+  it("does not coerce object-valued inherited Object metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const authorizationWrapper = frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls);
+    const metadataSymbol = Symbol("object-valued-inherited-object-metadata");
+    const objectPrototype = Object.prototype as Record<PropertyKey, unknown>;
+    const metadataKeys = [
+      Symbol.toStringTag,
+      Symbol.toPrimitive,
+      Symbol.iterator,
+      Symbol.asyncIterator,
+      Symbol.unscopables,
+      Symbol.isConcatSpreadable,
+      Symbol.match,
+      Symbol.matchAll,
+      Symbol.replace,
+      Symbol.search,
+      Symbol.split,
+      "constructor",
+      "toLocaleString",
+      "toString",
+      "valueOf",
+      "hasOwnProperty",
+      "propertyIsEnumerable",
+      "isPrototypeOf",
+      "__defineGetter__",
+      "__defineSetter__",
+      "__lookupGetter__",
+      "__lookupSetter__",
+      "__proto__",
+      "reviewerBypass",
+      metadataSymbol
+    ] as const;
+    const originalDescriptors = metadataKeys.map((metadataKey) => ({
+      metadataKey,
+      descriptor: Object.getOwnPropertyDescriptor(Object.prototype, metadataKey)
+    }));
+
+    let metadataCoerced = false;
+    function hostileMetadataValue(metadataKey: PropertyKey) {
+      return Object.freeze({
+        [Symbol.toPrimitive]: () => {
+          metadataCoerced = true;
+          throw new Error(`inherited Object ${String(metadataKey)} metadata must not use Symbol.toPrimitive`);
+        },
+        toString: () => {
+          metadataCoerced = true;
+          throw new Error(`inherited Object ${String(metadataKey)} metadata must not use toString`);
+        },
+        valueOf: () => {
+          metadataCoerced = true;
+          throw new Error(`inherited Object ${String(metadataKey)} metadata must not use valueOf`);
+        }
+      });
+    }
+
+    function evaluateExactFrozenEvidence() {
+      return {
+        indexedEntries: liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls),
+        frozen: liveWorkerControlsAreFrozen(implementedControls),
+        frozenDescriptors: liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls),
+        publicFields: liveWorkerControlsExposeOnlyPublicFields(implementedControls),
+        supportedStatuses: liveWorkerControlsUseSupportedStatuses(implementedControls),
+        checklist: liveWorkerControlIdsMatchRequiredChecklist(implementedControls),
+        implemented: liveWorkerControlsAreImplemented(implementedControls),
+        authorized: liveWorkerDeploymentClassIsAuthorized(authorizationWrapper)
+      };
+    }
+
+    let results: ReturnType<typeof evaluateExactFrozenEvidence>;
+
+    try {
+      for (const metadataKey of metadataKeys) {
+        Object.defineProperty(Object.prototype, metadataKey, {
+          configurable: true,
+          value: hostileMetadataValue(metadataKey),
+          writable: true
+        });
+      }
+
+      results = evaluateExactFrozenEvidence();
+    } finally {
+      for (const { metadataKey, descriptor } of originalDescriptors) {
+        if (descriptor === undefined) {
+          delete objectPrototype[metadataKey];
+        } else {
+          Object.defineProperty(Object.prototype, metadataKey, descriptor);
+        }
+      }
+    }
+
+    expect(results!).toEqual({
+      indexedEntries: true,
+      frozen: true,
+      frozenDescriptors: true,
+      publicFields: true,
+      supportedStatuses: true,
+      checklist: true,
+      implemented: true,
+      authorized: true
+    });
+    expect(metadataCoerced).toBe(false);
+  });
+
   it("does not read inherited control-entry toStringTag metadata while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const objectPrototype = Object.prototype as {
