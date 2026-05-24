@@ -547,6 +547,48 @@ describe("production live campaign worker controls", () => {
     ).toBe(false);
   });
 
+  it("rejects own well-known symbol metadata on control arrays without reading it", () => {
+    const implementedControls = implementedFrozenControls();
+    const symbolMetadataControls = [...implementedControls];
+    const metadataSymbols = [
+      Symbol.unscopables,
+      Symbol.isConcatSpreadable,
+      Symbol.match,
+      Symbol.matchAll,
+      Symbol.replace,
+      Symbol.search,
+      Symbol.split
+    ];
+
+    for (const symbol of metadataSymbols) {
+      Object.defineProperty(symbolMetadataControls, symbol, {
+        enumerable: false,
+        get: () => {
+          throw new Error("own control-array well-known symbol metadata must not be read");
+        }
+      });
+    }
+    Object.freeze(symbolMetadataControls);
+
+    expect(Object.isFrozen(symbolMetadataControls)).toBe(true);
+    expect(() => liveWorkerControlsAreFrozen(symbolMetadataControls)).not.toThrow();
+    expect(() => liveWorkerControlEvidenceUsesFrozenDataDescriptors(symbolMetadataControls)).not.toThrow();
+    expect(() => liveWorkerControlArrayExposesOnlyIndexedEntries(symbolMetadataControls)).not.toThrow();
+    expect(() => liveWorkerControlsAreImplemented(symbolMetadataControls)).not.toThrow();
+    expect(liveWorkerControlsAreFrozen(symbolMetadataControls)).toBe(true);
+    expect(liveWorkerControlEvidenceUsesFrozenDataDescriptors(symbolMetadataControls)).toBe(true);
+    expect(liveWorkerControlsExposeOnlyPublicFields(symbolMetadataControls)).toBe(true);
+    expect(liveWorkerControlsUseSupportedStatuses(symbolMetadataControls)).toBe(true);
+    expect(liveWorkerControlIdsMatchRequiredChecklist(symbolMetadataControls)).toBe(true);
+    expect(liveWorkerControlArrayExposesOnlyIndexedEntries(symbolMetadataControls)).toBe(false);
+    expect(liveWorkerControlsAreImplemented(symbolMetadataControls)).toBe(false);
+    expect(
+      liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, symbolMetadataControls)
+      )
+    ).toBe(false);
+  });
+
   it("does not invoke inherited array iterators while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const originalIteratorDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, Symbol.iterator);
