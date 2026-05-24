@@ -7319,6 +7319,91 @@ describe("production live campaign worker controls", () => {
     expect(authorizedResult!).toBe(true);
   });
 
+  it("does not invoke data-backed inherited Object coercion metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const objectPrototype = Object.prototype as {
+      [Symbol.toPrimitive]?: unknown;
+      toString?: unknown;
+      valueOf?: unknown;
+    };
+    const originalToPrimitiveDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, Symbol.toPrimitive);
+    const originalToStringDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "toString");
+    const originalValueOfDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "valueOf");
+
+    let exposesOnlyIndexedEntriesResult: boolean;
+    let frozenResult: boolean;
+    let frozenDescriptorResult: boolean;
+    let publicFieldsResult: boolean;
+    let supportedStatusesResult: boolean;
+    let checklistResult: boolean;
+    let implementedResult: boolean;
+    let authorizedResult: boolean;
+
+    try {
+      Object.defineProperties(Object.prototype, {
+        [Symbol.toPrimitive]: {
+          configurable: true,
+          value: () => {
+            throw new Error("data-backed inherited Object Symbol.toPrimitive metadata must not be invoked");
+          },
+          writable: true
+        },
+        toString: {
+          configurable: true,
+          value: () => {
+            throw new Error("data-backed inherited Object toString metadata must not be invoked");
+          },
+          writable: true
+        },
+        valueOf: {
+          configurable: true,
+          value: () => {
+            throw new Error("data-backed inherited Object valueOf metadata must not be invoked");
+          },
+          writable: true
+        }
+      });
+
+      exposesOnlyIndexedEntriesResult = liveWorkerControlArrayExposesOnlyIndexedEntries(implementedControls);
+      frozenResult = liveWorkerControlsAreFrozen(implementedControls);
+      frozenDescriptorResult = liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls);
+      publicFieldsResult = liveWorkerControlsExposeOnlyPublicFields(implementedControls);
+      supportedStatusesResult = liveWorkerControlsUseSupportedStatuses(implementedControls);
+      checklistResult = liveWorkerControlIdsMatchRequiredChecklist(implementedControls);
+      implementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      authorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalToPrimitiveDescriptor === undefined) {
+        delete objectPrototype[Symbol.toPrimitive];
+      } else {
+        Object.defineProperty(Object.prototype, Symbol.toPrimitive, originalToPrimitiveDescriptor);
+      }
+
+      if (originalToStringDescriptor === undefined) {
+        delete objectPrototype.toString;
+      } else {
+        Object.defineProperty(Object.prototype, "toString", originalToStringDescriptor);
+      }
+
+      if (originalValueOfDescriptor === undefined) {
+        delete objectPrototype.valueOf;
+      } else {
+        Object.defineProperty(Object.prototype, "valueOf", originalValueOfDescriptor);
+      }
+    }
+
+    expect(exposesOnlyIndexedEntriesResult!).toBe(true);
+    expect(frozenResult!).toBe(true);
+    expect(frozenDescriptorResult!).toBe(true);
+    expect(publicFieldsResult!).toBe(true);
+    expect(supportedStatusesResult!).toBe(true);
+    expect(checklistResult!).toBe(true);
+    expect(implementedResult!).toBe(true);
+    expect(authorizedResult!).toBe(true);
+  });
+
   it("does not read inherited control-entry toStringTag metadata while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const objectPrototype = Object.prototype as {
