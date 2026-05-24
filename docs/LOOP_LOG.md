@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 714  GREEN  auth-assigned-asserted-destructured-globalthis-request-aliases  2026-05-24 13:07
+Objective:    Keep mutating-route auth scanner coverage aligned with assigned destructured `globalThis` `Request` aliases when the destructuring source is type-asserted or `satisfies`-asserted.
+Changed:
+- Added focused auth unit coverage proving `({ Request: RequestCtor } = (globalThis as typeof globalThis))` and `({ [requestConstructorName]: RequestCtor } = (globalThis satisfies typeof globalThis))` aliases before `Request.prototype` body-reader calls are treated as body parsing before `requireApiRole`.
+- Updated testing docs, contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the assigned asserted destructured globalThis Request alias boundary.
+- Kept live SMS, billing, providers, workers, Redis, notifications, live AI, secrets, protected gate scripts, and destructive production actions untouched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the product demo path stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 713  GREEN  auth-assigned-destructured-globalthis-request-aliases  2026-05-24 13:01
 Objective:    Keep mutating-route auth scanner coverage aligned with assigned destructured `globalThis` `Request` constructor aliases.
 Changed:

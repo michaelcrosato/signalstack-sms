@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 714
+
+- Latest mutating-route auth hardening adds focused coverage for assigned type-asserted and `satisfies` destructured `globalThis` `Request` constructor aliases, including `({ Request: RequestCtor } = (globalThis as typeof globalThis))` and `({ [requestConstructorName]: RequestCtor } = (globalThis satisfies typeof globalThis))`, before `Request.prototype` body-reader calls, so those body readers stay classified as parsing that must happen after each handler's own top-level `requireApiRole`. Focused auth coverage passed; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 713
 
 - Latest mutating-route auth hardening adds focused coverage for assigned destructured `globalThis` `Request` constructor aliases, including `({ Request: RequestCtor } = globalThis)` and `({ [requestConstructorName]: RequestCtor } = globalThis)`, before `Request.prototype` body-reader calls, so those body readers stay classified as parsing that must happen after each handler's own top-level `requireApiRole`. Focused auth coverage passed; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
