@@ -7465,6 +7465,74 @@ describe("production live campaign worker controls", () => {
     expect(dataBackedAuthorizedResult!).toBe(true);
   });
 
+  it("does not read or invoke inherited Object prototype-helper metadata while evaluating exact frozen evidence", () => {
+    const implementedControls = implementedFrozenControls();
+    const objectPrototype = Object.prototype as {
+      isPrototypeOf?: unknown;
+    };
+    const originalIsPrototypeOfDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, "isPrototypeOf");
+
+    let accessorFrozenResult: boolean;
+    let accessorFrozenDescriptorResult: boolean;
+    let accessorPublicFieldsResult: boolean;
+    let accessorImplementedResult: boolean;
+    let accessorAuthorizedResult: boolean;
+    let dataBackedFrozenResult: boolean;
+    let dataBackedFrozenDescriptorResult: boolean;
+    let dataBackedPublicFieldsResult: boolean;
+    let dataBackedImplementedResult: boolean;
+    let dataBackedAuthorizedResult: boolean;
+
+    try {
+      Object.defineProperty(Object.prototype, "isPrototypeOf", {
+        configurable: true,
+        get: () => {
+          throw new Error("inherited Object isPrototypeOf metadata must not be read");
+        }
+      });
+
+      accessorFrozenResult = liveWorkerControlsAreFrozen(implementedControls);
+      accessorFrozenDescriptorResult = liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls);
+      accessorPublicFieldsResult = liveWorkerControlsExposeOnlyPublicFields(implementedControls);
+      accessorImplementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      accessorAuthorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+
+      Object.defineProperty(Object.prototype, "isPrototypeOf", {
+        configurable: true,
+        value: () => {
+          throw new Error("data-backed inherited Object isPrototypeOf metadata must not be invoked");
+        }
+      });
+
+      dataBackedFrozenResult = liveWorkerControlsAreFrozen(implementedControls);
+      dataBackedFrozenDescriptorResult = liveWorkerControlEvidenceUsesFrozenDataDescriptors(implementedControls);
+      dataBackedPublicFieldsResult = liveWorkerControlsExposeOnlyPublicFields(implementedControls);
+      dataBackedImplementedResult = liveWorkerControlsAreImplemented(implementedControls);
+      dataBackedAuthorizedResult = liveWorkerDeploymentClassIsAuthorized(
+        frozenAuthorizationWrapper(reservedLiveWorkerDeploymentClass, implementedControls)
+      );
+    } finally {
+      if (originalIsPrototypeOfDescriptor === undefined) {
+        delete objectPrototype.isPrototypeOf;
+      } else {
+        Object.defineProperty(Object.prototype, "isPrototypeOf", originalIsPrototypeOfDescriptor);
+      }
+    }
+
+    expect(accessorFrozenResult!).toBe(true);
+    expect(accessorFrozenDescriptorResult!).toBe(true);
+    expect(accessorPublicFieldsResult!).toBe(true);
+    expect(accessorImplementedResult!).toBe(true);
+    expect(accessorAuthorizedResult!).toBe(true);
+    expect(dataBackedFrozenResult!).toBe(true);
+    expect(dataBackedFrozenDescriptorResult!).toBe(true);
+    expect(dataBackedPublicFieldsResult!).toBe(true);
+    expect(dataBackedImplementedResult!).toBe(true);
+    expect(dataBackedAuthorizedResult!).toBe(true);
+  });
+
   it("does not read inherited control-array index accessors while evaluating exact frozen evidence", () => {
     const implementedControls = implementedFrozenControls();
     const inheritedIndex = String(requiredControlIds.length);
