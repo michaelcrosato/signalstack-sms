@@ -266,19 +266,25 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
     `(?:globalThis${globalThisAliases.size > 0 ? `|${[...globalThisAliases].map(escapeRegExp).join("|")}` : ""})`;
   const globalThisTargetWithOptionalTypeAssertionPattern = () =>
     `\\(?\\s*${globalThisTargetPattern()}(?:\\s+(?:as|satisfies)\\s+typeof\\s+globalThis)?\\s*\\)?`;
+  const withoutDestructuringDefault = (field: string) => field.replace(/\s*=\s*[\s\S]*$/, "");
   const collectGlobalThisBuiltInAliases = (fields: string) =>
     fields.split(",").flatMap((field) => {
-      const fieldMatch = /^\s*(Object|Reflect)\s*(?::\s*([A-Za-z_$][\w$]*))?\s*$/.exec(field);
+      const fieldWithoutDefault = withoutDestructuringDefault(field);
+      const fieldMatch = /^\s*(Object|Reflect)\s*(?::\s*([A-Za-z_$][\w$]*))?\s*$/.exec(fieldWithoutDefault);
       if (fieldMatch !== null) {
         return [[fieldMatch[2] ?? fieldMatch[1], fieldMatch[1]]] as const;
       }
 
-      const computedLiteralMatch = /^\s*\[\s*["'`](Object|Reflect)["'`]\s*\]\s*:\s*([A-Za-z_$][\w$]*)\s*$/.exec(field);
+      const computedLiteralMatch = /^\s*\[\s*["'`](Object|Reflect)["'`]\s*\]\s*:\s*([A-Za-z_$][\w$]*)\s*$/.exec(
+        fieldWithoutDefault
+      );
       if (computedLiteralMatch !== null) {
         return [[computedLiteralMatch[2], computedLiteralMatch[1]]] as const;
       }
 
-      const computedAliasMatch = /^\s*\[\s*([A-Za-z_$][\w$]*)\s*\]\s*:\s*([A-Za-z_$][\w$]*)\s*$/.exec(field);
+      const computedAliasMatch = /^\s*\[\s*([A-Za-z_$][\w$]*)\s*\]\s*:\s*([A-Za-z_$][\w$]*)\s*$/.exec(
+        fieldWithoutDefault
+      );
       const builtInName = computedAliasMatch === null ? undefined : builtInPropertyAliases.get(computedAliasMatch[1]);
       return builtInName === undefined || computedAliasMatch === null ? [] : ([[computedAliasMatch[2], builtInName]] as const);
     });
@@ -413,17 +419,22 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
   );
   const collectGlobalThisRequestAliases = (fields: string) =>
     fields.split(",").flatMap((field) => {
-      const fieldMatch = /^\s*Request\s*(?::\s*([A-Za-z_$][\w$]*))?\s*$/.exec(field);
+      const fieldWithoutDefault = withoutDestructuringDefault(field);
+      const fieldMatch = /^\s*Request\s*(?::\s*([A-Za-z_$][\w$]*))?\s*$/.exec(fieldWithoutDefault);
       if (fieldMatch !== null) {
         return [fieldMatch[1] ?? "Request"];
       }
 
-      const computedLiteralMatch = /^\s*\[\s*["'`]Request["'`]\s*\]\s*:\s*([A-Za-z_$][\w$]*)\s*$/.exec(field);
+      const computedLiteralMatch = /^\s*\[\s*["'`]Request["'`]\s*\]\s*:\s*([A-Za-z_$][\w$]*)\s*$/.exec(
+        fieldWithoutDefault
+      );
       if (computedLiteralMatch !== null) {
         return [computedLiteralMatch[1]];
       }
 
-      const computedAliasMatch = /^\s*\[\s*([A-Za-z_$][\w$]*)\s*\]\s*:\s*([A-Za-z_$][\w$]*)\s*$/.exec(field);
+      const computedAliasMatch = /^\s*\[\s*([A-Za-z_$][\w$]*)\s*\]\s*:\s*([A-Za-z_$][\w$]*)\s*$/.exec(
+        fieldWithoutDefault
+      );
       return computedAliasMatch !== null && requestConstructorPropertyAliases.has(computedAliasMatch[1])
         ? [computedAliasMatch[2]]
         : [];
@@ -5524,6 +5535,32 @@ describe("API route authorization coverage", () => {
         return Response.json({ size: payload.byteLength });
       }
     `;
+    const unsafeDefaultedDestructuredGlobalBuiltinsSource = `
+      export async function DELETE(req: Request) {
+        const { Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = globalThis;
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "blob"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const unsafeDefaultedComputedDestructuredGlobalBuiltinsSource = `
+      export async function PATCH(req: Request) {
+        const objectName = "Object" as const;
+        const reflectName = ("Reflect");
+        const { [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = globalThis;
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "arrayBuffer"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
     const unsafeAssignedTypeAssertedDestructuredGlobalObjectSource = `
       export async function PATCH(req: Request) {
         let ObjectBuiltin;
@@ -5708,6 +5745,10 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSatisfiesComputedDestructuredGlobalBuiltinsSource, "PATCH")).toBe(
       true
     );
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeDefaultedDestructuredGlobalBuiltinsSource, "DELETE")).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(unsafeDefaultedComputedDestructuredGlobalBuiltinsSource, "PATCH")
+    ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeAssignedTypeAssertedDestructuredGlobalObjectSource, "PATCH")).toBe(
       true
     );
