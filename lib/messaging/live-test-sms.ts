@@ -39,6 +39,11 @@ export function normalizeNorthAmericanPhone(value: string) {
   return trimmed;
 }
 
+function normalizeTwilioMessageStatus(value: string | undefined) {
+  const normalized = value?.trim().toLowerCase();
+  return normalized || "queued";
+}
+
 export function parseLiveTestSmsAllowlist(env: LiveTestSmsEnv = process.env) {
   return (env.LIVE_TEST_SMS_TO_ALLOWLIST ?? "")
     .split(",")
@@ -192,6 +197,6 @@ async function sendTwilioSms(input: {
 
   return {
     sid: payload.sid,
-    status: payload.status ?? "queued"
+    status: normalizeTwilioMessageStatus(payload.status)
   };
 }

@@ -18,6 +18,7 @@ Post-MVP live test SMS exception:
 - It must not use locally stored provider credential metadata for live sends; raw Twilio credentials must come from environment variables only.
 - It must not enable campaign sends, queue workers, bulk sends, billing, live AI, notification delivery, non-allowlisted recipients, or provider credential display.
 - Successful sends must create local audit evidence without storing raw auth tokens.
+- Twilio response status values must be trimmed and lowercased before local message rows, readiness audit metadata, or API responses consume them; blank or missing statuses default to `queued`.
 - A complete compliance profile and `APPROVED` A2P status are necessary but not sufficient; demo mode and live flags must also permit external impact.
 
 Post-MVP provider settings foundation:

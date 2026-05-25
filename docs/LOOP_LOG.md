@@ -6649,3 +6649,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3140'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer production auth/RBAC planning, deeper product reporting visibility, or concrete correctness gaps over syntactic scanner variants.
+
+## Run 782  GREEN  live-test-status-normalization  2026-05-24 21:35
+Objective:    Normalize gated live-test SMS Twilio response statuses before local evidence is stored or returned.
+Changed:
+- Trimmed and lowercased Twilio live-test response statuses before local `Message` rows, readiness audit metadata, and API responses consume them, defaulting blank/missing statuses to `queued`.
+- Added mocked successful live-test SMS coverage proving `" ACCEPTED "` becomes `accepted` without real Twilio credentials or provider calls in tests.
+- Updated provider/testing contracts, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state notes for the live-test status-normalization boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3141'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer production auth/RBAC planning, deeper product reporting visibility, or concrete idempotency correctness gaps over syntactic scanner variants.
