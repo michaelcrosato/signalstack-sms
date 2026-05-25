@@ -76,7 +76,7 @@ describe("scheduled campaign worker processing", () => {
     vi.stubEnv("APP_ENV", "");
     mocks.queueJobFindFirst.mockResolvedValue(queueJob);
     mocks.dummySend.mockResolvedValue({
-      providerMessageId: "dummy_dummy-outbound:queue_job_demo:contact_allowed",
+      providerMessageId: "dummy_dummy-outbound:org_demo:queue_job_demo:contact_allowed",
       status: "queued"
     });
   });
@@ -140,13 +140,13 @@ describe("scheduled campaign worker processing", () => {
       from: "demo-signalstack",
       body: "Hi Ada, your local demo invite is ready.",
       orgId: "org_demo",
-      idempotencyKey: "dummy-outbound:queue_job_demo:contact_allowed"
+      idempotencyKey: "dummy-outbound:org_demo:queue_job_demo:contact_allowed"
     });
     expect(mocks.messageUpsert).toHaveBeenCalledWith({
       where: {
         orgId_idempotencyKey: {
           orgId: "org_demo",
-          idempotencyKey: "dummy-outbound:queue_job_demo:contact_allowed"
+          idempotencyKey: "dummy-outbound:org_demo:queue_job_demo:contact_allowed"
         }
       },
       update: {},
@@ -156,9 +156,9 @@ describe("scheduled campaign worker processing", () => {
         campaignId: "campaign_demo",
         direction: "OUTBOUND",
         body: "Hi Ada, your local demo invite is ready.",
-        providerMessageId: "dummy_dummy-outbound:queue_job_demo:contact_allowed",
+        providerMessageId: "dummy_dummy-outbound:org_demo:queue_job_demo:contact_allowed",
         providerStatus: "queued",
-        idempotencyKey: "dummy-outbound:queue_job_demo:contact_allowed"
+        idempotencyKey: "dummy-outbound:org_demo:queue_job_demo:contact_allowed"
       }
     });
     expect(mocks.campaignRecipientUpdateMany).toHaveBeenNthCalledWith(1, {

@@ -14,6 +14,7 @@ import { renderTemplate } from "@/lib/messaging/render-template";
 import { liveWorkerDeploymentClassIsAuthorized } from "@/lib/queue/live-worker-controls";
 import { preflightCampaignRecipients } from "@/lib/messaging/send-preflight";
 import { scheduledCampaignJobSchema } from "@/lib/queue/jobs";
+import { outboundCampaignMessageIdempotencyKey } from "@/lib/queue/idempotency";
 
 export type WorkerSafetyInput = {
   liveMessagingEnabled?: unknown;
@@ -317,7 +318,7 @@ async function processScheduledCampaignQueueJob(
   }
 
   for (const recipient of sendableRecipients) {
-    const idempotencyKey = `dummy-outbound:${job.id}:${recipient.contactId}`;
+    const idempotencyKey = outboundCampaignMessageIdempotencyKey(job.orgId, job.id, recipient.contactId);
     const body = renderTemplate(campaign.body, campaignMessageValues(recipient.contact));
     const result = await dummyProvider.send({
       to: recipient.contact.phone,

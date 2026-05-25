@@ -381,6 +381,10 @@ Post-MVP inbox idempotency:
 - Inbox repository tests must verify explicit demo inbound idempotency duplicates and provider-message duplicates return existing local messages before contact, conversation, timestamp, or opt-out mutations repeat.
 - Inbox repository tests must verify explicit conversation-message idempotency duplicates return existing local messages before contact opt-out or conversation timestamp mutations repeat.
 
+Post-MVP queue idempotency:
+
+- Queue helper and worker tests must verify worker-generated outbound message idempotency keys include the current `orgId` before provider calls and local `Message` upserts, so same queue/contact identifiers in different tenants cannot share provider request evidence.
+
 Post-MVP delivery operations view:
 
 - The seeded investor demo path must verify that `/settings/delivery` renders read-only message direction counts, delivery status metadata, provider status labels, recent message metadata, and safety-boundary text without sends, retries, webhook replays, provider calls, message mutation, notifications, billing records, SMS, or live messaging enablement.

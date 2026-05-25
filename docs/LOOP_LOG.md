@@ -6739,3 +6739,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3153'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer production auth/RBAC planning, deeper reporting visibility, or concrete idempotency gaps.
+
+## Run 791  GREEN  tenant-explicit-worker-idempotency  2026-05-24 22:50
+Objective:    Make local outbound worker idempotency keys tenant-explicit before provider calls and message upserts.
+Changed:
+- Added `outboundCampaignMessageIdempotencyKey` and used it in scheduled campaign worker sends.
+- Updated focused queue tests to pin tenant-explicit outbound keys and worker provider/upsert evidence.
+- Updated queue/testing contracts plus compact current handoff docs for the worker idempotency boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3154'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer high-signal product/demo polish, production auth/RBAC planning, or named production-readiness correctness gaps.
