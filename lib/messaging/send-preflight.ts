@@ -16,10 +16,28 @@ export type CampaignPreflightResult = {
 };
 
 export function preflightCampaignRecipients(
-  contacts: Array<Pick<Contact, "id" | "phone" | "consentStatus" | "optedOutAt" | "archivedAt">>
+  contacts: Array<Pick<Contact, "id" | "phone" | "consentStatus" | "optedOutAt" | "archivedAt">>,
+  selectedContactIds?: string[]
 ): CampaignPreflightResult {
-  const recipients = contacts.map((contact) => {
+  const contactsById = new Map(contacts.map((contact) => [contact.id, contact]));
+  const recipientRows = selectedContactIds
+    ? [...new Set(selectedContactIds)].map((contactId) => ({
+        contactId,
+        contact: contactsById.get(contactId) ?? null
+      }))
+    : contacts.map((contact) => ({ contactId: contact.id, contact }));
+
+  const recipients = recipientRows.map(({ contactId, contact }) => {
     const reasons: string[] = [];
+
+    if (!contact) {
+      return {
+        contactId,
+        phone: "unknown",
+        allowed: false,
+        reasons: ["CONTACT_NOT_FOUND"]
+      };
+    }
 
     if (contact.archivedAt) {
       reasons.push("CONTACT_ARCHIVED");

@@ -102,7 +102,7 @@ Updates draft campaigns only. Non-draft campaigns return conflict.
 
 ### `POST /api/campaigns/:campaignId/preflight`
 
-Runs a compliance preflight over campaign recipients or the provided `contactIds`. It returns allowed/blocked counts and row-level reasons. It does not send or enqueue messages.
+Runs a compliance preflight over campaign recipients or the provided `contactIds`. It returns allowed/blocked counts and row-level reasons. Missing or cross-tenant requested contact IDs are returned as blocked `CONTACT_NOT_FOUND` rows instead of being silently ignored. It does not send or enqueue messages.
 
 ### `POST /api/campaigns/:campaignId/schedule`
 

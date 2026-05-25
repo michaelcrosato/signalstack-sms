@@ -165,4 +165,26 @@ describe("scheduleCampaign", () => {
     expect(mocks.queueJobUpsert).not.toHaveBeenCalled();
     expect(mocks.campaignUpdate).not.toHaveBeenCalled();
   });
+
+  it("rejects missing or foreign campaign recipients without cancelling or creating queue jobs", async () => {
+    mocks.campaignFindFirst.mockResolvedValue({
+      id: "campaign_demo",
+      orgId: "org_demo",
+      status: CampaignStatus.DRAFT,
+      recipients: [{ contactId: "contact_foreign" }]
+    });
+    mocks.contactFindMany.mockResolvedValue([]);
+
+    await expect(scheduleCampaign("org_demo", "campaign_demo", scheduledAt)).rejects.toThrow(
+      "Campaign preflight failed."
+    );
+
+    expect(mocks.contactFindMany).toHaveBeenCalledWith({
+      where: { orgId: "org_demo", id: { in: ["contact_foreign"] } },
+      select: { id: true, phone: true, consentStatus: true, optedOutAt: true, archivedAt: true }
+    });
+    expect(mocks.queueJobUpdateMany).not.toHaveBeenCalled();
+    expect(mocks.queueJobUpsert).not.toHaveBeenCalled();
+    expect(mocks.campaignUpdate).not.toHaveBeenCalled();
+  });
 });

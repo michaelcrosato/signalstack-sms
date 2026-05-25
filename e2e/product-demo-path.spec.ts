@@ -233,6 +233,10 @@ test("product campaigns page creates, preflights, and schedules a local campaign
   await expect(page.getByRole("status")).toContainText("Draft saved");
   const preflight = page.getByLabel("Campaign preflight");
   await expect(preflight.getByText("Allowed recipients")).toBeVisible();
+  await expect(preflight.locator("dl > div").filter({ hasText: "Allowed recipients" }).locator("dd")).toHaveText(
+    /[1-9]\d*/
+  );
+  await expect(preflight.locator("dl > div").filter({ hasText: "Blocked recipients" }).locator("dd")).toHaveText("0");
   await expect(preflight.getByText("blocked by default")).toBeVisible();
 
   await page.getByRole("button", { name: "Schedule Locally" }).click();

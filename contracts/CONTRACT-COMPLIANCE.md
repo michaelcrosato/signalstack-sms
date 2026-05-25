@@ -23,6 +23,7 @@ Milestone 2 contact storage rules:
 Milestone 3 preflight rules:
 
 - Empty recipient sets are blocked.
+- Missing or cross-tenant requested contact IDs are blocked as `CONTACT_NOT_FOUND`.
 - Archived contacts are blocked.
 - Contacts not explicitly `OPTED_IN` are blocked.
 - Opted-out contacts are blocked.

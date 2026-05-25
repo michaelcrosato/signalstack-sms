@@ -7345,3 +7345,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3144'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer production auth/RBAC planning, higher-signal reporting correctness, or concrete idempotency gaps over syntactic scanner variants.
+
+## Run 789  GREEN  campaign-preflight-missing-contact-counts  2026-05-24 22:35
+Objective:    Block missing or cross-tenant requested campaign preflight contacts and show product preflight counts.
+Changed:
+- Updated campaign preflight to return missing/cross-tenant requested contact IDs as blocked `CONTACT_NOT_FOUND` rows, and scheduling now fails that preflight before queue mutations.
+- Fixed the product campaign composer to render the API's `allowedRecipients` and `blockedRecipients` fields instead of blank count names.
+- Added focused unit coverage plus seeded product-demo browser coverage for missing-contact preflight behavior and visible allowed/blocked counts; updated compact contracts/handoffs.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3152'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer production auth/RBAC planning, higher-signal reporting correctness, or concrete idempotency gaps over syntactic scanner variants.

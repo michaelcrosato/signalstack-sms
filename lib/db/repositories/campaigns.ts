@@ -111,7 +111,7 @@ export async function preflightCampaign(orgId: string, campaignId: string, conta
     }
   });
 
-  return preflightCampaignRecipients(contacts);
+  return preflightCampaignRecipients(contacts, selectedContactIds);
 }
 
 export async function scheduleCampaign(orgId: string, campaignId: string, scheduledAt: Date) {
@@ -132,7 +132,10 @@ export async function scheduleCampaign(orgId: string, campaignId: string, schedu
       where: { orgId, id: { in: campaign.recipients.map((recipient) => recipient.contactId) } },
       select: { id: true, phone: true, consentStatus: true, optedOutAt: true, archivedAt: true }
     });
-    const preflight = preflightCampaignRecipients(contacts);
+    const preflight = preflightCampaignRecipients(
+      contacts,
+      campaign.recipients.map((recipient) => recipient.contactId)
+    );
     if (!preflight.allowed) {
       throw new Error("Campaign preflight failed.");
     }

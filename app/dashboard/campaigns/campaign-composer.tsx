@@ -20,8 +20,8 @@ type ComposerTemplate = {
 
 type PreflightResult = {
   allowed: boolean;
-  allowedCount: number;
-  blockedCount: number;
+  allowedRecipients: number;
+  blockedRecipients: number;
   recipients: Array<{ contactId: string; allowed: boolean; reasons: string[] }>;
 };
 
@@ -280,11 +280,11 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
           <dl className="mt-3 grid gap-2 text-sm">
             <div className="flex justify-between gap-4">
               <dt className="text-slate-600">Allowed recipients</dt>
-              <dd className="font-medium">{preflight.allowedCount}</dd>
+              <dd className="font-medium">{preflight.allowedRecipients}</dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-slate-600">Blocked recipients</dt>
-              <dd className="font-medium">{preflight.blockedCount}</dd>
+              <dd className="font-medium">{preflight.blockedRecipients}</dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-slate-600">Live sends</dt>

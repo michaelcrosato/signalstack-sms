@@ -28,7 +28,7 @@ Milestone 3:
 - `POST /api/campaigns`: creates a draft campaign.
 - `GET /api/campaigns/:campaignId`: reads a tenant-scoped campaign.
 - `PATCH /api/campaigns/:campaignId`: updates a draft campaign.
-- `POST /api/campaigns/:campaignId/preflight`: checks recipients without sending.
+- `POST /api/campaigns/:campaignId/preflight`: checks recipients without sending, including blocked rows for requested contact IDs that are missing or outside the current tenant.
 
 Milestone 4:
 
