@@ -219,7 +219,9 @@ test("product campaigns page creates, preflights, and schedules a local campaign
   await expect(page.getByRole("heading", { name: "Composer" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Campaign status" })).toBeVisible();
   await expect(page.getByRole("columnheader", { name: "Readiness" })).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "Delivery" })).toBeVisible();
   await expect(page.getByText("Demo intro campaign")).toBeVisible();
+  await expect(page.getByText(/(No outbound evidence|pending; awaiting provider status|failed; review evidence|All delivered)/).first()).toBeVisible();
 
   await page.getByLabel("Campaign name").fill(campaignName);
   await expect(page.getByRole("heading", { name: "Fake AI copy assist" })).toBeVisible();
@@ -290,6 +292,8 @@ test("product campaign detail page edits a draft and cancels a queued campaign l
   await expect(deliverySnapshot.getByText("Recent Evidence Rows")).toBeVisible();
   await expect(deliverySnapshot.getByText("0 of 0")).toBeVisible();
   await expect(deliverySnapshot.getByText("Delivery Rate")).toBeVisible();
+  await expect(deliverySnapshot.getByText("Review Status")).toBeVisible();
+  await expect(deliverySnapshot.getByText("No outbound evidence")).toBeVisible();
   await expect(deliverySnapshot.getByText("Last Outbound Message")).toBeVisible();
   await expect(deliverySnapshot.getByText("Provider Statuses")).toBeVisible();
   await expect(deliverySnapshot.getByRole("heading", { name: "Recent outbound evidence" })).toBeVisible();

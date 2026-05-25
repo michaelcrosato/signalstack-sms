@@ -321,14 +321,16 @@ describe("getProductCampaigns", () => {
         delivered: 1,
         pending: 1,
         failed: 0,
-        deliveryRatePercent: 50
+        deliveryRatePercent: 50,
+        reviewStatus: "1 pending; awaiting provider status"
       },
       {
         outboundMessages: 1,
         delivered: 0,
         pending: 0,
         failed: 1,
-        deliveryRatePercent: 0
+        deliveryRatePercent: 0,
+        reviewStatus: "1 failed; review evidence"
       }
     ]);
     expect(result.contacts).toEqual([
@@ -419,6 +421,7 @@ describe("getProductCampaigns", () => {
       { key: "outboundMessages", label: "Outbound Messages", value: "4" },
       { key: "recentEvidenceRows", label: "Recent Evidence Rows", value: "4 of 4" },
       { key: "deliveryRate", label: "Delivery Rate", value: "25%" },
+      { key: "reviewStatus", label: "Review Status", value: "2 failed; review evidence" },
       { key: "delivered", label: "Delivered", value: "1" },
       { key: "pending", label: "Pending", value: "1" },
       { key: "failed", label: "Failed", value: "2" },
@@ -484,6 +487,7 @@ describe("getProductCampaigns", () => {
       { key: "outboundMessages", label: "Outbound Messages", value: "35" },
       { key: "recentEvidenceRows", label: "Recent Evidence Rows", value: "4 of 35" },
       { key: "deliveryRate", label: "Delivery Rate", value: "89%" },
+      { key: "reviewStatus", label: "Review Status", value: "4 pending; awaiting provider status" },
       { key: "delivered", label: "Delivered", value: "31" },
       { key: "pending", label: "Pending", value: "4" },
       { key: "failed", label: "Failed", value: "0" },
@@ -610,6 +614,7 @@ describe("getProductCampaigns", () => {
       "outboundMessages",
       "recentEvidenceRows",
       "deliveryRate",
+      "reviewStatus",
       "delivered",
       "pending",
       "failed",
@@ -620,6 +625,7 @@ describe("getProductCampaigns", () => {
       "Outbound Messages",
       "Recent Evidence Rows",
       "Delivery Rate",
+      "Review Status",
       "Delivered",
       "Pending",
       "Failed",

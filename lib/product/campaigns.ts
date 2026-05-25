@@ -60,6 +60,7 @@ const productCampaignDeliveryMetricRowItems = [
   { key: "outboundMessages", label: "Outbound Messages" },
   { key: "recentEvidenceRows", label: "Recent Evidence Rows" },
   { key: "deliveryRate", label: "Delivery Rate" },
+  { key: "reviewStatus", label: "Review Status" },
   { key: "delivered", label: "Delivered" },
   { key: "pending", label: "Pending" },
   { key: "failed", label: "Failed" },
@@ -116,7 +117,8 @@ export async function getProductCampaigns(orgId: string) {
           delivered,
           pending,
           failed,
-          deliveryRatePercent: outboundMessages > 0 ? Math.round((delivered / outboundMessages) * 100) : 0
+          deliveryRatePercent: outboundMessages > 0 ? Math.round((delivered / outboundMessages) * 100) : 0,
+          reviewStatus: getCampaignDeliveryReviewStatus(outboundMessages, delivered, pending, failed)
         }
       };
     }),
@@ -324,12 +326,38 @@ function getCampaignDeliverySummary(
     outboundMessages: outboundMessages.length.toString(),
     recentEvidenceRows: `${options.recentEvidenceRows ?? outboundMessages.length} of ${outboundMessages.length}`,
     deliveryRate: `${deliveryRatePercent}%`,
+    reviewStatus: getCampaignDeliveryReviewStatus(
+      outboundMessages.length,
+      delivered.length,
+      pending.length,
+      failed.length
+    ),
     delivered: delivered.length.toString(),
     pending: pending.length.toString(),
     failed: failed.length.toString(),
     lastOutboundMessage: lastOutboundMessageAt?.toISOString() ?? "none",
     providerStatuses: providerStatuses.length > 0 ? providerStatuses.join(", ") : "none"
   };
+}
+
+function getCampaignDeliveryReviewStatus(outboundMessages: number, delivered: number, pending: number, failed: number) {
+  if (outboundMessages === 0) {
+    return "No outbound evidence";
+  }
+
+  if (failed > 0) {
+    return `${failed} failed; review evidence`;
+  }
+
+  if (pending > 0) {
+    return `${pending} pending; awaiting provider status`;
+  }
+
+  if (delivered === outboundMessages) {
+    return "All delivered";
+  }
+
+  return "Review delivery evidence";
 }
 
 function getCampaignDeliveryState(message: {

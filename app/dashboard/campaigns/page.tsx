@@ -105,6 +105,7 @@ export default async function CampaignsPage() {
                         <div className="text-xs text-slate-600">
                           {campaign.delivery.delivered} delivered / {campaign.delivery.pending} pending / {campaign.delivery.failed} failed
                         </div>
+                        <div className="mt-1 text-xs font-medium text-slate-700">{campaign.delivery.reviewStatus}</div>
                       </td>
                       <td className="px-4 py-3 text-slate-700">
                         {campaign.scheduledAt ? campaign.scheduledAt.toLocaleString("en-US") : "Not scheduled"}

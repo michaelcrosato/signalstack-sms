@@ -7496,3 +7496,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/auth/api-rbac-matrix.test.ts`, `npm run production-auth:check`, `npm run typecheck`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer concrete idempotency/auth correctness gaps, feedback-driven reporting depth, or real auth only after a Clerk/session design slice is selected.
+
+## Run 804  GREEN  campaign-delivery-review-status  2026-05-25 00:45
+Objective:    Add a concise campaign delivery review signal to the product demo reporting path.
+Changed:
+- Derived a local delivery review status from existing outbound message evidence: no outbound evidence, pending status, failed evidence, or all delivered.
+- Rendered the review status in `/dashboard/campaigns` delivery rows and as a `Review Status` metric on `/dashboard/campaigns/:campaignId`.
+- Updated product campaign unit coverage, product-demo E2E assertions, API docs/contracts, current matrix, and compact handoffs.
+Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run typecheck`, `npm run test:e2e:product-demo -- --grep "product campaign"`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer concrete idempotency/auth correctness gaps, feedback-driven reporting depth, or real auth only after a Clerk/session design slice is selected.
