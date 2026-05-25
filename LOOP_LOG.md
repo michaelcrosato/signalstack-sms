@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 754  GREEN  auth-logical-expression-globalthis-aliases  2026-05-24 17:33
+Objective:    Prove logical-expression local `globalThis` root aliases are classified before mutating-route body-reader role gates.
+Changed:
+- Added auth scanner alias discovery for logical-expression local `globalThis` root chains where both operands are already known roots, such as `root = globalThis || globalThis; platform = root ?? root; runtime = platform && platform`.
+- Added focused auth unit coverage for logical-expression root chains feeding defaulted `Request`, `Object`, and `Reflect` destructuring before body-reader calls.
+- Updated testing contract, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the logical-expression alias boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 753  GREEN  auth-conditional-expression-globalthis-aliases  2026-05-24 17:24
 Objective:    Prove conditional-expression local `globalThis` root aliases are classified before mutating-route body-reader role gates.
 Changed:
