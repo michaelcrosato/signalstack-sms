@@ -225,16 +225,19 @@ describe("product dashboard navigation", () => {
     expect(productDashboardNextStepRows.map((step) => step.key)).toEqual([
       "reviewInbox",
       "prepareCampaign",
+      "reviewDelivery",
       "checkCompliance"
     ]);
     expect(productDashboardNextStepRows.map((step) => step.href)).toEqual([
       "/dashboard/inbox",
       "/dashboard/campaigns",
+      "/dashboard/analytics",
       "/dashboard/compliance"
     ]);
     expect(productDashboardNextStepRows.map((step) => step.label)).toEqual([
       "Review open replies",
       "Prepare campaign",
+      "Review delivery evidence",
       "Check go-live blockers"
     ]);
 
@@ -367,6 +370,13 @@ describe("product dashboard navigation", () => {
           href: "/dashboard/campaigns",
           value: "1 scheduled",
           detail: "Review queued local work and delivery signals before the demo."
+        },
+        {
+          key: "reviewDelivery",
+          label: "Review delivery evidence",
+          href: "/dashboard/analytics",
+          value: "1 failed",
+          detail: "Open analytics to review failed local delivery evidence before continuing the demo."
         },
         {
           key: "checkCompliance",

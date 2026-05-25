@@ -60,7 +60,7 @@ export default async function DashboardPage() {
         </section>
 
         <ProductSection id="next-steps" title="Next Steps" eyebrow="Demo Path">
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {dashboard.nextSteps.map((step) => (
               <NextStep
                 key={step.key}

@@ -7596,3 +7596,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/deployment/workflow-local-gate.test.ts`, `npm run typecheck`, `npm run lint`, `npm run contracts:check`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.
+
+## Run 814  GREEN  dashboard-delivery-next-step  2026-05-25 02:06
+Objective:    Make delivery evidence an explicit product dashboard next-step checkpoint.
+Changed:
+- Added a frozen `Review delivery evidence` dashboard next-step linking to `/dashboard/analytics`, derived from existing outbound local delivery counts with failed, pending, outbound, and zero-state wording.
+- Updated the dashboard next-step grid plus focused unit and product-demo Playwright coverage for the new analytics link.
+- Updated API/testing contracts, current matrix, compact handoffs, and loop logs without provider calls, delivery retries, worker execution, live messaging, billing, live AI, secrets, delivery-state mutation, or protected gate script edits.
+Gate:         passed with `npm run test -- tests/unit/product/dashboard.test.ts`, `npm run typecheck`, `npm run lint`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.

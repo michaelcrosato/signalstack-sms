@@ -66,6 +66,7 @@ export const productDashboardSignalRows = Object.freeze(
 const productDashboardNextStepItems = [
   { key: "reviewInbox", label: "Review open replies", href: "/dashboard/inbox" },
   { key: "prepareCampaign", label: "Prepare campaign", href: "/dashboard/campaigns" },
+  { key: "reviewDelivery", label: "Review delivery evidence", href: "/dashboard/analytics" },
   { key: "checkCompliance", label: "Check go-live blockers", href: "/dashboard/compliance" }
 ] as const;
 
@@ -278,6 +279,26 @@ export async function getProductDashboard(orgId: string) {
               value: "needs draft",
               detail: "Create a local draft campaign before showing campaign scheduling."
             },
+    reviewDelivery:
+      dashboard.delivery.failed > 0
+        ? {
+            value: `${dashboard.delivery.failed} failed`,
+            detail: "Open analytics to review failed local delivery evidence before continuing the demo."
+          }
+        : dashboard.delivery.pending > 0
+          ? {
+              value: `${dashboard.delivery.pending} pending`,
+              detail: "Open analytics to check pending local provider-status evidence."
+            }
+          : dashboard.delivery.outbound > 0
+            ? {
+                value: `${dashboard.delivery.outbound} outbound`,
+                detail: "Confirm delivered local evidence before presenting campaign results."
+              }
+            : {
+                value: "none yet",
+                detail: "Schedule a local campaign before showing delivery evidence."
+              },
     checkCompliance: {
       value: `${dashboard.compliance.completeFields}/${dashboard.compliance.requiredFields} fields`,
       detail: `A2P ${dashboard.compliance.a2pRegistrationStatus}; live messaging remains blocked.`

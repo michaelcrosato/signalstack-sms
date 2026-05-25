@@ -27,6 +27,10 @@ test("product dashboard renders seeded owner workflow checkpoints", async ({ pag
   await expect(nextSteps.getByRole("heading", { name: "Next Steps" })).toBeVisible();
   await expect(nextSteps.getByRole("link", { name: /Review open replies/ })).toHaveAttribute("href", "/dashboard/inbox");
   await expect(nextSteps.getByRole("link", { name: /Prepare campaign/ })).toHaveAttribute("href", "/dashboard/campaigns");
+  await expect(nextSteps.getByRole("link", { name: /Review delivery evidence/ })).toHaveAttribute(
+    "href",
+    "/dashboard/analytics"
+  );
   await expect(nextSteps.getByRole("link", { name: /Check go-live blockers/ })).toHaveAttribute(
     "href",
     "/dashboard/compliance"

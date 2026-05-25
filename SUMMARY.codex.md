@@ -1,11 +1,10 @@
 # Codex Summary
 
-Run number: 813
+Run number: 814
 
-- Latest loop routes GitHub `ci` and `premerge` workflows through `pwsh ./scripts/local-gate.ps1` so workflow green status includes protected gate integrity verification before `npm run validate`.
-- Added `tests/unit/deployment/workflow-local-gate.test.ts` to pin protected-gate workflow invocation, direct raw validation/premerge call avoidance, and demo-safe validation environment defaults.
-- Testing contract/docs, local gate docs, current matrix, compact handoffs, and loop logs were updated.
-- Focused validation passed with `npm run test -- tests/unit/deployment/workflow-local-gate.test.ts`, `npm run typecheck`, `npm run lint`, and `npm run contracts:check`.
+- Latest loop adds a product dashboard `Review delivery evidence` next-step card that links to `/dashboard/analytics` and derives its value from existing tenant-scoped outbound local delivery counts.
+- The card prioritizes failed, then pending, then outbound evidence states, with a no-evidence zero state; it does not retry delivery, mutate messages, call providers, send SMS, bill, call live AI, expose secrets, or enable live features.
+- Updated frozen dashboard next-step metadata, the dashboard responsive grid, focused unit coverage, product-demo Playwright coverage, API/testing contracts, current matrix, compact handoffs, and loop logs.
+- Focused validation passed with `npm run test -- tests/unit/product/dashboard.test.ts`, `npm run typecheck`, `npm run lint`, and `npm run test:e2e:product-demo`.
 - Protected validation passed with `.\scripts\local-gate.ps1`.
 - History is preserved in `LOOP_LOG.md` and `docs/LOOP_LOG.md`; current agents should start with `npm run agent:brief`, targeted `rg`, file heads/tails, and current summaries before loading large logs, contracts, or tests.
-- The change is CI/premerge workflow routing, test, docs, and handoff updates only. It does not use production credentials, call Clerk/Twilio/Stripe, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, execute workers, touch Redis, mutate delivery state, or perform destructive production actions.
