@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 759  GREEN  auth-comma-declared-sequence-globalthis-aliases  2026-05-24 18:05
+Objective:    Prove comma-declared sequence-expression local `globalThis` root aliases are classified before mutating-route body-reader role gates.
+Changed:
+- Added focused auth unit coverage for comma-declared sequence-expression local `globalThis` root aliases, such as `const root = (void 0, globalThis), platform = (undefined, root), runtime = (0, platform)`.
+- Updated testing docs/contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, docs/LOOP_LOG, and current state matrix for the comma-declared sequence-expression alias boundary.
+- Kept the change local to tests/docs/logs; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 758  GREEN  auth-comma-sequence-logical-assignment-globalthis-aliases  2026-05-24 17:58
 Objective:    Prove comma-expression sequence-wrapped logical-assignment local `globalThis` root aliases are classified before mutating-route body-reader role gates.
 Changed:
