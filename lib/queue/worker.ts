@@ -1,5 +1,12 @@
 import { setTimeout as sleep } from "node:timers/promises";
-import { CampaignStatus, QueueJobStatus, QueueJobType, type Contact, type QueueJob } from "@prisma/client";
+import {
+  CampaignRecipientStatus,
+  CampaignStatus,
+  QueueJobStatus,
+  QueueJobType,
+  type Contact,
+  type QueueJob
+} from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 import { environmentIsProductionLike } from "@/lib/deployment/production-gate";
 import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
@@ -269,13 +276,41 @@ async function processScheduledCampaignQueueJob(
   }
 
   const recipientContacts = campaign.recipients.map((recipient) => recipient.contact);
-  if (!scheduledCampaignSendIsAllowed(recipientContacts)) {
+  const sendPreflight = preflightCampaignRecipients(recipientContacts);
+  const preflightByContactId = new Map(
+    sendPreflight.recipients.map((recipient) => [recipient.contactId, recipient])
+  );
+  const sendableRecipients = campaign.recipients.filter((recipient) =>
+    preflightByContactId.get(recipient.contactId)?.allowed
+  );
+  const blockedRecipients = campaign.recipients
+    .map((recipient) => ({ recipient, preflight: preflightByContactId.get(recipient.contactId) }))
+    .filter(({ preflight }) => !preflight?.allowed);
+
+  if (sendableRecipients.length > 0) {
+    await prisma.campaignRecipient.updateMany({
+      where: { orgId: job.orgId, id: { in: sendableRecipients.map((recipient) => recipient.id) } },
+      data: { status: CampaignRecipientStatus.PENDING, blockReason: null }
+    });
+  }
+
+  for (const { recipient, preflight } of blockedRecipients) {
+    await prisma.campaignRecipient.updateMany({
+      where: { orgId: job.orgId, id: recipient.id },
+      data: {
+        status: CampaignRecipientStatus.BLOCKED,
+        blockReason: preflight?.reasons.join(",") || "SEND_TIME_PREFLIGHT_BLOCKED"
+      }
+    });
+  }
+
+  if (sendableRecipients.length === 0) {
     await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.FAILED } });
     await prisma.campaign.update({ where: { id: campaign.id }, data: { status: CampaignStatus.PAUSED } });
     return { processed: 0, skipped: 1, blocked: false, reason: "send-preflight-failed" };
   }
 
-  for (const recipient of campaign.recipients) {
+  for (const recipient of sendableRecipients) {
     const idempotencyKey = `dummy-outbound:${job.id}:${recipient.contactId}`;
     const body = renderTemplate(campaign.body, campaignMessageValues(recipient.contact));
     const result = await dummyProvider.send({

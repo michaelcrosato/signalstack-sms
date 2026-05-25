@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 768  GREEN  worker-send-time-recipient-skips  2026-05-24 19:45
+Objective:    Keep scheduled-campaign send-time checks per recipient so stale opt-outs do not block allowed local dummy sends.
+Changed:
+- Updated the local scheduled-campaign worker to re-run recipient preflight, mark stale blocked recipients `BLOCKED`, skip them, and send only allowed recipients through the dummy provider.
+- Added focused mocked worker-processing coverage for the partial-recipient send-time path.
+- Updated queue/compliance/testing contracts and compact handoff docs for the per-recipient skip behavior.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3125'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live sends blocked; prefer product-demo polish, production auth/RBAC planning, or send-time reporting visibility.
+
 ## Run 767  GREEN  context-budget-check  2026-05-24 19:36
 Objective:    Keep current agent handoff files compact and make handoff bloat a validation failure.
 Changed:

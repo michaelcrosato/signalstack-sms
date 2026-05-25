@@ -42,6 +42,7 @@ Milestone 6 hard gate rules:
 - The centralized messaging hard gate must block when the selected provider is `dummy`.
 - The centralized messaging hard gate must block when the compliance profile is incomplete or A2P status is not `APPROVED`.
 - Contact-level consent and opt-out checks remain required even if provider/configuration gates pass.
+- Local scheduled-campaign workers must recheck recipient consent, opt-out, and archive state at send time. Recipients blocked by stale consent state are skipped and marked `BLOCKED`; the job fails only when no sendable recipients remain.
 
 Post-MVP live-readiness audit rules:
 

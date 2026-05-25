@@ -67,7 +67,8 @@ Exact frozen control-array evidence must remain authorized without reading inher
 
 - The worker uses validated version-1 scheduled campaign payloads.
 - Invalid payloads or missing scheduled campaigns are marked `FAILED`.
-- Valid due jobs create idempotent outbound `Message` rows through the dummy provider.
+- Valid due jobs re-run recipient preflight at send time. Recipients that became archived, non-opted-in, or opted out after scheduling are marked `BLOCKED` and skipped; allowed recipients still create idempotent outbound `Message` rows through the dummy provider.
+- Jobs are marked `FAILED` and campaigns are paused only when no sendable recipients remain after the send-time preflight.
 - Outbound message idempotency is scoped by `(orgId, idempotencyKey)` so retries cannot collide across tenants.
 - Completed jobs are marked `COMPLETED`; campaigns are marked `COMPLETED`.
 - The worker must not call Twilio or any live provider.
