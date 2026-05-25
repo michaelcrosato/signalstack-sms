@@ -1,5 +1,25 @@
 # LOOP_LOG
 
+## Run 755  GREEN  auth-sequence-wrapped-expression-globalthis-aliases  2026-05-24 17:37
+Objective:    Prove sequence-wrapped conditional/logical local `globalThis` root aliases are classified before mutating-route body-reader role gates.
+Changed:
+- Added focused auth unit coverage for sequence-wrapped conditional and logical local `globalThis` root chains, such as `root = (void 0, condition ? globalThis : globalThis); platform = (undefined, condition ? root : root); runtime = (0, true ? platform : platform)` and `root = (void 0, globalThis || globalThis); platform = (undefined, root ?? root); runtime = (0, platform && platform)`.
+- Updated testing docs/contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, docs/LOOP_LOG, and current state matrix for the sequence-wrapped expression alias boundary.
+- Kept the change local to tests/docs/logs; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 754  GREEN  auth-logical-expression-globalthis-aliases  2026-05-24 17:33
+Objective:    Prove logical-expression local `globalThis` root aliases are classified before mutating-route body-reader role gates.
+Changed:
+- Added auth scanner alias discovery for logical-expression local `globalThis` root chains where both operands are already known roots, such as `root = globalThis || globalThis; platform = root ?? root; runtime = platform && platform`.
+- Added focused auth unit coverage for logical-expression root chains feeding defaulted `Request`, `Object`, and `Reflect` destructuring before body-reader calls.
+- Updated testing contract, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the logical-expression alias boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 753  GREEN  auth-conditional-expression-globalthis-aliases  2026-05-24 17:24
 Objective:    Prove conditional-expression local `globalThis` root aliases are classified before mutating-route body-reader role gates.
 Changed:
