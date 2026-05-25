@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 769  GREEN  campaign-detail-recipient-send-state  2026-05-24 19:52
+Objective:    Make local scheduled-campaign recipient send state and block reasons visible in the product campaign detail path.
+Changed:
+- Added Send State and Block Reason rows to `/dashboard/campaigns/:campaignId` recipient snapshots from existing tenant-scoped `CampaignRecipient` fields.
+- Added focused product projection coverage and a seeded product-demo assertion for the recipient snapshot visibility.
+- Updated API/testing contracts and compact handoff docs for the local recipient reporting visibility.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3126'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live sends blocked; prefer deeper product-demo polish, production auth/RBAC planning, or high-value delivery/reporting correctness.
+
 ## Run 768  GREEN  worker-send-time-recipient-skips  2026-05-24 19:45
 Objective:    Keep scheduled-campaign send-time checks per recipient so stale opt-outs do not block allowed local dummy sends.
 Changed:

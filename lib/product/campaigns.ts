@@ -29,7 +29,9 @@ export const productCampaignDetailMetricRows = Object.freeze(
 
 const productCampaignRecipientStatusRowItems = [
   { key: "consent", label: "Consent" },
-  { key: "archived", label: "Archive" }
+  { key: "archived", label: "Archive" },
+  { key: "sendState", label: "Send State" },
+  { key: "blockReason", label: "Block Reason" }
 ] as const;
 
 type ProductCampaignRecipientStatusKey = (typeof productCampaignRecipientStatusRowItems)[number]["key"];
@@ -116,7 +118,9 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
           contact.displayName ?? ([contact.firstName, contact.lastName].filter(Boolean).join(" ") || contact.phone),
         phone: contact.phone,
         consentStatus: contact.consentStatus,
-        archived: Boolean(contact.archivedAt)
+        archived: Boolean(contact.archivedAt),
+        sendState: recipient.status,
+        blockReason: recipient.blockReason
       };
 
       return {
@@ -164,6 +168,8 @@ function getCampaignRecipientStatusValue(
   recipient: {
     consentStatus: ConsentStatus;
     archived: boolean;
+    sendState: string;
+    blockReason: string | null;
   }
 ) {
   switch (key) {
@@ -171,5 +177,9 @@ function getCampaignRecipientStatusValue(
       return recipient.consentStatus;
     case "archived":
       return recipient.archived ? "archived" : "active";
+    case "sendState":
+      return recipient.sendState;
+    case "blockReason":
+      return recipient.blockReason ?? "none";
   }
 }

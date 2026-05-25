@@ -1,4 +1,4 @@
-import { CampaignStatus, ConsentStatus } from "@prisma/client";
+import { CampaignRecipientStatus, CampaignStatus, ConsentStatus } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { productCampaignComposerDefaults } from "@/lib/product/campaign-composer-defaults";
 import {
@@ -26,6 +26,8 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
           recipients: [
             {
               contactId: "contact_1",
+              status: CampaignRecipientStatus.PENDING,
+              blockReason: null,
               contact: {
                 id: "contact_1",
                 displayName: "Ada Lovelace",
@@ -151,9 +153,13 @@ describe("getProductCampaigns", () => {
         phone: "+15555550100",
         consentStatus: ConsentStatus.OPTED_IN,
         archived: false,
+        sendState: CampaignRecipientStatus.PENDING,
+        blockReason: null,
         statusRows: [
           { key: "consent", label: "Consent", value: ConsentStatus.OPTED_IN },
-          { key: "archived", label: "Archive", value: "active" }
+          { key: "archived", label: "Archive", value: "active" },
+          { key: "sendState", label: "Send State", value: CampaignRecipientStatus.PENDING },
+          { key: "blockReason", label: "Block Reason", value: "none" }
         ]
       }
     ]);
@@ -214,8 +220,18 @@ describe("getProductCampaigns", () => {
   it("freezes campaign recipient snapshot metadata before rendering", () => {
     expect(Object.isFrozen(productCampaignRecipientStatusRows)).toBe(true);
     expect(productCampaignRecipientStatusRows.every((row) => Object.isFrozen(row))).toBe(true);
-    expect(productCampaignRecipientStatusRows.map((row) => row.key)).toEqual(["consent", "archived"]);
-    expect(productCampaignRecipientStatusRows.map((row) => row.label)).toEqual(["Consent", "Archive"]);
+    expect(productCampaignRecipientStatusRows.map((row) => row.key)).toEqual([
+      "consent",
+      "archived",
+      "sendState",
+      "blockReason"
+    ]);
+    expect(productCampaignRecipientStatusRows.map((row) => row.label)).toEqual([
+      "Consent",
+      "Archive",
+      "Send State",
+      "Block Reason"
+    ]);
 
     expect(() =>
       (productCampaignRecipientStatusRows as unknown as Array<{ key: string; label: string }>).push({

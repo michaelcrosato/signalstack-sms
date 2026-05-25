@@ -256,6 +256,11 @@ test("product campaign detail page edits a draft and cancels a queued campaign l
   await expect(page.getByRole("heading", { name: campaignName })).toBeVisible();
   await expect(page.getByLabel("Campaign lifecycle").getByText("DRAFT")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Campaign detail" })).toBeVisible();
+  const recipientSnapshot = page.getByRole("heading", { name: "Recipient snapshot" }).locator("..").locator("..");
+  await expect(recipientSnapshot.getByText("Send State:")).toBeVisible();
+  await expect(recipientSnapshot.getByText("PENDING")).toBeVisible();
+  await expect(recipientSnapshot.getByText("Block Reason:")).toBeVisible();
+  await expect(recipientSnapshot.getByText("none")).toBeVisible();
   await page.getByLabel("Campaign name").fill(updatedName);
   await page.getByRole("button", { name: "Save Draft" }).click();
 

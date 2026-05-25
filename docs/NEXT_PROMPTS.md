@@ -14,9 +14,9 @@ This is the compact handoff for the next automated loop. Full history is in `LOO
 
 ## Current State
 
-- Latest validated run: Run 768 changed the local scheduled-campaign worker to skip stale blocked recipients at send time, mark them `BLOCKED`, and still send allowed recipients through the dummy provider.
+- Latest validated run: Run 769 added campaign detail recipient send-state and block-reason visibility, with focused product projection coverage and a product-demo assertion.
 - The backend foundation is strong: tenant helpers, contacts, campaigns, queue jobs with per-recipient send-time skips, inbox, compliance gates, fake AI, local billing/analytics, provider metadata, Twilio webhook foundations, readiness audit, operations inventory, and validation gates.
-- The browser product has a usable local demo path across dashboard, contacts import/detail/archive/restore/merge, campaign fake-AI copy/schedule/detail/edit/cancel, inbox thread work, template create/detail/edit, analytics, and compliance readiness.
+- The browser product has a usable local demo path across dashboard, contacts import/detail/archive/restore/merge, campaign fake-AI copy/schedule/detail/edit/cancel plus recipient send-state/block-reason visibility, inbox thread work, template create/detail/edit, analytics, and compliance readiness.
 - Live campaign sending, live billing, live AI, production auth, production secrets, production workers, and production deployment remain blocked by default.
 - The only intentional live external-impact route is the isolated `/demo` live-test SMS path, gated by explicit Twilio credentials, live flags, recipient allowlist, and confirmation phrase.
 - Auth scanner and live-worker hardening coverage is already very broad. Do not spend another loop on minor syntactic variants unless a concrete uncovered parser/control-flow gap is proven with targeted search.
@@ -25,7 +25,7 @@ This is the compact handoff for the next automated loop. Full history is in `LOO
 
 1. Keep the product demo path stable and run the protected local gate before treating changes as green.
 2. Prefer high-signal product-demo or production-readiness correctness work over more low-value syntactic test variants.
-3. Good next targets: concise product demo polish, production auth/RBAC planning, send-time delivery/reporting visibility, idempotency scoping checks, or targeted live-worker controls that close a named gap.
+3. Good next targets: concise product demo polish, production auth/RBAC planning, deeper delivery/reporting visibility, idempotency scoping checks, or targeted live-worker controls that close a named gap.
 4. Keep operations surfaces read-only and avoid expanding settings pages unless it directly supports release safety.
 5. Keep all live SMS/provider/billing/AI/secret/destructive-production actions behind hard gates.
 
