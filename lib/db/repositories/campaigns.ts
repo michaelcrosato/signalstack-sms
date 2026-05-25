@@ -11,6 +11,20 @@ const campaignListInclude = {
   recipients: { include: { contact: true } }
 } satisfies Prisma.CampaignInclude;
 
+const campaignListDeliveryInclude = {
+  template: true,
+  recipients: { include: { contact: true } },
+  messages: {
+    where: { direction: "OUTBOUND" },
+    select: {
+      direction: true,
+      providerStatus: true,
+      deliveredAt: true,
+      failedAt: true
+    }
+  }
+} satisfies Prisma.CampaignInclude;
+
 const campaignDetailInclude = {
   template: true,
   recipients: { include: { contact: true } },
@@ -26,6 +40,14 @@ export async function listCampaigns(orgId: string) {
     where: { orgId },
     orderBy: { updatedAt: "desc" },
     include: campaignListInclude
+  });
+}
+
+export async function listCampaignsWithDelivery(orgId: string) {
+  return prisma.campaign.findMany({
+    where: { orgId },
+    orderBy: { updatedAt: "desc" },
+    include: campaignListDeliveryInclude
   });
 }
 

@@ -69,6 +69,7 @@ export default async function CampaignsPage() {
                     <th className="px-4 py-3">Campaign</th>
                     <th className="px-4 py-3">Status</th>
                     <th className="px-4 py-3">Recipients</th>
+                    <th className="px-4 py-3">Delivery</th>
                     <th className="px-4 py-3">Schedule</th>
                   </tr>
                 </thead>
@@ -87,6 +88,12 @@ export default async function CampaignsPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-slate-700">{campaign.recipientCount}</td>
+                      <td className="px-4 py-3 text-slate-700">
+                        <div className="font-medium text-slate-950">{campaign.delivery.deliveryRatePercent}% delivered</div>
+                        <div className="text-xs text-slate-600">
+                          {campaign.delivery.delivered} delivered / {campaign.delivery.pending} pending / {campaign.delivery.failed} failed
+                        </div>
+                      </td>
                       <td className="px-4 py-3 text-slate-700">
                         {campaign.scheduledAt ? campaign.scheduledAt.toLocaleString("en-US") : "Not scheduled"}
                       </td>

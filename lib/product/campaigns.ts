@@ -1,5 +1,5 @@
 import { CampaignStatus, ConsentStatus } from "@prisma/client";
-import { getCampaignWithMessages, listCampaigns } from "@/lib/db/repositories/campaigns";
+import { getCampaignWithMessages, listCampaignsWithDelivery } from "@/lib/db/repositories/campaigns";
 import { listContacts } from "@/lib/db/repositories/contacts";
 import { listTemplates } from "@/lib/db/repositories/templates";
 import { isLocalDeliveryDelivered, isTerminalDeliveryFailure } from "@/lib/messaging/delivery-status";
@@ -57,7 +57,7 @@ export const productCampaignDeliveryMetricRows = Object.freeze(
 
 export async function getProductCampaigns(orgId: string) {
   const [campaigns, contacts, templates] = await Promise.all([
-    listCampaigns(orgId),
+    listCampaignsWithDelivery(orgId),
     listContacts(orgId),
     listTemplates(orgId)
   ]);
@@ -76,15 +76,30 @@ export async function getProductCampaigns(orgId: string) {
       label: row.label,
       value: summary[row.key]
     })),
-    campaigns: campaigns.map((campaign) => ({
-      id: campaign.id,
-      name: campaign.name,
-      status: campaign.status,
-      scheduledAt: campaign.scheduledAt,
-      recipientCount: campaign.recipients.length,
-      templateName: campaign.template?.name ?? "Custom copy",
-      updatedAt: campaign.updatedAt
-    })),
+    campaigns: campaigns.map((campaign) => {
+      const deliverySummary = getCampaignDeliverySummary(campaign.messages);
+      const outboundMessages = Number(deliverySummary.outboundMessages);
+      const delivered = Number(deliverySummary.delivered);
+      const pending = Number(deliverySummary.pending);
+      const failed = Number(deliverySummary.failed);
+
+      return {
+        id: campaign.id,
+        name: campaign.name,
+        status: campaign.status,
+        scheduledAt: campaign.scheduledAt,
+        recipientCount: campaign.recipients.length,
+        templateName: campaign.template?.name ?? "Custom copy",
+        updatedAt: campaign.updatedAt,
+        delivery: {
+          outboundMessages,
+          delivered,
+          pending,
+          failed,
+          deliveryRatePercent: outboundMessages > 0 ? Math.round((delivered / outboundMessages) * 100) : 0
+        }
+      };
+    }),
     contacts: contacts.map((contact) => ({
       id: contact.id,
       displayName: contact.displayName ?? ([contact.firstName, contact.lastName].filter(Boolean).join(" ") || contact.phone),

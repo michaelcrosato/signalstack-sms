@@ -133,6 +133,48 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
       template: null,
       recipients: []
     }
+  ]),
+  listCampaignsWithDelivery: vi.fn(async () => [
+    {
+      id: "campaign_1",
+      name: "Welcome",
+      status: CampaignStatus.DRAFT,
+      scheduledAt: null,
+      updatedAt: new Date("2026-01-02T00:00:00.000Z"),
+      template: { name: "Intro" },
+      recipients: [{ contactId: "contact_1" }],
+      messages: [
+        {
+          direction: "OUTBOUND",
+          providerStatus: "delivered",
+          deliveredAt: new Date("2026-01-03T00:00:00.000Z"),
+          failedAt: null
+        },
+        {
+          direction: "OUTBOUND",
+          providerStatus: "sent",
+          deliveredAt: null,
+          failedAt: null
+        }
+      ]
+    },
+    {
+      id: "campaign_2",
+      name: "Reminder",
+      status: CampaignStatus.SCHEDULED,
+      scheduledAt: new Date("2026-01-03T00:00:00.000Z"),
+      updatedAt: new Date("2026-01-03T00:00:00.000Z"),
+      template: null,
+      recipients: [],
+      messages: [
+        {
+          direction: "OUTBOUND",
+          providerStatus: "failed",
+          deliveredAt: null,
+          failedAt: new Date("2026-01-04T00:00:00.000Z")
+        }
+      ]
+    }
   ])
 }));
 
@@ -180,6 +222,22 @@ describe("getProductCampaigns", () => {
       { key: "readyRecipients", label: "Ready Recipients", value: 1 }
     ]);
     expect(result.campaigns.map((campaign) => campaign.templateName)).toEqual(["Intro", "Custom copy"]);
+    expect(result.campaigns.map((campaign) => campaign.delivery)).toEqual([
+      {
+        outboundMessages: 2,
+        delivered: 1,
+        pending: 1,
+        failed: 0,
+        deliveryRatePercent: 50
+      },
+      {
+        outboundMessages: 1,
+        delivered: 0,
+        pending: 0,
+        failed: 1,
+        deliveryRatePercent: 0
+      }
+    ]);
     expect(result.contacts).toEqual([
       {
         id: "contact_1",

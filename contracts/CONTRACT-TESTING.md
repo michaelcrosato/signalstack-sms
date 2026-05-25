@@ -265,6 +265,7 @@ Post-MVP AI operations view:
 - Unit tests must verify product contact consent option metadata is runtime-frozen at both array and entry level before `/dashboard/contacts/:contactId` renders consent update choices.
 - Unit tests must verify product contact import defaults are runtime-frozen before `/dashboard/contacts` renders the local CSV import workflow.
 - Unit tests must verify product campaign metric metadata is runtime-frozen at both array and entry level before `/dashboard/campaigns` renders total, draft, scheduled, and ready-recipient metric rows.
+- Unit tests must verify product campaign list rows project outbound-only local delivery counts into delivered, pending, failed, and delivery-rate summaries before `/dashboard/campaigns` renders them.
 - Unit tests must verify product campaign detail lifecycle metric metadata is runtime-frozen at both array and entry level before `/dashboard/campaigns/:campaignId` renders status, recipient, template, and schedule metric rows.
 - Unit tests must verify product campaign recipient snapshot metadata is runtime-frozen at both array and entry level before `/dashboard/campaigns/:campaignId` renders Consent, Archive, Send State, and Block Reason status rows.
 - Unit tests must verify product campaign delivery metric metadata is runtime-frozen at both array and entry level before `/dashboard/campaigns/:campaignId` renders Outbound Messages, Delivered, Pending, Failed, and Provider Statuses rows.

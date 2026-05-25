@@ -7375,3 +7375,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3154'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer high-signal product/demo polish, production auth/RBAC planning, or named production-readiness correctness gaps.
+
+## Run 792  GREEN  campaign-list-delivery-reporting  2026-05-24 22:58
+Objective:    Surface campaign-list local outbound delivery reporting for the product demo path.
+Changed:
+- Added a tenant-scoped `listCampaignsWithDelivery` repository read that includes outbound local message delivery evidence without changing the campaign API response.
+- Projected delivered, pending, failed, and delivery-rate summaries into `/dashboard/campaigns` campaign rows.
+- Added focused product campaign unit coverage and updated compact testing/current handoff docs for the campaign-list reporting signal.
+Gate:         passed with `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer production auth/RBAC planning, campaign-level reporting detail after feedback, or concrete idempotency correctness gaps.
