@@ -1,6 +1,7 @@
 import { UsageEventType } from "@prisma/client";
 import { aggregateUsageEvents } from "@/lib/billing/metering";
 import { prisma } from "@/lib/db/prisma";
+import { terminalDeliveryFailureProviderStatuses } from "@/lib/messaging/delivery-status";
 import { productComplianceFields } from "@/lib/product/compliance-fields";
 
 const productNavigationItems = [
@@ -162,7 +163,7 @@ export async function getProductDashboard(orgId: string) {
       where: {
         orgId,
         direction: "OUTBOUND",
-        OR: [{ failedAt: { not: null } }, { providerStatus: { in: ["failed", "undelivered"] } }]
+        OR: [{ failedAt: { not: null } }, { providerStatus: { in: [...terminalDeliveryFailureProviderStatuses] } }]
       }
     }),
     prisma.complianceProfile.findUnique({ where: { orgId } }),

@@ -7265,3 +7265,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3139'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer product-demo polish, production auth/RBAC planning, reporting visibility, or concrete correctness gaps over syntactic scanner variants.
+
+## Run 781  GREEN  dashboard-terminal-failures  2026-05-24 21:27
+Objective:    Keep `/dashboard` delivery-failure signals aligned with shared terminal provider-status handling.
+Changed:
+- Updated `getProductDashboard` to use `terminalDeliveryFailureProviderStatuses` for outbound local delivery-failure counts.
+- Added focused delivery-status helper coverage for frozen terminal status metadata, provider-status classification, and failed timestamp handling.
+- Updated testing docs/contracts and compact handoffs for the dashboard delivery reporting boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3140'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer production auth/RBAC planning, deeper product reporting visibility, or concrete correctness gaps over syntactic scanner variants.

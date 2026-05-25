@@ -1,6 +1,7 @@
 import { UsageEventType } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { prisma } from "@/lib/db/prisma";
+import { terminalDeliveryFailureProviderStatuses } from "@/lib/messaging/delivery-status";
 import { productComplianceFields } from "@/lib/product/compliance";
 import {
   getProductDashboard,
@@ -412,7 +413,7 @@ describe("product dashboard navigation", () => {
       where: {
         orgId: "org_1",
         direction: "OUTBOUND",
-        OR: [{ failedAt: { not: null } }, { providerStatus: { in: ["failed", "undelivered"] } }]
+        OR: [{ failedAt: { not: null } }, { providerStatus: { in: [...terminalDeliveryFailureProviderStatuses] } }]
       }
     });
   });
