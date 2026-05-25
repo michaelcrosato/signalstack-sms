@@ -58,6 +58,7 @@ export const productCampaignRecipientReadinessMetricRows = Object.freeze(
 
 const productCampaignDeliveryMetricRowItems = [
   { key: "outboundMessages", label: "Outbound Messages" },
+  { key: "recentEvidenceRows", label: "Recent Evidence Rows" },
   { key: "deliveryRate", label: "Delivery Rate" },
   { key: "delivered", label: "Delivered" },
   { key: "pending", label: "Pending" },
@@ -197,7 +198,9 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
   const selectedContactIds = new Set(campaign.recipients.map((recipient) => recipient.contactId));
   const recentDeliveryMessages = campaign.messages.filter((message) => message.direction === "OUTBOUND");
   const deliveryMessages = campaign.deliveryMessages;
-  const deliverySummary = getCampaignDeliverySummary(deliveryMessages);
+  const deliverySummary = getCampaignDeliverySummary(deliveryMessages, {
+    recentEvidenceRows: recentDeliveryMessages.length
+  });
   const recipientReadiness = getCampaignRecipientReadinessSummary(campaign.recipients);
   const detail = {
     id: campaign.id,
@@ -297,7 +300,8 @@ function getCampaignDeliverySummary(
     deliveredAt: Date | null;
     failedAt: Date | null;
     createdAt?: Date | null;
-  }>
+  }>,
+  options: { recentEvidenceRows?: number } = {}
 ): Record<ProductCampaignDeliveryMetricKey, string> {
   const outboundMessages = messages.filter((message) => message.direction === "OUTBOUND");
   const delivered = outboundMessages.filter(isLocalDeliveryDelivered);
@@ -318,6 +322,7 @@ function getCampaignDeliverySummary(
 
   return {
     outboundMessages: outboundMessages.length.toString(),
+    recentEvidenceRows: `${options.recentEvidenceRows ?? outboundMessages.length} of ${outboundMessages.length}`,
     deliveryRate: `${deliveryRatePercent}%`,
     delivered: delivered.length.toString(),
     pending: pending.length.toString(),

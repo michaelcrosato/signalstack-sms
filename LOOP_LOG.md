@@ -7476,3 +7476,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run typecheck`, `npm run test:e2e:product-demo -- --grep "product campaign detail"`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer concrete idempotency/auth correctness gaps or feedback-driven reporting depth.
+
+## Run 802  GREEN  campaign-detail-evidence-count  2026-05-25 00:28
+Objective:    Show how many campaign-detail delivery evidence rows are visible against the all-outbound local message total.
+Changed:
+- Added a `Recent Evidence Rows` delivery metric to `/dashboard/campaigns/:campaignId`.
+- Derived the metric from capped recent outbound evidence rows and the complete outbound delivery aggregate without provider, worker, billing, AI, secret, retry, delivery-mutation, or live-message behavior.
+- Updated focused product campaign unit coverage, product-demo E2E assertions, API/testing docs, current matrix, and compact handoffs.
+Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run typecheck`, `npm run test:e2e:product-demo -- --grep "product campaign detail"`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer concrete idempotency/auth correctness gaps or feedback-driven reporting depth.

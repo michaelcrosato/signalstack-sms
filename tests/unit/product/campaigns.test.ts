@@ -417,6 +417,7 @@ describe("getProductCampaigns", () => {
     ]);
     expect(result?.deliveryMetrics).toEqual([
       { key: "outboundMessages", label: "Outbound Messages", value: "4" },
+      { key: "recentEvidenceRows", label: "Recent Evidence Rows", value: "4 of 4" },
       { key: "deliveryRate", label: "Delivery Rate", value: "25%" },
       { key: "delivered", label: "Delivered", value: "1" },
       { key: "pending", label: "Pending", value: "1" },
@@ -481,6 +482,7 @@ describe("getProductCampaigns", () => {
 
     expect(result?.deliveryMetrics).toEqual([
       { key: "outboundMessages", label: "Outbound Messages", value: "35" },
+      { key: "recentEvidenceRows", label: "Recent Evidence Rows", value: "4 of 35" },
       { key: "deliveryRate", label: "Delivery Rate", value: "89%" },
       { key: "delivered", label: "Delivered", value: "31" },
       { key: "pending", label: "Pending", value: "4" },
@@ -606,6 +608,7 @@ describe("getProductCampaigns", () => {
     expect(productCampaignDeliveryMetricRows.every((row) => Object.isFrozen(row))).toBe(true);
     expect(productCampaignDeliveryMetricRows.map((row) => row.key)).toEqual([
       "outboundMessages",
+      "recentEvidenceRows",
       "deliveryRate",
       "delivered",
       "pending",
@@ -615,6 +618,7 @@ describe("getProductCampaigns", () => {
     ]);
     expect(productCampaignDeliveryMetricRows.map((row) => row.label)).toEqual([
       "Outbound Messages",
+      "Recent Evidence Rows",
       "Delivery Rate",
       "Delivered",
       "Pending",
