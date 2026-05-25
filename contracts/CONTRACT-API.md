@@ -386,7 +386,7 @@ Renders the product-facing template detail workflow for a tenant-scoped message 
 
 ### `/dashboard/analytics`
 
-Renders the product-facing analytics workspace for the current organization. It may display tenant-scoped contact, campaign, scheduled-campaign, conversation, local outbound message delivery counts, latest outbound evidence timestamp, a campaign-level delivery review summary, bounded delivery review rows linking to existing campaign detail pages, and local usage totals from existing local analytics and campaign records. It must not execute reports, create exports, mutate records, retry deliveries, run workers, call providers, call Stripe, create billing artifacts, send SMS, call live AI, expose secrets, or enable live messaging.
+Renders the product-facing analytics workspace for the current organization. It may display tenant-scoped contact, campaign, scheduled-campaign, conversation, local outbound message delivery counts, latest outbound evidence timestamp, a campaign-level delivery review summary including failed and pending campaign counts, bounded delivery review rows linking to existing campaign detail pages, and local usage totals from existing local analytics and campaign records. It must not execute reports, create exports, mutate records, retry deliveries, run workers, call providers, call Stripe, create billing artifacts, send SMS, call live AI, expose secrets, or enable live messaging.
 
 ### `/dashboard/compliance`
 

@@ -127,12 +127,14 @@ export default async function AnalyticsPage() {
               Campaign-level local delivery evidence, ordered by failed and pending review states before delivered or
               no-evidence campaigns.
             </p>
-            <dl aria-label="Delivery review queue summary" className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <dl aria-label="Delivery review queue summary" className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
               <QueueSummaryMetric label="Campaigns" value={String(analytics.campaignDeliverySummary.totalCampaigns)} />
               <QueueSummaryMetric
                 label="Need Review"
                 value={String(analytics.campaignDeliverySummary.campaignsNeedingReview)}
               />
+              <QueueSummaryMetric label="Failed" value={String(analytics.campaignDeliverySummary.failedCampaigns)} />
+              <QueueSummaryMetric label="Pending" value={String(analytics.campaignDeliverySummary.pendingCampaigns)} />
               <QueueSummaryMetric
                 label="Visible Rows"
                 value={`${analytics.campaignDeliverySummary.visibleRows}/${analytics.campaignDeliverySummary.totalCampaigns}`}

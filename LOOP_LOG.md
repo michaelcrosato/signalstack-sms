@@ -7626,3 +7626,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/analytics.test.ts`, `npm run typecheck`, `npm run lint`, `npm run contracts:check`, `npm run context:check`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.
+
+## Run 817  GREEN  analytics-review-failed-pending-summary  2026-05-25 02:34
+Objective:    Split failed and pending campaign counts in the product analytics delivery review summary.
+Changed:
+- Added read-only `Failed` and `Pending` summary metrics to `/dashboard/analytics` from existing campaign delivery summary data.
+- Updated the seeded product-demo Playwright assertion, API/testing contracts, current matrix, and compact handoffs.
+- Kept the change UI/docs only with no provider calls, delivery retries, worker execution, live messaging, billing, live AI, secrets, delivery-state mutation, or protected gate script edits.
+Gate:         passed with `npm run test -- tests/unit/product/analytics.test.ts`, `npm run typecheck`, `npm run lint`, `npm run contracts:check`, `npm run context:check`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.

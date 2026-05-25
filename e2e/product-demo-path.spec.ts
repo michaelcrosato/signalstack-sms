@@ -476,6 +476,8 @@ test("product analytics page renders local overview detail", async ({ page }) =>
   const deliveryReviewSummary = deliveryReviewQueue.getByLabel("Delivery review queue summary");
   await expect(deliveryReviewSummary.getByText("Campaigns")).toBeVisible();
   await expect(deliveryReviewSummary.getByText("Need Review")).toBeVisible();
+  await expect(deliveryReviewSummary.getByText("Failed")).toBeVisible();
+  await expect(deliveryReviewSummary.getByText("Pending")).toBeVisible();
   await expect(deliveryReviewSummary.getByText("Visible Rows")).toBeVisible();
   await expect(deliveryReviewSummary.getByText(/\d+\/\d+/)).toBeVisible();
   await expect(deliveryReviewSummary.getByText("Hidden Rows")).toBeVisible();
