@@ -47,6 +47,7 @@ export type SingleQueueJobProcessResult = {
     | "not-due"
     | "invalid-payload"
     | "invalid-campaign"
+    | "stale-schedule"
     | "send-preflight-failed";
 };
 
@@ -273,6 +274,11 @@ async function processScheduledCampaignQueueJob(
   if (!campaign || campaign.status !== CampaignStatus.SCHEDULED) {
     await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.FAILED } });
     return { processed: 0, skipped: 1, blocked: false, reason: "invalid-campaign" };
+  }
+
+  if (campaign.scheduledAt?.toISOString() !== payload.data.scheduledAt) {
+    await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.CANCELLED } });
+    return { processed: 0, skipped: 1, blocked: false, reason: "stale-schedule" };
   }
 
   const recipientContacts = campaign.recipients.map((recipient) => recipient.contact);

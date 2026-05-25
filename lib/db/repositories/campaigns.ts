@@ -145,6 +145,16 @@ export async function scheduleCampaign(orgId: string, campaignId: string, schedu
       scheduledAt: scheduledAt.toISOString()
     });
 
+    await tx.queueJob.updateMany({
+      where: {
+        orgId,
+        campaignId,
+        status: QueueJobStatus.QUEUED,
+        idempotencyKey: { not: idempotencyKey }
+      },
+      data: { status: QueueJobStatus.CANCELLED }
+    });
+
     await tx.campaign.update({
       where: { id: campaignId },
       data: { status: CampaignStatus.SCHEDULED, scheduledAt }

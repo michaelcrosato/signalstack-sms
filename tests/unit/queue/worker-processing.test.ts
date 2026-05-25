@@ -108,6 +108,7 @@ describe("scheduled campaign worker processing", () => {
       id: "campaign_demo",
       orgId: "org_demo",
       status: CampaignStatus.SCHEDULED,
+      scheduledAt: now,
       body: "Hi {{firstName}}, your local demo invite is ready.",
       recipients: [
         {
@@ -178,5 +179,32 @@ describe("scheduled campaign worker processing", () => {
       where: { id: "campaign_demo" },
       data: { status: CampaignStatus.COMPLETED }
     });
+  });
+
+  it("cancels stale queued jobs before they can send from an old schedule", async () => {
+    mocks.campaignFindFirst.mockResolvedValue({
+      id: "campaign_demo",
+      orgId: "org_demo",
+      status: CampaignStatus.SCHEDULED,
+      scheduledAt: new Date("2026-05-24T13:00:00.000Z"),
+      body: "Hi {{firstName}}, your local demo invite is ready.",
+      recipients: []
+    });
+
+    await expect(processScheduledCampaignQueueJobById("queue_job_demo", now)).resolves.toEqual({
+      processed: 0,
+      skipped: 1,
+      blocked: false,
+      reason: "stale-schedule"
+    });
+
+    expect(mocks.queueJobUpdate).toHaveBeenCalledWith({
+      where: { id: "queue_job_demo" },
+      data: { status: QueueJobStatus.CANCELLED }
+    });
+    expect(mocks.campaignRecipientUpdateMany).not.toHaveBeenCalled();
+    expect(mocks.dummySend).not.toHaveBeenCalled();
+    expect(mocks.messageUpsert).not.toHaveBeenCalled();
+    expect(mocks.campaignUpdate).not.toHaveBeenCalled();
   });
 });

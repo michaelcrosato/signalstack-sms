@@ -6609,3 +6609,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3136'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer production auth/RBAC, reporting, or concrete idempotency correctness gaps over more syntactic worker/auth variants.
+
+## Run 778  GREEN  stale-scheduled-queue-jobs  2026-05-24 21:08
+Objective:    Prevent stale scheduled-campaign queue rows from sending from an old local schedule.
+Changed:
+- Cancelled other queued local jobs for the same tenant campaign before upserting the active schedule.
+- Cancelled worker jobs whose payload `scheduledAt` no longer matches the campaign's active `scheduledAt`, before recipient mutations, dummy sends, or message rows.
+- Added focused campaign schedule repository and worker-processing coverage, and updated queue/API/testing contracts plus compact handoffs.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3137'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer product-demo polish, production auth/RBAC planning, reporting visibility, or concrete correctness gaps over syntactic scanner variants.

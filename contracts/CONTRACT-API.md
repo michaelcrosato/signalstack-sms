@@ -106,7 +106,7 @@ Runs a compliance preflight over campaign recipients or the provided `contactIds
 
 ### `POST /api/campaigns/:campaignId/schedule`
 
-Runs preflight, marks a campaign `SCHEDULED`, and stores a queued job record. This does not call providers.
+Runs preflight, marks a campaign `SCHEDULED`, cancels any other queued local jobs for the same campaign, and stores the active queued job record. This does not call providers.
 
 ### `POST /api/campaigns/:campaignId/cancel`
 
