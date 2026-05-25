@@ -1,8 +1,8 @@
 # Codex Blockers
 
-Run number: 815
+Run number: 816
 
-- No blocker from adding the product analytics campaign-level delivery review queue.
+- No blocker from adding product analytics delivery review summary counts.
 - Focused validation passed with `npm run test -- tests/unit/product/analytics.test.ts`, `npm run typecheck`, `npm run lint`, `npm run contracts:check`, `npm run context:check`, and `npm run test:e2e:product-demo`.
 - Protected validation passed with `.\scripts\local-gate.ps1`.
 - The change is a read-only product analytics projection/UI, product-demo assertion, contracts, and handoff updates only; it did not use production credentials, call Clerk/Twilio/Stripe, send campaign/live bulk SMS, bill, notify, touch Redis, edit protected gate scripts, hard-delete data, mutate delivery state, execute workers, or perform destructive production actions.

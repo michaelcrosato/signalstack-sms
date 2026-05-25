@@ -7616,3 +7616,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/analytics.test.ts`, `npm run typecheck`, `npm run lint`, `npm run contracts:check`, `npm run context:check`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.
+
+## Run 816  GREEN  analytics-review-queue-summary  2026-05-25 02:24
+Objective:    Show bounded campaign delivery review coverage in the product analytics workspace.
+Changed:
+- Added a read-only delivery review queue summary for total campaigns, needs-review campaigns, visible rows, and hidden rows from existing tenant-scoped outbound campaign evidence.
+- Kept the campaign review queue capped at five visible rows while preserving failed-first, pending-second ordering and links to existing campaign detail evidence pages.
+- Updated product analytics unit coverage, product-demo Playwright coverage, API/testing contracts, current matrix, compact handoffs, and loop logs without provider calls, delivery retries, worker execution, live messaging, billing, live AI, secrets, delivery-state mutation, or protected gate script edits.
+Gate:         passed with `npm run test -- tests/unit/product/analytics.test.ts`, `npm run typecheck`, `npm run lint`, `npm run contracts:check`, `npm run context:check`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.

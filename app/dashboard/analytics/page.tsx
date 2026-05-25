@@ -127,6 +127,18 @@ export default async function AnalyticsPage() {
               Campaign-level local delivery evidence, ordered by failed and pending review states before delivered or
               no-evidence campaigns.
             </p>
+            <dl aria-label="Delivery review queue summary" className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <QueueSummaryMetric label="Campaigns" value={String(analytics.campaignDeliverySummary.totalCampaigns)} />
+              <QueueSummaryMetric
+                label="Need Review"
+                value={String(analytics.campaignDeliverySummary.campaignsNeedingReview)}
+              />
+              <QueueSummaryMetric
+                label="Visible Rows"
+                value={`${analytics.campaignDeliverySummary.visibleRows}/${analytics.campaignDeliverySummary.totalCampaigns}`}
+              />
+              <QueueSummaryMetric label="Hidden Rows" value={String(analytics.campaignDeliverySummary.hiddenRows)} />
+            </dl>
           </div>
           {analytics.campaignDeliveryRows.length > 0 ? (
             <div className="overflow-x-auto">
@@ -212,6 +224,15 @@ function StatusRow({ label, value }: { label: string; value: string }) {
     <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-2">
       <dt className="text-slate-600">{label}</dt>
       <dd className="text-right font-medium text-slate-950">{value}</dd>
+    </div>
+  );
+}
+
+function QueueSummaryMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded border border-slate-200 bg-slate-50 px-3 py-2">
+      <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</dt>
+      <dd className="mt-1 text-lg font-semibold text-slate-950">{value}</dd>
     </div>
   );
 }

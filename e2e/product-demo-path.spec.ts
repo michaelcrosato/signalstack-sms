@@ -473,6 +473,12 @@ test("product analytics page renders local overview detail", async ({ page }) =>
   const deliveryReviewQueue = page.getByLabel("Campaign delivery review queue");
   await expect(deliveryReviewQueue.getByRole("heading", { name: "Delivery Review Queue" })).toBeVisible();
   await expect(deliveryReviewQueue.getByText("Campaign-level local delivery evidence")).toBeVisible();
+  const deliveryReviewSummary = deliveryReviewQueue.getByLabel("Delivery review queue summary");
+  await expect(deliveryReviewSummary.getByText("Campaigns")).toBeVisible();
+  await expect(deliveryReviewSummary.getByText("Need Review")).toBeVisible();
+  await expect(deliveryReviewSummary.getByText("Visible Rows")).toBeVisible();
+  await expect(deliveryReviewSummary.getByText(/\d+\/\d+/)).toBeVisible();
+  await expect(deliveryReviewSummary.getByText("Hidden Rows")).toBeVisible();
   await expect(deliveryReviewQueue.getByRole("columnheader", { name: "Review" })).toBeVisible();
   await expect(deliveryReviewQueue.getByRole("link", { name: /Review evidence for/ }).first()).toHaveAttribute(
     "href",

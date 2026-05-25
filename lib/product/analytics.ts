@@ -96,7 +96,7 @@ export async function getProductAnalytics(orgId: string) {
     inboxLoad: { value: overview.conversations.open, detail: `${overview.messages.total} local messages` },
     usageEvents: { value: derived.totalUsageEvents, detail: "local metering only" }
   };
-  const campaignDeliveryRows = campaigns
+  const campaignDeliveryReviewRows = campaigns
     .map((campaign) => {
       const outboundMessages = campaign.messages.filter((message) => message.direction === "OUTBOUND");
       const delivered = outboundMessages.filter(isLocalDeliveryDelivered).length;
@@ -146,7 +146,10 @@ export async function getProductAnalytics(orgId: string) {
       }
 
       return left.name.localeCompare(right.name);
-    })
+    });
+  const failedCampaigns = campaignDeliveryReviewRows.filter((row) => row.failed > 0).length;
+  const pendingCampaigns = campaignDeliveryReviewRows.filter((row) => row.failed === 0 && row.pending > 0).length;
+  const campaignDeliveryRows = campaignDeliveryReviewRows
     .slice(0, 5)
     .map((row) => ({
       id: row.id,
@@ -161,6 +164,14 @@ export async function getProductAnalytics(orgId: string) {
       reviewStatus: row.reviewStatus,
       lastOutboundMessage: row.lastOutboundMessage
     }));
+  const campaignDeliverySummary = {
+    totalCampaigns: campaignDeliveryReviewRows.length,
+    visibleRows: campaignDeliveryRows.length,
+    hiddenRows: Math.max(campaignDeliveryReviewRows.length - campaignDeliveryRows.length, 0),
+    campaignsNeedingReview: failedCampaigns + pendingCampaigns,
+    failedCampaigns,
+    pendingCampaigns
+  };
 
   return {
     ...overview,
@@ -180,6 +191,7 @@ export async function getProductAnalytics(orgId: string) {
       label: row.label,
       value: deliveryValues[row.key]
     })),
+    campaignDeliverySummary,
     campaignDeliveryRows,
     usageRows: productAnalyticsUsageRows.map((row) => ({
       type: row.type,

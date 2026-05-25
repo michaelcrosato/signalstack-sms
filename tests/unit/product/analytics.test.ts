@@ -162,6 +162,14 @@ describe("product analytics", () => {
       { key: "reviewStatus", label: "Review status", value: "1 failed; review evidence" },
       { key: "lastDeliveryEvidence", label: "Last delivery evidence", value: "2026-01-04T12:00:00.000Z" }
     ]);
+    expect(analytics.campaignDeliverySummary).toEqual({
+      totalCampaigns: 3,
+      visibleRows: 3,
+      hiddenRows: 0,
+      campaignsNeedingReview: 2,
+      failedCampaigns: 1,
+      pendingCampaigns: 1
+    });
     expect(analytics.campaignDeliveryRows).toEqual([
       {
         id: "campaign_failed",
@@ -258,6 +266,75 @@ describe("product analytics", () => {
         deliveryReviewStatus: "No outbound evidence"
       }
     });
+  });
+
+  it("summarizes visible and hidden campaign delivery review rows", async () => {
+    vi.mocked(getAnalyticsOverview).mockResolvedValue({
+      contacts: {
+        total: 0,
+        optedIn: 0,
+        optedOut: 0
+      },
+      campaigns: {
+        total: 6,
+        scheduled: 0
+      },
+      conversations: {
+        total: 0,
+        open: 0,
+        resolved: 0
+      },
+      messages: {
+        total: 0,
+        inbound: 0,
+        outbound: 0,
+        delivered: 0,
+        pending: 0,
+        failed: 0,
+        lastOutboundAt: null
+      },
+      usage: {
+        [UsageEventType.CONTACT_IMPORTED]: 0,
+        [UsageEventType.MESSAGE_INBOUND]: 0,
+        [UsageEventType.CAMPAIGN_SCHEDULED]: 0,
+        [UsageEventType.AI_REQUEST]: 0
+      }
+    });
+    vi.mocked(listCampaignsWithDelivery).mockResolvedValue(
+      Array.from({ length: 6 }, (_value, index) => ({
+        id: `campaign_${index + 1}`,
+        orgId: "org_123",
+        name: `Campaign ${String(index + 1).padStart(2, "0")}`,
+        body: "Hi",
+        status: CampaignStatus.DRAFT,
+        templateId: null,
+        scheduledAt: null,
+        createdAt: new Date("2026-01-01T00:00:00.000Z"),
+        updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+        template: null,
+        recipients: [],
+        messages: []
+      }))
+    );
+
+    const analytics = await getProductAnalytics("org_123");
+
+    expect(analytics.campaignDeliverySummary).toEqual({
+      totalCampaigns: 6,
+      visibleRows: 5,
+      hiddenRows: 1,
+      campaignsNeedingReview: 0,
+      failedCampaigns: 0,
+      pendingCampaigns: 0
+    });
+    expect(analytics.campaignDeliveryRows).toHaveLength(5);
+    expect(analytics.campaignDeliveryRows.map((row) => row.name)).toEqual([
+      "Campaign 01",
+      "Campaign 02",
+      "Campaign 03",
+      "Campaign 04",
+      "Campaign 05"
+    ]);
   });
 
   it("freezes product analytics metric metadata before rendering", () => {
