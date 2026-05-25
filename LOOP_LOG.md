@@ -7546,3 +7546,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/analytics.test.ts`, `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run typecheck`, `npm run lint`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.
+
+## Run 809  GREEN  dashboard-delivery-review-status  2026-05-25 01:26
+Objective:    Surface the shared local delivery review wording on the product dashboard.
+Changed:
+- Reused `getLocalDeliveryReviewStatus` in `/dashboard` product projection from existing tenant-scoped outbound message counts.
+- Added a frozen `Delivery review` dashboard signal plus focused unit and product-demo browser coverage.
+- Updated API/testing contracts, current matrix, and compact handoffs without provider calls, delivery retries, worker execution, live messaging, billing, live AI, secrets, or delivery-state mutation.
+Gate:         passed with `npm run test -- tests/unit/product/dashboard.test.ts`, `npm run typecheck`, `npm run lint`, `npm run contracts:check`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.

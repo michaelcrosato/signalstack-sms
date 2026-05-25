@@ -185,6 +185,7 @@ describe("product dashboard navigation", () => {
       "deliveryRate",
       "deliveryPending",
       "deliveryFailures",
+      "deliveryReviewStatus",
       "inboxLoad",
       "fakeAiRequests",
       "localUsageEvents"
@@ -197,6 +198,7 @@ describe("product dashboard navigation", () => {
       "Delivery rate",
       "Delivery pending",
       "Delivery failures",
+      "Delivery review",
       "Inbox load",
       "Fake AI requests",
       "Local usage events"
@@ -319,7 +321,8 @@ describe("product dashboard navigation", () => {
         delivered: 3,
         pending: 2,
         failed: 1,
-        deliveryRatePercent: 60
+        deliveryRatePercent: 60,
+        deliveryReviewStatus: "1 failed; review evidence"
       },
       compliance: {
         completeFields: productComplianceFields.length,
@@ -340,6 +343,7 @@ describe("product dashboard navigation", () => {
         { key: "deliveryRate", label: "Delivery rate", value: "60%" },
         { key: "deliveryPending", label: "Delivery pending", value: "2" },
         { key: "deliveryFailures", label: "Delivery failures", value: "1" },
+        { key: "deliveryReviewStatus", label: "Delivery review", value: "1 failed; review evidence" },
         { key: "inboxLoad", label: "Inbox load", value: "4" },
         { key: "fakeAiRequests", label: "Fake AI requests", value: "2" },
         { key: "localUsageEvents", label: "Local usage events", value: "3" }

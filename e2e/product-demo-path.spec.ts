@@ -79,6 +79,8 @@ test("product dashboard renders seeded owner workflow checkpoints", async ({ pag
   await expect(analytics.getByText("Delivery rate")).toBeVisible();
   await expect(analytics.getByText("Delivery pending")).toBeVisible();
   await expect(analytics.getByText("Delivery failures")).toBeVisible();
+  await expect(analytics.getByText("Delivery review")).toBeVisible();
+  await expect(analytics.getByText(/(No outbound evidence|pending; awaiting provider status|failed; review evidence|All delivered)/).first()).toBeVisible();
   await expect(analytics.getByText("Inbox load")).toBeVisible();
   await expect(analytics.getByText("Fake AI requests")).toBeVisible();
   await expect(analytics.getByText("Local usage events")).toBeVisible();

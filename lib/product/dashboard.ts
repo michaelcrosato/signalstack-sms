@@ -7,6 +7,7 @@ import {
   outboundMessageWhere,
   outboundPendingMessageWhere
 } from "@/lib/messaging/delivery-counts";
+import { getLocalDeliveryReviewStatus } from "@/lib/messaging/delivery-review";
 import { productComplianceFields } from "@/lib/product/compliance-fields";
 
 const productNavigationItems = [
@@ -49,6 +50,7 @@ const productDashboardSignalRowItems = [
   { key: "deliveryRate", label: "Delivery rate" },
   { key: "deliveryPending", label: "Delivery pending" },
   { key: "deliveryFailures", label: "Delivery failures" },
+  { key: "deliveryReviewStatus", label: "Delivery review" },
   { key: "inboxLoad", label: "Inbox load" },
   { key: "fakeAiRequests", label: "Fake AI requests" },
   { key: "localUsageEvents", label: "Local usage events" }
@@ -177,6 +179,12 @@ export async function getProductDashboard(orgId: string) {
   const usage = aggregateUsageEvents(usageEvents);
   const optedInPercent = contacts > 0 ? Math.round((optedInContacts / contacts) * 100) : 0;
   const deliveryRatePercent = outboundMessages > 0 ? Math.round((deliveredMessages / outboundMessages) * 100) : 0;
+  const deliveryReviewStatus = getLocalDeliveryReviewStatus({
+    outboundMessages,
+    delivered: deliveredMessages,
+    pending: pendingMessages,
+    failed: failedMessages
+  });
 
   const dashboard = {
     contacts: {
@@ -199,7 +207,8 @@ export async function getProductDashboard(orgId: string) {
       delivered: deliveredMessages,
       pending: pendingMessages,
       failed: failedMessages,
-      deliveryRatePercent
+      deliveryRatePercent,
+      deliveryReviewStatus
     },
     templates: {
       total: templates
@@ -229,6 +238,7 @@ export async function getProductDashboard(orgId: string) {
     deliveryRate: `${dashboard.delivery.deliveryRatePercent}%`,
     deliveryPending: String(dashboard.delivery.pending),
     deliveryFailures: String(dashboard.delivery.failed),
+    deliveryReviewStatus: dashboard.delivery.deliveryReviewStatus,
     inboxLoad: String(dashboard.inbox.open),
     fakeAiRequests: String(dashboard.usage.fakeAiRequests),
     localUsageEvents: String(dashboard.usage.totalEvents)
