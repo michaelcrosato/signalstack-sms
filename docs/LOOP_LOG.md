@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 775  GREEN  campaign-detail-outbound-delivery  2026-05-24 20:44
+Objective:    Keep product campaign detail delivery snapshots scoped to outbound messages.
+Changed:
+- Scoped campaign detail delivery rows and delivered/failed/provider-status metrics to outbound campaign message rows.
+- Added focused product campaign detail unit coverage with inbound campaign-linked messages that must not inflate delivery metrics or render in the delivery snapshot.
+- Updated compact handoff docs for outbound-only campaign detail reporting without sends, retries, provider calls, billing, live AI, notifications, mutations, workers, secrets, or live feature enablement.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3134'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live sends blocked; prefer product-demo polish, production auth/RBAC planning, or high-value reporting correctness.
+
 ## Run 774  GREEN  outbound-delivery-reporting  2026-05-24 20:39
 Objective:    Keep product delivery reporting scoped to outbound messages.
 Changed:

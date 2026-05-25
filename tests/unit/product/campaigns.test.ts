@@ -65,6 +65,26 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
               failedAt: new Date("2026-01-04T00:00:00.000Z"),
               createdAt: new Date("2026-01-04T00:00:00.000Z"),
               contact: null
+            },
+            {
+              id: "message_inbound_delivered",
+              direction: "INBOUND",
+              providerStatus: "delivered",
+              providerMessageId: "provider_inbound_delivered",
+              deliveredAt: new Date("2026-01-05T00:00:00.000Z"),
+              failedAt: null,
+              createdAt: new Date("2026-01-05T00:00:00.000Z"),
+              contact: null
+            },
+            {
+              id: "message_inbound_failed",
+              direction: "INBOUND",
+              providerStatus: "failed",
+              providerMessageId: "provider_inbound_failed",
+              deliveredAt: null,
+              failedAt: new Date("2026-01-06T00:00:00.000Z"),
+              createdAt: new Date("2026-01-06T00:00:00.000Z"),
+              contact: null
             }
           ]
         }

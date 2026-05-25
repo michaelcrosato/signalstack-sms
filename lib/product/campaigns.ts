@@ -110,7 +110,8 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
   }
 
   const selectedContactIds = new Set(campaign.recipients.map((recipient) => recipient.contactId));
-  const deliverySummary = getCampaignDeliverySummary(campaign.messages);
+  const deliveryMessages = campaign.messages.filter((message) => message.direction === "OUTBOUND");
+  const deliverySummary = getCampaignDeliverySummary(deliveryMessages);
   const detail = {
     id: campaign.id,
     name: campaign.name,
@@ -146,7 +147,7 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
         }))
       };
     }),
-    deliveryRows: campaign.messages.map((message) => ({
+    deliveryRows: deliveryMessages.map((message) => ({
       id: message.id,
       contactDisplayName: message.contact
         ? message.contact.displayName ??
@@ -204,12 +205,12 @@ function getCampaignDeliverySummary(
   }>
 ): Record<ProductCampaignDeliveryMetricKey, string> {
   const outboundMessages = messages.filter((message) => message.direction === "OUTBOUND");
-  const delivered = messages.filter((message) => message.deliveredAt !== null);
-  const failed = messages.filter(
+  const delivered = outboundMessages.filter((message) => message.deliveredAt !== null);
+  const failed = outboundMessages.filter(
     (message) =>
       message.failedAt !== null || message.providerStatus === "failed" || message.providerStatus === "undelivered"
   );
-  const providerStatuses = Array.from(new Set(messages.map((message) => message.providerStatus ?? "local_only")));
+  const providerStatuses = Array.from(new Set(outboundMessages.map((message) => message.providerStatus ?? "local_only")));
 
   return {
     outboundMessages: outboundMessages.length.toString(),
