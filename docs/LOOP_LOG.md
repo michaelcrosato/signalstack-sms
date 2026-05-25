@@ -6619,3 +6619,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3137'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer product-demo polish, production auth/RBAC planning, reporting visibility, or concrete correctness gaps over syntactic scanner variants.
+
+## Run 779  GREEN  scheduled-provider-status  2026-05-24 21:13
+Objective:    Preserve dummy provider status on local scheduled-campaign outbound message rows.
+Changed:
+- Stored the dummy provider's returned `status` as `Message.providerStatus` when the local scheduled-campaign worker creates outbound campaign messages.
+- Updated focused worker-processing coverage to assert local outbound rows keep both provider message ID and provider status.
+- Updated queue/testing contracts plus compact handoffs for product delivery reporting visibility.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3138'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer product-demo polish, production auth/RBAC planning, reporting visibility, or concrete correctness gaps over syntactic scanner variants.

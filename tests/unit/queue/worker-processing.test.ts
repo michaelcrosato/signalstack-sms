@@ -157,6 +157,7 @@ describe("scheduled campaign worker processing", () => {
         direction: "OUTBOUND",
         body: "Hi Ada, your local demo invite is ready.",
         providerMessageId: "dummy_dummy-outbound:queue_job_demo:contact_allowed",
+        providerStatus: "queued",
         idempotencyKey: "dummy-outbound:queue_job_demo:contact_allowed"
       }
     });

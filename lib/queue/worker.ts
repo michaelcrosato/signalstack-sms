@@ -337,6 +337,7 @@ async function processScheduledCampaignQueueJob(
         direction: "OUTBOUND",
         body,
         providerMessageId: result.providerMessageId,
+        providerStatus: result.status,
         idempotencyKey
       }
     });
