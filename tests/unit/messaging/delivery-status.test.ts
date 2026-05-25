@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  isLocalDeliveryDelivered,
   isTerminalDeliveryFailure,
   isTerminalDeliveryFailureProviderStatus,
   terminalDeliveryFailureProviderStatuses
@@ -27,5 +28,21 @@ describe("delivery status helpers", () => {
     expect(isTerminalDeliveryFailure({ failedAt: null, providerStatus: "undelivered" })).toBe(true);
     expect(isTerminalDeliveryFailure({ failedAt: null, providerStatus: "delivered" })).toBe(false);
     expect(isTerminalDeliveryFailure({ failedAt: null, providerStatus: null })).toBe(false);
+  });
+
+  it("requires delivered timestamps without terminal failure evidence for local delivered counts", () => {
+    const deliveredAt = new Date("2026-05-24T20:00:00.000Z");
+
+    expect(isLocalDeliveryDelivered({ deliveredAt, failedAt: null, providerStatus: "delivered" })).toBe(true);
+    expect(isLocalDeliveryDelivered({ deliveredAt, failedAt: null, providerStatus: null })).toBe(true);
+    expect(isLocalDeliveryDelivered({ deliveredAt: null, failedAt: null, providerStatus: "delivered" })).toBe(false);
+    expect(
+      isLocalDeliveryDelivered({
+        deliveredAt,
+        failedAt: new Date("2026-05-24T20:01:00.000Z"),
+        providerStatus: "delivered"
+      })
+    ).toBe(false);
+    expect(isLocalDeliveryDelivered({ deliveredAt, failedAt: null, providerStatus: "undelivered" })).toBe(false);
   });
 });

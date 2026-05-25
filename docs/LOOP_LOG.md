@@ -6679,3 +6679,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3142'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer production auth/RBAC planning, deeper product reporting visibility, or concrete idempotency correctness gaps over syntactic scanner variants.
+
+## Run 785  GREEN  delivery-count-exclusivity  2026-05-24 21:56
+Objective:    Prevent stale terminal-failure evidence from also counting as delivered in local delivery reporting.
+Changed:
+- Added a shared delivered-status helper that requires `deliveredAt` and no terminal failure evidence.
+- Updated analytics overview and product dashboard delivered-count queries to exclude `failedAt` and terminal `failed`/`undelivered` provider statuses.
+- Reused the helper in campaign detail and delivery operations, added focused stale-metadata tests, and updated compact contracts/handoffs.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3144'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer production auth/RBAC planning, higher-signal reporting correctness, or concrete idempotency gaps over syntactic scanner variants.

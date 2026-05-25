@@ -158,7 +158,15 @@ export async function getProductDashboard(orgId: string) {
     prisma.messageTemplate.count({ where: { orgId } }),
     prisma.message.count({ where: { orgId } }),
     prisma.message.count({ where: { orgId, direction: "OUTBOUND" } }),
-    prisma.message.count({ where: { orgId, direction: "OUTBOUND", deliveredAt: { not: null } } }),
+    prisma.message.count({
+      where: {
+        orgId,
+        direction: "OUTBOUND",
+        deliveredAt: { not: null },
+        failedAt: null,
+        OR: [{ providerStatus: null }, { providerStatus: { notIn: [...terminalDeliveryFailureProviderStatuses] } }]
+      }
+    }),
     prisma.message.count({
       where: {
         orgId,

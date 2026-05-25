@@ -29,7 +29,15 @@ export async function getAnalyticsOverview(orgId: string) {
     prisma.message.count({ where: { orgId } }),
     prisma.message.count({ where: { orgId, direction: "INBOUND" } }),
     prisma.message.count({ where: { orgId, direction: "OUTBOUND" } }),
-    prisma.message.count({ where: { orgId, direction: "OUTBOUND", deliveredAt: { not: null } } }),
+    prisma.message.count({
+      where: {
+        orgId,
+        direction: "OUTBOUND",
+        deliveredAt: { not: null },
+        failedAt: null,
+        OR: [{ providerStatus: null }, { providerStatus: { notIn: [...terminalDeliveryFailureProviderStatuses] } }]
+      }
+    }),
     prisma.message.count({
       where: {
         orgId,

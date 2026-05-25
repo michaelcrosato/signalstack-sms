@@ -14,3 +14,11 @@ export function isTerminalDeliveryFailure(message: {
 }) {
   return message.failedAt !== null || isTerminalDeliveryFailureProviderStatus(message.providerStatus);
 }
+
+export function isLocalDeliveryDelivered(message: {
+  deliveredAt: Date | null;
+  failedAt: Date | null;
+  providerStatus: string | null;
+}) {
+  return message.deliveredAt !== null && !isTerminalDeliveryFailure(message);
+}

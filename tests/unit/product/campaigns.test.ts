@@ -67,6 +67,16 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
               contact: null
             },
             {
+              id: "message_stale_delivered_failure",
+              direction: "OUTBOUND",
+              providerStatus: "undelivered",
+              providerMessageId: "dummy_message_stale",
+              deliveredAt: new Date("2026-01-04T06:00:00.000Z"),
+              failedAt: null,
+              createdAt: new Date("2026-01-04T06:00:00.000Z"),
+              contact: null
+            },
+            {
               id: "message_pending",
               direction: "OUTBOUND",
               providerStatus: "sent",
@@ -227,11 +237,11 @@ describe("getProductCampaigns", () => {
       }
     ]);
     expect(result?.deliveryMetrics).toEqual([
-      { key: "outboundMessages", label: "Outbound Messages", value: "3" },
+      { key: "outboundMessages", label: "Outbound Messages", value: "4" },
       { key: "delivered", label: "Delivered", value: "1" },
       { key: "pending", label: "Pending", value: "1" },
-      { key: "failed", label: "Failed", value: "1" },
-      { key: "providerStatuses", label: "Provider Statuses", value: "delivered, failed, sent" }
+      { key: "failed", label: "Failed", value: "2" },
+      { key: "providerStatuses", label: "Provider Statuses", value: "delivered, failed, undelivered, sent" }
     ]);
     expect(result?.deliveryRows).toEqual([
       {
@@ -253,6 +263,16 @@ describe("getProductCampaigns", () => {
         createdAt: "2026-01-04T00:00:00.000Z",
         deliveredAt: null,
         failedAt: "2026-01-04T00:00:00.000Z"
+      },
+      {
+        id: "message_stale_delivered_failure",
+        contactDisplayName: "Unknown contact",
+        direction: "OUTBOUND",
+        providerStatus: "undelivered",
+        providerMessageId: "dummy_message_stale",
+        createdAt: "2026-01-04T06:00:00.000Z",
+        deliveredAt: "2026-01-04T06:00:00.000Z",
+        failedAt: null
       },
       {
         id: "message_pending",
