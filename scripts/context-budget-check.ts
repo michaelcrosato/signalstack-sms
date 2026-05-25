@@ -23,7 +23,7 @@ const currentHandoffBudgets: BudgetedFile[] = [
   {
     path: "docs/NEXT_PROMPTS.md",
     maxBytes: 16_000,
-    requiredText: ["## Context Discipline", "Full history is in `LOOP_LOG.md`"],
+    requiredText: ["## Context Discipline", "Full history is in `LOOP_LOG.md`", "npm run agent:brief"],
     forbiddenText: ["Run 700", "Run 650", "Run 600"]
   },
   {
@@ -35,7 +35,7 @@ const currentHandoffBudgets: BudgetedFile[] = [
   {
     path: "docs/AGENT-LOOP.md",
     maxBytes: 12_000,
-    requiredText: ["# CONTEXT BUDGET", "Read the latest useful truth, not the entire history."]
+    requiredText: ["# CONTEXT BUDGET", "Read the latest useful truth, not the entire history.", "npm run agent:brief"]
   }
 ];
 

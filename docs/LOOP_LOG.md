@@ -6680,6 +6680,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3146'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer production auth/RBAC planning, higher-signal reporting correctness, or concrete idempotency gaps over syntactic scanner variants.
 
+## Run 787  GREEN  agent-context-brief  2026-05-24 22:20
+Objective:    Reduce autonomous-loop context ingestion by giving agents a compact current-state startup brief.
+Changed:
+- Added `npm run agent:brief`, which prints current git state, recent commits, compact NEXT_PROMPTS sections, handoff sizes, large-file advisories, and latest loop run headings.
+- Updated AGENT-LOOP, NEXT_PROMPTS, LOCAL_GATE, agent handoff output, context-budget validation, SUMMARY, BLOCKERS, TESTING, and current state notes to make the brief the first loop context step.
+- Kept the change local to automation/docs/check coverage; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3148'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Restart the loop and measure the next 30-60 minutes for SignalStack tokens/hour versus useful commits/hour after agents start from the compact brief.
+
 ## Run 783  GREEN  webhook-malformed-form-fail-closed  2026-05-24 21:42
 Objective:    Return controlled invalid-form responses for malformed or unsupported Twilio webhook bodies before local work can run.
 Changed:

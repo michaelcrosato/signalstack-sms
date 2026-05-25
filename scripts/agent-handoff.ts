@@ -1,1 +1,1 @@
-console.log("Read SUMMARY.bootstrap.md, BLOCKERS.bootstrap.md, AGENTS.md, contracts/**, and docs/LOCAL_GATE.md.");
+console.log("Run npm run agent:brief, then read docs/AXIOMS.md, docs/AGENT-LOOP.md, and targeted task files.");

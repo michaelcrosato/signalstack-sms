@@ -6,15 +6,17 @@ This is the compact handoff for the next automated loop. Full history is in `LOO
 
 1. `docs/AXIOMS.md`
 2. `docs/AGENT-LOOP.md`
-3. `PLAN.md`
-4. `docs/CURRENT_STATE_MATRIX.md`
-5. `planning/CONSENSUS-2026-05-21.md`
-6. `contracts/**` with targeted reads
-7. `docs/LOCAL_GATE.md`
+3. `npm run agent:brief`
+4. `PLAN.md`
+5. `docs/CURRENT_STATE_MATRIX.md`
+6. `planning/CONSENSUS-2026-05-21.md`
+7. `contracts/**` with targeted reads
+8. `docs/LOCAL_GATE.md`
 
 ## Current State
 
-- Latest validated run: Run 786 adds a dashboard pending-delivery signal, so the product overview now shows outbound local delivery rate, pending, and failure counts with the same terminal-status exclusion rules used by analytics.
+- Latest validated run: Run 787 adds `npm run agent:brief`, so autonomous loops can start from a compact current-state packet before targeted reads instead of reloading long history by default.
+- Run 786 added a dashboard pending-delivery signal, so the product overview now shows outbound local delivery rate, pending, and failure counts with the same terminal-status exclusion rules used by analytics.
 - The backend foundation is strong: tenant helpers, contacts, campaigns, queue jobs with schedule-time stale queued-job cancellation, per-recipient send-time skips, and local outbound provider-status preservation, inbox with explicit inbound duplicate side-effect prevention, compliance gates, fake AI, local billing/analytics, provider metadata, Twilio webhook foundations with duplicate-race handling, readiness audit, operations inventory, and validation gates.
 - The browser product has a usable local demo path across dashboard with next-step and shared outbound-only local delivery rate/pending/failure signals, contacts import/detail/archive/restore/merge, campaign fake-AI copy/schedule/detail/edit/cancel plus recipient send-state/block-reason and mutually exclusive outbound-only delivered/pending/failed delivery visibility, inbox thread work, template create/detail/edit, analytics plus delivery operations with outbound-only `failed`/`undelivered` breakdowns, and compliance readiness.
 - Live campaign sending, live billing, live AI, production auth, production secrets, production workers, and production deployment remain blocked by default.
@@ -32,7 +34,7 @@ This is the compact handoff for the next automated loop. Full history is in `LOO
 
 ## Context Discipline
 
-- Start with file heads/tails, current summaries, `git status`, `git log -3`, and targeted `rg`.
+- Start with `npm run agent:brief`, file heads/tails, current summaries, `git status`, `git log -3`, and targeted `rg`.
 - Avoid reading full `SUMMARY.codex.md`, `BLOCKERS.codex.md`, `LOOP_LOG.md`, `docs/LOOP_LOG.md`, `docs/CURRENT_STATE_MATRIX.md`, or very large tests unless the next change requires exact historical context.
 - If a handoff file starts growing into a run log, compact it and rely on the append-only logs for history.
 - `npm run context:check` enforces the current-handoff budget during validation.

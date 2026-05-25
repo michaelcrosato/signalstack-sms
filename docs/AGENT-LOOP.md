@@ -8,9 +8,10 @@ No word is the best word: remove any instruction that does not change behaviour.
 # THE LOOP
 LOOP UNTIL A HUMAN STOPS IT:
 
-1. Explore.  Read the axioms first. Reconcile repo truth: code, git state, tests, contracts,
-   docs, roadmap, NEXT_PROMPTS, LOOP_LOG, prior artifacts, current failures, and outward
-   information when it materially improves the next move.
+1. Explore.  Read the axioms first. Run `npm run agent:brief`, then reconcile repo truth:
+   code, git state, tests, contracts, docs, roadmap, NEXT_PROMPTS, LOOP_LOG, prior
+   artifacts, current failures, and outward information when it materially improves the next
+   move.
 2. Plan.     Read the axioms. Determine the move you would defend at human review. Roadmaps
    guide; repo truth governs. State the objective, the validation path, and the rollback point.
 3. Work.     Read the axioms. Execute the most coherent, high-value change that advances the repo.
@@ -22,7 +23,8 @@ LOOP UNTIL A HUMAN STOPS IT:
      base, log the truth + pivot reason, choose different work, continue.
 
 # CONTEXT BUDGET
-Read the latest useful truth, not the entire history. For append-only or oversized files
+Read the latest useful truth, not the entire history. Start with `npm run agent:brief`.
+For append-only or oversized files
 (`LOOP_LOG.md`, `docs/LOOP_LOG.md`, `SUMMARY.codex.md`, `BLOCKERS.codex.md`,
 `docs/CURRENT_STATE_MATRIX.md`, large tests), start with current headers, latest entries,
 `git diff`, and targeted `rg` queries. Load full historical files only when the current

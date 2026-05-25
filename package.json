@@ -35,6 +35,7 @@
     "context:check": "tsx scripts/context-budget-check.ts",
     "secrets:scan": "tsx scripts/secrets-scan.ts",
     "validate": "tsx scripts/validate.ts",
+    "agent:brief": "tsx scripts/agent-brief.ts",
     "agent:status": "tsx scripts/agent-status.ts",
     "agent:handoff": "tsx scripts/agent-handoff.ts",
     "agent:repair": "npm run validate",
