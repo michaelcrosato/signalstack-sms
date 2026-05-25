@@ -6670,6 +6670,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3143'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer production auth/RBAC planning, higher-signal reporting correctness, or concrete idempotency gaps over syntactic scanner variants.
 
+## Run 788  GREEN  twilio-webhook-route-coverage  2026-05-24 22:26
+Objective:    Pin Twilio webhook route fail-closed, duplicate, and tenant-scoped status behavior.
+Changed:
+- Added direct inbound/status route tests for malformed form bodies and invalid signatures returning before current-org lookup, webhook-event storage, inbox writes, or delivery updates.
+- Added route tests proving duplicate inbound/status webhook events return without local inbox or delivery mutations.
+- Added route coverage for non-duplicate status webhooks updating only current-tenant messages by normalized provider message ID, and updated webhook/testing/current handoff docs.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3150'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer production auth/RBAC planning, higher-signal reporting correctness, or concrete idempotency gaps over syntactic scanner variants.
+
 ## Run 786  GREEN  dashboard-pending-delivery  2026-05-24 22:05
 Objective:    Surface pending outbound local delivery counts on the product dashboard.
 Changed:
