@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 763 note: mutating-route auth scanner coverage now includes typed comma-declared sequence-wrapped conditional/logical local `globalThis` root aliases, including `const root: typeof globalThis = (void 0, condition ? globalThis : globalThis), platform: typeof globalThis = (undefined, condition ? root : root), runtime: typeof globalThis = (0, true ? platform : platform)`, before `Request`, `Object`, and `Reflect` destructuring reaches prototype/descriptor body-reader calls.
+
 Run 762 note: mutating-route auth scanner coverage now includes comma-declared sequence-wrapped conditional/logical local `globalThis` root aliases, including `const root = (void 0, condition ? globalThis : globalThis), platform = (undefined, condition ? root : root), runtime = (0, true ? platform : platform)` and `const root = (void 0, globalThis || globalThis), platform = (undefined, root ?? root), runtime = (0, platform && platform)`, before `Request`, `Object`, and `Reflect` destructuring reaches prototype/descriptor body-reader calls.
 
 Run 761 note: mutating-route auth scanner coverage now includes comma-declared logical-expression local `globalThis` root aliases, including `const root = globalThis || globalThis, platform = root ?? root, runtime = platform && platform`, before `Request`, `Object`, and `Reflect` destructuring reaches prototype/descriptor body-reader calls.

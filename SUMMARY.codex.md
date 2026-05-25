@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 763
+
+- Latest mutating-route auth hardening adds typed comma-declared sequence-wrapped conditional/logical local `globalThis` root alias coverage, including `const root: typeof globalThis = (void 0, condition ? globalThis : globalThis), platform: typeof globalThis = (undefined, condition ? root : root), runtime: typeof globalThis = (0, true ? platform : platform)`, so defaulted `Request`, `Object`, and `Reflect` destructuring through typed comma-declared sequence-wrapped aliases still counts as body-reader access before each handler's own top-level `requireApiRole`. Focused auth coverage passed with `npm run test -- tests/unit/auth/api-route-authorization.test.ts`; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 762
 
 - Latest mutating-route auth hardening adds comma-declared sequence-wrapped conditional/logical local `globalThis` root alias coverage, including `const root = (void 0, condition ? globalThis : globalThis), platform = (undefined, condition ? root : root), runtime = (0, true ? platform : platform)` and `const root = (void 0, globalThis || globalThis), platform = (undefined, root ?? root), runtime = (0, platform && platform)`, so defaulted `Request`, `Object`, and `Reflect` destructuring through those comma-declared sequence-wrapped aliases still counts as body-reader access before each handler's own top-level `requireApiRole`. Focused auth coverage passed with `npm run test -- tests/unit/auth/api-route-authorization.test.ts`; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
