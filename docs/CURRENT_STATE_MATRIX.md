@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 766 note: mutating-route auth scanner coverage now includes asserted typed sequence-wrapped expression logical-assignment local `globalThis` root aliases, including `let root: typeof globalThis; let platform: typeof globalThis; let runtime: typeof globalThis; root ??= (void 0, ((globalThis as typeof globalThis)!)); platform ||= (undefined, ((root)! satisfies typeof globalThis)); runtime &&= (0, ((platform as typeof globalThis)!))`, before `Request`, `Object`, and `Reflect` destructuring reaches prototype/descriptor body-reader calls.
+
 Run 765 note: mutating-route auth scanner coverage now includes asserted typed comma-expression sequence-wrapped logical-assignment local `globalThis` root aliases, including `let root: typeof globalThis; let platform: typeof globalThis; let runtime: typeof globalThis; (((root ??= (void 0, ((globalThis as typeof globalThis)!))), (platform ||= (undefined, ((root)! satisfies typeof globalThis))), (runtime &&= (0, ((platform as typeof globalThis)!)))))`, before `Request`, `Object`, and `Reflect` destructuring reaches prototype/descriptor body-reader calls.
 
 Run 764 note: mutating-route auth scanner coverage now includes asserted typed comma-declared sequence-wrapped local `globalThis` root aliases, including `const root: typeof globalThis = (void 0, ((globalThis as typeof globalThis)!)), platform: typeof globalThis = (undefined, ((root)! satisfies typeof globalThis)), runtime: typeof globalThis = (0, ((platform as typeof globalThis)!))`, before `Request`, `Object`, and `Reflect` destructuring reaches prototype/descriptor body-reader calls.
@@ -540,7 +542,7 @@ Run 495 note: live-worker authorization now denies built-in object-shaped deploy
 
 Run 494 note: live-worker authorization now evaluates exact frozen control-entry evidence without reading inherited `Object.prototype` accessors for `id`, `status`, or `requirement`.
 
-Latest protected local gate for Run 600: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-23 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 59 Vitest files / 618 tests, Playwright smoke, and build green.
+Latest protected local gate for Run 766: `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1` passed on 2026-05-24 with gate integrity, contracts, secrets, compliance, production, production-worker, observability, operator, platform, lint, typecheck, Prisma validate/generate, 59 Vitest files / 744 tests, Playwright smoke, and build green.
 
 Run 581 note: live-worker authorization now proves exact frozen control-array evidence is evaluated without reading inherited `Array.prototype` indexed accessors beyond the frozen checklist entries.
 
