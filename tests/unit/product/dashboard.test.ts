@@ -41,7 +41,29 @@ vi.mock("@/lib/db/prisma", () => ({
       count: vi.fn(async () => 6)
     },
     message: {
-      count: vi.fn(async () => 12)
+      count: vi.fn(
+        async ({
+          where
+        }: {
+          where: {
+            direction?: string;
+            deliveredAt?: { not: null };
+            OR?: Array<Record<string, unknown>>;
+          };
+        }) => {
+          if (where.direction === "OUTBOUND") {
+            return 5;
+          }
+          if (where.deliveredAt) {
+            return 4;
+          }
+          if (where.OR) {
+            return 1;
+          }
+
+          return 12;
+        }
+      )
     },
     complianceProfile: {
       findUnique: vi.fn(async () => ({
@@ -148,6 +170,8 @@ describe("product dashboard navigation", () => {
       "consentCoverage",
       "optInRate",
       "scheduledWork",
+      "deliveryRate",
+      "deliveryFailures",
       "inboxLoad",
       "fakeAiRequests",
       "localUsageEvents"
@@ -156,6 +180,8 @@ describe("product dashboard navigation", () => {
       "Consent coverage",
       "Opt-in rate",
       "Scheduled work",
+      "Delivery rate",
+      "Delivery failures",
       "Inbox load",
       "Fake AI requests",
       "Local usage events"
@@ -241,6 +267,12 @@ describe("product dashboard navigation", () => {
         fakeAiRequests: 2,
         totalEvents: 3
       },
+      delivery: {
+        outbound: 5,
+        delivered: 4,
+        failed: 1,
+        deliveryRatePercent: 80
+      },
       compliance: {
         completeFields: productComplianceFields.length,
         requiredFields: productComplianceFields.length,
@@ -256,6 +288,8 @@ describe("product dashboard navigation", () => {
         { key: "consentCoverage", label: "Consent coverage", value: "7/10" },
         { key: "optInRate", label: "Opt-in rate", value: "70%" },
         { key: "scheduledWork", label: "Scheduled work", value: "1" },
+        { key: "deliveryRate", label: "Delivery rate", value: "80%" },
+        { key: "deliveryFailures", label: "Delivery failures", value: "1" },
         { key: "inboxLoad", label: "Inbox load", value: "4" },
         { key: "fakeAiRequests", label: "Fake AI requests", value: "2" },
         { key: "localUsageEvents", label: "Local usage events", value: "3" }

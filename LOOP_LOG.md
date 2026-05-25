@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 772  GREEN  product-dashboard-delivery-signals  2026-05-24 20:22
+Objective:    Surface existing local delivery outcomes on the main product dashboard.
+Changed:
+- Added tenant-scoped outbound, delivered, and failed local message counts to the product dashboard projection.
+- Added read-only Delivery rate and Delivery failures signal pills to `/dashboard`, with focused unit coverage and a seeded product-demo assertion.
+- Updated API/testing contracts and compact handoff docs for local dashboard delivery visibility without enabling sends, retries, provider calls, workers, billing, notifications, or live features.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3130'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live sends blocked; prefer concise product-demo polish, production auth/RBAC planning, or high-value reporting correctness.
+
 ## Run 771  GREEN  product-analytics-delivery-breakdown  2026-05-24 20:12
 Objective:    Make existing local delivery outcomes visible in the product analytics path.
 Changed:

@@ -80,6 +80,7 @@ Post-MVP webhook foundation:
 Post-MVP provider settings foundation:
 
 - `/`: renders a static local launch dashboard with demo-safe defaults and links to existing local-only admin/demo views without database access, mutations, provider calls, billing artifacts, notifications, live messaging, or secrets.
+- `/dashboard`: renders a product-facing dashboard with tenant-scoped product metrics, local message delivery signals, local usage totals, and navigation links without mutations, delivery retries, provider calls, SMS, billing artifacts, live AI, secrets, or live messaging enablement.
 - `/dashboard/contacts`: renders a product-facing contacts workspace with tenant-scoped active contacts, consent/list/tag context, metrics, and a local CSV import form backed by `POST /api/contacts/imports` without provider calls, SMS, billing, live AI, secrets, hard deletion, validation bypasses, or live messaging enablement.
 - `/dashboard/contacts/:contactId`: renders a product-facing contact detail workspace with local profile, consent, notes, tags, list editing, soft archive, restore, and duplicate-merge actions backed by existing contact APIs without provider calls, SMS, billing, live AI, secrets, hard deletion, consent bypasses, or live messaging enablement.
 - `/dashboard/campaigns`: renders a product-facing campaign workspace with local draft creation, compliance preflight, and local schedule actions backed by existing campaign APIs without provider calls, SMS, billing, live AI, secrets, worker execution, or live messaging enablement.

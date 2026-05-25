@@ -84,7 +84,7 @@ export default async function DashboardPage() {
         </section>
 
         <ProductSection id="analytics" title="Analytics" eyebrow="Local Signals">
-          <div className="grid gap-3 text-sm md:grid-cols-2 lg:grid-cols-6">
+          <div className="grid gap-3 text-sm md:grid-cols-2 lg:grid-cols-4">
             {dashboard.signals.map((signal) => (
               <StatusPill key={signal.key} label={signal.label} value={signal.value} />
             ))}

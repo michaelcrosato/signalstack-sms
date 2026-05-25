@@ -39,6 +39,8 @@ const productDashboardSignalRowItems = [
   { key: "consentCoverage", label: "Consent coverage" },
   { key: "optInRate", label: "Opt-in rate" },
   { key: "scheduledWork", label: "Scheduled work" },
+  { key: "deliveryRate", label: "Delivery rate" },
+  { key: "deliveryFailures", label: "Delivery failures" },
   { key: "inboxLoad", label: "Inbox load" },
   { key: "fakeAiRequests", label: "Fake AI requests" },
   { key: "localUsageEvents", label: "Local usage events" }
@@ -127,6 +129,9 @@ export async function getProductDashboard(orgId: string) {
     openConversations,
     templates,
     messages,
+    outboundMessages,
+    deliveredMessages,
+    failedMessages,
     complianceProfile,
     usageEvents
   ] = await Promise.all([
@@ -139,6 +144,14 @@ export async function getProductDashboard(orgId: string) {
     prisma.conversation.count({ where: { orgId, status: "OPEN" } }),
     prisma.messageTemplate.count({ where: { orgId } }),
     prisma.message.count({ where: { orgId } }),
+    prisma.message.count({ where: { orgId, direction: "OUTBOUND" } }),
+    prisma.message.count({ where: { orgId, deliveredAt: { not: null } } }),
+    prisma.message.count({
+      where: {
+        orgId,
+        OR: [{ failedAt: { not: null } }, { providerStatus: { in: ["failed", "undelivered"] } }]
+      }
+    }),
     prisma.complianceProfile.findUnique({ where: { orgId } }),
     prisma.usageEvent.findMany({ where: { orgId }, select: { type: true, quantity: true } })
   ]);
@@ -146,6 +159,7 @@ export async function getProductDashboard(orgId: string) {
   const completeComplianceFields = productComplianceFields.filter((field) => Boolean(complianceProfile?.[field.key])).length;
   const usage = aggregateUsageEvents(usageEvents);
   const optedInPercent = contacts > 0 ? Math.round((optedInContacts / contacts) * 100) : 0;
+  const deliveryRatePercent = outboundMessages > 0 ? Math.round((deliveredMessages / outboundMessages) * 100) : 0;
 
   const dashboard = {
     contacts: {
@@ -162,6 +176,12 @@ export async function getProductDashboard(orgId: string) {
     inbox: {
       open: openConversations,
       messages
+    },
+    delivery: {
+      outbound: outboundMessages,
+      delivered: deliveredMessages,
+      failed: failedMessages,
+      deliveryRatePercent
     },
     templates: {
       total: templates
@@ -187,6 +207,8 @@ export async function getProductDashboard(orgId: string) {
     consentCoverage: `${dashboard.contacts.optedIn}/${dashboard.contacts.total}`,
     optInRate: `${dashboard.contacts.optedInPercent}%`,
     scheduledWork: String(dashboard.campaigns.scheduled),
+    deliveryRate: `${dashboard.delivery.deliveryRatePercent}%`,
+    deliveryFailures: String(dashboard.delivery.failed),
     inboxLoad: String(dashboard.inbox.open),
     fakeAiRequests: String(dashboard.usage.fakeAiRequests),
     localUsageEvents: String(dashboard.usage.totalEvents)
