@@ -7536,3 +7536,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/queue/bullmq-worker.test.ts` and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer feedback-driven product/reporting work or concrete auth/idempotency correctness gaps over more syntactic gate variants.
+
+## Run 808  GREEN  analytics-delivery-review-status  2026-05-25 01:18
+Objective:    Surface a concise delivery review signal on the product analytics page.
+Changed:
+- Added `getLocalDeliveryReviewStatus` as a shared pure helper for existing local outbound delivery evidence wording.
+- Reused the helper in campaign reporting and rendered `Review status` in `/dashboard/analytics` Delivery Signals.
+- Updated product analytics unit coverage and the product-demo Playwright analytics assertion without provider calls, delivery retries, worker execution, live messaging, billing, live AI, secrets, or delivery-state mutation.
+Gate:         passed with `npm run test -- tests/unit/product/analytics.test.ts`, `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run typecheck`, `npm run lint`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.

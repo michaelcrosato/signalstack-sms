@@ -1,5 +1,6 @@
 import { UsageEventType } from "@prisma/client";
 import { getAnalyticsOverview } from "@/lib/analytics/overview";
+import { getLocalDeliveryReviewStatus } from "@/lib/messaging/delivery-review";
 
 const productAnalyticsMetricRowItems = [
   { key: "consentCoverage", label: "Consent Coverage" },
@@ -30,7 +31,8 @@ const productAnalyticsDeliveryRowItems = [
   { key: "delivered", label: "Delivered" },
   { key: "pending", label: "Pending" },
   { key: "failed", label: "Failed" },
-  { key: "deliveryRate", label: "Delivery rate" }
+  { key: "deliveryRate", label: "Delivery rate" },
+  { key: "reviewStatus", label: "Review status" }
 ] as const;
 
 type ProductAnalyticsDeliveryRowKey = (typeof productAnalyticsDeliveryRowItems)[number]["key"];
@@ -64,14 +66,21 @@ export async function getProductAnalytics(orgId: string) {
       overview.conversations.total > 0 ? Number((overview.messages.total / overview.conversations.total).toFixed(1)) : 0,
     totalUsageEvents,
     fakeAiUsagePercent,
-    deliveryRatePercent
+    deliveryRatePercent,
+    deliveryReviewStatus: getLocalDeliveryReviewStatus({
+      outboundMessages: overview.messages.outbound,
+      delivered: overview.messages.delivered,
+      pending: overview.messages.pending,
+      failed: overview.messages.failed
+    })
   };
   const deliveryValues: Record<ProductAnalyticsDeliveryRowKey, string> = {
     outbound: overview.messages.outbound.toString(),
     delivered: overview.messages.delivered.toString(),
     pending: overview.messages.pending.toString(),
     failed: overview.messages.failed.toString(),
-    deliveryRate: `${derived.deliveryRatePercent}%`
+    deliveryRate: `${derived.deliveryRatePercent}%`,
+    reviewStatus: derived.deliveryReviewStatus
   };
   const metricValues: Record<ProductAnalyticsMetricKey, { value: number | string; detail: string }> = {
     consentCoverage: {

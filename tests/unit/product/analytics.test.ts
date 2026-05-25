@@ -56,7 +56,8 @@ describe("product analytics", () => {
       averageMessagesPerConversation: 2.2,
       totalUsageEvents: 10,
       fakeAiUsagePercent: 10,
-      deliveryRatePercent: 80
+      deliveryRatePercent: 80,
+      deliveryReviewStatus: "1 failed; review evidence"
     });
     expect(analytics.metrics).toEqual([
       { key: "consentCoverage", label: "Consent Coverage", value: "75%", detail: "3/4 opted in" },
@@ -69,7 +70,8 @@ describe("product analytics", () => {
       { key: "delivered", label: "Delivered", value: "4" },
       { key: "pending", label: "Pending", value: "0" },
       { key: "failed", label: "Failed", value: "1" },
-      { key: "deliveryRate", label: "Delivery rate", value: "80%" }
+      { key: "deliveryRate", label: "Delivery rate", value: "80%" },
+      { key: "reviewStatus", label: "Review status", value: "1 failed; review evidence" }
     ]);
     expect(analytics.usageRows).toEqual([
       { type: UsageEventType.CONTACT_IMPORTED, label: "Contacts imported", quantity: 4 },
@@ -120,7 +122,8 @@ describe("product analytics", () => {
         averageMessagesPerConversation: 0,
         totalUsageEvents: 0,
         fakeAiUsagePercent: 0,
-        deliveryRatePercent: 0
+        deliveryRatePercent: 0,
+        deliveryReviewStatus: "No outbound evidence"
       }
     });
   });
@@ -177,7 +180,8 @@ describe("product analytics", () => {
       "delivered",
       "pending",
       "failed",
-      "deliveryRate"
+      "deliveryRate",
+      "reviewStatus"
     ]);
 
     expect(() => {

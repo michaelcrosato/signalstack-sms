@@ -2,6 +2,7 @@ import { CampaignStatus, ConsentStatus } from "@prisma/client";
 import { getCampaignWithMessages, listCampaignsWithDelivery } from "@/lib/db/repositories/campaigns";
 import { listContacts } from "@/lib/db/repositories/contacts";
 import { listTemplates } from "@/lib/db/repositories/templates";
+import { getLocalDeliveryReviewStatus } from "@/lib/messaging/delivery-review";
 import { isLocalDeliveryDelivered, isTerminalDeliveryFailure } from "@/lib/messaging/delivery-status";
 import { preflightCampaignRecipients } from "@/lib/messaging/send-preflight";
 
@@ -118,7 +119,7 @@ export async function getProductCampaigns(orgId: string) {
           pending,
           failed,
           deliveryRatePercent: outboundMessages > 0 ? Math.round((delivered / outboundMessages) * 100) : 0,
-          reviewStatus: getCampaignDeliveryReviewStatus(outboundMessages, delivered, pending, failed),
+          reviewStatus: getLocalDeliveryReviewStatus({ outboundMessages, delivered, pending, failed }),
           lastOutboundMessage: deliverySummary.lastOutboundMessage
         }
       };
@@ -327,38 +328,18 @@ function getCampaignDeliverySummary(
     outboundMessages: outboundMessages.length.toString(),
     recentEvidenceRows: `${options.recentEvidenceRows ?? outboundMessages.length} of ${outboundMessages.length}`,
     deliveryRate: `${deliveryRatePercent}%`,
-    reviewStatus: getCampaignDeliveryReviewStatus(
-      outboundMessages.length,
-      delivered.length,
-      pending.length,
-      failed.length
-    ),
+    reviewStatus: getLocalDeliveryReviewStatus({
+      outboundMessages: outboundMessages.length,
+      delivered: delivered.length,
+      pending: pending.length,
+      failed: failed.length
+    }),
     delivered: delivered.length.toString(),
     pending: pending.length.toString(),
     failed: failed.length.toString(),
     lastOutboundMessage: lastOutboundMessageAt?.toISOString() ?? "none",
     providerStatuses: providerStatuses.length > 0 ? providerStatuses.join(", ") : "none"
   };
-}
-
-function getCampaignDeliveryReviewStatus(outboundMessages: number, delivered: number, pending: number, failed: number) {
-  if (outboundMessages === 0) {
-    return "No outbound evidence";
-  }
-
-  if (failed > 0) {
-    return `${failed} failed; review evidence`;
-  }
-
-  if (pending > 0) {
-    return `${pending} pending; awaiting provider status`;
-  }
-
-  if (delivered === outboundMessages) {
-    return "All delivered";
-  }
-
-  return "Review delivery evidence";
 }
 
 function getCampaignDeliveryState(message: {
