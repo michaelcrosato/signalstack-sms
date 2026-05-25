@@ -98,3 +98,5 @@ Production-like demo deployment operations are documented in `docs/PRODUCTION_DE
 Demo-safe hosting platform notes are documented in `docs/DEPLOYMENT_PLATFORM_NOTES.md`. They do not authorize live messaging, billing, AI, provider calls, notifications, third-party telemetry exports, real secrets, or destructive data operations.
 
 The local gate must pass before committing a milestone unless an exact environment blocker is recorded in `BLOCKERS.codex.md`.
+
+GitHub `ci` and `premerge` workflows invoke `pwsh ./scripts/local-gate.ps1` after install/browser setup, so automated green status also includes the protected gate integrity check before `npm run validate`.

@@ -12,6 +12,7 @@ jobs:
       LIVE_BILLING_ENABLED: "false"
       MESSAGING_PROVIDER: dummy
       AI_PROVIDER: fake
+      DATABASE_URL: postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,4 +21,4 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm run premerge
+      - run: pwsh ./scripts/local-gate.ps1

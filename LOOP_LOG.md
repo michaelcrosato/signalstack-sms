@@ -7586,3 +7586,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run typecheck`, `npm run lint`, `npm run contracts:check`, `npm run context:check`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.
+
+## Run 813  GREEN  workflow-protected-local-gate  2026-05-25 01:59
+Objective:    Make CI and premerge green status exercise the protected local gate.
+Changed:
+- Routed GitHub `ci` and `premerge` workflows through `pwsh ./scripts/local-gate.ps1` after install/browser setup, with demo-safe validation defaults in both workflows.
+- Added focused deployment workflow unit coverage that pins protected-gate invocation and rejects direct raw `npm run validate`/`npm run premerge` green signals.
+- Updated testing contract/docs, local gate docs, current matrix, and compact handoffs without editing protected gate scripts or enabling live-world side effects.
+Gate:         passed with `npm run test -- tests/unit/deployment/workflow-local-gate.test.ts`, `npm run typecheck`, `npm run lint`, `npm run contracts:check`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.
