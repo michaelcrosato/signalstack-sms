@@ -110,7 +110,9 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
         <section aria-label="Campaign delivery snapshot" className="rounded border border-slate-200 bg-white">
           <div className="border-b border-slate-200 p-5">
             <h2 className="text-xl font-semibold">Delivery snapshot</h2>
-            <p className="mt-1 text-sm text-slate-600">Local message delivery evidence for this campaign.</p>
+            <p className="mt-1 text-sm text-slate-600">
+              Metrics summarize all outbound local messages; recent rows show the latest 30 evidence records.
+            </p>
           </div>
           <div className="grid gap-5 p-5">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -120,6 +122,12 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
             </div>
 
             <div className="grid gap-3">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-800">Recent outbound evidence</h3>
+                <p className="mt-1 text-sm text-slate-600">
+                  These rows are local ledger records only and do not trigger delivery retries or provider calls.
+                </p>
+              </div>
               {campaign.deliveryRows.length > 0 ? (
                 campaign.deliveryRows.map((message) => (
                   <article className="rounded border border-slate-200 bg-slate-50 p-3" key={message.id}>

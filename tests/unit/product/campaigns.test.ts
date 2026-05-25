@@ -411,7 +411,7 @@ describe("getProductCampaigns", () => {
           { key: "consent", label: "Consent", value: ConsentStatus.OPTED_OUT },
           { key: "archived", label: "Archive", value: "active" },
           { key: "sendState", label: "Send State", value: CampaignRecipientStatus.BLOCKED },
-          { key: "blockReason", label: "Block Reason", value: "CONTACT_OPTED_OUT" }
+          { key: "blockReason", label: "Block Reason", value: "Opted out" }
         ]
       }
     ]);

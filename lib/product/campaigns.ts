@@ -360,7 +360,7 @@ function getCampaignRecipientStatusValue(
     case "sendState":
       return recipient.sendState;
     case "blockReason":
-      return recipient.blockReason ?? "none";
+      return recipient.blockReason ? formatCampaignBlockReason(recipient.blockReason) : "none";
   }
 }
 

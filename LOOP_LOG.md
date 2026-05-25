@@ -7466,3 +7466,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run typecheck`, `npm run test:e2e:product-demo -- --grep "product campaign detail"`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer concrete idempotency/auth correctness gaps or feedback-driven reporting depth.
+
+## Run 801  GREEN  campaign-detail-review-copy  2026-05-25 00:20
+Objective:    Make campaign-detail review signals clearer without expanding live behavior.
+Changed:
+- Rendered recipient block reasons with the existing human-readable campaign blocker labels in `/dashboard/campaigns/:campaignId`.
+- Added visible delivery snapshot copy that explains aggregate metrics use all outbound local messages while recent rows show the latest 30 evidence records.
+- Updated focused product campaign unit coverage, product-demo E2E assertions, API/testing docs, current matrix, and compact handoffs.
+Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run typecheck`, `npm run test:e2e:product-demo -- --grep "product campaign detail"`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer concrete idempotency/auth correctness gaps or feedback-driven reporting depth.
