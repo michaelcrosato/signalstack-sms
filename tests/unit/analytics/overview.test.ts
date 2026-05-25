@@ -39,17 +39,17 @@ describe("analytics usage aggregation", () => {
     mocks.campaignCount.mockImplementation(async ({ where }: CountArgs) => (where.status === "SCHEDULED" ? 3 : 7));
     mocks.conversationCount.mockImplementation(async ({ where }: CountArgs) => (where.status === "OPEN" ? 4 : 9));
     mocks.messageCount.mockImplementation(async ({ where }: CountArgs) => {
-      if (where.direction === "INBOUND") {
-        return 11;
-      }
-      if (where.direction === "OUTBOUND") {
-        return 5;
-      }
       if (where.deliveredAt) {
         return 4;
       }
       if (where.OR) {
         return 1;
+      }
+      if (where.direction === "INBOUND") {
+        return 11;
+      }
+      if (where.direction === "OUTBOUND") {
+        return 5;
       }
 
       return 16;
@@ -104,10 +104,13 @@ describe("analytics usage aggregation", () => {
     expect(mocks.messageCount).toHaveBeenCalledWith({ where: { orgId: "org_analytics" } });
     expect(mocks.messageCount).toHaveBeenCalledWith({ where: { orgId: "org_analytics", direction: "INBOUND" } });
     expect(mocks.messageCount).toHaveBeenCalledWith({ where: { orgId: "org_analytics", direction: "OUTBOUND" } });
-    expect(mocks.messageCount).toHaveBeenCalledWith({ where: { orgId: "org_analytics", deliveredAt: { not: null } } });
+    expect(mocks.messageCount).toHaveBeenCalledWith({
+      where: { orgId: "org_analytics", direction: "OUTBOUND", deliveredAt: { not: null } }
+    });
     expect(mocks.messageCount).toHaveBeenCalledWith({
       where: {
         orgId: "org_analytics",
+        direction: "OUTBOUND",
         OR: [{ failedAt: { not: null } }, { providerStatus: { in: ["failed", "undelivered"] } }]
       }
     });

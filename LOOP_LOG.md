@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 774  GREEN  outbound-delivery-reporting  2026-05-24 20:39
+Objective:    Keep product delivery reporting scoped to outbound messages.
+Changed:
+- Scoped analytics overview delivered/failed delivery counts to `direction: "OUTBOUND"` so inbound rows cannot inflate product delivery rates.
+- Applied the same outbound-only delivery filters to the main product dashboard projection.
+- Added focused analytics/dashboard unit assertions and aligned API/testing docs for outbound-only local delivery reporting without sends, retries, provider calls, billing, live AI, notifications, mutations, or live feature enablement.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3132'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live sends blocked; prefer product-demo polish, production auth/RBAC planning, or high-value reporting correctness.
+
 ## Run 773  GREEN  product-dashboard-next-steps  2026-05-24 20:31
 Objective:    Give the main product dashboard concise owner-facing next steps from existing local counts.
 Changed:

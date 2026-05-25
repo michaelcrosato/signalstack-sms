@@ -64,7 +64,7 @@ Milestone 7:
 
 Milestone 8:
 
-- `GET /api/analytics/overview`: returns tenant-scoped aggregate analytics, including scheduled campaign counts and local message delivery breakdowns.
+- `GET /api/analytics/overview`: returns tenant-scoped aggregate analytics, including scheduled campaign counts and outbound-only local message delivery breakdowns.
 - `GET /api/billing/usage`: returns local billing metadata and usage totals.
 - `POST /api/billing/usage`: records a local usage event only.
 
@@ -80,7 +80,7 @@ Post-MVP webhook foundation:
 Post-MVP provider settings foundation:
 
 - `/`: renders a static local launch dashboard with demo-safe defaults and links to existing local-only admin/demo views without database access, mutations, provider calls, billing artifacts, notifications, live messaging, or secrets.
-- `/dashboard`: renders a product-facing dashboard with tenant-scoped product metrics, local message delivery signals, local usage totals, and navigation links without mutations, delivery retries, provider calls, SMS, billing artifacts, live AI, secrets, or live messaging enablement.
+- `/dashboard`: renders a product-facing dashboard with tenant-scoped product metrics, outbound-only local message delivery signals, local usage totals, and navigation links without mutations, delivery retries, provider calls, SMS, billing artifacts, live AI, secrets, or live messaging enablement.
 - `/dashboard/contacts`: renders a product-facing contacts workspace with tenant-scoped active contacts, consent/list/tag context, metrics, and a local CSV import form backed by `POST /api/contacts/imports` without provider calls, SMS, billing, live AI, secrets, hard deletion, validation bypasses, or live messaging enablement.
 - `/dashboard/contacts/:contactId`: renders a product-facing contact detail workspace with local profile, consent, notes, tags, list editing, soft archive, restore, and duplicate-merge actions backed by existing contact APIs without provider calls, SMS, billing, live AI, secrets, hard deletion, consent bypasses, or live messaging enablement.
 - `/dashboard/campaigns`: renders a product-facing campaign workspace with local draft creation, compliance preflight, and local schedule actions backed by existing campaign APIs without provider calls, SMS, billing, live AI, secrets, worker execution, or live messaging enablement.
@@ -88,7 +88,7 @@ Post-MVP provider settings foundation:
 - `/dashboard/inbox`: renders a product-facing inbox workspace with tenant-scoped threads, local inbound replies, notes, assignment, and resolve/reopen actions backed by existing inbox APIs without outbound SMS, provider calls, billing, live AI, notifications, secrets, or live messaging enablement.
 - `/dashboard/templates`: renders a product-facing template workspace with tenant-scoped template rows, local template creation/upsert, detected variables, and campaign usage counts backed by `GET/POST /api/templates` without live outbound rendering, provider calls, SMS, billing, live AI, secrets, or live messaging enablement.
 - `/dashboard/templates/:templateId`: renders a product-facing template detail/edit workflow backed by `GET/PATCH /api/templates/:templateId` without live outbound rendering, scheduling campaigns, provider calls, SMS, billing, live AI, secrets, hard deletion, or live messaging enablement.
-- `/dashboard/analytics`: renders a product-facing analytics workspace with tenant-scoped contact, campaign, scheduled-campaign, inbox, message delivery, and usage totals backed by the existing analytics overview without report execution, exports, mutations, provider calls, Stripe calls, billing artifacts, live AI, SMS, secrets, or live feature enablement.
+- `/dashboard/analytics`: renders a product-facing analytics workspace with tenant-scoped contact, campaign, scheduled-campaign, inbox, outbound-only message delivery, and usage totals backed by the existing analytics overview without report execution, exports, mutations, provider calls, Stripe calls, billing artifacts, live AI, SMS, secrets, or live feature enablement.
 - `/dashboard/compliance`: renders a product-facing compliance readiness workspace with required profile fields, A2P status, runtime hard-gate blockers, and demo-safe live messaging state without registering A2P campaigns, provider calls, SMS, billing, live AI, secrets, or live feature enablement.
 - `/settings/demo`: renders a read-only local demo operations checkpoint with seeded demo readiness, shared-inventory workflow links, local metrics, usage totals, and runtime gates without imports, campaign scheduling, worker execution, inbox replies, report execution, exports, mutations, provider calls, billing records, notifications, live feature enablement, or secrets.
 - `/settings/operations`: renders a read-only local operations index with grouped existing operator surfaces, route names, static counts, and safety-boundary text without command execution, file inspection, API probes, mutations, exports, provider calls, billing records, notifications, live feature enablement, or secrets.

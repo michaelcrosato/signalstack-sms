@@ -186,7 +186,7 @@ Returns deterministic fake lead qualification score, stage, and reasons from sup
 
 ### `GET /api/analytics/overview`
 
-Returns tenant-scoped counts for contacts, total and scheduled campaigns, conversations, local message delivery breakdowns, and local usage totals.
+Returns tenant-scoped counts for contacts, total and scheduled campaigns, conversations, local outbound message delivery breakdowns, and local usage totals.
 
 ### `GET /api/billing/usage`
 
@@ -358,7 +358,7 @@ Renders a read-only local go-live readiness audit view for the current organizat
 
 ### `/dashboard`
 
-Renders the product-facing dashboard for the current organization. It may display tenant-scoped contact, campaign, inbox, template, compliance, local message delivery, local usage, fake-AI usage, navigation signals, and read-only next-step links derived from existing local counts. It must not mutate records, retry delivery, call providers, send SMS, create billing records, call live AI, expose secrets, or enable live messaging.
+Renders the product-facing dashboard for the current organization. It may display tenant-scoped contact, campaign, inbox, template, compliance, local outbound message delivery, local usage, fake-AI usage, navigation signals, and read-only next-step links derived from existing local counts. It must not mutate records, retry delivery, call providers, send SMS, create billing records, call live AI, expose secrets, or enable live messaging.
 
 ### `/dashboard/contacts`
 
@@ -386,7 +386,7 @@ Renders the product-facing template detail workflow for a tenant-scoped message 
 
 ### `/dashboard/analytics`
 
-Renders the product-facing analytics workspace for the current organization. It may display tenant-scoped contact, campaign, scheduled-campaign, conversation, local message delivery, and local usage totals from the existing analytics overview. It must not execute reports, create exports, mutate records, call providers, call Stripe, create billing artifacts, send SMS, call live AI, expose secrets, or enable live messaging.
+Renders the product-facing analytics workspace for the current organization. It may display tenant-scoped contact, campaign, scheduled-campaign, conversation, local outbound message delivery, and local usage totals from the existing analytics overview. It must not execute reports, create exports, mutate records, call providers, call Stripe, create billing artifacts, send SMS, call live AI, expose secrets, or enable live messaging.
 
 ### `/dashboard/compliance`
 

@@ -1,5 +1,6 @@
 import { UsageEventType } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
+import { prisma } from "@/lib/db/prisma";
 import { productComplianceFields } from "@/lib/product/compliance";
 import {
   getProductDashboard,
@@ -52,14 +53,14 @@ vi.mock("@/lib/db/prisma", () => ({
             OR?: Array<Record<string, unknown>>;
           };
         }) => {
-          if (where.direction === "OUTBOUND") {
-            return 5;
-          }
           if (where.deliveredAt) {
             return 4;
           }
           if (where.OR) {
             return 1;
+          }
+          if (where.direction === "OUTBOUND") {
+            return 5;
           }
 
           return 12;
@@ -402,6 +403,17 @@ describe("product dashboard navigation", () => {
           ]
         }
       ]
+    });
+
+    expect(vi.mocked(prisma.message.count)).toHaveBeenCalledWith({
+      where: { orgId: "org_1", direction: "OUTBOUND", deliveredAt: { not: null } }
+    });
+    expect(vi.mocked(prisma.message.count)).toHaveBeenCalledWith({
+      where: {
+        orgId: "org_1",
+        direction: "OUTBOUND",
+        OR: [{ failedAt: { not: null } }, { providerStatus: { in: ["failed", "undelivered"] } }]
+      }
     });
   });
 });
