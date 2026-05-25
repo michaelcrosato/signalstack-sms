@@ -108,6 +108,7 @@ BullMQ workers may consume scheduled-campaign queue events only by referencing d
 - Worker startup is blocked unless `QUEUE_BACKEND=bullmq`, `REDIS_URL` is configured, `MESSAGING_PROVIDER=dummy`, `LIVE_MESSAGING_ENABLED` is not `true`, and no production-like runtime marker is present. BullMQ worker readiness must reject every production-like runtime marker before provider or live-worker-class checks can fall through.
 - BullMQ worker startup also rejects any `WORKER_DEPLOYMENT_CLASS` other than `local-demo`.
 - BullMQ worker startup must continue to reject `WORKER_DEPLOYMENT_CLASS=production-live-campaign` until every frozen future live-worker control is implemented.
+- Every exported BullMQ worker startup or direct worker-construction helper must enforce the same BullMQ backend, Redis, provider, live-messaging, production-runtime, and worker-deployment-class readiness gate before constructing a worker.
 - The BullMQ worker must use the same dummy-only send path and idempotent `Message` rows as the database polling worker.
 
 ## Post-MVP BullMQ/Redis Smoke

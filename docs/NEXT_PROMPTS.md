@@ -15,7 +15,8 @@ This is the compact handoff for the next automated loop. Full history is in `LOO
 
 ## Current State
 
-- Latest validated run: Run 806 adds a dashboard delivery evidence signal from existing outbound local message counts.
+- Latest validated run: Run 807 closes a direct BullMQ worker construction bypass by forcing the exported construction helper through the same startup readiness gate as the public start helper.
+- Run 806 adds a dashboard delivery evidence signal from existing outbound local message counts.
 - Run 805 adds latest outbound evidence visibility to campaign-list delivery reporting from existing local message records.
 - Run 804 adds a campaign delivery review status to product campaign list/detail reporting from existing local outbound message evidence.
 - Run 803 adds an executable API RBAC matrix at `lib/auth/api-rbac-matrix.ts` and cross-checks it against every mutating `app/api/**/route.ts` method plus the signed Twilio webhook exceptions.
@@ -25,13 +26,13 @@ This is the compact handoff for the next automated loop. Full history is in `LOO
 - Run 799 adds a local last-outbound-message metric to `/dashboard/campaigns/:campaignId`.
 - Run 798 adds a local outbound delivery-rate metric to `/dashboard/campaigns/:campaignId`.
 - Run 797 adds aggregate local recipient-readiness metrics to `/dashboard/campaigns/:campaignId`.
-- The backend foundation is strong: tenant helpers, contacts, campaigns with missing/cross-tenant requested preflight contact IDs blocked, queue jobs with schedule-time stale queued-job cancellation, tenant-explicit local outbound worker idempotency keys, per-recipient send-time skips, and local outbound provider-status preservation, inbox with explicit inbound duplicate side-effect prevention, compliance gates, fake AI, local billing/analytics, provider metadata, Twilio webhook foundations with duplicate-race handling, readiness audit, operations inventory, and validation gates.
+- The backend foundation is strong: tenant helpers, contacts, campaigns with missing/cross-tenant requested preflight contact IDs blocked, queue jobs with schedule-time stale queued-job cancellation, tenant-explicit local outbound worker idempotency keys, per-recipient send-time skips, local outbound provider-status preservation, BullMQ worker startup and direct construction gates, inbox with explicit inbound duplicate side-effect prevention, compliance gates, fake AI, local billing/analytics, provider metadata, Twilio webhook foundations with duplicate-race handling, readiness audit, operations inventory, and validation gates.
 - The browser product has a usable local demo path across dashboard with next-step and centralized outbound-only local delivery evidence/rate/pending/failure signals, contacts import/detail/archive/restore/merge, campaign fake-AI copy/preflight count/schedule/detail/edit/cancel plus campaign-list recipient readiness and delivered/pending/failed/rate/review-status/latest-evidence reporting, campaign-detail aggregate recipient readiness, all-outbound delivery-rate/count/review-status/last-message metrics, visible recent-evidence row count, explicit recent-row boundary copy and recent delivery rows, recipient send-state/human-readable block reasons, and mutually exclusive outbound-only delivery detail visibility with per-row delivery states, inbox query-selected thread work, template create/detail/edit, analytics plus delivery operations with outbound-only `failed`/`undelivered` breakdowns, and compliance readiness.
 - Live campaign sending, live billing, live AI, production auth, production secrets, production workers, and production deployment remain blocked by default.
 - Production auth/RBAC now has a checked planning document at `docs/PRODUCTION_AUTH_RBAC.md`, an executable mutating-route RBAC matrix, `npm run production-auth:check` as part of validation, and production-like demo deployments reject Clerk auth configuration with `CLERK_AUTH_CONFIG_PRESENT` until explicit controls exist.
 - The only intentional live external-impact route is the isolated `/demo` live-test SMS path, gated by explicit Twilio credentials, live flags, recipient allowlist, and confirmation phrase; accepted Twilio statuses are normalized before local evidence is stored or returned.
 - Twilio webhook handlers fail closed on malformed or unsupported form bodies before signature validation, tenant lookup, webhook-event storage, or local inbox/delivery mutations; route-level tests also pin invalid signatures, duplicate-event no-ops, and current-tenant status updates.
-- Auth scanner, API RBAC matrix, and live-worker hardening coverage are already very broad. Do not spend another loop on minor syntactic variants unless a concrete uncovered parser/control-flow gap is proven with targeted search.
+- Auth scanner, API RBAC matrix, BullMQ direct startup gating, and live-worker hardening coverage are already very broad. Do not spend another loop on minor syntactic variants unless a concrete uncovered parser/control-flow gap is proven with targeted search.
 
 ## Next Work
 

@@ -6900,3 +6900,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/dashboard.test.ts`, `npm run typecheck`, `npm run test:e2e:product-demo -- --grep "product dashboard"`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer concrete idempotency/auth correctness gaps, feedback-driven reporting depth, or real auth only after a Clerk/session design slice is selected.
+
+## Run 807  GREEN  bullmq-direct-startup-gate  2026-05-25 01:10
+Objective:    Ensure direct BullMQ worker construction cannot bypass the local/demo startup readiness gate.
+Changed:
+- Routed `createScheduledCampaignBullMqWorker` through `bullMqWorkerCanStart` before any BullMQ worker is constructed.
+- Added focused unit coverage proving direct construction rejects backend-disabled, production-like, and provider-blocked inputs through the same gate as the public start helper.
+- Updated queue/testing contracts, current matrix, and compact handoffs without executing workers, touching Redis, sending SMS, calling providers, billing, live AI, notifications, secrets, or live feature enablement.
+Gate:         passed with `npm run test -- tests/unit/queue/bullmq-worker.test.ts` and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer feedback-driven product/reporting work or concrete auth/idempotency correctness gaps over more syntactic gate variants.

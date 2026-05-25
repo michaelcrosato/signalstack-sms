@@ -35,6 +35,11 @@ export function bullMqWorkerCanStart(env: Record<string, string | undefined> = p
 }
 
 export function createScheduledCampaignBullMqWorker(env: Record<string, string | undefined> = process.env) {
+  const readiness = bullMqWorkerCanStart(env);
+  if (!readiness.allowed) {
+    throw new Error(`BullMQ worker startup blocked: ${readiness.reason}.`);
+  }
+
   const { redisUrl } = getRedisQueueConfig(env);
   if (!redisUrl) {
     throw new Error("REDIS_URL is required for BullMQ worker startup.");

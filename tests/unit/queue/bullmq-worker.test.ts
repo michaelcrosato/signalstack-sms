@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { bullMqWorkerCanStart } from "@/lib/queue/bullmq-worker";
+import { bullMqWorkerCanStart, createScheduledCampaignBullMqWorker } from "@/lib/queue/bullmq-worker";
 import { scheduledCampaignBullMqJobDataSchema } from "@/lib/queue/jobs";
 
 describe("BullMQ worker foundation", () => {
@@ -83,6 +83,29 @@ describe("BullMQ worker foundation", () => {
         })
       ).toEqual({ allowed: false, reason: "production-worker-blocked" });
     }
+  });
+
+  it("blocks direct BullMQ worker creation through the same startup gate", () => {
+    expect(() => createScheduledCampaignBullMqWorker({})).toThrow(
+      "BullMQ worker startup blocked: backend-disabled."
+    );
+    expect(() =>
+      createScheduledCampaignBullMqWorker({
+        QUEUE_BACKEND: "bullmq",
+        REDIS_URL: "redis://localhost:6379",
+        NODE_ENV: "production",
+        LIVE_MESSAGING_ENABLED: "false",
+        MESSAGING_PROVIDER: "dummy"
+      })
+    ).toThrow("BullMQ worker startup blocked: production-worker-blocked.");
+    expect(() =>
+      createScheduledCampaignBullMqWorker({
+        QUEUE_BACKEND: "bullmq",
+        REDIS_URL: "redis://localhost:6379",
+        LIVE_MESSAGING_ENABLED: "true",
+        MESSAGING_PROVIDER: "twilio"
+      })
+    ).toThrow("BullMQ worker startup blocked: provider-blocked.");
   });
 
   it("validates BullMQ worker payloads with durable queue job IDs", () => {
