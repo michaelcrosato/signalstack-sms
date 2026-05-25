@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 750  GREEN  auth-logical-and-assignment-globalthis-aliases  2026-05-24 17:06
+Objective:    Prove logical-and assignment local `globalThis` root aliases are classified before mutating-route body-reader role gates.
+Changed:
+- Added auth scanner alias discovery for `&&=` local `globalThis` root chains.
+- Added focused auth unit coverage for logical-and assignment chains feeding defaulted `Request`, `Object`, and `Reflect` destructuring before body-reader calls.
+- Updated testing docs/contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the logical-and assignment alias boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 749  GREEN  auth-logical-assignment-globalthis-aliases  2026-05-24 17:00
 Objective:    Prove nullish/fallback logical assignment local `globalThis` root aliases are classified before mutating-route body-reader role gates.
 Changed:

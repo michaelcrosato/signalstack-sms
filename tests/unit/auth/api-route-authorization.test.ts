@@ -238,7 +238,7 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
       "g"
     );
     const logicalAssignedGlobalThisAliasPattern = new RegExp(
-      `(?:^|[;,\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*(?:\\?\\?=|\\|\\|=)\\s*${globalThisAliasValuePattern}\\s*(?=,|;|\\r?\\n)`,
+      `(?:^|[;,\\r\\n])\\s*([A-Za-z_$][\\w$]*)\\s*(?:\\?\\?=|\\|\\|=|&&=)\\s*${globalThisAliasValuePattern}\\s*(?=,|;|\\r?\\n)`,
       "g"
     );
     const parenthesizedAssignedGlobalThisAliasPattern = new RegExp(
@@ -246,7 +246,7 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
       "g"
     );
     const parenthesizedLogicalAssignedGlobalThisAliasPattern = new RegExp(
-      `(?:^|[;,\\r\\n])\\s*\\(+\\s*([A-Za-z_$][\\w$]*)\\s*(?:\\?\\?=|\\|\\|=)\\s*${globalThisAliasValuePattern}\\s*\\)+\\s*(?=,|;|\\r?\\n)`,
+      `(?:^|[;,\\r\\n])\\s*\\(+\\s*([A-Za-z_$][\\w$]*)\\s*(?:\\?\\?=|\\|\\|=|&&=)\\s*${globalThisAliasValuePattern}\\s*\\)+\\s*(?=,|;|\\r?\\n)`,
       "g"
     );
     for (const match of [
@@ -7411,7 +7411,7 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
-  it("treats nullish and fallback logical assignment local globalThis root aliases as body parsing for role-gate ordering", () => {
+  it("treats nullish, fallback, and logical-and assignment local globalThis root aliases as body parsing for role-gate ordering", () => {
     const unsafeLogicalAssignmentRequestRootAliasSource = `
       export async function POST(req: Request) {
         let root;
@@ -7483,6 +7483,41 @@ describe("API route authorization coverage", () => {
         return Response.json({ size: payload.size });
       }
     `;
+    const unsafeLogicalAndAssignmentRequestRootAliasSource = `
+      export async function POST(req: Request) {
+        let root = {};
+        let platform = {};
+        let runtime = {};
+        root &&= globalThis;
+        platform &&= root;
+        runtime &&= platform;
+        const { Request: RequestCtor = Request } = runtime;
+        const payload = await RequestCtor.prototype.json.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeParenthesizedLogicalAndAssignmentComputedBuiltinsRootAliasSource = `
+      export async function PATCH(req: Request) {
+        const objectName = "Object" as const;
+        const reflectName = "Reflect" as const;
+        let root = {};
+        let platform = {};
+        let runtime = {};
+        ((root &&= ((globalThis as typeof globalThis)!)));
+        ((platform &&= ((root)! satisfies typeof globalThis)));
+        ((runtime &&= ((platform)! as typeof globalThis)));
+        const { [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = runtime;
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "text"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
     const safeSource = `
       export async function POST(req: Request) {
         let root;
@@ -7515,6 +7550,15 @@ describe("API route authorization coverage", () => {
       mutatingMethodParsesBodyBeforeRoleGate(
         unsafeLogicalAssignmentComputedBuiltinsRootAliasSource,
         "DELETE"
+      )
+    ).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeLogicalAndAssignmentRequestRootAliasSource, "POST")).toBe(
+      true
+    );
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeParenthesizedLogicalAndAssignmentComputedBuiltinsRootAliasSource,
+        "PATCH"
       )
     ).toBe(true);
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
