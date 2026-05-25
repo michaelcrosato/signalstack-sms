@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 752  GREEN  auth-sequence-expression-globalthis-aliases  2026-05-24 17:18
+Objective:    Prove simple sequence-expression local `globalThis` root aliases are classified before mutating-route body-reader role gates.
+Changed:
+- Added auth scanner alias discovery for parenthesized literal sequence-expression local `globalThis` root chains such as `root = (void 0, globalThis); platform = (undefined, root); runtime = (0, platform)`.
+- Added focused auth unit coverage for sequence-expression root chains feeding defaulted `Request`, `Object`, and `Reflect` destructuring before body-reader calls.
+- Updated testing docs/contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, and current state matrix for the sequence-expression alias boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 751  GREEN  auth-comma-logical-assignment-globalthis-aliases  2026-05-24 17:11
 Objective:    Prove comma-expression logical assignment local `globalThis` root aliases are classified before mutating-route body-reader role gates.
 Changed:

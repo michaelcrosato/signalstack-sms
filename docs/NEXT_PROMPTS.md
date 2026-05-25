@@ -14,7 +14,8 @@ This file is the handoff for the next automated loop. It should stay short enoug
 
 ## Current State
 
-- Latest run: Run 751 added mutating-route auth scanner coverage for comma-expression logical assignment local `globalThis` roots, including `((root ??= globalThis), (platform ||= root), (runtime &&= platform))`, before `Request`, `Object`, and `Reflect` destructuring reaches prototype/descriptor body-reader calls.
+- Latest run: Run 752 added mutating-route auth scanner coverage for simple sequence-expression local `globalThis` roots, including `root = (void 0, globalThis); platform = (undefined, root); runtime = (0, platform)`, before `Request`, `Object`, and `Reflect` destructuring reaches prototype/descriptor body-reader calls.
+- Run 751 added mutating-route auth scanner coverage for comma-expression logical assignment local `globalThis` roots, including `((root ??= globalThis), (platform ||= root), (runtime &&= platform))`, before `Request`, `Object`, and `Reflect` destructuring reaches prototype/descriptor body-reader calls.
 - Run 750 added mutating-route auth scanner coverage for logical-and assignment local `globalThis` roots, including `root &&= globalThis; platform &&= root; runtime &&= platform`, before `Request`, `Object`, and `Reflect` destructuring reaches prototype/descriptor body-reader calls.
 - Run 749 added mutating-route auth scanner coverage for nullish/fallback logical assignment local `globalThis` roots, including `root ??= globalThis; platform ||= root; runtime ??= platform`, before `Request`, `Object`, and `Reflect` destructuring reaches prototype/descriptor body-reader calls.
 - Run 748 added mutating-route auth scanner coverage for parenthesized assignment comma-expression non-null local `globalThis` roots, including `(((root = (globalThis)!), (platform = ((root)!)), (runtime = ((platform)!))))`, before `Request`, `Object`, and `Reflect` destructuring reaches prototype/descriptor body-reader calls.

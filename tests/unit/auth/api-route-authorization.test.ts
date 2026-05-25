@@ -223,12 +223,14 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
   const builtInPropertyAliases = new Map<string, string>();
   const globalThisAliases = new Set<string>();
   const optionalNonNullAssertionPattern = "(?:\\s*!\\s*)?";
+  const simpleSequenceExpressionPrefixPattern =
+    "(?:\\(+\\s*(?:void\\s+0|undefined|null|0|false|true)\\s*,\\s*)*";
   let discoveredGlobalThisAlias = true;
   while (discoveredGlobalThisAlias) {
     discoveredGlobalThisAlias = false;
     const globalThisAliasTargets =
       globalThisAliases.size > 0 ? `globalThis|${[...globalThisAliases].map(escapeRegExp).join("|")}` : "globalThis";
-    const globalThisAliasValuePattern = `\\(*\\s*(?:${globalThisAliasTargets})${optionalNonNullAssertionPattern}\\s*\\)*${optionalNonNullAssertionPattern}(?:\\s+(?:as|satisfies)\\s+typeof\\s+globalThis)?\\s*\\)*${optionalNonNullAssertionPattern}\\s*\\)*`;
+    const globalThisAliasValuePattern = `${simpleSequenceExpressionPrefixPattern}\\(*\\s*(?:${globalThisAliasTargets})${optionalNonNullAssertionPattern}\\s*\\)*${optionalNonNullAssertionPattern}(?:\\s+(?:as|satisfies)\\s+typeof\\s+globalThis)?\\s*\\)*${optionalNonNullAssertionPattern}\\s*\\)*`;
     const globalThisAliasPattern = new RegExp(
       `(?:\\b(?:const|let|var)\\s+|,\\s*)([A-Za-z_$][\\w$]*)\\s*(?::[^=;,\\n]+)?=\\s*${globalThisAliasValuePattern}\\s*(?=,|;|\\r?\\n)`,
       "g"
@@ -295,7 +297,7 @@ function bodySliceParsesRequestBody(rawBodySlice: string, requestParameterName =
   const globalThisTargetPattern = () =>
     `(?:globalThis${globalThisAliases.size > 0 ? `|${[...globalThisAliases].map(escapeRegExp).join("|")}` : ""})`;
   const globalThisTargetWithOptionalTypeAssertionPattern = () =>
-    `\\(*\\s*${globalThisTargetPattern()}${optionalNonNullAssertionPattern}\\s*\\)*${optionalNonNullAssertionPattern}(?:\\s+(?:as|satisfies)\\s+typeof\\s+globalThis)?\\s*\\)*${optionalNonNullAssertionPattern}\\s*\\)*`;
+    `${simpleSequenceExpressionPrefixPattern}\\(*\\s*${globalThisTargetPattern()}${optionalNonNullAssertionPattern}\\s*\\)*${optionalNonNullAssertionPattern}(?:\\s+(?:as|satisfies)\\s+typeof\\s+globalThis)?\\s*\\)*${optionalNonNullAssertionPattern}\\s*\\)*`;
   const withoutDestructuringDefault = (field: string) => field.replace(/\s*=\s*[\s\S]*$/, "");
   const collectGlobalThisBuiltInAliases = (fields: string) =>
     fields.split(",").flatMap((field) => {
@@ -7657,6 +7659,114 @@ describe("API route authorization coverage", () => {
     expect(
       mutatingMethodParsesBodyBeforeRoleGate(
         unsafeCommaLogicalAssignmentComputedBuiltinsRootAliasSource,
+        "DELETE"
+      )
+    ).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
+  it("treats simple sequence-expression local globalThis root aliases as body parsing for role-gate ordering", () => {
+    const unsafeSequenceExpressionRequestRootAliasSource = `
+      export async function POST(req: Request) {
+        let root;
+        let platform;
+        let runtime;
+        root = (void 0, globalThis);
+        platform = (undefined, root);
+        runtime = (0, platform);
+        const { Request: RequestCtor = Request } = runtime;
+        const payload = await RequestCtor.prototype.json.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeSequenceExpressionComputedRequestRootAliasSource = `
+      export async function PATCH(req: Request) {
+        const requestConstructorName = "Request" as const;
+        let platform;
+        let runtime;
+        const root = (void 0, ((globalThis as typeof globalThis)!));
+        platform = (undefined, ((root)! satisfies typeof globalThis));
+        runtime = (0, ((platform)! as typeof globalThis));
+        const { [requestConstructorName]: RequestCtor = Request } = runtime;
+        const payload = await RequestCtor.prototype.text.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeSequenceExpressionBuiltinsRootAliasSource = `
+      export async function PUT(req: Request) {
+        let root;
+        let platform;
+        let runtime;
+        root = (void 0, globalThis satisfies typeof globalThis);
+        platform = (undefined, root);
+        runtime = (0, platform satisfies typeof globalThis);
+        const { Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = runtime;
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "formData"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const unsafeSequenceExpressionComputedBuiltinsRootAliasSource = `
+      export async function DELETE(req: Request) {
+        const objectName = "Object" as const;
+        const reflectName = "Reflect" as const;
+        let root;
+        let platform;
+        let runtime;
+        let ObjectBuiltin;
+        let ReflectBuiltin;
+        ((root = (void 0, ((globalThis satisfies typeof globalThis)!))));
+        ((platform = (undefined, ((root)! as typeof globalThis))));
+        ((runtime = (0, ((platform)! satisfies typeof globalThis))));
+        ({ [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = runtime);
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "blob"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        let root;
+        let platform;
+        let runtime;
+        root = (void 0, globalThis);
+        platform = (undefined, root);
+        runtime = (0, platform);
+        const { Request: RequestCtor = Request } = runtime;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await RequestCtor.prototype.arrayBuffer.call(req);
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSequenceExpressionRequestRootAliasSource, "POST")).toBe(
+      true
+    );
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeSequenceExpressionComputedRequestRootAliasSource,
+        "PATCH"
+      )
+    ).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(unsafeSequenceExpressionBuiltinsRootAliasSource, "PUT")).toBe(
+      true
+    );
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeSequenceExpressionComputedBuiltinsRootAliasSource,
         "DELETE"
       )
     ).toBe(true);
