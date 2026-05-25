@@ -5,6 +5,7 @@ import {
   getProductDashboard,
   productDashboardActions,
   productDashboardMetricRows,
+  productDashboardNextStepRows,
   productDashboardSections,
   productDashboardSignalRows,
   productNavigation
@@ -199,6 +200,38 @@ describe("product dashboard navigation", () => {
     expect(productDashboardSignalRows[0].label).toBe("Consent coverage");
   });
 
+  it("freezes dashboard next-step metadata before rendering", () => {
+    expect(Object.isFrozen(productDashboardNextStepRows)).toBe(true);
+    expect(productDashboardNextStepRows.every((step) => Object.isFrozen(step))).toBe(true);
+    expect(productDashboardNextStepRows.map((step) => step.key)).toEqual([
+      "reviewInbox",
+      "prepareCampaign",
+      "checkCompliance"
+    ]);
+    expect(productDashboardNextStepRows.map((step) => step.href)).toEqual([
+      "/dashboard/inbox",
+      "/dashboard/campaigns",
+      "/dashboard/compliance"
+    ]);
+    expect(productDashboardNextStepRows.map((step) => step.label)).toEqual([
+      "Review open replies",
+      "Prepare campaign",
+      "Check go-live blockers"
+    ]);
+
+    expect(() =>
+      (productDashboardNextStepRows as unknown as Array<{ key: string; label: string; href: string }>).push({
+        key: "unsafe",
+        label: "Unsafe",
+        href: "#unsafe"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productDashboardNextStepRows[0] as { href: string }).href = "#unsafe";
+    }).toThrow(TypeError);
+    expect(productDashboardNextStepRows[0].href).toBe("/dashboard/inbox");
+  });
+
   it("freezes dashboard section status metadata before rendering", () => {
     expect(Object.isFrozen(productDashboardSections)).toBe(true);
     expect(productDashboardSections.every((section) => Object.isFrozen(section))).toBe(true);
@@ -293,6 +326,29 @@ describe("product dashboard navigation", () => {
         { key: "inboxLoad", label: "Inbox load", value: "4" },
         { key: "fakeAiRequests", label: "Fake AI requests", value: "2" },
         { key: "localUsageEvents", label: "Local usage events", value: "3" }
+      ],
+      nextSteps: [
+        {
+          key: "reviewInbox",
+          label: "Review open replies",
+          href: "/dashboard/inbox",
+          value: "4 open",
+          detail: "Use fake AI insights, notes, and resolution state to work replies locally."
+        },
+        {
+          key: "prepareCampaign",
+          label: "Prepare campaign",
+          href: "/dashboard/campaigns",
+          value: "1 scheduled",
+          detail: "Review queued local work and delivery signals before the demo."
+        },
+        {
+          key: "checkCompliance",
+          label: "Check go-live blockers",
+          href: "/dashboard/compliance",
+          value: `${productComplianceFields.length}/${productComplianceFields.length} fields`,
+          detail: "A2P NOT_STARTED; live messaging remains blocked."
+        }
       ],
       sections: [
         {

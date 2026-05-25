@@ -59,6 +59,20 @@ export default async function DashboardPage() {
           ))}
         </section>
 
+        <ProductSection id="next-steps" title="Next Steps" eyebrow="Demo Path">
+          <div className="grid gap-3 md:grid-cols-3">
+            {dashboard.nextSteps.map((step) => (
+              <NextStep
+                key={step.key}
+                label={step.label}
+                href={step.href}
+                value={step.value}
+                detail={step.detail}
+              />
+            ))}
+          </div>
+        </ProductSection>
+
         <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           {dashboard.sections.slice(0, 2).map((section) => (
             <ProductSection id={section.id} title={section.title} eyebrow={section.eyebrow} key={section.id}>
@@ -92,6 +106,16 @@ export default async function DashboardPage() {
         </ProductSection>
       </div>
     </main>
+  );
+}
+
+function NextStep({ label, href, value, detail }: { label: string; href: string; value: string; detail: string }) {
+  return (
+    <Link className="rounded border border-slate-200 bg-slate-50 p-4 text-left" href={href}>
+      <span className="block text-sm font-medium text-slate-700">{label}</span>
+      <span className="mt-2 block text-lg font-semibold text-slate-950">{value}</span>
+      <span className="mt-2 block text-sm leading-6 text-slate-600">{detail}</span>
+    </Link>
   );
 }
 

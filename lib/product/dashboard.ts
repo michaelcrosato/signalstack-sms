@@ -52,6 +52,18 @@ export const productDashboardSignalRows = Object.freeze(
   productDashboardSignalRowItems.map((row) => Object.freeze({ ...row }))
 );
 
+const productDashboardNextStepItems = [
+  { key: "reviewInbox", label: "Review open replies", href: "/dashboard/inbox" },
+  { key: "prepareCampaign", label: "Prepare campaign", href: "/dashboard/campaigns" },
+  { key: "checkCompliance", label: "Check go-live blockers", href: "/dashboard/compliance" }
+] as const;
+
+type ProductDashboardNextStepKey = (typeof productDashboardNextStepItems)[number]["key"];
+
+export const productDashboardNextStepRows = Object.freeze(
+  productDashboardNextStepItems.map((step) => Object.freeze({ ...step }))
+);
+
 const productDashboardSectionItems = [
   {
     id: "contacts",
@@ -213,6 +225,37 @@ export async function getProductDashboard(orgId: string) {
     fakeAiRequests: String(dashboard.usage.fakeAiRequests),
     localUsageEvents: String(dashboard.usage.totalEvents)
   };
+  const nextStepValues: Record<ProductDashboardNextStepKey, { value: string; detail: string }> = {
+    reviewInbox:
+      dashboard.inbox.open > 0
+        ? {
+            value: `${dashboard.inbox.open} open`,
+            detail: "Use fake AI insights, notes, and resolution state to work replies locally."
+          }
+        : {
+            value: "none open",
+            detail: "Create a demo inbound message when the walkthrough needs a fresh reply."
+          },
+    prepareCampaign:
+      dashboard.campaigns.scheduled > 0
+        ? {
+            value: `${dashboard.campaigns.scheduled} scheduled`,
+            detail: "Review queued local work and delivery signals before the demo."
+          }
+        : dashboard.campaigns.draft > 0
+          ? {
+              value: `${dashboard.campaigns.draft} drafts`,
+              detail: "Run preflight and schedule one local campaign from opted-in contacts."
+            }
+          : {
+              value: "needs draft",
+              detail: "Create a local draft campaign before showing campaign scheduling."
+            },
+    checkCompliance: {
+      value: `${dashboard.compliance.completeFields}/${dashboard.compliance.requiredFields} fields`,
+      detail: `A2P ${dashboard.compliance.a2pRegistrationStatus}; live messaging remains blocked.`
+    }
+  };
   const sectionStatusValues: Record<ProductDashboardSectionStatusKey, string> = {
     activeContacts: String(dashboard.contacts.total),
     optedIn: String(dashboard.contacts.optedIn),
@@ -248,6 +291,17 @@ export async function getProductDashboard(orgId: string) {
       label: row.label,
       value: signalValues[row.key]
     })),
+    nextSteps: productDashboardNextStepRows.map((step) => {
+      const nextStep = nextStepValues[step.key];
+
+      return {
+        key: step.key,
+        label: step.label,
+        href: step.href,
+        value: nextStep.value,
+        detail: nextStep.detail
+      };
+    }),
     sections: productDashboardSections.map((section) => ({
       id: section.id,
       title: section.title,

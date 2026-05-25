@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 773  GREEN  product-dashboard-next-steps  2026-05-24 20:31
+Objective:    Give the main product dashboard concise owner-facing next steps from existing local counts.
+Changed:
+- Added frozen next-step dashboard metadata and read-only projected links for inbox review, campaign prep, and compliance blockers.
+- Rendered a `/dashboard` Next Steps panel and added focused unit plus seeded product-demo assertions.
+- Updated API/testing contracts and compact handoff docs for the local dashboard guidance without enabling sends, retries, provider calls, workers, billing, notifications, mutations, or live features.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3131'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live sends blocked; prefer product-demo polish, production auth/RBAC planning, or high-value reporting correctness.
+
 ## Run 772  GREEN  product-dashboard-delivery-signals  2026-05-24 20:22
 Objective:    Surface existing local delivery outcomes on the main product dashboard.
 Changed:
