@@ -12,6 +12,7 @@ Implemented foundations:
 Rules:
 
 - Webhook requests are `application/x-www-form-urlencoded`.
+- Malformed or unsupported form bodies return `400` before signature validation, current-org lookup, webhook-event storage, or local message/delivery mutation.
 - Non-string form parts are rejected before signature validation; Twilio webhook helpers must not coerce file/blob parts into filenames or trusted payload fields.
 - Duplicate form field names are rejected before signature validation; Twilio webhook helpers must not collapse repeated fields into an ambiguous last-value payload.
 - Signature validation uses the exact request URL, all received parameters including unknown provider fields, and `TWILIO_AUTH_TOKEN`.

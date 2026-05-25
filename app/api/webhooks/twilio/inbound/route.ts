@@ -3,14 +3,14 @@ import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { createDemoInboundMessage } from "@/lib/db/repositories/inbox";
 import { recordWebhookEvent } from "@/lib/db/repositories/webhooks";
 import {
-  formDataToRecord,
   normalizeTwilioInbound,
+  readTwilioFormPayload,
   validateTwilioSignature
 } from "@/lib/messaging/twilio-webhooks";
 import { twilioWebhookPayloadSchema } from "@/lib/validation/webhooks";
 
 export async function POST(request: Request) {
-  const rawPayload = formDataToRecord(await request.formData());
+  const rawPayload = await readTwilioFormPayload(request);
   if (!rawPayload) {
     return NextResponse.json({ error: "Invalid Twilio form payload." }, { status: 400 });
   }

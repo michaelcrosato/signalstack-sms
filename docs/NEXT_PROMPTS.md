@@ -14,11 +14,12 @@ This is the compact handoff for the next automated loop. Full history is in `LOO
 
 ## Current State
 
-- Latest validated run: Run 782 normalizes gated live-test SMS Twilio response statuses before local message/audit storage and API responses.
+- Latest validated run: Run 783 returns controlled invalid-form responses for malformed or unsupported Twilio webhook bodies before signature validation, tenant lookup, webhook storage, or local message/delivery mutation.
 - The backend foundation is strong: tenant helpers, contacts, campaigns, queue jobs with schedule-time stale queued-job cancellation, per-recipient send-time skips, and local outbound provider-status preservation, inbox with explicit inbound duplicate side-effect prevention, compliance gates, fake AI, local billing/analytics, provider metadata, Twilio webhook foundations with duplicate-race handling, readiness audit, operations inventory, and validation gates.
 - The browser product has a usable local demo path across dashboard with next-step and shared outbound-only local delivery signals, contacts import/detail/archive/restore/merge, campaign fake-AI copy/schedule/detail/edit/cancel plus recipient send-state/block-reason and outbound-only delivery visibility, inbox thread work, template create/detail/edit, analytics plus delivery operations with outbound-only `failed`/`undelivered` breakdowns, and compliance readiness.
 - Live campaign sending, live billing, live AI, production auth, production secrets, production workers, and production deployment remain blocked by default.
 - The only intentional live external-impact route is the isolated `/demo` live-test SMS path, gated by explicit Twilio credentials, live flags, recipient allowlist, and confirmation phrase; accepted Twilio statuses are normalized before local evidence is stored or returned.
+- Twilio webhook handlers now fail closed on malformed or unsupported form bodies before signature validation, tenant lookup, webhook-event storage, or local inbox/delivery mutations.
 - Auth scanner and live-worker hardening coverage is already very broad. Do not spend another loop on minor syntactic variants unless a concrete uncovered parser/control-flow gap is proven with targeted search.
 
 ## Next Work

@@ -57,6 +57,14 @@ export function formDataToRecord(formData: FormData): Record<string, string> | n
   return payload;
 }
 
+export async function readTwilioFormPayload(request: Request): Promise<Record<string, string> | null> {
+  try {
+    return formDataToRecord(await request.formData());
+  } catch {
+    return null;
+  }
+}
+
 export function validateTwilioSignature(input: {
   authToken?: string;
   signature?: string | null;

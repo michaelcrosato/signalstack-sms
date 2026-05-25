@@ -4,6 +4,7 @@ import {
   formDataToRecord,
   normalizeTwilioInbound,
   normalizeTwilioStatus,
+  readTwilioFormPayload,
   twilioStatusTransition,
   validateTwilioSignature
 } from "@/lib/messaging/twilio-webhooks";
@@ -16,6 +17,37 @@ function sign(url: string, params: Record<string, string>, token: string) {
 }
 
 describe("Twilio webhook helpers", () => {
+  it("returns null for unsupported request body formats before signature validation", async () => {
+    const request = new Request("https://example.com/api/webhooks/twilio/inbound", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ From: "+15555550100", Body: "HELP", MessageSid: "SM123" })
+    });
+
+    await expect(readTwilioFormPayload(request)).resolves.toBeNull();
+  });
+
+  it("parses URL-encoded Twilio form payloads without dropping unknown fields", async () => {
+    const form = new URLSearchParams({
+      From: "+15555550100",
+      Body: "HELP",
+      MessageSid: "SM123",
+      FutureField: "kept"
+    });
+    const request = new Request("https://example.com/api/webhooks/twilio/inbound", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: form
+    });
+
+    await expect(readTwilioFormPayload(request)).resolves.toEqual({
+      From: "+15555550100",
+      Body: "HELP",
+      MessageSid: "SM123",
+      FutureField: "kept"
+    });
+  });
+
   it("rejects non-string form fields before signature validation", () => {
     const formData = new FormData();
     formData.append("From", "+15555550100");

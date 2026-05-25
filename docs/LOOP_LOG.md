@@ -6659,3 +6659,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3141'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer production auth/RBAC planning, deeper product reporting visibility, or concrete idempotency correctness gaps over syntactic scanner variants.
+
+## Run 783  GREEN  webhook-malformed-form-fail-closed  2026-05-24 21:42
+Objective:    Return controlled invalid-form responses for malformed or unsupported Twilio webhook bodies before local work can run.
+Changed:
+- Added a safe Twilio form-payload reader that catches `request.formData()` parser failures and preserves the existing non-string/duplicate-field rejection path.
+- Updated inbound and status webhook routes to use the reader before signature validation, current-org lookup, webhook-event storage, or local message/delivery mutation.
+- Added focused webhook helper coverage for unsupported body formats and normal URL-encoded payloads preserving unknown provider fields, and updated webhook docs/contracts plus compact handoffs.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3142'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer production auth/RBAC planning, deeper product reporting visibility, or concrete idempotency correctness gaps over syntactic scanner variants.
