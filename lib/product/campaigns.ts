@@ -58,6 +58,7 @@ export const productCampaignRecipientReadinessMetricRows = Object.freeze(
 
 const productCampaignDeliveryMetricRowItems = [
   { key: "outboundMessages", label: "Outbound Messages" },
+  { key: "deliveryRate", label: "Delivery Rate" },
   { key: "delivered", label: "Delivered" },
   { key: "pending", label: "Pending" },
   { key: "failed", label: "Failed" },
@@ -302,9 +303,12 @@ function getCampaignDeliverySummary(
     (message) => message.deliveredAt === null && !isTerminalDeliveryFailure(message)
   );
   const providerStatuses = Array.from(new Set(outboundMessages.map((message) => message.providerStatus ?? "local_only")));
+  const deliveryRatePercent =
+    outboundMessages.length > 0 ? Math.round((delivered.length / outboundMessages.length) * 100) : 0;
 
   return {
     outboundMessages: outboundMessages.length.toString(),
+    deliveryRate: `${deliveryRatePercent}%`,
     delivered: delivered.length.toString(),
     pending: pending.length.toString(),
     failed: failed.length.toString(),

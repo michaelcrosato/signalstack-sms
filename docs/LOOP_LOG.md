@@ -6810,3 +6810,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; add deeper campaign reporting only after feedback, or pursue concrete idempotency/auth correctness gaps.
+
+## Run 798  GREEN  campaign-detail-delivery-rate  2026-05-24 23:45
+Objective:    Surface campaign-detail local outbound delivery rate for product demo review.
+Changed:
+- Added a `Delivery Rate` metric to `/dashboard/campaigns/:campaignId` from outbound delivered messages over outbound local campaign messages.
+- Updated focused product campaign unit coverage and the seeded product-demo campaign-detail assertion.
+- Updated API/testing contracts, local testing docs, current matrix, and compact handoffs for the new read-only reporting signal.
+Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run test:e2e:product-demo -- --grep "product campaign detail"`, a localhost browser check for `Delivery Rate`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer feedback-driven reporting detail, concrete idempotency gaps, or gated auth/RBAC work.
