@@ -4,13 +4,14 @@ import { productCampaignComposerDefaults } from "@/lib/product/campaign-composer
 import {
   getProductCampaignDetail,
   getProductCampaigns,
+  productCampaignDeliveryMetricRows,
   productCampaignDetailMetricRows,
   productCampaignMetricRows,
   productCampaignRecipientStatusRows
 } from "@/lib/product/campaigns";
 
 vi.mock("@/lib/db/repositories/campaigns", () => ({
-  getCampaign: vi.fn(async (_orgId: string, campaignId: string) =>
+  getCampaignWithMessages: vi.fn(async (_orgId: string, campaignId: string) =>
     campaignId === "missing"
       ? null
       : {
@@ -37,6 +38,33 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
                 consentStatus: ConsentStatus.OPTED_IN,
                 archivedAt: null
               }
+            }
+          ],
+          messages: [
+            {
+              id: "message_delivered",
+              direction: "OUTBOUND",
+              providerStatus: "delivered",
+              providerMessageId: "dummy_message_1",
+              deliveredAt: new Date("2026-01-03T00:00:00.000Z"),
+              failedAt: null,
+              createdAt: new Date("2026-01-02T00:00:00.000Z"),
+              contact: {
+                displayName: "Ada Lovelace",
+                firstName: "Ada",
+                lastName: "Lovelace",
+                phone: "+15555550100"
+              }
+            },
+            {
+              id: "message_failed",
+              direction: "OUTBOUND",
+              providerStatus: "failed",
+              providerMessageId: null,
+              deliveredAt: null,
+              failedAt: new Date("2026-01-04T00:00:00.000Z"),
+              createdAt: new Date("2026-01-04T00:00:00.000Z"),
+              contact: null
             }
           ]
         }
@@ -163,6 +191,34 @@ describe("getProductCampaigns", () => {
         ]
       }
     ]);
+    expect(result?.deliveryMetrics).toEqual([
+      { key: "outboundMessages", label: "Outbound Messages", value: "2" },
+      { key: "delivered", label: "Delivered", value: "1" },
+      { key: "failed", label: "Failed", value: "1" },
+      { key: "providerStatuses", label: "Provider Statuses", value: "delivered, failed" }
+    ]);
+    expect(result?.deliveryRows).toEqual([
+      {
+        id: "message_delivered",
+        contactDisplayName: "Ada Lovelace",
+        direction: "OUTBOUND",
+        providerStatus: "delivered",
+        providerMessageId: "dummy_message_1",
+        createdAt: "2026-01-02T00:00:00.000Z",
+        deliveredAt: "2026-01-03T00:00:00.000Z",
+        failedAt: null
+      },
+      {
+        id: "message_failed",
+        contactDisplayName: "Unknown contact",
+        direction: "OUTBOUND",
+        providerStatus: "failed",
+        providerMessageId: "no provider id",
+        createdAt: "2026-01-04T00:00:00.000Z",
+        deliveredAt: null,
+        failedAt: "2026-01-04T00:00:00.000Z"
+      }
+    ]);
     expect(result?.contacts.map((contact) => ({ id: contact.id, selected: contact.selected, disabled: contact.disabled }))).toEqual([
       { id: "contact_1", selected: true, disabled: false },
       { id: "contact_2", selected: false, disabled: true }
@@ -243,6 +299,34 @@ describe("getProductCampaigns", () => {
       (productCampaignRecipientStatusRows[0] as { label: string }).label = "Unsafe";
     }).toThrow(TypeError);
     expect(productCampaignRecipientStatusRows[0].label).toBe("Consent");
+  });
+
+  it("freezes campaign delivery metric metadata before rendering", () => {
+    expect(Object.isFrozen(productCampaignDeliveryMetricRows)).toBe(true);
+    expect(productCampaignDeliveryMetricRows.every((row) => Object.isFrozen(row))).toBe(true);
+    expect(productCampaignDeliveryMetricRows.map((row) => row.key)).toEqual([
+      "outboundMessages",
+      "delivered",
+      "failed",
+      "providerStatuses"
+    ]);
+    expect(productCampaignDeliveryMetricRows.map((row) => row.label)).toEqual([
+      "Outbound Messages",
+      "Delivered",
+      "Failed",
+      "Provider Statuses"
+    ]);
+
+    expect(() =>
+      (productCampaignDeliveryMetricRows as unknown as Array<{ key: string; label: string }>).push({
+        key: "unsafe",
+        label: "Unsafe"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productCampaignDeliveryMetricRows[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productCampaignDeliveryMetricRows[0].label).toBe("Outbound Messages");
   });
 
   it("freezes campaign composer defaults before rendering the local composer", () => {

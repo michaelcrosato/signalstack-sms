@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 770  GREEN  campaign-detail-delivery-snapshot  2026-05-24 20:01
+Objective:    Make existing local campaign delivery metadata visible in the product campaign detail path.
+Changed:
+- Added a read-only Delivery snapshot to `/dashboard/campaigns/:campaignId` with outbound, delivered, failed, provider-status, and recent local message metadata from tenant-scoped `Message` rows.
+- Added focused product projection coverage for delivery metrics/rows and a seeded product-demo assertion for the campaign delivery snapshot.
+- Updated API/testing contracts and compact handoff docs for local delivery visibility without enabling sends, retries, provider calls, workers, billing, notifications, or live features.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3127'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live sends blocked; prefer concise product-demo polish, production auth/RBAC planning, or high-value reporting correctness.
+
 ## Run 769  GREEN  campaign-detail-recipient-send-state  2026-05-24 19:52
 Objective:    Make local scheduled-campaign recipient send state and block reasons visible in the product campaign detail path.
 Changed:

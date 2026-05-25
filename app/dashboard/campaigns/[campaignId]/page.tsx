@@ -99,6 +99,54 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
           </section>
         </section>
 
+        <section aria-label="Campaign delivery snapshot" className="rounded border border-slate-200 bg-white">
+          <div className="border-b border-slate-200 p-5">
+            <h2 className="text-xl font-semibold">Delivery snapshot</h2>
+            <p className="mt-1 text-sm text-slate-600">Local message delivery evidence for this campaign.</p>
+          </div>
+          <div className="grid gap-5 p-5">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {campaign.deliveryMetrics.map((metric) => (
+                <Metric key={metric.key} label={metric.label} value={metric.value} />
+              ))}
+            </div>
+
+            <div className="grid gap-3">
+              {campaign.deliveryRows.length > 0 ? (
+                campaign.deliveryRows.map((message) => (
+                  <article className="rounded border border-slate-200 bg-slate-50 p-3" key={message.id}>
+                    <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <p className="font-medium text-slate-950">{message.contactDisplayName}</p>
+                        <p className="mt-1 text-sm text-slate-600">
+                          {message.direction} / {message.providerStatus} / {message.providerMessageId}
+                        </p>
+                      </div>
+                      <time className="text-xs text-slate-600" dateTime={message.createdAt}>
+                        {message.createdAt}
+                      </time>
+                    </div>
+                    <dl className="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
+                      <div className="rounded border border-slate-300 bg-white px-2 py-1">
+                        <dt className="inline text-slate-500">Delivered: </dt>
+                        <dd className="inline text-slate-800">{message.deliveredAt ?? "not recorded"}</dd>
+                      </div>
+                      <div className="rounded border border-slate-300 bg-white px-2 py-1">
+                        <dt className="inline text-slate-500">Failed: </dt>
+                        <dd className="inline text-slate-800">{message.failedAt ?? "not recorded"}</dd>
+                      </div>
+                    </dl>
+                  </article>
+                ))
+              ) : (
+                <p className="rounded border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+                  No local delivery messages recorded for this campaign.
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
+
         <section className="rounded border border-slate-200 bg-white p-5">
           <h2 className="text-xl font-semibold">Safety Boundary</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">

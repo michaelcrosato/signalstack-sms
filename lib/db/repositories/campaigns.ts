@@ -6,23 +6,40 @@ import { scheduledCampaignIdempotencyKey } from "@/lib/queue/idempotency";
 import { scheduledCampaignJobSchema } from "@/lib/queue/jobs";
 import type { CampaignCreateInput, CampaignUpdateInput } from "@/lib/validation/campaigns";
 
-const campaignInclude = {
+const campaignListInclude = {
   template: true,
   recipients: { include: { contact: true } }
+} satisfies Prisma.CampaignInclude;
+
+const campaignDetailInclude = {
+  template: true,
+  recipients: { include: { contact: true } },
+  messages: {
+    include: { contact: true },
+    orderBy: { createdAt: "desc" },
+    take: 30
+  }
 } satisfies Prisma.CampaignInclude;
 
 export async function listCampaigns(orgId: string) {
   return prisma.campaign.findMany({
     where: { orgId },
     orderBy: { updatedAt: "desc" },
-    include: campaignInclude
+    include: campaignListInclude
   });
 }
 
 export async function getCampaign(orgId: string, campaignId: string) {
   return prisma.campaign.findFirst({
     where: orgWhere(orgId, { id: campaignId }),
-    include: campaignInclude
+    include: campaignListInclude
+  });
+}
+
+export async function getCampaignWithMessages(orgId: string, campaignId: string) {
+  return prisma.campaign.findFirst({
+    where: orgWhere(orgId, { id: campaignId }),
+    include: campaignDetailInclude
   });
 }
 
@@ -38,7 +55,7 @@ export async function createCampaign(orgId: string, input: CampaignCreateInput) 
     });
 
     await syncCampaignRecipients(tx, orgId, campaign.id, input.contactIds);
-    return tx.campaign.findUniqueOrThrow({ where: { id: campaign.id }, include: campaignInclude });
+    return tx.campaign.findUniqueOrThrow({ where: { id: campaign.id }, include: campaignListInclude });
   });
 }
 
@@ -65,7 +82,7 @@ export async function updateCampaign(orgId: string, campaignId: string, input: C
       await syncCampaignRecipients(tx, orgId, campaign.id, input.contactIds);
     }
 
-    return tx.campaign.findUniqueOrThrow({ where: { id: campaign.id }, include: campaignInclude });
+    return tx.campaign.findUniqueOrThrow({ where: { id: campaign.id }, include: campaignListInclude });
   });
 }
 

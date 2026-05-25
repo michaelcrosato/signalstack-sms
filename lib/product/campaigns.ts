@@ -1,5 +1,5 @@
 import { CampaignStatus, ConsentStatus } from "@prisma/client";
-import { getCampaign, listCampaigns } from "@/lib/db/repositories/campaigns";
+import { getCampaignWithMessages, listCampaigns } from "@/lib/db/repositories/campaigns";
 import { listContacts } from "@/lib/db/repositories/contacts";
 import { listTemplates } from "@/lib/db/repositories/templates";
 
@@ -38,6 +38,19 @@ type ProductCampaignRecipientStatusKey = (typeof productCampaignRecipientStatusR
 
 export const productCampaignRecipientStatusRows = Object.freeze(
   productCampaignRecipientStatusRowItems.map((row) => Object.freeze({ ...row }))
+);
+
+const productCampaignDeliveryMetricRowItems = [
+  { key: "outboundMessages", label: "Outbound Messages" },
+  { key: "delivered", label: "Delivered" },
+  { key: "failed", label: "Failed" },
+  { key: "providerStatuses", label: "Provider Statuses" }
+] as const;
+
+type ProductCampaignDeliveryMetricKey = (typeof productCampaignDeliveryMetricRowItems)[number]["key"];
+
+export const productCampaignDeliveryMetricRows = Object.freeze(
+  productCampaignDeliveryMetricRowItems.map((row) => Object.freeze({ ...row }))
 );
 
 export async function getProductCampaigns(orgId: string) {
@@ -87,7 +100,7 @@ export async function getProductCampaigns(orgId: string) {
 
 export async function getProductCampaignDetail(orgId: string, campaignId: string) {
   const [campaign, contacts, templates] = await Promise.all([
-    getCampaign(orgId, campaignId),
+    getCampaignWithMessages(orgId, campaignId),
     listContacts(orgId),
     listTemplates(orgId)
   ]);
@@ -97,6 +110,7 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
   }
 
   const selectedContactIds = new Set(campaign.recipients.map((recipient) => recipient.contactId));
+  const deliverySummary = getCampaignDeliverySummary(campaign.messages);
   const detail = {
     id: campaign.id,
     name: campaign.name,
@@ -132,6 +146,24 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
         }))
       };
     }),
+    deliveryRows: campaign.messages.map((message) => ({
+      id: message.id,
+      contactDisplayName: message.contact
+        ? message.contact.displayName ??
+          ([message.contact.firstName, message.contact.lastName].filter(Boolean).join(" ") || message.contact.phone)
+        : "Unknown contact",
+      direction: message.direction,
+      providerStatus: message.providerStatus ?? "local_only",
+      providerMessageId: message.providerMessageId ?? "no provider id",
+      createdAt: message.createdAt.toISOString(),
+      deliveredAt: message.deliveredAt?.toISOString() ?? null,
+      failedAt: message.failedAt?.toISOString() ?? null
+    })),
+    deliveryMetrics: productCampaignDeliveryMetricRows.map((row) => ({
+      key: row.key,
+      label: row.label,
+      value: deliverySummary[row.key]
+    })),
     contacts: contacts.map((contact) => ({
       id: contact.id,
       displayName: contact.displayName ?? ([contact.firstName, contact.lastName].filter(Boolean).join(" ") || contact.phone),
@@ -160,6 +192,30 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
       label: row.label,
       value: metricValues[row.key]
     }))
+  };
+}
+
+function getCampaignDeliverySummary(
+  messages: Array<{
+    direction: string;
+    providerStatus: string | null;
+    deliveredAt: Date | null;
+    failedAt: Date | null;
+  }>
+): Record<ProductCampaignDeliveryMetricKey, string> {
+  const outboundMessages = messages.filter((message) => message.direction === "OUTBOUND");
+  const delivered = messages.filter((message) => message.deliveredAt !== null);
+  const failed = messages.filter(
+    (message) =>
+      message.failedAt !== null || message.providerStatus === "failed" || message.providerStatus === "undelivered"
+  );
+  const providerStatuses = Array.from(new Set(messages.map((message) => message.providerStatus ?? "local_only")));
+
+  return {
+    outboundMessages: outboundMessages.length.toString(),
+    delivered: delivered.length.toString(),
+    failed: failed.length.toString(),
+    providerStatuses: providerStatuses.length > 0 ? providerStatuses.join(", ") : "none"
   };
 }
 
