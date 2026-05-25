@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 761
+
+- Latest mutating-route auth hardening adds comma-declared logical-expression local `globalThis` root alias coverage, including `const root = globalThis || globalThis, platform = root ?? root, runtime = platform && platform`, so defaulted `Request`, `Object`, and `Reflect` destructuring through those comma-declared logical aliases still counts as body-reader access before each handler's own top-level `requireApiRole`. Focused auth coverage passed with `npm run test -- tests/unit/auth/api-route-authorization.test.ts`; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 760
 
 - Latest mutating-route auth hardening adds comma-declared conditional-expression local `globalThis` root alias coverage, including `const root = condition ? globalThis : globalThis, platform = condition ? root : root, runtime = true ? platform : platform`, so defaulted `Request`, `Object`, and `Reflect` destructuring through those comma-declared conditional aliases still counts as body-reader access before each handler's own top-level `requireApiRole`. Focused auth coverage passed with `npm run test -- tests/unit/auth/api-route-authorization.test.ts`; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
