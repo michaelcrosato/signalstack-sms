@@ -9,7 +9,7 @@ As of 2026-05-21:
 - The repo has strong demo-safe foundations: data model, tenant boundaries, contracts, validation gates, seed data, local worker paths, Twilio webhook foundations, read-only operations surfaces, and automated tests.
 - The browser experience now has a product-facing dashboard, contacts, contact restore/merge, campaigns with fake-AI copy assist, campaign detail/edit/cancel, inbox, templates, template detail/edit, analytics, and compliance flow, with remaining gaps around demo polish and production readiness.
 - Live messaging remains blocked by default. The only intentional live external-impact path is the isolated `/demo` live-test SMS surface, which requires explicit Twilio credentials, live flags, a recipient allowlist, and the confirmation phrase.
-- Live campaign sending, live AI, live billing, real auth, production secret management, production Redis/rate-limit infrastructure, and production deployment are not complete.
+- Live campaign sending, live AI, live billing, real auth, production secret management, production Redis/rate-limit infrastructure, and production deployment are not complete. Production auth/RBAC is now a checked planning boundary, and production-like demo deployments reject Clerk auth configuration until explicit controls exist.
 - Planning inputs from Claude, Gemini, Grok, and Codex are captured under `planning/`; the current consensus is summarized in `planning/CONSENSUS-2026-05-21.md`.
 
 ## Completed Foundations
@@ -44,6 +44,7 @@ Goal: make the repo understandable in minutes and remove known correctness risks
 - Keep the canonical implementation plan and contracts intact.
 - Stop adding new read-only operations surfaces unless they unblock product or release safety.
 - Keep mutating-route RBAC enforcement covered while production auth is still pending.
+- Keep `docs/PRODUCTION_AUTH_RBAC.md`, `npm run production-auth:check`, and the production-gate `CLERK_AUTH_CONFIG_PRESENT` blocker green while production auth is still pending.
 - Keep contact consent rechecks at send time in worker/send paths, with stale blocked recipients skipped per recipient while allowed local dummy sends continue.
 - Keep idempotency keys tenant-scoped where cross-tenant key reuse is legitimate.
 - Keep live SMS, billing, AI, secrets, destructive DB operations, production worker execution, and production side effects hard-gated.
@@ -86,4 +87,5 @@ Goal: turn the demo-safe product into a paid production SaaS.
 
 1. Keep `docs/CURRENT_STATE_MATRIX.md` current.
 2. Keep the product demo path stable while collecting review feedback, including fake-AI campaign copy and inbox insights.
-3. Continue hardening the executable `production-live-campaign` control checklist, without adding it to supported worker classes until every listed control is implemented.
+3. Keep the production auth/RBAC planning check green while future Clerk-backed auth remains blocked in demo-safe production-like deployments.
+4. Continue hardening the executable `production-live-campaign` control checklist, without adding it to supported worker classes until every listed control is implemented.

@@ -19,6 +19,7 @@ Without `ALLOW_PRODUCTION_EXTERNALS=true`, the gate blocks:
 - `AI_PROVIDER` values other than `fake`
 - Twilio account, auth-token, messaging-service, or from-number environment configuration
 - Stripe secret or webhook-secret environment configuration
+- Clerk secret or publishable-key environment configuration
 
 This gate is part of `npm run validate`.
 
@@ -43,6 +44,7 @@ A future live-send milestone must add and validate all of these before any live 
 - Explicit org-level live messaging enablement separate from environment flags.
 - Complete compliance profile with approved A2P status.
 - Provider credential storage through a real secret manager, not raw database fields.
+- Production auth/RBAC adapter, membership-status enforcement, and route matrix as documented in `docs/PRODUCTION_AUTH_RBAC.md`.
 - Provider number ownership/readiness verification.
 - A dedicated production worker policy gate as documented in `docs/PRODUCTION_WORKER_POLICY.md`.
 - Send-rate limits and queue backpressure appropriate for provider limits.

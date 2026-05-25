@@ -28,6 +28,7 @@
     "contracts:check": "tsx scripts/contracts-check.ts",
     "compliance:check": "tsx scripts/compliance-check.ts",
     "production:gate": "tsx scripts/production-gate.ts",
+    "production-auth:check": "tsx scripts/production-auth-rbac-check.ts",
     "production-worker:check": "tsx scripts/production-worker-policy-check.ts",
     "observability:check": "tsx scripts/observability-check.ts",
     "operator:check": "tsx scripts/operator-runbook-check.ts",

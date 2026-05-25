@@ -48,6 +48,9 @@ export function evaluateProductionDeploymentGate(
     if (env.STRIPE_SECRET_KEY || env.STRIPE_WEBHOOK_SECRET) {
       blockers.push("STRIPE_SECRET_CONFIG_PRESENT");
     }
+    if (env.CLERK_SECRET_KEY || env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+      blockers.push("CLERK_AUTH_CONFIG_PRESENT");
+    }
   }
 
   return {

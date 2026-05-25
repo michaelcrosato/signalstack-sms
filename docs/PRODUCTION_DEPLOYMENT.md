@@ -26,6 +26,7 @@ Forbidden for the current deployment class:
 - `AI_PROVIDER` values other than `fake`
 - Twilio account, auth-token, messaging-service, or from-number environment secrets
 - Stripe secret or webhook-secret environment secrets
+- Clerk secret or publishable-key environment configuration
 
 Provider credential metadata may be entered through `/settings/provider`, but it remains local readiness metadata only. Raw provider auth tokens must not be stored, logged, returned by APIs, committed to the repo, or placed in production environment variables under the current gate.
 
@@ -90,6 +91,8 @@ Production observability planning is documented in `docs/PRODUCTION_OBSERVABILIT
 Platform-specific hosting notes are documented in `docs/DEPLOYMENT_PLATFORM_NOTES.md`. Current platform guidance covers demo-safe production-like hosting only and does not authorize live messaging, billing, AI, provider calls, notifications, third-party telemetry exports, real secrets, or destructive data operations.
 
 Production worker execution is separately blocked today. The planning gate for any future live worker deployment is documented in `docs/PRODUCTION_WORKER_POLICY.md`; the current deployment class does not run scheduled campaign workers in production-like runtimes.
+
+Production auth/RBAC planning is documented in `docs/PRODUCTION_AUTH_RBAC.md`. The current deployment class uses the deterministic demo session only; Clerk configuration, user invitations, role changes, suspensions, membership deletion, email, notifications, and real customer access remain blocked until a future auth milestone adds executable controls.
 
 ## Rollback
 

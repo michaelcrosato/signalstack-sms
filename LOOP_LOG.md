@@ -7415,3 +7415,14 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/inbox.test.ts`, `npm run typecheck`, `npm run test:e2e:product-demo -- --grep "product inbox"`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer production auth/RBAC planning, feedback-driven reporting depth, or concrete idempotency correctness gaps.
+
+## Run 796  GREEN  production-auth-rbac-plan  2026-05-24 23:30
+Objective:    Make production auth/RBAC readiness an executable planning boundary before Clerk-backed auth work.
+Changed:
+- Added `docs/PRODUCTION_AUTH_RBAC.md` with current demo-auth limits, future active-membership/RBAC requirements, and no-Clerk/no-live-action boundaries.
+- Added `npm run production-auth:check` to `npm run validate`, requiring the auth plan, deployment docs, local gate docs, and current auth helpers to stay aligned.
+- Extended the production deployment gate and tests to block Clerk secret or publishable-key configuration in production-like demo deployments as `CLERK_AUTH_CONFIG_PRESENT`.
+- Updated compact handoffs and production deployment/go-live docs for the checked auth boundary.
+Gate:         passed with `npm run production-auth:check`, `npm run test -- tests/unit/deployment/production-gate.test.ts`, `npm run production:gate`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; implement real auth/RBAC only as a concrete gated design slice, or pursue feedback-driven reporting/idempotency gaps.

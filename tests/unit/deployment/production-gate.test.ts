@@ -35,7 +35,8 @@ describe("production deployment gate", () => {
         MESSAGING_PROVIDER: "twilio",
         AI_PROVIDER: "openai",
         TWILIO_AUTH_TOKEN: "placeholder-token",
-        STRIPE_SECRET_KEY: "placeholder-stripe"
+        STRIPE_SECRET_KEY: "placeholder-stripe",
+        CLERK_SECRET_KEY: "placeholder-clerk"
       }).blockers
     ).toEqual([
       "LIVE_MESSAGING_ENABLED_TRUE",
@@ -44,7 +45,8 @@ describe("production deployment gate", () => {
       "LIVE_MESSAGING_PROVIDER_SELECTED",
       "LIVE_AI_PROVIDER_SELECTED",
       "TWILIO_SECRET_OR_ACCOUNT_CONFIG_PRESENT",
-      "STRIPE_SECRET_CONFIG_PRESENT"
+      "STRIPE_SECRET_CONFIG_PRESENT",
+      "CLERK_AUTH_CONFIG_PRESENT"
     ]);
   });
 
