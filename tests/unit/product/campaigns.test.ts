@@ -435,14 +435,25 @@ describe("getProductCampaigns", () => {
     ]);
     expect(result?.deliveryRows).toEqual([
       {
-        id: "message_delivered",
-        contactDisplayName: "Ada Lovelace",
-        deliveryState: "delivered",
+        id: "message_pending",
+        contactDisplayName: "Grace Hopper",
+        deliveryState: "pending",
         direction: "OUTBOUND",
-        providerStatus: "delivered",
-        providerMessageId: "dummy_message_1",
-        createdAt: "2026-01-02T00:00:00.000Z",
-        deliveredAt: "2026-01-03T00:00:00.000Z",
+        providerStatus: "sent",
+        providerMessageId: "dummy_message_2",
+        createdAt: "2026-01-04T12:00:00.000Z",
+        deliveredAt: null,
+        failedAt: null
+      },
+      {
+        id: "message_stale_delivered_failure",
+        contactDisplayName: "Unknown contact",
+        deliveryState: "failed",
+        direction: "OUTBOUND",
+        providerStatus: "undelivered",
+        providerMessageId: "dummy_message_stale",
+        createdAt: "2026-01-04T06:00:00.000Z",
+        deliveredAt: "2026-01-04T06:00:00.000Z",
         failedAt: null
       },
       {
@@ -457,25 +468,14 @@ describe("getProductCampaigns", () => {
         failedAt: "2026-01-04T00:00:00.000Z"
       },
       {
-        id: "message_stale_delivered_failure",
-        contactDisplayName: "Unknown contact",
-        deliveryState: "failed",
+        id: "message_delivered",
+        contactDisplayName: "Ada Lovelace",
+        deliveryState: "delivered",
         direction: "OUTBOUND",
-        providerStatus: "undelivered",
-        providerMessageId: "dummy_message_stale",
-        createdAt: "2026-01-04T06:00:00.000Z",
-        deliveredAt: "2026-01-04T06:00:00.000Z",
-        failedAt: null
-      },
-      {
-        id: "message_pending",
-        contactDisplayName: "Grace Hopper",
-        deliveryState: "pending",
-        direction: "OUTBOUND",
-        providerStatus: "sent",
-        providerMessageId: "dummy_message_2",
-        createdAt: "2026-01-04T12:00:00.000Z",
-        deliveredAt: null,
+        providerStatus: "delivered",
+        providerMessageId: "dummy_message_1",
+        createdAt: "2026-01-02T00:00:00.000Z",
+        deliveredAt: "2026-01-03T00:00:00.000Z",
         failedAt: null
       }
     ]);
@@ -501,10 +501,10 @@ describe("getProductCampaigns", () => {
     ]);
     expect(result?.deliveryRows).toHaveLength(4);
     expect(result?.deliveryRows.map((row) => row.id)).toEqual([
-      "message_delivered",
-      "message_failed",
+      "message_pending",
       "message_stale_delivered_failure",
-      "message_pending"
+      "message_failed",
+      "message_delivered"
     ]);
   });
 

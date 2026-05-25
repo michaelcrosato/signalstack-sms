@@ -6950,3 +6950,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/analytics/overview.test.ts tests/unit/product/analytics.test.ts`, `npm run typecheck`, `npm run lint`, `npm run contracts:check`, `npm run context:check`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.
+
+## Run 812  GREEN  campaign-detail-recent-evidence-order  2026-05-25 01:53
+Objective:    Render campaign-detail recent delivery evidence rows newest-first before the product page consumes them.
+Changed:
+- Sorted `/dashboard/campaigns/:campaignId` recent outbound evidence rows by `createdAt` descending in the product projection, independent of repository ordering.
+- Updated product campaign unit coverage to pin newest-first visible delivery rows while preserving all-outbound aggregate delivery metrics and the recent-row cap.
+- Updated testing contracts, current matrix, compact handoffs, and loop logs without provider calls, delivery retries, worker execution, live messaging, billing, live AI, secrets, or delivery-state mutation.
+Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run typecheck`, `npm run lint`, `npm run contracts:check`, `npm run context:check`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.

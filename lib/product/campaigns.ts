@@ -200,7 +200,10 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
   }
 
   const selectedContactIds = new Set(campaign.recipients.map((recipient) => recipient.contactId));
-  const recentDeliveryMessages = campaign.messages.filter((message) => message.direction === "OUTBOUND");
+  const recentDeliveryMessages = campaign.messages
+    .filter((message) => message.direction === "OUTBOUND")
+    .slice()
+    .sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime());
   const deliveryMessages = campaign.deliveryMessages;
   const deliverySummary = getCampaignDeliverySummary(deliveryMessages, {
     recentEvidenceRows: recentDeliveryMessages.length
