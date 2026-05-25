@@ -128,7 +128,46 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
               createdAt: new Date("2026-01-06T00:00:00.000Z"),
               contact: null
             }
-          ]
+          ],
+          deliveryMessages:
+            campaignId === "large"
+              ? Array.from({ length: 35 }, (_value, index) => ({
+                  direction: "OUTBOUND",
+                  providerStatus: index < 31 ? "delivered" : "sent",
+                  deliveredAt: index < 31 ? new Date(Date.UTC(2026, 1, 4, 11, index, 0)) : null,
+                  failedAt: null,
+                  createdAt: new Date(Date.UTC(2026, 1, 4, 10, index, 0))
+                }))
+              : [
+                  {
+                    direction: "OUTBOUND",
+                    providerStatus: "delivered",
+                    deliveredAt: new Date("2026-01-03T00:00:00.000Z"),
+                    failedAt: null,
+                    createdAt: new Date("2026-01-02T00:00:00.000Z")
+                  },
+                  {
+                    direction: "OUTBOUND",
+                    providerStatus: "failed",
+                    deliveredAt: null,
+                    failedAt: new Date("2026-01-04T00:00:00.000Z"),
+                    createdAt: new Date("2026-01-04T00:00:00.000Z")
+                  },
+                  {
+                    direction: "OUTBOUND",
+                    providerStatus: "undelivered",
+                    deliveredAt: new Date("2026-01-04T06:00:00.000Z"),
+                    failedAt: null,
+                    createdAt: new Date("2026-01-04T06:00:00.000Z")
+                  },
+                  {
+                    direction: "OUTBOUND",
+                    providerStatus: "sent",
+                    deliveredAt: null,
+                    failedAt: null,
+                    createdAt: new Date("2026-01-04T12:00:00.000Z")
+                  }
+                ]
         }
   ),
   listCampaigns: vi.fn(async () => [
@@ -434,6 +473,27 @@ describe("getProductCampaigns", () => {
     expect(result?.contacts.map((contact) => ({ id: contact.id, selected: contact.selected, disabled: contact.disabled }))).toEqual([
       { id: "contact_1", selected: true, disabled: false },
       { id: "contact_2", selected: true, disabled: true }
+    ]);
+  });
+
+  it("aggregates campaign detail delivery metrics across all outbound messages while keeping recent rows separate", async () => {
+    const result = await getProductCampaignDetail("org_1", "large");
+
+    expect(result?.deliveryMetrics).toEqual([
+      { key: "outboundMessages", label: "Outbound Messages", value: "35" },
+      { key: "deliveryRate", label: "Delivery Rate", value: "89%" },
+      { key: "delivered", label: "Delivered", value: "31" },
+      { key: "pending", label: "Pending", value: "4" },
+      { key: "failed", label: "Failed", value: "0" },
+      { key: "lastOutboundMessage", label: "Last Outbound Message", value: "2026-02-04T10:34:00.000Z" },
+      { key: "providerStatuses", label: "Provider Statuses", value: "delivered, sent" }
+    ]);
+    expect(result?.deliveryRows).toHaveLength(4);
+    expect(result?.deliveryRows.map((row) => row.id)).toEqual([
+      "message_delivered",
+      "message_failed",
+      "message_stale_delivered_failure",
+      "message_pending"
     ]);
   });
 

@@ -30,11 +30,20 @@ const campaignDetailInclude = {
   template: true,
   recipients: { include: { contact: true } },
   messages: {
+    where: { direction: "OUTBOUND" },
     include: { contact: true },
     orderBy: { createdAt: "desc" },
     take: 30
   }
 } satisfies Prisma.CampaignInclude;
+
+const campaignDetailDeliveryMessageSelect = {
+  direction: true,
+  providerStatus: true,
+  deliveredAt: true,
+  failedAt: true,
+  createdAt: true
+} satisfies Prisma.MessageSelect;
 
 export async function listCampaigns(orgId: string) {
   return prisma.campaign.findMany({
@@ -60,10 +69,25 @@ export async function getCampaign(orgId: string, campaignId: string) {
 }
 
 export async function getCampaignWithMessages(orgId: string, campaignId: string) {
-  return prisma.campaign.findFirst({
+  const campaign = await prisma.campaign.findFirst({
     where: orgWhere(orgId, { id: campaignId }),
     include: campaignDetailInclude
   });
+
+  if (!campaign) {
+    return null;
+  }
+
+  const deliveryMessages = await prisma.message.findMany({
+    where: orgWhere(orgId, { campaignId, direction: "OUTBOUND" }),
+    orderBy: { createdAt: "asc" },
+    select: campaignDetailDeliveryMessageSelect
+  });
+
+  return {
+    ...campaign,
+    deliveryMessages
+  };
 }
 
 export async function createCampaign(orgId: string, input: CampaignCreateInput) {

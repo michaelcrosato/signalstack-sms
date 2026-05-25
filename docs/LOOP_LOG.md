@@ -6830,3 +6830,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run typecheck`, `npm run test:e2e:product-demo -- --grep "product campaign detail"`, a localhost Playwright check for `Last Outbound Message`, and `.\scripts\local-gate.ps1`; first gate attempt hit a Prisma client file lock from the temporary dev server and passed after stopping it
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer feedback-driven reporting detail, concrete idempotency gaps, or gated auth/RBAC work.
+
+## Run 800  GREEN  campaign-detail-aggregate-delivery  2026-05-25 00:09
+Objective:    Keep campaign-detail delivery metrics complete when visible delivery rows are capped.
+Changed:
+- Split campaign-detail delivery evidence so visible rows remain recent outbound local messages while metrics aggregate all outbound campaign messages.
+- Derived outbound count, delivery rate, delivered/pending/failed totals, provider-status summary, and last-outbound-message from the complete outbound set.
+- Added focused product campaign coverage and updated compact API/testing contracts plus current handoffs.
+Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run typecheck`, `npm run test:e2e:product-demo -- --grep "product campaign detail"`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer concrete idempotency/auth correctness gaps or feedback-driven reporting depth.

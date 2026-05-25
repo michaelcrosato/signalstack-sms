@@ -195,7 +195,8 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
   }
 
   const selectedContactIds = new Set(campaign.recipients.map((recipient) => recipient.contactId));
-  const deliveryMessages = campaign.messages.filter((message) => message.direction === "OUTBOUND");
+  const recentDeliveryMessages = campaign.messages.filter((message) => message.direction === "OUTBOUND");
+  const deliveryMessages = campaign.deliveryMessages;
   const deliverySummary = getCampaignDeliverySummary(deliveryMessages);
   const recipientReadiness = getCampaignRecipientReadinessSummary(campaign.recipients);
   const detail = {
@@ -239,7 +240,7 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
         }))
       };
     }),
-    deliveryRows: deliveryMessages.map((message) => ({
+    deliveryRows: recentDeliveryMessages.map((message) => ({
       id: message.id,
       contactDisplayName: message.contact
         ? message.contact.displayName ??
