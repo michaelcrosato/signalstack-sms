@@ -28,6 +28,14 @@ const requiredTexts: RequiredText[] = [
   },
   {
     file: "docs/PRODUCTION_AUTH_RBAC.md",
+    text: "Route RBAC Matrix"
+  },
+  {
+    file: "docs/PRODUCTION_AUTH_RBAC.md",
+    text: "lib/auth/api-rbac-matrix.ts"
+  },
+  {
+    file: "docs/PRODUCTION_AUTH_RBAC.md",
     text: "mutating API route must resolve the current organization and pass role authorization before reading a request body"
   },
   {
@@ -77,6 +85,14 @@ const requiredTexts: RequiredText[] = [
   {
     file: "lib/auth/api-authorization.ts",
     text: "getRoleAuthorizationError"
+  },
+  {
+    file: "lib/auth/api-rbac-matrix.ts",
+    text: "apiRouteRbacMatrix"
+  },
+  {
+    file: "tests/unit/auth/api-rbac-matrix.test.ts",
+    text: "declares every mutating API route method exactly once"
   },
   {
     file: "lib/auth/roles.ts",

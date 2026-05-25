@@ -12,6 +12,15 @@ Current supported auth mode: deterministic demo session.
 - `requireApiRole` enforces the local `OWNER > ADMIN > MEMBER` role hierarchy for API mutations that already accept local demo actions.
 - The `/settings/team` surface is read-only and must not invite users, create users, change roles, suspend members, delete memberships, call Clerk, send email, send notifications, call providers, create billing records, send SMS, or enable live messaging.
 
+## Route RBAC Matrix
+
+The executable current route matrix lives in `lib/auth/api-rbac-matrix.ts` and is covered by `tests/unit/auth/api-rbac-matrix.test.ts`.
+
+- Admin-gated local mutations include contacts, imports, templates, campaign create/update/preflight/schedule/cancel, compliance settings, provider number and credential metadata, local usage records, local demo inbound, gated live-test SMS, campaign-copy fake AI, and conversation assignment.
+- Member-gated local mutations include conversation messages, internal notes, conversation resolve/reopen, reply suggestions, conversation summaries, and lead qualification.
+- Twilio inbound and status webhooks are the only mutating route exceptions; they remain signed-webhook routes and must validate the Twilio signature before tenant-local persistence.
+- The matrix is planning and validation evidence only. It does not authorize production auth, new roles, invitations, role changes, live messaging, billing, notifications, provider calls, or real customer access.
+
 ## Production Auth Requirements
 
 Before production auth can be enabled, the app must add all of these controls behind tests and the protected local gate:

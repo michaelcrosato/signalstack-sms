@@ -7486,3 +7486,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run typecheck`, `npm run test:e2e:product-demo -- --grep "product campaign detail"`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer concrete idempotency/auth correctness gaps or feedback-driven reporting depth.
+
+## Run 803  GREEN  api-rbac-route-matrix  2026-05-25 00:39
+Objective:    Make the current mutating API role decisions executable before future production auth work.
+Changed:
+- Added `lib/auth/api-rbac-matrix.ts` with every mutating local API route method, required local role, and signed Twilio webhook exceptions.
+- Added `tests/unit/auth/api-rbac-matrix.test.ts` to cross-check the matrix against actual route files, role-gate calls, signed-webhook validation, and frozen metadata.
+- Updated the production auth/RBAC planning check, local gate docs, current matrix, and compact handoffs so the route matrix remains part of validation.
+Gate:         passed with `npm run test -- tests/unit/auth/api-rbac-matrix.test.ts`, `npm run production-auth:check`, `npm run typecheck`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer concrete idempotency/auth correctness gaps, feedback-driven reporting depth, or real auth only after a Clerk/session design slice is selected.
