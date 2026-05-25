@@ -358,7 +358,7 @@ Renders a read-only local go-live readiness audit view for the current organizat
 
 ### `/dashboard`
 
-Renders the product-facing dashboard for the current organization. It may display tenant-scoped contact, campaign, inbox, template, compliance, local outbound message delivery rate/pending/failure signals, local usage, fake-AI usage, navigation signals, and read-only next-step links derived from existing local counts. It must not mutate records, retry delivery, call providers, send SMS, create billing records, call live AI, expose secrets, or enable live messaging.
+Renders the product-facing dashboard for the current organization. It may display tenant-scoped contact, campaign, inbox, template, compliance, local outbound message delivery evidence/rate/pending/failure signals, local usage, fake-AI usage, navigation signals, and read-only next-step links derived from existing local counts. It must not mutate records, retry delivery, call providers, send SMS, create billing records, call live AI, expose secrets, or enable live messaging.
 
 ### `/dashboard/contacts`
 

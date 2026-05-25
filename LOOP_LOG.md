@@ -7516,3 +7516,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run typecheck`, `npm run test:e2e:product-demo -- --grep "product campaigns page"`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer concrete idempotency/auth correctness gaps, feedback-driven reporting depth, or real auth only after a Clerk/session design slice is selected.
+
+## Run 806  GREEN  dashboard-delivery-evidence  2026-05-25 01:01
+Objective:    Show the dashboard delivery evidence denominator beside rate, pending, and failure signals.
+Changed:
+- Added a `Delivery evidence` dashboard signal sourced from existing tenant-scoped outbound local message counts.
+- Updated frozen dashboard signal metadata, product dashboard unit coverage, and the product-demo dashboard browser assertion.
+- Updated API/testing docs, current matrix, and compact handoffs without adding provider calls, retries, worker execution, live messaging, billing, live AI, secrets, or message delivery mutation.
+Gate:         passed with `npm run test -- tests/unit/product/dashboard.test.ts`, `npm run typecheck`, `npm run test:e2e:product-demo -- --grep "product dashboard"`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer concrete idempotency/auth correctness gaps, feedback-driven reporting depth, or real auth only after a Clerk/session design slice is selected.
