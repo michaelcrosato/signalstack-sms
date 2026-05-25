@@ -142,7 +142,28 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
       scheduledAt: null,
       updatedAt: new Date("2026-01-02T00:00:00.000Z"),
       template: { name: "Intro" },
-      recipients: [{ contactId: "contact_1" }],
+      recipients: [
+        {
+          contactId: "contact_1",
+          contact: {
+            id: "contact_1",
+            phone: "+15555550100",
+            consentStatus: ConsentStatus.OPTED_IN,
+            optedOutAt: null,
+            archivedAt: null
+          }
+        },
+        {
+          contactId: "contact_2",
+          contact: {
+            id: "contact_2",
+            phone: "+15555550101",
+            consentStatus: ConsentStatus.OPTED_OUT,
+            optedOutAt: new Date("2026-01-01T00:00:00.000Z"),
+            archivedAt: null
+          }
+        }
+      ],
       messages: [
         {
           direction: "OUTBOUND",
@@ -222,6 +243,22 @@ describe("getProductCampaigns", () => {
       { key: "readyRecipients", label: "Ready Recipients", value: 1 }
     ]);
     expect(result.campaigns.map((campaign) => campaign.templateName)).toEqual(["Intro", "Custom copy"]);
+    expect(result.campaigns.map((campaign) => campaign.readiness)).toEqual([
+      {
+        totalRecipients: 2,
+        readyRecipients: 1,
+        blockedRecipients: 1,
+        blockReasonLabels: ["Missing opt-in", "Opted out"],
+        summaryLabel: "1 need attention"
+      },
+      {
+        totalRecipients: 0,
+        readyRecipients: 0,
+        blockedRecipients: 0,
+        blockReasonLabels: [],
+        summaryLabel: "No recipients selected"
+      }
+    ]);
     expect(result.campaigns.map((campaign) => campaign.delivery)).toEqual([
       {
         outboundMessages: 2,

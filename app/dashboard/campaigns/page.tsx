@@ -63,12 +63,13 @@ export default async function CampaignsPage() {
               <p className="mt-1 text-sm text-slate-600">Local tenant campaigns and queue-ready state.</p>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[680px] border-collapse text-left text-sm">
+              <table className="w-full min-w-[820px] border-collapse text-left text-sm">
                 <thead className="bg-slate-100 text-xs uppercase tracking-wide text-slate-600">
                   <tr>
                     <th className="px-4 py-3">Campaign</th>
                     <th className="px-4 py-3">Status</th>
                     <th className="px-4 py-3">Recipients</th>
+                    <th className="px-4 py-3">Readiness</th>
                     <th className="px-4 py-3">Delivery</th>
                     <th className="px-4 py-3">Schedule</th>
                   </tr>
@@ -88,6 +89,17 @@ export default async function CampaignsPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-slate-700">{campaign.recipientCount}</td>
+                      <td className="px-4 py-3 text-slate-700">
+                        <div className="font-medium text-slate-950">
+                          {campaign.readiness.readyRecipients}/{campaign.readiness.totalRecipients} ready
+                        </div>
+                        <div className="text-xs text-slate-600">{campaign.readiness.summaryLabel}</div>
+                        {campaign.readiness.blockReasonLabels.length > 0 ? (
+                          <div className="mt-1 text-xs text-amber-700">
+                            {campaign.readiness.blockReasonLabels.join(" / ")}
+                          </div>
+                        ) : null}
+                      </td>
                       <td className="px-4 py-3 text-slate-700">
                         <div className="font-medium text-slate-950">{campaign.delivery.deliveryRatePercent}% delivered</div>
                         <div className="text-xs text-slate-600">

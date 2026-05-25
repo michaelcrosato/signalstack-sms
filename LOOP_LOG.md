@@ -7385,3 +7385,13 @@ Changed:
 Gate:         passed with `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer production auth/RBAC planning, campaign-level reporting detail after feedback, or concrete idempotency correctness gaps.
+
+## Run 793  GREEN  campaign-list-recipient-readiness  2026-05-24 23:04
+Objective:    Surface campaign-list recipient readiness for the product demo path.
+Changed:
+- Derived ready/blocked recipient summaries from the same local consent/archive preflight rules used before scheduling.
+- Rendered readiness totals, blocker summary text, and human-readable blocker labels in `/dashboard/campaigns` rows alongside existing delivery summaries.
+- Added focused product campaign unit coverage and a product-demo E2E column visibility check, plus updated contracts/current handoffs.
+Gate:         passed with `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer production auth/RBAC planning, higher-signal reporting correctness, or concrete idempotency gaps.

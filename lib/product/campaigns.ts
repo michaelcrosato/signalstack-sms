@@ -3,6 +3,7 @@ import { getCampaignWithMessages, listCampaignsWithDelivery } from "@/lib/db/rep
 import { listContacts } from "@/lib/db/repositories/contacts";
 import { listTemplates } from "@/lib/db/repositories/templates";
 import { isLocalDeliveryDelivered, isTerminalDeliveryFailure } from "@/lib/messaging/delivery-status";
+import { preflightCampaignRecipients } from "@/lib/messaging/send-preflight";
 
 const productCampaignMetricRowItems = [
   { key: "total", label: "Total Campaigns" },
@@ -78,6 +79,7 @@ export async function getProductCampaigns(orgId: string) {
     })),
     campaigns: campaigns.map((campaign) => {
       const deliverySummary = getCampaignDeliverySummary(campaign.messages);
+      const readinessSummary = getCampaignRecipientReadinessSummary(campaign.recipients);
       const outboundMessages = Number(deliverySummary.outboundMessages);
       const delivered = Number(deliverySummary.delivered);
       const pending = Number(deliverySummary.pending);
@@ -89,6 +91,7 @@ export async function getProductCampaigns(orgId: string) {
         status: campaign.status,
         scheduledAt: campaign.scheduledAt,
         recipientCount: campaign.recipients.length,
+        readiness: readinessSummary,
         templateName: campaign.template?.name ?? "Custom copy",
         updatedAt: campaign.updatedAt,
         delivery: {
@@ -113,6 +116,55 @@ export async function getProductCampaigns(orgId: string) {
       body: template.body
     }))
   };
+}
+
+function getCampaignRecipientReadinessSummary(
+  recipients: Array<{
+    contactId: string;
+    contact: {
+      id: string;
+      phone: string;
+      consentStatus: ConsentStatus;
+      optedOutAt: Date | null;
+      archivedAt: Date | null;
+    };
+  }>
+) {
+  const preflight = preflightCampaignRecipients(
+    recipients.map((recipient) => recipient.contact),
+    recipients.map((recipient) => recipient.contactId)
+  );
+  const blockReasonLabels = Array.from(
+    new Set(preflight.recipients.flatMap((recipient) => recipient.reasons.map(formatCampaignBlockReason)))
+  );
+
+  return {
+    totalRecipients: preflight.totalRecipients,
+    readyRecipients: preflight.allowedRecipients,
+    blockedRecipients: preflight.blockedRecipients,
+    blockReasonLabels,
+    summaryLabel:
+      preflight.totalRecipients === 0
+        ? "No recipients selected"
+        : preflight.blockedRecipients === 0
+          ? "All recipients ready"
+          : `${preflight.blockedRecipients} need attention`
+  };
+}
+
+function formatCampaignBlockReason(reason: string) {
+  switch (reason) {
+    case "CONTACT_ARCHIVED":
+      return "Archived contact";
+    case "CONSENT_NOT_OPTED_IN":
+      return "Missing opt-in";
+    case "CONTACT_OPTED_OUT":
+      return "Opted out";
+    case "CONTACT_NOT_FOUND":
+      return "Contact not found";
+    default:
+      return reason;
+  }
 }
 
 export async function getProductCampaignDetail(orgId: string, campaignId: string) {

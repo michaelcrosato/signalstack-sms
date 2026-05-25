@@ -218,6 +218,7 @@ test("product campaigns page creates, preflights, and schedules a local campaign
   await expect(page.getByLabel("Campaign metrics").getByText("Ready Recipients")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Composer" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Campaign status" })).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "Readiness" })).toBeVisible();
   await expect(page.getByText("Demo intro campaign")).toBeVisible();
 
   await page.getByLabel("Campaign name").fill(campaignName);

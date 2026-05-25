@@ -370,7 +370,7 @@ Renders the product-facing contact detail workspace for a tenant-scoped contact.
 
 ### `/dashboard/campaigns`
 
-Renders the product-facing campaign workspace for the current organization. It may create local draft campaigns through the existing campaign API, run preflight, and schedule local queue records through existing endpoints. It must not send SMS, call providers, create billing records, call live AI, expose secrets, bypass compliance preflight, execute workers, or enable live messaging.
+Renders the product-facing campaign workspace for the current organization. It may display tenant-scoped campaign status, current recipient readiness/blocker counts derived from local consent/archive preflight rules, local outbound delivery summaries, create local draft campaigns through the existing campaign API, run preflight, and schedule local queue records through existing endpoints. It must not send SMS, call providers, create billing records, call live AI, expose secrets, bypass compliance preflight, execute workers, or enable live messaging.
 
 ### `/dashboard/inbox`
 
