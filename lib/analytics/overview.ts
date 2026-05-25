@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db/prisma";
 import { aggregateUsageEvents } from "@/lib/billing/metering";
+import { terminalDeliveryFailureProviderStatuses } from "@/lib/messaging/delivery-status";
 
 export async function getAnalyticsOverview(orgId: string) {
   const [
@@ -32,7 +33,7 @@ export async function getAnalyticsOverview(orgId: string) {
       where: {
         orgId,
         direction: "OUTBOUND",
-        OR: [{ failedAt: { not: null } }, { providerStatus: { in: ["failed", "undelivered"] } }]
+        OR: [{ failedAt: { not: null } }, { providerStatus: { in: [...terminalDeliveryFailureProviderStatuses] } }]
       }
     }),
     prisma.usageEvent.findMany({ where: { orgId }, select: { type: true, quantity: true } })

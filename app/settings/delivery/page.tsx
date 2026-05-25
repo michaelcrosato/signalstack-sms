@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { prisma } from "@/lib/db/prisma";
+import { getDeliveryMessageMetrics } from "@/lib/operations/delivery-message-metrics";
 import { getDeliveryOperationsStatus } from "@/lib/operations/delivery-operations";
 import { getDeliveryOperationLinks } from "@/lib/operations/operator-surfaces";
 
@@ -22,11 +23,8 @@ export default async function DeliveryOperationsPage() {
     take: 30
   });
 
-  const outboundMessages = messages.filter((message) => message.direction === "OUTBOUND");
-  const inboundMessages = messages.filter((message) => message.direction === "INBOUND");
-  const deliveredMessages = messages.filter((message) => message.deliveredAt !== null);
-  const failedMessages = messages.filter((message) => message.failedAt !== null || message.providerStatus === "failed");
-  const providerStatuses = Array.from(new Set(messages.map((message) => message.providerStatus ?? "local_only")));
+  const { outboundMessages, inboundMessages, deliveredMessages, failedMessages, providerStatuses } =
+    getDeliveryMessageMetrics(messages);
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">

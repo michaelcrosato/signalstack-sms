@@ -6629,3 +6629,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3138'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer product-demo polish, production auth/RBAC planning, reporting visibility, or concrete correctness gaps over syntactic scanner variants.
+
+## Run 780  GREEN  delivery-terminal-failures  2026-05-24 21:21
+Objective:    Count outbound `failed` and `undelivered` provider statuses consistently in local delivery reporting.
+Changed:
+- Added shared terminal delivery-failure status helpers and used them from analytics, campaign detail, and `/settings/delivery`.
+- Moved `/settings/delivery` message metric projection into a focused helper that counts outbound `failed`/`undelivered` statuses and explicit failed timestamps as terminal delivery failures.
+- Added focused unit coverage for outbound undelivered failures while keeping inbound failed labels as direction counts only, and updated the testing contract plus compact handoffs.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3139'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer product-demo polish, production auth/RBAC planning, reporting visibility, or concrete correctness gaps over syntactic scanner variants.

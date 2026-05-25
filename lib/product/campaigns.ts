@@ -2,6 +2,7 @@ import { CampaignStatus, ConsentStatus } from "@prisma/client";
 import { getCampaignWithMessages, listCampaigns } from "@/lib/db/repositories/campaigns";
 import { listContacts } from "@/lib/db/repositories/contacts";
 import { listTemplates } from "@/lib/db/repositories/templates";
+import { isTerminalDeliveryFailure } from "@/lib/messaging/delivery-status";
 
 const productCampaignMetricRowItems = [
   { key: "total", label: "Total Campaigns" },
@@ -206,10 +207,7 @@ function getCampaignDeliverySummary(
 ): Record<ProductCampaignDeliveryMetricKey, string> {
   const outboundMessages = messages.filter((message) => message.direction === "OUTBOUND");
   const delivered = outboundMessages.filter((message) => message.deliveredAt !== null);
-  const failed = outboundMessages.filter(
-    (message) =>
-      message.failedAt !== null || message.providerStatus === "failed" || message.providerStatus === "undelivered"
-  );
+  const failed = outboundMessages.filter(isTerminalDeliveryFailure);
   const providerStatuses = Array.from(new Set(outboundMessages.map((message) => message.providerStatus ?? "local_only")));
 
   return {
