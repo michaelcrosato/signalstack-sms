@@ -1,5 +1,11 @@
 # Codex Summary
 
+Run number: 757
+
+- Latest mutating-route auth hardening adds sequence-wrapped conditional/logical expression RHS coverage inside local `globalThis` logical-assignment chains, including `root ??= (void 0, condition ? globalThis : globalThis); platform ||= (undefined, root ?? root); runtime &&= (0, platform && platform)`, so defaulted `Request`, `Object`, and `Reflect` destructuring through those combined alias forms still counts as body-reader access before each handler's own top-level `requireApiRole`. Focused auth coverage passed with `npm run test -- tests/unit/auth/api-route-authorization.test.ts`; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+
+## Previous Run
+
 Run number: 756
 
 - Latest mutating-route auth hardening adds sequence-wrapped logical-assignment local `globalThis` root alias coverage, including `root ??= (void 0, globalThis); platform ||= (undefined, root); runtime &&= (0, platform)`, so defaulted `Request`, `Object`, and `Reflect` destructuring through sequence-wrapped `??=`, `||=`, and `&&=` chains still counts as body-reader access before each handler's own top-level `requireApiRole`. Focused auth coverage passed with `npm run test -- tests/unit/auth/api-route-authorization.test.ts`; the protected local gate passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`. The change is local test/docs/log coverage only and does not execute API handlers outside local tests/build, run workers, enqueue jobs, call Redis/providers, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
