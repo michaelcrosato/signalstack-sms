@@ -31,6 +31,7 @@ test("product dashboard renders seeded owner workflow checkpoints", async ({ pag
     "href",
     "/dashboard/analytics"
   );
+  await expect(nextSteps.getByText("failed local delivery evidence")).toBeVisible();
   await expect(nextSteps.getByRole("link", { name: /Check go-live blockers/ })).toHaveAttribute(
     "href",
     "/dashboard/compliance"
@@ -482,6 +483,8 @@ test("product analytics page renders local overview detail", async ({ page }) =>
   await expect(deliveryReviewSummary.getByText(/\d+\/\d+/)).toBeVisible();
   await expect(deliveryReviewSummary.getByText("Hidden Rows")).toBeVisible();
   await expect(deliveryReviewQueue.getByRole("columnheader", { name: "Review" })).toBeVisible();
+  await expect(deliveryReviewQueue.getByText("1 failed; review evidence").first()).toBeVisible();
+  await expect(deliveryReviewQueue.getByText("1 pending; awaiting provider status").first()).toBeVisible();
   await expect(deliveryReviewQueue.getByRole("link", { name: /Review evidence for/ }).first()).toHaveAttribute(
     "href",
     /\/dashboard\/campaigns\//

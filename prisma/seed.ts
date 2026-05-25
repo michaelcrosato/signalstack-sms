@@ -1,6 +1,7 @@
 import {
   A2pRegistrationStatus,
   BillingAccountStatus,
+  CampaignStatus,
   ConsentStatus,
   ConversationStatus,
   MembershipRole,
@@ -202,6 +203,8 @@ async function main() {
       orgId: org.id,
       templateId: template.id,
       name: "Demo intro campaign",
+      status: CampaignStatus.COMPLETED,
+      scheduledAt: new Date("2026-01-02T09:00:00.000Z"),
       body: template.body
     },
     create: {
@@ -209,15 +212,61 @@ async function main() {
       orgId: org.id,
       templateId: template.id,
       name: "Demo intro campaign",
+      status: CampaignStatus.COMPLETED,
+      scheduledAt: new Date("2026-01-02T09:00:00.000Z"),
       body: template.body
     }
   });
 
-  await prisma.campaignRecipient.upsert({
-    where: { campaignId_contactId: { campaignId: campaign.id, contactId: contact.id } },
-    update: {},
-    create: { orgId: org.id, campaignId: campaign.id, contactId: contact.id }
+  const pendingCampaign = await prisma.campaign.upsert({
+    where: { id: "demo_campaign_pending_delivery" },
+    update: {
+      orgId: org.id,
+      templateId: template.id,
+      name: "Demo pending delivery check",
+      status: CampaignStatus.SCHEDULED,
+      scheduledAt: new Date("2026-01-03T09:00:00.000Z"),
+      body: "Hi {{firstName}}, this local demo message is waiting on provider status."
+    },
+    create: {
+      id: "demo_campaign_pending_delivery",
+      orgId: org.id,
+      templateId: template.id,
+      name: "Demo pending delivery check",
+      status: CampaignStatus.SCHEDULED,
+      scheduledAt: new Date("2026-01-03T09:00:00.000Z"),
+      body: "Hi {{firstName}}, this local demo message is waiting on provider status."
+    }
   });
+
+  const failedCampaign = await prisma.campaign.upsert({
+    where: { id: "demo_campaign_failed_delivery" },
+    update: {
+      orgId: org.id,
+      templateId: template.id,
+      name: "Demo failed delivery check",
+      status: CampaignStatus.COMPLETED,
+      scheduledAt: new Date("2026-01-04T09:00:00.000Z"),
+      body: "Hi {{firstName}}, this local demo message simulates a failed carrier update."
+    },
+    create: {
+      id: "demo_campaign_failed_delivery",
+      orgId: org.id,
+      templateId: template.id,
+      name: "Demo failed delivery check",
+      status: CampaignStatus.COMPLETED,
+      scheduledAt: new Date("2026-01-04T09:00:00.000Z"),
+      body: "Hi {{firstName}}, this local demo message simulates a failed carrier update."
+    }
+  });
+
+  for (const seededCampaign of [campaign, pendingCampaign, failedCampaign]) {
+    await prisma.campaignRecipient.upsert({
+      where: { campaignId_contactId: { campaignId: seededCampaign.id, contactId: contact.id } },
+      update: {},
+      create: { orgId: org.id, campaignId: seededCampaign.id, contactId: contact.id }
+    });
+  }
 
   const conversation = await prisma.conversation.upsert({
     where: { id: "demo_conversation_ada" },
@@ -255,6 +304,76 @@ async function main() {
       createdAt: new Date("2026-01-03T10:00:00.000Z")
     }
   });
+
+  const seededDeliveryMessages = [
+    {
+      campaignId: campaign.id,
+      idempotencyKey: "demo-seed-outbound-intro-delivered",
+      body: "Hi Ada, this is SignalStack Demo Co. Reply STOP to opt out.",
+      providerMessageId: "dummy_demo_intro_delivered",
+      providerStatus: "delivered",
+      providerErrorCode: null,
+      deliveredAt: new Date("2026-01-03T10:01:00.000Z"),
+      failedAt: null,
+      createdAt: new Date("2026-01-03T10:01:00.000Z")
+    },
+    {
+      campaignId: pendingCampaign.id,
+      idempotencyKey: "demo-seed-outbound-pending-status",
+      body: "Hi Ada, this local demo message is waiting on provider status.",
+      providerMessageId: "dummy_demo_pending_status",
+      providerStatus: "sent",
+      providerErrorCode: null,
+      deliveredAt: null,
+      failedAt: null,
+      createdAt: new Date("2026-01-03T10:02:00.000Z")
+    },
+    {
+      campaignId: failedCampaign.id,
+      idempotencyKey: "demo-seed-outbound-carrier-failed",
+      body: "Hi Ada, this local demo message simulates a failed carrier update.",
+      providerMessageId: "dummy_demo_carrier_failed",
+      providerStatus: "undelivered",
+      providerErrorCode: "30005",
+      deliveredAt: null,
+      failedAt: new Date("2026-01-03T10:03:00.000Z"),
+      createdAt: new Date("2026-01-03T10:03:00.000Z")
+    }
+  ];
+
+  for (const message of seededDeliveryMessages) {
+    await prisma.message.upsert({
+      where: { orgId_idempotencyKey: { orgId: org.id, idempotencyKey: message.idempotencyKey } },
+      update: {
+        contactId: contact.id,
+        conversationId: conversation.id,
+        campaignId: message.campaignId,
+        direction: "OUTBOUND",
+        body: message.body,
+        providerMessageId: message.providerMessageId,
+        providerStatus: message.providerStatus,
+        providerErrorCode: message.providerErrorCode,
+        deliveredAt: message.deliveredAt,
+        failedAt: message.failedAt,
+        createdAt: message.createdAt
+      },
+      create: {
+        orgId: org.id,
+        contactId: contact.id,
+        conversationId: conversation.id,
+        campaignId: message.campaignId,
+        direction: "OUTBOUND",
+        body: message.body,
+        providerMessageId: message.providerMessageId,
+        providerStatus: message.providerStatus,
+        providerErrorCode: message.providerErrorCode,
+        deliveredAt: message.deliveredAt,
+        failedAt: message.failedAt,
+        idempotencyKey: message.idempotencyKey,
+        createdAt: message.createdAt
+      }
+    });
+  }
 
   await prisma.internalNote.upsert({
     where: { id: "demo_note_ada_1" },

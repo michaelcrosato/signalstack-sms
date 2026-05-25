@@ -7636,3 +7636,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/analytics.test.ts`, `npm run typecheck`, `npm run lint`, `npm run contracts:check`, `npm run context:check`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.
+
+## Run 818  GREEN  seeded-delivery-evidence  2026-05-25 02:46
+Objective:    Make fresh seeded demos show realistic local delivery evidence states.
+Changed:
+- Added deterministic seeded delivered, pending, and failed outbound `Message` rows with dummy-style provider IDs/statuses and no provider calls.
+- Added seeded pending/failed demo campaigns linked to the existing demo contact so dashboard, campaign list, analytics, and delivery operations surfaces have local evidence immediately after `npm run demo:seed`.
+- Updated product-demo Playwright assertions, testing contract, demo/testing docs, current matrix, compact handoffs, and loop logs without SMS, workers, webhooks, billing, notifications, live AI, secrets, delivery-state mutation, or protected gate script edits.
+Gate:         passed with `npm run typecheck`, `npm run lint`, `npm run contracts:check`, `npm run context:check`, `npm run demo:seed`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep the seeded product demo stable; prefer feedback-driven reporting depth or concrete production-readiness correctness gaps.
