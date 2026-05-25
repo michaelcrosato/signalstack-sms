@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
 import { productInboxWorkspaceDefaults } from "@/lib/product/inbox-workspace-defaults";
 
 type InboxConversationRow = {
   id: string;
+  selected: boolean;
   status: string;
   contactName: string;
   phone: string;
@@ -215,7 +217,17 @@ export function InboxWorkspace({
         </div>
         <div className="divide-y divide-slate-100">
           {conversations.map((conversation) => (
-            <article className="grid gap-2 p-4" key={conversation.id}>
+            <Link
+              aria-current={conversation.selected ? "page" : undefined}
+              aria-label={`Open conversation with ${conversation.contactName}`}
+              className={
+                conversation.selected
+                  ? "grid gap-2 bg-teal-50 p-4 text-left"
+                  : "grid gap-2 bg-white p-4 text-left transition hover:bg-slate-50"
+              }
+              href={`/dashboard/inbox?conversationId=${encodeURIComponent(conversation.id)}`}
+              key={conversation.id}
+            >
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className="font-semibold text-slate-950">{conversation.contactName}</h3>
@@ -236,7 +248,7 @@ export function InboxWorkspace({
                   <dd>{conversation.consentStatus}</dd>
                 </div>
               </dl>
-            </article>
+            </Link>
           ))}
         </div>
       </div>

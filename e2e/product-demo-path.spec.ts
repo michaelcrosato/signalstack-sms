@@ -306,21 +306,30 @@ test("product campaign detail page edits a draft and cancels a queued campaign l
 test("product inbox page manages a local conversation thread", async ({ page }) => {
   const uniqueSuffix = Date.now().toString().slice(-7);
   const phone = `+1555${uniqueSuffix}`;
+  const newerPhone = `+1666${uniqueSuffix}`;
   const noteBody = `Product E2E note ${Date.now()}: local reply should remain provider-free.`;
 
-  await page.request.post("/api/inbox/conversations", {
+  const conversationResponse = await page.request.post("/api/inbox/conversations", {
     data: {
       phone,
       body: "Can you send pricing?"
     }
   });
+  const conversationPayload = await conversationResponse.json();
+  await page.request.post("/api/inbox/conversations", {
+    data: {
+      phone: newerPhone,
+      body: "Newer thread should not override the requested selection."
+    }
+  });
 
-  await page.goto("/dashboard/inbox");
+  await page.goto(`/dashboard/inbox?conversationId=${conversationPayload.conversation.id}`);
 
   await expect(page.getByRole("heading", { name: "Inbox workspace" })).toBeVisible();
   await expect(page.getByLabel("Inbox metrics").getByText("Open Threads")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Conversation list" })).toBeVisible();
   await expect(page.getByText(phone).first()).toBeVisible();
+  await expect(page.getByLabel(`Open conversation with ${phone}`)).toHaveAttribute("aria-current", "page");
   await expect(page.getByText("Can you send pricing?").first()).toBeVisible();
   await expect(page.getByRole("heading", { name: "Thread" })).toBeVisible();
   await expect(page.getByLabel("Thread status").getByText("Consent")).toBeVisible();

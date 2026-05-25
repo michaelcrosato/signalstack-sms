@@ -6,9 +6,17 @@ import { InboxWorkspace } from "./workspace";
 
 export const dynamic = "force-dynamic";
 
-export default async function InboxPage() {
+type InboxPageProps = {
+  searchParams?: Promise<{
+    conversationId?: string | string[];
+  }>;
+};
+
+export default async function InboxPage({ searchParams }: InboxPageProps) {
+  const params = await searchParams;
+  const selectedConversationId = firstQueryValue(params?.conversationId);
   const currentOrg = await getOrCreateCurrentOrg();
-  const inbox = await getProductInbox(currentOrg.orgId);
+  const inbox = await getProductInbox(currentOrg.orgId, selectedConversationId);
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
@@ -49,6 +57,7 @@ export default async function InboxPage() {
         </section>
 
         <InboxWorkspace
+          key={inbox.selectedConversation?.id ?? "none"}
           conversations={inbox.conversations}
           currentUserId={currentOrg.userId}
           selectedConversation={inbox.selectedConversation}
@@ -56,6 +65,10 @@ export default async function InboxPage() {
       </div>
     </main>
   );
+}
+
+function firstQueryValue(value?: string | string[]) {
+  return Array.isArray(value) ? value[0] : value;
 }
 
 function Metric({ label, value }: { label: string; value: number }) {

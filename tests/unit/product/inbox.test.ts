@@ -1,5 +1,6 @@
 import { ConsentStatus, ConversationStatus } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
+import { listConversationMessages } from "@/lib/db/repositories/inbox";
 import { productInboxWorkspaceDefaults } from "@/lib/product/inbox-workspace-defaults";
 import { getProductInbox, productInboxMetricRows, productInboxThreadStatusRows } from "@/lib/product/inbox";
 
@@ -76,6 +77,7 @@ describe("getProductInbox", () => {
     ]);
     expect(result.conversations[0]).toMatchObject({
       id: "conversation_1",
+      selected: true,
       status: ConversationStatus.OPEN,
       contactName: "Ada Lovelace",
       phone: "+15555550100",
@@ -84,6 +86,7 @@ describe("getProductInbox", () => {
       latestMessage: "Can you send pricing?"
     });
     expect(result.conversations[1]).toMatchObject({
+      selected: false,
       contactName: "Unknown contact",
       phone: "Unknown phone",
       assignedTo: "Unassigned",
@@ -106,6 +109,33 @@ describe("getProductInbox", () => {
       { key: "thread", label: "Thread", value: ConversationStatus.OPEN },
       { key: "consent", label: "Consent", value: ConsentStatus.OPTED_IN }
     ]);
+  });
+
+  it("selects a requested conversation from the local inbox query when present", async () => {
+    vi.mocked(listConversationMessages).mockClear();
+
+    const result = await getProductInbox("org_1", "conversation_2");
+
+    expect(result.conversations.map((conversation) => [conversation.id, conversation.selected])).toEqual([
+      ["conversation_1", false],
+      ["conversation_2", true]
+    ]);
+    expect(result.selectedConversation?.id).toBe("conversation_2");
+    expect(result.selectedConversation?.contactName).toBe("Unknown contact");
+    expect(vi.mocked(listConversationMessages)).toHaveBeenCalledWith("org_1", "conversation_2");
+  });
+
+  it("falls back to the first conversation when a requested thread is not in the tenant inbox", async () => {
+    vi.mocked(listConversationMessages).mockClear();
+
+    const result = await getProductInbox("org_1", "missing_conversation");
+
+    expect(result.conversations.map((conversation) => [conversation.id, conversation.selected])).toEqual([
+      ["conversation_1", true],
+      ["conversation_2", false]
+    ]);
+    expect(result.selectedConversation?.id).toBe("conversation_1");
+    expect(vi.mocked(listConversationMessages)).toHaveBeenCalledWith("org_1", "conversation_1");
   });
 
   it("freezes inbox metric metadata before rendering", () => {

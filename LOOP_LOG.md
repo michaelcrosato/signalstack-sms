@@ -7405,3 +7405,13 @@ Changed:
 Gate:         passed with `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer production auth/RBAC planning, deeper reporting only after feedback, or concrete idempotency correctness gaps.
+
+## Run 795  GREEN  inbox-thread-selection  2026-05-24 23:22
+Objective:    Make the product inbox select a requested local thread from the conversation list.
+Changed:
+- Added `conversationId` query selection to `/dashboard/inbox` with fallback to the first visible tenant-scoped thread.
+- Rendered conversation list rows as selected-thread links with active state while keeping inbox actions local-only.
+- Added focused product inbox unit coverage, product-demo E2E coverage for requested thread selection, and updated the API contract/map plus compact handoffs.
+Gate:         passed with `npm run test -- tests/unit/product/inbox.test.ts`, `npm run typecheck`, `npm run test:e2e:product-demo -- --grep "product inbox"`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer production auth/RBAC planning, feedback-driven reporting depth, or concrete idempotency correctness gaps.

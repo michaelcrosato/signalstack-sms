@@ -1,11 +1,11 @@
 # Codex Summary
 
-Run number: 794
+Run number: 795
 
-- Latest loop adds mutually exclusive campaign-detail delivery row states for the product demo path.
-- `/dashboard/campaigns/:campaignId` delivery rows now show delivered, failed, or pending state derived from the same local terminal-failure and delivered-status helpers used by summary counts.
-- Existing campaign-list delivery reporting remains intact: delivered, pending, failed, and delivery-rate counts still come from local outbound message evidence.
-- Focused product campaign tests cover readiness projection, delivered/pending/failed/rate projection, and campaign-detail row-state classification for stale provider metadata.
+- Latest loop adds query-selected local thread support for the product inbox demo path.
+- `/dashboard/inbox` now accepts `conversationId` query state, selects a matching visible tenant-scoped thread, highlights it in the conversation list, and falls back to the first visible thread when the query does not match the current inbox.
+- The inbox list rows now link to their own selected-thread URL without creating outbound replies, provider calls, live AI, billing, notifications, secrets, or live messaging enablement.
+- Contracts and API map document the product inbox query-selection behavior.
+- Focused validation passed with `npm run test -- tests/unit/product/inbox.test.ts`, `npm run typecheck`, and `npm run test:e2e:product-demo -- --grep "product inbox"`; the protected local gate passed with `.\scripts\local-gate.ps1`.
 - History is preserved in `LOOP_LOG.md` and `docs/LOOP_LOG.md`; current agents should start with `npm run agent:brief`, targeted `rg`, file heads/tails, and current summaries before loading large logs, contracts, or tests.
-- Focused validation passed with `npm run test -- tests/unit/product/campaigns.test.ts` and `npm run typecheck`; the protected local gate passed with `.\scripts\local-gate.ps1`.
-- The change is local product reporting code, UI, tests, docs, and handoff updates only. It does not use production credentials, call real Twilio, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.
+- The change is local product inbox code, UI, tests, docs, and handoff updates only. It does not use production credentials, call real Twilio, bill, notify, send SMS or email, call live AI, expose secrets, enable live features, edit protected gate scripts, hard-delete data, or perform destructive production actions.

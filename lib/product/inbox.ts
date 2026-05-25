@@ -37,9 +37,10 @@ function contactName(contact: {
   return contact.displayName ?? (fullName || contact.phone) ?? "Unknown contact";
 }
 
-export async function getProductInbox(orgId: string) {
+export async function getProductInbox(orgId: string, selectedConversationId?: string | null) {
   const conversations = await listConversations(orgId);
-  const selectedConversation = conversations[0] ?? null;
+  const selectedConversation =
+    conversations.find((conversation) => conversation.id === selectedConversationId) ?? conversations[0] ?? null;
   const messages = selectedConversation ? await listConversationMessages(orgId, selectedConversation.id) : [];
   const summary = {
     total: conversations.length,
@@ -62,6 +63,7 @@ export async function getProductInbox(orgId: string) {
     })),
     conversations: conversations.map((conversation) => ({
       id: conversation.id,
+      selected: conversation.id === selectedConversation?.id,
       status: conversation.status,
       contactName: contactName(conversation.contact),
       phone: conversation.contact?.phone ?? "Unknown phone",
