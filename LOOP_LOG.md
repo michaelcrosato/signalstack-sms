@@ -7606,3 +7606,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/dashboard.test.ts`, `npm run typecheck`, `npm run lint`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.
+
+## Run 815  GREEN  analytics-delivery-review-queue  2026-05-25 02:17
+Objective:    Add campaign-level delivery review links to the product analytics workspace.
+Changed:
+- Added a read-only `/dashboard/analytics` delivery review queue derived from existing tenant-scoped campaign outbound message evidence.
+- Ordered campaign review rows by failed, then pending, then delivered/no-evidence states and linked each row to the existing campaign detail evidence page.
+- Updated product analytics unit coverage, product-demo Playwright coverage, API/testing contracts, current matrix, compact handoffs, and loop logs without provider calls, delivery retries, worker execution, live messaging, billing, live AI, secrets, delivery-state mutation, or protected gate script edits.
+Gate:         passed with `npm run test -- tests/unit/product/analytics.test.ts`, `npm run typecheck`, `npm run lint`, `npm run contracts:check`, `npm run context:check`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.

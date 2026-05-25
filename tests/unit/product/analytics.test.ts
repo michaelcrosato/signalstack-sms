@@ -1,6 +1,7 @@
-import { UsageEventType } from "@prisma/client";
-import { describe, expect, it, vi } from "vitest";
+import { CampaignStatus, UsageEventType } from "@prisma/client";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getAnalyticsOverview } from "@/lib/analytics/overview";
+import { listCampaignsWithDelivery } from "@/lib/db/repositories/campaigns";
 import {
   getProductAnalytics,
   productAnalyticsDeliveryRows,
@@ -12,7 +13,17 @@ vi.mock("@/lib/analytics/overview", () => ({
   getAnalyticsOverview: vi.fn()
 }));
 
+vi.mock("@/lib/db/repositories/campaigns", () => ({
+  listCampaignsWithDelivery: vi.fn()
+}));
+
 describe("product analytics", () => {
+  beforeEach(() => {
+    vi.mocked(getAnalyticsOverview).mockReset();
+    vi.mocked(listCampaignsWithDelivery).mockReset();
+    vi.mocked(listCampaignsWithDelivery).mockResolvedValue([]);
+  });
+
   it("projects existing analytics overview into product-facing metrics", async () => {
     vi.mocked(getAnalyticsOverview).mockResolvedValue({
       contacts: {
@@ -45,10 +56,85 @@ describe("product analytics", () => {
         [UsageEventType.AI_REQUEST]: 1
       }
     });
+    vi.mocked(listCampaignsWithDelivery).mockResolvedValue([
+      {
+        id: "campaign_pending",
+        orgId: "org_123",
+        name: "Pending Review",
+        body: "Hi",
+        status: CampaignStatus.SCHEDULED,
+        templateId: null,
+        scheduledAt: new Date("2026-01-05T00:00:00.000Z"),
+        createdAt: new Date("2026-01-01T00:00:00.000Z"),
+        updatedAt: new Date("2026-01-05T00:00:00.000Z"),
+        template: null,
+        recipients: [],
+        messages: [
+          {
+            direction: "OUTBOUND",
+            providerStatus: "sent",
+            deliveredAt: null,
+            failedAt: null,
+            createdAt: new Date("2026-01-04T10:00:00.000Z")
+          },
+          {
+            direction: "OUTBOUND",
+            providerStatus: "delivered",
+            deliveredAt: new Date("2026-01-04T11:00:00.000Z"),
+            failedAt: null,
+            createdAt: new Date("2026-01-04T09:00:00.000Z")
+          }
+        ]
+      },
+      {
+        id: "campaign_failed",
+        orgId: "org_123",
+        name: "Failed Review",
+        body: "Hi",
+        status: CampaignStatus.SCHEDULED,
+        templateId: null,
+        scheduledAt: new Date("2026-01-06T00:00:00.000Z"),
+        createdAt: new Date("2026-01-02T00:00:00.000Z"),
+        updatedAt: new Date("2026-01-06T00:00:00.000Z"),
+        template: null,
+        recipients: [],
+        messages: [
+          {
+            direction: "OUTBOUND",
+            providerStatus: "failed",
+            deliveredAt: null,
+            failedAt: new Date("2026-01-04T12:00:00.000Z"),
+            createdAt: new Date("2026-01-04T12:00:00.000Z")
+          },
+          {
+            direction: "INBOUND",
+            providerStatus: "failed",
+            deliveredAt: null,
+            failedAt: new Date("2026-01-04T13:00:00.000Z"),
+            createdAt: new Date("2026-01-04T13:00:00.000Z")
+          }
+        ]
+      },
+      {
+        id: "campaign_empty",
+        orgId: "org_123",
+        name: "No Evidence",
+        body: "Hi",
+        status: CampaignStatus.DRAFT,
+        templateId: null,
+        scheduledAt: null,
+        createdAt: new Date("2026-01-03T00:00:00.000Z"),
+        updatedAt: new Date("2026-01-03T00:00:00.000Z"),
+        template: null,
+        recipients: [],
+        messages: []
+      }
+    ]);
 
     const analytics = await getProductAnalytics("org_123");
 
     expect(getAnalyticsOverview).toHaveBeenCalledWith("org_123");
+    expect(listCampaignsWithDelivery).toHaveBeenCalledWith("org_123");
     expect(analytics.derived).toMatchObject({
       consentCoveragePercent: 75,
       optedOutPercent: 25,
@@ -75,6 +161,47 @@ describe("product analytics", () => {
       { key: "deliveryRate", label: "Delivery rate", value: "80%" },
       { key: "reviewStatus", label: "Review status", value: "1 failed; review evidence" },
       { key: "lastDeliveryEvidence", label: "Last delivery evidence", value: "2026-01-04T12:00:00.000Z" }
+    ]);
+    expect(analytics.campaignDeliveryRows).toEqual([
+      {
+        id: "campaign_failed",
+        name: "Failed Review",
+        href: "/dashboard/campaigns/campaign_failed",
+        status: CampaignStatus.SCHEDULED,
+        outboundMessages: 1,
+        delivered: 0,
+        pending: 0,
+        failed: 1,
+        deliveryRatePercent: 0,
+        reviewStatus: "1 failed; review evidence",
+        lastOutboundMessage: "2026-01-04T12:00:00.000Z"
+      },
+      {
+        id: "campaign_pending",
+        name: "Pending Review",
+        href: "/dashboard/campaigns/campaign_pending",
+        status: CampaignStatus.SCHEDULED,
+        outboundMessages: 2,
+        delivered: 1,
+        pending: 1,
+        failed: 0,
+        deliveryRatePercent: 50,
+        reviewStatus: "1 pending; awaiting provider status",
+        lastOutboundMessage: "2026-01-04T10:00:00.000Z"
+      },
+      {
+        id: "campaign_empty",
+        name: "No Evidence",
+        href: "/dashboard/campaigns/campaign_empty",
+        status: CampaignStatus.DRAFT,
+        outboundMessages: 0,
+        delivered: 0,
+        pending: 0,
+        failed: 0,
+        deliveryRatePercent: 0,
+        reviewStatus: "No outbound evidence",
+        lastOutboundMessage: "none"
+      }
     ]);
     expect(analytics.usageRows).toEqual([
       { type: UsageEventType.CONTACT_IMPORTED, label: "Contacts imported", quantity: 4 },

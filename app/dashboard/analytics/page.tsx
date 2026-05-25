@@ -120,6 +120,62 @@ export default async function AnalyticsPage() {
           </section>
         </section>
 
+        <section aria-label="Campaign delivery review queue" className="rounded border border-slate-200 bg-white">
+          <div className="border-b border-slate-200 p-5">
+            <h2 className="text-xl font-semibold">Delivery Review Queue</h2>
+            <p className="mt-1 text-sm text-slate-600">
+              Campaign-level local delivery evidence, ordered by failed and pending review states before delivered or
+              no-evidence campaigns.
+            </p>
+          </div>
+          {analytics.campaignDeliveryRows.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[760px] border-collapse text-left text-sm">
+                <thead className="bg-slate-100 text-xs uppercase tracking-wide text-slate-600">
+                  <tr>
+                    <th className="px-4 py-3">Campaign</th>
+                    <th className="px-4 py-3">Review</th>
+                    <th className="px-4 py-3 text-right">Outbound</th>
+                    <th className="px-4 py-3 text-right">Rate</th>
+                    <th className="px-4 py-3">Last evidence</th>
+                    <th className="px-4 py-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {analytics.campaignDeliveryRows.map((campaign) => (
+                    <tr className="border-t border-slate-100" key={campaign.id}>
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-slate-950">{campaign.name}</div>
+                        <div className="text-xs text-slate-600">{campaign.status}</div>
+                      </td>
+                      <td className="px-4 py-3 text-slate-700">
+                        <div className="font-medium text-slate-950">{campaign.reviewStatus}</div>
+                        <div className="text-xs text-slate-600">
+                          {campaign.delivered} delivered / {campaign.pending} pending / {campaign.failed} failed
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-right text-slate-700">{campaign.outboundMessages}</td>
+                      <td className="px-4 py-3 text-right text-slate-700">{campaign.deliveryRatePercent}%</td>
+                      <td className="px-4 py-3 text-slate-700">{campaign.lastOutboundMessage}</td>
+                      <td className="px-4 py-3 text-right">
+                        <Link
+                          aria-label={`Review evidence for ${campaign.name}`}
+                          className="font-medium text-teal-700"
+                          href={campaign.href}
+                        >
+                          Review evidence
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="p-5 text-sm text-slate-600">No campaign records are available for delivery review.</p>
+          )}
+        </section>
+
         <Panel title="Safety Boundary">
           <ul className="grid gap-2 text-sm text-slate-700">
             <li>This workspace reads tenant-scoped local analytics and usage totals only.</li>

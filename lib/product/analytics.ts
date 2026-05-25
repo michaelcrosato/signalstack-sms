@@ -1,6 +1,8 @@
 import { UsageEventType } from "@prisma/client";
 import { getAnalyticsOverview } from "@/lib/analytics/overview";
+import { listCampaignsWithDelivery } from "@/lib/db/repositories/campaigns";
 import { getLocalDeliveryReviewStatus } from "@/lib/messaging/delivery-review";
+import { isLocalDeliveryDelivered, isTerminalDeliveryFailure } from "@/lib/messaging/delivery-status";
 
 const productAnalyticsMetricRowItems = [
   { key: "consentCoverage", label: "Consent Coverage" },
@@ -43,7 +45,7 @@ export const productAnalyticsDeliveryRows = Object.freeze(
 );
 
 export async function getProductAnalytics(orgId: string) {
-  const overview = await getAnalyticsOverview(orgId);
+  const [overview, campaigns] = await Promise.all([getAnalyticsOverview(orgId), listCampaignsWithDelivery(orgId)]);
   const consentCoveragePercent =
     overview.contacts.total > 0 ? Math.round((overview.contacts.optedIn / overview.contacts.total) * 100) : 0;
   const resolvedConversationPercent =
@@ -94,6 +96,71 @@ export async function getProductAnalytics(orgId: string) {
     inboxLoad: { value: overview.conversations.open, detail: `${overview.messages.total} local messages` },
     usageEvents: { value: derived.totalUsageEvents, detail: "local metering only" }
   };
+  const campaignDeliveryRows = campaigns
+    .map((campaign) => {
+      const outboundMessages = campaign.messages.filter((message) => message.direction === "OUTBOUND");
+      const delivered = outboundMessages.filter(isLocalDeliveryDelivered).length;
+      const failed = outboundMessages.filter(isTerminalDeliveryFailure).length;
+      const pending = outboundMessages.filter(
+        (message) => message.deliveredAt === null && !isTerminalDeliveryFailure(message)
+      ).length;
+      const lastOutboundMessageAt = outboundMessages.reduce<Date | null>((latest, message) => {
+        if (!message.createdAt) {
+          return latest;
+        }
+
+        return latest === null || message.createdAt.getTime() > latest.getTime() ? message.createdAt : latest;
+      }, null);
+      const outboundCount = outboundMessages.length;
+
+      return {
+        id: campaign.id,
+        name: campaign.name,
+        href: `/dashboard/campaigns/${campaign.id}`,
+        status: campaign.status,
+        outboundMessages: outboundCount,
+        delivered,
+        pending,
+        failed,
+        deliveryRatePercent: outboundCount > 0 ? Math.round((delivered / outboundCount) * 100) : 0,
+        reviewStatus: getLocalDeliveryReviewStatus({
+          outboundMessages: outboundCount,
+          delivered,
+          pending,
+          failed
+        }),
+        lastOutboundMessageAt,
+        lastOutboundMessage: lastOutboundMessageAt?.toISOString() ?? "none"
+      };
+    })
+    .sort((left, right) => {
+      const priorityDelta = getCampaignDeliveryReviewPriority(left) - getCampaignDeliveryReviewPriority(right);
+      if (priorityDelta !== 0) {
+        return priorityDelta;
+      }
+
+      const timeDelta =
+        (right.lastOutboundMessageAt?.getTime() ?? 0) - (left.lastOutboundMessageAt?.getTime() ?? 0);
+      if (timeDelta !== 0) {
+        return timeDelta;
+      }
+
+      return left.name.localeCompare(right.name);
+    })
+    .slice(0, 5)
+    .map((row) => ({
+      id: row.id,
+      name: row.name,
+      href: row.href,
+      status: row.status,
+      outboundMessages: row.outboundMessages,
+      delivered: row.delivered,
+      pending: row.pending,
+      failed: row.failed,
+      deliveryRatePercent: row.deliveryRatePercent,
+      reviewStatus: row.reviewStatus,
+      lastOutboundMessage: row.lastOutboundMessage
+    }));
 
   return {
     ...overview,
@@ -113,10 +180,31 @@ export async function getProductAnalytics(orgId: string) {
       label: row.label,
       value: deliveryValues[row.key]
     })),
+    campaignDeliveryRows,
     usageRows: productAnalyticsUsageRows.map((row) => ({
       type: row.type,
       label: row.label,
       quantity: overview.usage[row.type]
     }))
   };
+}
+
+function getCampaignDeliveryReviewPriority(row: {
+  outboundMessages: number;
+  pending: number;
+  failed: number;
+}) {
+  if (row.failed > 0) {
+    return 0;
+  }
+
+  if (row.pending > 0) {
+    return 1;
+  }
+
+  if (row.outboundMessages > 0) {
+    return 2;
+  }
+
+  return 3;
 }

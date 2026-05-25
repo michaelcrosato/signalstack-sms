@@ -470,6 +470,14 @@ test("product analytics page renders local overview detail", async ({ page }) =>
   await expect(page.getByText("Scheduled rate")).toBeVisible();
   await expect(page.getByText("Fake AI usage share")).toBeVisible();
   await expect(page.getByText("Provider sends")).toBeVisible();
+  const deliveryReviewQueue = page.getByLabel("Campaign delivery review queue");
+  await expect(deliveryReviewQueue.getByRole("heading", { name: "Delivery Review Queue" })).toBeVisible();
+  await expect(deliveryReviewQueue.getByText("Campaign-level local delivery evidence")).toBeVisible();
+  await expect(deliveryReviewQueue.getByRole("columnheader", { name: "Review" })).toBeVisible();
+  await expect(deliveryReviewQueue.getByRole("link", { name: /Review evidence for/ }).first()).toHaveAttribute(
+    "href",
+    /\/dashboard\/campaigns\//
+  );
   await expect(page.getByRole("heading", { name: "Usage Metering" })).toBeVisible();
   await expect(page.getByRole("row").filter({ hasText: "Contacts imported" })).toBeVisible();
   const fakeAiUsageRow = page.getByRole("row").filter({ hasText: "Fake AI requests" });
