@@ -118,7 +118,8 @@ export async function getProductCampaigns(orgId: string) {
           pending,
           failed,
           deliveryRatePercent: outboundMessages > 0 ? Math.round((delivered / outboundMessages) * 100) : 0,
-          reviewStatus: getCampaignDeliveryReviewStatus(outboundMessages, delivered, pending, failed)
+          reviewStatus: getCampaignDeliveryReviewStatus(outboundMessages, delivered, pending, failed),
+          lastOutboundMessage: deliverySummary.lastOutboundMessage
         }
       };
     }),

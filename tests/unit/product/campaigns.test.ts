@@ -225,13 +225,15 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
           direction: "OUTBOUND",
           providerStatus: "delivered",
           deliveredAt: new Date("2026-01-03T00:00:00.000Z"),
-          failedAt: null
+          failedAt: null,
+          createdAt: new Date("2026-01-03T00:00:00.000Z")
         },
         {
           direction: "OUTBOUND",
           providerStatus: "sent",
           deliveredAt: null,
-          failedAt: null
+          failedAt: null,
+          createdAt: new Date("2026-01-04T00:00:00.000Z")
         }
       ]
     },
@@ -248,7 +250,8 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
           direction: "OUTBOUND",
           providerStatus: "failed",
           deliveredAt: null,
-          failedAt: new Date("2026-01-04T00:00:00.000Z")
+          failedAt: new Date("2026-01-04T00:00:00.000Z"),
+          createdAt: new Date("2026-01-04T12:00:00.000Z")
         }
       ]
     }
@@ -322,7 +325,8 @@ describe("getProductCampaigns", () => {
         pending: 1,
         failed: 0,
         deliveryRatePercent: 50,
-        reviewStatus: "1 pending; awaiting provider status"
+        reviewStatus: "1 pending; awaiting provider status",
+        lastOutboundMessage: "2026-01-04T00:00:00.000Z"
       },
       {
         outboundMessages: 1,
@@ -330,7 +334,8 @@ describe("getProductCampaigns", () => {
         pending: 0,
         failed: 1,
         deliveryRatePercent: 0,
-        reviewStatus: "1 failed; review evidence"
+        reviewStatus: "1 failed; review evidence",
+        lastOutboundMessage: "2026-01-04T12:00:00.000Z"
       }
     ]);
     expect(result.contacts).toEqual([

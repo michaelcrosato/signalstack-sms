@@ -7506,3 +7506,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run typecheck`, `npm run test:e2e:product-demo -- --grep "product campaign"`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer concrete idempotency/auth correctness gaps, feedback-driven reporting depth, or real auth only after a Clerk/session design slice is selected.
+
+## Run 805  GREEN  campaign-list-last-evidence  2026-05-25 00:53
+Objective:    Show latest outbound evidence directly on campaign-list delivery rows.
+Changed:
+- Projected each campaign row's latest outbound message timestamp from existing outbound-only local delivery records.
+- Rendered `Last evidence` in `/dashboard/campaigns` delivery cells without provider calls, retries, worker execution, live messaging, billing, live AI, secrets, or message delivery mutation.
+- Updated focused product campaign unit coverage, product-demo E2E assertions, API docs/contracts, current matrix, and compact handoffs.
+Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run typecheck`, `npm run test:e2e:product-demo -- --grep "product campaigns page"`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer concrete idempotency/auth correctness gaps, feedback-driven reporting depth, or real auth only after a Clerk/session design slice is selected.

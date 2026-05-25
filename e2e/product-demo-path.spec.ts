@@ -222,6 +222,7 @@ test("product campaigns page creates, preflights, and schedules a local campaign
   await expect(page.getByRole("columnheader", { name: "Delivery" })).toBeVisible();
   await expect(page.getByText("Demo intro campaign")).toBeVisible();
   await expect(page.getByText(/(No outbound evidence|pending; awaiting provider status|failed; review evidence|All delivered)/).first()).toBeVisible();
+  await expect(page.getByText(/Last evidence: (none|\d{4}-\d{2}-\d{2}T)/).first()).toBeVisible();
 
   await page.getByLabel("Campaign name").fill(campaignName);
   await expect(page.getByRole("heading", { name: "Fake AI copy assist" })).toBeVisible();
