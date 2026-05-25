@@ -457,6 +457,8 @@ test("product analytics page renders local overview detail", async ({ page }) =>
   await expect(page.getByText("Delivery rate")).toBeVisible();
   await expect(page.getByText("Review status")).toBeVisible();
   await expect(page.getByText(/(No outbound evidence|pending; awaiting provider status|failed; review evidence|All delivered)/).first()).toBeVisible();
+  await expect(page.getByText("Last delivery evidence", { exact: true })).toBeVisible();
+  await expect(page.getByText(/(none|\d{4}-\d{2}-\d{2}T)/).first()).toBeVisible();
   await expect(page.getByText("Delivery source")).toBeVisible();
   await expect(page.getByText("local message rows")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Campaign Signals" })).toBeVisible();

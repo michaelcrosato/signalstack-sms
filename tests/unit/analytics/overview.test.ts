@@ -16,6 +16,7 @@ const mocks = vi.hoisted(() => ({
   campaignCount: vi.fn(),
   conversationCount: vi.fn(),
   messageCount: vi.fn(),
+  messageFindFirst: vi.fn(),
   usageEventFindMany: vi.fn()
 }));
 
@@ -24,7 +25,7 @@ vi.mock("@/lib/db/prisma", () => ({
     contact: { count: mocks.contactCount },
     campaign: { count: mocks.campaignCount },
     conversation: { count: mocks.conversationCount },
-    message: { count: mocks.messageCount },
+    message: { count: mocks.messageCount, findFirst: mocks.messageFindFirst },
     usageEvent: { findMany: mocks.usageEventFindMany }
   }
 }));
@@ -67,6 +68,7 @@ describe("analytics usage aggregation", () => {
       { type: UsageEventType.CONTACT_IMPORTED, quantity: 10 },
       { type: UsageEventType.CAMPAIGN_SCHEDULED, quantity: 1 }
     ]);
+    mocks.messageFindFirst.mockResolvedValue({ createdAt: new Date("2026-01-04T12:00:00.000Z") });
   });
 
   it("supports overview usage totals", () => {
@@ -103,7 +105,8 @@ describe("analytics usage aggregation", () => {
         outbound: 5,
         delivered: 3,
         pending: 2,
-        failed: 1
+        failed: 1,
+        lastOutboundAt: "2026-01-04T12:00:00.000Z"
       },
       usage: {
         [UsageEventType.CONTACT_IMPORTED]: 10,
@@ -117,5 +120,10 @@ describe("analytics usage aggregation", () => {
     expect(mocks.messageCount).toHaveBeenCalledWith({ where: outboundDeliveredMessageWhere("org_analytics") });
     expect(mocks.messageCount).toHaveBeenCalledWith({ where: outboundPendingMessageWhere("org_analytics") });
     expect(mocks.messageCount).toHaveBeenCalledWith({ where: outboundFailedMessageWhere("org_analytics") });
+    expect(mocks.messageFindFirst).toHaveBeenCalledWith({
+      where: outboundMessageWhere("org_analytics"),
+      orderBy: { createdAt: "desc" },
+      select: { createdAt: true }
+    });
   });
 });

@@ -35,7 +35,8 @@ describe("product analytics", () => {
         outbound: 5,
         delivered: 4,
         pending: 0,
-        failed: 1
+        failed: 1,
+        lastOutboundAt: "2026-01-04T12:00:00.000Z"
       },
       usage: {
         [UsageEventType.CONTACT_IMPORTED]: 4,
@@ -57,6 +58,7 @@ describe("product analytics", () => {
       totalUsageEvents: 10,
       fakeAiUsagePercent: 10,
       deliveryRatePercent: 80,
+      lastDeliveryEvidence: "2026-01-04T12:00:00.000Z",
       deliveryReviewStatus: "1 failed; review evidence"
     });
     expect(analytics.metrics).toEqual([
@@ -71,7 +73,8 @@ describe("product analytics", () => {
       { key: "pending", label: "Pending", value: "0" },
       { key: "failed", label: "Failed", value: "1" },
       { key: "deliveryRate", label: "Delivery rate", value: "80%" },
-      { key: "reviewStatus", label: "Review status", value: "1 failed; review evidence" }
+      { key: "reviewStatus", label: "Review status", value: "1 failed; review evidence" },
+      { key: "lastDeliveryEvidence", label: "Last delivery evidence", value: "2026-01-04T12:00:00.000Z" }
     ]);
     expect(analytics.usageRows).toEqual([
       { type: UsageEventType.CONTACT_IMPORTED, label: "Contacts imported", quantity: 4 },
@@ -103,7 +106,8 @@ describe("product analytics", () => {
         outbound: 0,
         delivered: 0,
         pending: 0,
-        failed: 0
+        failed: 0,
+        lastOutboundAt: null
       },
       usage: {
         [UsageEventType.CONTACT_IMPORTED]: 0,
@@ -123,6 +127,7 @@ describe("product analytics", () => {
         totalUsageEvents: 0,
         fakeAiUsagePercent: 0,
         deliveryRatePercent: 0,
+        lastDeliveryEvidence: "none",
         deliveryReviewStatus: "No outbound evidence"
       }
     });
@@ -181,7 +186,8 @@ describe("product analytics", () => {
       "pending",
       "failed",
       "deliveryRate",
-      "reviewStatus"
+      "reviewStatus",
+      "lastDeliveryEvidence"
     ]);
 
     expect(() => {

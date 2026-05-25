@@ -6940,3 +6940,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/dashboard.test.ts`, `npm run typecheck`, `npm run lint`, `npm run contracts:check`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.
+
+## Run 811  GREEN  analytics-last-delivery-evidence  2026-05-25 01:45
+Objective:    Surface the latest local outbound delivery evidence timestamp on the product analytics page.
+Changed:
+- Added `messages.lastOutboundAt` to `GET /api/analytics/overview` from the newest tenant-scoped outbound local message row.
+- Rendered a frozen `Last delivery evidence` delivery row in `/dashboard/analytics` and covered it in product analytics unit tests plus the product-demo browser path.
+- Updated API/testing docs, current matrix, and compact handoffs without provider calls, delivery retries, worker execution, live messaging, billing, live AI, secrets, or delivery-state mutation.
+Gate:         passed with `npm run test -- tests/unit/analytics/overview.test.ts tests/unit/product/analytics.test.ts`, `npm run typecheck`, `npm run lint`, `npm run contracts:check`, `npm run context:check`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.

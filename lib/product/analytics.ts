@@ -32,7 +32,8 @@ const productAnalyticsDeliveryRowItems = [
   { key: "pending", label: "Pending" },
   { key: "failed", label: "Failed" },
   { key: "deliveryRate", label: "Delivery rate" },
-  { key: "reviewStatus", label: "Review status" }
+  { key: "reviewStatus", label: "Review status" },
+  { key: "lastDeliveryEvidence", label: "Last delivery evidence" }
 ] as const;
 
 type ProductAnalyticsDeliveryRowKey = (typeof productAnalyticsDeliveryRowItems)[number]["key"];
@@ -67,6 +68,7 @@ export async function getProductAnalytics(orgId: string) {
     totalUsageEvents,
     fakeAiUsagePercent,
     deliveryRatePercent,
+    lastDeliveryEvidence: overview.messages.lastOutboundAt ?? "none",
     deliveryReviewStatus: getLocalDeliveryReviewStatus({
       outboundMessages: overview.messages.outbound,
       delivered: overview.messages.delivered,
@@ -80,7 +82,8 @@ export async function getProductAnalytics(orgId: string) {
     pending: overview.messages.pending.toString(),
     failed: overview.messages.failed.toString(),
     deliveryRate: `${derived.deliveryRatePercent}%`,
-    reviewStatus: derived.deliveryReviewStatus
+    reviewStatus: derived.deliveryReviewStatus,
+    lastDeliveryEvidence: derived.lastDeliveryEvidence
   };
   const metricValues: Record<ProductAnalyticsMetricKey, { value: number | string; detail: string }> = {
     consentCoverage: {

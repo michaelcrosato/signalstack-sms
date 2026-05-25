@@ -22,6 +22,7 @@ export async function getAnalyticsOverview(orgId: string) {
     deliveredMessages,
     pendingMessages,
     failedMessages,
+    lastOutboundMessage,
     usageEvents
   ] = await Promise.all([
     prisma.contact.count({ where: { orgId, archivedAt: null } }),
@@ -37,6 +38,11 @@ export async function getAnalyticsOverview(orgId: string) {
     prisma.message.count({ where: outboundDeliveredMessageWhere(orgId) }),
     prisma.message.count({ where: outboundPendingMessageWhere(orgId) }),
     prisma.message.count({ where: outboundFailedMessageWhere(orgId) }),
+    prisma.message.findFirst({
+      where: outboundMessageWhere(orgId),
+      orderBy: { createdAt: "desc" },
+      select: { createdAt: true }
+    }),
     prisma.usageEvent.findMany({ where: { orgId }, select: { type: true, quantity: true } })
   ]);
 
@@ -61,7 +67,8 @@ export async function getAnalyticsOverview(orgId: string) {
       outbound: outboundMessages,
       delivered: deliveredMessages,
       pending: pendingMessages,
-      failed: failedMessages
+      failed: failedMessages,
+      lastOutboundAt: lastOutboundMessage?.createdAt.toISOString() ?? null
     },
     usage: aggregateUsageEvents(usageEvents)
   };
