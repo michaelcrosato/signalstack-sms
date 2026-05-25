@@ -74,7 +74,8 @@ vi.mock("@/lib/db/prisma", () => ({
 
           return 12;
         }
-      )
+      ),
+      findFirst: vi.fn(async () => ({ createdAt: new Date("2026-01-04T12:00:00.000Z") }))
     },
     complianceProfile: {
       findUnique: vi.fn(async () => ({
@@ -186,6 +187,7 @@ describe("product dashboard navigation", () => {
       "deliveryPending",
       "deliveryFailures",
       "deliveryReviewStatus",
+      "lastDeliveryEvidence",
       "inboxLoad",
       "fakeAiRequests",
       "localUsageEvents"
@@ -199,6 +201,7 @@ describe("product dashboard navigation", () => {
       "Delivery pending",
       "Delivery failures",
       "Delivery review",
+      "Last delivery evidence",
       "Inbox load",
       "Fake AI requests",
       "Local usage events"
@@ -322,7 +325,8 @@ describe("product dashboard navigation", () => {
         pending: 2,
         failed: 1,
         deliveryRatePercent: 60,
-        deliveryReviewStatus: "1 failed; review evidence"
+        deliveryReviewStatus: "1 failed; review evidence",
+        lastEvidenceAt: "2026-01-04T12:00:00.000Z"
       },
       compliance: {
         completeFields: productComplianceFields.length,
@@ -344,6 +348,7 @@ describe("product dashboard navigation", () => {
         { key: "deliveryPending", label: "Delivery pending", value: "2" },
         { key: "deliveryFailures", label: "Delivery failures", value: "1" },
         { key: "deliveryReviewStatus", label: "Delivery review", value: "1 failed; review evidence" },
+        { key: "lastDeliveryEvidence", label: "Last delivery evidence", value: "2026-01-04T12:00:00.000Z" },
         { key: "inboxLoad", label: "Inbox load", value: "4" },
         { key: "fakeAiRequests", label: "Fake AI requests", value: "2" },
         { key: "localUsageEvents", label: "Local usage events", value: "3" }
@@ -433,6 +438,11 @@ describe("product dashboard navigation", () => {
     });
     expect(vi.mocked(prisma.message.count)).toHaveBeenCalledWith({
       where: outboundFailedMessageWhere("org_1")
+    });
+    expect(vi.mocked(prisma.message.findFirst)).toHaveBeenCalledWith({
+      where: { orgId: "org_1", direction: "OUTBOUND" },
+      orderBy: { createdAt: "desc" },
+      select: { createdAt: true }
     });
   });
 });

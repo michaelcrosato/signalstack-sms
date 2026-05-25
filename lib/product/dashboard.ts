@@ -51,6 +51,7 @@ const productDashboardSignalRowItems = [
   { key: "deliveryPending", label: "Delivery pending" },
   { key: "deliveryFailures", label: "Delivery failures" },
   { key: "deliveryReviewStatus", label: "Delivery review" },
+  { key: "lastDeliveryEvidence", label: "Last delivery evidence" },
   { key: "inboxLoad", label: "Inbox load" },
   { key: "fakeAiRequests", label: "Fake AI requests" },
   { key: "localUsageEvents", label: "Local usage events" }
@@ -155,6 +156,7 @@ export async function getProductDashboard(orgId: string) {
     deliveredMessages,
     pendingMessages,
     failedMessages,
+    lastOutboundMessage,
     complianceProfile,
     usageEvents
   ] = await Promise.all([
@@ -171,6 +173,11 @@ export async function getProductDashboard(orgId: string) {
     prisma.message.count({ where: outboundDeliveredMessageWhere(orgId) }),
     prisma.message.count({ where: outboundPendingMessageWhere(orgId) }),
     prisma.message.count({ where: outboundFailedMessageWhere(orgId) }),
+    prisma.message.findFirst({
+      where: outboundMessageWhere(orgId),
+      orderBy: { createdAt: "desc" },
+      select: { createdAt: true }
+    }),
     prisma.complianceProfile.findUnique({ where: { orgId } }),
     prisma.usageEvent.findMany({ where: { orgId }, select: { type: true, quantity: true } })
   ]);
@@ -208,7 +215,8 @@ export async function getProductDashboard(orgId: string) {
       pending: pendingMessages,
       failed: failedMessages,
       deliveryRatePercent,
-      deliveryReviewStatus
+      deliveryReviewStatus,
+      lastEvidenceAt: lastOutboundMessage?.createdAt.toISOString() ?? "none"
     },
     templates: {
       total: templates
@@ -239,6 +247,7 @@ export async function getProductDashboard(orgId: string) {
     deliveryPending: String(dashboard.delivery.pending),
     deliveryFailures: String(dashboard.delivery.failed),
     deliveryReviewStatus: dashboard.delivery.deliveryReviewStatus,
+    lastDeliveryEvidence: dashboard.delivery.lastEvidenceAt,
     inboxLoad: String(dashboard.inbox.open),
     fakeAiRequests: String(dashboard.usage.fakeAiRequests),
     localUsageEvents: String(dashboard.usage.totalEvents)

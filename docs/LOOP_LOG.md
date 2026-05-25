@@ -6930,3 +6930,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/dashboard.test.ts`, `npm run typecheck`, `npm run lint`, `npm run contracts:check`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.
+
+## Run 810  GREEN  dashboard-last-delivery-evidence  2026-05-25 01:34
+Objective:    Surface the latest local outbound delivery evidence timestamp on the product dashboard.
+Changed:
+- Added a `Last delivery evidence` dashboard signal sourced from the newest tenant-scoped outbound local message row.
+- Updated frozen dashboard signal metadata, focused dashboard unit coverage, product-demo browser coverage, API/testing contracts, current matrix, and compact handoffs.
+- Repaired a product-demo locator ambiguity by making the existing `Delivery evidence` assertion exact after the new longer label was added.
+Gate:         passed with `npm run test -- tests/unit/product/dashboard.test.ts`, `npm run typecheck`, `npm run lint`, `npm run contracts:check`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete auth/idempotency correctness gaps.
