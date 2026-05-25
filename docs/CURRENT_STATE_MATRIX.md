@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 758 note: mutating-route auth scanner coverage now includes comma-expression chains whose local `globalThis` logical-assignment aliases use sequence-wrapped conditional/logical right-hand sides, including `((root ??= (void 0, condition ? globalThis : globalThis)), (platform ||= (undefined, root ?? root)), (runtime &&= (0, platform && platform)))`, before `Request`, `Object`, and `Reflect` destructuring reaches prototype/descriptor body-reader calls.
+
 Run 757 note: mutating-route auth scanner coverage now includes sequence-wrapped conditional/logical expression right-hand sides inside local `globalThis` logical-assignment chains, including `root ??= (void 0, condition ? globalThis : globalThis); platform ||= (undefined, root ?? root); runtime &&= (0, platform && platform)`, before `Request`, `Object`, and `Reflect` destructuring reaches prototype/descriptor body-reader calls.
 
 Run 756 note: mutating-route auth scanner coverage now includes sequence-wrapped logical-assignment local `globalThis` root aliases for `Request` constructor aliases and `Object`/`Reflect` aliases, including `root ??= (void 0, globalThis); platform ||= (undefined, root); runtime &&= (0, platform)`, before prototype/descriptor body-reader calls.
