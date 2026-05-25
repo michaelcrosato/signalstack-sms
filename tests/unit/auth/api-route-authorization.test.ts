@@ -8102,6 +8102,121 @@ describe("API route authorization coverage", () => {
     expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
   });
 
+  it("treats sequence-wrapped logical-assignment local globalThis root aliases as body parsing for role-gate ordering", () => {
+    const unsafeSequenceLogicalAssignmentRequestRootAliasSource = `
+      export async function POST(req: Request) {
+        let root;
+        let platform;
+        let runtime;
+        root ??= (void 0, globalThis);
+        platform ||= (undefined, root);
+        runtime &&= (0, platform);
+        const { Request: RequestCtor = Request } = runtime;
+        const payload = await RequestCtor.prototype.json.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json(payload);
+      }
+    `;
+    const unsafeSequenceLogicalAssignmentComputedRequestRootAliasSource = `
+      export async function PATCH(req: Request) {
+        const requestConstructorName = "Request" as const;
+        let root;
+        let platform;
+        let runtime;
+        root ??= (void 0, ((globalThis as typeof globalThis)!));
+        platform ||= (undefined, ((root)! satisfies typeof globalThis));
+        runtime &&= (0, ((platform)! as typeof globalThis));
+        const { [requestConstructorName]: RequestCtor = Request } = runtime;
+        const payload = await RequestCtor.prototype.text.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ payload });
+      }
+    `;
+    const unsafeSequenceLogicalAssignmentBuiltinsRootAliasSource = `
+      export async function PUT(req: Request) {
+        let root;
+        let platform;
+        let runtime;
+        root ||= (null, globalThis satisfies typeof globalThis);
+        platform ??= (false, root);
+        runtime &&= (true, platform satisfies typeof globalThis);
+        const { Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = runtime;
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "formData"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ ok: Boolean(payload) });
+      }
+    `;
+    const unsafeSequenceLogicalAssignmentComputedBuiltinsRootAliasSource = `
+      export async function DELETE(req: Request) {
+        const objectName = "Object" as const;
+        const reflectName = "Reflect" as const;
+        let root;
+        let platform;
+        let runtime;
+        let ObjectBuiltin;
+        let ReflectBuiltin;
+        ((root ??= (void 0, ((globalThis satisfies typeof globalThis)!))));
+        ((platform ||= (undefined, ((root)! as typeof globalThis))));
+        ((runtime &&= (0, ((platform)! satisfies typeof globalThis))));
+        ({ [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = runtime);
+        const payload = await ObjectBuiltin.getOwnPropertyDescriptor(
+          ReflectBuiltin.getPrototypeOf(req),
+          "blob"
+        )?.value.call(req);
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        return Response.json({ size: payload.size });
+      }
+    `;
+    const safeSource = `
+      export async function POST(req: Request) {
+        let root;
+        let platform;
+        let runtime;
+        root ??= (void 0, globalThis);
+        platform ||= (undefined, root);
+        runtime &&= (0, platform);
+        const { Request: RequestCtor = Request } = runtime;
+        const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+        if (roleResponse) return roleResponse;
+        const payload = await RequestCtor.prototype.arrayBuffer.call(req);
+        return Response.json({ size: payload.byteLength });
+      }
+    `;
+
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeSequenceLogicalAssignmentRequestRootAliasSource,
+        "POST"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeSequenceLogicalAssignmentComputedRequestRootAliasSource,
+        "PATCH"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeSequenceLogicalAssignmentBuiltinsRootAliasSource,
+        "PUT"
+      )
+    ).toBe(true);
+    expect(
+      mutatingMethodParsesBodyBeforeRoleGate(
+        unsafeSequenceLogicalAssignmentComputedBuiltinsRootAliasSource,
+        "DELETE"
+      )
+    ).toBe(true);
+    expect(mutatingMethodParsesBodyBeforeRoleGate(safeSource, "POST")).toBe(false);
+  });
+
   it("treats multi-hop assigned transitive local globalThis root aliases as body parsing for role-gate ordering", () => {
     const unsafeAssignedMultiHopRequestRootAliasSource = `
       export async function POST(req: Request) {

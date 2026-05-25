@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 756  GREEN  auth-sequence-wrapped-logical-assignment-globalthis-aliases  2026-05-24 17:45
+Objective:    Prove sequence-wrapped logical-assignment local `globalThis` root aliases are classified before mutating-route body-reader role gates.
+Changed:
+- Added focused auth unit coverage for sequence-wrapped `??=`, `||=`, and `&&=` local `globalThis` root chains, such as `root ??= (void 0, globalThis); platform ||= (undefined, root); runtime &&= (0, platform)`.
+- Updated testing docs/contracts, NEXT_PROMPTS, SUMMARY, BLOCKERS, LOOP_LOG, docs/LOOP_LOG, and current state matrix for the sequence-wrapped logical-assignment alias boundary.
+- Kept the change local to tests/docs/logs; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
 ## Run 755  GREEN  auth-sequence-wrapped-expression-globalthis-aliases  2026-05-24 17:37
 Objective:    Prove sequence-wrapped conditional/logical local `globalThis` root aliases are classified before mutating-route body-reader role gates.
 Changed:
