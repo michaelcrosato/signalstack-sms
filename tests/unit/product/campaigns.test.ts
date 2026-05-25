@@ -63,6 +63,7 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
               direction: "OUTBOUND",
               providerStatus: "delivered",
               providerMessageId: "dummy_message_1",
+              providerErrorCode: null,
               deliveredAt: new Date("2026-01-03T00:00:00.000Z"),
               failedAt: null,
               createdAt: new Date("2026-01-02T00:00:00.000Z"),
@@ -78,6 +79,7 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
               direction: "OUTBOUND",
               providerStatus: "failed",
               providerMessageId: null,
+              providerErrorCode: "30008",
               deliveredAt: null,
               failedAt: new Date("2026-01-04T00:00:00.000Z"),
               createdAt: new Date("2026-01-04T00:00:00.000Z"),
@@ -88,6 +90,7 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
               direction: "OUTBOUND",
               providerStatus: "undelivered",
               providerMessageId: "dummy_message_stale",
+              providerErrorCode: "30005",
               deliveredAt: new Date("2026-01-04T06:00:00.000Z"),
               failedAt: null,
               createdAt: new Date("2026-01-04T06:00:00.000Z"),
@@ -98,6 +101,7 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
               direction: "OUTBOUND",
               providerStatus: "sent",
               providerMessageId: "dummy_message_2",
+              providerErrorCode: null,
               deliveredAt: null,
               failedAt: null,
               createdAt: new Date("2026-01-04T12:00:00.000Z"),
@@ -113,6 +117,7 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
               direction: "INBOUND",
               providerStatus: "delivered",
               providerMessageId: "provider_inbound_delivered",
+              providerErrorCode: null,
               deliveredAt: new Date("2026-01-05T00:00:00.000Z"),
               failedAt: null,
               createdAt: new Date("2026-01-05T00:00:00.000Z"),
@@ -123,6 +128,7 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
               direction: "INBOUND",
               providerStatus: "failed",
               providerMessageId: "provider_inbound_failed",
+              providerErrorCode: "30009",
               deliveredAt: null,
               failedAt: new Date("2026-01-06T00:00:00.000Z"),
               createdAt: new Date("2026-01-06T00:00:00.000Z"),
@@ -134,6 +140,7 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
               ? Array.from({ length: 35 }, (_value, index) => ({
                   direction: "OUTBOUND",
                   providerStatus: index < 31 ? "delivered" : "sent",
+                  providerErrorCode: null,
                   deliveredAt: index < 31 ? new Date(Date.UTC(2026, 1, 4, 11, index, 0)) : null,
                   failedAt: null,
                   createdAt: new Date(Date.UTC(2026, 1, 4, 10, index, 0))
@@ -142,6 +149,7 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
                   {
                     direction: "OUTBOUND",
                     providerStatus: "delivered",
+                    providerErrorCode: null,
                     deliveredAt: new Date("2026-01-03T00:00:00.000Z"),
                     failedAt: null,
                     createdAt: new Date("2026-01-02T00:00:00.000Z")
@@ -149,6 +157,7 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
                   {
                     direction: "OUTBOUND",
                     providerStatus: "failed",
+                    providerErrorCode: "30008",
                     deliveredAt: null,
                     failedAt: new Date("2026-01-04T00:00:00.000Z"),
                     createdAt: new Date("2026-01-04T00:00:00.000Z")
@@ -156,6 +165,7 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
                   {
                     direction: "OUTBOUND",
                     providerStatus: "undelivered",
+                    providerErrorCode: "30005",
                     deliveredAt: new Date("2026-01-04T06:00:00.000Z"),
                     failedAt: null,
                     createdAt: new Date("2026-01-04T06:00:00.000Z")
@@ -163,6 +173,7 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
                   {
                     direction: "OUTBOUND",
                     providerStatus: "sent",
+                    providerErrorCode: null,
                     deliveredAt: null,
                     failedAt: null,
                     createdAt: new Date("2026-01-04T12:00:00.000Z")
@@ -431,7 +442,8 @@ describe("getProductCampaigns", () => {
       { key: "pending", label: "Pending", value: "1" },
       { key: "failed", label: "Failed", value: "2" },
       { key: "lastOutboundMessage", label: "Last Outbound Message", value: "2026-01-04T12:00:00.000Z" },
-      { key: "providerStatuses", label: "Provider Statuses", value: "delivered, failed, undelivered, sent" }
+      { key: "providerStatuses", label: "Provider Statuses", value: "delivered, failed, undelivered, sent" },
+      { key: "providerErrorCodes", label: "Provider Error Codes", value: "30008, 30005" }
     ]);
     expect(result?.deliveryRows).toEqual([
       {
@@ -440,6 +452,7 @@ describe("getProductCampaigns", () => {
         deliveryState: "pending",
         direction: "OUTBOUND",
         providerStatus: "sent",
+        providerErrorCode: "none",
         providerMessageId: "dummy_message_2",
         createdAt: "2026-01-04T12:00:00.000Z",
         deliveredAt: null,
@@ -451,6 +464,7 @@ describe("getProductCampaigns", () => {
         deliveryState: "failed",
         direction: "OUTBOUND",
         providerStatus: "undelivered",
+        providerErrorCode: "30005",
         providerMessageId: "dummy_message_stale",
         createdAt: "2026-01-04T06:00:00.000Z",
         deliveredAt: "2026-01-04T06:00:00.000Z",
@@ -462,6 +476,7 @@ describe("getProductCampaigns", () => {
         deliveryState: "failed",
         direction: "OUTBOUND",
         providerStatus: "failed",
+        providerErrorCode: "30008",
         providerMessageId: "no provider id",
         createdAt: "2026-01-04T00:00:00.000Z",
         deliveredAt: null,
@@ -473,6 +488,7 @@ describe("getProductCampaigns", () => {
         deliveryState: "delivered",
         direction: "OUTBOUND",
         providerStatus: "delivered",
+        providerErrorCode: "none",
         providerMessageId: "dummy_message_1",
         createdAt: "2026-01-02T00:00:00.000Z",
         deliveredAt: "2026-01-03T00:00:00.000Z",
@@ -497,7 +513,8 @@ describe("getProductCampaigns", () => {
       { key: "pending", label: "Pending", value: "4" },
       { key: "failed", label: "Failed", value: "0" },
       { key: "lastOutboundMessage", label: "Last Outbound Message", value: "2026-02-04T10:34:00.000Z" },
-      { key: "providerStatuses", label: "Provider Statuses", value: "delivered, sent" }
+      { key: "providerStatuses", label: "Provider Statuses", value: "delivered, sent" },
+      { key: "providerErrorCodes", label: "Provider Error Codes", value: "none" }
     ]);
     expect(result?.deliveryRows).toHaveLength(4);
     expect(result?.deliveryRows.map((row) => row.id)).toEqual([
@@ -624,7 +641,8 @@ describe("getProductCampaigns", () => {
       "pending",
       "failed",
       "lastOutboundMessage",
-      "providerStatuses"
+      "providerStatuses",
+      "providerErrorCodes"
     ]);
     expect(productCampaignDeliveryMetricRows.map((row) => row.label)).toEqual([
       "Outbound Messages",
@@ -635,7 +653,8 @@ describe("getProductCampaigns", () => {
       "Pending",
       "Failed",
       "Last Outbound Message",
-      "Provider Statuses"
+      "Provider Statuses",
+      "Provider Error Codes"
     ]);
 
     expect(() =>

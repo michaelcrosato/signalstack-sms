@@ -40,6 +40,7 @@ const campaignDetailInclude = {
 const campaignDetailDeliveryMessageSelect = {
   direction: true,
   providerStatus: true,
+  providerErrorCode: true,
   deliveredAt: true,
   failedAt: true,
   createdAt: true

@@ -155,6 +155,10 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
                         <dt className="inline text-slate-500">Failed: </dt>
                         <dd className="inline text-slate-800">{message.failedAt ?? "not recorded"}</dd>
                       </div>
+                      <div className="rounded border border-slate-300 bg-white px-2 py-1">
+                        <dt className="inline text-slate-500">Error Code: </dt>
+                        <dd className="inline text-slate-800">{message.providerErrorCode}</dd>
+                      </div>
                     </dl>
                   </article>
                 ))

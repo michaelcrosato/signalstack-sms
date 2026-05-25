@@ -10,7 +10,7 @@ Demo provider credential records are redacted local readiness metadata only. The
 
 Demo provider credential rotation history is also local metadata only. Seeded history uses redacted values and configured booleans so readiness screens can show and export change history without raw secrets or provider calls.
 
-Seeded campaign delivery evidence is local `Message` metadata only. The demo seed includes delivered, pending, and failed outbound examples with dummy-style provider IDs so dashboard, campaign, analytics, and delivery-review screens show realistic evidence without sending SMS, running workers, replaying webhooks, calling providers, billing, notifying, or enabling live messaging.
+Seeded campaign delivery evidence is local `Message` metadata only. The demo seed includes delivered, pending, and failed outbound examples with dummy-style provider IDs and a local failed-message provider error code so dashboard, campaign, analytics, and delivery-review screens show realistic evidence without sending SMS, running workers, replaying webhooks, calling providers, billing, notifying, or enabling live messaging.
 
 The provider details screen can configure, rotate, clear, or CSV-export demo Twilio credential metadata history through local API routes. This is a readiness record only: submitted values are reduced to redacted identifiers and token fingerprints, raw auth tokens and fingerprints are not shown after submission or export, and no provider verification, live sending, billing, or provider-side revocation occurs.
 

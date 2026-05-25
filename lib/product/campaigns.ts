@@ -66,7 +66,8 @@ const productCampaignDeliveryMetricRowItems = [
   { key: "pending", label: "Pending" },
   { key: "failed", label: "Failed" },
   { key: "lastOutboundMessage", label: "Last Outbound Message" },
-  { key: "providerStatuses", label: "Provider Statuses" }
+  { key: "providerStatuses", label: "Provider Statuses" },
+  { key: "providerErrorCodes", label: "Provider Error Codes" }
 ] as const;
 
 type ProductCampaignDeliveryMetricKey = (typeof productCampaignDeliveryMetricRowItems)[number]["key"];
@@ -259,6 +260,7 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
       deliveryState: getCampaignDeliveryState(message),
       direction: message.direction,
       providerStatus: message.providerStatus ?? "local_only",
+      providerErrorCode: message.providerErrorCode ?? "none",
       providerMessageId: message.providerMessageId ?? "no provider id",
       createdAt: message.createdAt.toISOString(),
       deliveredAt: message.deliveredAt?.toISOString() ?? null,
@@ -304,6 +306,7 @@ function getCampaignDeliverySummary(
   messages: Array<{
     direction: string;
     providerStatus: string | null;
+    providerErrorCode?: string | null;
     deliveredAt: Date | null;
     failedAt: Date | null;
     createdAt?: Date | null;
@@ -324,6 +327,13 @@ function getCampaignDeliverySummary(
     return latest === null || message.createdAt.getTime() > latest.getTime() ? message.createdAt : latest;
   }, null);
   const providerStatuses = Array.from(new Set(outboundMessages.map((message) => message.providerStatus ?? "local_only")));
+  const providerErrorCodes = Array.from(
+    new Set(
+      outboundMessages
+        .map((message) => message.providerErrorCode)
+        .filter((providerErrorCode): providerErrorCode is string => Boolean(providerErrorCode))
+    )
+  );
   const deliveryRatePercent =
     outboundMessages.length > 0 ? Math.round((delivered.length / outboundMessages.length) * 100) : 0;
 
@@ -341,7 +351,8 @@ function getCampaignDeliverySummary(
     pending: pending.length.toString(),
     failed: failed.length.toString(),
     lastOutboundMessage: lastOutboundMessageAt?.toISOString() ?? "none",
-    providerStatuses: providerStatuses.length > 0 ? providerStatuses.join(", ") : "none"
+    providerStatuses: providerStatuses.length > 0 ? providerStatuses.join(", ") : "none",
+    providerErrorCodes: providerErrorCodes.length > 0 ? providerErrorCodes.join(", ") : "none"
   };
 }
 

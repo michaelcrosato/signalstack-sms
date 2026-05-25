@@ -7020,3 +7020,13 @@ Changed:
 Gate:         passed with `npm run typecheck`, `npm run lint`, `npm run contracts:check`, `npm run context:check`, `npm run demo:seed`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep the seeded product demo stable; prefer feedback-driven reporting depth or concrete production-readiness correctness gaps.
+
+## Run 819  GREEN  campaign-detail-provider-error-codes  2026-05-25 02:58
+Objective:    Surface provider error-code evidence in campaign detail delivery snapshots.
+Changed:
+- Added provider error-code summaries to campaign detail delivery metrics from existing tenant-scoped outbound local message metadata.
+- Rendered per-row `Error Code` evidence in the recent outbound campaign delivery snapshot without provider calls, delivery retries, message mutation, workers, SMS, billing, live AI, notifications, secrets, or live feature enablement.
+- Updated product campaign unit coverage, seeded product-demo Playwright coverage, API/testing contracts, demo/testing docs, current matrix, compact handoffs, and loop logs.
+Gate:         passed with `npm run typecheck`, `npm run contracts:check`, `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run demo:seed`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer feedback-driven reporting depth or concrete production-readiness correctness gaps.

@@ -497,6 +497,13 @@ test("product analytics page renders local overview detail", async ({ page }) =>
   await expect(fakeAiUsageRow.getByRole("cell").last()).toHaveText(/[1-9]\d*/);
   await expect(page.getByRole("heading", { name: "Safety Boundary" })).toBeVisible();
   await expect(page.getByText("It does not execute reports, create exports, mutate records")).toBeVisible();
+
+  await deliveryReviewQueue.getByRole("link", { name: "Review evidence for Demo failed delivery check" }).click();
+  await expect(page.getByRole("heading", { name: "Demo failed delivery check" })).toBeVisible();
+  const deliverySnapshot = page.getByLabel("Campaign delivery snapshot");
+  await expect(deliverySnapshot.getByText("Provider Error Codes")).toBeVisible();
+  await expect(deliverySnapshot.getByText("30005").first()).toBeVisible();
+  await expect(deliverySnapshot.getByText("Error Code:")).toBeVisible();
 });
 
 test("product compliance page explains readiness and hard-gate blockers", async ({ page }) => {
