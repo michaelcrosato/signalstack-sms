@@ -17,6 +17,24 @@ const conversationInclude = {
   internalNotes: { orderBy: { createdAt: "desc" }, take: 5, include: { author: true } }
 } satisfies Prisma.ConversationInclude;
 
+async function findExistingInboundMessage(
+  tx: Prisma.TransactionClient,
+  orgId: string,
+  idempotencyKey: string
+) {
+  const existing = await tx.message.findUnique({
+    where: { orgId_idempotencyKey: { orgId, idempotencyKey } },
+    include: { conversation: { include: conversationInclude } }
+  });
+
+  if (!existing) {
+    return null;
+  }
+
+  const { conversation, ...message } = existing;
+  return { conversation, message };
+}
+
 export async function listConversations(orgId: string) {
   return prisma.conversation.findMany({
     where: { orgId },
@@ -46,6 +64,16 @@ export async function listConversationMessages(orgId: string, conversationId: st
 
 export async function createDemoInboundMessage(orgId: string, input: InboundMessageInput) {
   return prisma.$transaction(async (tx) => {
+    const explicitIdempotencyKey =
+      input.idempotencyKey ?? (input.providerMessageId ? `demo-inbound:${orgId}:${input.providerMessageId}` : null);
+    if (explicitIdempotencyKey) {
+      const existing = await findExistingInboundMessage(tx, orgId, explicitIdempotencyKey);
+      if (existing) {
+        return { ...existing, keywordAction: classifyInboundKeyword(existing.message.body) };
+      }
+    }
+
+    const keywordAction = classifyInboundKeyword(input.body);
     const contact = await tx.contact.upsert({
       where: { orgId_phone: { orgId, phone: input.phone } },
       update: {},
@@ -72,7 +100,6 @@ export async function createDemoInboundMessage(orgId: string, input: InboundMess
         }
       }));
 
-    const keywordAction = classifyInboundKeyword(input.body);
     if (keywordAction === "OPT_OUT") {
       await tx.contact.update({
         where: { id: contact.id },
@@ -84,7 +111,7 @@ export async function createDemoInboundMessage(orgId: string, input: InboundMess
     }
 
     const idempotencyKey =
-      input.idempotencyKey ??
+      explicitIdempotencyKey ??
       `demo-inbound:${orgId}:${input.providerMessageId ?? `${contact.id}:${Date.now()}`}`;
 
     const message = await tx.message.upsert({
@@ -130,10 +157,17 @@ export async function createConversationInboundMessage(
       return null;
     }
 
+    if (input.idempotencyKey) {
+      const existing = await findExistingInboundMessage(tx, orgId, input.idempotencyKey);
+      if (existing) {
+        return { message: existing.message, keywordAction: classifyInboundKeyword(existing.message.body) };
+      }
+    }
+
+    const keywordAction = classifyInboundKeyword(input.body);
     const contact = conversation.contactId
       ? await tx.contact.findFirst({ where: orgWhere(orgId, { id: conversation.contactId }) })
       : null;
-    const keywordAction = classifyInboundKeyword(input.body);
     if (contact && keywordAction === "OPT_OUT") {
       await tx.contact.update({
         where: { id: contact.id },

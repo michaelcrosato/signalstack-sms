@@ -118,7 +118,7 @@ Returns tenant-scoped conversations with contact, assignee, recent messages, and
 
 ### `POST /api/inbox/conversations`
 
-Creates a demo-safe inbound message from `{ "phone": "...", "body": "..." }`, creating a contact/conversation when needed. This is local-only and does not send SMS.
+Creates a demo-safe inbound message from `{ "phone": "...", "body": "..." }`, creating a contact/conversation when needed. Explicit `idempotencyKey` duplicates and provider-message duplicates return the existing local message/conversation before contact, conversation, timestamp, or opt-out mutations. This is local-only and does not send SMS.
 
 ### `GET /api/inbox/conversations/:conversationId`
 
@@ -130,7 +130,7 @@ Returns tenant-scoped messages for the conversation in chronological order.
 
 ### `POST /api/inbox/conversations/:conversationId/messages`
 
-Creates a demo-safe inbound message on an existing conversation. STOP-class keywords update local consent to `OPTED_OUT`; HELP/INFO-class keywords are recorded but do not opt the contact in or send a provider response.
+Creates a demo-safe inbound message on an existing conversation. Explicit `idempotencyKey` duplicates return the existing local message before contact opt-out or conversation timestamp mutations. STOP-class keywords update local consent to `OPTED_OUT`; HELP/INFO-class keywords are recorded but do not opt the contact in or send a provider response.
 
 ### `POST /api/inbox/conversations/:conversationId/assign`
 

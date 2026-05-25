@@ -31,6 +31,7 @@ Milestone 3 preflight rules:
 Milestone 5 inbound rules:
 
 - Demo inbound APIs create local message records only.
+- Explicit local inbound idempotency duplicates must be detected before contact, conversation, timestamp, or opt-out mutations repeat.
 - STOP, STOPALL, UNSUBSCRIBE, CANCEL, END, and QUIT update the local contact to `OPTED_OUT` and set `optedOutAt`.
 - HELP and INFO are recorded as inbound help keywords but do not opt a contact in and do not send a live or dummy outbound response yet.
 - Inbox assignment, notes, resolve, and reopen operations are tenant-scoped.

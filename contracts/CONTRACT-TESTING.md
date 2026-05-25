@@ -374,6 +374,11 @@ Post-MVP webhook operations view:
 - Unit tests must verify that the static webhook operations inventory keeps Twilio route coverage, event-type vocabularies, no-impact summary states, public fields, frozen snapshots, detached returned arrays with aligned counts, stable order, unique identifiers, whitespace-clean copy, secret-like literal rejection, command-like literal rejection, and required no-replay/no-provider/no-mutation boundary terms stable before `/settings/webhooks` renders them.
 - The seeded investor demo path must verify that `/settings/webhooks` renders read-only Twilio route coverage, event-type summaries, recent local webhook metadata, and safety-boundary text without webhook replay, provider calls, outbound replies, message/contact mutation, notifications, billing records, SMS, or live messaging enablement.
 
+Post-MVP inbox idempotency:
+
+- Inbox repository tests must verify explicit demo inbound idempotency duplicates and provider-message duplicates return existing local messages before contact, conversation, timestamp, or opt-out mutations repeat.
+- Inbox repository tests must verify explicit conversation-message idempotency duplicates return existing local messages before contact opt-out or conversation timestamp mutations repeat.
+
 Post-MVP delivery operations view:
 
 - The seeded investor demo path must verify that `/settings/delivery` renders read-only message direction counts, delivery status metadata, provider status labels, recent message metadata, and safety-boundary text without sends, retries, webhook replays, provider calls, message mutation, notifications, billing records, SMS, or live messaging enablement.

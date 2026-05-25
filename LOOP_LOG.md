@@ -7225,3 +7225,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3135'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer product-demo, production auth/RBAC, reporting, or concrete idempotency correctness gaps over more syntactic worker/auth variants.
+
+## Run 777  GREEN  inbox-idempotency-side-effects  2026-05-24 20:59
+Objective:    Prevent explicit local inbound idempotency duplicates from repeating contact, conversation, timestamp, or opt-out side effects.
+Changed:
+- Added early duplicate message lookup for explicit demo inbound idempotency keys, provider-message-derived demo inbound keys, and explicit conversation-message idempotency keys.
+- Added focused inbox repository tests proving duplicate inbound messages return existing local records before contact, conversation, opt-out, timestamp, or message upsert mutations repeat.
+- Updated API/compliance/testing contracts and compact handoffs for the inbox idempotency side-effect boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3136'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer production auth/RBAC, reporting, or concrete idempotency correctness gaps over more syntactic worker/auth variants.
