@@ -57,6 +57,14 @@ npm run platform:check
 
 The platform notes check is included in `npm run validate` and verifies that `docs/DEPLOYMENT_PLATFORM_NOTES.md` keeps demo-safe hosting defaults, production gate usage, smoke routes, worker limits, and no-external-impact platform boundaries documented.
 
+Context budget check:
+
+```bash
+npm run context:check
+```
+
+The context budget check is included in `npm run validate` and verifies that current handoff files stay compact, while append-only history remains in `LOOP_LOG.md` and `docs/LOOP_LOG.md`. Large test files are allowed, but agents should inspect them with targeted `rg` searches instead of loading them wholesale.
+
 BullMQ/Redis enqueue support is optional. The default local gate does not require Redis, and campaign scheduling must continue to persist database `QueueJob` rows when BullMQ is disabled or not configured.
 
 The BullMQ smoke command skips successfully unless BullMQ and Redis are explicitly configured. When enabled, it uses a dedicated smoke queue and does not touch scheduled campaigns, providers, billing, or live messaging flags.

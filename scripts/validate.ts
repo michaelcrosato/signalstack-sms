@@ -10,6 +10,7 @@ const scripts = [
   "observability:check",
   "operator:check",
   "platform:check",
+  "context:check",
   "lint",
   "typecheck",
   "db:validate",

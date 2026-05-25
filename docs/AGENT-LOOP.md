@@ -21,6 +21,14 @@ LOOP UNTIL A HUMAN STOPS IT:
    - Progress stopped: save the attempt as an artifact, restore last green, re-validate the
      base, log the truth + pivot reason, choose different work, continue.
 
+# CONTEXT BUDGET
+Read the latest useful truth, not the entire history. For append-only or oversized files
+(`LOOP_LOG.md`, `docs/LOOP_LOG.md`, `SUMMARY.codex.md`, `BLOCKERS.codex.md`,
+`docs/CURRENT_STATE_MATRIX.md`, large tests), start with current headers, latest entries,
+`git diff`, and targeted `rg` queries. Load full historical files only when the current
+task requires exact old context. If the next move is another syntactic variant of already
+covered auth or worker hardening, first prove the gap is not already covered.
+
 # EXHAUSTION RULE
 Progress stops when the work no longer produces useful new information. No retry counters.
 Signals: same failure repeats; error surface does not shrink; different approaches hit the same

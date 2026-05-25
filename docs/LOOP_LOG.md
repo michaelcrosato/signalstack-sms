@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 767  GREEN  context-budget-check  2026-05-24 19:36
+Objective:    Keep current agent handoff files compact and make handoff bloat a validation failure.
+Changed:
+- Added `npm run context:check` through `scripts/context-budget-check.ts` and wired it into `npm run validate`.
+- Compacted `SUMMARY.codex.md`, `BLOCKERS.codex.md`, `docs/NEXT_PROMPTS.md`, and `docs/CURRENT_STATE_MATRIX.md`; documented context-budget reading discipline in `docs/AGENT-LOOP.md`, `docs/LOCAL_GATE.md`, `docs/TESTING.md`, and `contracts/CONTRACT-TESTING.md`.
+- Kept the change local to docs and validation scripts; no live sends, providers, billing, secrets, workers, Redis, protected gate scripts, or destructive production actions were touched.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3124'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Prefer product-demo or production-readiness correctness work over more low-value syntactic auth or live-worker variants unless a concrete gap is proven.
+
 ## Run 766  GREEN  auth-asserted-typed-sequence-logical-assignment-aliases  2026-05-24 18:51
 Objective:    Prove asserted typed sequence-wrapped expression logical-assignment local `globalThis` root aliases are classified before mutating-route body-reader role gates.
 Changed:
