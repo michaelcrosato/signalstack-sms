@@ -1,7 +1,11 @@
 import { UsageEventType } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { prisma } from "@/lib/db/prisma";
-import { terminalDeliveryFailureProviderStatuses } from "@/lib/messaging/delivery-status";
+import {
+  outboundDeliveredMessageWhere,
+  outboundFailedMessageWhere,
+  outboundPendingMessageWhere
+} from "@/lib/messaging/delivery-counts";
 import { productComplianceFields } from "@/lib/product/compliance";
 import {
   getProductDashboard,
@@ -415,29 +419,13 @@ describe("product dashboard navigation", () => {
     });
 
     expect(vi.mocked(prisma.message.count)).toHaveBeenCalledWith({
-      where: {
-        orgId: "org_1",
-        direction: "OUTBOUND",
-        deliveredAt: { not: null },
-        failedAt: null,
-        OR: [{ providerStatus: null }, { providerStatus: { notIn: [...terminalDeliveryFailureProviderStatuses] } }]
-      }
+      where: outboundDeliveredMessageWhere("org_1")
     });
     expect(vi.mocked(prisma.message.count)).toHaveBeenCalledWith({
-      where: {
-        orgId: "org_1",
-        direction: "OUTBOUND",
-        deliveredAt: null,
-        failedAt: null,
-        OR: [{ providerStatus: null }, { providerStatus: { notIn: [...terminalDeliveryFailureProviderStatuses] } }]
-      }
+      where: outboundPendingMessageWhere("org_1")
     });
     expect(vi.mocked(prisma.message.count)).toHaveBeenCalledWith({
-      where: {
-        orgId: "org_1",
-        direction: "OUTBOUND",
-        OR: [{ failedAt: { not: null } }, { providerStatus: { in: [...terminalDeliveryFailureProviderStatuses] } }]
-      }
+      where: outboundFailedMessageWhere("org_1")
     });
   });
 });

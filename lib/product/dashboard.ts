@@ -1,7 +1,12 @@
 import { UsageEventType } from "@prisma/client";
 import { aggregateUsageEvents } from "@/lib/billing/metering";
 import { prisma } from "@/lib/db/prisma";
-import { terminalDeliveryFailureProviderStatuses } from "@/lib/messaging/delivery-status";
+import {
+  outboundDeliveredMessageWhere,
+  outboundFailedMessageWhere,
+  outboundMessageWhere,
+  outboundPendingMessageWhere
+} from "@/lib/messaging/delivery-counts";
 import { productComplianceFields } from "@/lib/product/compliance-fields";
 
 const productNavigationItems = [
@@ -159,32 +164,10 @@ export async function getProductDashboard(orgId: string) {
     prisma.conversation.count({ where: { orgId, status: "OPEN" } }),
     prisma.messageTemplate.count({ where: { orgId } }),
     prisma.message.count({ where: { orgId } }),
-    prisma.message.count({ where: { orgId, direction: "OUTBOUND" } }),
-    prisma.message.count({
-      where: {
-        orgId,
-        direction: "OUTBOUND",
-        deliveredAt: { not: null },
-        failedAt: null,
-        OR: [{ providerStatus: null }, { providerStatus: { notIn: [...terminalDeliveryFailureProviderStatuses] } }]
-      }
-    }),
-    prisma.message.count({
-      where: {
-        orgId,
-        direction: "OUTBOUND",
-        deliveredAt: null,
-        failedAt: null,
-        OR: [{ providerStatus: null }, { providerStatus: { notIn: [...terminalDeliveryFailureProviderStatuses] } }]
-      }
-    }),
-    prisma.message.count({
-      where: {
-        orgId,
-        direction: "OUTBOUND",
-        OR: [{ failedAt: { not: null } }, { providerStatus: { in: [...terminalDeliveryFailureProviderStatuses] } }]
-      }
-    }),
+    prisma.message.count({ where: outboundMessageWhere(orgId) }),
+    prisma.message.count({ where: outboundDeliveredMessageWhere(orgId) }),
+    prisma.message.count({ where: outboundPendingMessageWhere(orgId) }),
+    prisma.message.count({ where: outboundFailedMessageWhere(orgId) }),
     prisma.complianceProfile.findUnique({ where: { orgId } }),
     prisma.usageEvent.findMany({ where: { orgId }, select: { type: true, quantity: true } })
   ]);

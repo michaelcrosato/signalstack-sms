@@ -7355,3 +7355,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3152'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer production auth/RBAC planning, higher-signal reporting correctness, or concrete idempotency gaps over syntactic scanner variants.
+
+## Run 790  GREEN  shared-delivery-count-filters  2026-05-24 22:44
+Objective:    Keep dashboard and analytics local outbound delivery counts aligned through shared query helpers.
+Changed:
+- Added `lib/messaging/delivery-counts.ts` with shared total, delivered, pending, and failed outbound message where clauses.
+- Updated analytics overview and product dashboard reporting to use the shared filters instead of duplicated terminal-failure query literals.
+- Added focused delivery-count helper coverage plus updated dashboard/analytics tests and compact testing/handoff docs.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3153'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer production auth/RBAC planning, deeper reporting visibility, or concrete idempotency gaps.

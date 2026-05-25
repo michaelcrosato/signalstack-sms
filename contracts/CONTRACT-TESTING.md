@@ -256,7 +256,7 @@ Post-MVP AI operations view:
 - Unit tests must verify product dashboard metric metadata is runtime-frozen at both array and entry level before `/dashboard` renders active-contact, campaign, open-conversation, and template metric rows.
 - Unit tests must verify product dashboard action metadata is runtime-frozen at both array and entry level before `/dashboard` renders demo-console and settings header links.
 - Unit tests must verify product dashboard local signal metadata is runtime-frozen at both array and entry level before `/dashboard` renders consent coverage, opt-in rate, scheduled work, delivery rate, delivery pending, delivery failures, inbox load, fake-AI request, and local usage signal rows.
-- Unit tests must verify product dashboard outbound delivery-pending and delivery-failure queries use the shared terminal delivery-failure provider status list so `/dashboard`, `/dashboard/analytics`, campaign detail, and `/settings/delivery` remain aligned.
+- Unit tests must verify product dashboard and analytics outbound delivery-count queries use shared local total/delivered/pending/failed helper filters backed by the terminal delivery-failure provider status list so `/dashboard`, `/dashboard/analytics`, campaign detail, and `/settings/delivery` remain aligned.
 - Unit tests must verify product dashboard next-step metadata is runtime-frozen at both array and entry level before `/dashboard` renders inbox, campaign, and compliance next-step links.
 - Unit tests must verify product dashboard compliance readiness counts derive from the shared runtime-frozen product compliance checklist metadata before `/dashboard` renders required profile field counts.
 - Unit tests must verify product dashboard section/status metadata is runtime-frozen at section array, section entry, row array, and row entry level before `/dashboard` renders contacts, compliance, campaigns, inbox, and templates summary sections.
@@ -281,7 +281,7 @@ Post-MVP AI operations view:
 - Unit tests must verify product compliance hard-gate blocker copy metadata is runtime-frozen before `/dashboard/compliance` renders blocker descriptions.
 - Unit tests must verify product analytics metric metadata is runtime-frozen at both array and entry level before `/dashboard/analytics` renders consent coverage, campaign, inbox-load, and usage-event metric rows.
 - Unit tests must verify product analytics usage-row metadata is runtime-frozen at both array and entry level before `/dashboard/analytics` renders local usage rows.
-- Unit tests must verify product analytics delivery-row metadata is runtime-frozen at both array and entry level before `/dashboard/analytics` renders outbound, delivered, pending, failed, and delivery-rate rows, and analytics overview tests must keep delivered/pending/failed delivery counts scoped to outbound messages.
+- Unit tests must verify product analytics delivery-row metadata is runtime-frozen at both array and entry level before `/dashboard/analytics` renders outbound, delivered, pending, failed, and delivery-rate rows, and analytics overview tests must keep delivered/pending/failed delivery counts scoped to outbound messages through the shared delivery-count helper filters.
 
 Post-MVP reporting index view:
 

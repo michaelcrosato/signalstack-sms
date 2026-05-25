@@ -2,6 +2,12 @@ import { UsageEventType } from "@prisma/client";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getAnalyticsOverview } from "@/lib/analytics/overview";
 import { aggregateUsageEvents } from "@/lib/billing/metering";
+import {
+  outboundDeliveredMessageWhere,
+  outboundFailedMessageWhere,
+  outboundMessageWhere,
+  outboundPendingMessageWhere
+} from "@/lib/messaging/delivery-counts";
 
 type CountArgs = { where: Record<string, unknown> };
 
@@ -107,31 +113,9 @@ describe("analytics usage aggregation", () => {
 
     expect(mocks.messageCount).toHaveBeenCalledWith({ where: { orgId: "org_analytics" } });
     expect(mocks.messageCount).toHaveBeenCalledWith({ where: { orgId: "org_analytics", direction: "INBOUND" } });
-    expect(mocks.messageCount).toHaveBeenCalledWith({ where: { orgId: "org_analytics", direction: "OUTBOUND" } });
-    expect(mocks.messageCount).toHaveBeenCalledWith({
-      where: {
-        orgId: "org_analytics",
-        direction: "OUTBOUND",
-        deliveredAt: { not: null },
-        failedAt: null,
-        OR: [{ providerStatus: null }, { providerStatus: { notIn: ["failed", "undelivered"] } }]
-      }
-    });
-    expect(mocks.messageCount).toHaveBeenCalledWith({
-      where: {
-        orgId: "org_analytics",
-        direction: "OUTBOUND",
-        deliveredAt: null,
-        failedAt: null,
-        OR: [{ providerStatus: null }, { providerStatus: { notIn: ["failed", "undelivered"] } }]
-      }
-    });
-    expect(mocks.messageCount).toHaveBeenCalledWith({
-      where: {
-        orgId: "org_analytics",
-        direction: "OUTBOUND",
-        OR: [{ failedAt: { not: null } }, { providerStatus: { in: ["failed", "undelivered"] } }]
-      }
-    });
+    expect(mocks.messageCount).toHaveBeenCalledWith({ where: outboundMessageWhere("org_analytics") });
+    expect(mocks.messageCount).toHaveBeenCalledWith({ where: outboundDeliveredMessageWhere("org_analytics") });
+    expect(mocks.messageCount).toHaveBeenCalledWith({ where: outboundPendingMessageWhere("org_analytics") });
+    expect(mocks.messageCount).toHaveBeenCalledWith({ where: outboundFailedMessageWhere("org_analytics") });
   });
 });
