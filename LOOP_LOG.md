@@ -7426,3 +7426,13 @@ Changed:
 Gate:         passed with `npm run production-auth:check`, `npm run test -- tests/unit/deployment/production-gate.test.ts`, `npm run production:gate`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; implement real auth/RBAC only as a concrete gated design slice, or pursue feedback-driven reporting/idempotency gaps.
+
+## Run 797  GREEN  campaign-detail-recipient-readiness  2026-05-24 23:38
+Objective:    Surface aggregate campaign-detail recipient readiness for product demo review.
+Changed:
+- Derived total, ready, blocked, and blocker-label metrics on campaign detail from the same local preflight rules used before scheduling.
+- Rendered those metrics above the per-recipient consent/archive/send-state/block-reason rows in `/dashboard/campaigns/:campaignId`.
+- Updated the API contract/map, focused product campaign unit coverage, product-demo E2E assertions, and compact handoffs.
+Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run test:e2e:product-demo`, and `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; add deeper campaign reporting only after feedback, or pursue concrete idempotency/auth correctness gaps.

@@ -42,6 +42,20 @@ export const productCampaignRecipientStatusRows = Object.freeze(
   productCampaignRecipientStatusRowItems.map((row) => Object.freeze({ ...row }))
 );
 
+const productCampaignRecipientReadinessMetricRowItems = [
+  { key: "totalRecipients", label: "Total Recipients" },
+  { key: "readyRecipients", label: "Ready Recipients" },
+  { key: "blockedRecipients", label: "Blocked Recipients" },
+  { key: "blockers", label: "Blockers" }
+] as const;
+
+type ProductCampaignRecipientReadinessMetricKey =
+  (typeof productCampaignRecipientReadinessMetricRowItems)[number]["key"];
+
+export const productCampaignRecipientReadinessMetricRows = Object.freeze(
+  productCampaignRecipientReadinessMetricRowItems.map((row) => Object.freeze({ ...row }))
+);
+
 const productCampaignDeliveryMetricRowItems = [
   { key: "outboundMessages", label: "Outbound Messages" },
   { key: "delivered", label: "Delivered" },
@@ -181,6 +195,7 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
   const selectedContactIds = new Set(campaign.recipients.map((recipient) => recipient.contactId));
   const deliveryMessages = campaign.messages.filter((message) => message.direction === "OUTBOUND");
   const deliverySummary = getCampaignDeliverySummary(deliveryMessages);
+  const recipientReadiness = getCampaignRecipientReadinessSummary(campaign.recipients);
   const detail = {
     id: campaign.id,
     name: campaign.name,
@@ -194,6 +209,12 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
     canEdit: campaign.status === CampaignStatus.DRAFT,
     canCancel: campaign.status === CampaignStatus.SCHEDULED,
     selectedContactIds: [...selectedContactIds],
+    recipientReadiness,
+    recipientReadinessMetrics: productCampaignRecipientReadinessMetricRows.map((row) => ({
+      key: row.key,
+      label: row.label,
+      value: getCampaignRecipientReadinessMetricValue(row.key, recipientReadiness)
+    })),
     recipientRows: campaign.recipients.map((recipient) => {
       const contact = recipient.contact;
       const recipientDetail = {
@@ -325,5 +346,21 @@ function getCampaignRecipientStatusValue(
       return recipient.sendState;
     case "blockReason":
       return recipient.blockReason ?? "none";
+  }
+}
+
+function getCampaignRecipientReadinessMetricValue(
+  key: ProductCampaignRecipientReadinessMetricKey,
+  readiness: ReturnType<typeof getCampaignRecipientReadinessSummary>
+) {
+  switch (key) {
+    case "totalRecipients":
+      return readiness.totalRecipients.toString();
+    case "readyRecipients":
+      return readiness.readyRecipients.toString();
+    case "blockedRecipients":
+      return readiness.blockedRecipients.toString();
+    case "blockers":
+      return readiness.blockReasonLabels.length > 0 ? readiness.blockReasonLabels.join(" / ") : "No blockers";
   }
 }

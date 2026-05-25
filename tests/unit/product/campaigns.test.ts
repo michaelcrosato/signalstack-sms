@@ -7,6 +7,7 @@ import {
   productCampaignDeliveryMetricRows,
   productCampaignDetailMetricRows,
   productCampaignMetricRows,
+  productCampaignRecipientReadinessMetricRows,
   productCampaignRecipientStatusRows
 } from "@/lib/product/campaigns";
 
@@ -36,6 +37,22 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
                 lastName: "Lovelace",
                 phone: "+15555550100",
                 consentStatus: ConsentStatus.OPTED_IN,
+                optedOutAt: null,
+                archivedAt: null
+              }
+            },
+            {
+              contactId: "contact_2",
+              status: CampaignRecipientStatus.BLOCKED,
+              blockReason: "CONTACT_OPTED_OUT",
+              contact: {
+                id: "contact_2",
+                displayName: null,
+                firstName: "Grace",
+                lastName: "Hopper",
+                phone: "+15555550101",
+                consentStatus: ConsentStatus.OPTED_OUT,
+                optedOutAt: new Date("2026-01-01T00:00:00.000Z"),
                 archivedAt: null
               }
             }
@@ -306,13 +323,26 @@ describe("getProductCampaigns", () => {
       templateName: "Intro",
       canEdit: true,
       canCancel: false,
-      selectedContactIds: ["contact_1"]
+      selectedContactIds: ["contact_1", "contact_2"]
     });
     expect(result?.metrics).toEqual([
       { key: "status", label: "Status", value: CampaignStatus.DRAFT },
-      { key: "recipients", label: "Recipients", value: "1" },
+      { key: "recipients", label: "Recipients", value: "2" },
       { key: "template", label: "Template", value: "Intro" },
       { key: "schedule", label: "Schedule", value: "Not scheduled" }
+    ]);
+    expect(result?.recipientReadiness).toEqual({
+      totalRecipients: 2,
+      readyRecipients: 1,
+      blockedRecipients: 1,
+      blockReasonLabels: ["Missing opt-in", "Opted out"],
+      summaryLabel: "1 need attention"
+    });
+    expect(result?.recipientReadinessMetrics).toEqual([
+      { key: "totalRecipients", label: "Total Recipients", value: "2" },
+      { key: "readyRecipients", label: "Ready Recipients", value: "1" },
+      { key: "blockedRecipients", label: "Blocked Recipients", value: "1" },
+      { key: "blockers", label: "Blockers", value: "Missing opt-in / Opted out" }
     ]);
     expect(result?.recipientRows).toEqual([
       {
@@ -328,6 +358,21 @@ describe("getProductCampaigns", () => {
           { key: "archived", label: "Archive", value: "active" },
           { key: "sendState", label: "Send State", value: CampaignRecipientStatus.PENDING },
           { key: "blockReason", label: "Block Reason", value: "none" }
+        ]
+      },
+      {
+        id: "contact_2",
+        displayName: "Grace Hopper",
+        phone: "+15555550101",
+        consentStatus: ConsentStatus.OPTED_OUT,
+        archived: false,
+        sendState: CampaignRecipientStatus.BLOCKED,
+        blockReason: "CONTACT_OPTED_OUT",
+        statusRows: [
+          { key: "consent", label: "Consent", value: ConsentStatus.OPTED_OUT },
+          { key: "archived", label: "Archive", value: "active" },
+          { key: "sendState", label: "Send State", value: CampaignRecipientStatus.BLOCKED },
+          { key: "blockReason", label: "Block Reason", value: "CONTACT_OPTED_OUT" }
         ]
       }
     ]);
@@ -386,7 +431,7 @@ describe("getProductCampaigns", () => {
     ]);
     expect(result?.contacts.map((contact) => ({ id: contact.id, selected: contact.selected, disabled: contact.disabled }))).toEqual([
       { id: "contact_1", selected: true, disabled: false },
-      { id: "contact_2", selected: false, disabled: true }
+      { id: "contact_2", selected: true, disabled: true }
     ]);
   });
 
@@ -464,6 +509,34 @@ describe("getProductCampaigns", () => {
       (productCampaignRecipientStatusRows[0] as { label: string }).label = "Unsafe";
     }).toThrow(TypeError);
     expect(productCampaignRecipientStatusRows[0].label).toBe("Consent");
+  });
+
+  it("freezes campaign recipient readiness metric metadata before rendering", () => {
+    expect(Object.isFrozen(productCampaignRecipientReadinessMetricRows)).toBe(true);
+    expect(productCampaignRecipientReadinessMetricRows.every((row) => Object.isFrozen(row))).toBe(true);
+    expect(productCampaignRecipientReadinessMetricRows.map((row) => row.key)).toEqual([
+      "totalRecipients",
+      "readyRecipients",
+      "blockedRecipients",
+      "blockers"
+    ]);
+    expect(productCampaignRecipientReadinessMetricRows.map((row) => row.label)).toEqual([
+      "Total Recipients",
+      "Ready Recipients",
+      "Blocked Recipients",
+      "Blockers"
+    ]);
+
+    expect(() =>
+      (productCampaignRecipientReadinessMetricRows as unknown as Array<{ key: string; label: string }>).push({
+        key: "unsafe",
+        label: "Unsafe"
+      })
+    ).toThrow(TypeError);
+    expect(() => {
+      (productCampaignRecipientReadinessMetricRows[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productCampaignRecipientReadinessMetricRows[0].label).toBe("Total Recipients");
   });
 
   it("freezes campaign delivery metric metadata before rendering", () => {

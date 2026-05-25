@@ -275,6 +275,10 @@ test("product campaign detail page edits a draft and cancels a queued campaign l
   await expect(page.getByLabel("Campaign lifecycle").getByText("DRAFT")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Campaign detail" })).toBeVisible();
   const recipientSnapshot = page.getByRole("heading", { name: "Recipient snapshot" }).locator("..").locator("..");
+  const readinessSummary = page.getByLabel("Recipient readiness summary");
+  await expect(readinessSummary.getByText("Ready Recipients")).toBeVisible();
+  await expect(readinessSummary.getByText("Blocked Recipients")).toBeVisible();
+  await expect(readinessSummary.getByText("No blockers")).toBeVisible();
   await expect(recipientSnapshot.getByText("Send State:")).toBeVisible();
   await expect(recipientSnapshot.getByText("PENDING")).toBeVisible();
   await expect(recipientSnapshot.getByText("Block Reason:")).toBeVisible();

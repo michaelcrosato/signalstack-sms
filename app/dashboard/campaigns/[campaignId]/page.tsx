@@ -76,6 +76,14 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
               <p className="mt-1 text-sm text-slate-600">Current campaign recipients and send eligibility signals.</p>
             </div>
             <div className="grid gap-3 p-5">
+              <section aria-label="Recipient readiness summary" className="grid gap-3 sm:grid-cols-2">
+                {campaign.recipientReadinessMetrics.map((metric) => (
+                  <Metric key={metric.key} label={metric.label} value={metric.value} />
+                ))}
+              </section>
+              <p className="rounded border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
+                {campaign.recipientReadiness.summaryLabel}
+              </p>
               {campaign.recipientRows.map((recipient) => (
                 <article className="rounded border border-slate-200 bg-slate-50 p-3" key={recipient.id}>
                   <div className="font-medium text-slate-950">{recipient.displayName}</div>
