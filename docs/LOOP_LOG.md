@@ -6769,3 +6769,13 @@ Changed:
 Gate:         passed with `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer production auth/RBAC planning, higher-signal reporting correctness, or concrete idempotency gaps.
+
+## Run 794  GREEN  campaign-detail-delivery-state  2026-05-24 23:12
+Objective:    Make campaign-detail local delivery rows use the same mutually exclusive state as summary counts.
+Changed:
+- Added delivered/failed/pending row-state projection for outbound campaign detail delivery rows.
+- Rendered that state in `/dashboard/campaigns/:campaignId` so stale terminal-failure metadata is visible as failed, not only as a timestamp/provider-status mix.
+- Added focused product campaign coverage and updated compact API/testing contracts plus current handoffs.
+Gate:         passed with `.\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer production auth/RBAC planning, deeper reporting only after feedback, or concrete idempotency correctness gaps.

@@ -342,6 +342,7 @@ describe("getProductCampaigns", () => {
       {
         id: "message_delivered",
         contactDisplayName: "Ada Lovelace",
+        deliveryState: "delivered",
         direction: "OUTBOUND",
         providerStatus: "delivered",
         providerMessageId: "dummy_message_1",
@@ -352,6 +353,7 @@ describe("getProductCampaigns", () => {
       {
         id: "message_failed",
         contactDisplayName: "Unknown contact",
+        deliveryState: "failed",
         direction: "OUTBOUND",
         providerStatus: "failed",
         providerMessageId: "no provider id",
@@ -362,6 +364,7 @@ describe("getProductCampaigns", () => {
       {
         id: "message_stale_delivered_failure",
         contactDisplayName: "Unknown contact",
+        deliveryState: "failed",
         direction: "OUTBOUND",
         providerStatus: "undelivered",
         providerMessageId: "dummy_message_stale",
@@ -372,6 +375,7 @@ describe("getProductCampaigns", () => {
       {
         id: "message_pending",
         contactDisplayName: "Grace Hopper",
+        deliveryState: "pending",
         direction: "OUTBOUND",
         providerStatus: "sent",
         providerMessageId: "dummy_message_2",

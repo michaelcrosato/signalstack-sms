@@ -222,6 +222,7 @@ export async function getProductCampaignDetail(orgId: string, campaignId: string
         ? message.contact.displayName ??
           ([message.contact.firstName, message.contact.lastName].filter(Boolean).join(" ") || message.contact.phone)
         : "Unknown contact",
+      deliveryState: getCampaignDeliveryState(message),
       direction: message.direction,
       providerStatus: message.providerStatus ?? "local_only",
       providerMessageId: message.providerMessageId ?? "no provider id",
@@ -288,6 +289,22 @@ function getCampaignDeliverySummary(
     failed: failed.length.toString(),
     providerStatuses: providerStatuses.length > 0 ? providerStatuses.join(", ") : "none"
   };
+}
+
+function getCampaignDeliveryState(message: {
+  providerStatus: string | null;
+  deliveredAt: Date | null;
+  failedAt: Date | null;
+}) {
+  if (isLocalDeliveryDelivered(message)) {
+    return "delivered";
+  }
+
+  if (isTerminalDeliveryFailure(message)) {
+    return "failed";
+  }
+
+  return "pending";
 }
 
 function getCampaignRecipientStatusValue(

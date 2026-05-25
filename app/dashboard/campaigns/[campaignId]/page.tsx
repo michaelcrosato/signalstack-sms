@@ -119,7 +119,7 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
                       <div>
                         <p className="font-medium text-slate-950">{message.contactDisplayName}</p>
                         <p className="mt-1 text-sm text-slate-600">
-                          {message.direction} / {message.providerStatus} / {message.providerMessageId}
+                          {message.direction} / {message.deliveryState} / {message.providerStatus} / {message.providerMessageId}
                         </p>
                       </div>
                       <time className="text-xs text-slate-600" dateTime={message.createdAt}>
@@ -127,6 +127,10 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
                       </time>
                     </div>
                     <dl className="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
+                      <div className="rounded border border-slate-300 bg-white px-2 py-1">
+                        <dt className="inline text-slate-500">State: </dt>
+                        <dd className="inline text-slate-800">{message.deliveryState}</dd>
+                      </div>
                       <div className="rounded border border-slate-300 bg-white px-2 py-1">
                         <dt className="inline text-slate-500">Delivered: </dt>
                         <dd className="inline text-slate-800">{message.deliveredAt ?? "not recorded"}</dd>
