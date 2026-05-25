@@ -2,6 +2,8 @@
 
 Last updated: 2026-05-24.
 
+Run 753 note: mutating-route auth scanner coverage now includes conditional-expression local `globalThis` root aliases for `Request` constructor aliases and `Object`/`Reflect` aliases when both branches are known roots, including `root = condition ? globalThis : globalThis; platform = condition ? root : root; runtime = true ? platform : platform`, before prototype/descriptor body-reader calls.
+
 Run 752 note: mutating-route auth scanner coverage now includes simple sequence-expression local `globalThis` root aliases for `Request` constructor aliases and `Object`/`Reflect` aliases, including `root = (void 0, globalThis); platform = (undefined, root); runtime = (0, platform)`, before prototype/descriptor body-reader calls.
 
 Run 751 note: mutating-route auth scanner coverage now includes comma-expression logical assignment local `globalThis` root aliases for `Request` constructor aliases and `Object`/`Reflect` aliases, including `((root ??= globalThis), (platform ||= root), (runtime &&= platform))`, before prototype/descriptor body-reader calls.
