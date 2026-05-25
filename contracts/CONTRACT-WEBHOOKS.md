@@ -19,6 +19,7 @@ Rules:
 - Missing required normalized fields return `400`.
 - Valid and duplicate events return `204`.
 - Raw payloads are stored in `WebhookEvent.rawPayload` without dropping unknown provider fields.
+- Concurrent duplicate webhook creates that lose the tenant-scoped unique-key race are re-read and treated as duplicates before local message/contact/delivery mutations.
 - Delivery-status idempotency keys normalize provider message ID whitespace, provider status casing/whitespace, provider error-code whitespace, and blank modern/legacy field alias fallback before local storage.
 - Inbound webhook idempotency keys normalize provider message ID whitespace and blank modern/legacy message ID alias fallback before local storage, inbound `From`/`To` addresses are trimmed before local contact/message creation, and whitespace-only inbound bodies are rejected without trimming stored nonblank body text.
 - Inbound webhooks may create local inbox messages and local STOP/HELP consent effects through the same demo-safe inbound path.

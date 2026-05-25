@@ -6589,3 +6589,13 @@ Changed:
 Gate:         passed with `$env:PLAYWRIGHT_PORT='3111'; .\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable and continue hardening static gates or live-worker controls without enabling live sends.
+
+## Run 776  GREEN  webhook-duplicate-create-race  2026-05-24 20:53
+Objective:    Treat concurrent tenant-scoped duplicate webhook creates as duplicates before local mutations repeat.
+Changed:
+- Updated `recordWebhookEvent` to re-read the existing tenant-scoped webhook event after a `P2002` unique-key create conflict.
+- Added focused repository tests for existing duplicates, normal creates, concurrent duplicate create conflicts, and non-unique persistence errors.
+- Updated webhook docs/contracts and compact handoffs for the duplicate create-race boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3135'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer product-demo, production auth/RBAC, reporting, or concrete idempotency correctness gaps over more syntactic worker/auth variants.
