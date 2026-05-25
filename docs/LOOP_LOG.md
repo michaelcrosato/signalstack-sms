@@ -6670,6 +6670,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3143'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer production auth/RBAC planning, higher-signal reporting correctness, or concrete idempotency gaps over syntactic scanner variants.
 
+## Run 786  GREEN  dashboard-pending-delivery  2026-05-24 22:05
+Objective:    Surface pending outbound local delivery counts on the product dashboard.
+Changed:
+- Added a dashboard pending-delivery signal that counts outbound local rows with no delivered/failed timestamp and no terminal failure provider status.
+- Updated focused dashboard unit coverage and the seeded product-demo browser path to pin the visible pending-delivery signal.
+- Updated API/testing contracts, API map, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state notes for the dashboard rate/pending/failure reporting boundary.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3146'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer production auth/RBAC planning, higher-signal reporting correctness, or concrete idempotency gaps over syntactic scanner variants.
+
 ## Run 783  GREEN  webhook-malformed-form-fail-closed  2026-05-24 21:42
 Objective:    Return controlled invalid-form responses for malformed or unsupported Twilio webhook bodies before local work can run.
 Changed:

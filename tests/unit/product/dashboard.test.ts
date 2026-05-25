@@ -50,13 +50,16 @@ vi.mock("@/lib/db/prisma", () => ({
         }: {
           where: {
             direction?: string;
-            deliveredAt?: { not: null };
+            deliveredAt?: { not: null } | null;
             failedAt?: null;
             OR?: Array<Record<string, unknown>>;
           };
         }) => {
           if (where.deliveredAt && where.failedAt === null) {
             return 3;
+          }
+          if (where.deliveredAt === null && where.failedAt === null) {
+            return 2;
           }
           if (where.OR) {
             return 1;
@@ -175,6 +178,7 @@ describe("product dashboard navigation", () => {
       "optInRate",
       "scheduledWork",
       "deliveryRate",
+      "deliveryPending",
       "deliveryFailures",
       "inboxLoad",
       "fakeAiRequests",
@@ -185,6 +189,7 @@ describe("product dashboard navigation", () => {
       "Opt-in rate",
       "Scheduled work",
       "Delivery rate",
+      "Delivery pending",
       "Delivery failures",
       "Inbox load",
       "Fake AI requests",
@@ -306,6 +311,7 @@ describe("product dashboard navigation", () => {
       delivery: {
         outbound: 5,
         delivered: 3,
+        pending: 2,
         failed: 1,
         deliveryRatePercent: 60
       },
@@ -325,6 +331,7 @@ describe("product dashboard navigation", () => {
         { key: "optInRate", label: "Opt-in rate", value: "70%" },
         { key: "scheduledWork", label: "Scheduled work", value: "1" },
         { key: "deliveryRate", label: "Delivery rate", value: "60%" },
+        { key: "deliveryPending", label: "Delivery pending", value: "2" },
         { key: "deliveryFailures", label: "Delivery failures", value: "1" },
         { key: "inboxLoad", label: "Inbox load", value: "4" },
         { key: "fakeAiRequests", label: "Fake AI requests", value: "2" },
@@ -412,6 +419,15 @@ describe("product dashboard navigation", () => {
         orgId: "org_1",
         direction: "OUTBOUND",
         deliveredAt: { not: null },
+        failedAt: null,
+        OR: [{ providerStatus: null }, { providerStatus: { notIn: [...terminalDeliveryFailureProviderStatuses] } }]
+      }
+    });
+    expect(vi.mocked(prisma.message.count)).toHaveBeenCalledWith({
+      where: {
+        orgId: "org_1",
+        direction: "OUTBOUND",
+        deliveredAt: null,
         failedAt: null,
         OR: [{ providerStatus: null }, { providerStatus: { notIn: [...terminalDeliveryFailureProviderStatuses] } }]
       }

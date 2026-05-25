@@ -41,6 +41,7 @@ const productDashboardSignalRowItems = [
   { key: "optInRate", label: "Opt-in rate" },
   { key: "scheduledWork", label: "Scheduled work" },
   { key: "deliveryRate", label: "Delivery rate" },
+  { key: "deliveryPending", label: "Delivery pending" },
   { key: "deliveryFailures", label: "Delivery failures" },
   { key: "inboxLoad", label: "Inbox load" },
   { key: "fakeAiRequests", label: "Fake AI requests" },
@@ -144,6 +145,7 @@ export async function getProductDashboard(orgId: string) {
     messages,
     outboundMessages,
     deliveredMessages,
+    pendingMessages,
     failedMessages,
     complianceProfile,
     usageEvents
@@ -163,6 +165,15 @@ export async function getProductDashboard(orgId: string) {
         orgId,
         direction: "OUTBOUND",
         deliveredAt: { not: null },
+        failedAt: null,
+        OR: [{ providerStatus: null }, { providerStatus: { notIn: [...terminalDeliveryFailureProviderStatuses] } }]
+      }
+    }),
+    prisma.message.count({
+      where: {
+        orgId,
+        direction: "OUTBOUND",
+        deliveredAt: null,
         failedAt: null,
         OR: [{ providerStatus: null }, { providerStatus: { notIn: [...terminalDeliveryFailureProviderStatuses] } }]
       }
@@ -202,6 +213,7 @@ export async function getProductDashboard(orgId: string) {
     delivery: {
       outbound: outboundMessages,
       delivered: deliveredMessages,
+      pending: pendingMessages,
       failed: failedMessages,
       deliveryRatePercent
     },
@@ -230,6 +242,7 @@ export async function getProductDashboard(orgId: string) {
     optInRate: `${dashboard.contacts.optedInPercent}%`,
     scheduledWork: String(dashboard.campaigns.scheduled),
     deliveryRate: `${dashboard.delivery.deliveryRatePercent}%`,
+    deliveryPending: String(dashboard.delivery.pending),
     deliveryFailures: String(dashboard.delivery.failed),
     inboxLoad: String(dashboard.inbox.open),
     fakeAiRequests: String(dashboard.usage.fakeAiRequests),
