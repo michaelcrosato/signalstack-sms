@@ -44,6 +44,7 @@ export const productCampaignRecipientStatusRows = Object.freeze(
 const productCampaignDeliveryMetricRowItems = [
   { key: "outboundMessages", label: "Outbound Messages" },
   { key: "delivered", label: "Delivered" },
+  { key: "pending", label: "Pending" },
   { key: "failed", label: "Failed" },
   { key: "providerStatuses", label: "Provider Statuses" }
 ] as const;
@@ -208,11 +209,15 @@ function getCampaignDeliverySummary(
   const outboundMessages = messages.filter((message) => message.direction === "OUTBOUND");
   const delivered = outboundMessages.filter((message) => message.deliveredAt !== null);
   const failed = outboundMessages.filter(isTerminalDeliveryFailure);
+  const pending = outboundMessages.filter(
+    (message) => message.deliveredAt === null && !isTerminalDeliveryFailure(message)
+  );
   const providerStatuses = Array.from(new Set(outboundMessages.map((message) => message.providerStatus ?? "local_only")));
 
   return {
     outboundMessages: outboundMessages.length.toString(),
     delivered: delivered.length.toString(),
+    pending: pending.length.toString(),
     failed: failed.length.toString(),
     providerStatuses: providerStatuses.length > 0 ? providerStatuses.join(", ") : "none"
   };

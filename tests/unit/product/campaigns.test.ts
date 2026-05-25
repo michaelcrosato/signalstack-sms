@@ -67,6 +67,21 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
               contact: null
             },
             {
+              id: "message_pending",
+              direction: "OUTBOUND",
+              providerStatus: "sent",
+              providerMessageId: "dummy_message_2",
+              deliveredAt: null,
+              failedAt: null,
+              createdAt: new Date("2026-01-04T12:00:00.000Z"),
+              contact: {
+                displayName: null,
+                firstName: "Grace",
+                lastName: "Hopper",
+                phone: "+15555550101"
+              }
+            },
+            {
               id: "message_inbound_delivered",
               direction: "INBOUND",
               providerStatus: "delivered",
@@ -212,10 +227,11 @@ describe("getProductCampaigns", () => {
       }
     ]);
     expect(result?.deliveryMetrics).toEqual([
-      { key: "outboundMessages", label: "Outbound Messages", value: "2" },
+      { key: "outboundMessages", label: "Outbound Messages", value: "3" },
       { key: "delivered", label: "Delivered", value: "1" },
+      { key: "pending", label: "Pending", value: "1" },
       { key: "failed", label: "Failed", value: "1" },
-      { key: "providerStatuses", label: "Provider Statuses", value: "delivered, failed" }
+      { key: "providerStatuses", label: "Provider Statuses", value: "delivered, failed, sent" }
     ]);
     expect(result?.deliveryRows).toEqual([
       {
@@ -237,6 +253,16 @@ describe("getProductCampaigns", () => {
         createdAt: "2026-01-04T00:00:00.000Z",
         deliveredAt: null,
         failedAt: "2026-01-04T00:00:00.000Z"
+      },
+      {
+        id: "message_pending",
+        contactDisplayName: "Grace Hopper",
+        direction: "OUTBOUND",
+        providerStatus: "sent",
+        providerMessageId: "dummy_message_2",
+        createdAt: "2026-01-04T12:00:00.000Z",
+        deliveredAt: null,
+        failedAt: null
       }
     ]);
     expect(result?.contacts.map((contact) => ({ id: contact.id, selected: contact.selected, disabled: contact.disabled }))).toEqual([
@@ -327,12 +353,14 @@ describe("getProductCampaigns", () => {
     expect(productCampaignDeliveryMetricRows.map((row) => row.key)).toEqual([
       "outboundMessages",
       "delivered",
+      "pending",
       "failed",
       "providerStatuses"
     ]);
     expect(productCampaignDeliveryMetricRows.map((row) => row.label)).toEqual([
       "Outbound Messages",
       "Delivered",
+      "Pending",
       "Failed",
       "Provider Statuses"
     ]);

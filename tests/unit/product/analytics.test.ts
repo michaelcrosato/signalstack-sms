@@ -34,6 +34,7 @@ describe("product analytics", () => {
         inbound: 6,
         outbound: 5,
         delivered: 4,
+        pending: 0,
         failed: 1
       },
       usage: {
@@ -66,6 +67,7 @@ describe("product analytics", () => {
     expect(analytics.deliveryRows).toEqual([
       { key: "outbound", label: "Outbound messages", value: "5" },
       { key: "delivered", label: "Delivered", value: "4" },
+      { key: "pending", label: "Pending", value: "0" },
       { key: "failed", label: "Failed", value: "1" },
       { key: "deliveryRate", label: "Delivery rate", value: "80%" }
     ]);
@@ -98,6 +100,7 @@ describe("product analytics", () => {
         inbound: 0,
         outbound: 0,
         delivered: 0,
+        pending: 0,
         failed: 0
       },
       usage: {
@@ -172,6 +175,7 @@ describe("product analytics", () => {
     expect(productAnalyticsDeliveryRows.map((row) => row.key)).toEqual([
       "outbound",
       "delivered",
+      "pending",
       "failed",
       "deliveryRate"
     ]);

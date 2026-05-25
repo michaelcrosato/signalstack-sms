@@ -7286,6 +7286,16 @@ Gate:         passed with `$env:PLAYWRIGHT_PORT='3141'; .\scripts\local-gate.ps1
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer production auth/RBAC planning, deeper product reporting visibility, or concrete idempotency correctness gaps over syntactic scanner variants.
 
+## Run 784  GREEN  pending-delivery-reporting  2026-05-24 21:49
+Objective:    Show pending outbound local delivery counts in campaign detail and analytics reporting.
+Changed:
+- Added a tenant-scoped outbound pending message count to analytics overview for local messages with no delivered/failed timestamp and no terminal failure provider status.
+- Added Pending rows to product analytics delivery metadata and campaign detail delivery snapshots while preserving inbound-row exclusion.
+- Updated focused analytics/campaign tests, API/testing contracts, TESTING, NEXT_PROMPTS, SUMMARY, BLOCKERS, and current state notes for the pending local delivery row.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3143'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer production auth/RBAC planning, higher-signal reporting correctness, or concrete idempotency gaps over syntactic scanner variants.
+
 ## Run 783  GREEN  webhook-malformed-form-fail-closed  2026-05-24 21:42
 Objective:    Return controlled invalid-form responses for malformed or unsupported Twilio webhook bodies before local work can run.
 Changed:

@@ -186,7 +186,7 @@ Returns deterministic fake lead qualification score, stage, and reasons from sup
 
 ### `GET /api/analytics/overview`
 
-Returns tenant-scoped counts for contacts, total and scheduled campaigns, conversations, local outbound message delivery breakdowns, and local usage totals.
+Returns tenant-scoped counts for contacts, total and scheduled campaigns, conversations, local outbound message delivery breakdowns including delivered, pending, and failed outbound counts, and local usage totals.
 
 ### `GET /api/billing/usage`
 

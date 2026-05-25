@@ -28,6 +28,7 @@ export const productAnalyticsUsageRows = Object.freeze(
 const productAnalyticsDeliveryRowItems = [
   { key: "outbound", label: "Outbound messages" },
   { key: "delivered", label: "Delivered" },
+  { key: "pending", label: "Pending" },
   { key: "failed", label: "Failed" },
   { key: "deliveryRate", label: "Delivery rate" }
 ] as const;
@@ -68,6 +69,7 @@ export async function getProductAnalytics(orgId: string) {
   const deliveryValues: Record<ProductAnalyticsDeliveryRowKey, string> = {
     outbound: overview.messages.outbound.toString(),
     delivered: overview.messages.delivered.toString(),
+    pending: overview.messages.pending.toString(),
     failed: overview.messages.failed.toString(),
     deliveryRate: `${derived.deliveryRatePercent}%`
   };

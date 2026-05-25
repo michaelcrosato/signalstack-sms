@@ -42,6 +42,9 @@ describe("analytics usage aggregation", () => {
       if (where.deliveredAt) {
         return 4;
       }
+      if (where.deliveredAt === null && where.failedAt === null) {
+        return 2;
+      }
       if (where.OR) {
         return 1;
       }
@@ -93,6 +96,7 @@ describe("analytics usage aggregation", () => {
         inbound: 11,
         outbound: 5,
         delivered: 4,
+        pending: 2,
         failed: 1
       },
       usage: {
@@ -106,6 +110,15 @@ describe("analytics usage aggregation", () => {
     expect(mocks.messageCount).toHaveBeenCalledWith({ where: { orgId: "org_analytics", direction: "OUTBOUND" } });
     expect(mocks.messageCount).toHaveBeenCalledWith({
       where: { orgId: "org_analytics", direction: "OUTBOUND", deliveredAt: { not: null } }
+    });
+    expect(mocks.messageCount).toHaveBeenCalledWith({
+      where: {
+        orgId: "org_analytics",
+        direction: "OUTBOUND",
+        deliveredAt: null,
+        failedAt: null,
+        OR: [{ providerStatus: null }, { providerStatus: { notIn: ["failed", "undelivered"] } }]
+      }
     });
     expect(mocks.messageCount).toHaveBeenCalledWith({
       where: {

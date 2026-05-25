@@ -267,8 +267,8 @@ Post-MVP AI operations view:
 - Unit tests must verify product campaign metric metadata is runtime-frozen at both array and entry level before `/dashboard/campaigns` renders total, draft, scheduled, and ready-recipient metric rows.
 - Unit tests must verify product campaign detail lifecycle metric metadata is runtime-frozen at both array and entry level before `/dashboard/campaigns/:campaignId` renders status, recipient, template, and schedule metric rows.
 - Unit tests must verify product campaign recipient snapshot metadata is runtime-frozen at both array and entry level before `/dashboard/campaigns/:campaignId` renders Consent, Archive, Send State, and Block Reason status rows.
-- Unit tests must verify product campaign delivery metric metadata is runtime-frozen at both array and entry level before `/dashboard/campaigns/:campaignId` renders Outbound Messages, Delivered, Failed, and Provider Statuses rows.
-- Unit tests must verify product campaign detail delivery rows and delivered/failed/provider-status metrics are scoped to outbound campaign messages, so inbound campaign-linked rows cannot inflate local delivery reporting.
+- Unit tests must verify product campaign delivery metric metadata is runtime-frozen at both array and entry level before `/dashboard/campaigns/:campaignId` renders Outbound Messages, Delivered, Pending, Failed, and Provider Statuses rows.
+- Unit tests must verify product campaign detail delivery rows and delivered/pending/failed/provider-status metrics are scoped to outbound campaign messages, so inbound campaign-linked rows cannot inflate local delivery reporting.
 - Unit tests must verify product campaign composer defaults are runtime-frozen before `/dashboard/campaigns` renders local campaign name, fallback body, fake-AI prompt, business-name, and tone defaults.
 - Unit tests must verify product inbox metric metadata is runtime-frozen at both array and entry level before `/dashboard/inbox` renders total, open, resolved, and recent-inbound thread metric rows.
 - Unit tests must verify product inbox thread status metadata is runtime-frozen at both array and entry level before `/dashboard/inbox` renders selected-thread Thread and Consent status rows.
@@ -281,7 +281,7 @@ Post-MVP AI operations view:
 - Unit tests must verify product compliance hard-gate blocker copy metadata is runtime-frozen before `/dashboard/compliance` renders blocker descriptions.
 - Unit tests must verify product analytics metric metadata is runtime-frozen at both array and entry level before `/dashboard/analytics` renders consent coverage, campaign, inbox-load, and usage-event metric rows.
 - Unit tests must verify product analytics usage-row metadata is runtime-frozen at both array and entry level before `/dashboard/analytics` renders local usage rows.
-- Unit tests must verify product analytics delivery-row metadata is runtime-frozen at both array and entry level before `/dashboard/analytics` renders outbound, delivered, failed, and delivery-rate rows, and analytics overview tests must keep delivered/failed delivery counts scoped to outbound messages.
+- Unit tests must verify product analytics delivery-row metadata is runtime-frozen at both array and entry level before `/dashboard/analytics` renders outbound, delivered, pending, failed, and delivery-rate rows, and analytics overview tests must keep delivered/pending/failed delivery counts scoped to outbound messages.
 
 Post-MVP reporting index view:
 
