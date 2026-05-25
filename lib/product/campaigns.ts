@@ -62,6 +62,7 @@ const productCampaignDeliveryMetricRowItems = [
   { key: "delivered", label: "Delivered" },
   { key: "pending", label: "Pending" },
   { key: "failed", label: "Failed" },
+  { key: "lastOutboundMessage", label: "Last Outbound Message" },
   { key: "providerStatuses", label: "Provider Statuses" }
 ] as const;
 
@@ -294,6 +295,7 @@ function getCampaignDeliverySummary(
     providerStatus: string | null;
     deliveredAt: Date | null;
     failedAt: Date | null;
+    createdAt?: Date | null;
   }>
 ): Record<ProductCampaignDeliveryMetricKey, string> {
   const outboundMessages = messages.filter((message) => message.direction === "OUTBOUND");
@@ -302,6 +304,13 @@ function getCampaignDeliverySummary(
   const pending = outboundMessages.filter(
     (message) => message.deliveredAt === null && !isTerminalDeliveryFailure(message)
   );
+  const lastOutboundMessageAt = outboundMessages.reduce<Date | null>((latest, message) => {
+    if (!message.createdAt) {
+      return latest;
+    }
+
+    return latest === null || message.createdAt.getTime() > latest.getTime() ? message.createdAt : latest;
+  }, null);
   const providerStatuses = Array.from(new Set(outboundMessages.map((message) => message.providerStatus ?? "local_only")));
   const deliveryRatePercent =
     outboundMessages.length > 0 ? Math.round((delivered.length / outboundMessages.length) * 100) : 0;
@@ -312,6 +321,7 @@ function getCampaignDeliverySummary(
     delivered: delivered.length.toString(),
     pending: pending.length.toString(),
     failed: failed.length.toString(),
+    lastOutboundMessage: lastOutboundMessageAt?.toISOString() ?? "none",
     providerStatuses: providerStatuses.length > 0 ? providerStatuses.join(", ") : "none"
   };
 }

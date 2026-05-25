@@ -287,6 +287,7 @@ test("product campaign detail page edits a draft and cancels a queued campaign l
   await expect(deliverySnapshot.getByRole("heading", { name: "Delivery snapshot" })).toBeVisible();
   await expect(deliverySnapshot.getByText("Outbound Messages")).toBeVisible();
   await expect(deliverySnapshot.getByText("Delivery Rate")).toBeVisible();
+  await expect(deliverySnapshot.getByText("Last Outbound Message")).toBeVisible();
   await expect(deliverySnapshot.getByText("Provider Statuses")).toBeVisible();
   await expect(deliverySnapshot.getByText("No local delivery messages recorded for this campaign.")).toBeVisible();
   await page.getByLabel("Campaign name").fill(updatedName);

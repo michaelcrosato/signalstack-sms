@@ -382,6 +382,7 @@ describe("getProductCampaigns", () => {
       { key: "delivered", label: "Delivered", value: "1" },
       { key: "pending", label: "Pending", value: "1" },
       { key: "failed", label: "Failed", value: "2" },
+      { key: "lastOutboundMessage", label: "Last Outbound Message", value: "2026-01-04T12:00:00.000Z" },
       { key: "providerStatuses", label: "Provider Statuses", value: "delivered, failed, undelivered, sent" }
     ]);
     expect(result?.deliveryRows).toEqual([
@@ -549,6 +550,7 @@ describe("getProductCampaigns", () => {
       "delivered",
       "pending",
       "failed",
+      "lastOutboundMessage",
       "providerStatuses"
     ]);
     expect(productCampaignDeliveryMetricRows.map((row) => row.label)).toEqual([
@@ -557,6 +559,7 @@ describe("getProductCampaigns", () => {
       "Delivered",
       "Pending",
       "Failed",
+      "Last Outbound Message",
       "Provider Statuses"
     ]);
 

@@ -20,7 +20,8 @@ const campaignListDeliveryInclude = {
       direction: true,
       providerStatus: true,
       deliveredAt: true,
-      failedAt: true
+      failedAt: true,
+      createdAt: true
     }
   }
 } satisfies Prisma.CampaignInclude;

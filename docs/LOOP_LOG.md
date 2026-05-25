@@ -6820,3 +6820,13 @@ Changed:
 Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run test:e2e:product-demo -- --grep "product campaign detail"`, a localhost browser check for `Delivery Rate`, and `.\scripts\local-gate.ps1`
 Commit/Saved: this commit
 Next:         Keep product demo paths stable; prefer feedback-driven reporting detail, concrete idempotency gaps, or gated auth/RBAC work.
+
+## Run 799  GREEN  campaign-detail-last-message  2026-05-24 23:58
+Objective:    Surface the latest local outbound message timestamp in campaign-detail delivery reporting.
+Changed:
+- Added a `Last Outbound Message` metric to `/dashboard/campaigns/:campaignId` from outbound local campaign message `createdAt` values.
+- Included message `createdAt` in campaign delivery projections and kept the metric read-only with no provider, worker, billing, AI, notification, secret, or live-message behavior.
+- Updated focused product campaign unit coverage, product-demo E2E assertions, API/testing contracts, local testing docs, current matrix, and compact handoffs.
+Gate:         passed with `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run typecheck`, `npm run test:e2e:product-demo -- --grep "product campaign detail"`, a localhost Playwright check for `Last Outbound Message`, and `.\scripts\local-gate.ps1`; first gate attempt hit a Prisma client file lock from the temporary dev server and passed after stopping it
+Commit/Saved: this commit
+Next:         Keep product demo paths stable; prefer feedback-driven reporting detail, concrete idempotency gaps, or gated auth/RBAC work.
