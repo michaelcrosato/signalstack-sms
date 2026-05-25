@@ -48,7 +48,7 @@ export default async function AnalyticsPage() {
           ))}
         </section>
 
-        <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <section className="grid gap-6 lg:grid-cols-3">
           <Panel title="Audience Signals">
             <dl className="grid gap-3 text-sm">
               <StatusRow label="Active contacts" value={String(analytics.contacts.total)} />
@@ -65,6 +65,16 @@ export default async function AnalyticsPage() {
               <StatusRow label="Resolved conversations" value={String(analytics.conversations.resolved)} />
               <StatusRow label="Resolution rate" value={`${analytics.derived.resolvedConversationPercent}%`} />
               <StatusRow label="Average messages per conversation" value={String(analytics.derived.averageMessagesPerConversation)} />
+            </dl>
+          </Panel>
+
+          <Panel title="Delivery Signals">
+            <dl className="grid gap-3 text-sm">
+              {analytics.deliveryRows.map((row) => (
+                <StatusRow key={row.key} label={row.label} value={row.value} />
+              ))}
+              <StatusRow label="Inbound messages" value={String(analytics.messages.inbound)} />
+              <StatusRow label="Delivery source" value="local message rows" />
             </dl>
           </Panel>
         </section>

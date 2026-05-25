@@ -186,7 +186,7 @@ Returns deterministic fake lead qualification score, stage, and reasons from sup
 
 ### `GET /api/analytics/overview`
 
-Returns tenant-scoped counts for contacts, total and scheduled campaigns, conversations, messages, and local usage totals.
+Returns tenant-scoped counts for contacts, total and scheduled campaigns, conversations, local message delivery breakdowns, and local usage totals.
 
 ### `GET /api/billing/usage`
 
@@ -382,7 +382,7 @@ Renders the product-facing template detail workflow for a tenant-scoped message 
 
 ### `/dashboard/analytics`
 
-Renders the product-facing analytics workspace for the current organization. It may display tenant-scoped contact, campaign, scheduled-campaign, conversation, message, and local usage totals from the existing analytics overview. It must not execute reports, create exports, mutate records, call providers, call Stripe, create billing artifacts, send SMS, call live AI, expose secrets, or enable live messaging.
+Renders the product-facing analytics workspace for the current organization. It may display tenant-scoped contact, campaign, scheduled-campaign, conversation, local message delivery, and local usage totals from the existing analytics overview. It must not execute reports, create exports, mutate records, call providers, call Stripe, create billing artifacts, send SMS, call live AI, expose secrets, or enable live messaging.
 
 ### `/dashboard/compliance`
 

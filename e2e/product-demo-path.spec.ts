@@ -404,6 +404,11 @@ test("product analytics page renders local overview detail", async ({ page }) =>
   await expect(page.getByRole("heading", { name: "Inbox Signals" })).toBeVisible();
   await expect(page.getByText("Resolution rate")).toBeVisible();
   await expect(page.getByText("Average messages per conversation")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Delivery Signals" })).toBeVisible();
+  await expect(page.getByText("Outbound messages")).toBeVisible();
+  await expect(page.getByText("Delivery rate")).toBeVisible();
+  await expect(page.getByText("Delivery source")).toBeVisible();
+  await expect(page.getByText("local message rows")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Campaign Signals" })).toBeVisible();
   await expect(page.getByText("Scheduled campaigns")).toBeVisible();
   await expect(page.getByText("Scheduled rate")).toBeVisible();

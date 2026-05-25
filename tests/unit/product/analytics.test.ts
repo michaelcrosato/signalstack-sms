@@ -1,7 +1,12 @@
 import { UsageEventType } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { getAnalyticsOverview } from "@/lib/analytics/overview";
-import { getProductAnalytics, productAnalyticsMetricRows, productAnalyticsUsageRows } from "@/lib/product/analytics";
+import {
+  getProductAnalytics,
+  productAnalyticsDeliveryRows,
+  productAnalyticsMetricRows,
+  productAnalyticsUsageRows
+} from "@/lib/product/analytics";
 
 vi.mock("@/lib/analytics/overview", () => ({
   getAnalyticsOverview: vi.fn()
@@ -25,7 +30,11 @@ describe("product analytics", () => {
         resolved: 3
       },
       messages: {
-        total: 11
+        total: 11,
+        inbound: 6,
+        outbound: 5,
+        delivered: 4,
+        failed: 1
       },
       usage: {
         [UsageEventType.CONTACT_IMPORTED]: 4,
@@ -45,13 +54,20 @@ describe("product analytics", () => {
       resolvedConversationPercent: 60,
       averageMessagesPerConversation: 2.2,
       totalUsageEvents: 10,
-      fakeAiUsagePercent: 10
+      fakeAiUsagePercent: 10,
+      deliveryRatePercent: 80
     });
     expect(analytics.metrics).toEqual([
       { key: "consentCoverage", label: "Consent Coverage", value: "75%", detail: "3/4 opted in" },
       { key: "campaigns", label: "Campaigns", value: 4, detail: "local campaign records" },
       { key: "inboxLoad", label: "Inbox Load", value: 2, detail: "11 local messages" },
       { key: "usageEvents", label: "Usage Events", value: 10, detail: "local metering only" }
+    ]);
+    expect(analytics.deliveryRows).toEqual([
+      { key: "outbound", label: "Outbound messages", value: "5" },
+      { key: "delivered", label: "Delivered", value: "4" },
+      { key: "failed", label: "Failed", value: "1" },
+      { key: "deliveryRate", label: "Delivery rate", value: "80%" }
     ]);
     expect(analytics.usageRows).toEqual([
       { type: UsageEventType.CONTACT_IMPORTED, label: "Contacts imported", quantity: 4 },
@@ -78,7 +94,11 @@ describe("product analytics", () => {
         resolved: 0
       },
       messages: {
-        total: 0
+        total: 0,
+        inbound: 0,
+        outbound: 0,
+        delivered: 0,
+        failed: 0
       },
       usage: {
         [UsageEventType.CONTACT_IMPORTED]: 0,
@@ -96,7 +116,8 @@ describe("product analytics", () => {
         resolvedConversationPercent: 0,
         averageMessagesPerConversation: 0,
         totalUsageEvents: 0,
-        fakeAiUsagePercent: 0
+        fakeAiUsagePercent: 0,
+        deliveryRatePercent: 0
       }
     });
   });
@@ -143,5 +164,27 @@ describe("product analytics", () => {
       (productAnalyticsUsageRows[0] as { label: string }).label = "Unsafe";
     }).toThrow(TypeError);
     expect(productAnalyticsUsageRows[0].label).toBe("Contacts imported");
+  });
+
+  it("freezes product analytics delivery row metadata before rendering", () => {
+    expect(Object.isFrozen(productAnalyticsDeliveryRows)).toBe(true);
+    expect(productAnalyticsDeliveryRows.every((row) => Object.isFrozen(row))).toBe(true);
+    expect(productAnalyticsDeliveryRows.map((row) => row.key)).toEqual([
+      "outbound",
+      "delivered",
+      "failed",
+      "deliveryRate"
+    ]);
+
+    expect(() => {
+      (productAnalyticsDeliveryRows as unknown as Array<{ key: string; label: string }>).push({
+        key: "unsafe",
+        label: "Unsafe"
+      });
+    }).toThrow(TypeError);
+    expect(() => {
+      (productAnalyticsDeliveryRows[0] as { label: string }).label = "Unsafe";
+    }).toThrow(TypeError);
+    expect(productAnalyticsDeliveryRows[0].label).toBe("Outbound messages");
   });
 });

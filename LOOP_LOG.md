@@ -1,5 +1,15 @@
 # LOOP_LOG
 
+## Run 771  GREEN  product-analytics-delivery-breakdown  2026-05-24 20:12
+Objective:    Make existing local delivery outcomes visible in the product analytics path.
+Changed:
+- Added tenant-scoped inbound, outbound, delivered, and failed local message counts to `GET /api/analytics/overview`.
+- Added read-only Delivery Signals rows to `/dashboard/analytics` from the analytics overview, with focused unit coverage and a seeded product-demo assertion.
+- Updated API/testing contracts and compact handoff docs for local delivery visibility without enabling sends, retries, provider calls, workers, billing, notifications, or live features.
+Gate:         passed with `$env:PLAYWRIGHT_PORT='3128'; .\scripts\local-gate.ps1`
+Commit/Saved: this commit
+Next:         Keep live sends blocked; prefer concise product-demo polish, production auth/RBAC planning, or high-value reporting correctness.
+
 ## Run 770  GREEN  campaign-detail-delivery-snapshot  2026-05-24 20:01
 Objective:    Make existing local campaign delivery metadata visible in the product campaign detail path.
 Changed:

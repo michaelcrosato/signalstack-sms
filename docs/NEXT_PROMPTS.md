@@ -14,9 +14,9 @@ This is the compact handoff for the next automated loop. Full history is in `LOO
 
 ## Current State
 
-- Latest validated run: Run 770 added a read-only campaign detail delivery snapshot from existing local message rows, with focused product projection coverage and a product-demo assertion.
+- Latest validated run: Run 771 added local message delivery breakdowns to the product analytics overview and `/dashboard/analytics`, with focused unit coverage and a product-demo assertion.
 - The backend foundation is strong: tenant helpers, contacts, campaigns, queue jobs with per-recipient send-time skips, inbox, compliance gates, fake AI, local billing/analytics, provider metadata, Twilio webhook foundations, readiness audit, operations inventory, and validation gates.
-- The browser product has a usable local demo path across dashboard, contacts import/detail/archive/restore/merge, campaign fake-AI copy/schedule/detail/edit/cancel plus recipient send-state/block-reason and delivery visibility, inbox thread work, template create/detail/edit, analytics, and compliance readiness.
+- The browser product has a usable local demo path across dashboard, contacts import/detail/archive/restore/merge, campaign fake-AI copy/schedule/detail/edit/cancel plus recipient send-state/block-reason and delivery visibility, inbox thread work, template create/detail/edit, analytics with local delivery breakdowns, and compliance readiness.
 - Live campaign sending, live billing, live AI, production auth, production secrets, production workers, and production deployment remain blocked by default.
 - The only intentional live external-impact route is the isolated `/demo` live-test SMS path, gated by explicit Twilio credentials, live flags, recipient allowlist, and confirmation phrase.
 - Auth scanner and live-worker hardening coverage is already very broad. Do not spend another loop on minor syntactic variants unless a concrete uncovered parser/control-flow gap is proven with targeted search.

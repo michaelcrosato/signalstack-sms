@@ -278,6 +278,7 @@ Post-MVP AI operations view:
 - Unit tests must verify product compliance hard-gate blocker copy metadata is runtime-frozen before `/dashboard/compliance` renders blocker descriptions.
 - Unit tests must verify product analytics metric metadata is runtime-frozen at both array and entry level before `/dashboard/analytics` renders consent coverage, campaign, inbox-load, and usage-event metric rows.
 - Unit tests must verify product analytics usage-row metadata is runtime-frozen at both array and entry level before `/dashboard/analytics` renders local usage rows.
+- Unit tests must verify product analytics delivery-row metadata is runtime-frozen at both array and entry level before `/dashboard/analytics` renders outbound, delivered, failed, and delivery-rate rows.
 
 Post-MVP reporting index view:
 

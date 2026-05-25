@@ -11,6 +11,10 @@ export async function getAnalyticsOverview(orgId: string) {
     conversations,
     openConversations,
     messages,
+    inboundMessages,
+    outboundMessages,
+    deliveredMessages,
+    failedMessages,
     usageEvents
   ] = await Promise.all([
     prisma.contact.count({ where: { orgId, archivedAt: null } }),
@@ -21,6 +25,15 @@ export async function getAnalyticsOverview(orgId: string) {
     prisma.conversation.count({ where: { orgId } }),
     prisma.conversation.count({ where: { orgId, status: "OPEN" } }),
     prisma.message.count({ where: { orgId } }),
+    prisma.message.count({ where: { orgId, direction: "INBOUND" } }),
+    prisma.message.count({ where: { orgId, direction: "OUTBOUND" } }),
+    prisma.message.count({ where: { orgId, deliveredAt: { not: null } } }),
+    prisma.message.count({
+      where: {
+        orgId,
+        OR: [{ failedAt: { not: null } }, { providerStatus: { in: ["failed", "undelivered"] } }]
+      }
+    }),
     prisma.usageEvent.findMany({ where: { orgId }, select: { type: true, quantity: true } })
   ]);
 
@@ -40,7 +53,11 @@ export async function getAnalyticsOverview(orgId: string) {
       resolved: conversations - openConversations
     },
     messages: {
-      total: messages
+      total: messages,
+      inbound: inboundMessages,
+      outbound: outboundMessages,
+      delivered: deliveredMessages,
+      failed: failedMessages
     },
     usage: aggregateUsageEvents(usageEvents)
   };

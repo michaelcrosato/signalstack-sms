@@ -25,6 +25,19 @@ export const productAnalyticsUsageRows = Object.freeze(
   productAnalyticsUsageRowItems.map((row) => Object.freeze({ ...row }))
 );
 
+const productAnalyticsDeliveryRowItems = [
+  { key: "outbound", label: "Outbound messages" },
+  { key: "delivered", label: "Delivered" },
+  { key: "failed", label: "Failed" },
+  { key: "deliveryRate", label: "Delivery rate" }
+] as const;
+
+type ProductAnalyticsDeliveryRowKey = (typeof productAnalyticsDeliveryRowItems)[number]["key"];
+
+export const productAnalyticsDeliveryRows = Object.freeze(
+  productAnalyticsDeliveryRowItems.map((row) => Object.freeze({ ...row }))
+);
+
 export async function getProductAnalytics(orgId: string) {
   const overview = await getAnalyticsOverview(orgId);
   const consentCoveragePercent =
@@ -38,6 +51,8 @@ export async function getProductAnalytics(orgId: string) {
   const totalUsageEvents = Object.values(overview.usage).reduce((total, quantity) => total + quantity, 0);
   const fakeAiUsagePercent =
     totalUsageEvents > 0 ? Math.round((overview.usage[UsageEventType.AI_REQUEST] / totalUsageEvents) * 100) : 0;
+  const deliveryRatePercent =
+    overview.messages.outbound > 0 ? Math.round((overview.messages.delivered / overview.messages.outbound) * 100) : 0;
   const derived = {
     consentCoveragePercent,
     optedOutPercent:
@@ -47,7 +62,14 @@ export async function getProductAnalytics(orgId: string) {
     averageMessagesPerConversation:
       overview.conversations.total > 0 ? Number((overview.messages.total / overview.conversations.total).toFixed(1)) : 0,
     totalUsageEvents,
-    fakeAiUsagePercent
+    fakeAiUsagePercent,
+    deliveryRatePercent
+  };
+  const deliveryValues: Record<ProductAnalyticsDeliveryRowKey, string> = {
+    outbound: overview.messages.outbound.toString(),
+    delivered: overview.messages.delivered.toString(),
+    failed: overview.messages.failed.toString(),
+    deliveryRate: `${derived.deliveryRatePercent}%`
   };
   const metricValues: Record<ProductAnalyticsMetricKey, { value: number | string; detail: string }> = {
     consentCoverage: {
@@ -72,6 +94,11 @@ export async function getProductAnalytics(orgId: string) {
         detail: metric.detail
       };
     }),
+    deliveryRows: productAnalyticsDeliveryRows.map((row) => ({
+      key: row.key,
+      label: row.label,
+      value: deliveryValues[row.key]
+    })),
     usageRows: productAnalyticsUsageRows.map((row) => ({
       type: row.type,
       label: row.label,
