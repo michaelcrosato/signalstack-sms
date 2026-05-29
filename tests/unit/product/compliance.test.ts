@@ -124,7 +124,8 @@ describe("getProductCompliance", () => {
       "A2P_NOT_APPROVED",
       "CONTACT_ARCHIVED",
       "CONSENT_NOT_OPTED_IN",
-      "CONTACT_OPTED_OUT"
+      "CONTACT_OPTED_OUT",
+      "CONSENT_EVIDENCE_MISSING"
     ]);
 
     expect(() => {

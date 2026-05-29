@@ -39,7 +39,14 @@ describe("messaging hard gate quiet-hours integration", () => {
       termsOfServiceUrl: "https://example.com/terms",
       a2pRegistrationStatus: A2pRegistrationStatus.APPROVED
     },
-    contact: { consentStatus: ConsentStatus.OPTED_IN, optedOutAt: null, archivedAt: null }
+    contact: {
+      consentStatus: ConsentStatus.OPTED_IN,
+      optedOutAt: null,
+      archivedAt: null,
+      consentCapturedAt: new Date("2026-01-01T00:00:00.000Z"),
+      consentMethod: "web_form",
+      consentDisclosure: "I agree to receive texts. Reply STOP to opt out."
+    }
   } as const;
 
   it("adds QUIET_HOURS when an otherwise-ready send is outside the window", () => {

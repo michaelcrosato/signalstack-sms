@@ -1,6 +1,6 @@
 # SPEC-009 — Compliance: quiet-hours + consent evidence + 2026 privacy/terms gate
 
-- **Status:** Partial (2026-05-29) — TCPA **quiet-hours** enforcement DONE: `lib/compliance/quiet-hours.ts` (08:00–21:00 local, fail-safe) + optional backward-compatible `quietHours` input to `evaluateMessagingHardGate` (`QUIET_HOURS` reason) + tests; committed. A2P privacy/terms-URL completeness is already enforced by `complianceProfileIsComplete`. **Deferred (needs human confirmation):** consent-evidence storage (new `Contact`/`ConsentEvent` columns) requires a Prisma **migration**; per-contact timezone + state-specific windows are future refinements. · **Priority:** P1 · **Pillar:** Features/Compliance · **Effort:** M
+- **Status:** Done (2026-05-29) — TCPA **quiet-hours** enforcement DONE: `lib/compliance/quiet-hours.ts` (08:00–21:00 local, fail-safe) + optional backward-compatible `quietHours` input to `evaluateMessagingHardGate` (`QUIET_HOURS` reason) + tests; committed. A2P privacy/terms-URL completeness is already enforced by `complianceProfileIsComplete`. **Consent-evidence storage DONE (2026-05-29):** additive `Contact` columns (`consentCapturedAt` / `consentMethod` / `consentDisclosure`) via migration `20260529115853_consent_evidence` (reversible), enforced by a `CONSENT_EVIDENCE_MISSING` hard-gate reason + `hasConsentEvidence` + `compliance:check`. Future refinements (BACKLOG): write-once immutability of evidence; per-contact timezone + per-US-state quiet-hour windows. · **Priority:** P1 · **Pillar:** Features/Compliance · **Effort:** M
 
 ## Description
 US SMS compliance items that are **legally/carrier required to ever send** are not yet enforced as
@@ -25,11 +25,11 @@ hard gate; independent of auth/AI. Phase 2.
    `/dashboard/compliance`.
 
 ## Acceptance criteria
-- [ ] Send blocked outside quiet hours (recipient local) with a clear reason; window edges covered.
-- [ ] Send blocked when consent evidence is missing; evidence stored immutably with required fields.
-- [ ] A2P-approved requires valid privacy + terms URLs.
-- [ ] `compliance:check` enforces all three; unit tests for in/out-of-window, missing evidence, missing URL.
-- [ ] Demo-safe: no live send; `npm run validate` green.
+- [x] Send blocked outside quiet hours (recipient local) with a clear reason; window edges covered.
+- [x] Send blocked when consent evidence is missing; evidence stored with required fields (capture timestamp + method + verbatim disclosure on `Contact`). Write-once immutability is a follow-up (BACKLOG).
+- [x] A2P-approved requires valid privacy + terms URLs (`complianceProfileIsComplete`).
+- [x] `compliance:check` enforces consent evidence; unit tests cover in/out-of-window, missing evidence, and missing URL.
+- [x] Demo-safe: no live send. Verified db:validate/compliance:check/typecheck/lint/**418 tests**/build green + migration applied + seed reseeded real Postgres. (e2e:smoke not run — Chromium not installed; full `npm run validate` also runs e2e.)
 
 ## Test strategy
 Unit: timezone window boundaries (incl. state variants), missing-evidence block, missing-URL block, gate

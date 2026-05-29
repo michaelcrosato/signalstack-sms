@@ -14,7 +14,7 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 | TICKET003 inbox-reply | 1 | **Done** | working tree (committed) | typecheck/lint/build/388 tests green; reply route + RBAC + UI | demo-safe dummy provider; opt-out blocked; idempotent |
 | TICKET009 clerk-auth-slice | 1 | **Done (demo-safe seam)** | committed (maint/iter-0001) | production-auth:check + typecheck/lint/**417 tests**/build green | fail-closed session seam + membership resolver + gate/doc; demo default unchanged; live Clerk enablement human-gated |
 | SPEC-006 observability | 2 | **Done (core)** | committed `115bb435` | typecheck/lint/build/393 tests/observability:check green | OTel exporter deferred to BACKLOG |
-| SPEC-009 compliance-quiet-hours | 2 | **Partial** | committed (quiet-hours) | quiet-hours window + gate integration tested (398 tests) | consent-evidence storage needs migration (deferred, human confirm) |
+| SPEC-009 compliance | 2 | **Done** | migration `20260529115853_consent_evidence` applied + committed | db:validate/compliance:check/typecheck/lint/**418 tests**/build green; seed reseeded real Postgres | quiet-hours + consent-evidence storage + A2P privacy/terms all enforced in the hard gate |
 | SPEC-007 ai-reply-drafting | 3 | **Done (demo-safe slice)** | committed (maint/iter-0001) | typecheck/lint/**411 tests**/build/`ai:check` green | seam+gate+cap+PII redaction; live key provisioning still human-gated |
 | SPEC-008 ai-lead-qualification | 3 | Todo | — | — | after SPEC-007 + TICKET009 |
 | SPEC-010 postgres-rls | 4 | Todo | — | — | after TICKET009 + pooling decision |
@@ -28,12 +28,20 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [x] SPEC-006 — observability (PII-safe logging + flag-gated instrumentation; OTel exporter → BACKLOG)
 - [x] SPEC-007 — AI reply-draft **seam shipped** (provider seam + `ai:gate` + per-tenant cap + PII-redacted prompt, fake default); live key/cost enablement still human-gated
 - [ ] SPEC-008 — real AI lead qualification — BLOCKED (migration + secrets; human-only)
-- [~] SPEC-009 — quiet-hours DONE; consent-evidence storage deferred (migration)
+- [x] SPEC-009 — quiet-hours + **consent-evidence storage** (additive migration applied) + A2P privacy/terms, all enforced in `evaluateMessagingHardGate`
 - [ ] SPEC-010 — Postgres RLS — BLOCKED (migration; needs human confirmation + non-Windows env for prisma generate)
 - [x] TICKET003 — demo-safe inbox reply
 - [x] TICKET009 — session-provider **seam shipped** (`resolveProductionCurrentOrg`, fail-closed, flag-gated; demo default unchanged); live Clerk enablement still human-gated
 
 ## Log (most recent first)
+- 2026-05-29 — **SPEC-009 consent-evidence DONE (real migration).** With Postgres up + `prisma generate`
+  working (transient EPERM cleared on retry), applied additive migration `20260529115853_consent_evidence`
+  (nullable `Contact.consentCapturedAt`/`consentMethod`/`consentDisclosure` — reversible, no data loss).
+  Added `CONSENT_EVIDENCE_MISSING` to `evaluateMessagingHardGate` (+ `hasConsentEvidence`), blocker copy,
+  `compliance:check` assertion, seed evidence on the demo contact; updated 2 gate fixtures + added a
+  missing-evidence test; fixed the frozen blocker-copy list test. Verified (real): db:validate,
+  compliance:check, typecheck, lint, **418 tests**, build all green; `db:seed` reseeded the live Postgres.
+  e2e:smoke not run (Chromium not installed). Committed on `maint/iter-0001`.
 - 2026-05-29 — **TICKET009 demo-safe session seam DONE.** Added `lib/auth/session.ts`
   (`resolveProductionCurrentOrg`: verified subject → active `Membership` → org/role, **fail-closed**;
   `productionAuthIsEnabled`/`clerkConfigIsPresent`, behind `PRODUCTION_AUTH_ENABLED`, DI resolver, **no

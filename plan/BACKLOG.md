@@ -27,6 +27,7 @@ free of creep.
   `LIVE_AI_ENABLED` + `AI_API_KEY` + `AI_COST_ACK`, with cost monitoring); optional streaming/multi-model routing.
 - Double opt-in + sign-up unit / keyword growth tooling.
 - Per-US-state quiet-hour variants (FL/OK/WA 8–8, TX 9–9) beyond the core 8am–9pm rule.
+- SPEC-009 follow-up: write-once immutability of stored consent evidence (DB/app guard so captured evidence can't be silently altered); per-contact timezone resolution for quiet hours.
 
 ## Infra / platform ideas
 - Real Stripe billing (live, behind cost + data-use hard gate).

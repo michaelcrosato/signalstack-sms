@@ -142,6 +142,9 @@ async function main() {
       consentStatus: ConsentStatus.OPTED_IN,
       optInSource: "demo_seed",
       optInAt: new Date("2026-01-01T00:00:00.000Z"),
+      consentCapturedAt: new Date("2026-01-01T00:00:00.000Z"),
+      consentMethod: "demo_seed_web_form",
+      consentDisclosure: "Demo opt-in: I agree to receive texts from SignalStack Demo Co. Reply STOP to opt out.",
       source: "demo_seed"
     },
     create: {
@@ -154,6 +157,9 @@ async function main() {
       consentStatus: ConsentStatus.OPTED_IN,
       optInSource: "demo_seed",
       optInAt: new Date("2026-01-01T00:00:00.000Z"),
+      consentCapturedAt: new Date("2026-01-01T00:00:00.000Z"),
+      consentMethod: "demo_seed_web_form",
+      consentDisclosure: "Demo opt-in: I agree to receive texts from SignalStack Demo Co. Reply STOP to opt out.",
       source: "demo_seed"
     }
   });

@@ -42,10 +42,26 @@ describe("messaging hard gates", () => {
         contact: {
           consentStatus: ConsentStatus.OPTED_IN,
           optedOutAt: null,
-          archivedAt: null
+          archivedAt: null,
+          consentCapturedAt: new Date("2026-01-01T00:00:00.000Z"),
+          consentMethod: "web_form",
+          consentDisclosure: "I agree to receive texts. Msg&data rates may apply. Reply STOP to opt out."
         }
       })
     ).toEqual({ allowed: true, reasons: [] });
+  });
+
+  it("blocks an opted-in contact that lacks stored consent evidence", () => {
+    const result = evaluateMessagingHardGate({
+      demoMode: false,
+      liveMessagingEnabled: true,
+      messagingProvider: "twilio",
+      complianceProfile: completeProfile,
+      contact: { consentStatus: ConsentStatus.OPTED_IN, optedOutAt: null, archivedAt: null }
+    });
+
+    expect(result.allowed).toBe(false);
+    expect(result.reasons).toEqual(["CONSENT_EVIDENCE_MISSING"]);
   });
 
   it("blocks opted-out contacts even when provider gates are otherwise ready", () => {

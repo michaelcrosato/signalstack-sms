@@ -158,6 +158,9 @@ model Contact {
   optInSource   String?
   optInAt       DateTime?
   optedOutAt    DateTime?
+  consentCapturedAt DateTime?
+  consentMethod String?
+  consentDisclosure String?
   source        String?
   notes         String?
   archivedAt    DateTime?

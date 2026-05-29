@@ -9,6 +9,13 @@ for (const [key, expected] of Object.entries(envDefaults)) {
   }
 }
 
+// SPEC-009: the messaging hard gate must enforce stored consent evidence before a live send.
+const gatesSource = readFileSync("lib/compliance/gates.ts", "utf8");
+if (!gatesSource.includes("CONSENT_EVIDENCE_MISSING")) {
+  console.error("lib/compliance/gates.ts must enforce CONSENT_EVIDENCE_MISSING (SPEC-009 consent evidence).");
+  process.exit(1);
+}
+
 if (process.env.CI === "true") {
   if (process.env.LIVE_MESSAGING_ENABLED === "true" || process.env.LIVE_BILLING_ENABLED === "true") {
     console.error("CI cannot run with live messaging or billing enabled.");

@@ -18,6 +18,11 @@ export type MessagingHardGateInput = {
     consentStatus: ConsentStatus;
     optedOutAt: Date | null;
     archivedAt: Date | null;
+    // SPEC-009 consent evidence (TCPA: number + exact timestamp + capture method + verbatim disclosure).
+    // The number is the contact phone; the other three are stored on Contact and required to send live.
+    consentCapturedAt?: Date | null;
+    consentMethod?: string | null;
+    consentDisclosure?: string | null;
   } | null;
   // Optional TCPA quiet-hours check. When supplied, sending outside 08:00–21:00 in the given timezone
   // adds a QUIET_HOURS block reason. Omitted by demo/non-time-sensitive callers (backward compatible).
@@ -64,6 +69,9 @@ export function evaluateMessagingHardGate(input: MessagingHardGateInput): Messag
     if (input.contact.optedOutAt || input.contact.consentStatus === ConsentStatus.OPTED_OUT) {
       reasons.push("CONTACT_OPTED_OUT");
     }
+    if (!hasConsentEvidence(input.contact)) {
+      reasons.push("CONSENT_EVIDENCE_MISSING");
+    }
   }
 
   if (input.quietHours && isWithinQuietHours(input.quietHours.now, input.quietHours.timeZone)) {
@@ -74,6 +82,16 @@ export function evaluateMessagingHardGate(input: MessagingHardGateInput): Messag
     allowed: reasons.length === 0,
     reasons
   };
+}
+
+// SPEC-009: a live send requires stored consent evidence — exact capture timestamp, capture method, and
+// the verbatim disclosure shown at opt-in (retained alongside the contact number). Missing any → blocked.
+export function hasConsentEvidence(contact: {
+  consentCapturedAt?: Date | null;
+  consentMethod?: string | null;
+  consentDisclosure?: string | null;
+}): boolean {
+  return Boolean(contact.consentCapturedAt && contact.consentMethod && contact.consentDisclosure);
 }
 
 export function complianceProfileIsComplete(

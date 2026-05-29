@@ -26,7 +26,8 @@ const productComplianceBlockerCopyItems = {
   A2P_NOT_APPROVED: "A2P registration is not approved.",
   CONTACT_ARCHIVED: "Selected contact is archived.",
   CONSENT_NOT_OPTED_IN: "Selected contact is not opted in.",
-  CONTACT_OPTED_OUT: "Selected contact has opted out."
+  CONTACT_OPTED_OUT: "Selected contact has opted out.",
+  CONSENT_EVIDENCE_MISSING: "Selected contact has no stored consent evidence."
 } as const;
 
 export const productComplianceBlockerCopy = Object.freeze({ ...productComplianceBlockerCopyItems });
