@@ -173,6 +173,13 @@ const apiRouteRbacMatrixItems = [
   {
     auth: "role",
     method: "POST",
+    path: "app/api/inbox/conversations/[conversationId]/reply/route.ts",
+    requiredRole: MembershipRole.MEMBER,
+    scope: "send local outbound conversation reply"
+  },
+  {
+    auth: "role",
+    method: "POST",
     path: "app/api/inbox/conversations/[conversationId]/resolve/route.ts",
     requiredRole: MembershipRole.MEMBER,
     scope: "resolve or reopen local conversation"

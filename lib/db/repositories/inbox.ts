@@ -2,10 +2,12 @@ import { ConsentStatus, ConversationStatus, type Prisma } from "@prisma/client";
 import { classifyInboundKeyword } from "@/lib/compliance/opt-out";
 import { prisma } from "@/lib/db/prisma";
 import { orgWhere } from "@/lib/db/tenant";
+import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
 import type {
   ConversationAssignInput,
   ConversationMessageCreateInput,
   ConversationNoteCreateInput,
+  ConversationReplyCreateInput,
   ConversationResolveInput,
   InboundMessageInput
 } from "@/lib/validation/inbox";
@@ -197,6 +199,86 @@ export async function createConversationInboundMessage(
     });
 
     return { message, keywordAction };
+  });
+}
+
+export type OutboundReplyResult =
+  | null
+  | { blocked: true; reasons: string[] }
+  | { blocked: false; message: Awaited<ReturnType<typeof prisma.message.upsert>>; deduped: boolean };
+
+// Demo-safe outbound reply: records a local OUTBOUND message via the dummy provider only — never a live
+// send. Replying to an inbound conversation does not require OPTED_IN, but opt-out/STOP and archived
+// contacts are blocked (no message row created), honoring the consent boundary the live hard gate enforces.
+export async function createConversationOutboundReply(
+  orgId: string,
+  conversationId: string,
+  input: ConversationReplyCreateInput
+): Promise<OutboundReplyResult> {
+  return prisma.$transaction(async (tx) => {
+    const conversation = await tx.conversation.findFirst({ where: orgWhere(orgId, { id: conversationId }) });
+    if (!conversation) {
+      return null;
+    }
+
+    if (input.idempotencyKey) {
+      const existing = await tx.message.findUnique({
+        where: { orgId_idempotencyKey: { orgId, idempotencyKey: input.idempotencyKey } }
+      });
+      if (existing) {
+        return { blocked: false, message: existing, deduped: true };
+      }
+    }
+
+    const contact = conversation.contactId
+      ? await tx.contact.findFirst({ where: orgWhere(orgId, { id: conversation.contactId }) })
+      : null;
+
+    const reasons: string[] = [];
+    if (!contact) {
+      reasons.push("CONTACT_MISSING");
+    } else {
+      if (contact.archivedAt) {
+        reasons.push("CONTACT_ARCHIVED");
+      }
+      if (contact.optedOutAt || contact.consentStatus === ConsentStatus.OPTED_OUT) {
+        reasons.push("CONTACT_OPTED_OUT");
+      }
+    }
+    if (reasons.length > 0 || !contact) {
+      return { blocked: true, reasons };
+    }
+
+    const idempotencyKey = input.idempotencyKey ?? `inbox-reply:${orgId}:${conversationId}:${Date.now()}`;
+    const providerResult = await dummyProvider.send({
+      to: contact.phone,
+      from: "demo-signalstack",
+      body: input.body,
+      orgId,
+      idempotencyKey
+    });
+
+    const message = await tx.message.upsert({
+      where: { orgId_idempotencyKey: { orgId, idempotencyKey } },
+      update: {},
+      create: {
+        orgId,
+        contactId: conversation.contactId,
+        conversationId,
+        direction: "OUTBOUND",
+        body: input.body,
+        providerMessageId: providerResult.providerMessageId,
+        providerStatus: providerResult.status,
+        idempotencyKey
+      }
+    });
+
+    await tx.conversation.update({
+      where: { id: conversationId },
+      data: { lastMessageAt: message.createdAt }
+    });
+
+    return { blocked: false, message, deduped: false };
   });
 }
 

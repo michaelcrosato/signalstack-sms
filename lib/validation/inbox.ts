@@ -17,6 +17,11 @@ export const conversationMessageCreateSchema = z.object({
   idempotencyKey: z.string().trim().min(1).max(255).optional()
 });
 
+export const conversationReplyCreateSchema = z.object({
+  body: bodySchema,
+  idempotencyKey: z.string().trim().min(1).max(255).optional()
+});
+
 export const conversationAssignSchema = z.object({
   assignedToUserId: idSchema.nullable().optional()
 });
@@ -31,6 +36,7 @@ export const conversationResolveSchema = z.object({
 
 export type InboundMessageInput = z.infer<typeof inboundMessageSchema>;
 export type ConversationMessageCreateInput = z.infer<typeof conversationMessageCreateSchema>;
+export type ConversationReplyCreateInput = z.infer<typeof conversationReplyCreateSchema>;
 export type ConversationAssignInput = z.infer<typeof conversationAssignSchema>;
 export type ConversationNoteCreateInput = z.infer<typeof conversationNoteCreateSchema>;
 export type ConversationResolveInput = z.infer<typeof conversationResolveSchema>;

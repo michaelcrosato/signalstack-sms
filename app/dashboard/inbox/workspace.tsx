@@ -68,6 +68,7 @@ export function InboxWorkspace({
   const router = useRouter();
   const [messageBody, setMessageBody] = useState<string>(productInboxWorkspaceDefaults.inboundReply);
   const [noteBody, setNoteBody] = useState<string>(productInboxWorkspaceDefaults.internalNote);
+  const [replyBody, setReplyBody] = useState<string>("");
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -117,6 +118,22 @@ export function InboxWorkspace({
       `/api/inbox/conversations/${selectedConversation.id}/messages`,
       { body: messageBody },
       (payload) => inboundStatusMessage(payload)
+    );
+  }
+
+  function sendReply(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!selectedConversation) {
+      return;
+    }
+
+    void submitJson(
+      `/api/inbox/conversations/${selectedConversation.id}/reply`,
+      { body: replyBody },
+      (payload) =>
+        payload.deduped
+          ? "Duplicate reply ignored (idempotent). No provider send ran."
+          : "Local outbound reply recorded via the dummy provider. No live SMS was sent."
     );
   }
 
@@ -362,6 +379,29 @@ export function InboxWorkspace({
             </div>
           ) : null}
         </section>
+
+        <form className="grid gap-3 rounded border border-slate-200 bg-white p-5" onSubmit={sendReply}>
+          <h2 className="text-xl font-semibold">Send reply</h2>
+          <p className="text-sm text-slate-600">
+            Records a local OUTBOUND message via the dummy provider. Opted-out or archived contacts are blocked; no live SMS is sent.
+          </p>
+          <label className="grid gap-2 text-sm font-medium text-slate-700">
+            Reply message
+            <textarea
+              className="min-h-28 rounded border border-slate-300 px-3 py-2 text-sm text-slate-950"
+              onChange={(event) => setReplyBody(event.target.value)}
+              placeholder="Type a reply to record via the demo-safe dummy provider"
+              value={replyBody}
+            />
+          </label>
+          <button
+            className="rounded bg-teal-700 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-400"
+            disabled={pending || !selectedConversation || replyBody.trim().length === 0}
+            type="submit"
+          >
+            Send Reply
+          </button>
+        </form>
 
         <section className="grid gap-6 md:grid-cols-2">
           <form className="grid gap-3 rounded border border-slate-200 bg-white p-5" onSubmit={addInboundMessage}>
