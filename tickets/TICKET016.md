@@ -1,7 +1,17 @@
 # TICKET016 — Remove dead operator-surface code for consolidated pages
 
-- **Status:** Todo
+- **Status:** Done
 - **Priority:** P3 (ULTRAPLAN Phase A cleanup)
+
+## Result
+`operator-surfaces.ts` 849 → 413 LOC (−436): removed 23 dead projection functions, their backing
+route-list consts/definitions, and the 3 types only they used (`DemoOperationsCheckpoint`,
+`WorkflowOperationStep`, `IntegrationOperationArea`). Kept the 14 live exports (inventory, 5
+inventory-derived projections, `findOperatorSurfaceLink`, and the 8 in-set `get*OperationLinks`).
+Deleted 6 orphaned `lib/operations/*-operations.ts` modules (`api`, `contract`, `delivery`,
+`delivery-message-metrics`, `notification`, `webhook`) + their 6 tests — each imported only by its
+own test. Suite 462 → 384 tests; typecheck + lint + build + all 10 domain gates green
+(`test:e2e:smoke` not run — needs Postgres + Chromium).
 
 ## Goal
 Delete the now-dead per-area projection functions, route-list constants, and orphaned `lib/operations`
@@ -32,9 +42,9 @@ surfaces are likewise orphaned (testing data for pages that no longer exist).
 4. `npm run typecheck`, `npm run lint`, `npm run test`, `npm run validate`.
 
 ## Acceptance criteria
-- [ ] No exported operator-surface projection references a removed route.
-- [ ] No orphaned operations module/test for a deleted surface remains.
-- [ ] `npm run validate` green (e2e via CI).
+- [x] No exported operator-surface projection references a removed route.
+- [x] No orphaned operations module/test for a deleted surface remains.
+- [x] `npm run validate` green (e2e via CI).
 
 ## Risks
 Low — deleting uncalled code. Verify each removal isn't imported by a kept page/test before deleting.
