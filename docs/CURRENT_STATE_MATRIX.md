@@ -4,7 +4,7 @@ Last updated: 2026-05-25.
 
 This file is intentionally compact. Historical run notes live in `git log`; current agents should use this matrix plus targeted searches instead of loading old run history.
 
-Latest validated run: Run 819 surfaces provider error-code evidence in campaign detail delivery snapshots without provider calls.
+Latest validated run: Run 820 collapses the 11.7k-LOC live-worker-controls permutation test to a 222-LOC table-driven suite preserving every real invariant (ULTRAPLAN Phase A). Gate green except e2e (needs Postgres).
 
 | Area | Backend/API State | Browser State | Main Gap | Next Action |
 | --- | --- | --- | --- | --- |

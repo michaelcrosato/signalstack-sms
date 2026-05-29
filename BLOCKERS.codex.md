@@ -1,9 +1,8 @@
 # Codex Blockers
 
-Run number: 819
+Run number: 820
 
-- No blocker from surfacing provider error-code evidence in campaign detail delivery snapshots.
-- Focused validation passed with `npm run typecheck`, `npm run contracts:check`, `npm run test -- tests/unit/product/campaigns.test.ts`, `npm run demo:seed`, and `npm run test:e2e:product-demo`.
-- Protected validation passed with `.\scripts\local-gate.ps1`.
-- The change reads existing local message metadata and updates UI/docs/tests only; it did not use production credentials, call Clerk/Twilio/Stripe, send campaign/live bulk SMS, bill, notify, touch Redis, edit protected gate scripts, hard-delete data, mutate delivery state, execute workers, replay webhooks, or perform destructive production actions.
+- No blocker from collapsing the live-worker-controls permutation test. SUT and the production-worker policy gate are unchanged; the reserved `production-live-campaign` class remains blocked.
+- Environment: `test:e2e:smoke`, `db:migrate`, and `demo:seed` need a running Postgres (and Chromium for e2e), unavailable in this sandbox — recorded as "not run", verified by CI. Tracked in TICKET002.
+- The change edits one test file plus handoff docs only; it did not touch the SUT, gate scripts, hard gates, secrets, providers, billing, or production paths.
 - Historical blocker notes live in `git log`; keep this file current-only to avoid recursive handoff bloat.
