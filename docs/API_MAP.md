@@ -42,6 +42,7 @@ Milestone 5:
 - `GET /api/inbox/conversations/:conversationId`: reads one conversation.
 - `GET /api/inbox/conversations/:conversationId/messages`: lists conversation messages.
 - `POST /api/inbox/conversations/:conversationId/messages`: creates a demo-safe inbound message.
+- `POST /api/inbox/conversations/:conversationId/reply`: records a demo-safe outbound reply via the dummy provider (opt-out/archived blocked, idempotent, no live send).
 - `POST /api/inbox/conversations/:conversationId/assign`: assigns or clears conversation assignment.
 - `GET /api/inbox/conversations/:conversationId/notes`: lists internal notes.
 - `POST /api/inbox/conversations/:conversationId/notes`: creates an internal note.

@@ -132,6 +132,10 @@ Returns tenant-scoped messages for the conversation in chronological order.
 
 Creates a demo-safe inbound message on an existing conversation. Explicit `idempotencyKey` duplicates return the existing local message before contact opt-out or conversation timestamp mutations. STOP-class keywords update local consent to `OPTED_OUT`; HELP/INFO-class keywords are recorded but do not opt the contact in or send a provider response.
 
+### `POST /api/inbox/conversations/:conversationId/reply`
+
+Records a demo-safe **outbound** reply on the conversation through the dummy provider — never a live send. Requires `MEMBER`. Opted-out, archived, or missing contacts are blocked with `422` and `{ "reasons": [...] }`, creating no message row. An explicit `idempotencyKey` duplicate returns the existing local message with `deduped: true` and does not insert again.
+
 ### `POST /api/inbox/conversations/:conversationId/assign`
 
 Assigns or clears a conversation assignment with `{ "assignedToUserId": "user_id" }` or `{ "assignedToUserId": null }`. The assignee must be an active member of the current organization.
