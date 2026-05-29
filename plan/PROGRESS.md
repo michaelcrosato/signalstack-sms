@@ -16,7 +16,7 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 | SPEC-006 observability | 2 | **Done (core)** | committed `115bb435` | typecheck/lint/build/393 tests/observability:check green | OTel exporter deferred to BACKLOG |
 | SPEC-009 compliance | 2 | **Done** | migration `20260529115853_consent_evidence` applied + committed | db:validate/compliance:check/typecheck/lint/**418 tests**/build green; seed reseeded real Postgres | quiet-hours + consent-evidence storage + A2P privacy/terms all enforced in the hard gate |
 | SPEC-007 ai-reply-drafting | 3 | **Done (demo-safe slice)** | committed (maint/iter-0001) | typecheck/lint/**411 tests**/build/`ai:check` green | seam+gate+cap+PII redaction; live key provisioning still human-gated |
-| SPEC-008 ai-lead-qualification | 3 | Todo | — | — | after SPEC-007 + TICKET009 |
+| SPEC-008 ai-lead-qualification | 3 | **Done (backend slice)** | migration `20260529120721` applied + committed | typecheck/lint/**423 tests**/build/`ai:check` green | qualifyLead seam (fake+gated live) + tenant-scoped score persistence; UI surfacing deferred (BACKLOG); live needs secrets |
 | SPEC-010 postgres-rls | 4 | Todo | — | — | after TICKET009 + pooling decision |
 
 ## Checklist (downstream agents)
@@ -27,13 +27,21 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [x] SPEC-005 — dep hygiene (Redis pinned + carets aligned to installed; majors → BACKLOG)
 - [x] SPEC-006 — observability (PII-safe logging + flag-gated instrumentation; OTel exporter → BACKLOG)
 - [x] SPEC-007 — AI reply-draft **seam shipped** (provider seam + `ai:gate` + per-tenant cap + PII-redacted prompt, fake default); live key/cost enablement still human-gated
-- [ ] SPEC-008 — real AI lead qualification — BLOCKED (migration + secrets; human-only)
+- [x] SPEC-008 — lead-qual **seam + tenant-scoped score persistence shipped** (fake default, gated live, migration applied); UI surfacing deferred (BACKLOG); live enablement needs secrets
 - [x] SPEC-009 — quiet-hours + **consent-evidence storage** (additive migration applied) + A2P privacy/terms, all enforced in `evaluateMessagingHardGate`
 - [ ] SPEC-010 — Postgres RLS — BLOCKED (migration; needs human confirmation + non-Windows env for prisma generate)
 - [x] TICKET003 — demo-safe inbox reply
 - [x] TICKET009 — session-provider **seam shipped** (`resolveProductionCurrentOrg`, fail-closed, flag-gated; demo default unchanged); live Clerk enablement still human-gated
 
 ## Log (most recent first)
+- 2026-05-29 — **SPEC-008 lead-qualification backend slice DONE.** Extended the `AiProvider` seam with
+  `qualifyLead` (fake default + gated live Anthropic via the SPEC-007 `ai:gate`/cap, defensive JSON parse,
+  PII-redacted prompt); added tenant-scoped `persistContactLeadQualification` + additive migration
+  `20260529120721_lead_qualification_score` (nullable `Contact.leadScore`/`leadStage`/`leadQualifiedAt`);
+  refactored the lead-qualification route (analysis-only — no send/consent change); `ai:check` rule + tests
+  (+5 → 423). **NOTE:** a transient API 500 had interrupted before verification — re-verified and caught +
+  fixed a typecheck bug (nullable `Conversation.contactId` guard). Verified: typecheck/lint/423 tests/build/
+  ai:check/db:validate green. UI surfacing of scores deferred to BACKLOG; live enablement human-gated.
 - 2026-05-29 — **SPEC-009 consent-evidence DONE (real migration).** With Postgres up + `prisma generate`
   working (transient EPERM cleared on retry), applied additive migration `20260529115853_consent_evidence`
   (nullable `Contact.consentCapturedAt`/`consentMethod`/`consentDisclosure` — reversible, no data loss).

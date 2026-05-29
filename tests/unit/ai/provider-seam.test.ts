@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { evaluateAiHardGate, liveAiIsBlocked, readAiHardGateInput } from "@/lib/ai/ai-gate";
 import { fakeAiProvider, liveAiProvider, resolveAiProvider } from "@/lib/ai/provider";
 import { aiDraftCapExceeded, aiDraftDailyCap, DEFAULT_AI_DRAFT_DAILY_CAP } from "@/lib/ai/usage";
-import { fakeReplySuggestion } from "@/lib/ai/fake-ai-provider";
+import { fakeLeadQualification, fakeReplySuggestion } from "@/lib/ai/fake-ai-provider";
 
 const liveEnv = {
   AI_PROVIDER: "live",
@@ -97,6 +97,39 @@ describe("liveAiProvider.generateReplyDraft", () => {
     await expect(
       liveAiProvider.generateReplyDraft({ messages: [{ direction: "INBOUND", body: "hi" }] })
     ).rejects.toThrow(/status 500/);
+  });
+});
+
+describe("qualifyLead seam", () => {
+  it("fake provider returns the deterministic qualification byte-for-byte", async () => {
+    const messages = [{ direction: "INBOUND", body: "Can you send pricing?" }];
+    await expect(fakeAiProvider.qualifyLead({ messages })).resolves.toEqual(fakeLeadQualification(messages));
+  });
+
+  it("live provider parses model JSON and strips phone PII from the outgoing prompt", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ content: [{ text: '{"score": 82, "stage": "HOT", "reasons": ["asked pricing"]}' }] })
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubEnv("AI_API_KEY", "test-key");
+
+    const result = await liveAiProvider.qualifyLead({
+      messages: [{ direction: "INBOUND", body: "Quote for +1 415 555 0199 please" }]
+    });
+
+    expect(result).toEqual({ provider: "live", score: 82, stage: "HOT", reasons: ["asked pricing"] });
+    const [, init] = fetchMock.mock.calls[0] as [string, { body: string }];
+    expect(init.body).toContain("[redacted]");
+    expect(init.body).not.toContain("0199");
+  });
+
+  it("live provider throws on an unparseable qualification", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ content: [{ text: "not json" }] }) }));
+    vi.stubEnv("AI_API_KEY", "test-key");
+    await expect(
+      liveAiProvider.qualifyLead({ messages: [{ direction: "INBOUND", body: "hi" }] })
+    ).rejects.toThrow(/unparseable/);
   });
 });
 

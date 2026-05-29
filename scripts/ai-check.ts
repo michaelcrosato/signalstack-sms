@@ -16,6 +16,12 @@ const rules: Rule[] = [
     mustInclude: ["resolveAiProvider", "recordFakeAiUsage", "currentOrg.orgId"],
     mustExclude: ["createConversationOutboundReply", "sendSms", "deliverMessage", "enqueue"]
   },
+  // Lead qualification goes through the same seam and is analysis-only (no send).
+  {
+    file: "app/api/ai/lead-qualification/route.ts",
+    mustInclude: ["resolveAiProvider", "recordFakeAiUsage", "currentOrg.orgId"],
+    mustExclude: ["createConversationOutboundReply", "sendSms", "deliverMessage", "enqueue"]
+  },
   // Demo-safe defaults: live AI off, cost not acknowledged, provider fake.
   { file: ".env.example", mustInclude: ["AI_PROVIDER=fake", "LIVE_AI_ENABLED=false", "AI_COST_ACK=false"] },
   { file: "lib/env/defaults.ts", mustInclude: ['AI_PROVIDER: "fake"'] }

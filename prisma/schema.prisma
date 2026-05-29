@@ -163,6 +163,9 @@ model Contact {
   consentDisclosure String?
   source        String?
   notes         String?
+  leadScore     Int?
+  leadStage     String?
+  leadQualifiedAt DateTime?
   archivedAt    DateTime?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt

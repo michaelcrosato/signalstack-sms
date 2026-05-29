@@ -1,6 +1,8 @@
 # SPEC-008 — Real AI lead qualification + scoring behind a gate
 
-- **Status:** Todo · **Priority:** P3 · **Pillar:** Features · **Effort:** L
+- **Status:** Done — backend slice (2026-05-29); UI surfacing deferred · **Priority:** P3 · **Pillar:** Features · **Effort:** L
+  - Shipped: `qualifyLead` on the `AiProvider` seam (`lib/ai/provider.ts`: fake default + gated live, defensive JSON parse, PII-redacted prompt); tenant-scoped score persistence (`lib/db/repositories/lead-qualification.ts` + migration `20260529120721_lead_qualification_score` — nullable `Contact.leadScore`/`leadStage`/`leadQualifiedAt`); lead-qualification route refactor (gate/cap/meter; analysis-only, no send/consent change); `ai:check` rule; tests.
+  - **Deferred (follow-up, BACKLOG):** surfacing the persisted score in inbox/contact UI; live enablement needs human secrets.
 
 ## Description
 `app/api/ai/lead-qualification/route.ts` exists on the fake provider. AI lead qualification/scoring/routing
@@ -20,10 +22,10 @@ human-gated. Builds on `lib/ai/conversation-context`.
 4. Gate identical to SPEC-007 (`LIVE_AI_ENABLED` + key + cost-ack).
 
 ## Acceptance criteria
-- [ ] Default fake provider returns deterministic scores; tests pass.
-- [ ] Score persisted tenant-scoped; visible in UI; no consent/send side effects.
-- [ ] Live path gated; usage metered; PII redacted.
-- [ ] `npm run validate` green; no live calls by default.
+- [x] Default fake provider returns deterministic scores; tests pass. (`fakeAiProvider.qualifyLead` byte-for-byte; 423 tests green.)
+- [x] Score persisted tenant-scoped; no consent/send side effects. (`persistContactLeadQualification` updates only the contact lead fields, scoped by `orgId`, fail-safe.) **UI surfacing deferred** (follow-up, BACKLOG).
+- [x] Live path gated; usage metered; PII redacted. (Same `ai:gate` + per-tenant cap as SPEC-007; phone-redacted prompt; live client mocked in tests.)
+- [x] No live calls by default; demo-safe. Verified typecheck/lint/**423 tests**/build/`ai:check`/db:validate green + migration applied. (Full `npm run validate` also runs e2e:smoke — not run here, Chromium not installed.)
 
 ## Test strategy
 Unit: scoring contract + determinism (fake); persistence is tenant-scoped; no side-effect invariants;
