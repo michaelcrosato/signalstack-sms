@@ -18,6 +18,11 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 | SPEC-007 ai-reply-drafting | 3 | **Done (demo-safe slice)** | committed (maint/iter-0001) | typecheck/lint/**411 tests**/build/`ai:check` green | seam+gate+cap+PII redaction; live key provisioning still human-gated |
 | SPEC-008 ai-lead-qualification | 3 | **Done** | migration `20260529120721` applied + committed | typecheck/lint/**424 tests**/build/`ai:check` green; live render verified | qualifyLead seam + tenant-scoped score persistence + "Lead Score" row on contact page; live needs secrets |
 | SPEC-010 postgres-rls | 4 | **Done (opt-in backstop)** | migration `20260529130000` applied + committed | RLS proof test (read+write denial) green; 424 tests + 12 gates + build green; EXPLAIN policy applied | FORCE RLS + `app_rls` role + `withTenantRls`; unset-allows → no regression; prod enablement = non-superuser role + request wiring |
+| SPEC-011 inbox-lead-score | 5 | Todo | — | — | AFK queue; surface lead score in inbox workspace (render-verifiable) |
+| SPEC-012 ai-seam-remaining | 5 | Todo | — | — | AFK queue; route campaign-copy + conversation-summary through resolveAiProvider |
+| SPEC-013 state-quiet-hours | 5 | Todo | — | — | AFK queue; per-US-state windows, pure logic, no migration |
+| SPEC-014 consent-immutability | 5 | Todo | — | — | AFK queue; write-once consent-evidence guard (app-level) |
+| SPEC-015 delivery-metrics | 5 | Todo | — | — | AFK queue; flag-gated delivery/queue/webhook counters, no PII |
 
 ## Checklist (downstream agents)
 - [x] SPEC-001 — Docker `start` script
@@ -32,8 +37,20 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [x] SPEC-010 — Postgres RLS **backstop shipped** (FORCE RLS + `app_rls` role + `withTenantRls`; cross-tenant read/write denial proven); unset-allows = no regression; prod enablement (non-superuser app role + request wiring) is the documented next step
 - [x] TICKET003 — demo-safe inbox reply
 - [x] TICKET009 — session-provider **seam shipped** (`resolveProductionCurrentOrg`, fail-closed, flag-gated; demo default unchanged); live Clerk enablement still human-gated
+- [ ] SPEC-011 — inbox lead-score surfacing (AFK queue)
+- [ ] SPEC-012 — AI seam for campaign-copy + conversation-summary (AFK queue)
+- [ ] SPEC-013 — per-US-state quiet-hour variants (AFK queue)
+- [ ] SPEC-014 — consent-evidence write-once immutability (AFK queue)
+- [ ] SPEC-015 — delivery/queue/webhook metrics counters (AFK queue)
 
 ## Log (most recent first)
+- 2026-05-29 — **AFK 12h readiness setup (no app code changed).** Made the full protected gate green on
+  Windows: `db:generate` → retry wrapper `scripts/db-generate.ts` (transient EPERM); `docker-compose`
+  services pinned `restart: unless-stopped`; added `scripts/agent/afk-preflight.sh` (`npm run afk:preflight`)
+  = services up + migrate + seed + Playwright Chromium + `local-gate.ps1`. Verified: **full `npm run validate`
+  GREEN end-to-end incl `e2e:smoke`** (first full e2e this session) + build; `PREFLIGHT=0`. Authored AFK work
+  queue `plan/specs/SPEC-011..015` (demo-safe, no secrets) + `scripts/agent/afk-12h.ps1` launcher +
+  `docs/AFK_RUNBOOK.md`; refreshed SUMMARY/BLOCKERS/NEXT_PROMPTS. All specs SPEC-001..010 remain done.
 - 2026-05-29 — **SPEC-010 Postgres RLS backstop DONE — all plan specs SPEC-001..010 + TICKET003/009 complete.**
   Applied migration `20260529130000_tenant_rls` (ENABLE+FORCE RLS + `tenant_isolation` policy on 22 tenant
   tables; non-superuser `app_rls` role + grants). Policy allows when `app.current_org_id` is unset → the

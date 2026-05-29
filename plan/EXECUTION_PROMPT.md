@@ -4,16 +4,13 @@ You are an autonomous principal engineer executing the SignalStack SMS transform
 in `plan/` as the single source of truth. Be terse. Verify with real commands. Never scope-creep. Full
 honesty: a check is "passed" only if it ran and passed; e2e without Postgres is "not run."
 
-CURRENT STATE (2026-05-29, verified): Phase 0, Phase 2 (SPEC-006; SPEC-009 quiet-hours + consent-evidence),
-TICKET003, SPEC-007 (AI reply-draft seam), TICKET009 (session seam), SPEC-008 (lead-qualification seam +
-score persistence + contact-UI surfacing), and **SPEC-010** (Postgres RLS backstop) are done — **all plan
-specs SPEC-001..010 + TICKET003/009 complete.** `npm test` = **424 pass** (+2 RLS integration tests behind
-`RUN_DB_TESTS`), `npm run build` pass, 12/12 domain gates + typecheck/lint/db:validate pass; on Windows
-`npm run validate` can abort at the transient `db:generate` EPERM (retry, or use Linux/CI); e2e:smoke needs
-Chromium (`npx playwright install chromium`) + local Postgres (up). **Remaining is non-spec:** live
-enablement of SPEC-007/SPEC-008 (`AI_API_KEY`+`AI_COST_ACK`) / TICKET009 (verified Clerk subject + deny
-responses + Clerk secrets); RLS production enablement (non-superuser app role + per-request `withTenantRls`);
-inbox lead-score surfacing; major dependency upgrades — all tracked in `plan/BACKLOG.md`.
+CURRENT STATE (2026-05-29, verified): all plan specs **SPEC-001..010 + TICKET003/009 are done**, and an
+**AFK continuation queue SPEC-011..015 is queued (Todo; demo-safe, no secrets).** The full protected gate is
+GREEN end-to-end on Windows: `npm run afk:preflight` (services up + migrate + seed + Playwright Chromium +
+gate) then `pwsh scripts/local-gate.ps1` / `npm run validate` pass through `db:generate` (now retry-wrapped,
+`scripts/db-generate.ts`), 424 unit tests, **e2e:smoke** (self-starts dev server on :3100 vs docker
+Postgres), and build. Human-gated (out of scope for unattended runs): live SMS/AI/Clerk/Stripe secrets; RLS
+production role wiring. See `docs/AFK_RUNBOOK.md`.
 
 READ FIRST (in order): `/AGENTS.md` (canonical doctrine) → `plan/AGENTS.md` (how to run this plan) →
 `plan/ROADMAP.md` (priority matrix + DAG + phases) → `plan/CONTEXT.md` (baseline + research rationale) →
@@ -66,9 +63,9 @@ blocked, stop and report: what shipped (files/specs, verified commands + results
 blocked and why (esp. human-gated: secrets/cost/CI), and the single best next item. Never claim an
 unrun/failed check passed.
 
-START: run `bash scripts/agent/status.sh`. **All plan specs (SPEC-001..010) + TICKET003/009 are done.** No
-`SPEC-XXX` remain to execute. Further work is either human-gated (live AI/Clerk/Stripe secrets) or lives in
-`plan/BACKLOG.md`: RLS production enablement (point the app at a non-superuser DB role + adopt
-`withTenantRls` on request paths + a pooling decision); inbox lead-score surfacing; and the major dependency
-upgrades (Next 16 / Prisma 7 / Zod 4 — one isolated branch each). Promote a BACKLOG item to a
-`plan/specs/SPEC-NNN.md` before building it; never execute directly from BACKLOG.
+START: run `bash scripts/agent/status.sh`, then work the **AFK continuation queue** lowest-effort /
+highest-Σ unblocked first: **SPEC-011** (inbox lead score, S) → **SPEC-013** (state quiet hours, S) →
+**SPEC-014** (consent immutability) → **SPEC-015** (delivery metrics) → **SPEC-012** (AI seam: copy+summary).
+All are demo-safe, no secrets, verifiable; serialize SPEC-012 against other `lib/ai/provider.ts` edits. When
+the queue is exhausted, only human-gated work (live AI/Clerk/Stripe secrets; RLS production wiring) +
+`plan/BACKLOG.md` majors remain — promote a BACKLOG item to a `plan/specs/SPEC-NNN.md` before building it.

@@ -43,11 +43,20 @@ This is the compact handoff for the next automated loop. History lives in `git l
 
 ## Next Work
 
-1. Keep the product demo path stable and run the protected local gate before treating changes as green.
-2. Prefer high-signal product-demo or production-readiness correctness work over more low-value syntactic test variants.
-3. Good next targets: concise product demo polish, real auth/RBAC only after a concrete Clerk/session design slice is selected, campaign-level reporting detail after feedback, idempotency scoping checks, or targeted live-worker controls that close a named gap.
-4. Keep operations surfaces read-only and avoid expanding settings pages unless it directly supports release safety.
-5. Keep all live SMS/provider/billing/AI/secret/destructive-production actions behind hard gates.
+All plan specs SPEC-001..010 + TICKET003/009 are DONE (see `plan/PROGRESS.md`). The active queue is the
+demo-safe **AFK continuation set** `plan/specs/SPEC-011..015` — work them lowest-effort / highest-Σ first:
+
+1. SPEC-011 — surface the lead score in the inbox workspace (render-verifiable).
+2. SPEC-013 — per-US-state TCPA quiet-hour variants (pure logic, no migration).
+3. SPEC-014 — write-once immutability for stored consent evidence (app-level guard).
+4. SPEC-015 — flag-gated delivery/queue/webhook metrics counters (no PII).
+5. SPEC-012 — route campaign-copy + conversation-summary through the AI provider seam (serialize vs other `lib/ai` edits).
+
+Rules: run the protected gate (`pwsh scripts/local-gate.ps1`, now fully green incl `e2e:smoke` after
+`npm run afk:preflight`) before treating work as green; commit only when green. Keep all live
+SMS/provider/billing/AI/secret/destructive-production actions behind hard gates. When the queue is exhausted,
+only human-gated work + `plan/BACKLOG.md` remain — promote a BACKLOG item to a `plan/specs/SPEC-NNN.md`
+before building it.
 
 ## Context Discipline
 

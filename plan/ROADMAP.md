@@ -35,6 +35,11 @@ Scores 1–5, **higher is better**: Impact (value), Feasibility (ease/small blas
 | SPEC-010 | Postgres RLS defense-in-depth | Future | 4 | 2 | 2 | 4 | **12** | DB-enforced isolation; pooling/txn risk |
 | TICKET009 | Clerk auth/RBAC slice (gated) | Product | 5 | 3 | 3 | 5 | — | biggest unlock; enablement needs human secrets |
 | TICKET003 | Demo-safe inbox reply | Product | 4 | 4 | 5 | 5 | — | fully unblocked product gap |
+| SPEC-011 | Inbox lead-score surfacing | Product | 3 | 5 | 5 | 5 | **18** | completes SPEC-008 visibility; render-verifiable |
+| SPEC-012 | AI seam for campaign-copy + summary | Features | 3 | 4 | 4 | 4 | **15** | consistency; finishes the AI seam (gated) |
+| SPEC-013 | Per-US-state quiet-hour variants | Features | 4 | 4 | 4 | 5 | **17** | compliance depth; pure logic, no migration |
+| SPEC-014 | Consent-evidence write-once immutability | Features | 4 | 4 | 4 | 5 | **17** | TCPA defensibility; app-level guard |
+| SPEC-015 | Delivery/queue/webhook metrics counters | Sec/Qual | 4 | 4 | 4 | 4 | **16** | observability depth; flag-gated, no PII |
 
 ## DAG (dependencies)
 ```
@@ -60,6 +65,13 @@ Phase 3 (AI features, gated):
 Phase 4 (future-proofing):
   SPEC-010 (RLS) ── after TICKET009 (reliable orgId in session) + pooling decision
   Major upgrades (next16 / prisma7 / zod4 / tailwind4) ── plan/BACKLOG.md, one per isolated branch
+
+Phase 5 (AFK continuation queue — demo-safe, no secrets, verifiable; SPEC-001..010 all done):
+  SPEC-011 (inbox lead score)        ── after SPEC-008 (done)
+  SPEC-013 (state quiet hours)       ── after SPEC-009 (done); pure logic
+  SPEC-014 (consent immutability)    ── after SPEC-009 (done)
+  SPEC-015 (delivery metrics)        ── after SPEC-006 (done)
+  SPEC-012 (AI seam: copy+summary)   ── after SPEC-007 (done); shares lib/ai/provider → serialize vs other AI edits
 ```
 
 ## Phases (sequenced)

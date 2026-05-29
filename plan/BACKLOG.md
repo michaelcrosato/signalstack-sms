@@ -39,6 +39,16 @@ free of creep.
 - BullMQ Prometheus metrics export + stalled-job alerting in production.
 - OpenTelemetry **exporter** wiring (`@vercel/otel` `registerOTel`) behind the `instrumentation.ts` seam (SPEC-006 left the seam + PII-safe logger; exporter needs a backend choice + dependency install).
 
+## Promoted to specs (2026-05-29, AFK queue)
+Several follow-ups are now active specs: inbox lead-score surfacing → **SPEC-011**; per-US-state quiet hours →
+**SPEC-013**; consent-evidence write-once immutability → **SPEC-014**; delivery/queue/webhook metric counters
+→ **SPEC-015**; AI seam for campaign-copy + conversation-summary → **SPEC-012**. (An OTel/Prometheus
+*exporter* + dashboards remain BACKLOG — SPEC-015 ships counters only.)
+
+Still BACKLOG (not yet specs):
+- BullMQ production hardening: graceful `worker.close()` on SIGTERM, `removeOnComplete/Fail` TTLs,
+  deterministic `jobId` idempotency, stalled-job settings — additive config behind the existing worker gates.
+
 ## Notes
 Anything an executing agent discovers that is out-of-scope for its current spec goes **here**, not into the
 working change.

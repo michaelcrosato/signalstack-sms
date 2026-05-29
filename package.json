@@ -19,7 +19,7 @@
     "test:e2e:smoke": "playwright test e2e/smoke.spec.ts --project=chromium",
     "test:e2e:demo": "playwright test e2e/demo-path.spec.ts --project=chromium",
     "test:e2e:product-demo": "playwright test e2e/product-demo-path.spec.ts --project=chromium",
-    "db:generate": "prisma generate",
+    "db:generate": "tsx scripts/db-generate.ts",
     "db:validate": "prisma validate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
@@ -43,6 +43,7 @@
     "agent:status": "tsx scripts/agent-status.ts",
     "agent:handoff": "tsx scripts/agent-handoff.ts",
     "agent:repair": "npm run validate",
+    "afk:preflight": "bash scripts/agent/afk-preflight.sh",
     "ci": "npm run validate",
     "premerge": "npm run validate"
   },
