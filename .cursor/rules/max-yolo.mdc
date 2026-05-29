@@ -3,4 +3,6 @@ description: Maximum automation with hard external-impact gates
 alwaysApply: true
 ---
 
+Canonical agent instructions live in `AGENTS.md` (read-first order, the loop, command reference, conventions). This file is a thin pointer.
+
 Run routine install, build, lint, test, and repair commands automatically. Do not bypass hard gates for live SMS, billing, real secrets, destructive production database operations, compliance-sensitive behavior, spam, data leakage, or real financial cost.

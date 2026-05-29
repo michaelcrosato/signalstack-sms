@@ -9,7 +9,6 @@ It supervises the protected repo loop created by:
 
 - docs/AXIOMS.md
 - docs/AGENT-LOOP.md
-- docs/LOOP_LOG.md
 - scripts/assert-gate-integrity.ps1
 - scripts/local-gate.ps1
 - scripts/run-codex-yolo-loop.ps1
@@ -138,7 +137,6 @@ if ($KeepAwake) {
 $requiredPaths = @(
   "docs\AXIOMS.md",
   "docs\AGENT-LOOP.md",
-  "docs\LOOP_LOG.md",
   "docs\loop-artifacts\.gitkeep",
   "scripts\assert-gate-integrity.ps1",
   "scripts\local-gate.ps1",

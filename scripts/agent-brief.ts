@@ -10,8 +10,6 @@ const handoffFiles = [
 ] as const;
 
 const largeContextFiles = [
-  "LOOP_LOG.md",
-  "docs/LOOP_LOG.md",
   "tests/unit/auth/api-route-authorization.test.ts",
   "tests/unit/queue/live-worker-controls.test.ts",
   "contracts/CONTRACT-TESTING.md"
@@ -56,17 +54,6 @@ function fileSizeLine(path: string) {
   return `${path}: ${statSync(path).size.toLocaleString()} bytes`;
 }
 
-function latestLoopRuns(path: string, maxRuns = 5) {
-  const matches = [...fileText(path).matchAll(/^## Run\s+(\d+)\s+(.+)$/gm)]
-    .map((match) => ({ run: Number(match[1]), heading: `Run ${match[1]} ${match[2]}` }))
-    .filter(({ run }) => Number.isFinite(run))
-    .sort((left, right) => right.run - left.run)
-    .slice(0, maxRuns)
-    .map(({ heading }) => `- ${heading}`);
-
-  return matches.length > 0 ? matches.join("\n") : "- (no run headings found)";
-}
-
 function printBlock(title: string, body: string) {
   console.log(`\n## ${title}`);
   console.log(body.trim() || "(none)");
@@ -84,7 +71,6 @@ printBlock("Next Work", markdownSection("docs/NEXT_PROMPTS.md", "Next Work", 10)
 printBlock("Context Discipline", markdownSection("docs/NEXT_PROMPTS.md", "Context Discipline", 10));
 printBlock("Current Handoff Sizes", handoffFiles.map(fileSizeLine).join("\n"));
 printBlock("Large File Advisory", largeContextFiles.map(fileSizeLine).join("\n"));
-printBlock("Latest Loop Runs", latestLoopRuns("LOOP_LOG.md"));
 printBlock(
   "Required First Reads",
   [

@@ -11,19 +11,19 @@ const currentHandoffBudgets: BudgetedFile[] = [
   {
     path: "SUMMARY.codex.md",
     maxBytes: 12_000,
-    requiredText: ["Run number:", "History is preserved in `LOOP_LOG.md`"],
+    requiredText: ["Run number:"],
     forbiddenText: ["## Previous Run"]
   },
   {
     path: "BLOCKERS.codex.md",
     maxBytes: 12_000,
-    requiredText: ["Run number:", "Historical blocker notes are preserved in `LOOP_LOG.md`"],
+    requiredText: ["Run number:"],
     forbiddenText: ["## Previous Run"]
   },
   {
     path: "docs/NEXT_PROMPTS.md",
     maxBytes: 16_000,
-    requiredText: ["## Context Discipline", "Full history is in `LOOP_LOG.md`", "npm run agent:brief"],
+    requiredText: ["## Context Discipline", "npm run agent:brief"],
     forbiddenText: ["Run 700", "Run 650", "Run 600"]
   },
   {
@@ -39,7 +39,6 @@ const currentHandoffBudgets: BudgetedFile[] = [
   }
 ];
 
-const appendOnlyHistoryFiles = ["LOOP_LOG.md", "docs/LOOP_LOG.md"];
 const advisoryLargeFiles = [
   "tests/unit/auth/api-route-authorization.test.ts",
   "tests/unit/queue/live-worker-controls.test.ts",
@@ -70,13 +69,6 @@ for (const budget of currentHandoffBudgets) {
     if (text.includes(forbidden)) {
       failures.push(`${budget.path} contains historical handoff bloat marker: ${forbidden}`);
     }
-  }
-}
-
-for (const historyFile of appendOnlyHistoryFiles) {
-  const text = fileText(historyFile);
-  if (!text.includes("## Run ")) {
-    failures.push(`${historyFile} must remain the append-only run history.`);
   }
 }
 

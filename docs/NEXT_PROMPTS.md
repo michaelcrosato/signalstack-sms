@@ -1,6 +1,6 @@
 # Next Prompts
 
-This is the compact handoff for the next automated loop. Full history is in `LOOP_LOG.md` and `docs/LOOP_LOG.md`; do not reload historical logs unless the task requires it.
+This is the compact handoff for the next automated loop. History lives in `git log`; do not reload historical context unless the task requires it.
 
 ## Read First
 
@@ -52,6 +52,6 @@ This is the compact handoff for the next automated loop. Full history is in `LOO
 ## Context Discipline
 
 - Start with `npm run agent:brief`, file heads/tails, current summaries, `git status`, `git log -3`, and targeted `rg`.
-- Avoid reading full `SUMMARY.codex.md`, `BLOCKERS.codex.md`, `LOOP_LOG.md`, `docs/LOOP_LOG.md`, `docs/CURRENT_STATE_MATRIX.md`, or very large tests unless the next change requires exact historical context.
+- Avoid reading full `SUMMARY.codex.md`, `BLOCKERS.codex.md`, `docs/CURRENT_STATE_MATRIX.md`, or very large tests unless the next change requires exact historical context.
 - If a handoff file starts growing into a run log, compact it and rely on the append-only logs for history.
 - `npm run context:check` enforces the current-handoff budget during validation.

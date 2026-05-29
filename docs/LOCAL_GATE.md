@@ -63,7 +63,7 @@ Context budget check:
 npm run context:check
 ```
 
-The context budget check is included in `npm run validate` and verifies that current handoff files stay compact, while append-only history remains in `LOOP_LOG.md` and `docs/LOOP_LOG.md`. Large test files are allowed, but agents should inspect them with targeted `rg` searches instead of loading them wholesale.
+The context budget check is included in `npm run validate` and verifies that current handoff files stay compact. Run history lives in `git log`. Large test files are allowed, but agents should inspect them with targeted `rg` searches instead of loading them wholesale.
 
 Agent startup brief:
 

@@ -9,7 +9,7 @@ No word is the best word: remove any instruction that does not change behaviour.
 LOOP UNTIL A HUMAN STOPS IT:
 
 1. Explore.  Read the axioms first. Run `npm run agent:brief`, then reconcile repo truth:
-   code, git state, tests, contracts, docs, roadmap, NEXT_PROMPTS, LOOP_LOG, prior
+   code, git state, tests, contracts, docs, roadmap, NEXT_PROMPTS, prior
    artifacts, current failures, and outward information when it materially improves the next
    move.
 2. Plan.     Read the axioms. Determine the move you would defend at human review. Roadmaps
@@ -24,8 +24,8 @@ LOOP UNTIL A HUMAN STOPS IT:
 
 # CONTEXT BUDGET
 Read the latest useful truth, not the entire history. Start with `npm run agent:brief`.
-For append-only or oversized files
-(`LOOP_LOG.md`, `docs/LOOP_LOG.md`, `SUMMARY.codex.md`, `BLOCKERS.codex.md`,
+For oversized files
+(`SUMMARY.codex.md`, `BLOCKERS.codex.md`,
 `docs/CURRENT_STATE_MATRIX.md`, large tests), start with current headers, latest entries,
 `git diff`, and targeted `rg` queries. Load full historical files only when the current
 task requires exact old context. If the next move is another syntactic variant of already
@@ -57,16 +57,6 @@ Tried:    <approaches>
 Result:   <why it stopped  loss of delta>
 Saved:    <path>
 Next:     <do-not-retry-until / pivot>
-
-# LOOP_LOG FORMAT
-Append-only, no tables, one entry per run, readable in 60 seconds.
-## Run XXX  <GREEN|BLOCKED-ON-DEP|EXHAUSTED>  <slug>  <YYYY-MM-DD HH:MM>
-Objective:    <one line>
-Changed:      <bullets>
-Gate:         <passed | failed at step>
-Commit/Saved: <hash or artifact path>
-Why stopped:  <only if not green>
-Next:         <one line>
 
 # GATE & TOPOLOGY
 The gate is protected by construction, not prose: gate scripts and AXIOMS.md live outside the

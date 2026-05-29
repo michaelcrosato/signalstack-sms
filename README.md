@@ -8,6 +8,9 @@ The product workspace starts at `/dashboard`. Deeper product routes now include 
 
 ## Current roadmap
 
+- `GOAL.md` is the one-page purpose, current state, and definition of done.
+- `ROADMAP.md` maps phases to executable tickets in `tickets/`.
+- `AGENTS.md` + `docs/ai/REPO_MAP.md` orient autonomous agents (read-first order, the loop, where code lives).
 - `PLAN.md` is the short operational roadmap.
 - `docs/CURRENT_STATE_MATRIX.md` is the quick reality check by product area.
 - `planning/CONSENSUS-2026-05-21.md` summarizes Claude, Gemini, Grok, and Codex planning input.
@@ -23,9 +26,15 @@ The product workspace starts at `/dashboard`. Deeper product routes now include 
 
 ## Local validation
 
+First-time setup — creates `.env` from `.env.example`, installs dependencies, generates the Prisma client:
+
 ```bash
-npm install
-npm run db:generate
+bash scripts/agent/bootstrap.sh
+```
+
+Then run the gate (Postgres required for `db:migrate` and `demo:seed`):
+
+```bash
 npm run db:migrate
 npm run demo:seed
 npm run validate

@@ -2,7 +2,7 @@
 
 Last updated: 2026-05-25.
 
-This file is intentionally compact. Historical run notes are preserved in `LOOP_LOG.md` and `docs/LOOP_LOG.md`; current agents should use this matrix plus targeted searches instead of loading old run history.
+This file is intentionally compact. Historical run notes live in `git log`; current agents should use this matrix plus targeted searches instead of loading old run history.
 
 Latest validated run: Run 819 surfaces provider error-code evidence in campaign detail delivery snapshots without provider calls.
 
