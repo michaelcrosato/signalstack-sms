@@ -6,6 +6,30 @@
 export const QUIET_HOURS_START_HOUR = 8; // inclusive
 export const QUIET_HOURS_END_HOUR = 21; // exclusive (9pm)
 
+export type QuietHoursWindow = {
+  startHour: number;
+  endHour: number;
+};
+
+// Florida: 8am - 8pm, Texas: 9am - 9pm, Indiana: 9am - 8pm, Alabama: 8am - 8pm
+export const STATE_WINDOW_OVERRIDES: Record<string, QuietHoursWindow> = {
+  FL: { startHour: 8, endHour: 20 },
+  TX: { startHour: 9, endHour: 21 },
+  IN: { startHour: 9, endHour: 20 },
+  AL: { startHour: 8, endHour: 20 }
+};
+
+export function quietHoursWindowForState(state?: string): QuietHoursWindow {
+  if (state) {
+    const normalized = state.toUpperCase().trim();
+    const override = STATE_WINDOW_OVERRIDES[normalized];
+    if (override) {
+      return override;
+    }
+  }
+  return { startHour: QUIET_HOURS_START_HOUR, endHour: QUIET_HOURS_END_HOUR };
+}
+
 export function localHourInTimeZone(now: Date, timeZone: string): number {
   try {
     const formatted = new Intl.DateTimeFormat("en-US", {
@@ -21,15 +45,16 @@ export function localHourInTimeZone(now: Date, timeZone: string): number {
   }
 }
 
-export function isWithinQuietHours(now: Date, timeZone: string): boolean {
+export function isWithinQuietHours(now: Date, timeZone: string, state?: string): boolean {
   const hour = localHourInTimeZone(now, timeZone);
   if (!Number.isFinite(hour)) {
     // Fail safe: an unresolvable timezone is treated as quiet hours (blocked), never as permissive.
     return true;
   }
-  return hour < QUIET_HOURS_START_HOUR || hour >= QUIET_HOURS_END_HOUR;
+  const window = quietHoursWindowForState(state);
+  return hour < window.startHour || hour >= window.endHour;
 }
 
-export function quietHoursBlockReason(now: Date, timeZone: string): "QUIET_HOURS" | null {
-  return isWithinQuietHours(now, timeZone) ? "QUIET_HOURS" : null;
+export function quietHoursBlockReason(now: Date, timeZone: string, state?: string): "QUIET_HOURS" | null {
+  return isWithinQuietHours(now, timeZone, state) ? "QUIET_HOURS" : null;
 }

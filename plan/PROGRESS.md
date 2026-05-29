@@ -20,7 +20,7 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 | SPEC-010 postgres-rls | 4 | **Done (opt-in backstop)** | migration `20260529130000` applied + committed | RLS proof test (read+write denial) green; 424 tests + 12 gates + build green; EXPLAIN policy applied | FORCE RLS + `app_rls` role + `withTenantRls`; unset-allows → no regression; prod enablement = non-superuser role + request wiring |
 | SPEC-011 inbox-lead-score | 5 | **Done** | maint/iter-0001 | `npm run validate` green | AFK queue; surface lead score in inbox workspace (render-verifiable) |
 | SPEC-012 ai-seam-remaining | 5 | **Done** | feat/spec-012-ai-seam-remaining | `npm run validate` green | Route campaign-copy + conversation-summary through resolveAiProvider |
-| SPEC-013 state-quiet-hours | 5 | Todo | — | — | AFK queue; per-US-state windows, pure logic, no migration |
+| SPEC-013 state-quiet-hours | 5 | **Done** | feat/spec-013-state-quiet-hours | `npm run validate` green | AFK queue; per-US-state windows, pure logic, no migration |
 | SPEC-014 consent-immutability | 5 | Todo | — | — | AFK queue; write-once consent-evidence guard (app-level) |
 | SPEC-015 delivery-metrics | 5 | Todo | — | — | AFK queue; flag-gated delivery/queue/webhook counters, no PII |
 
@@ -39,7 +39,7 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [x] TICKET009 — session-provider **seam shipped** (`resolveProductionCurrentOrg`, fail-closed, flag-gated; demo default unchanged); live Clerk enablement still human-gated
 - [x] SPEC-011 — inbox lead-score surfacing (AFK queue)
 - [x] SPEC-012 — AI seam for campaign-copy + conversation-summary (AFK queue)
-- [ ] SPEC-013 — per-US-state quiet-hour variants (AFK queue)
+- [x] SPEC-013 — per-US-state quiet-hour variants (AFK queue)
 - [ ] SPEC-014 — consent-evidence write-once immutability (AFK queue)
 - [ ] SPEC-015 — delivery/queue/webhook metrics counters (AFK queue)
 

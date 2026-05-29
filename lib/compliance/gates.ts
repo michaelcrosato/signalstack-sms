@@ -29,6 +29,7 @@ export type MessagingHardGateInput = {
   quietHours?: {
     now: Date;
     timeZone: string;
+    state?: string;
   };
 };
 
@@ -74,7 +75,7 @@ export function evaluateMessagingHardGate(input: MessagingHardGateInput): Messag
     }
   }
 
-  if (input.quietHours && isWithinQuietHours(input.quietHours.now, input.quietHours.timeZone)) {
+  if (input.quietHours && isWithinQuietHours(input.quietHours.now, input.quietHours.timeZone, input.quietHours.state)) {
     reasons.push("QUIET_HOURS");
   }
 
