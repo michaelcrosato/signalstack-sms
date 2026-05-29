@@ -2,42 +2,19 @@ import { existsSync, readdirSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
-  getAiOperationLinks,
-  getAudienceOperationLinks,
-  getBillingOperationLinks,
-  getCampaignOperationLinks,
   getComplianceOperationLinks,
-  getContactOperationLinks,
-  getContractOperationLinks,
-  getDataOperationLinks,
-  getDeliveryOperationLinks,
   getDemoConsoleLinks,
-  getDemoOperationsCheckpoints,
-  getDemoOperationsLinks,
-  getEnvironmentOperationLinks,
   getExportOperationLinks,
   getHealthOperationLinks,
-  getInboxOperationLinks,
-  getIntegrationOperationAreas,
   getLaunchDashboardLinks,
-  getNotificationOperationLinks,
-  getNumberOperationLinks,
   getOperatorSurfaceSummary,
   getProviderOperationLinks,
   getQueueOperationLinks,
   getReadinessAuditOperationLinks,
-  getReleaseOperationSurfaceLinks,
-  getReportingIndexLinks,
   getRunbookAdminLinks,
   getSecurityOperationLinks,
   getSettingsNavigationLinks,
-  getSystemOperationLinks,
-  getTeamOperationLinks,
-  getTemplateOperationLinks,
-  getUsageOperationLinks,
   getValidationOperationLinks,
-  getWebhookOperationLinks,
-  getWorkflowOperationSteps,
   operatorSurfaceGroups,
   type OperatorSurfaceGroup,
   type OperatorSurfaceLink
@@ -46,7 +23,7 @@ import {
 // The operations inventory is the single source of truth for read-only operator surfaces. The real
 // guarantees: a filesystem bijection between inventory routes and implemented pages, frozen metadata
 // that callers cannot mutate, link projections backed by the inventory, and rejection of malformed
-// supplied inventories. This suite pins those instead of exhaustive proxy/descriptor permutations.
+// supplied inventories. (The surface was consolidated in ULTRAPLAN Phase A / A3.)
 
 function routeToAppPagePath(route: string) {
   const routeSegments = route === "/" ? [] : route.split("/").filter(Boolean);
@@ -77,34 +54,14 @@ const linkProjections: Array<{ name: string; run: () => readonly OperatorSurface
   { name: "settings navigation", run: getSettingsNavigationLinks },
   { name: "launch dashboard", run: getLaunchDashboardLinks },
   { name: "demo console", run: getDemoConsoleLinks },
-  { name: "demo operations", run: getDemoOperationsLinks },
-  { name: "reporting index", run: getReportingIndexLinks },
-  { name: "release surfaces", run: getReleaseOperationSurfaceLinks },
-  { name: "security", run: getSecurityOperationLinks },
-  { name: "environment", run: getEnvironmentOperationLinks },
   { name: "health", run: getHealthOperationLinks },
-  { name: "contract", run: getContractOperationLinks },
+  { name: "security", run: getSecurityOperationLinks },
   { name: "validation", run: getValidationOperationLinks },
   { name: "queue", run: getQueueOperationLinks },
-  { name: "contact", run: getContactOperationLinks },
-  { name: "campaign", run: getCampaignOperationLinks },
-  { name: "audience", run: getAudienceOperationLinks },
-  { name: "template", run: getTemplateOperationLinks },
-  { name: "inbox", run: getInboxOperationLinks },
-  { name: "data", run: getDataOperationLinks },
-  { name: "notification", run: getNotificationOperationLinks },
-  { name: "export", run: getExportOperationLinks },
-  { name: "webhook", run: getWebhookOperationLinks },
-  { name: "delivery", run: getDeliveryOperationLinks },
-  { name: "team", run: getTeamOperationLinks },
-  { name: "billing", run: getBillingOperationLinks },
-  { name: "ai", run: getAiOperationLinks },
   { name: "provider", run: getProviderOperationLinks },
-  { name: "number", run: getNumberOperationLinks },
   { name: "compliance", run: getComplianceOperationLinks },
-  { name: "system", run: getSystemOperationLinks },
-  { name: "usage", run: getUsageOperationLinks },
-  { name: "readiness audit", run: getReadinessAuditOperationLinks }
+  { name: "readiness audit", run: getReadinessAuditOperationLinks },
+  { name: "exports", run: getExportOperationLinks }
 ];
 
 describe("operator surface inventory", () => {
@@ -160,19 +117,10 @@ describe("operator surface inventory", () => {
   it("keeps page-specific projections from linking to their own page", () => {
     const pageSpecific: Array<{ route: string; links: readonly OperatorSurfaceLink[] }> = [
       { route: "/settings/provider", links: getProviderOperationLinks() },
-      { route: "/settings/compliance", links: getComplianceOperationLinks() },
-      { route: "/settings/usage", links: getUsageOperationLinks() }
+      { route: "/settings/compliance", links: getComplianceOperationLinks() }
     ];
     for (const projection of pageSpecific) {
       expect(projection.links.map((link) => link.href)).not.toContain(projection.route);
-    }
-  });
-
-  it("returns frozen, non-empty structured projections (checkpoints, steps, areas)", () => {
-    for (const structured of [getDemoOperationsCheckpoints(), getWorkflowOperationSteps(), getIntegrationOperationAreas()]) {
-      expect(Array.isArray(structured)).toBe(true);
-      expect(structured.length).toBeGreaterThan(0);
-      expect(Object.isFrozen(structured)).toBe(true);
     }
   });
 

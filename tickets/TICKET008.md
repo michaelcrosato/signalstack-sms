@@ -1,7 +1,15 @@
 # TICKET008 — Consolidate /settings operations pages and freeze new ones
 
-- **Status:** Todo
+- **Status:** Done (2026-05-28)
 - **Priority:** P2 (ULTRAPLAN Phase A / A3)
+
+## Result
+Consolidated `/settings` 33 -> 10 release-safety surfaces (operations, health, security, validation, queue,
+provider, compliance, readiness-audit, exports, runbook) + `/settings` index + `/demo`. Reduced the inventory
+to 3 groups/12 links and pruned kept projections' route lists. Decoupled `e2e/demo-path.spec.ts` to derive its
+tour from `getSettingsNavigationLinks()` (correct-by-construction). Freeze allowlist updated to the 10-page set.
+Verified green locally: typecheck, lint, build, `npm run test` (462), and all gate scripts. e2e via CI.
+Dead per-area projections/modules remain for deleted surfaces — cleanup in TICKET016.
 
 ## Goal
 Reduce the over-built operations surface (33 `/settings` pages vs 9 `/dashboard` product pages) toward the

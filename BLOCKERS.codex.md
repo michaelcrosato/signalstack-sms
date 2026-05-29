@@ -1,8 +1,8 @@
 # Codex Blockers
 
-Run number: 823
+Run number: 824
 
-- A3 reduction (33 -> ~8 /settings pages) is BLOCKED on CI verification: `grep e2e/*.spec.ts` proves the operations-coverage specs reference all 33 `/settings` pages, so deleting any breaks an e2e assertion. e2e is unrunnable here (needs Postgres + Chromium), so the deletion cannot be verified locally without silently risking the investor/operations demo. The "freeze new ones" half is done (settings-surface-allowlist.test.ts). The reduction needs a CI-gated iteration updating pages + inventory + per-surface tests + e2e specs together — TICKET008. This is a verification limit, not a code defect.
-- Environment: `test:e2e:smoke`, `db:migrate`, `demo:seed` need Postgres (+ Chromium) — "not run", verified by CI. Tracked in TICKET002.
-- This run edits two test files, one contract doc, and handoff docs only; no route handlers, gate scripts, hard gates, secrets, providers, billing, or production paths touched.
+- No blocker. ULTRAPLAN Phase A is complete (A1 + A2 + A3). The `/settings` consolidation (33 -> 10) was done with the e2e demo tour decoupled to derive from the inventory, so it is correct-by-construction; the page<->inventory bijection, freeze allowlist, build, typecheck, lint, and all gate scripts pass locally.
+- `test:e2e:smoke` / `test:e2e:demo` / `db:migrate` / `demo:seed` need Postgres (+ Chromium) — "not run" here, verified by CI on PR #1. This is the only `npm run validate` step not exercised locally.
+- Dead code remains: ~20 per-area projection functions + route-list consts + checkpoint/workflow/integration definitions in `lib/operations/operator-surfaces.ts`, plus orphaned `lib/operations/*-operations.ts` modules + tests for deleted surfaces. They are uncalled (exported, so not lint-flagged) and harmless; TICKET016 removes them. Not a blocker.
 - Historical blocker notes live in `git log`; keep this file current-only.

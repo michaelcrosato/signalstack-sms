@@ -8,39 +8,16 @@ import { describe, expect, it } from "vitest";
 // Reducing this set toward release-safety-only is TICKET008 — gated on CI e2e, because the
 // operations-coverage e2e specs currently reference every page, so deletion cannot be verified locally.
 const allowedSettingsSurfaces = [
-  "ai",
-  "api",
-  "audience",
-  "billing",
-  "campaigns",
   "compliance",
-  "contacts",
-  "contracts",
-  "data",
-  "delivery",
-  "demo",
-  "environment",
   "exports",
   "health",
-  "inbox",
-  "integrations",
-  "notifications",
-  "numbers",
   "operations",
   "provider",
   "queue",
   "readiness-audit",
-  "releases",
-  "reports",
   "runbook",
   "security",
-  "system",
-  "team",
-  "templates",
-  "usage",
-  "validation",
-  "webhooks",
-  "workflows"
+  "validation"
 ].sort();
 
 const settingsRoot = join(process.cwd(), "app", "settings");

@@ -274,27 +274,14 @@ function getUniqueOperatorSurfaceLinks(groups: readonly OperatorSurfaceGroup[]) 
   return links;
 }
 
+// Consolidated to the release-safety + investor surfaces (ULTRAPLAN Phase A / A3). The page set is
+// frozen by tests/unit/operations/settings-surface-allowlist.test.ts; the page<->inventory bijection is
+// enforced by tests/unit/operations/operator-surfaces.test.ts.
 export const operatorSurfaceGroups = freezeOperatorSurfaceGroups([
   {
-    name: "Demo And Workflow",
+    name: "Demo",
     links: [
-      { href: "/demo", label: "Demo Console", note: "seeded investor path" },
-      { href: "/settings/demo", label: "Demo Operations", note: "seed readiness and runtime gates" },
-      { href: "/settings/workflows", label: "Workflow Operations", note: "local workflow checkpoints" },
-      { href: "/settings/releases", label: "Release Operations", note: "release gate references" }
-    ]
-  },
-  {
-    name: "Data And Messaging",
-    links: [
-      { href: "/settings/contacts", label: "Contact Operations", note: "consent and import metadata" },
-      { href: "/settings/audience", label: "Audience Operations", note: "tags, lists, and segments" },
-      { href: "/settings/templates", label: "Template Operations", note: "template variables and usage" },
-      { href: "/settings/campaigns", label: "Campaign Operations", note: "campaign and queue state" },
-      { href: "/settings/queue", label: "Queue Operations", note: "scheduled job metadata" },
-      { href: "/settings/inbox", label: "Inbox Operations", note: "conversation status and notes" },
-      { href: "/settings/webhooks", label: "Webhook Operations", note: "stored webhook metadata" },
-      { href: "/settings/delivery", label: "Delivery Operations", note: "message delivery state" }
+      { href: "/demo", label: "Demo Console", note: "seeded investor path" }
     ]
   },
   {
@@ -302,31 +289,19 @@ export const operatorSurfaceGroups = freezeOperatorSurfaceGroups([
     links: [
       { href: "/settings", label: "Go-Live Readiness", note: "provider and compliance blockers" },
       { href: "/settings/operations", label: "Operations Index", note: "grouped local operator surfaces" },
-      { href: "/settings/system", label: "System Status", note: "runtime flags and queue backend" },
-      { href: "/settings/environment", label: "Environment Operations", note: "safe config categories" },
       { href: "/settings/health", label: "Health Operations", note: "health contract and blockers" },
       { href: "/settings/security", label: "Security Operations", note: "safety gates and secret boundaries" },
       { href: "/settings/validation", label: "Validation Operations", note: "local gate and repair signals" },
-      { href: "/settings/contracts", label: "Contract Operations", note: "contract drift controls" },
-      { href: "/settings/api", label: "API Operations", note: "route inventory and rate limits" }
+      { href: "/settings/queue", label: "Queue Operations", note: "scheduled job metadata" }
     ]
   },
   {
-    name: "Provider And Reporting",
+    name: "Provider And Compliance",
     links: [
       { href: "/settings/provider", label: "Provider Details", note: "redacted local credential metadata" },
-      { href: "/settings/numbers", label: "Provider Numbers", note: "local number metadata" },
       { href: "/settings/compliance", label: "Compliance Detail", note: "profile and hard-gate blockers" },
       { href: "/settings/readiness-audit", label: "Readiness Audit", note: "local readiness history" },
       { href: "/settings/exports", label: "Admin Exports", note: "bounded local CSV links" },
-      { href: "/settings/reports", label: "Reporting Index", note: "reporting surface map" },
-      { href: "/settings/usage", label: "Usage & Analytics", note: "tenant metrics and local usage" },
-      { href: "/settings/billing", label: "Billing Operations", note: "local billing boundary" },
-      { href: "/settings/ai", label: "AI Operations", note: "fake AI boundary and usage" },
-      { href: "/settings/notifications", label: "Notification Operations", note: "no-send notification boundary" },
-      { href: "/settings/integrations", label: "Integration Operations", note: "external-impact integrations" },
-      { href: "/settings/team", label: "Team Operations", note: "membership metadata" },
-      { href: "/settings/data", label: "Data Operations", note: "record totals and archive state" },
       { href: "/settings/runbook", label: "Operator Runbook", note: "local commands as read-only text" }
     ]
   }
@@ -499,13 +474,8 @@ const integrationOperationAreaDefinitions = [
 const securityOperationNavigationRoutes = [
   "/demo",
   "/settings",
-  "/settings/system",
-  "/settings/api",
-  "/settings/contracts",
-  "/settings/notifications",
   "/settings/validation",
-  "/settings/runbook",
-  "/settings/releases"
+  "/settings/runbook"
 ] as const;
 
 const environmentOperationLinkRoutes = [
@@ -517,8 +487,6 @@ const environmentOperationLinkRoutes = [
 ] as const;
 
 const healthOperationLinkRoutes = [
-  "/settings/system",
-  "/settings/api",
   "/settings/security",
   "/settings/validation"
 ] as const;
@@ -535,19 +503,13 @@ const contractOperationNavigationRoutes = [
 const validationOperationNavigationRoutes = [
   "/demo",
   "/settings",
-  "/settings/contracts",
   "/settings/runbook",
-  "/settings/security",
-  "/settings/releases"
+  "/settings/security"
 ] as const;
 
 const queueOperationNavigationRoutes = [
   "/settings",
-  "/settings/campaigns",
-  "/settings/system",
-  "/settings/runbook",
-  "/settings/workflows",
-  "/settings/releases"
+  "/settings/runbook"
 ] as const;
 
 const contactOperationNavigationRoutes = [
@@ -627,14 +589,6 @@ const exportOperationNavigationRoutes = [
   "/settings",
   "/settings/compliance",
   "/settings/readiness-audit",
-  "/settings/system",
-  "/settings/usage",
-  "/settings/reports",
-  "/settings/campaigns",
-  "/settings/contacts",
-  "/settings/templates",
-  "/settings/audience",
-  "/settings/inbox",
   "/settings/runbook"
 ] as const;
 
@@ -686,12 +640,9 @@ const aiOperationNavigationRoutes = [
 
 const providerOperationNavigationRoutes = [
   "/settings",
-  "/settings/integrations",
-  "/settings/numbers",
   "/settings/compliance",
   "/settings/readiness-audit",
-  "/settings/exports",
-  "/settings/system"
+  "/settings/exports"
 ] as const;
 
 const numberOperationNavigationRoutes = [
@@ -705,12 +656,7 @@ const complianceOperationNavigationRoutes = [
   "/settings",
   "/settings/exports",
   "/settings/readiness-audit",
-  "/settings/provider",
-  "/settings/numbers",
-  "/settings/system",
-  "/settings/contacts",
-  "/settings/templates",
-  "/settings/audience"
+  "/settings/provider"
 ] as const;
 
 const systemOperationNavigationRoutes = [
