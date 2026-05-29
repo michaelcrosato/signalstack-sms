@@ -1,10 +1,10 @@
 # Codex Summary
 
-Run number: 820
+Run number: 821
 
-- ULTRAPLAN Phase A / TICKET007: collapsed `tests/unit/queue/live-worker-controls.test.ts` from 11,715 LOC / 229 syntactic proxy-reflection permutations to 222 LOC / 33 table-driven tests, preserving every real invariant (metadata shape, each predicate, `liveWorkerControlsAreImplemented`, the authorization deny-table + positive path, and `workerDeploymentClassIsAllowed`).
-- SUT `lib/queue/live-worker-controls.ts` and the gate `scripts/production-worker-policy-check.ts` are unchanged; the gate's 8 required policy-coverage strings are preserved as test names.
-- Test totals: 795 → 599 (removed 229 permutation tests, added 33). Net repo test LOC down ~11.5k.
-- Verified green: `npm run test` (599), `typecheck`, `lint`, `production-worker:check`, `context:check`. e2e + db:migrate not run (need Postgres; CI verifies).
-- Next: TICKET006 — same collapse for `tests/unit/auth/api-route-authorization.test.ts` (11,014 LOC).
+- ULTRAPLAN Phase A / TICKET006: collapsed `tests/unit/auth/api-route-authorization.test.ts` from 11,014 LOC / 108 tests to 2,162 LOC / 18 tests. Kept the static analyzer (lines 1-1509, unchanged) and the two real guarantees that scan actual `app/api/**/route.ts` files (every mutating handler calls `requireApiRole` before reading the body; signed Twilio webhooks excepted), plus ~16 representative analyzer-robustness cases. Dropped ~90 synthetic `globalThis`/`Request`/`Reflect` alias permutations.
+- Combined with TICKET007 (run 820), total test LOC is now 14,641 (was 34,986 — a 58% cut). Phase A A1 (collapse both giant permutation tests) is done.
+- No gate requires strings from the auth test file (verified), so no coverage-name coupling to preserve.
+- Verified green: `npm run test` (509), `typecheck`, `lint`, `context:check` (auth test no longer in the >100KB advisory). e2e + db steps not run (need Postgres; CI verifies).
+- Next: TICKET008 (consolidate /settings ops pages, 33 -> ~8) and TICKET014 (trim TESTING.md / CONTRACT-TESTING.md permutation prose).
 - History lives in `git log`; current agents should start with `npm run agent:brief`, targeted `rg`, file heads/tails, and current summaries before loading large contracts or tests.

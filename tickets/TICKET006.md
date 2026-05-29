@@ -1,7 +1,13 @@
 # TICKET006 — Collapse api-route-authorization permutation tests
 
-- **Status:** Todo
+- **Status:** Done (2026-05-28)
 - **Priority:** P1 (ULTRAPLAN Phase A / A1)
+
+## Result
+11,014 LOC / 108 tests → 2,162 LOC / 18 tests. Kept the analyzer (lines 1-1509, unchanged) + the two
+real-route guarantees + ~16 representative analyzer cases; dropped ~90 synthetic alias permutations. No
+gate requires strings from this file. Full suite 599 → 509, all green; typecheck, lint, context:check pass.
+Total test LOC now 14,641 (from 34,986). e2e not run (needs Postgres).
 
 ## Goal
 Replace the 11,014-LOC `tests/unit/auth/api-route-authorization.test.ts` (syntactic `globalThis`-alias /

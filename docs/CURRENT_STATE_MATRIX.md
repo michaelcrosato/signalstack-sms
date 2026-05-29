@@ -4,7 +4,7 @@ Last updated: 2026-05-25.
 
 This file is intentionally compact. Historical run notes live in `git log`; current agents should use this matrix plus targeted searches instead of loading old run history.
 
-Latest validated run: Run 820 collapses the 11.7k-LOC live-worker-controls permutation test to a 222-LOC table-driven suite preserving every real invariant (ULTRAPLAN Phase A). Gate green except e2e (needs Postgres).
+Latest validated run: Run 821 collapses the 11.0k-LOC api-route-authorization permutation test to 2.2k LOC (analyzer + real-route scans kept). With run 820 (live-worker), total test LOC is 14.6k (was 35k). ULTRAPLAN Phase A / A1 done. Gate green except e2e (needs Postgres).
 
 | Area | Backend/API State | Browser State | Main Gap | Next Action |
 | --- | --- | --- | --- | --- |
