@@ -12,6 +12,7 @@ const scripts = [
   "operator:check",
   "platform:check",
   "context:check",
+  "security:check",
   "lint",
   "typecheck",
   "db:validate",

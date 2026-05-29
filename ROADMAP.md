@@ -6,7 +6,7 @@ agent-executable work to tickets in `tickets/`.
 
 ## Assessment
 
-Mature, demo-safe codebase with a single aggregated gate (`npm run validate`), ~795 unit tests,
+Mature, demo-safe codebase with a single aggregated gate (`npm run validate`), ~384 unit tests,
 extensive executable policy gates, and prior agent tooling. Gaps addressed for AFK use: no
 `GOAL.md`/`ROADMAP.md`/`tickets/`/`.aiignore`/`docs/ai/REPO_MAP.md`, no POSIX agent scripts, a
 gate-breaking `context:check` bug, a confusing standalone `db:validate` (missing `.env`), and a
@@ -20,7 +20,7 @@ gate-breaking `context:check` bug, a confusing standalone `db:validate` (missing
 | 1. Tooling / deps | Reproducible onboarding, agent scripts | done | TICKET001 ✅ |
 | 2. Docs / repo-map | Orientation in minutes | done; keep current | TICKET004 |
 | 3. Bugs / tests | Close known gaps + regressions | open | TICKET003, TICKET005 |
-| 4. Modularity | Reduce over-indexed operations/test surface | open | (see PLAN.md Phase 0) |
+| 4. Modularity | Reduce over-indexed operations/test surface | ULTRAPLAN Phase A done (test LOC −65%, /settings 33→10, dead code removed) | TICKET006–008 ✅, TICKET015 ✅, TICKET016 ✅ |
 | 5. Features | Product demo polish | open | PLAN.md Phase 1 |
 | 6. Live readiness / CI | Controlled live behind hard gates | blocked (human) | PLAN.md Phase 2–3 |
 

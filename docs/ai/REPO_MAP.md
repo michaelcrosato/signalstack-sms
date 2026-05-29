@@ -12,7 +12,7 @@ Stack: Next.js App Router + TypeScript (strict) + Prisma/Postgres + BullMQ/Redis
 | Request middleware | `middleware.ts` |
 | Queue workers (local/demo only) | `workers/index.ts` (DB), `workers/bullmq.ts` (BullMQ) |
 
-## Core logic — `lib/` (84 files)
+## Core logic — `lib/` (78 files)
 
 | Domain | Path | Notes |
 | --- | --- | --- |

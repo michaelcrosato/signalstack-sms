@@ -14,7 +14,7 @@ for the full product/architecture contract.
   provider metadata, readiness audit, operations surfaces.
 - Browser product path at `/dashboard` (contacts, campaigns, inbox, templates, analytics, compliance).
 - `npm run validate` green locally except `test:e2e:smoke` (needs Postgres + Playwright browsers).
-- ~795 unit tests passing; lint + typecheck + build clean.
+- ~384 unit tests passing; lint + typecheck + build clean.
 - Live SMS/billing/AI, production auth, production workers, and production deploy are intentionally **off**,
   behind hard gates. The only live external path is the isolated, multi-gated `/demo` live-test SMS form.
 

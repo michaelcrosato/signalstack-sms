@@ -1,12 +1,22 @@
 # Codex Summary
 
-Run number: 824
+Run number: 827
 
-- ULTRAPLAN Phase A / A3 consolidation DONE: reduced `/settings` operations pages from 33 to 10 release-safety surfaces (operations, health, security, validation, queue, provider, compliance, readiness-audit, exports, runbook) + the `/settings` go-live index + `/demo`.
-- Reduced the shared inventory `lib/operations/operator-surfaces.ts` to 3 groups / 12 links and pruned the kept projections' route lists to the kept set (findOperatorSurfaceLink throws on missing routes). Deleted 23 `app/settings/*` page dirs.
-- Decoupled the investor-demo e2e: `e2e/demo-path.spec.ts` now derives its operations tour from `getSettingsNavigationLinks()` (correct-by-construction) + robust API-level export/import/campaign/inbox/AI/analytics checks, instead of a hardcoded 400-line tour of every page.
-- Updated the operator-surfaces test (table reduced to kept projections; bijection + freeze + malformed-rejection kept) and the freeze allowlist to the 10-page set.
-- Verified green locally: `typecheck`, `lint`, `build` (route table shows only kept pages; /settings/operations + /settings/runbook prerender), `npm run test` (462), and all gate scripts (contracts/secrets/compliance/production/auth/worker/observability/operator/platform/context). `test:e2e:smoke` not run (needs Postgres + Chromium; CI verifies via PR #1).
-- Phase A COMPLETE: A1 (collapse both giant tests), A2 (shrink CONTRACT-TESTING), A3 (consolidate + freeze ops pages); test LOC 34,986 -> ~12.4k (-65%).
-- Follow-up: TICKET016 removes the now-dead per-area projection functions + route-list consts + orphaned lib/operations modules for deleted surfaces. Next phase: B (Clerk auth slice / inbox reply).
-- History lives in `git log`; start with `npm run agent:brief`.
+- **SPEC-003 (security headers) DONE + verified.** Added a baseline to `next.config.mjs`
+  (`poweredByHeader:false` + `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`,
+  HSTS, `Permissions-Policy`, and `Content-Security-Policy-Report-Only`), a new
+  `scripts/security-headers-check.ts`, and wired `security:check` into `scripts/validate.ts`. Verified
+  live: `GET /` → 200 with all headers served and `X-Powered-By` absent; `build` green.
+- **Full e2e path verified locally (proves the SPEC-002 CI workflow).** Brought up Docker
+  `postgres`+`redis`, ran `db:deploy` (14 migrations) → `demo:seed` → `test:e2e:smoke` → **passed**
+  against the live DB. The new `ci.yml`/`premerge.yml` mirror this exact path (GitHub Actions run still
+  pending — not triggerable from the sandbox).
+- SPEC-005 partial: `docker-compose.yml` Redis pinned `7.4-alpine` (CVE-2025-49844). Caret alignment TODO.
+- **KNOWN LOCAL FLAKE (not a code failure):** `db:generate` hits a Windows `EPERM` rename lock on the
+  Prisma engine DLL (antivirus/file-lock). The client is already generated & valid — `db:validate`,
+  `typecheck`, `test` (384), `build`, and `test:e2e:smoke` all pass using it. Linux CI is unaffected. So
+  `npm run validate` halts only at `db:generate` locally; every other step (incl. `security:check`,
+  lint, all 10 domain gates, e2e, build) is verified green.
+- Plan in `plan/`. Remaining: SPEC-003 CSP nonce-enforce (follow-up), SPEC-005 carets, SPEC-006 (obs),
+  SPEC-007/008 (real AI — hard-gated), SPEC-009 (compliance), SPEC-010 (RLS); product TICKET003/009.
+- Next: TICKET003 (inbox reply, unblocked) or SPEC-009 (compliance). `git log` for history; `npm run agent:brief`.

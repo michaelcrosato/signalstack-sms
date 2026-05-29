@@ -7,7 +7,12 @@ weakening the hard gates that protect live SMS/billing/AI, secrets, and producti
 Governing contract stays `docs/CANONICAL_IMPLEMENTATION_PLAN.md`; product roadmap stays `PLAN.md`.
 This file is the strategic overlay and ticket map. Execute via the loop in `AGENTS.md`.
 
-## Evidence (2026-05, measured this session)
+**Status:** Phase A COMPLETE (A1–A4 + TICKET016 cleanup). Test LOC −65%, `/settings` 33→10, dead
+operator-surface code removed; suite now ~384 tests, gate green (e2e via CI). Next: Phase B (TICKET009
+Clerk auth slice / TICKET003 inbox reply). The Evidence below is the **pre-Phase-A baseline** that
+justified the plan — kept as a historical snapshot, not current state.
+
+## Evidence (2026-05, pre-Phase-A baseline)
 
 - Gate is green (lint, typecheck, build, 795 unit tests, all domain gates); e2e needs Postgres (CI).
 - **Test debt:** `tests/unit/auth/api-route-authorization.test.ts` (11,014 LOC) + `tests/unit/queue/live-worker-controls.test.ts` (11,715 LOC) = **65% of all test code (22,729 / 34,986)** — syntactic alias / proxy-reflection permutations, much of it for the **reserved, unimplemented** `production-live-campaign` class.

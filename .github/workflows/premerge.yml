@@ -13,6 +13,30 @@ jobs:
       MESSAGING_PROVIDER: dummy
       AI_PROVIDER: fake
       DATABASE_URL: postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public
+      REDIS_URL: redis://localhost:6379
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: signalstack_sms
+          POSTGRES_USER: signalstack
+          POSTGRES_PASSWORD: signalstack
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U signalstack"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7.4-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,4 +45,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+      - run: npm run db:deploy
+      - run: npm run demo:seed
       - run: pwsh ./scripts/local-gate.ps1

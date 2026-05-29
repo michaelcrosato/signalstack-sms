@@ -1,8 +1,15 @@
 # Codex Blockers
 
-Run number: 824
+Run number: 827
 
-- No blocker. ULTRAPLAN Phase A is complete (A1 + A2 + A3). The `/settings` consolidation (33 -> 10) was done with the e2e demo tour decoupled to derive from the inventory, so it is correct-by-construction; the page<->inventory bijection, freeze allowlist, build, typecheck, lint, and all gate scripts pass locally.
-- `test:e2e:smoke` / `test:e2e:demo` / `db:migrate` / `demo:seed` need Postgres (+ Chromium) — "not run" here, verified by CI on PR #1. This is the only `npm run validate` step not exercised locally.
-- Dead code remains: ~20 per-area projection functions + route-list consts + checkpoint/workflow/integration definitions in `lib/operations/operator-surfaces.ts`, plus orphaned `lib/operations/*-operations.ts` modules + tests for deleted surfaces. They are uncalled (exported, so not lint-flagged) and harmless; TICKET016 removes them. Not a blocker.
-- Historical blocker notes live in `git log`; keep this file current-only.
+- **Local-only flake (documented, not a code failure):** `npm run db:generate` fails on Windows with
+  `EPERM: ... rename query_engine-windows.dll.node` — an antivirus/file-lock on the freshly written
+  Prisma engine DLL. The client is already generated & valid (db:validate/typecheck/384 tests/build/
+  e2e:smoke all pass using it). This halts a single end-to-end `npm run validate` at the `db:generate`
+  step **locally**; Linux CI is unaffected. Every other gate step is verified green individually.
+- **SPEC-002 CI run pending:** the workflow now provisions postgres+redis + migrate+seed and the exact
+  path passed locally (e2e:smoke green), but a GitHub Actions run is not triggerable from this sandbox —
+  confirm green on the next PR.
+- Live SMS/MMS, live billing (Stripe), live AI keys+cost, Clerk/prod-auth enablement, destructive/prod DB
+  ops remain human-gated. Docker `postgres`+`redis` containers were left running this session.
+- Historical notes live in `git log`; keep this file current-only.
