@@ -21,6 +21,10 @@ free of creep.
 - Predictive / behavioral segmentation + revenue attribution (Klaviyo-style moat for SMB).
 - Native CRM sync (HubSpot/Salesforce) beyond CSV import.
 - Autonomous two-way conversation automation (AI Concierge) — beyond review-before-send drafts.
+- SPEC-007 follow-ups: extend the `AiProvider` seam to the other 3 AI endpoints (campaign-copy + summary;
+  lead-qualification is SPEC-008); broaden prompt PII redaction beyond phone-like runs (names/emails) if
+  real PII enters message bodies; write the human-only live-AI enablement runbook (set `AI_PROVIDER=live` +
+  `LIVE_AI_ENABLED` + `AI_API_KEY` + `AI_COST_ACK`, with cost monitoring); optional streaming/multi-model routing.
 - Double opt-in + sign-up unit / keyword growth tooling.
 - Per-US-state quiet-hour variants (FL/OK/WA 8–8, TX 9–9) beyond the core 8am–9pm rule.
 
