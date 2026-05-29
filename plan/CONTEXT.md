@@ -81,7 +81,8 @@ CI = `.github/workflows/ci.yml` (PR + push main; now provisions Postgres+Redis +
 `premerge.yml` (manual), `automerge.yml` (placeholder).
 
 ### Current state — verified (2026-05-29, this machine; supersedes the 2026-05-28 run)
-- Components verified individually with real commands: **`npm test` → 424 unit tests / 70 files PASS**,
+- Components verified individually with real commands: **`npm test` → 424 unit tests / 70 files PASS**
+  (+2 RLS integration tests in `tests/unit/db/rls-isolation.test.ts`, gated behind `RUN_DB_TESTS` — run + passing against local Postgres),
   **`npm run build` → PASS**, `typecheck` / `lint` / `db:validate` PASS, **12/12 domain gates** PASS
   (the 10 above + `security:check` from SPEC-003 + `ai:check` from SPEC-007).
 - **`npm run validate` exits 1 on Windows** — it aborts at the `db:generate` step (EPERM renaming

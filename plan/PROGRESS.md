@@ -17,7 +17,7 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 | SPEC-009 compliance | 2 | **Done** | migration `20260529115853_consent_evidence` applied + committed | db:validate/compliance:check/typecheck/lint/**418 tests**/build green; seed reseeded real Postgres | quiet-hours + consent-evidence storage + A2P privacy/terms all enforced in the hard gate |
 | SPEC-007 ai-reply-drafting | 3 | **Done (demo-safe slice)** | committed (maint/iter-0001) | typecheck/lint/**411 tests**/build/`ai:check` green | seam+gate+cap+PII redaction; live key provisioning still human-gated |
 | SPEC-008 ai-lead-qualification | 3 | **Done** | migration `20260529120721` applied + committed | typecheck/lint/**424 tests**/build/`ai:check` green; live render verified | qualifyLead seam + tenant-scoped score persistence + "Lead Score" row on contact page; live needs secrets |
-| SPEC-010 postgres-rls | 4 | Todo | — | — | after TICKET009 + pooling decision |
+| SPEC-010 postgres-rls | 4 | **Done (opt-in backstop)** | migration `20260529130000` applied + committed | RLS proof test (read+write denial) green; 424 tests + 12 gates + build green; EXPLAIN policy applied | FORCE RLS + `app_rls` role + `withTenantRls`; unset-allows → no regression; prod enablement = non-superuser role + request wiring |
 
 ## Checklist (downstream agents)
 - [x] SPEC-001 — Docker `start` script
@@ -29,11 +29,21 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [x] SPEC-007 — AI reply-draft **seam shipped** (provider seam + `ai:gate` + per-tenant cap + PII-redacted prompt, fake default); live key/cost enablement still human-gated
 - [x] SPEC-008 — lead-qual **seam + score persistence + contact-UI surfacing shipped** (fake default, gated live, migration applied; live render verified); live enablement needs secrets
 - [x] SPEC-009 — quiet-hours + **consent-evidence storage** (additive migration applied) + A2P privacy/terms, all enforced in `evaluateMessagingHardGate`
-- [ ] SPEC-010 — Postgres RLS — BLOCKED (migration; needs human confirmation + non-Windows env for prisma generate)
+- [x] SPEC-010 — Postgres RLS **backstop shipped** (FORCE RLS + `app_rls` role + `withTenantRls`; cross-tenant read/write denial proven); unset-allows = no regression; prod enablement (non-superuser app role + request wiring) is the documented next step
 - [x] TICKET003 — demo-safe inbox reply
 - [x] TICKET009 — session-provider **seam shipped** (`resolveProductionCurrentOrg`, fail-closed, flag-gated; demo default unchanged); live Clerk enablement still human-gated
 
 ## Log (most recent first)
+- 2026-05-29 — **SPEC-010 Postgres RLS backstop DONE — all plan specs SPEC-001..010 + TICKET003/009 complete.**
+  Applied migration `20260529130000_tenant_rls` (ENABLE+FORCE RLS + `tenant_isolation` policy on 22 tenant
+  tables; non-superuser `app_rls` role + grants). Policy allows when `app.current_org_id` is unset → the
+  default superuser app path is unaffected (no regression). `lib/db/rls.ts#withTenantRls` enforces via
+  transaction-local `set_config` + `SET LOCAL ROLE app_rls` (pooling-safe). Proven by
+  `tests/unit/db/rls-isolation.test.ts` (`RUN_DB_TESTS`): app-filter-omitted reads return only the active org;
+  cross-tenant insert blocked by `WITH CHECK` (Postgres `42501`). `EXPLAIN` shows the policy predicate applied
+  (`orgId` index present; seq scan on the tiny demo table). Verified: 424 tests (RLS test skipped by default)
+  + 12 domain gates + typecheck/lint/build/db:validate green; reseed clean. Prod enablement (non-superuser app
+  role + per-request `withTenantRls`) documented in the spec + migration header.
 - 2026-05-29 — **SPEC-008 finished — lead score surfaced in the contact UI.** Added a read-only "Lead Score"
   row to `lib/product/contacts.ts` (`formatLeadStatus` → `"<score> · <stage>"` or "Not qualified"; the
   contact detail page already maps `statusRows`, so no page change). Updated the two frozen-row tests + added

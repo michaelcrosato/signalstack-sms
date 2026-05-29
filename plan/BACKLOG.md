@@ -35,6 +35,7 @@ free of creep.
 - Redis-backed distributed rate limit + queue execution in production (replace in-memory limiter).
 - Next standalone output for a smaller Docker image; deploy automation; branch protection + real automerge.
 - Prisma Accelerate / PgBouncer transaction-mode pooling for serverless.
+- SPEC-010 RLS **production enablement**: point the app at a non-superuser DB role and adopt `withTenantRls` on request paths so RLS enforces at runtime (it currently enforces only via the helper, proven by the gated test); pair with the pooling decision above.
 - BullMQ Prometheus metrics export + stalled-job alerting in production.
 - OpenTelemetry **exporter** wiring (`@vercel/otel` `registerOTel`) behind the `instrumentation.ts` seam (SPEC-006 left the seam + PII-safe logger; exporter needs a backend choice + dependency install).
 

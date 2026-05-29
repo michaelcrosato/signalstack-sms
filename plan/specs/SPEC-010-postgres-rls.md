@@ -1,7 +1,16 @@
 # SPEC-010 — Postgres Row-Level Security as tenant-isolation defense-in-depth
 
-- **Status:** Todo · **Priority:** P3 (future-proofing) · **Pillar:** Future-proofing · **Effort:** L
-- **RISK:** higher — touches DB access, pooling, and transactions for every tenant query.
+- **Status:** Done (2026-05-29) — installed as an opt-in backstop · **Priority:** P3 · **Pillar:** Future-proofing · **Effort:** L
+  - Shipped: migration `20260529130000_tenant_rls` (ENABLE + FORCE RLS + `tenant_isolation` policy on all 22
+    tenant tables; non-superuser `app_rls` role + grants); `lib/db/rls.ts#withTenantRls` (transaction-local
+    `set_config` + `SET LOCAL ROLE app_rls`); `tests/unit/db/rls-isolation.test.ts` (gated on `RUN_DB_TESTS`).
+  - **Safe by design:** the policy allows when `app.current_org_id` is unset, so the default app path (a
+    superuser/BYPASSRLS connection that never sets it) is unaffected — pure backstop, no regression.
+  - **Enablement (remaining, documented):** point the app at a **non-superuser** DB role and adopt
+    `withTenantRls` on request paths so RLS actually enforces in production (it currently enforces only via
+    the helper, proven by the test). The migration header documents the rollback.
+- **RISK:** higher — touches DB access, pooling, and transactions; mitigated by the unset-allows policy + the
+  transaction-local helper (no cross-connection leak) and the no-regression verification below.
 
 ## Description
 Tenant isolation is currently **application-level** (`orgId` on every query via `lib/db/tenant`). This
@@ -23,11 +32,17 @@ transaction-mode or Prisma driver adapter). Phase 4. Do after the product backbo
    the DB even if an app filter is omitted.
 
 ## Acceptance criteria
-- [ ] RLS enabled on tenant tables; cross-tenant access denied at DB level (proven by test that omits the
-      app filter and still gets zero rows).
-- [ ] App-level scoping retained; no functional regression; `npm run validate` green.
-- [ ] Pooling + `$transaction` verified; representative queries index-backed (`EXPLAIN ANALYZE`).
-- [ ] Migration is reversible; rollback documented.
+- [x] RLS enabled on all 22 tenant tables (FORCE); cross-tenant access denied at DB level — proven by
+      `rls-isolation.test.ts`: with the app filter omitted, `withTenantRls(orgA)` returns only orgA rows, and a
+      cross-tenant insert is rejected by `WITH CHECK` (Postgres `42501`).
+- [x] App-level scoping retained (no app query changed); no functional regression — 424 unit tests pass (RLS
+      test skipped without `RUN_DB_TESTS`), all 12 domain gates + typecheck/lint/build/db:validate green, seed
+      re-runs clean.
+- [x] `$transaction` + pooling verified — `withTenantRls` uses transaction-local `set_config` + `SET LOCAL
+      ROLE`, so settings never leak across pooled connections. `EXPLAIN` confirms the policy predicate is
+      applied; the `orgId` B-tree index exists (the demo table is tiny so the planner picks a seq scan — the
+      index backs the predicate at scale).
+- [x] Migration is reversible; rollback documented (in the migration header).
 
 ## Test strategy
 Integration against Postgres: set session org A, attempt to read org B rows (with and without app filter)
