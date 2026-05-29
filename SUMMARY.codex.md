@@ -1,10 +1,10 @@
 # Codex Summary
 
-Run number: 821
+Run number: 822
 
-- ULTRAPLAN Phase A / TICKET006: collapsed `tests/unit/auth/api-route-authorization.test.ts` from 11,014 LOC / 108 tests to 2,162 LOC / 18 tests. Kept the static analyzer (lines 1-1509, unchanged) and the two real guarantees that scan actual `app/api/**/route.ts` files (every mutating handler calls `requireApiRole` before reading the body; signed Twilio webhooks excepted), plus ~16 representative analyzer-robustness cases. Dropped ~90 synthetic `globalThis`/`Request`/`Reflect` alias permutations.
-- Combined with TICKET007 (run 820), total test LOC is now 14,641 (was 34,986 — a 58% cut). Phase A A1 (collapse both giant permutation tests) is done.
-- No gate requires strings from the auth test file (verified), so no coverage-name coupling to preserve.
-- Verified green: `npm run test` (509), `typecheck`, `lint`, `context:check` (auth test no longer in the >100KB advisory). e2e + db steps not run (need Postgres; CI verifies).
-- Next: TICKET008 (consolidate /settings ops pages, 33 -> ~8) and TICKET014 (trim TESTING.md / CONTRACT-TESTING.md permutation prose).
-- History lives in `git log`; current agents should start with `npm run agent:brief`, targeted `rg`, file heads/tails, and current summaries before loading large contracts or tests.
+- ULTRAPLAN Phase A continued. Collapsed `tests/unit/operations/operator-surfaces.test.ts` (2,371 LOC / 67 tests) to 203 LOC / 40 tests: kept the two filesystem-bijection guarantees (every inventory route has a page; every local operator page is listed), frozen-inventory checks, a table-driven projection check over all 32 link accessors (frozen, deduped, inventory-backed, real page exists), structured-projection checks, and representative malformed-inventory rejection. SUT `lib/operations/operator-surfaces.ts` unchanged; no gate requires strings from this test.
+- A2: rewrote `contracts/CONTRACT-TESTING.md` 399 -> 48 LOC, keeping the durable testing contract and dropping the permutation catalogue (`contracts:check` only checks existence; still passes).
+- Total test LOC now 12,473 (was 34,986 at session start, -64%) — Phase A exit metric "< ~14k" MET. `context:check` now reports no large-file advisory.
+- Verified green: `npm run test` (482), `typecheck`, `lint`, `contracts:check`, `context:check`. e2e + db steps not run (need Postgres; CI verifies).
+- Phase A status: A1 (collapse both giant tests) done; A2 (shrink CONTRACT-TESTING) done; LOC target met. A3 (consolidate /settings ops pages 33 -> ~8) remains — see TICKET008; it must reconcile with the investor-demo e2e path, which visits /settings/{demo,reports,workflows,releases,operations}, so it needs CI e2e verification.
+- History lives in `git log`; start with `npm run agent:brief`, targeted `rg`, and current summaries.

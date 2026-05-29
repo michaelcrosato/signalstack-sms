@@ -4,7 +4,7 @@ Last updated: 2026-05-25.
 
 This file is intentionally compact. Historical run notes live in `git log`; current agents should use this matrix plus targeted searches instead of loading old run history.
 
-Latest validated run: Run 821 collapses the 11.0k-LOC api-route-authorization permutation test to 2.2k LOC (analyzer + real-route scans kept). With run 820 (live-worker), total test LOC is 14.6k (was 35k). ULTRAPLAN Phase A / A1 done. Gate green except e2e (needs Postgres).
+Latest validated run: Run 822 collapses operator-surfaces test (2.4k -> 0.2k LOC, bijection kept) and trims CONTRACT-TESTING.md (399 -> 48). With runs 820/821, total test LOC is 12.5k (was 35k, -64%). ULTRAPLAN Phase A: A1+A2 done, LOC target met; A3 (ops page consolidation) pending (TICKET008). Gate green except e2e (needs Postgres).
 
 | Area | Backend/API State | Browser State | Main Gap | Next Action |
 | --- | --- | --- | --- | --- |

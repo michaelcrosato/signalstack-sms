@@ -1,9 +1,9 @@
 # Codex Blockers
 
-Run number: 821
+Run number: 822
 
-- No blocker from collapsing the api-route-authorization permutation test. The analyzer and the two real-route guarantees are unchanged; only redundant synthetic alias permutations were removed.
-- Environment: `test:e2e:smoke`, `db:migrate`, and `demo:seed` need a running Postgres (and Chromium for e2e), unavailable in this sandbox — recorded as "not run", verified by CI. Tracked in TICKET002.
-- Total test LOC is 14,641 vs the ULTRAPLAN Phase A "< ~14k" target — substantially met (58% cut from 34,986); the auth analyzer floor (~1,500 LOC) is legitimate coverage. Not treated as a blocker.
-- The change edits one test file plus handoff docs only; it did not touch route handlers, `lib/auth/**`, gate scripts, hard gates, secrets, providers, billing, or production paths.
-- Historical blocker notes live in `git log`; keep this file current-only to avoid recursive handoff bloat.
+- No blocker from collapsing the operator-surfaces test or trimming CONTRACT-TESTING.md. The inventory SUT and the page↔inventory bijection guarantee are unchanged; `contracts:check` still passes.
+- A3 (consolidate /settings ops pages 33 -> ~8) is NOT a clean autonomous delete: the investor-demo e2e path visits `/settings/{demo,reports,workflows,releases,operations}`, which are outside the proposed ~8 release-safety keep-set, and e2e is not runnable here (needs Postgres + Chromium). Deleting pages also requires updating `lib/operations/operator-surfaces.ts`, the bijection test, nav, and e2e specs together. Scoped to TICKET008 for a CI-verified iteration; not done blindly to avoid silently breaking the demo.
+- Environment: `test:e2e:smoke`, `db:migrate`, `demo:seed` need Postgres (+ Chromium) — "not run", verified by CI. Tracked in TICKET002.
+- This run edits two test files, one contract doc, and handoff docs only; no route handlers, gate scripts, hard gates, secrets, providers, billing, or production paths touched.
+- Historical blocker notes live in `git log`; keep this file current-only.
