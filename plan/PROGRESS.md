@@ -12,7 +12,7 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 | SPEC-004 readme-rewrite | 0 | **Done** | working tree | 14/14 gates; README 152→54 lines, 0 deleted-page refs | human quick-start |
 | SPEC-005 dependency-hygiene | 0 | **Done** | committed `e1565201` | typecheck/lint/test/build green; lockfile resynced | carets aligned to installed; majors → BACKLOG |
 | TICKET003 inbox-reply | 1 | **Done** | working tree (committed) | typecheck/lint/build/388 tests green; reply route + RBAC + UI | demo-safe dummy provider; opt-out blocked; idempotent |
-| TICKET009 clerk-auth-slice | 1 | Todo | — | — | existing ticket; enablement human-gated |
+| TICKET009 clerk-auth-slice | 1 | **Done (demo-safe seam)** | committed (maint/iter-0001) | production-auth:check + typecheck/lint/**417 tests**/build green | fail-closed session seam + membership resolver + gate/doc; demo default unchanged; live Clerk enablement human-gated |
 | SPEC-006 observability | 2 | **Done (core)** | committed `115bb435` | typecheck/lint/build/393 tests/observability:check green | OTel exporter deferred to BACKLOG |
 | SPEC-009 compliance-quiet-hours | 2 | **Partial** | committed (quiet-hours) | quiet-hours window + gate integration tested (398 tests) | consent-evidence storage needs migration (deferred, human confirm) |
 | SPEC-007 ai-reply-drafting | 3 | **Done (demo-safe slice)** | committed (maint/iter-0001) | typecheck/lint/**411 tests**/build/`ai:check` green | seam+gate+cap+PII redaction; live key provisioning still human-gated |
@@ -31,9 +31,18 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [~] SPEC-009 — quiet-hours DONE; consent-evidence storage deferred (migration)
 - [ ] SPEC-010 — Postgres RLS — BLOCKED (migration; needs human confirmation + non-Windows env for prisma generate)
 - [x] TICKET003 — demo-safe inbox reply
-- [ ] TICKET009 — Clerk auth/RBAC slice — BLOCKED (Clerk secrets + prod-auth hard gate; human-only)
+- [x] TICKET009 — session-provider **seam shipped** (`resolveProductionCurrentOrg`, fail-closed, flag-gated; demo default unchanged); live Clerk enablement still human-gated
 
 ## Log (most recent first)
+- 2026-05-29 — **TICKET009 demo-safe session seam DONE.** Added `lib/auth/session.ts`
+  (`resolveProductionCurrentOrg`: verified subject → active `Membership` → org/role, **fail-closed**;
+  `productionAuthIsEnabled`/`clerkConfigIsPresent`, behind `PRODUCTION_AUTH_ENABLED`, DI resolver, **no
+  Clerk SDK or secrets**), `tests/unit/auth/session.test.ts` (+6 → 417), extended `production-auth:check`
+  + `docs/PRODUCTION_AUTH_RBAC.md` (demo-default/flag-gated/fail-closed assertions; all prior texts kept),
+  `.env.example` `PRODUCTION_AUTH_ENABLED=false`. Demo path (`current-org.ts`/`demo-session.ts`) unchanged;
+  `production:gate` not weakened. Verified: production-auth:check + typecheck/lint/417 tests/build green;
+  e2e not run (no Postgres). Live Clerk enablement (verified-subject binding + deny responses + secrets)
+  stays human-gated. Committed on `maint/iter-0001`.
 - 2026-05-29 — **SPEC-007 demo-safe slice DONE.** Added the AI provider seam (`lib/ai/provider.ts`:
   `resolveAiProvider` → fake default + gated live Anthropic client, draft-only, phone-PII-redacted prompt),
   a 4-condition hard gate (`lib/ai/ai-gate.ts`), per-tenant live cap + `recordLiveAiUsage` (`lib/ai/usage.ts`),

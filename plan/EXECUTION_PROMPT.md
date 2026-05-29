@@ -4,13 +4,14 @@ You are an autonomous principal engineer executing the SignalStack SMS transform
 in `plan/` as the single source of truth. Be terse. Verify with real commands. Never scope-creep. Full
 honesty: a check is "passed" only if it ran and passed; e2e without Postgres is "not run."
 
-CURRENT STATE (2026-05-29, verified): Phase 0 (SPEC-001/002/003/004/005), Phase 2 core (SPEC-006;
-SPEC-009 quiet-hours), TICKET003, and **SPEC-007's demo-safe AI provider-seam slice** are done.
-`npm test` = **411 pass**, `npm run build` pass, 12/12 domain gates + typecheck/lint/db:validate pass;
-`npm run validate` exits 1 only at the Windows `db:generate` EPERM (run `npm test`/`npm run build` directly
-on Windows, or use Linux/CI). **Remaining work is human-gated** (needs secrets / migrations / credentialed
-Linux/CI): TICKET009 Clerk *enablement*, SPEC-008, SPEC-010, SPEC-009 consent-evidence (migration), and
-live-AI enablement of SPEC-007 (`AI_API_KEY` + `AI_COST_ACK`).
+CURRENT STATE (2026-05-29, verified): Phase 0, Phase 2 core (SPEC-006; SPEC-009 quiet-hours), TICKET003,
+**SPEC-007's AI provider-seam slice**, and **TICKET009's session-provider seam** are done. `npm test` =
+**417 pass**, `npm run build` pass, 12/12 domain gates + typecheck/lint/db:validate pass; `npm run validate`
+exits 1 only at the Windows `db:generate` EPERM (run `npm test`/`npm run build` directly on Windows, or use
+Linux/CI). **Remaining work needs Prisma migrations and/or secrets in a credentialed Linux/CI env**:
+SPEC-009 consent-evidence (migration), SPEC-008 (migration + secrets), SPEC-010 RLS (migration), live-AI
+enablement of SPEC-007 (`AI_API_KEY` + `AI_COST_ACK`), and TICKET009 live Clerk enablement (bind a verified
+subject + deny responses + Clerk secrets).
 
 READ FIRST (in order): `/AGENTS.md` (canonical doctrine) → `plan/AGENTS.md` (how to run this plan) →
 `plan/ROADMAP.md` (priority matrix + DAG + phases) → `plan/CONTEXT.md` (baseline + research rationale) →
@@ -63,9 +64,10 @@ blocked, stop and report: what shipped (files/specs, verified commands + results
 blocked and why (esp. human-gated: secrets/cost/CI), and the single best next item. Never claim an
 unrun/failed check passed.
 
-START: run `bash scripts/agent/status.sh`. SPEC-007's demo-safe slice is shipped; the next no-secrets,
-in-scope item is **TICKET009's session-provider seam** — `resolveCurrentSession()` with the demo impl as
-default and a Clerk-backed impl selected only behind `PRODUCTION_AUTH_ENABLED` + Clerk env; unit-test both
-paths and extend `production-auth:check`. Do NOT enable Clerk by default or add real credentials. After
-that, the remaining specs (SPEC-008, SPEC-010, SPEC-009 consent-evidence, and live enablement of
-SPEC-007/TICKET009) need a credentialed Linux/CI environment with secrets + confirmed migrations.
+START: run `bash scripts/agent/status.sh`. The demo-safe slices (SPEC-007 + TICKET009 seams) are shipped;
+every remaining item needs a Prisma migration and/or secrets, so run them in a credentialed Linux/CI env
+(Windows `db:generate` EPERMs). Next: **SPEC-009 consent-evidence** — an additive, reversible migration
+(consent fields on `Contact` / a `ConsentEvent` table + privacy/terms URLs already enforced) plus a
+fail-closed check wired into `evaluateMessagingHardGate`, behind human confirmation of the migration. Then
+SPEC-008 (AI lead-qualification storage) and SPEC-010 (Postgres RLS). Live enablement of SPEC-007 (AI key +
+cost-ack) and TICKET009 (verified Clerk subject + deny responses + Clerk secrets) remain human-only.

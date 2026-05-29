@@ -41,3 +41,22 @@ Before production auth can be enabled, the app must add all of these controls be
 The current production-like demo deployment class uses the local demo session only. `npm run production:gate` blocks Clerk auth configuration in production-like demo environments with `CLERK_AUTH_CONFIG_PRESENT` unless a future controlled live-auth deployment explicitly expands the gate.
 
 This plan is checked by `npm run production-auth:check`, and that check is part of `npm run validate`.
+
+## Gated Session Seam (TICKET009)
+
+The deterministic demo session remains the default and only enabled auth mode; the seam below is built but
+OFF and introduces no Clerk calls or secrets.
+
+- `lib/auth/session.ts` adds `resolveProductionCurrentOrg(subject)` behind `PRODUCTION_AUTH_ENABLED`
+  (default `false`). It maps a server-verified subject to its ACTIVE local `Membership` and returns the
+  org/role, or `null` (fail closed) when there is no verified subject or no active membership — it never
+  downgrades to the demo session.
+- `clerkConfigIsPresent()` only reports whether Clerk env is set; no key is read into a provider call here.
+- Covered by `tests/unit/auth/session.test.ts` (fail-closed paths + role derivation + `requireApiRole`
+  denial). The demo default is unchanged: `getOrCreateCurrentOrg` still resolves the demo org via
+  `getDemoSession` with `demoMode: true`.
+
+Enabling production auth stays human-gated: bind a server-verified Clerk subject to
+`resolveProductionCurrentOrg`, add 401/403 deny responses at the request boundary, and explicitly expand
+`npm run production:gate` (which still blocks `CLERK_AUTH_CONFIG_PRESENT`). No Clerk secrets are added by
+this seam.

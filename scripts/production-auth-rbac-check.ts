@@ -105,6 +105,35 @@ const requiredTexts: RequiredText[] = [
   {
     file: "package.json",
     text: "\"production-auth:check\": \"tsx scripts/production-auth-rbac-check.ts\""
+  },
+  // TICKET009 — gated session seam stays demo-by-default, flag-gated, and fail-closed (no secrets read).
+  {
+    file: "lib/auth/session.ts",
+    text: "PRODUCTION_AUTH_ENABLED"
+  },
+  {
+    file: "lib/auth/session.ts",
+    text: "resolveProductionCurrentOrg"
+  },
+  {
+    file: "lib/auth/session.ts",
+    text: "Fail closed"
+  },
+  {
+    file: "docs/PRODUCTION_AUTH_RBAC.md",
+    text: "demo session remains the default"
+  },
+  {
+    file: "docs/PRODUCTION_AUTH_RBAC.md",
+    text: "resolveProductionCurrentOrg"
+  },
+  {
+    file: "tests/unit/auth/session.test.ts",
+    text: "resolveProductionCurrentOrg"
+  },
+  {
+    file: ".env.example",
+    text: "PRODUCTION_AUTH_ENABLED=false"
   }
 ];
 
