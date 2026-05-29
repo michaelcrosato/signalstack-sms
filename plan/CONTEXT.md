@@ -81,18 +81,20 @@ CI = `.github/workflows/ci.yml` (PR + push main; now provisions Postgres+Redis +
 `premerge.yml` (manual), `automerge.yml` (placeholder).
 
 ### Current state — verified (2026-05-29, this machine; supersedes the 2026-05-28 run)
-- Components verified individually with real commands: **`npm test` → 398 unit tests / 67 files PASS**,
-  **`npm run build` → PASS**, `typecheck` / `lint` / `db:validate` PASS, **11/11 domain gates** PASS
-  (the 10 above + `security:check` from SPEC-003).
-- **`npm run validate` exits 1 on Windows** — it aborts at step 15 `db:generate` (EPERM renaming
+- Components verified individually with real commands: **`npm test` → 411 unit tests / 68 files PASS**,
+  **`npm run build` → PASS**, `typecheck` / `lint` / `db:validate` PASS, **12/12 domain gates** PASS
+  (the 10 above + `security:check` from SPEC-003 + `ai:check` from SPEC-007).
+- **`npm run validate` exits 1 on Windows** — it aborts at the `db:generate` step (EPERM renaming
   `query_engine-windows.dll.node`; Defender/AV holds the DLL — client is already generated & valid),
-  *before* steps 16–18 (`test`, `test:e2e:smoke`, `build`). Not a code defect; Linux/CI is unaffected.
+  *before* the later `test`, `test:e2e:smoke`, and `build` steps. Not a code defect; Linux/CI is unaffected.
   On Windows, run `npm test` / `npm run build` directly (done here), or rely on CI for a clean full gate.
 - **`test:e2e:smoke` NOT RUN** here (needs Postgres + Chromium).
 - `npm audit`: **2 moderate** transitive only (postcss `<8.5.10` XSS, pulled via next) — low real risk;
   resolved only by a future next major upgrade (BACKLOG). [GHSA-qx2v-qp2m-jg93]
-- **No AI provider seam yet** (confirmed): the 4 `app/api/ai/*` routes import the fake provider directly
-  and call `assertFakeAiProvider()` (hard fake-only throw). SPEC-007's seam/gate/draft-contract is unbuilt.
+- **AI provider seam shipped (SPEC-007):** `lib/ai/provider.ts` (`resolveAiProvider` → fake default, gated
+  live), `lib/ai/ai-gate.ts` (4-condition hard gate), per-tenant cap + PII-redacted prompts; the reply route
+  is draft-only and `ai:check` enforces it. Live key/cost enablement remains human-gated. (The other 3
+  `app/api/ai/*` routes still call `assertFakeAiProvider()` — extending the seam to them is SPEC-008.)
 
 ### Strengths
 - One green aggregated gate; executable policy gates; integrity-pinned gate scripts + AXIOMS.

@@ -15,7 +15,7 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 | TICKET009 clerk-auth-slice | 1 | Todo | — | — | existing ticket; enablement human-gated |
 | SPEC-006 observability | 2 | **Done (core)** | committed `115bb435` | typecheck/lint/build/393 tests/observability:check green | OTel exporter deferred to BACKLOG |
 | SPEC-009 compliance-quiet-hours | 2 | **Partial** | committed (quiet-hours) | quiet-hours window + gate integration tested (398 tests) | consent-evidence storage needs migration (deferred, human confirm) |
-| SPEC-007 ai-reply-drafting | 3 | Todo | — | — | after SPEC-006 |
+| SPEC-007 ai-reply-drafting | 3 | **Done (demo-safe slice)** | committed (maint/iter-0001) | typecheck/lint/**411 tests**/build/`ai:check` green | seam+gate+cap+PII redaction; live key provisioning still human-gated |
 | SPEC-008 ai-lead-qualification | 3 | Todo | — | — | after SPEC-007 + TICKET009 |
 | SPEC-010 postgres-rls | 4 | Todo | — | — | after TICKET009 + pooling decision |
 
@@ -26,7 +26,7 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [x] SPEC-004 — README human quick-start
 - [x] SPEC-005 — dep hygiene (Redis pinned + carets aligned to installed; majors → BACKLOG)
 - [x] SPEC-006 — observability (PII-safe logging + flag-gated instrumentation; OTel exporter → BACKLOG)
-- [ ] SPEC-007 — real AI reply drafting — BLOCKED (secrets/cost + live-AI hard gate; human-only)
+- [x] SPEC-007 — AI reply-draft **seam shipped** (provider seam + `ai:gate` + per-tenant cap + PII-redacted prompt, fake default); live key/cost enablement still human-gated
 - [ ] SPEC-008 — real AI lead qualification — BLOCKED (migration + secrets; human-only)
 - [~] SPEC-009 — quiet-hours DONE; consent-evidence storage deferred (migration)
 - [ ] SPEC-010 — Postgres RLS — BLOCKED (migration; needs human confirmation + non-Windows env for prisma generate)
@@ -34,6 +34,14 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [ ] TICKET009 — Clerk auth/RBAC slice — BLOCKED (Clerk secrets + prod-auth hard gate; human-only)
 
 ## Log (most recent first)
+- 2026-05-29 — **SPEC-007 demo-safe slice DONE.** Added the AI provider seam (`lib/ai/provider.ts`:
+  `resolveAiProvider` → fake default + gated live Anthropic client, draft-only, phone-PII-redacted prompt),
+  a 4-condition hard gate (`lib/ai/ai-gate.ts`), per-tenant live cap + `recordLiveAiUsage` (`lib/ai/usage.ts`),
+  refactored `app/api/ai/reply-suggestion/route.ts`, `scripts/ai-check.ts` wired into `validate`
+  (now 19 steps / 12 domain gates), `.env.example` flags, `tests/unit/ai/provider-seam.test.ts` (+13 → 411).
+  Updated `contracts/CONTRACT-AI.md` to gated-live. Verified (real): typecheck/lint/**411 tests**/build/`ai:check`
+  green; `npm run validate` aborts only at the Windows `db:generate` EPERM; e2e not run (no Postgres).
+  Live enablement (`AI_API_KEY` + `AI_COST_ACK`) stays human-gated. Committed on `maint/iter-0001`.
 - 2026-05-29 — **Reconciliation + re-verification pass (no code change).** Re-ran ground truth on HEAD
   `ada8ac86`: `npm test` **398 pass / 67 files**, `npm run build` **pass**, typecheck/lint/db:validate +
   **11/11** domain gates pass, `npm audit` 2 moderate (unchanged). `npm run validate` **exits 1** at

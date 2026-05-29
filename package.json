@@ -36,6 +36,7 @@
     "platform:check": "tsx scripts/platform-notes-check.ts",
     "context:check": "tsx scripts/context-budget-check.ts",
     "security:check": "tsx scripts/security-headers-check.ts",
+    "ai:check": "tsx scripts/ai-check.ts",
     "secrets:scan": "tsx scripts/secrets-scan.ts",
     "validate": "tsx scripts/validate.ts",
     "agent:brief": "tsx scripts/agent-brief.ts",
