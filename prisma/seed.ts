@@ -145,6 +145,9 @@ async function main() {
       consentCapturedAt: new Date("2026-01-01T00:00:00.000Z"),
       consentMethod: "demo_seed_web_form",
       consentDisclosure: "Demo opt-in: I agree to receive texts from SignalStack Demo Co. Reply STOP to opt out.",
+      leadScore: 82,
+      leadStage: "HOT",
+      leadQualifiedAt: new Date("2026-01-03T10:05:00.000Z"),
       source: "demo_seed"
     },
     create: {
@@ -160,6 +163,9 @@ async function main() {
       consentCapturedAt: new Date("2026-01-01T00:00:00.000Z"),
       consentMethod: "demo_seed_web_form",
       consentDisclosure: "Demo opt-in: I agree to receive texts from SignalStack Demo Co. Reply STOP to opt out.",
+      leadScore: 82,
+      leadStage: "HOT",
+      leadQualifiedAt: new Date("2026-01-03T10:05:00.000Z"),
       source: "demo_seed"
     }
   });

@@ -14,7 +14,8 @@ const productContactDetailStatusRowItems = [
   { key: "consent", label: "Consent" },
   { key: "lists", label: "Lists" },
   { key: "tags", label: "Tags" },
-  { key: "archived", label: "Archived" }
+  { key: "archived", label: "Archived" },
+  { key: "lead", label: "Lead Score" }
 ] as const;
 
 export const productContactMetricRows = Object.freeze(
@@ -70,6 +71,9 @@ export async function getProductContactDetail(orgId: string, contactId: string) 
     tags: contact.tagLinks.map((link) => link.tag.name).sort(),
     lists: contact.listLinks.map((link) => link.list.name).sort(),
     archived: Boolean(contact.archivedAt),
+    leadScore: contact.leadScore ?? null,
+    leadStage: contact.leadStage ?? null,
+    leadQualifiedAt: contact.leadQualifiedAt ?? null,
     updatedAt: contact.updatedAt,
     mergeCandidates: activeContacts
       .filter((candidate) => candidate.id !== contact.id)
@@ -101,6 +105,14 @@ function contactListRow(contact: Awaited<ReturnType<typeof listContacts>>[number
   };
 }
 
+// SPEC-008: render the persisted lead qualification read-only ("<score> · <stage>"), or "Not qualified".
+export function formatLeadStatus(leadScore: number | null, leadStage: string | null): string {
+  if (leadScore === null || leadStage === null) {
+    return "Not qualified";
+  }
+  return `${leadScore} · ${leadStage}`;
+}
+
 function getContactDetailStatusValue(
   key: ProductContactDetailStatusKey,
   contact: {
@@ -109,6 +121,8 @@ function getContactDetailStatusValue(
     lists: string[];
     tags: string[];
     archived: boolean;
+    leadScore: number | null;
+    leadStage: string | null;
   }
 ) {
   switch (key) {
@@ -122,5 +136,7 @@ function getContactDetailStatusValue(
       return contact.tags.join(", ") || "None";
     case "archived":
       return contact.archived ? "yes" : "no";
+    case "lead":
+      return formatLeadStatus(contact.leadScore, contact.leadStage);
   }
 }

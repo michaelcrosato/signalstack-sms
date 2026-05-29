@@ -5,13 +5,13 @@ in `plan/` as the single source of truth. Be terse. Verify with real commands. N
 honesty: a check is "passed" only if it ran and passed; e2e without Postgres is "not run."
 
 CURRENT STATE (2026-05-29, verified): Phase 0, Phase 2 (SPEC-006; SPEC-009 quiet-hours + consent-evidence),
-TICKET003, SPEC-007 (AI reply-draft seam), TICKET009 (session seam), and **SPEC-008's lead-qualification
-backend slice** (qualifyLead seam + score-persistence migration) are done. `npm test` = **423 pass**,
-`npm run build` pass, 12/12 domain gates + typecheck/lint/db:validate pass; on Windows `npm run validate`
-can abort at the transient `db:generate` EPERM (retry, or use Linux/CI); e2e:smoke needs Chromium
+TICKET003, SPEC-007 (AI reply-draft seam), TICKET009 (session seam), and **SPEC-008** (lead-qualification
+seam + score persistence + contact-UI surfacing) are done. `npm test` = **424 pass**, `npm run build` pass,
+12/12 domain gates + typecheck/lint/db:validate pass; on Windows `npm run validate` can abort at the
+transient `db:generate` EPERM (retry, or use Linux/CI); e2e:smoke needs Chromium
 (`npx playwright install chromium`) + local Postgres (up). **Remaining:** SPEC-010 RLS (migration +
-pooling), SPEC-008 UI surfacing of scores (BACKLOG), and live enablement of SPEC-007/SPEC-008
-(`AI_API_KEY`+`AI_COST_ACK`) / TICKET009 (verified Clerk subject + deny responses + Clerk secrets).
+pooling); live enablement of SPEC-007/SPEC-008 (`AI_API_KEY`+`AI_COST_ACK`) / TICKET009 (verified Clerk
+subject + deny responses + Clerk secrets); optional inbox surfacing of lead scores (BACKLOG).
 
 READ FIRST (in order): `/AGENTS.md` (canonical doctrine) → `plan/AGENTS.md` (how to run this plan) →
 `plan/ROADMAP.md` (priority matrix + DAG + phases) → `plan/CONTEXT.md` (baseline + research rationale) →
@@ -64,10 +64,10 @@ blocked, stop and report: what shipped (files/specs, verified commands + results
 blocked and why (esp. human-gated: secrets/cost/CI), and the single best next item. Never claim an
 unrun/failed check passed.
 
-START: run `bash scripts/agent/status.sh`. SPEC-007/008 AI seams (+ tenant-scoped score persistence),
-TICKET009 session seam, and SPEC-009 are shipped; local Postgres + `prisma generate` work here. Next:
-**SPEC-010 Postgres RLS** — defense-in-depth behind the existing app-level `orgId` scoping: add RLS policies
-(reversible migration) keyed on `current_setting('app.current_org_id')`, set it per request, and prove
-cross-tenant reads return zero rows even if an app filter is omitted; validate `$transaction`/pooling. Higher
-risk — keep app-level scoping and make the migration reversible. Then SPEC-008 UI surfacing of scores. Live
-AI/Clerk enablement (real secrets) stays human-only.
+START: run `bash scripts/agent/status.sh`. SPEC-007/008 AI seams (+ score persistence + contact-UI
+surfacing), TICKET009 session seam, and SPEC-009 are shipped; local Postgres + `prisma generate` work here.
+Next: **SPEC-010 Postgres RLS** — defense-in-depth behind the existing app-level `orgId` scoping: add RLS
+policies (reversible migration) keyed on `current_setting('app.current_org_id')`, set it per request, and
+prove cross-tenant reads return zero rows even if an app filter is omitted; validate `$transaction`/pooling.
+Higher risk — keep app-level scoping and make the migration reversible. Live AI/Clerk enablement (real
+secrets) stays human-only.

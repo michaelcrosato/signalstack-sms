@@ -28,7 +28,7 @@ free of creep.
 - Double opt-in + sign-up unit / keyword growth tooling.
 - Per-US-state quiet-hour variants (FL/OK/WA 8–8, TX 9–9) beyond the core 8am–9pm rule.
 - SPEC-009 follow-up: write-once immutability of stored consent evidence (DB/app guard so captured evidence can't be silently altered); per-contact timezone resolution for quiet hours.
-- SPEC-008 follow-up: surface the persisted lead score/stage in the inbox + contact UI; optional auto-routing/assignment on score (out of scope for the backend slice).
+- SPEC-008 follow-up: surface the lead score in the inbox workspace too (the contact detail page is done); optional auto-routing/assignment on score (out of scope).
 
 ## Infra / platform ideas
 - Real Stripe billing (live, behind cost + data-use hard gate).

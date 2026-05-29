@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { productContactConsentOptions } from "@/lib/product/contact-consent-options";
 import { productContactImportDefaults } from "@/lib/product/contact-import-defaults";
 import {
+  formatLeadStatus,
   getProductContactDetail,
   getProductContacts,
   productContactDetailStatusRows,
@@ -148,7 +149,8 @@ describe("getProductContacts", () => {
         { key: "consent", label: "Consent", value: ConsentStatus.OPTED_IN },
         { key: "lists", label: "Lists", value: "Customers" },
         { key: "tags", label: "Tags", value: "alpha, vip" },
-        { key: "archived", label: "Archived", value: "no" }
+        { key: "archived", label: "Archived", value: "no" },
+        { key: "lead", label: "Lead Score", value: "Not qualified" }
       ],
       mergeCandidates: expect.arrayContaining([
         expect.objectContaining({
@@ -162,6 +164,12 @@ describe("getProductContacts", () => {
 
   it("returns null when the product contact detail is outside the tenant", async () => {
     await expect(getProductContactDetail("org_1", "missing")).resolves.toBeNull();
+  });
+
+  it("formats the persisted lead qualification for the detail status row", () => {
+    expect(formatLeadStatus(82, "HOT")).toBe("82 · HOT");
+    expect(formatLeadStatus(null, null)).toBe("Not qualified");
+    expect(formatLeadStatus(40, null)).toBe("Not qualified");
   });
 
   it("freezes contact metric metadata before rendering", () => {
@@ -195,7 +203,8 @@ describe("getProductContacts", () => {
       "consent",
       "lists",
       "tags",
-      "archived"
+      "archived",
+      "lead"
     ]);
 
     expect(() =>

@@ -16,7 +16,7 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 | SPEC-006 observability | 2 | **Done (core)** | committed `115bb435` | typecheck/lint/build/393 tests/observability:check green | OTel exporter deferred to BACKLOG |
 | SPEC-009 compliance | 2 | **Done** | migration `20260529115853_consent_evidence` applied + committed | db:validate/compliance:check/typecheck/lint/**418 tests**/build green; seed reseeded real Postgres | quiet-hours + consent-evidence storage + A2P privacy/terms all enforced in the hard gate |
 | SPEC-007 ai-reply-drafting | 3 | **Done (demo-safe slice)** | committed (maint/iter-0001) | typecheck/lint/**411 tests**/build/`ai:check` green | seam+gate+cap+PII redaction; live key provisioning still human-gated |
-| SPEC-008 ai-lead-qualification | 3 | **Done (backend slice)** | migration `20260529120721` applied + committed | typecheck/lint/**423 tests**/build/`ai:check` green | qualifyLead seam (fake+gated live) + tenant-scoped score persistence; UI surfacing deferred (BACKLOG); live needs secrets |
+| SPEC-008 ai-lead-qualification | 3 | **Done** | migration `20260529120721` applied + committed | typecheck/lint/**424 tests**/build/`ai:check` green; live render verified | qualifyLead seam + tenant-scoped score persistence + "Lead Score" row on contact page; live needs secrets |
 | SPEC-010 postgres-rls | 4 | Todo | — | — | after TICKET009 + pooling decision |
 
 ## Checklist (downstream agents)
@@ -27,13 +27,20 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [x] SPEC-005 — dep hygiene (Redis pinned + carets aligned to installed; majors → BACKLOG)
 - [x] SPEC-006 — observability (PII-safe logging + flag-gated instrumentation; OTel exporter → BACKLOG)
 - [x] SPEC-007 — AI reply-draft **seam shipped** (provider seam + `ai:gate` + per-tenant cap + PII-redacted prompt, fake default); live key/cost enablement still human-gated
-- [x] SPEC-008 — lead-qual **seam + tenant-scoped score persistence shipped** (fake default, gated live, migration applied); UI surfacing deferred (BACKLOG); live enablement needs secrets
+- [x] SPEC-008 — lead-qual **seam + score persistence + contact-UI surfacing shipped** (fake default, gated live, migration applied; live render verified); live enablement needs secrets
 - [x] SPEC-009 — quiet-hours + **consent-evidence storage** (additive migration applied) + A2P privacy/terms, all enforced in `evaluateMessagingHardGate`
 - [ ] SPEC-010 — Postgres RLS — BLOCKED (migration; needs human confirmation + non-Windows env for prisma generate)
 - [x] TICKET003 — demo-safe inbox reply
 - [x] TICKET009 — session-provider **seam shipped** (`resolveProductionCurrentOrg`, fail-closed, flag-gated; demo default unchanged); live Clerk enablement still human-gated
 
 ## Log (most recent first)
+- 2026-05-29 — **SPEC-008 finished — lead score surfaced in the contact UI.** Added a read-only "Lead Score"
+  row to `lib/product/contacts.ts` (`formatLeadStatus` → `"<score> · <stage>"` or "Not qualified"; the
+  contact detail page already maps `statusRows`, so no page change). Updated the two frozen-row tests + added
+  a formatter test (→ 424); seeded a score on the demo contact. **Verified by live render:** started
+  `next dev`, fetched the contact detail page, confirmed the HTML shows `Lead Score` + `82 · HOT`; stopped the
+  server. typecheck/lint/424 tests/build green. SPEC-008 now fully meets its ACs (inbox surfacing + auto-routing
+  remain optional BACKLOG items).
 - 2026-05-29 — **SPEC-008 lead-qualification backend slice DONE.** Extended the `AiProvider` seam with
   `qualifyLead` (fake default + gated live Anthropic via the SPEC-007 `ai:gate`/cap, defensive JSON parse,
   PII-redacted prompt); added tenant-scoped `persistContactLeadQualification` + additive migration
