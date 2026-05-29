@@ -16,4 +16,17 @@ describe("contact validation", () => {
     expect(contactUpdateSchema.parse({ archived: true })).toEqual({ archived: true });
     expect(contactUpdateSchema.parse({ archived: false })).toEqual({ archived: false });
   });
+
+  it("supports parsing consent evidence fields", () => {
+    const parsed = contactCreateSchema.parse({
+      phone: "+15555550100",
+      consentCapturedAt: "2026-05-29T10:00:00.000Z",
+      consentMethod: "web_form",
+      consentDisclosure: "I agree to terms"
+    });
+    expect(parsed.consentCapturedAt).toBeInstanceOf(Date);
+    expect(parsed.consentCapturedAt?.toISOString()).toBe("2026-05-29T10:00:00.000Z");
+    expect(parsed.consentMethod).toBe("web_form");
+    expect(parsed.consentDisclosure).toBe("I agree to terms");
+  });
 });

@@ -21,7 +21,7 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 | SPEC-011 inbox-lead-score | 5 | **Done** | maint/iter-0001 | `npm run validate` green | AFK queue; surface lead score in inbox workspace (render-verifiable) |
 | SPEC-012 ai-seam-remaining | 5 | **Done** | feat/spec-012-ai-seam-remaining | `npm run validate` green | Route campaign-copy + conversation-summary through resolveAiProvider |
 | SPEC-013 state-quiet-hours | 5 | **Done** | feat/spec-013-state-quiet-hours | `npm run validate` green | AFK queue; per-US-state windows, pure logic, no migration |
-| SPEC-014 consent-immutability | 5 | Todo | — | — | AFK queue; write-once consent-evidence guard (app-level) |
+| SPEC-014 consent-immutability | 5 | **Done** | feat/spec-014-consent-evidence-immutability | `npm run validate` green | AFK queue; write-once consent-evidence guard (app-level) |
 | SPEC-015 delivery-metrics | 5 | Todo | — | — | AFK queue; flag-gated delivery/queue/webhook counters, no PII |
 
 ## Checklist (downstream agents)
@@ -40,10 +40,11 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [x] SPEC-011 — inbox lead-score surfacing (AFK queue)
 - [x] SPEC-012 — AI seam for campaign-copy + conversation-summary (AFK queue)
 - [x] SPEC-013 — per-US-state quiet-hour variants (AFK queue)
-- [ ] SPEC-014 — consent-evidence write-once immutability (AFK queue)
+- [x] SPEC-014 — consent-evidence write-once immutability (AFK queue)
 - [ ] SPEC-015 — delivery/queue/webhook metrics counters (AFK queue)
 
 ## Log (most recent first)
+- 2026-05-29 — **SPEC-014 write-once consent evidence immutability DONE.** Enforced write-once immutability for contact consent evidence fields (`consentCapturedAt`, `consentMethod`, `consentDisclosure`) at the application layer. First capture, no-op writes, and unrelated fields updates are allowed; updates attempting to overwrite existing evidence fields with a different non-empty value are rejected with a tenant-safe error. Covered by a new Vitest unit test suite (10 specs) and verified full local gate (19/19 checks green).
 - 2026-05-29 — **AFK 12h readiness setup (no app code changed).** Made the full protected gate green on
   Windows: `db:generate` → retry wrapper `scripts/db-generate.ts` (transient EPERM); `docker-compose`
   services pinned `restart: unless-stopped`; added `scripts/agent/afk-preflight.sh` (`npm run afk:preflight`)

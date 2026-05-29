@@ -34,6 +34,14 @@ export async function getContact(orgId: string, contactId: string) {
 
 export async function upsertContact(orgId: string, input: ContactCreateInput) {
   return prisma.$transaction(async (tx) => {
+    const existing = await tx.contact.findUnique({
+      where: { orgId_phone: { orgId, phone: input.phone } }
+    });
+
+    if (existing) {
+      verifyConsentEvidenceImmutability(existing, input);
+    }
+
     const contact = await tx.contact.upsert({
       where: { orgId_phone: { orgId, phone: input.phone } },
       update: contactWriteData(input),
@@ -55,6 +63,8 @@ export async function updateContact(orgId: string, contactId: string, input: Con
     if (!existing) {
       return null;
     }
+
+    verifyConsentEvidenceImmutability(existing, input);
 
     const contact = await tx.contact.update({
       where: { id: contactId },
@@ -173,6 +183,14 @@ export async function importContacts(
     });
 
     for (const contact of parsed.contacts) {
+      const existing = await tx.contact.findUnique({
+        where: { orgId_phone: { orgId, phone: contact.phone } }
+      });
+
+      if (existing) {
+        verifyConsentEvidenceImmutability(existing, contact);
+      }
+
       const saved = await tx.contact.upsert({
         where: { orgId_phone: { orgId, phone: contact.phone } },
         update: contactWriteData(contact),
@@ -210,6 +228,9 @@ function contactWriteData(input: Partial<ContactCreateInput>) {
     optInSource: input.optInSource,
     optInAt,
     optedOutAt,
+    consentCapturedAt: input.consentCapturedAt,
+    consentMethod: input.consentMethod,
+    consentDisclosure: input.consentDisclosure,
     source: input.source,
     notes: input.notes
   };
@@ -324,4 +345,35 @@ function mergeSourceArchiveNote(sourceNotes: string | null, targetLabel: string,
 
 function uniqueNames(names: string[]) {
   return [...new Set(names.map((name) => name.trim()).filter(Boolean))];
+}
+
+function verifyConsentEvidenceImmutability(
+  existing: {
+    consentCapturedAt: Date | null;
+    consentMethod: string | null;
+    consentDisclosure: string | null;
+  },
+  input: Partial<{
+    consentCapturedAt?: Date | null;
+    consentMethod?: string | null;
+    consentDisclosure?: string | null;
+  }>
+) {
+  if (existing.consentCapturedAt && input.consentCapturedAt !== undefined && input.consentCapturedAt !== null) {
+    const existingTime = existing.consentCapturedAt.getTime();
+    const inputTime = new Date(input.consentCapturedAt).getTime();
+    if (existingTime !== inputTime) {
+      throw new Error("Consent evidence (consentCapturedAt) is write-once and cannot be changed");
+    }
+  }
+  if (existing.consentMethod && input.consentMethod !== undefined && input.consentMethod !== null && input.consentMethod !== "") {
+    if (existing.consentMethod !== input.consentMethod) {
+      throw new Error("Consent evidence (consentMethod) is write-once and cannot be changed");
+    }
+  }
+  if (existing.consentDisclosure && input.consentDisclosure !== undefined && input.consentDisclosure !== null && input.consentDisclosure !== "") {
+    if (existing.consentDisclosure !== input.consentDisclosure) {
+      throw new Error("Consent evidence (consentDisclosure) is write-once and cannot be changed");
+    }
+  }
 }

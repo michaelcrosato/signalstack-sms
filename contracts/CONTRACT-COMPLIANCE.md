@@ -19,6 +19,7 @@ Milestone 2 contact storage rules:
 - `OPTED_IN` contacts should retain `optInAt` and `optInSource` when available.
 - CSV import is local-only and must not send messages or notify contacts.
 - Contact deletion is soft archive only during the MVP foundation.
+- Stored consent evidence (`consentCapturedAt`, `consentMethod`, `consentDisclosure`) is write-once. Once captured, any subsequent update that attempts to change them to a different value must be rejected at the application layer.
 
 Milestone 3 preflight rules:
 

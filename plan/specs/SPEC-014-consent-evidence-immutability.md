@@ -20,9 +20,9 @@ SPEC-009 consent-evidence (done). Contact writes go through `lib/db/repositories
 3. Document the rule in `CONTRACT-AI.md`/compliance docs; assert via `compliance:check` if cheap.
 
 ## Acceptance criteria
-- [ ] First capture allowed; later change to a different value rejected; identical write is a no-op.
-- [ ] Non-evidence contact fields still update normally; `npm run validate` green.
-- [ ] Unit tests cover first-capture, change-rejected, and no-op cases (tenant-scoped).
+- [x] First capture allowed; later change to a different value rejected; identical write is a no-op.
+- [x] Non-evidence contact fields still update normally; `npm run validate` green.
+- [x] Unit tests cover first-capture, change-rejected, and no-op cases (tenant-scoped).
 
 ## Test strategy
 Unit: guard behavior with a fake/mocked client for empty→set (allow), set→change (reject), same→same (allow).
