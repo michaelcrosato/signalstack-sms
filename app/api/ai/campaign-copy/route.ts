@@ -1,10 +1,17 @@
 import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { assertFakeAiProvider, fakeCampaignCopyVariants } from "@/lib/ai/fake-ai-provider";
-import { recordFakeAiUsage } from "@/lib/ai/usage";
+import { resolveAiProvider } from "@/lib/ai/provider";
+import {
+  aiDraftCapExceeded,
+  countAiRequestsSince,
+  recordFakeAiUsage,
+  recordLiveAiUsage
+} from "@/lib/ai/usage";
 import { requireApiRole } from "@/lib/auth/api-authorization";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { campaignCopyRequestSchema } from "@/lib/validation/ai";
+
+const CAP_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 export async function POST(request: Request) {
   const currentOrg = await getOrCreateCurrentOrg();
@@ -21,11 +28,26 @@ export async function POST(request: Request) {
   }
 
   try {
-    assertFakeAiProvider();
-    const response = fakeCampaignCopyVariants(payload.data);
-    await recordFakeAiUsage(currentOrg.orgId, "campaign-copy");
+    const provider = resolveAiProvider();
+
+    if (provider.name === "live") {
+      const usedInWindow = await countAiRequestsSince(currentOrg.orgId, new Date(Date.now() - CAP_WINDOW_MS));
+      if (aiDraftCapExceeded(usedInWindow)) {
+        return NextResponse.json({ error: "AI draft daily cap reached for this organization." }, { status: 429 });
+      }
+    }
+
+    const response = await provider.generateCampaignCopy(payload.data);
+
+    if (provider.name === "live") {
+      await recordLiveAiUsage(currentOrg.orgId, "campaign-copy");
+    } else {
+      await recordFakeAiUsage(currentOrg.orgId, "campaign-copy");
+    }
+
     return NextResponse.json(response);
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "AI provider blocked." }, { status: 403 });
   }
 }
+

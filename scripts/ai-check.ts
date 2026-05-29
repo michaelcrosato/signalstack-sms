@@ -22,6 +22,18 @@ const rules: Rule[] = [
     mustInclude: ["resolveAiProvider", "recordFakeAiUsage", "currentOrg.orgId"],
     mustExclude: ["createConversationOutboundReply", "sendSms", "deliverMessage", "enqueue"]
   },
+  // Campaign copy route goes through the seam, meters usage, and has no send path.
+  {
+    file: "app/api/ai/campaign-copy/route.ts",
+    mustInclude: ["resolveAiProvider", "recordFakeAiUsage", "currentOrg.orgId"],
+    mustExclude: ["createConversationOutboundReply", "sendSms", "deliverMessage", "enqueue"]
+  },
+  // Conversation summary route goes through the seam, meters usage, and has no send path.
+  {
+    file: "app/api/ai/conversation-summary/route.ts",
+    mustInclude: ["resolveAiProvider", "recordFakeAiUsage", "currentOrg.orgId"],
+    mustExclude: ["createConversationOutboundReply", "sendSms", "deliverMessage", "enqueue"]
+  },
   // Demo-safe defaults: live AI off, cost not acknowledged, provider fake.
   { file: ".env.example", mustInclude: ["AI_PROVIDER=fake", "LIVE_AI_ENABLED=false", "AI_COST_ACK=false"] },
   { file: "lib/env/defaults.ts", mustInclude: ['AI_PROVIDER: "fake"'] }

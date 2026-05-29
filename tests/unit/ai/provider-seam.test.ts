@@ -2,7 +2,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { evaluateAiHardGate, liveAiIsBlocked, readAiHardGateInput } from "@/lib/ai/ai-gate";
 import { fakeAiProvider, liveAiProvider, resolveAiProvider } from "@/lib/ai/provider";
 import { aiDraftCapExceeded, aiDraftDailyCap, DEFAULT_AI_DRAFT_DAILY_CAP } from "@/lib/ai/usage";
-import { fakeLeadQualification, fakeReplySuggestion } from "@/lib/ai/fake-ai-provider";
+import {
+  fakeLeadQualification,
+  fakeReplySuggestion,
+  fakeCampaignCopyVariants,
+  fakeConversationSummary
+} from "@/lib/ai/fake-ai-provider";
 
 const liveEnv = {
   AI_PROVIDER: "live",
@@ -144,5 +149,73 @@ describe("aiDraftCapExceeded", () => {
     expect(aiDraftDailyCap({ AI_DRAFT_DAILY_CAP: "5" })).toBe(5);
     expect(aiDraftCapExceeded(4, { AI_DRAFT_DAILY_CAP: "5" })).toBe(false);
     expect(aiDraftCapExceeded(5, { AI_DRAFT_DAILY_CAP: "5" })).toBe(true);
+  });
+});
+
+describe("generateCampaignCopy seam", () => {
+  it("fake provider returns the deterministic variants byte-for-byte", async () => {
+    const input = { prompt: "spring sale", businessName: "Demo Co", tone: "casual" };
+    await expect(fakeAiProvider.generateCampaignCopy(input)).resolves.toEqual(fakeCampaignCopyVariants(input));
+  });
+
+  it("live provider parses model JSON and strips phone PII from the outgoing prompt", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ content: [{ text: '{"variants": ["Variant 1", "Variant 2"]}' }] })
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubEnv("AI_API_KEY", "test-key");
+
+    const result = await liveAiProvider.generateCampaignCopy({
+      prompt: "Call +1 415 555 0199 for a discount!",
+      businessName: "Acme",
+      tone: "bold"
+    });
+
+    expect(result).toEqual({ provider: "live", variants: ["Variant 1", "Variant 2"] });
+    const [, init] = fetchMock.mock.calls[0] as [string, { body: string }];
+    expect(init.body).toContain("[redacted]");
+    expect(init.body).not.toContain("0199");
+  });
+
+  it("live provider throws on an unparseable response", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ content: [{ text: "not json" }] }) }));
+    vi.stubEnv("AI_API_KEY", "test-key");
+    await expect(
+      liveAiProvider.generateCampaignCopy({ prompt: "hi" })
+    ).rejects.toThrow(/unparseable/);
+  });
+});
+
+describe("summarizeConversation seam", () => {
+  it("fake provider returns the deterministic summary byte-for-byte", async () => {
+    const messages = [{ direction: "INBOUND", body: "Hello" }];
+    await expect(fakeAiProvider.summarizeConversation({ messages })).resolves.toEqual(fakeConversationSummary(messages));
+  });
+
+  it("live provider parses model JSON and strips phone PII from the outgoing prompt", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ content: [{ text: '{"summary": "Conversation summary here"}' }] })
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubEnv("AI_API_KEY", "test-key");
+
+    const result = await liveAiProvider.summarizeConversation({
+      messages: [{ direction: "INBOUND", body: "My number is 415 555 0199" }]
+    });
+
+    expect(result).toEqual({ provider: "live", summary: "Conversation summary here" });
+    const [, init] = fetchMock.mock.calls[0] as [string, { body: string }];
+    expect(init.body).toContain("[redacted]");
+    expect(init.body).not.toContain("0199");
+  });
+
+  it("live provider throws on an unparseable response", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ content: [{ text: "not json" }] }) }));
+    vi.stubEnv("AI_API_KEY", "test-key");
+    await expect(
+      liveAiProvider.summarizeConversation({ messages: [] })
+    ).rejects.toThrow(/unparseable/);
   });
 });

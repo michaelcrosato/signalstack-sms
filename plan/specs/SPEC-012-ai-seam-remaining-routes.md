@@ -21,9 +21,9 @@ client is mocked in tests).
 3. Extend `ai:check` to assert both routes are seam-based and have no send path.
 
 ## Acceptance criteria
-- [ ] Default (`AI_PROVIDER=fake`) behavior byte-for-byte unchanged; all current AI tests pass.
-- [ ] Live path gated (flag+key+cost-ack), capped, PII-redacted; live client mocked in tests.
-- [ ] `ai:check` covers both routes; `npm run validate` green; no live calls by default.
+- [x] Default (`AI_PROVIDER=fake`) behavior byte-for-byte unchanged; all current AI tests pass.
+- [x] Live path gated (flag+key+cost-ack), capped, PII-redacted; live client mocked in tests.
+- [x] `ai:check` covers both routes; `npm run validate` green; no live calls by default.
 
 ## Test strategy
 Unit: seam fake determinism + live mock for both ops; route 400-first preserved; gate denial. Reuse the
