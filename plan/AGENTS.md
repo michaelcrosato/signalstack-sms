@@ -25,7 +25,7 @@ commands) → self-PR-review → commit → record in plan/PROGRESS.md → file 
   commit secrets. Never `--no-verify`.
 
 ## Verification command reference (full suite)
-`npm run validate` (= 17-step gate). Components: `typecheck`, `lint`, `test` (vitest), `build`,
+`npm run validate` (= 18-step gate). Components: `typecheck`, `lint`, `test` (vitest), `build`,
 `db:validate`, `db:generate`, and domain gates `contracts:check secrets:scan compliance:check
 production:gate production-auth:check production-worker:check observability:check operator:check
 platform:check context:check`. E2E (needs Postgres + Chromium): `test:e2e:smoke|:demo|:product-demo`.

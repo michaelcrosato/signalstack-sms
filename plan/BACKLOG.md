@@ -7,8 +7,9 @@ free of creep.
 ## Major dependency upgrades (each = its own isolated branch + full gate + visual check)
 - **Next.js 15 → 16** — caching model overhaul (`use cache` / Cache Components, PPR default),
   `middleware.ts` → `proxy.ts`, `revalidateTag` signature change. Needs a full caching + auth audit.
-- **Prisma 6 → 7** — new TypeScript query engine (Rust engine dropped); re-validate driver adapters,
-  pooling, RLS extension, `$transaction` behavior.
+- **Prisma 6 → 7** (latest 7.7+) — Rust-free architecture; **driver adapters are now mandatory** (pick
+  one, e.g. `@prisma/adapter-pg`), which intersects the SPEC-010 RLS + pooling decision. Re-validate
+  pooling, the RLS extension, and `$transaction` behavior under the adapter.
 - **Zod 3 → 4** — breaking (`.merge`→`.extend`, `nativeEnum`→`enum`, string-format API); touches every
   boundary/validation + server action. Codemod available.
 - **Tailwind 3 → 4**, **TypeScript 5 → 6**, **ESLint 9 → 10**, **Vitest 3 → 4** — independent breaking

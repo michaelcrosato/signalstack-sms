@@ -14,6 +14,7 @@ file covers risks introduced by executing `plan/` specs, with mitigations and ro
 | R7 | Major upgrades (next16/prisma7/zod4) bundled with features cause wide breakage | Med | High | BACKLOG only; **one major per isolated branch**, never with feature work; full gate + visual check | Revert the upgrade branch entirely |
 | R8 | Migration data-loss on compliance/AI schema changes (SPEC-009/008) | Low | High | Additive columns/tables only; reversible migrations; never destructive on existing data; human approves prod migrate | `prisma migrate` down / restore from backup (human) |
 | R9 | A planning/`plan/` doc drifts from canonical docs (duplication) | Med | Low | `plan/AGENTS.md` is a thin pointer; specs reference canonical docs; do not fork `ROADMAP`/`AGENTS`/`RISK_REGISTER` | Delete the divergent `plan/` file; canonical remains source of truth |
+| R10 | Windows `db:generate` EPERM aborts `npm run validate` at step 15 — *before* `test`/`build` (steps 16–18) — so an env lock masks the real test/build signal | High (Windows) | Med | Not a code defect (client stays valid); on Windows run `npm test` + `npm run build` directly, or use Linux/CI for the authoritative full gate; never read a Windows EPERM as a code failure | Environmental — re-run, or generate on Linux/CI |
 
 ## Cross-cutting guardrails
 - Never bypass hard gates (live SMS/billing/AI, secrets, destructive/prod DB, prod workers, Clerk

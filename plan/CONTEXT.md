@@ -80,13 +80,19 @@ All responses carry a security-header baseline + CSP (`next.config.mjs`, SPEC-00
 CI = `.github/workflows/ci.yml` (PR + push main; now provisions Postgres+Redis + migrate/seed),
 `premerge.yml` (manual), `automerge.yml` (placeholder).
 
-### Current state — verified gate run (2026-05-28, this machine)
-- **16/16 local gates PASS:** typecheck, lint, test (**384** unit tests / 65 files), build, db:validate,
-  db:generate, and all 10 domain checks (contracts/secrets/compliance/production/production-auth/
-  production-worker/observability/operator/platform/context).
+### Current state — verified (2026-05-29, this machine; supersedes the 2026-05-28 run)
+- Components verified individually with real commands: **`npm test` → 398 unit tests / 67 files PASS**,
+  **`npm run build` → PASS**, `typecheck` / `lint` / `db:validate` PASS, **11/11 domain gates** PASS
+  (the 10 above + `security:check` from SPEC-003).
+- **`npm run validate` exits 1 on Windows** — it aborts at step 15 `db:generate` (EPERM renaming
+  `query_engine-windows.dll.node`; Defender/AV holds the DLL — client is already generated & valid),
+  *before* steps 16–18 (`test`, `test:e2e:smoke`, `build`). Not a code defect; Linux/CI is unaffected.
+  On Windows, run `npm test` / `npm run build` directly (done here), or rely on CI for a clean full gate.
 - **`test:e2e:smoke` NOT RUN** here (needs Postgres + Chromium).
 - `npm audit`: **2 moderate** transitive only (postcss `<8.5.10` XSS, pulled via next) — low real risk;
-  resolved by a future next upgrade. [GHSA-qx2v-qp2m-jg93]
+  resolved only by a future next major upgrade (BACKLOG). [GHSA-qx2v-qp2m-jg93]
+- **No AI provider seam yet** (confirmed): the 4 `app/api/ai/*` routes import the fake provider directly
+  and call `assertFakeAiProvider()` (hard fake-only throw). SPEC-007's seam/gate/draft-contract is unbuilt.
 
 ### Strengths
 - One green aggregated gate; executable policy gates; integrity-pinned gate scripts + AXIOMS.
@@ -160,6 +166,17 @@ CI = `.github/workflows/ci.yml` (PR + push main; now provisions Postgres+Redis +
   by installed **next 15.5.18 / react 19.2.6**. Remaining: 2 moderate transitive postcss (audit); and a
   **deployment-time** concern: Redis **CVE-2025-49844** (patch Redis ≥7.4.x/8.2.2 — docker-compose pins
   `redis:7-alpine`, should pin a patched tag). [nextjs.org/blog/CVE-2025-66478; react.dev 2025-12-03; redis.io]
+- **NEW (refreshed 2026-05-29):** Next.js shipped a **coordinated security release in May 2026** — 13
+  advisories: DoS (**CVE-2026-23864**, **CVE-2026-23870**), `.rsc`/segment-prefetch **middleware-bypass**,
+  SSRF via WebSocket upgrade (self-hosted Node), cache-poisoning, XSS. Patched floor = **next 15.5.18 /
+  16.2.6** → installed **15.5.18 is already on the patched floor** (no action). The middleware-bypass class
+  reinforces existing doctrine: **middleware is routing, not a security boundary** — re-check authZ in every
+  route handler/DAL (the repo already does; keeps SPEC-003 headers + TICKET009 auth in the handler).
+  [vercel.com/changelog/next-js-may-2026-security-release; akamai.com CVE-2026-23864]
+- **A2P privacy/terms (confirmed, date-sensitive):** from **2026-06-30** Twilio A2P 10DLC campaign
+  registration returns a hard **400** without public HTTPS `PrivacyPolicyUrl` + `TermsAndConditionsUrl`
+  (Twilio fetches them). ~1 month out — SPEC-009 already covers it; `complianceProfileIsComplete` enforces
+  URL completeness today. [twilio.com/en-us/changelog a2p privacy-policy/terms]
 - **Clerk multi-tenant:** `clerkMiddleware()` + `createRouteMatcher`/`auth.protect()`,
   `organizationSyncOptions` to bind tenant from URL, server-side `auth()` returns `{userId,orgId,orgRole}`;
   keep a provider-agnostic `getAuthContext()` for the demo fallback. [clerk.com docs] → TICKET009.
@@ -183,3 +200,5 @@ Compliance: twilio.com/docs/messaging/compliance/a2p-10dlc, twilio.com/en-us/cha
 req), ctia.org messaging principles, activeprospect.com (TCPA), tatango.com (retention). Competitors:
 salesmessage.com, getapp.com (Textline), business.com/textbolt (EZ Texting), capterra/community.com,
 sequenzy.com (Attentive), subjectlime.com (Klaviyo). AI: relevanceai, sakari.io, attentioninsight.com.
+Refresh 2026-05-29: vercel.com/changelog/next-js-may-2026-security-release, akamai.com/blog (CVE-2026-23864),
+react.dev/blog/2025/12/03, nextjs.org/blog/next-16 + /docs/app/guides/upgrading/version-16, github.com/prisma/prisma/releases (7.x — driver adapters now mandatory).

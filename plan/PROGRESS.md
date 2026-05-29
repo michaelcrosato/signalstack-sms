@@ -34,6 +34,16 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [ ] TICKET009 — Clerk auth/RBAC slice — BLOCKED (Clerk secrets + prod-auth hard gate; human-only)
 
 ## Log (most recent first)
+- 2026-05-29 — **Reconciliation + re-verification pass (no code change).** Re-ran ground truth on HEAD
+  `ada8ac86`: `npm test` **398 pass / 67 files**, `npm run build` **pass**, typecheck/lint/db:validate +
+  **11/11** domain gates pass, `npm audit` 2 moderate (unchanged). `npm run validate` **exits 1** at
+  `db:generate` (Windows EPERM) — it aborts *before* `test`/`e2e`/`build` (steps 16–18), so those were run
+  directly. e2e:smoke not run (no Postgres). Research refresh: Next.js **May-2026** security release (13
+  advisories incl. CVE-2026-23864 + middleware-bypass) — installed **15.5.18 is the patched floor**, already
+  mitigated; A2P privacy/terms hard-400 confirmed for **2026-06-30**. Updated `plan/CONTEXT.md` (verified
+  state, May-2026 CVEs, A2P date), `RISK_REGISTER` (R10), `BACKLOG` (Prisma-7 driver adapters), `AGENTS`
+  (18-step), `EXECUTION_PROMPT` (v2026.05.29). **Top unblocked real-work item = SPEC-007 provider seam**
+  (no seam exists yet; secret/key part stays human-gated).
 - 2026-05-29 — **Execution ceiling reached; human chose to STOP.** 8/10 specs done + committed
   (SPEC-001/002/003/004/005/006 + TICKET003 + SPEC-009 quiet-hours); 398 unit tests green; 15/15 local
   gates green except `db:generate` (unresolvable Windows `prisma generate` EPERM — engine DLL held by an
