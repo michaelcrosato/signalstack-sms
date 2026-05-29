@@ -4,7 +4,7 @@ Last updated: 2026-05-25.
 
 This file is intentionally compact. Historical run notes live in `git log`; current agents should use this matrix plus targeted searches instead of loading old run history.
 
-Latest validated run: Run 822 collapses operator-surfaces test (2.4k -> 0.2k LOC, bijection kept) and trims CONTRACT-TESTING.md (399 -> 48). With runs 820/821, total test LOC is 12.5k (was 35k, -64%). ULTRAPLAN Phase A: A1+A2 done, LOC target met; A3 (ops page consolidation) pending (TICKET008). Gate green except e2e (needs Postgres).
+Latest validated run: Run 823 adds the /settings operations-surface freeze guard (A3 "freeze new ones"). ULTRAPLAN Phase A: A1+A2 done, test LOC 12.5k (was 35k, -64%), A3-freeze done; A3 reduction (33->~8) is CI-gated (all 33 pages are e2e-referenced; e2e needs Postgres) — TICKET008. Gate green except e2e.
 
 | Area | Backend/API State | Browser State | Main Gap | Next Action |
 | --- | --- | --- | --- | --- |

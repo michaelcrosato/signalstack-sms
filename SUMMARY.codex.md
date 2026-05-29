@@ -1,10 +1,10 @@
 # Codex Summary
 
-Run number: 822
+Run number: 823
 
-- ULTRAPLAN Phase A continued. Collapsed `tests/unit/operations/operator-surfaces.test.ts` (2,371 LOC / 67 tests) to 203 LOC / 40 tests: kept the two filesystem-bijection guarantees (every inventory route has a page; every local operator page is listed), frozen-inventory checks, a table-driven projection check over all 32 link accessors (frozen, deduped, inventory-backed, real page exists), structured-projection checks, and representative malformed-inventory rejection. SUT `lib/operations/operator-surfaces.ts` unchanged; no gate requires strings from this test.
-- A2: rewrote `contracts/CONTRACT-TESTING.md` 399 -> 48 LOC, keeping the durable testing contract and dropping the permutation catalogue (`contracts:check` only checks existence; still passes).
-- Total test LOC now 12,473 (was 34,986 at session start, -64%) — Phase A exit metric "< ~14k" MET. `context:check` now reports no large-file advisory.
-- Verified green: `npm run test` (482), `typecheck`, `lint`, `contracts:check`, `context:check`. e2e + db steps not run (need Postgres; CI verifies).
-- Phase A status: A1 (collapse both giant tests) done; A2 (shrink CONTRACT-TESTING) done; LOC target met. A3 (consolidate /settings ops pages 33 -> ~8) remains — see TICKET008; it must reconcile with the investor-demo e2e path, which visits /settings/{demo,reports,workflows,releases,operations}, so it needs CI e2e verification.
+- ULTRAPLAN Phase A / A3 "freeze new ones": added `tests/unit/operations/settings-surface-allowlist.test.ts` — a guard that pins the `/settings` operations surface to an explicit 33-entry allowlist. A new `app/settings/<x>/page.tsx` now fails the gate until `<x>` is added deliberately, stopping the over-indexing from growing.
+- A3 reduction (33 -> ~8) is provably CI-gated: `grep` of `e2e/*.spec.ts` shows the operations-coverage specs reference all 33 `/settings` pages, so deleting any page breaks an e2e assertion — and e2e is unrunnable here (needs Postgres + Chromium). Deletion must be a CI-verified iteration that updates pages + inventory + per-surface tests + e2e specs together. Scoped in TICKET008.
+- Phase A status: A1 (collapse both giant tests) done; A2 (shrink CONTRACT-TESTING) done; LOC exit met (12.5k < 14k); A3 split into freeze (done) + reduction (CI-gated, TICKET008).
+- Verified green: freeze guard test, `typecheck`, `lint` (and prior `npm run test` 482, contracts/context gates). e2e + db not run (Postgres; CI).
+- Session totals: test LOC 34,986 -> ~12.5k (-64%) across runs 820-823; gate green except e2e.
 - History lives in `git log`; start with `npm run agent:brief`, targeted `rg`, and current summaries.

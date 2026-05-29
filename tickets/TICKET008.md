@@ -8,6 +8,13 @@ Reduce the over-built operations surface (33 `/settings` pages vs 9 `/dashboard`
 set that serves release safety, and add a guard so new ops pages are a deliberate decision. Do this without
 breaking the investor-demo path.
 
+## Progress
+- DONE (run 823): "freeze new ones" — `tests/unit/operations/settings-surface-allowlist.test.ts` pins the
+  surface to an explicit 33-entry allowlist; a new `/settings` page fails the gate until added deliberately.
+- BLOCKED locally: the reduction (delete pages). Evidence: `grep e2e/*.spec.ts` references ALL 33 `/settings`
+  pages, so any deletion breaks an e2e assertion, and e2e needs Postgres + Chromium (unrunnable here). The
+  reduction is a CI-gated iteration. When reducing, shrink the allowlist in the freeze test in the same commit.
+
 ## Context
 The repo is over-indexed on read-only ops pages (own consensus + ULTRAPLAN). Pages render from the shared
 inventory `lib/operations/operator-surfaces.ts`; `tests/unit/operations/operator-surfaces.test.ts` enforces a
