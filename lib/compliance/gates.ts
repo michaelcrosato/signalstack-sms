@@ -1,4 +1,5 @@
 import { A2pRegistrationStatus, ConsentStatus, type ComplianceProfile } from "@prisma/client";
+import { isWithinQuietHours } from "@/lib/compliance/quiet-hours";
 
 export type MessagingHardGateInput = {
   demoMode: boolean;
@@ -18,6 +19,12 @@ export type MessagingHardGateInput = {
     optedOutAt: Date | null;
     archivedAt: Date | null;
   } | null;
+  // Optional TCPA quiet-hours check. When supplied, sending outside 08:00–21:00 in the given timezone
+  // adds a QUIET_HOURS block reason. Omitted by demo/non-time-sensitive callers (backward compatible).
+  quietHours?: {
+    now: Date;
+    timeZone: string;
+  };
 };
 
 export type MessagingHardGateResult = {
@@ -57,6 +64,10 @@ export function evaluateMessagingHardGate(input: MessagingHardGateInput): Messag
     if (input.contact.optedOutAt || input.contact.consentStatus === ConsentStatus.OPTED_OUT) {
       reasons.push("CONTACT_OPTED_OUT");
     }
+  }
+
+  if (input.quietHours && isWithinQuietHours(input.quietHours.now, input.quietHours.timeZone)) {
+    reasons.push("QUIET_HOURS");
   }
 
   return {
