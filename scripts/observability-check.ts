@@ -24,4 +24,26 @@ if (!deploymentRunbook.includes("docs/PRODUCTION_OBSERVABILITY.md")) {
   process.exit(1);
 }
 
+// SPEC-006: the instrumentation seam must be off by default and the logger must redact PII.
+const instrumentation = readFileSync("instrumentation.ts", "utf8");
+const observabilityLogger = readFileSync("lib/observability/logger.ts", "utf8");
+const observabilityCodeFailures: string[] = [];
+
+if (!instrumentation.includes("observabilityIsEnabled")) {
+  observabilityCodeFailures.push("instrumentation.ts must gate initialization on observabilityIsEnabled (default off)");
+}
+if (!observabilityLogger.includes('OBSERVABILITY_ENABLED === "true"')) {
+  observabilityCodeFailures.push('logger must treat OBSERVABILITY_ENABLED as opt-in (=== "true")');
+}
+for (const sensitiveKey of ['"phone"', '"body"', '"authToken"']) {
+  if (!observabilityLogger.includes(sensitiveKey)) {
+    observabilityCodeFailures.push(`logger redaction denylist must cover ${sensitiveKey}`);
+  }
+}
+
+if (observabilityCodeFailures.length > 0) {
+  console.error(`Observability instrumentation check failed: ${observabilityCodeFailures.join("; ")}`);
+  process.exit(1);
+}
+
 console.log("Production observability plan verified.");

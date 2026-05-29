@@ -1,0 +1,13 @@
+// Stable SMS-pipeline metric identifiers (SPEC-006). Names only — the exporter wiring is deferred until
+// an OpenTelemetry backend is selected (see plan/specs/SPEC-006 / plan/BACKLOG.md). Centralizing the
+// names here keeps future instrumentation consistent and avoids string drift.
+export const smsPipelineMetrics = Object.freeze({
+  deliveryRate: "sms.delivery.rate",
+  sendToDeliveredLatencyMs: "sms.delivery.latency_ms",
+  queueDepth: "queue.depth",
+  queueThroughput: "queue.throughput",
+  failureByErrorCode: "sms.failure.by_error_code",
+  webhookVerificationFailureRate: "webhook.verification.failure_rate"
+} as const);
+
+export type SmsPipelineMetricName = (typeof smsPipelineMetrics)[keyof typeof smsPipelineMetrics];
