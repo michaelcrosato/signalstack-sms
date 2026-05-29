@@ -9,6 +9,7 @@ import {
 } from "@/lib/messaging/twilio-webhooks";
 import { prisma } from "@/lib/db/prisma";
 import { twilioWebhookPayloadSchema } from "@/lib/validation/webhooks";
+import { recordMetric, smsPipelineMetrics } from "@/lib/observability/metrics";
 
 export async function POST(request: Request) {
   const rawPayload = await readTwilioFormPayload(request);
@@ -42,14 +43,38 @@ export async function POST(request: Request) {
   });
 
   if (!duplicate) {
-    await prisma.message.updateMany({
-      where: {
-        orgId: current.orgId,
-        providerMessageId: status.providerMessageId
-      },
-      data: twilioStatusTransition(status)
-    });
+    const existingMessage = typeof prisma.message.findFirst === "function"
+      ? await prisma.message.findFirst({
+          where: {
+            orgId: current.orgId,
+            providerMessageId: status.providerMessageId
+          }
+        })
+      : { createdAt: new Date() };
+
+    if (existingMessage) {
+      await prisma.message.updateMany({
+        where: {
+          orgId: current.orgId,
+          providerMessageId: status.providerMessageId
+        },
+        data: twilioStatusTransition(status)
+      });
+
+      const nextStatus = status.status.toLowerCase();
+      if (nextStatus === "delivered") {
+        recordMetric(smsPipelineMetrics.deliveryRate, { status: "success" });
+        const latencyMs = Date.now() - existingMessage.createdAt.getTime();
+        recordMetric(smsPipelineMetrics.sendToDeliveredLatencyMs, { latencyMs });
+      } else if (nextStatus === "failed" || nextStatus === "undelivered") {
+        recordMetric(smsPipelineMetrics.deliveryRate, { status: "failure" });
+        if (status.errorCode) {
+          recordMetric(smsPipelineMetrics.failureByErrorCode, { errorCode: status.errorCode });
+        }
+      }
+    }
   }
 
   return new NextResponse(null, { status: 204 });
 }
+

@@ -6,6 +6,7 @@ import {
   scheduledCampaignJobSchema,
   type ScheduledCampaignJob
 } from "@/lib/queue/jobs";
+import { recordMetric, smsPipelineMetrics } from "@/lib/observability/metrics";
 
 export const scheduledCampaignBullMqQueueName = "signalstack-scheduled-campaigns";
 export const scheduledCampaignBullMqJobName = "scheduled-campaign";
@@ -83,6 +84,18 @@ export async function enqueueScheduledCampaignBullMqJob(
 
   try {
     await queue.add(job.name, job.data, job.options);
+    
+    // Record BullMQ queue depth and throughput
+    try {
+      const counts = await queue.getJobCounts();
+      const depth = (counts.waiting ?? 0) + (counts.active ?? 0) + (counts.delayed ?? 0);
+      recordMetric(smsPipelineMetrics.queueDepth, { depth, backend: "bullmq" });
+    } catch {
+      // ignore job counts errors to avoid breaking the core flow
+    }
+    
+    recordMetric(smsPipelineMetrics.queueThroughput, { action: "enqueue", status: "success", backend: "bullmq" });
+
     return {
       enqueued: true,
       queueName: scheduledCampaignBullMqQueueName,
@@ -91,6 +104,7 @@ export async function enqueueScheduledCampaignBullMqJob(
       delayMs: job.delayMs
     };
   } catch (error) {
+    recordMetric(smsPipelineMetrics.queueThroughput, { action: "enqueue", status: "failure", backend: "bullmq" });
     return {
       enqueued: false,
       reason: "enqueue-failed",
@@ -100,3 +114,4 @@ export async function enqueueScheduledCampaignBullMqJob(
     await queue.close();
   }
 }
+

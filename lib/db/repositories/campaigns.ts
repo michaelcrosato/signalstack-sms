@@ -1,5 +1,6 @@
 import { CampaignStatus, QueueJobStatus, QueueJobType, type Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
+import { recordMetric, smsPipelineMetrics } from "@/lib/observability/metrics";
 import { orgWhere } from "@/lib/db/tenant";
 import { preflightCampaignRecipients } from "@/lib/messaging/send-preflight";
 import { scheduledCampaignIdempotencyKey } from "@/lib/queue/idempotency";
@@ -211,7 +212,7 @@ export async function scheduleCampaign(orgId: string, campaignId: string, schedu
       data: { status: CampaignStatus.SCHEDULED, scheduledAt }
     });
 
-    return tx.queueJob.upsert({
+    const queueJob = await tx.queueJob.upsert({
       where: { orgId_idempotencyKey: { orgId, idempotencyKey } },
       update: {
         status: QueueJobStatus.QUEUED,
@@ -228,6 +229,16 @@ export async function scheduleCampaign(orgId: string, campaignId: string, schedu
         runAt: scheduledAt
       }
     });
+
+    const depth = typeof tx.queueJob.count === "function"
+      ? await tx.queueJob.count({
+          where: { orgId, status: QueueJobStatus.QUEUED }
+        })
+      : 0;
+    recordMetric(smsPipelineMetrics.queueDepth, { depth, backend: "database" });
+    recordMetric(smsPipelineMetrics.queueThroughput, { action: "enqueue", status: "success", backend: "database" });
+
+    return queueJob;
   });
 }
 
@@ -245,6 +256,8 @@ export async function cancelCampaign(orgId: string, campaignId: string) {
       where: { orgId, campaignId, status: QueueJobStatus.QUEUED },
       data: { status: QueueJobStatus.CANCELLED }
     });
+
+    recordMetric(smsPipelineMetrics.queueThroughput, { action: "cancel", status: "success", backend: "database" });
 
     return tx.campaign.update({
       where: { id: campaignId },

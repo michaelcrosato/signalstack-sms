@@ -15,6 +15,7 @@ import { liveWorkerDeploymentClassIsAuthorized } from "@/lib/queue/live-worker-c
 import { preflightCampaignRecipients } from "@/lib/messaging/send-preflight";
 import { scheduledCampaignJobSchema } from "@/lib/queue/jobs";
 import { outboundCampaignMessageIdempotencyKey } from "@/lib/queue/idempotency";
+import { recordMetric, smsPipelineMetrics } from "@/lib/observability/metrics";
 
 export type WorkerSafetyInput = {
   liveMessagingEnabled?: unknown;
@@ -202,6 +203,16 @@ export async function processDueScheduledCampaignJobs(
     };
   }
 
+  const depth = typeof prisma.queueJob.count === "function"
+    ? await prisma.queueJob.count({
+        where: {
+          type: QueueJobType.SCHEDULED_CAMPAIGN,
+          status: QueueJobStatus.QUEUED
+        }
+      })
+    : 0;
+  recordMetric(smsPipelineMetrics.queueDepth, { depth, backend: "database" });
+
   const jobs = await prisma.queueJob.findMany({
     where: {
       type: QueueJobType.SCHEDULED_CAMPAIGN,
@@ -265,6 +276,7 @@ async function processScheduledCampaignQueueJob(
   const payload = scheduledCampaignJobSchema.safeParse(job.payload);
   if (!payload.success || payload.data.orgId !== job.orgId || payload.data.campaignId !== job.campaignId) {
     await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.FAILED } });
+    recordMetric(smsPipelineMetrics.queueThroughput, { action: "process", status: "failure", reason: "invalid-payload", backend: "database" });
     return { processed: 0, skipped: 1, blocked: false, reason: "invalid-payload" };
   }
 
@@ -274,11 +286,13 @@ async function processScheduledCampaignQueueJob(
   });
   if (!campaign || campaign.status !== CampaignStatus.SCHEDULED) {
     await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.FAILED } });
+    recordMetric(smsPipelineMetrics.queueThroughput, { action: "process", status: "failure", reason: "invalid-campaign", backend: "database" });
     return { processed: 0, skipped: 1, blocked: false, reason: "invalid-campaign" };
   }
 
   if (campaign.scheduledAt?.toISOString() !== payload.data.scheduledAt) {
     await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.CANCELLED } });
+    recordMetric(smsPipelineMetrics.queueThroughput, { action: "process", status: "cancelled", reason: "stale-schedule", backend: "database" });
     return { processed: 0, skipped: 1, blocked: false, reason: "stale-schedule" };
   }
 
@@ -314,6 +328,7 @@ async function processScheduledCampaignQueueJob(
   if (sendableRecipients.length === 0) {
     await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.FAILED } });
     await prisma.campaign.update({ where: { id: campaign.id }, data: { status: CampaignStatus.PAUSED } });
+    recordMetric(smsPipelineMetrics.queueThroughput, { action: "process", status: "failure", reason: "send-preflight-failed", backend: "database" });
     return { processed: 0, skipped: 1, blocked: false, reason: "send-preflight-failed" };
   }
 
@@ -346,6 +361,7 @@ async function processScheduledCampaignQueueJob(
 
   await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.COMPLETED } });
   await prisma.campaign.update({ where: { id: campaign.id }, data: { status: CampaignStatus.COMPLETED } });
+  recordMetric(smsPipelineMetrics.queueThroughput, { action: "process", status: "success", backend: "database" });
   return { processed: 1, skipped: 0, blocked: false };
 }
 

@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type { TwilioWebhookPayload } from "@/lib/validation/webhooks";
+import { recordMetric, smsPipelineMetrics } from "@/lib/observability/metrics";
 
 export type NormalizedTwilioInbound = {
   from: string;
@@ -72,6 +73,10 @@ export function validateTwilioSignature(input: {
   params: Record<string, string>;
 }) {
   if (!input.authToken || !input.signature) {
+    recordMetric(smsPipelineMetrics.webhookVerificationFailureRate, {
+      status: "fail",
+      reason: "missing"
+    });
     return false;
   }
 
@@ -82,8 +87,23 @@ export function validateTwilioSignature(input: {
 
   const expectedBuffer = Buffer.from(expected);
   const actualBuffer = Buffer.from(input.signature);
-  return expectedBuffer.length === actualBuffer.length && timingSafeEqual(expectedBuffer, actualBuffer);
+  
+  const isValid = expectedBuffer.length === actualBuffer.length && timingSafeEqual(expectedBuffer, actualBuffer);
+  
+  if (isValid) {
+    recordMetric(smsPipelineMetrics.webhookVerificationFailureRate, {
+      status: "pass"
+    });
+  } else {
+    recordMetric(smsPipelineMetrics.webhookVerificationFailureRate, {
+      status: "fail",
+      reason: "mismatch"
+    });
+  }
+
+  return isValid;
 }
+
 
 export function normalizeTwilioInbound(payload: TwilioWebhookPayload): NormalizedTwilioInbound | null {
   const providerMessageId = firstRequiredProviderValue(payload.MessageSid, payload.SmsSid);

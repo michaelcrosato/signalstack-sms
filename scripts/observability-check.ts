@@ -27,6 +27,7 @@ if (!deploymentRunbook.includes("docs/PRODUCTION_OBSERVABILITY.md")) {
 // SPEC-006: the instrumentation seam must be off by default and the logger must redact PII.
 const instrumentation = readFileSync("instrumentation.ts", "utf8");
 const observabilityLogger = readFileSync("lib/observability/logger.ts", "utf8");
+const observabilityMetrics = readFileSync("lib/observability/metrics.ts", "utf8");
 const observabilityCodeFailures: string[] = [];
 
 if (!instrumentation.includes("observabilityIsEnabled")) {
@@ -41,9 +42,17 @@ for (const sensitiveKey of ['"phone"', '"body"', '"authToken"']) {
   }
 }
 
+if (!observabilityMetrics.includes("observabilityIsEnabled")) {
+  observabilityCodeFailures.push("metrics.ts must gate recording on observabilityIsEnabled");
+}
+if (!observabilityMetrics.includes("redactLogContext")) {
+  observabilityCodeFailures.push("metrics.ts must defensively redact PII using redactLogContext");
+}
+
 if (observabilityCodeFailures.length > 0) {
   console.error(`Observability instrumentation check failed: ${observabilityCodeFailures.join("; ")}`);
   process.exit(1);
 }
 
 console.log("Production observability plan verified.");
+

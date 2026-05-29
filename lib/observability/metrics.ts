@@ -1,3 +1,5 @@
+import { logger, observabilityIsEnabled, redactLogContext } from "./logger";
+
 // Stable SMS-pipeline metric identifiers (SPEC-006). Names only — the exporter wiring is deferred until
 // an OpenTelemetry backend is selected (see plan/specs/SPEC-006 / plan/BACKLOG.md). Centralizing the
 // names here keeps future instrumentation consistent and avoids string drift.
@@ -11,3 +13,22 @@ export const smsPipelineMetrics = Object.freeze({
 } as const);
 
 export type SmsPipelineMetricName = (typeof smsPipelineMetrics)[keyof typeof smsPipelineMetrics];
+
+/**
+ * Record an SMS pipeline metric.
+ * Only works if OBSERVABILITY_ENABLED=true.
+ * Defensively redacts any PII using logger redaction.
+ */
+export function recordMetric(name: SmsPipelineMetricName, payload: Record<string, unknown> = {}): void {
+  if (!observabilityIsEnabled()) {
+    return;
+  }
+
+  // Redact any PII to ensure zero leakage
+  const safePayload = redactLogContext(payload);
+
+  logger.info("sms_metric_recorded", {
+    metricName: name,
+    ...safePayload
+  });
+}
