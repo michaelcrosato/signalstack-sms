@@ -1,6 +1,6 @@
 import { ConsentStatus, ConversationStatus } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
-import { listConversationMessages } from "@/lib/db/repositories/inbox";
+import { listConversations, listConversationMessages } from "@/lib/db/repositories/inbox";
 import { productInboxWorkspaceDefaults } from "@/lib/product/inbox-workspace-defaults";
 import { getProductInbox, productInboxMetricRows, productInboxThreadStatusRows } from "@/lib/product/inbox";
 
@@ -107,7 +107,8 @@ describe("getProductInbox", () => {
     });
     expect(result.selectedConversation?.statusRows).toEqual([
       { key: "thread", label: "Thread", value: ConversationStatus.OPEN },
-      { key: "consent", label: "Consent", value: ConsentStatus.OPTED_IN }
+      { key: "consent", label: "Consent", value: ConsentStatus.OPTED_IN },
+      { key: "lead", label: "Lead score", value: "Not qualified" }
     ]);
   });
 
@@ -138,6 +139,38 @@ describe("getProductInbox", () => {
     expect(vi.mocked(listConversationMessages)).toHaveBeenCalledWith("org_1", "conversation_1");
   });
 
+  it("exposes the selected contact's formatted lead status when present", async () => {
+    vi.mocked(listConversations).mockImplementationOnce(async () => [
+      {
+        id: "conversation_3",
+        status: ConversationStatus.OPEN,
+        contact: {
+          displayName: "Bob",
+          firstName: "Bob",
+          lastName: "Smith",
+          phone: "+15555550200",
+          consentStatus: ConsentStatus.OPTED_IN,
+          leadScore: 82,
+          leadStage: "HOT"
+        },
+        assignedTo: null,
+        assignedToUserId: null,
+        lastMessageAt: new Date("2026-01-03T10:00:00.000Z"),
+        updatedAt: new Date("2026-01-03T10:00:00.000Z"),
+        messages: [],
+        internalNotes: []
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ] as any);
+
+    const result = await getProductInbox("org_1", "conversation_3");
+    expect(result.selectedConversation?.statusRows).toContainEqual({
+      key: "lead",
+      label: "Lead score",
+      value: "82 · HOT"
+    });
+  });
+
   it("freezes inbox metric metadata before rendering", () => {
     expect(Object.isFrozen(productInboxMetricRows)).toBe(true);
     expect(productInboxMetricRows.every((row) => Object.isFrozen(row))).toBe(true);
@@ -163,8 +196,8 @@ describe("getProductInbox", () => {
   it("freezes inbox thread status metadata before rendering", () => {
     expect(Object.isFrozen(productInboxThreadStatusRows)).toBe(true);
     expect(productInboxThreadStatusRows.every((row) => Object.isFrozen(row))).toBe(true);
-    expect(productInboxThreadStatusRows.map((row) => row.key)).toEqual(["thread", "consent"]);
-    expect(productInboxThreadStatusRows.map((row) => row.label)).toEqual(["Thread", "Consent"]);
+    expect(productInboxThreadStatusRows.map((row) => row.key)).toEqual(["thread", "consent", "lead"]);
+    expect(productInboxThreadStatusRows.map((row) => row.label)).toEqual(["Thread", "Consent", "Lead score"]);
 
     expect(() =>
       (productInboxThreadStatusRows as unknown as Array<{ key: string; label: string }>).push({

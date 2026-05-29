@@ -18,7 +18,7 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 | SPEC-007 ai-reply-drafting | 3 | **Done (demo-safe slice)** | committed (maint/iter-0001) | typecheck/lint/**411 tests**/build/`ai:check` green | seam+gate+cap+PII redaction; live key provisioning still human-gated |
 | SPEC-008 ai-lead-qualification | 3 | **Done** | migration `20260529120721` applied + committed | typecheck/lint/**424 tests**/build/`ai:check` green; live render verified | qualifyLead seam + tenant-scoped score persistence + "Lead Score" row on contact page; live needs secrets |
 | SPEC-010 postgres-rls | 4 | **Done (opt-in backstop)** | migration `20260529130000` applied + committed | RLS proof test (read+write denial) green; 424 tests + 12 gates + build green; EXPLAIN policy applied | FORCE RLS + `app_rls` role + `withTenantRls`; unset-allows → no regression; prod enablement = non-superuser role + request wiring |
-| SPEC-011 inbox-lead-score | 5 | Todo | — | — | AFK queue; surface lead score in inbox workspace (render-verifiable) |
+| SPEC-011 inbox-lead-score | 5 | **Done** | maint/iter-0001 | `npm run validate` green | AFK queue; surface lead score in inbox workspace (render-verifiable) |
 | SPEC-012 ai-seam-remaining | 5 | Todo | — | — | AFK queue; route campaign-copy + conversation-summary through resolveAiProvider |
 | SPEC-013 state-quiet-hours | 5 | Todo | — | — | AFK queue; per-US-state windows, pure logic, no migration |
 | SPEC-014 consent-immutability | 5 | Todo | — | — | AFK queue; write-once consent-evidence guard (app-level) |
@@ -37,7 +37,7 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [x] SPEC-010 — Postgres RLS **backstop shipped** (FORCE RLS + `app_rls` role + `withTenantRls`; cross-tenant read/write denial proven); unset-allows = no regression; prod enablement (non-superuser app role + request wiring) is the documented next step
 - [x] TICKET003 — demo-safe inbox reply
 - [x] TICKET009 — session-provider **seam shipped** (`resolveProductionCurrentOrg`, fail-closed, flag-gated; demo default unchanged); live Clerk enablement still human-gated
-- [ ] SPEC-011 — inbox lead-score surfacing (AFK queue)
+- [x] SPEC-011 — inbox lead-score surfacing (AFK queue)
 - [ ] SPEC-012 — AI seam for campaign-copy + conversation-summary (AFK queue)
 - [ ] SPEC-013 — per-US-state quiet-hour variants (AFK queue)
 - [ ] SPEC-014 — consent-evidence write-once immutability (AFK queue)

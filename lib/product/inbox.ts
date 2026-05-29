@@ -1,5 +1,6 @@
 import { ConversationStatus } from "@prisma/client";
 import { listConversations, listConversationMessages } from "@/lib/db/repositories/inbox";
+import { formatLeadStatus } from "@/lib/product/contacts";
 
 const productInboxMetricRowItems = [
   { key: "total", label: "Total Threads" },
@@ -14,7 +15,8 @@ export const productInboxMetricRows = Object.freeze(
 
 const productInboxThreadStatusRowItems = [
   { key: "thread", label: "Thread" },
-  { key: "consent", label: "Consent" }
+  { key: "consent", label: "Consent" },
+  { key: "lead", label: "Lead score" }
 ] as const;
 
 type ProductInboxThreadStatusKey = (typeof productInboxThreadStatusRowItems)[number]["key"];
@@ -99,7 +101,9 @@ export async function getProductInbox(orgId: string, selectedConversationId?: st
             label: row.label,
             value: getInboxThreadStatusValue(row.key, {
               status: selectedConversation.status,
-              consentStatus: selectedConversation.contact?.consentStatus ?? "UNKNOWN"
+              consentStatus: selectedConversation.contact?.consentStatus ?? "UNKNOWN",
+              leadScore: selectedConversation.contact?.leadScore ?? null,
+              leadStage: selectedConversation.contact?.leadStage ?? null
             })
           }))
         }
@@ -112,6 +116,8 @@ function getInboxThreadStatusValue(
   conversation: {
     status: string;
     consentStatus: string;
+    leadScore: number | null;
+    leadStage: string | null;
   }
 ) {
   switch (key) {
@@ -119,5 +125,7 @@ function getInboxThreadStatusValue(
       return conversation.status;
     case "consent":
       return conversation.consentStatus;
+    case "lead":
+      return formatLeadStatus(conversation.leadScore, conversation.leadStage);
   }
 }

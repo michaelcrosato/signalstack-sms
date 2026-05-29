@@ -43,7 +43,7 @@ type SelectedConversation = {
   notes: InboxNote[];
   messages: InboxMessage[];
   statusRows: Array<{
-    key: "thread" | "consent";
+    key: "thread" | "consent" | "lead";
     label: string;
     value: string;
   }>;
