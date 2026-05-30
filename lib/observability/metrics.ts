@@ -14,6 +14,8 @@ export const smsPipelineMetrics = Object.freeze({
 
 export type SmsPipelineMetricName = (typeof smsPipelineMetrics)[keyof typeof smsPipelineMetrics];
 
+export let webhookVerificationFailuresCount = 0;
+
 /**
  * Record an SMS pipeline metric.
  * Only works if OBSERVABILITY_ENABLED=true.
@@ -22,6 +24,10 @@ export type SmsPipelineMetricName = (typeof smsPipelineMetrics)[keyof typeof sms
 export function recordMetric(name: SmsPipelineMetricName, payload: Record<string, unknown> = {}): void {
   if (!observabilityIsEnabled()) {
     return;
+  }
+
+  if (name === smsPipelineMetrics.webhookVerificationFailureRate) {
+    webhookVerificationFailuresCount++;
   }
 
   // Redact any PII to ensure zero leakage

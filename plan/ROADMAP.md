@@ -45,6 +45,12 @@ Scores 1–5, **higher is better**: Impact (value), Feasibility (ease/small blas
 | SPEC-018 | Distributed Redis-Backed Rate Limiter | Quality | 4 | 4 | 4 | 5 | **17** | Replace in-memory rate limiter with Redis, safe fallback |
 | SPEC-019 | OpenTelemetry Exporter Integration | Quality | 4 | 4 | 5 | 4 | **17** | Wire vercel/otel exporter under root instrumentation |
 | SPEC-020 | PostgreSQL RLS Production Enablement | Future | 4 | 3 | 3 | 5 | **15** | Run queries wrapped in withTenantRls using app_rls |
+| SPEC-021 | Double Opt-In Workflow Seam | Features | 4 | 4 | 4 | 5 | **17** | transitional PENDING_DOUBLE_OPT_IN state + request SMS |
+| SPEC-022 | Prometheus Metrics Exporter API | Quality | 4 | 4 | 5 | 4 | **17** | plaintext exposition metrics format endpoint at /api/metrics |
+| SPEC-023 | TCPA Opt-Out Auto-responder Seam | Features | 5 | 4 | 4 | 5 | **18** | Automate STOP opt-outs and confirm SMS auto-replies |
+| SPEC-024 | Segment Synchronization Seam | Features | 4 | 4 | 4 | 5 | **17** | Dynamic query filter contact segment aggregates |
+| SPEC-025 | Template Render Validator | Quality | 4 | 4 | 5 | 5 | **18** | Parse placeholder variable substitutions and preview rendered copy |
+| SPEC-026 | Sentiment Analysis Seam | Features | 4 | 4 | 4 | 4 | **16** | AI-driven sentiment and classification mapping on inbox |
 
 ## DAG (dependencies)
 ```
@@ -86,7 +92,18 @@ Phase 7 (distributed infrastructure & production enablement):
   SPEC-018 (Redis rate limiter)      ── after SPEC-016 (done)
   SPEC-019 (OTel exporter)           ── after SPEC-006 (done)
   SPEC-020 (RLS prod enablement)     ── after SPEC-010 (done) & TICKET009
+
+Phase 8 (compliance depth & scraping diagnostics):
+  SPEC-021 (Double opt-in workflow)  ── after SPEC-009 (done)
+  SPEC-022 (Prometheus metrics API)  ── after SPEC-015 (done)
+  SPEC-023 (TCPA keyword auto-reply) ── after Twilio webhook ingestion
+
+Phase 9 (Perpetual improvement Wave 9; Todo):
+  SPEC-024 (Segment query builder)   ── after SPEC-017 (done)
+  SPEC-025 (Template preview engine) ── after SPEC-012 (done)
+  SPEC-026 (Sentiment analysis seam) ── after SPEC-008 (done)
 ```
+
 
 ## Phases (sequenced)
 - **Phase 0 — Stabilize & harden (now):** SPEC-001, SPEC-004, SPEC-002, SPEC-005, SPEC-003. All
@@ -100,7 +117,9 @@ Phase 7 (distributed infrastructure & production enablement):
 - **Phase 4 — Future-proofing:** SPEC-010 (RLS), then staged major upgrades from BACKLOG.
 - **Phase 5 — AFK continuation queue (done):** SPEC-011, SPEC-012, SPEC-013, SPEC-014, SPEC-015.
 - **Phase 6 — Infrastructure resilience & input validation (done):** SPEC-016 (done), SPEC-017 (done).
-- **Phase 7 — Distributed infrastructure & production enablement:** SPEC-018 (Todo), SPEC-019 (Todo), SPEC-020 (Todo).
+- **Phase 7 — Distributed infrastructure & production enablement (done):** SPEC-018 (done), SPEC-019 (done), SPEC-020 (done).
+- **Phase 8 — Compliance depth & scraping diagnostics (done):** SPEC-021 (done), SPEC-022 (done), SPEC-023 (done).
+- **Phase 9 — Segment sync, template validation, and sentiment analysis:** SPEC-024 (Todo), SPEC-025 (Todo), SPEC-026 (Todo).
 
 
 ## Risks / blockers

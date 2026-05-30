@@ -64,7 +64,9 @@ export function evaluateMessagingHardGate(input: MessagingHardGateInput): Messag
     if (input.contact.archivedAt) {
       reasons.push("CONTACT_ARCHIVED");
     }
-    if (input.contact.consentStatus !== ConsentStatus.OPTED_IN) {
+    if (input.contact.consentStatus === ConsentStatus.PENDING_DOUBLE_OPT_IN) {
+      reasons.push("PENDING_DOUBLE_OPT_IN");
+    } else if (input.contact.consentStatus !== ConsentStatus.OPTED_IN) {
       reasons.push("CONSENT_NOT_OPTED_IN");
     }
     if (input.contact.optedOutAt || input.contact.consentStatus === ConsentStatus.OPTED_OUT) {

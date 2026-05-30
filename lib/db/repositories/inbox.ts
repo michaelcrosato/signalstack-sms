@@ -1,5 +1,5 @@
 import { ConsentStatus, ConversationStatus, type Prisma } from "@prisma/client";
-import { classifyInboundKeyword } from "@/lib/compliance/opt-out";
+import { classifyInboundKeyword, type InboundKeywordAction } from "@/lib/compliance/opt-out";
 import { prisma } from "@/lib/db/prisma";
 import { orgWhere } from "@/lib/db/tenant";
 import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
@@ -64,6 +64,99 @@ export async function listConversationMessages(orgId: string, conversationId: st
   });
 }
 
+export async function processInboundKeywordsAndAutoReply(
+  tx: Prisma.TransactionClient,
+  orgId: string,
+  contact: { id: string; phone: string; consentStatus: ConsentStatus },
+  conversationId: string,
+  keywordAction: InboundKeywordAction
+) {
+  if (keywordAction === "OPT_OUT") {
+    await tx.contact.update({
+      where: { id: contact.id },
+      data: {
+        consentStatus: ConsentStatus.OPTED_OUT,
+        optedOutAt: new Date()
+      }
+    });
+
+    const body = "You have successfully opted out. You will no longer receive messages. Reply START to opt back in.";
+    const idempotencyKey = `opt-out-confirm:${orgId}:${contact.id}:${Date.now()}`;
+
+    const providerResult = await dummyProvider.send({
+      to: contact.phone,
+      from: "demo-signalstack",
+      body,
+      orgId,
+      idempotencyKey
+    });
+
+    const message = await tx.message.create({
+      data: {
+        orgId,
+        contactId: contact.id,
+        conversationId,
+        direction: "OUTBOUND",
+        body,
+        providerMessageId: providerResult.providerMessageId,
+        providerStatus: providerResult.status,
+        idempotencyKey
+      }
+    });
+
+    await tx.conversation.update({
+      where: { id: conversationId },
+      data: { lastMessageAt: message.createdAt }
+    });
+  } else if (keywordAction === "OPT_IN") {
+    if (
+      contact.consentStatus === ConsentStatus.PENDING_DOUBLE_OPT_IN ||
+      contact.consentStatus === ConsentStatus.UNKNOWN ||
+      contact.consentStatus === ConsentStatus.OPTED_OUT
+    ) {
+      await tx.contact.update({
+        where: { id: contact.id },
+        data: {
+          consentStatus: ConsentStatus.OPTED_IN,
+          optedOutAt: null,
+          consentCapturedAt: new Date(),
+          consentMethod: "SMS",
+          consentDisclosure: "Contact replied with opt-in keyword to confirm subscription"
+        }
+      });
+
+      const body = "Thank you! You have successfully confirmed your subscription and opted in.";
+      const idempotencyKey = `opt-in-confirm:${orgId}:${contact.id}:${Date.now()}`;
+
+      const providerResult = await dummyProvider.send({
+        to: contact.phone,
+        from: "demo-signalstack",
+        body,
+        orgId,
+        idempotencyKey
+      });
+
+      const message = await tx.message.create({
+        data: {
+          orgId,
+          contactId: contact.id,
+          conversationId,
+          direction: "OUTBOUND",
+          body,
+          providerMessageId: providerResult.providerMessageId,
+          providerStatus: providerResult.status,
+          idempotencyKey
+        }
+      });
+
+      await tx.conversation.update({
+        where: { id: conversationId },
+        data: { lastMessageAt: message.createdAt }
+      });
+    }
+  }
+}
+
 export async function createDemoInboundMessage(orgId: string, input: InboundMessageInput) {
   return prisma.$transaction(async (tx) => {
     const explicitIdempotencyKey =
@@ -102,15 +195,7 @@ export async function createDemoInboundMessage(orgId: string, input: InboundMess
         }
       }));
 
-    if (keywordAction === "OPT_OUT") {
-      await tx.contact.update({
-        where: { id: contact.id },
-        data: {
-          consentStatus: ConsentStatus.OPTED_OUT,
-          optedOutAt: new Date()
-        }
-      });
-    }
+    await processInboundKeywordsAndAutoReply(tx, orgId, contact, conversation.id, keywordAction);
 
     const idempotencyKey =
       explicitIdempotencyKey ??
@@ -170,11 +255,8 @@ export async function createConversationInboundMessage(
     const contact = conversation.contactId
       ? await tx.contact.findFirst({ where: orgWhere(orgId, { id: conversation.contactId }) })
       : null;
-    if (contact && keywordAction === "OPT_OUT") {
-      await tx.contact.update({
-        where: { id: contact.id },
-        data: { consentStatus: ConsentStatus.OPTED_OUT, optedOutAt: new Date() }
-      });
+    if (contact) {
+      await processInboundKeywordsAndAutoReply(tx, orgId, contact, conversationId, keywordAction);
     }
 
     const idempotencyKey =

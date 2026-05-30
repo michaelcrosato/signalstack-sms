@@ -52,5 +52,15 @@ Perpetual resume log for autonomous engineering sessions. Disk is the single sou
   - Enforced full backward compatibility and demo-safe defaults: active RLS session wrappers execute on standard `prisma` instances by default and activate only when `DATABASE_RLS_ENFORCED=true`.
   - Added unit tests in `tests/unit/db/rls-isolation.test.ts` verifying that `withOptionalTenantRls` behaves correctly under positive and negative environments.
   - Verified 100% green linter, typecheck, 476 unit tests, Playwright smoke tests, and Next.js production build (full 19/19 gate verification suite).
-- **Next wave generated:** Completed all Phase 7 specifications! Ready to replenish backlog or await further human instructions.
-- **Current active branch:** feat/spec-020-postgres-rls-production.
+- **Next wave generated:** Generated Phase 8 compliance depth specifications: SPEC-021 (Double Opt-In Workflow Seam), SPEC-022 (Prometheus Metrics Exporter API Seam), and SPEC-023 (TCPA Auto-responder Seam).
+- **Current active branch:** main.
+
+## Cycle 6 (2026-05-30)
+- **Status:** Shipped Phase 8 specifications (SPEC-021, SPEC-022, SPEC-023) and replenished Wave 9!
+- **Accomplishments:**
+  - **SPEC-023 (TCPA Auto-responder Seam):** Expanded opt-out keywords to `STOP`, `UNSUBSCRIBE`, `CANCEL`, `QUIT`, `END`, `REVOKE`, `OPTOUT` inside `lib/compliance/opt-out.ts`. Implemented centralized `processInboundKeywordsAndAutoReply` in `lib/db/repositories/inbox.ts` transitioning contacts automatically to `OPTED_OUT` state and dispatching outbound auto-response SMS via the dummy provider. Added 4 unit tests in `tests/unit/compliance/auto-responder.test.ts`.
+  - **SPEC-022 (Prometheus Exporter API):** Implemented Prometheus plaintext format metrics exporter endpoint at `/api/metrics` exposing pipeline aggregates (delivery totals, queue depth, signature failures, and latencies), gated by `OBSERVABILITY_ENABLED`. Documented route under API Contracts and API Map. Added 2 unit tests in `tests/unit/observability/prometheus.test.ts`.
+  - **SPEC-021 (Double Opt-In Seam):** Added `PENDING_DOUBLE_OPT_IN` to Prisma schema and applied schema migration. Updated contactWriteData in repositories to force `PENDING_DOUBLE_OPT_IN` on creation/import under `DOUBLE_OPT_IN_REQUIRED=true`, enqueuing and saving a compliant confirmation SMS. Wired inbound keyword processing to transition contacts to `OPTED_IN` and log consent evidence on `YES`/`JOIN`/`START`. Updated preflight and compliance gates to block messages to DOI-pending contacts. Added 2 unit tests in `tests/unit/compliance/double-opt-in.test.ts`.
+  - Verified 100% green linter (`eslint`), typecheck (`tsc`), 484 unit tests, Playwright e2e smoke, and Next.js production build (full 19/19 gate verification suite).
+- **Next wave generated (REPLENISH):** Promoted backlog items to Phase 9 specs: SPEC-024 (Segment Synchronization Seam), SPEC-025 (Template Render Validator), and SPEC-026 (Sentiment Analysis Seam).
+- **Current active branch:** main (clean and fully validated).

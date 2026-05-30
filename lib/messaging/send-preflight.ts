@@ -42,7 +42,9 @@ export function preflightCampaignRecipients(
     if (contact.archivedAt) {
       reasons.push("CONTACT_ARCHIVED");
     }
-    if (contact.consentStatus !== ConsentStatus.OPTED_IN) {
+    if (contact.consentStatus === ConsentStatus.PENDING_DOUBLE_OPT_IN) {
+      reasons.push("PENDING_DOUBLE_OPT_IN");
+    } else if (contact.consentStatus !== ConsentStatus.OPTED_IN) {
       reasons.push("CONSENT_NOT_OPTED_IN");
     }
     if (contact.optedOutAt || contact.consentStatus === ConsentStatus.OPTED_OUT) {

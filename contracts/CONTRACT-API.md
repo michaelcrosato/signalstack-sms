@@ -416,6 +416,10 @@ Returns recent tenant-scoped live-readiness audit events for the current organiz
 
 Returns a CSV export of tenant-scoped live-readiness audit events for the current organization using the same bounded `limit`, allowlisted `action`, and allowlisted `subjectType` filters as the JSON audit endpoint. The export includes local audit metadata only. It must not expose secrets, call providers, send notifications, create billing records, enable live messaging, or mutate audit records.
 
+### `GET /api/metrics`
+
+Returns SMS pipeline metrics in standard Prometheus plaintext exposition format, gated behind `OBSERVABILITY_ENABLED=true`.
+
 Product endpoints must be specified here before implementation.
 
 ## Cross-Cutting API Rate Limit

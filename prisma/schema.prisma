@@ -24,6 +24,7 @@ enum ConsentStatus {
   UNKNOWN
   OPTED_IN
   OPTED_OUT
+  PENDING_DOUBLE_OPT_IN
 }
 
 enum ConversationStatus {

@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "ConsentStatus" ADD VALUE 'PENDING_DOUBLE_OPT_IN';

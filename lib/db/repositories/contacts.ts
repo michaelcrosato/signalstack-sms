@@ -2,6 +2,7 @@ import { ContactImportStatus, ConsentStatus, type Prisma } from "@prisma/client"
 import { prisma } from "@/lib/db/prisma";
 import { orgWhere } from "@/lib/db/tenant";
 import type { ContactCreateInput, ContactUpdateInput } from "@/lib/validation/contacts";
+import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
 import type { ParsedContactImport } from "@/lib/csv/import-contacts";
 
 const contactInclude = {
@@ -55,6 +56,12 @@ export async function upsertContact(
         ...contactWriteData(input)
       }
     });
+
+    if (contact.consentStatus === ConsentStatus.PENDING_DOUBLE_OPT_IN) {
+      if (!existing || existing.consentStatus !== ConsentStatus.PENDING_DOUBLE_OPT_IN) {
+        await sendDoubleOptInRequest(t, orgId, contact.id, contact.phone);
+      }
+    }
 
     await syncContactLabels(t, orgId, contact.id, input.tagNames, input.listNames);
     return t.contact.findUniqueOrThrow({ where: { id: contact.id }, include: contactInclude });
@@ -205,6 +212,13 @@ export async function importContacts(
         update: contactWriteData(contact),
         create: { orgId, phone: contact.phone, ...contactWriteData(contact) }
       });
+
+      if (saved.consentStatus === ConsentStatus.PENDING_DOUBLE_OPT_IN) {
+        if (!existing || existing.consentStatus !== ConsentStatus.PENDING_DOUBLE_OPT_IN) {
+          await sendDoubleOptInRequest(tx, orgId, saved.id, saved.phone);
+        }
+      }
+
       await syncContactLabels(tx, orgId, saved.id, contact.tagNames, contact.listNames);
     }
 
@@ -220,20 +234,27 @@ export async function importContacts(
 }
 
 function contactWriteData(input: Partial<ContactCreateInput>) {
+  let finalStatus = input.consentStatus;
+  if (process.env.DOUBLE_OPT_IN_REQUIRED === "true") {
+    if (finalStatus !== ConsentStatus.OPTED_OUT) {
+      finalStatus = ConsentStatus.PENDING_DOUBLE_OPT_IN;
+    }
+  }
+
   const optedOutAt =
-    input.consentStatus === ConsentStatus.OPTED_OUT
+    finalStatus === ConsentStatus.OPTED_OUT
       ? new Date()
-      : input.consentStatus === ConsentStatus.OPTED_IN
+      : finalStatus === ConsentStatus.OPTED_IN
         ? null
         : undefined;
-  const optInAt = input.consentStatus === ConsentStatus.OPTED_IN ? new Date() : undefined;
+  const optInAt = finalStatus === ConsentStatus.OPTED_IN ? new Date() : undefined;
 
   return {
     email: input.email,
     firstName: input.firstName,
     lastName: input.lastName,
     displayName: input.displayName,
-    consentStatus: input.consentStatus,
+    consentStatus: finalStatus,
     optInSource: input.optInSource,
     optInAt,
     optedOutAt,
@@ -385,4 +406,57 @@ function verifyConsentEvidenceImmutability(
       throw new Error("Consent evidence (consentDisclosure) is write-once and cannot be changed");
     }
   }
+}
+
+export async function sendDoubleOptInRequest(
+  tx: Prisma.TransactionClient,
+  orgId: string,
+  contactId: string,
+  phone: string
+) {
+  const existingConversation = await tx.conversation.findFirst({
+    where: { orgId, contactId, status: "OPEN" },
+    orderBy: { updatedAt: "desc" }
+  });
+
+  const conversation =
+    existingConversation ??
+    (await tx.conversation.create({
+      data: {
+        orgId,
+        contactId,
+        status: "OPEN"
+      }
+    }));
+
+  const body = "Please reply YES to confirm subscription to SignalStack alerts.";
+  const idempotencyKey = `doi-request:${orgId}:${contactId}:${Date.now()}`;
+
+  const providerResult = await dummyProvider.send({
+    to: phone,
+    from: "demo-signalstack",
+    body,
+    orgId,
+    idempotencyKey
+  });
+
+  const message = await tx.message.create({
+    data: {
+      orgId,
+      contactId,
+      conversationId: conversation.id,
+      direction: "OUTBOUND",
+      body,
+      providerMessageId: providerResult.providerMessageId,
+      providerStatus: providerResult.status,
+      idempotencyKey
+    }
+  });
+
+  await tx.conversation.update({
+    where: { id: conversation.id },
+    data: { lastMessageAt: message.createdAt }
+  });
+
+  return message;
 }

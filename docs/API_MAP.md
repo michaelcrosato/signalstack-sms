@@ -139,6 +139,10 @@ Post-MVP live-readiness audit foundation:
 - `GET /api/settings/readiness-audit`: lists recent local go-live readiness audit events with bounded `limit`, allowlisted `action`, and allowlisted `subjectType` filters.
 - `GET /api/settings/readiness-audit/export`: exports filtered local go-live readiness audit events as CSV using the same allowlisted filters without secrets, provider calls, billing records, notifications, live messaging, or mutations.
 
+Post-MVP metrics foundation:
+
+- `GET /api/metrics`: returns SMS pipeline metrics in standard Prometheus plaintext exposition format, gated behind `OBSERVABILITY_ENABLED=true`.
+
 Post-MVP API rate limiting foundation:
 
 - All `/api/*` routes are protected by a local in-memory rate limiter before route handlers run.
