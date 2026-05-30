@@ -10,8 +10,8 @@ else
   echo "- .env already present or no .env.example; leaving as-is"
 fi
 
-echo "-> installing dependencies (npm install)"
-npm install
+echo "-> installing dependencies"
+run_install
 
 run_script db:generate
 

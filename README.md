@@ -20,10 +20,13 @@ Product workspace is at `/dashboard`; the gated live-test console is at `/demo`.
 ## Run / build / test
 
 ```bash
+npm run agent:bootstrap # alias for scripts/agent/bootstrap.sh
+npm run agent:check # full local gate (alias: npm run validate)
 npm run dev        # dev server
 npm run build      # production build
 npm start          # serve the production build (next start)
 npm run validate   # full local gate: lint, typecheck, unit tests, build, domain gates
+npm run test       # unit tests only
 ```
 
 End-to-end (needs Postgres + `npx playwright install chromium`):
@@ -31,6 +34,9 @@ End-to-end (needs Postgres + `npx playwright install chromium`):
 ```bash
 npm run test:e2e:smoke
 ```
+
+If `playwright` browsers are unavailable in the shell runtime, run `npx playwright install chromium`
+before `npm run test:e2e:smoke` or `npm run validate` (Linux Playwright support is version-sensitive).
 
 ## Environment
 

@@ -35,12 +35,18 @@ Shell wrappers (`bash scripts/agent/<name>.sh`) delegate to the npm scripts belo
 | Task | Shell wrapper | npm script |
 | --- | --- | --- |
 | One-time setup (env, deps, prisma) | `bootstrap.sh` | `npm run setup` (+ `.env` copy) |
-| Env diagnostics (read-only) | `doctor.sh` | — |
+| AFK bootstrap alias | `bootstrap.sh` | `npm run agent:bootstrap` |
+| Env diagnostics (read-only) | `doctor.sh` | `npm run agent:doctor` |
 | Full local gate | `check.sh` | `npm run validate` |
+| AFK local gate alias | `check.sh` | `npm run agent:check` |
 | Unit tests (vitest) | `test.sh [file]` | `npm test` |
+| AFK unit-test alias | `test.sh [file]` | `npm run agent:test [file]` |
 | Lint | `lint.sh` | `npm run lint` |
+| AFK lint alias | `lint.sh` | `npm run agent:lint` |
 | Type check | `typecheck.sh` | `npm run typecheck` |
+| AFK typecheck alias | `typecheck.sh` | `npm run agent:typecheck` |
 | Format | `format.sh` | (none configured; skips) |
+| AFK format alias | `format.sh` | `npm run agent:format` |
 | Startup brief | `status.sh` | `npm run agent:brief` |
 
 DB: `npm run db:generate | db:validate | db:migrate | db:seed`. Demo seed: `npm run demo:seed`.
