@@ -16,7 +16,9 @@ export const productInboxMetricRows = Object.freeze(
 const productInboxThreadStatusRowItems = [
   { key: "thread", label: "Thread" },
   { key: "consent", label: "Consent" },
-  { key: "lead", label: "Lead score" }
+  { key: "lead", label: "Lead score" },
+  { key: "sentiment", label: "Sentiment" },
+  { key: "category", label: "Category" }
 ] as const;
 
 type ProductInboxThreadStatusKey = (typeof productInboxThreadStatusRowItems)[number]["key"];
@@ -103,7 +105,9 @@ export async function getProductInbox(orgId: string, selectedConversationId?: st
               status: selectedConversation.status,
               consentStatus: selectedConversation.contact?.consentStatus ?? "UNKNOWN",
               leadScore: selectedConversation.contact?.leadScore ?? null,
-              leadStage: selectedConversation.contact?.leadStage ?? null
+              leadStage: selectedConversation.contact?.leadStage ?? null,
+              sentiment: selectedConversation.sentiment,
+              category: selectedConversation.category
             })
           }))
         }
@@ -118,6 +122,8 @@ function getInboxThreadStatusValue(
     consentStatus: string;
     leadScore: number | null;
     leadStage: string | null;
+    sentiment: string | null;
+    category: string | null;
   }
 ) {
   switch (key) {
@@ -127,5 +133,9 @@ function getInboxThreadStatusValue(
       return conversation.consentStatus;
     case "lead":
       return formatLeadStatus(conversation.leadScore, conversation.leadStage);
+    case "sentiment":
+      return conversation.sentiment ?? "Not analyzed";
+    case "category":
+      return conversation.category ?? "Not categorized";
   }
 }

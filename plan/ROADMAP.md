@@ -98,7 +98,7 @@ Phase 8 (compliance depth & scraping diagnostics):
   SPEC-022 (Prometheus metrics API)  ── after SPEC-015 (done)
   SPEC-023 (TCPA keyword auto-reply) ── after Twilio webhook ingestion
 
-Phase 9 (Perpetual improvement Wave 9; Todo):
+Phase 9 (Perpetual improvement Wave 9; Done):
   SPEC-024 (Segment query builder)   ── after SPEC-017 (done)
   SPEC-025 (Template preview engine) ── after SPEC-012 (done)
   SPEC-026 (Sentiment analysis seam) ── after SPEC-008 (done)
@@ -119,7 +119,7 @@ Phase 9 (Perpetual improvement Wave 9; Todo):
 - **Phase 6 — Infrastructure resilience & input validation (done):** SPEC-016 (done), SPEC-017 (done).
 - **Phase 7 — Distributed infrastructure & production enablement (done):** SPEC-018 (done), SPEC-019 (done), SPEC-020 (done).
 - **Phase 8 — Compliance depth & scraping diagnostics (done):** SPEC-021 (done), SPEC-022 (done), SPEC-023 (done).
-- **Phase 9 — Segment sync, template validation, and sentiment analysis:** SPEC-024 (Todo), SPEC-025 (Todo), SPEC-026 (Todo).
+- **Phase 9 — Segment sync, template validation, and sentiment analysis (done):** SPEC-024 (done), SPEC-025 (done), SPEC-026 (done).
 
 
 ## Risks / blockers

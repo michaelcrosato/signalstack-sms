@@ -143,6 +143,15 @@ Post-MVP metrics foundation:
 
 - `GET /api/metrics`: returns SMS pipeline metrics in standard Prometheus plaintext exposition format, gated behind `OBSERVABILITY_ENABLED=true`.
 
+Post-MVP segment synchronization foundation:
+
+- `GET /api/contacts/segments`: lists contacts matching dynamic segment tag, consent, and lead score filters.
+- `GET /api/contacts/segments/export`: exports contacts matching dynamic segment queries to CSV.
+
+Post-MVP template validation foundation:
+
+- `POST /api/templates/preview`: validates and returns rendered templates with substitution previews.
+
 Post-MVP API rate limiting foundation:
 
 - All `/api/*` routes are protected by a local in-memory rate limiter before route handlers run.

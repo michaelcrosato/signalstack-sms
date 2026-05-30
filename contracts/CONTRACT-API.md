@@ -420,6 +420,18 @@ Returns a CSV export of tenant-scoped live-readiness audit events for the curren
 
 Returns SMS pipeline metrics in standard Prometheus plaintext exposition format, gated behind `OBSERVABILITY_ENABLED=true`.
 
+### `GET /api/contacts/segments`
+
+Evaluates dynamic contact segment filters (tags, consent status, lead score ranges) and returns matching tenant-scoped contacts.
+
+### `GET /api/contacts/segments/export`
+
+Exports matching contact segment queries directly to a downloadable standard CSV file.
+
+### `POST /api/templates/preview`
+
+Validates placeholder variable substitutions and returns the fully rendered preview string along with any missing or unused parameter warning list.
+
 Product endpoints must be specified here before implementation.
 
 ## Cross-Cutting API Rate Limit

@@ -4,6 +4,8 @@ import {
   fakeReplySuggestion,
   fakeCampaignCopyVariants,
   fakeConversationSummary,
+  fakeConversationSentiment,
+  type ConversationSentiment,
   type AiMessage
 } from "@/lib/ai/fake-ai-provider";
 import { redactValue } from "@/lib/observability/logger";
@@ -45,12 +47,17 @@ export type ConversationSummary = {
   summary: string;
 };
 
+export type ConversationSentimentInput = {
+  messages: AiMessage[];
+};
+
 export interface AiProvider {
   readonly name: "fake" | "live";
   generateReplyDraft(input: ReplyDraftInput): Promise<ReplyDraft>;
   qualifyLead(input: { messages: AiMessage[] }): Promise<LeadQualification>;
   generateCampaignCopy(input: CampaignCopyInput): Promise<CampaignCopy>;
   summarizeConversation(input: ConversationSummaryInput): Promise<ConversationSummary>;
+  analyzeConversationSentiment(input: ConversationSentimentInput): Promise<ConversationSentiment>;
 }
 
 export const fakeAiProvider: AiProvider = {
@@ -70,6 +77,9 @@ export const fakeAiProvider: AiProvider = {
   async summarizeConversation(input) {
     // Byte-for-byte the prior deterministic summary shape
     return fakeConversationSummary(input.messages);
+  },
+  async analyzeConversationSentiment(input) {
+    return fakeConversationSentiment(input.messages);
   }
 };
 
@@ -148,6 +158,24 @@ function parseConversationSummary(text: string): { summary: string } {
     throw new Error("missing summary field");
   } catch {
     throw new Error("Live AI returned an unparseable conversation summary.");
+  }
+}
+
+// Defensive parse of the model's conversation sentiment JSON (analysis only; never trusts shape blindly).
+function parseConversationSentiment(text: string): { sentiment: string; category: string } {
+  try {
+    const match = text.match(/\{[\s\S]*\}/);
+    const parsed = JSON.parse(match ? match[0] : text) as {
+      sentiment?: unknown;
+      category?: unknown;
+    };
+    const sentiment =
+      typeof parsed.sentiment === "string" && parsed.sentiment.length > 0 ? parsed.sentiment : "NEUTRAL";
+    const category =
+      typeof parsed.category === "string" && parsed.category.length > 0 ? parsed.category : "INQUIRY";
+    return { sentiment, category };
+  } catch {
+    throw new Error("Live AI returned an unparseable conversation sentiment.");
   }
 }
 
@@ -301,6 +329,45 @@ export const liveAiProvider: AiProvider = {
       .trim();
 
     return { provider: "live", ...parseConversationSummary(text) };
+  },
+  async analyzeConversationSentiment(input) {
+    const apiKey = process.env.AI_API_KEY ?? "";
+    const transcript = input.messages
+      .map((message) => `${message.direction}: ${redactValue(message.body) as string}`)
+      .join("\n");
+    const promptText = [
+      'Analyze the sentiment and category of this SMS conversation. Return ONLY compact JSON: {"sentiment": "POSITIVE|NEGATIVE|NEUTRAL", "category": "INQUIRY|OPT_OUT|SUPPORT|SALUTATION"}.',
+      "Analysis only — do not send anything.",
+      "",
+      "Conversation:",
+      transcript
+    ].join("\n");
+
+    const response = await fetch(ANTHROPIC_URL, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": ANTHROPIC_VERSION
+      },
+      body: JSON.stringify({
+        model: process.env.AI_MODEL ?? DEFAULT_MODEL,
+        max_tokens: 256,
+        messages: [{ role: "user", content: promptText }]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Live AI request failed with status ${response.status}.`);
+    }
+
+    const data = (await response.json()) as { content?: Array<{ text?: string }> };
+    const text = (data.content ?? [])
+      .map((part) => part.text ?? "")
+      .join("")
+      .trim();
+
+    return { provider: "live", ...parseConversationSentiment(text) };
   }
 };
 

@@ -43,7 +43,7 @@ type SelectedConversation = {
   notes: InboxNote[];
   messages: InboxMessage[];
   statusRows: Array<{
-    key: "thread" | "consent" | "lead";
+    key: "thread" | "consent" | "lead" | "sentiment" | "category";
     label: string;
     value: string;
   }>;
@@ -283,15 +283,30 @@ export function InboxWorkspace({
                 </p>
                 {selectedConversation ? (
                   <dl aria-label="Thread status" className="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
-                    {selectedConversation.statusRows.map((row) => (
-                      <div
-                        className="inline-flex gap-1 rounded border border-slate-300 bg-slate-50 px-2 py-1"
-                        key={row.key}
-                      >
-                        <dt>{row.label}</dt>
-                        <dd>{row.key === "thread" ? threadStatus : row.value}</dd>
-                      </div>
-                    ))}
+                    {selectedConversation.statusRows.map((row) => {
+                      const value = row.key === "thread" ? threadStatus : row.value;
+                      let themeClasses = "border-slate-300 bg-slate-50 text-slate-800";
+                      if (row.key === "sentiment") {
+                        if (value === "POSITIVE") {
+                          themeClasses = "border-emerald-300 bg-emerald-50 text-emerald-800";
+                        } else if (value === "NEGATIVE") {
+                          themeClasses = "border-rose-300 bg-rose-50 text-rose-800";
+                        } else if (value === "NEUTRAL") {
+                          themeClasses = "border-sky-300 bg-sky-50 text-sky-800";
+                        }
+                      } else if (row.key === "category" && value !== "Not categorized") {
+                        themeClasses = "border-violet-300 bg-violet-50 text-violet-800";
+                      }
+                      return (
+                        <div
+                          className={`inline-flex gap-1 rounded border px-2 py-1 ${themeClasses}`}
+                          key={row.key}
+                        >
+                          <dt>{row.label}</dt>
+                          <dd>{value}</dd>
+                        </div>
+                      );
+                    })}
                   </dl>
                 ) : null}
               </div>

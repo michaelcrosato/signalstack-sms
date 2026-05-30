@@ -331,6 +331,8 @@ model Conversation {
   lastMessageAt    DateTime?
   assignedAt       DateTime?
   resolvedAt       DateTime?
+  sentiment        String?
+  category         String?
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   org              Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)

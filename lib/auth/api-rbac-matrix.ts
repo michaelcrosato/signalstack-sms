@@ -221,6 +221,13 @@ const apiRouteRbacMatrixItems = [
   },
   {
     auth: "role",
+    method: "POST",
+    path: "app/api/templates/preview/route.ts",
+    requiredRole: MembershipRole.MEMBER,
+    scope: "preview rendered message template"
+  },
+  {
+    auth: "role",
     method: "PATCH",
     path: "app/api/templates/[templateId]/route.ts",
     requiredRole: MembershipRole.ADMIN,

@@ -31,6 +31,9 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 | SPEC-021 double-opt-in | 8 | **Done** | working tree | `npm run validate` green | Double Opt-In Workflow Seam |
 | SPEC-022 prometheus-metrics | 8 | **Done** | working tree | `npm run validate` green | Prometheus Metrics Exporter API |
 | SPEC-023 auto-responder | 8 | **Done** | working tree | `npm run validate` green | TCPA Auto-responder and Opt-out Keyword Seam |
+| SPEC-024 segment-sync | 9 | **Done** | working tree | `npm run validate` green | Dynamic Contact Segment Builder |
+| SPEC-025 template-preview | 9 | **Done** | working tree | `npm run validate` green | Message Template Preview & Validator |
+| SPEC-026 sentiment-analysis | 9 | **Done** | working tree | `npm run validate` green | Conversation Sentiment & AI Categorization |
 
 ## Checklist (downstream agents)
 - [x] SPEC-001 — Docker `start` script
@@ -58,8 +61,16 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [x] SPEC-021 — Double Opt-In Workflow Seam
 - [x] SPEC-022 — Prometheus Metrics Exporter API
 - [x] SPEC-023 — TCPA Auto-responder and Opt-out Keyword Seam
+- [x] SPEC-024 — Dynamic Contact Segment Builder
+- [x] SPEC-025 — Message Template Preview & Validator
+- [x] SPEC-026 — Conversation Sentiment & AI Categorization
 
 ## Log (most recent first)
+- 2026-05-30 — **SPEC-024, SPEC-025, SPEC-026 DONE.** Shipped Wave 9 specifications:
+  - **SPEC-024 (Dynamic Contact Segment Builder):** Implemented dynamic query builder `evaluateSegmentContacts` inside `lib/db/repositories/segments.ts` to aggregate contact filters across consent, tag constraints, and numeric lead scores. Exposed GET `/api/contacts/segments` and export plaintext `/api/contacts/segments/export` API endpoints with robust role checking and RLS support. Added unit tests in `tests/unit/product/segment-sync.test.ts`.
+  - **SPEC-025 (Message Template Preview & Validator):** Built placeholder variable substitution parser `renderTemplatePreview` in `lib/validation/template-preview.ts` ensuring clean variables tracking (unused and missing variables). Exposed role-gated POST `/api/templates/preview` route. Added unit tests in `tests/unit/validation/template-preview.test.ts`.
+  - **SPEC-026 (Conversation Sentiment & AI Categorization):** Structured and implemented asynchronous sentiment analysis hooks within inbound processing flows (createDemoInboundMessage, createConversationInboundMessage) calling `resolveAiProvider().analyzeConversationSentiment()`. Surface visual emerald/rose/sky sentiment tags in dashboard inbox workspace. Added 8 unit tests in `tests/unit/ai/sentiment-analysis.test.ts`.
+  - Verified 100% green linter (`eslint`), typecheck (`tsc`), 497 unit tests, Playwright e2e smoke, and Next.js production build.
 - 2026-05-30 — **SPEC-023 TCPA Auto-responder and Opt-out Keyword Seam DONE.** Expanded opt-out keywords list to `STOP`, `UNSUBSCRIBE`, `CANCEL`, `QUIT`, `END`, `REVOKE`, `OPTOUT` centrally inside `lib/compliance/opt-out.ts`. Expanded inbound keyword processing `processInboundKeywordsAndAutoReply` inside `lib/db/repositories/inbox.ts` to automatically transit matching inbound STOP keywords to `OPTED_OUT` state in the database, log opt-out timestamps, and dispatch a compliant outbound auto-response SMS via the dummy provider. Added unit tests under `tests/unit/compliance/auto-responder.test.ts` verifying parsing, updates, and mock responses. Verified 100% green linter, typecheck, tests, and build.
 - 2026-05-30 — **SPEC-022 Prometheus Metrics Exporter API Seam DONE.** Implemented standard Prometheus API exporter at `/api/metrics` exposing standard plaintext exposition metrics format for delivery totals, queue depth, webhook verification failures, and send latencies. Gated access behind `OBSERVABILITY_ENABLED` flag returning `404` when disabled. Exposed a robust global in-memory counter for signature failures inside `lib/observability/metrics.ts`. Documented endpoint under `contracts/CONTRACT-API.md` and `docs/API_MAP.md`. Added unit tests in `tests/unit/observability/prometheus.test.ts` passing successfully.
 - 2026-05-30 — **SPEC-021 Double Opt-In Workflow Seam DONE.** Added transitional `PENDING_DOUBLE_OPT_IN` to `ConsentStatus` enum in `prisma/schema.prisma` and applied additive Postgres schema migration safely. Updated `contactWriteData` to force `PENDING_DOUBLE_OPT_IN` status when single creating or CSV importing contacts under `DOUBLE_OPT_IN_REQUIRED=true` (unless opted out). Implemented `sendDoubleOptInRequest` enqueuing and saving a compliant outbound confirmation SMS via the dummy provider on transition. Wired inbound keyword processing to transit `OPTED_IN` and record exact consent evidence on `YES`/`JOIN`/`START` confirmation keyword replies. Updated messaging preflight and compliance gates to reject marketing sends to DOI-pending contacts. Added unit tests in `tests/unit/compliance/double-opt-in.test.ts` passing successfully.

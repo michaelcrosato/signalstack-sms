@@ -108,7 +108,9 @@ describe("getProductInbox", () => {
     expect(result.selectedConversation?.statusRows).toEqual([
       { key: "thread", label: "Thread", value: ConversationStatus.OPEN },
       { key: "consent", label: "Consent", value: ConsentStatus.OPTED_IN },
-      { key: "lead", label: "Lead score", value: "Not qualified" }
+      { key: "lead", label: "Lead score", value: "Not qualified" },
+      { key: "sentiment", label: "Sentiment", value: "Not analyzed" },
+      { key: "category", label: "Category", value: "Not categorized" }
     ]);
   });
 
@@ -196,8 +198,8 @@ describe("getProductInbox", () => {
   it("freezes inbox thread status metadata before rendering", () => {
     expect(Object.isFrozen(productInboxThreadStatusRows)).toBe(true);
     expect(productInboxThreadStatusRows.every((row) => Object.isFrozen(row))).toBe(true);
-    expect(productInboxThreadStatusRows.map((row) => row.key)).toEqual(["thread", "consent", "lead"]);
-    expect(productInboxThreadStatusRows.map((row) => row.label)).toEqual(["Thread", "Consent", "Lead score"]);
+    expect(productInboxThreadStatusRows.map((row) => row.key)).toEqual(["thread", "consent", "lead", "sentiment", "category"]);
+    expect(productInboxThreadStatusRows.map((row) => row.label)).toEqual(["Thread", "Consent", "Lead score", "Sentiment", "Category"]);
 
     expect(() =>
       (productInboxThreadStatusRows as unknown as Array<{ key: string; label: string }>).push({

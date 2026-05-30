@@ -65,3 +65,34 @@ export function assertFakeAiProvider() {
     throw new Error("Live AI providers are not enabled in this milestone.");
   }
 }
+
+export type ConversationSentiment = {
+  provider: "fake" | "live";
+  sentiment: string;
+  category: string;
+};
+
+export function fakeConversationSentiment(messages: AiMessage[]): ConversationSentiment {
+  const text = messages.map((message) => message.body.toLowerCase()).join(" ");
+  const sentiment =
+    text.includes("pricing") || text.includes("yes") || text.includes("join")
+      ? "POSITIVE"
+      : text.includes("stop") || text.includes("unsubscribe") || text.includes("cancel")
+        ? "NEGATIVE"
+        : "NEUTRAL";
+  const category =
+    text.includes("stop") || text.includes("unsubscribe")
+      ? "OPT_OUT"
+      : text.includes("help") || text.includes("support")
+        ? "SUPPORT"
+        : text.includes("pricing") || text.includes("quote")
+          ? "INQUIRY"
+          : "SALUTATION";
+
+  return {
+    provider: "fake" as const,
+    sentiment,
+    category
+  };
+}
+

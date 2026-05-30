@@ -3,6 +3,7 @@ import { classifyInboundKeyword, type InboundKeywordAction } from "@/lib/complia
 import { prisma } from "@/lib/db/prisma";
 import { orgWhere } from "@/lib/db/tenant";
 import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
+import { resolveAiProvider } from "@/lib/ai/provider";
 import type {
   ConversationAssignInput,
   ConversationMessageCreateInput,
@@ -225,12 +226,44 @@ export async function createDemoInboundMessage(orgId: string, input: InboundMess
       include: conversationInclude
     });
 
+    triggerConversationSentimentAnalysis(orgId, conversation.id);
+
     return {
       conversation: savedConversation,
       message,
       keywordAction
     };
   });
+}
+
+export function triggerConversationSentimentAnalysis(orgId: string, conversationId: string) {
+  setTimeout(async () => {
+    try {
+      const messages = await prisma.message.findMany({
+        where: { orgId, conversationId },
+        orderBy: { createdAt: "asc" }
+      });
+      if (messages.length === 0) return;
+
+      const aiMessages = messages.map((m) => ({
+        direction: m.direction,
+        body: m.body
+      }));
+
+      const provider = resolveAiProvider();
+      const result = await provider.analyzeConversationSentiment({ messages: aiMessages });
+
+      await prisma.conversation.update({
+        where: { id: conversationId },
+        data: {
+          sentiment: result.sentiment,
+          category: result.category
+        }
+      });
+    } catch (error) {
+      console.error("[SentimentAnalysis] Failed:", error);
+    }
+  }, 10);
 }
 
 export async function createConversationInboundMessage(
@@ -279,6 +312,8 @@ export async function createConversationInboundMessage(
       where: { id: conversationId },
       data: { status: ConversationStatus.OPEN, lastMessageAt: message.createdAt, resolvedAt: null }
     });
+
+    triggerConversationSentimentAnalysis(orgId, conversationId);
 
     return { message, keywordAction };
   });
