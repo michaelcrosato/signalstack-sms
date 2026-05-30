@@ -56,6 +56,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "@vercel/otel": "^2.1.2",
     "bullmq": "^5.76.10",
     "ioredis": "^5.11.0",
     "next": "^15.5.18",

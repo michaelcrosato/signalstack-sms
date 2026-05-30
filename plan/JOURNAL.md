@@ -33,3 +33,13 @@ Perpetual resume log for autonomous engineering sessions. Disk is the single sou
   - Verified 100% green linter, typecheck, 472 unit tests, Playwright smoke tests, and Next.js production build (full 19/19 gate verification suite).
 - **Next spec in-scope:** SPEC-019 (OpenTelemetry Exporter Integration).
 - **Current active branch:** feat/spec-018-redis-rate-limiter.
+
+## Cycle 4 (2026-05-30)
+- **Status:** Shipped SPEC-019 (OpenTelemetry Exporter Integration).
+- **Accomplishments:**
+  - Integrated official `@vercel/otel` package into our native Next.js root `instrumentation.ts` observing seam.
+  - Initialized tracing/telemetry registration under the `register()` hook, strictly guarded by the demo-safe `observabilityIsEnabled()` flag ensuring zero external overhead or telemetry execution by default.
+  - Added 3 vitest unit tests in `tests/unit/observability/otel.test.ts` verifying negative and positive env flag behaviors.
+  - Verified 100% green linter, typecheck, 475 unit tests, Playwright smoke tests, and Next.js production build (full 19/19 gate verification suite).
+- **Next spec in-scope:** SPEC-020 (PostgreSQL RLS Production Enablement).
+- **Current active branch:** feat/spec-019-otel-exporter.

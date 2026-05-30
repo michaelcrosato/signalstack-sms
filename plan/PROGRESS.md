@@ -26,7 +26,7 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 | SPEC-016 bullmq-hardening | 6 | **Done** | working tree | `npm test` green | BullMQ Worker production hardening |
 | SPEC-017 lookup-validation | 6 | **Done** | working tree | `npm test` green | Phone Number Lookup Validation Seam |
 | SPEC-018 redis-rate-limiter | 7 | **Done** | feat/spec-018-redis-rate-limiter | `npm run validate` green | Distributed Redis-Backed Rate Limiter |
-| SPEC-019 otel-exporter | 7 | **Todo** | | | OpenTelemetry Exporter Integration |
+| SPEC-019 otel-exporter | 7 | **Done** | feat/spec-019-otel-exporter | `npm run validate` green | OpenTelemetry Exporter Integration |
 | SPEC-020 postgres-rls-production | 7 | **Todo** | | | PostgreSQL RLS Production Enablement |
 
 ## Checklist (downstream agents)
@@ -50,10 +50,11 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [x] SPEC-016 — BullMQ Worker production hardening
 - [x] SPEC-017 — Phone Number Lookup Validation Seam
 - [x] SPEC-018 — Distributed Redis-Backed Rate Limiter
-- [ ] SPEC-019 — OpenTelemetry Exporter Integration
+- [x] SPEC-019 — OpenTelemetry Exporter Integration
 - [ ] SPEC-020 — PostgreSQL RLS Production Enablement
 
 ## Log (most recent first)
+- 2026-05-30 — **SPEC-019 OpenTelemetry Exporter Integration DONE.** Wired the official `@vercel/otel` package into our native Next.js root `instrumentation.ts` observing seam. Initialized tracing/telemetry registration under the `register()` hook, strictly guarded by the demo-safe `observabilityIsEnabled()` flag ensuring zero external overhead or telemetry execution by default. Added 3 vitest unit tests in `tests/unit/observability/otel.test.ts` verifying negative and positive env flag behaviors. Verified 100% green linter, typecheck, unit tests, playwright smoke tests, and Next.js production build.
 - 2026-05-30 — **SPEC-018 Distributed Redis-Backed Rate Limiter DONE.** Implemented robust distributed rate limiting inside `lib/rate-limit/api-rate-limit.ts` using dynamic runtime imports (`/* webpackIgnore: true */`) to prevent Next.js edge middleware Webpack compilation issues, isolating `ioredis` in `lib/rate-limit/redis-rate-limiter-impl.ts`. Implemented atomic transactions (`MULTI`, `INCR`, `PTTL`, `PEXPIRE`) for accurate distributed rate calculations, with graceful fast fallback (`maxRetriesPerRequest: 1`, `enableOfflineQueue: false`) to the in-memory Map store in case of Redis connection drops. Added 5 vitest unit tests in `tests/unit/rate-limit/redis-rate-limit.test.ts` verifying all success, block, failure, and fallback modes. Verified 100% green linter, typecheck, unit tests, playwright smoke tests, and Next.js production build.
 - 2026-05-30 — **SPEC-017 Phone Number Lookup Validation Seam DONE.** Shipped the centralized `lib/validation/lookup.ts` containing the `evaluatePhoneNumberLookup()` resolver which format-sanitizes strings to E.164 natively by default, and gates a live Twilio Lookup API validator (`client.lookups.v2.phoneNumbers` via fetch) checking for mobile line-types if `LIVE_LOOKUP_ENABLED=true`. Integrated into the single contact create (`app/api/contacts/route.ts` POST) and batch CSV import (`lib/csv/import-contacts.ts` + API route). Added 12 vitest unit tests covering local standardization, mock live responses, landline rejections, and graceful fallback behaviors. Verified 100% green linting and 467 tests successfully passing.
 - 2026-05-30 — **SPEC-016 BullMQ Worker Production Hardening DONE.** Added graceful shutdown hooks (SIGTERM/SIGINT), configurable locking properties (lockDuration, stalledInterval), centralized worker error monitoring/fail listeners with PII-safe logging and metric dispatch, and configurable job options TTL parameters (removeOnComplete, removeOnFail). Verified 100% green linting and 455 unit tests successfully passing.
