@@ -51,6 +51,9 @@ Scores 1–5, **higher is better**: Impact (value), Feasibility (ease/small blas
 | SPEC-024 | Segment Synchronization Seam | Features | 4 | 4 | 4 | 5 | **17** | Dynamic query filter contact segment aggregates |
 | SPEC-025 | Template Render Validator | Quality | 4 | 4 | 5 | 5 | **18** | Parse placeholder variable substitutions and preview rendered copy |
 | SPEC-026 | Sentiment Analysis Seam | Features | 4 | 4 | 4 | 4 | **16** | AI-driven sentiment and classification mapping on inbox |
+| SPEC-027 | Timezone Quiet Hours | Features | 5 | 4 | 4 | 5 | **18** | Resolve contact's timezone dynamically from phone area codes |
+| SPEC-028 | Subscription Quotas | Features | 5 | 4 | 4 | 5 | **18** | Implement multi-tenant billing tier scopes and usage dashboard API |
+| SPEC-029 | Conversational Autopilot | Features | 4 | 4 | 4 | 4 | **16** | Fully autonomous AI auto-reply loops for designated contacts |
 
 ## DAG (dependencies)
 ```
@@ -102,6 +105,11 @@ Phase 9 (Perpetual improvement Wave 9; Done):
   SPEC-024 (Segment query builder)   ── after SPEC-017 (done)
   SPEC-025 (Template preview engine) ── after SPEC-012 (done)
   SPEC-026 (Sentiment analysis seam) ── after SPEC-008 (done)
+
+Phase 10 (Perpetual improvement Wave 10; Todo):
+  SPEC-027 (Timezone quiet hours)    ── after SPEC-013 (done)
+  SPEC-028 (Subscription quotas)     ── after SPEC-020 (done)
+  SPEC-029 (Conversational autopilot) ── after SPEC-026 (done)
 ```
 
 
@@ -120,6 +128,7 @@ Phase 9 (Perpetual improvement Wave 9; Done):
 - **Phase 7 — Distributed infrastructure & production enablement (done):** SPEC-018 (done), SPEC-019 (done), SPEC-020 (done).
 - **Phase 8 — Compliance depth & scraping diagnostics (done):** SPEC-021 (done), SPEC-022 (done), SPEC-023 (done).
 - **Phase 9 — Segment sync, template validation, and sentiment analysis (done):** SPEC-024 (done), SPEC-025 (done), SPEC-026 (done).
+- **Phase 10 — Timezone dispatcher, subscription quotas, and conversational autopilot:** SPEC-027 (Todo), SPEC-028 (Todo), SPEC-029 (Todo).
 
 
 ## Risks / blockers
