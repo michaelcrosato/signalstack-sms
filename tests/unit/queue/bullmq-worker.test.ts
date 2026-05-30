@@ -130,4 +130,20 @@ describe("BullMQ worker foundation", () => {
       })
     ).toThrow();
   });
+
+  it("applies lock duration and stalled interval from environment variables in worker options", () => {
+    const worker = createScheduledCampaignBullMqWorker({
+      QUEUE_BACKEND: "bullmq",
+      REDIS_URL: "redis://localhost:6379",
+      LIVE_MESSAGING_ENABLED: "false",
+      MESSAGING_PROVIDER: "dummy",
+      BULLMQ_LOCK_DURATION_MS: "45000",
+      BULLMQ_STALLED_INTERVAL_MS: "15000"
+    });
+
+    expect(worker.opts.lockDuration).toBe(45000);
+    expect(worker.opts.stalledInterval).toBe(15000);
+    worker.close();
+  });
 });
+

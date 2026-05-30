@@ -27,9 +27,18 @@ export function buildScheduledCampaignBullMqJob(input: {
   payload: ScheduledCampaignJob;
   runAt: Date;
   now?: Date;
+  env?: Record<string, string | undefined>;
 }) {
   const now = input.now ?? new Date();
   const delayMs = Math.max(input.runAt.getTime() - now.getTime(), 0);
+  const env = input.env ?? process.env;
+
+  const removeOnCompleteAge = env.BULLMQ_REMOVE_ON_COMPLETE_AGE_SEC
+    ? Number.parseInt(env.BULLMQ_REMOVE_ON_COMPLETE_AGE_SEC, 10)
+    : 24 * 3600; // 24 hours
+  const removeOnFailAge = env.BULLMQ_REMOVE_ON_FAIL_AGE_SEC
+    ? Number.parseInt(env.BULLMQ_REMOVE_ON_FAIL_AGE_SEC, 10)
+    : 7 * 24 * 3600; // 7 days
 
   return {
     name: scheduledCampaignBullMqJobName,
@@ -41,8 +50,8 @@ export function buildScheduledCampaignBullMqJob(input: {
       jobId: input.idempotencyKey,
       delay: delayMs,
       attempts: 3,
-      removeOnComplete: true,
-      removeOnFail: false
+      removeOnComplete: { age: removeOnCompleteAge },
+      removeOnFail: { age: removeOnFailAge }
     } satisfies JobsOptions,
     delayMs
   };
@@ -72,7 +81,8 @@ export async function enqueueScheduledCampaignBullMqJob(
     idempotencyKey: queueJob.idempotencyKey,
     payload: payload.data,
     runAt: queueJob.runAt,
-    now: input.now
+    now: input.now,
+    env
   });
   const jobData = scheduledCampaignBullMqJobDataSchema.safeParse(job.data);
   if (!jobData.success) {

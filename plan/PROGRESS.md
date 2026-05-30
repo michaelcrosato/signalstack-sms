@@ -23,6 +23,8 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 | SPEC-013 state-quiet-hours | 5 | **Done** | feat/spec-013-state-quiet-hours | `npm run validate` green | AFK queue; per-US-state windows, pure logic, no migration |
 | SPEC-014 consent-immutability | 5 | **Done** | feat/spec-014-consent-evidence-immutability | `npm run validate` green | AFK queue; write-once consent-evidence guard (app-level) |
 | SPEC-015 delivery-metrics | 5 | **Done** | feat/spec-015-delivery-metrics-counters | `npm run validate` green | AFK queue; flag-gated delivery/queue/webhook counters, no PII |
+| SPEC-016 bullmq-hardening | 6 | **Done** | working tree | `npm test` green | BullMQ Worker production hardening |
+| SPEC-017 lookup-validation | 6 | **Todo** | | | Phone Number Lookup Validation Seam |
 
 ## Checklist (downstream agents)
 - [x] SPEC-001 — Docker `start` script
@@ -42,8 +44,11 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [x] SPEC-013 — per-US-state quiet-hour variants (AFK queue)
 - [x] SPEC-014 — consent-evidence write-once immutability (AFK queue)
 - [x] SPEC-015 — delivery/queue/webhook metrics counters (AFK queue)
+- [x] SPEC-016 — BullMQ Worker production hardening
+- [ ] SPEC-017 — Phone Number Lookup Validation Seam
 
 ## Log (most recent first)
+- 2026-05-30 — **SPEC-016 BullMQ Worker Production Hardening DONE.** Added graceful shutdown hooks (SIGTERM/SIGINT), configurable locking properties (lockDuration, stalledInterval), centralized worker error monitoring/fail listeners with PII-safe logging and metric dispatch, and configurable job options TTL parameters (removeOnComplete, removeOnFail). Verified 100% green linting and 455 unit tests successfully passing.
 - 2026-05-29 — **SPEC-015 SMS delivery/queue/webhook metrics counters DONE.** Extended the centralized `lib/observability/metrics.ts` with the `recordMetric()` helper. Structured and instrumented the five required pipeline counters: delivery rate, send-to-delivered latency, queue depth, failure-by-error-code, and webhook-verification failure rate at existing seams (Twilio webhooks validation/status transitions, database queue repositories, BullMQ worker enqueues). Defensively redacts PII context and gates behavior on `OBSERVABILITY_ENABLED`. Added a comprehensive unit test suite, extended `observability:check`, and verified a full local gate (`npm run validate` 19/19 checks green).
 - 2026-05-29 — **SPEC-014 write-once consent evidence immutability DONE.** Enforced write-once immutability for contact consent evidence fields (`consentCapturedAt`, `consentMethod`, `consentDisclosure`) at the application layer. First capture, no-op writes, and unrelated fields updates are allowed; updates attempting to overwrite existing evidence fields with a different non-empty value are rejected with a tenant-safe error. Covered by a new Vitest unit test suite (10 specs) and verified full local gate (19/19 checks green).
 - 2026-05-29 — **AFK 12h readiness setup (no app code changed).** Made the full protected gate green on

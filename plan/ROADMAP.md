@@ -40,6 +40,8 @@ Scores 1–5, **higher is better**: Impact (value), Feasibility (ease/small blas
 | SPEC-013 | Per-US-state quiet-hour variants | Features | 4 | 4 | 4 | 5 | **17** | compliance depth; pure logic, no migration |
 | SPEC-014 | Consent-evidence write-once immutability | Features | 4 | 4 | 4 | 5 | **17** | TCPA defensibility; app-level guard |
 | SPEC-015 | Delivery/queue/webhook metrics counters | Sec/Qual | 4 | 4 | 4 | 4 | **16** | observability depth; flag-gated, no PII |
+| SPEC-016 | BullMQ Worker production hardening | Infra | 4 | 4 | 4 | 4 | **16** | grace close, custom lock durations, error hooks |
+| SPEC-017 | Phone Number Lookup Validation Seam | Quality | 4 | 3 | 4 | 5 | **16** | sanitization and formatting at input/CSV boundaries |
 
 ## DAG (dependencies)
 ```
@@ -72,6 +74,10 @@ Phase 5 (AFK continuation queue — demo-safe, no secrets, verifiable; SPEC-001.
   SPEC-014 (consent immutability)    ── after SPEC-009 (done)
   SPEC-015 (delivery metrics)        ── after SPEC-006 (done)
   SPEC-012 (AI seam: copy+summary)   ── after SPEC-007 (done); shares lib/ai/provider → serialize vs other AI edits
+
+Phase 6 (infrastructure resilience & validation):
+  SPEC-016 (bullmq hardening)        ── after SPEC-015 (done)
+  SPEC-017 (lookup validation seam)  ── after SPEC-014 (done)
 ```
 
 ## Phases (sequenced)
@@ -84,6 +90,9 @@ Phase 5 (AFK continuation queue — demo-safe, no secrets, verifiable; SPEC-001.
 - **Phase 3 — AI value (gated):** SPEC-007, SPEC-008. Exit: real AI behind explicit cost/data gates with
   review-before-send; fake provider stays default.
 - **Phase 4 — Future-proofing:** SPEC-010 (RLS), then staged major upgrades from BACKLOG.
+- **Phase 5 — AFK continuation queue (done):** SPEC-011, SPEC-012, SPEC-013, SPEC-014, SPEC-015.
+- **Phase 6 — Infrastructure resilience & input validation:** SPEC-016 (done), SPEC-017 (Todo).
+
 
 ## Risks / blockers
 See `plan/RISK_REGISTER.md`. Top: CI can't verify e2e until SPEC-002; real AI/Clerk/Stripe enablement is
