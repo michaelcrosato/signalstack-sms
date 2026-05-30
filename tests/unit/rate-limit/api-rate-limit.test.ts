@@ -28,20 +28,20 @@ describe("API rate limiting", () => {
     });
   });
 
-  it("limits requests within a fixed window and resets after the window", () => {
+  it("limits requests within a fixed window and resets after the window", async () => {
     const store: RateLimitStore = new Map();
     const policy = { enabled: true, limit: 2, windowMs: 1_000 };
 
-    expect(checkApiRateLimit({ key: "client", policy, now: 10_000, store })).toMatchObject({
+    expect(await checkApiRateLimit({ key: "client", policy, now: 10_000, store })).toMatchObject({
       allowed: true,
       remaining: 1
     });
-    expect(checkApiRateLimit({ key: "client", policy, now: 10_100, store })).toMatchObject({
+    expect(await checkApiRateLimit({ key: "client", policy, now: 10_100, store })).toMatchObject({
       allowed: true,
       remaining: 0
     });
 
-    const blocked = checkApiRateLimit({ key: "client", policy, now: 10_200, store });
+    const blocked = await checkApiRateLimit({ key: "client", policy, now: 10_200, store });
     expect(blocked).toMatchObject({
       allowed: false,
       remaining: 0,
@@ -53,7 +53,7 @@ describe("API rate limiting", () => {
       "Retry-After": "1"
     });
 
-    expect(checkApiRateLimit({ key: "client", policy, now: 11_001, store })).toMatchObject({
+    expect(await checkApiRateLimit({ key: "client", policy, now: 11_001, store })).toMatchObject({
       allowed: true,
       remaining: 1
     });

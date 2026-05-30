@@ -25,7 +25,7 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 | SPEC-015 delivery-metrics | 5 | **Done** | feat/spec-015-delivery-metrics-counters | `npm run validate` green | AFK queue; flag-gated delivery/queue/webhook counters, no PII |
 | SPEC-016 bullmq-hardening | 6 | **Done** | working tree | `npm test` green | BullMQ Worker production hardening |
 | SPEC-017 lookup-validation | 6 | **Done** | working tree | `npm test` green | Phone Number Lookup Validation Seam |
-| SPEC-018 redis-rate-limiter | 7 | **Todo** | | | Distributed Redis-Backed Rate Limiter |
+| SPEC-018 redis-rate-limiter | 7 | **Done** | feat/spec-018-redis-rate-limiter | `npm run validate` green | Distributed Redis-Backed Rate Limiter |
 | SPEC-019 otel-exporter | 7 | **Todo** | | | OpenTelemetry Exporter Integration |
 | SPEC-020 postgres-rls-production | 7 | **Todo** | | | PostgreSQL RLS Production Enablement |
 
@@ -49,11 +49,12 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [x] SPEC-015 — delivery/queue/webhook metrics counters (AFK queue)
 - [x] SPEC-016 — BullMQ Worker production hardening
 - [x] SPEC-017 — Phone Number Lookup Validation Seam
-- [ ] SPEC-018 — Distributed Redis-Backed Rate Limiter
+- [x] SPEC-018 — Distributed Redis-Backed Rate Limiter
 - [ ] SPEC-019 — OpenTelemetry Exporter Integration
 - [ ] SPEC-020 — PostgreSQL RLS Production Enablement
 
 ## Log (most recent first)
+- 2026-05-30 — **SPEC-018 Distributed Redis-Backed Rate Limiter DONE.** Implemented robust distributed rate limiting inside `lib/rate-limit/api-rate-limit.ts` using dynamic runtime imports (`/* webpackIgnore: true */`) to prevent Next.js edge middleware Webpack compilation issues, isolating `ioredis` in `lib/rate-limit/redis-rate-limiter-impl.ts`. Implemented atomic transactions (`MULTI`, `INCR`, `PTTL`, `PEXPIRE`) for accurate distributed rate calculations, with graceful fast fallback (`maxRetriesPerRequest: 1`, `enableOfflineQueue: false`) to the in-memory Map store in case of Redis connection drops. Added 5 vitest unit tests in `tests/unit/rate-limit/redis-rate-limit.test.ts` verifying all success, block, failure, and fallback modes. Verified 100% green linter, typecheck, unit tests, playwright smoke tests, and Next.js production build.
 - 2026-05-30 — **SPEC-017 Phone Number Lookup Validation Seam DONE.** Shipped the centralized `lib/validation/lookup.ts` containing the `evaluatePhoneNumberLookup()` resolver which format-sanitizes strings to E.164 natively by default, and gates a live Twilio Lookup API validator (`client.lookups.v2.phoneNumbers` via fetch) checking for mobile line-types if `LIVE_LOOKUP_ENABLED=true`. Integrated into the single contact create (`app/api/contacts/route.ts` POST) and batch CSV import (`lib/csv/import-contacts.ts` + API route). Added 12 vitest unit tests covering local standardization, mock live responses, landline rejections, and graceful fallback behaviors. Verified 100% green linting and 467 tests successfully passing.
 - 2026-05-30 — **SPEC-016 BullMQ Worker Production Hardening DONE.** Added graceful shutdown hooks (SIGTERM/SIGINT), configurable locking properties (lockDuration, stalledInterval), centralized worker error monitoring/fail listeners with PII-safe logging and metric dispatch, and configurable job options TTL parameters (removeOnComplete, removeOnFail). Verified 100% green linting and 455 unit tests successfully passing.
 - 2026-05-29 — **SPEC-015 SMS delivery/queue/webhook metrics counters DONE.** Extended the centralized `lib/observability/metrics.ts` with the `recordMetric()` helper. Structured and instrumented the five required pipeline counters: delivery rate, send-to-delivered latency, queue depth, failure-by-error-code, and webhook-verification failure rate at existing seams (Twilio webhooks validation/status transitions, database queue repositories, BullMQ worker enqueues). Defensively redacts PII context and gates behavior on `OBSERVABILITY_ENABLED`. Added a comprehensive unit test suite, extended `observability:check`, and verified a full local gate (`npm run validate` 19/19 checks green).

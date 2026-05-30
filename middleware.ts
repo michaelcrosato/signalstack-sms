@@ -6,9 +6,9 @@ import {
   getApiRateLimitPolicy
 } from "@/lib/rate-limit/api-rate-limit";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const policy = getApiRateLimitPolicy();
-  const result = checkApiRateLimit({
+  const result = await checkApiRateLimit({
     key: getApiRateLimitClientKey(request.headers),
     policy
   });
