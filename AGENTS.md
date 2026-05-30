@@ -30,24 +30,25 @@ Full doctrine, exhaustion rule, and artifact shape: `docs/AGENT-LOOP.md`. Run hi
 
 ## Command reference
 
-Shell wrappers (`bash scripts/agent/<name>.sh`) delegate to the npm scripts below:
+Shell wrappers delegate to the npm scripts below. Both POSIX Bash (`scripts/agent/<name>.sh`) and Windows PowerShell (`pwsh scripts/agent/<name>.ps1`) variants are supported:
 
-| Task | Shell wrapper | npm script |
-| --- | --- | --- |
-| One-time setup (env, deps, prisma) | `bootstrap.sh` | `npm run setup` (+ `.env` copy) |
-| AFK bootstrap alias | `bootstrap.sh` | `npm run agent:bootstrap` |
-| Env diagnostics (read-only) | `doctor.sh` | `npm run agent:doctor` |
-| Full local gate | `check.sh` | `npm run validate` |
-| AFK local gate alias | `check.sh` | `npm run agent:check` |
-| Unit tests (vitest) | `test.sh [file]` | `npm test` |
-| AFK unit-test alias | `test.sh [file]` | `npm run agent:test [file]` |
-| Lint | `lint.sh` | `npm run lint` |
-| AFK lint alias | `lint.sh` | `npm run agent:lint` |
-| Type check | `typecheck.sh` | `npm run typecheck` |
-| AFK typecheck alias | `typecheck.sh` | `npm run agent:typecheck` |
-| Format | `format.sh` | (none configured; skips) |
-| AFK format alias | `format.sh` | `npm run agent:format` |
-| Startup brief | `status.sh` | `npm run agent:brief` |
+| Task | Bash wrapper | PowerShell wrapper | npm script |
+| --- | --- | --- | --- |
+| One-time setup (env, deps, prisma) | `bootstrap.sh` | `bootstrap.ps1` | `npm run setup` (+ `.env` copy) |
+| AFK bootstrap alias | `bootstrap.sh` | `bootstrap.ps1` | `npm run agent:bootstrap` |
+| Env diagnostics (read-only) | `doctor.sh` | `doctor.ps1` | `npm run agent:doctor` |
+| Full local gate | `check.sh` | `check.ps1` | `npm run validate` |
+| AFK local gate alias | `check.sh` | `check.ps1` | `npm run agent:check` |
+| Unit tests (vitest) | `test.sh [file]` | `test.ps1 [file]` | `npm test` |
+| AFK unit-test alias | `test.sh [file]` | `test.ps1 [file]` | `npm run agent:test [file]` |
+| Lint | `lint.sh` | `lint.ps1` | `npm run lint` |
+| AFK lint alias | `lint.sh` | `lint.ps1` | `npm run agent:lint` |
+| Type check | `typecheck.sh` | `typecheck.ps1` | `npm run typecheck` |
+| AFK typecheck alias | `typecheck.sh` | `typecheck.ps1` | `npm run agent:typecheck` |
+| Format | `format.sh` | `format.ps1` | (none configured; skips) |
+| AFK format alias | `format.sh` | `format.ps1` | `npm run agent:format` |
+| Startup brief | `status.sh` | `status.ps1` | `npm run agent:brief` |
+
 
 DB: `npm run db:generate | db:validate | db:migrate | db:seed`. Demo seed: `npm run demo:seed`.
 Domain gates (all inside `validate`): `contracts:check`, `secrets:scan`, `compliance:check`,

@@ -1,6 +1,6 @@
 # TICKET002 — Verify full local gate incl. e2e against real Postgres
 
-- **Status:** Todo
+- **Status:** Done (2026-05-30)
 - **Priority:** P1
 
 ## Goal

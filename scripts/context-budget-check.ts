@@ -1,13 +1,14 @@
-import { readFileSync, statSync } from "node:fs";
+import { readFileSync, statSync, existsSync } from "node:fs";
 
-type BudgetedFile = {
+export type BudgetedFile = {
   path: string;
   maxBytes: number;
   requiredText?: string[];
   forbiddenText?: string[];
+  isOptional?: boolean;
 };
 
-const currentHandoffBudgets: BudgetedFile[] = [
+export const currentHandoffBudgets: BudgetedFile[] = [
   {
     path: "SUMMARY.codex.md",
     maxBytes: 12_000,
@@ -39,53 +40,83 @@ const currentHandoffBudgets: BudgetedFile[] = [
   }
 ];
 
-const advisoryLargeFiles = [
+export const advisoryLargeFiles = [
   "tests/unit/auth/api-route-authorization.test.ts",
   "tests/unit/queue/live-worker-controls.test.ts",
   "contracts/CONTRACT-TESTING.md"
 ];
 
-const failures: string[] = [];
+export function evaluateContextBudget(
+  budgets: BudgetedFile[] = currentHandoffBudgets,
+  largeFiles: string[] = advisoryLargeFiles
+) {
+  const failures: string[] = [];
 
-function fileText(path: string) {
-  return readFileSync(path, "utf8");
-}
+  for (const budget of budgets) {
+    if (!existsSync(budget.path)) {
+      if (budget.isOptional) {
+        continue;
+      }
+      failures.push(`${budget.path} does not exist and is a required budget file.`);
+      continue;
+    }
 
-for (const budget of currentHandoffBudgets) {
-  const { size } = statSync(budget.path);
-  const text = fileText(budget.path);
+    const { size } = statSync(budget.path);
+    let text = "";
+    try {
+      text = readFileSync(budget.path, "utf8");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      failures.push(`Failed to read ${budget.path}: ${message}`);
+      continue;
+    }
 
-  if (size > budget.maxBytes) {
-    failures.push(`${budget.path} is ${size} bytes, above the ${budget.maxBytes} byte current-handoff budget.`);
-  }
+    if (size > budget.maxBytes) {
+      failures.push(`${budget.path} is ${size} bytes, above the ${budget.maxBytes} byte current-handoff budget.`);
+    }
 
-  for (const required of budget.requiredText ?? []) {
-    if (!text.includes(required)) {
-      failures.push(`${budget.path} is missing required context-budget text: ${required}`);
+    for (const required of budget.requiredText ?? []) {
+      if (!text.includes(required)) {
+        failures.push(`${budget.path} is missing required context-budget text: ${required}`);
+      }
+    }
+
+    for (const forbidden of budget.forbiddenText ?? []) {
+      if (text.includes(forbidden)) {
+        failures.push(`${budget.path} contains historical handoff bloat marker: ${forbidden}`);
+      }
     }
   }
 
-  for (const forbidden of budget.forbiddenText ?? []) {
-    if (text.includes(forbidden)) {
-      failures.push(`${budget.path} contains historical handoff bloat marker: ${forbidden}`);
+  const advisory = largeFiles
+    .filter((path) => existsSync(path))
+    .map((path) => ({ path, size: statSync(path).size }))
+    .filter(({ size }) => size > 100_000)
+    .map(({ path, size }) => `${path}=${size} bytes`);
+
+  return { failures, advisory };
+}
+
+const isMain =
+  process.argv[1] &&
+  (process.argv[1].endsWith("context-budget-check.ts") ||
+    process.argv[1].endsWith("context-budget-check.js") ||
+    process.argv[1].includes("context-budget-check"));
+
+if (isMain) {
+  const { failures, advisory } = evaluateContextBudget();
+
+  if (failures.length > 0) {
+    console.error("Context budget check failed:");
+    for (const failure of failures) {
+      console.error(`- ${failure}`);
     }
+    process.exit(1);
+  }
+
+  console.log("Context budget check passed.");
+  if (advisory.length > 0) {
+    console.log(`Large files are allowed but should be read with targeted search: ${advisory.join("; ")}`);
   }
 }
 
-if (failures.length > 0) {
-  console.error("Context budget check failed:");
-  for (const failure of failures) {
-    console.error(`- ${failure}`);
-  }
-  process.exit(1);
-}
-
-const advisory = advisoryLargeFiles
-  .map((path) => ({ path, size: statSync(path).size }))
-  .filter(({ size }) => size > 100_000)
-  .map(({ path, size }) => `${path}=${size} bytes`);
-
-console.log("Context budget check passed.");
-if (advisory.length > 0) {
-  console.log(`Large files are allowed but should be read with targeted search: ${advisory.join("; ")}`);
-}

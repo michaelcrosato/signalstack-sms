@@ -1,6 +1,6 @@
 # TICKET003 — Demo-safe local outbound reply in the inbox
 
-- **Status:** Todo
+- **Status:** Done (2026-05-29)
 - **Priority:** P2
 
 ## Goal

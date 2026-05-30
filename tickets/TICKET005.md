@@ -1,6 +1,6 @@
 # TICKET005 — Regression test: context:check tolerates removed history files
 
-- **Status:** Todo
+- **Status:** Done (2026-05-30)
 - **Priority:** P2
 
 ## Goal
