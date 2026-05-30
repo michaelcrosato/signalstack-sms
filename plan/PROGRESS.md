@@ -34,6 +34,9 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 | SPEC-024 segment-sync | 9 | **Done** | working tree | `npm run validate` green | Dynamic Contact Segment Builder |
 | SPEC-025 template-preview | 9 | **Done** | working tree | `npm run validate` green | Message Template Preview & Validator |
 | SPEC-026 sentiment-analysis | 9 | **Done** | working tree | `npm run validate` green | Conversation Sentiment & AI Categorization |
+| SPEC-027 timezone-quiet-hours | 10 | **Done** | working tree | `npm run validate` green | Timezone-Scoped Dynamic Quiet-Hour Dispatcher |
+| SPEC-028 subscription-quotas | 10 | **Todo** | working tree | | Multi-Tenant Subscription Tier & Quota Seam |
+| SPEC-029 conversational-autopilot | 10 | **Todo** | working tree | | Two-way Conversational AI Concierge (Autopilot) |
 
 ## Checklist (downstream agents)
 - [x] SPEC-001 — Docker `start` script
@@ -64,8 +67,12 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [x] SPEC-024 — Dynamic Contact Segment Builder
 - [x] SPEC-025 — Message Template Preview & Validator
 - [x] SPEC-026 — Conversation Sentiment & AI Categorization
+- [x] SPEC-027 — Timezone-Scoped Dynamic Quiet-Hour Dispatcher
+- [ ] SPEC-028 — Multi-Tenant Subscription Tier & Quota Seam
+- [ ] SPEC-029 — Two-way Conversational AI Concierge (Autopilot)
 
 ## Log (most recent first)
+- 2026-05-30 — **SPEC-027 Timezone-Scoped Dynamic Quiet-Hour Dispatcher DONE.** Shipped comprehensive area code-to-timezone database dictionary and resolver `resolveTimezoneFromPhone` in `lib/compliance/area-codes.ts` covering major US regions (Eastern, Central, Mountain, Pacific). Integrated dynamic contact-level timezone and state override resolutions inside the central `evaluateMessagingHardGate` preflight pipeline in `lib/compliance/gates.ts`. Added 6 high-quality unit tests in `tests/unit/compliance/timezone-quiet-hours.test.ts` covering E.164 and 10-digit formats, unrecognized defaults, and dynamic gate overrides. Verified 100% green unit tests.
 - 2026-05-30 — **SPEC-024, SPEC-025, SPEC-026 DONE.** Shipped Wave 9 specifications:
   - **SPEC-024 (Dynamic Contact Segment Builder):** Implemented dynamic query builder `evaluateSegmentContacts` inside `lib/db/repositories/segments.ts` to aggregate contact filters across consent, tag constraints, and numeric lead scores. Exposed GET `/api/contacts/segments` and export plaintext `/api/contacts/segments/export` API endpoints with robust role checking and RLS support. Added unit tests in `tests/unit/product/segment-sync.test.ts`.
   - **SPEC-025 (Message Template Preview & Validator):** Built placeholder variable substitution parser `renderTemplatePreview` in `lib/validation/template-preview.ts` ensuring clean variables tracking (unused and missing variables). Exposed role-gated POST `/api/templates/preview` route. Added unit tests in `tests/unit/validation/template-preview.test.ts`.

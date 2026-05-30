@@ -1,5 +1,6 @@
 import { A2pRegistrationStatus, ConsentStatus, type ComplianceProfile } from "@prisma/client";
 import { isWithinQuietHours } from "@/lib/compliance/quiet-hours";
+import { resolveTimezoneFromPhone } from "@/lib/compliance/area-codes";
 
 export type MessagingHardGateInput = {
   demoMode: boolean;
@@ -15,6 +16,8 @@ export type MessagingHardGateInput = {
     | "a2pRegistrationStatus"
   > | null;
   contact?: {
+    phone?: string | null;
+    state?: string | null;
     consentStatus: ConsentStatus;
     optedOutAt: Date | null;
     archivedAt: Date | null;
@@ -77,8 +80,20 @@ export function evaluateMessagingHardGate(input: MessagingHardGateInput): Messag
     }
   }
 
-  if (input.quietHours && isWithinQuietHours(input.quietHours.now, input.quietHours.timeZone, input.quietHours.state)) {
-    reasons.push("QUIET_HOURS");
+  if (input.quietHours) {
+    let resolvedTimeZone = input.quietHours.timeZone;
+    let resolvedState = input.quietHours.state;
+
+    if (input.contact?.phone) {
+      resolvedTimeZone = resolveTimezoneFromPhone(input.contact.phone);
+    }
+    if (input.contact?.state) {
+      resolvedState = input.contact.state;
+    }
+
+    if (isWithinQuietHours(input.quietHours.now, resolvedTimeZone, resolvedState)) {
+      reasons.push("QUIET_HOURS");
+    }
   }
 
   return {
