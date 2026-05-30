@@ -82,3 +82,35 @@ unavailable gates (e.g. e2e needing Postgres) as "not run", not "passed".
 
 Start from `docs/CANONICAL_IMPLEMENTATION_PLAN.md` milestone posture. Preserve hard gates for live
 messaging, billing, secrets, destructive production DB ops, and compliance-sensitive actions.
+
+## Cursor Cloud specific instructions
+
+### Backing services (Postgres)
+
+- **Docker Compose** (`docker compose up -d postgres`) is the documented path when Docker is available.
+- On Cloud VMs **without Docker**, install and start system Postgres 16 instead, then create the app role/database to match `.env.example`:
+  - `CREATE USER signalstack WITH PASSWORD 'signalstack' CREATEDB CREATEROLE;`
+  - `CREATE DATABASE signalstack_sms OWNER signalstack;`
+  - `CREATEROLE` is required for migration `20260529130000_tenant_rls` (creates `app_rls`).
+- Start: `sudo pg_ctlcluster 16 main start` (or `sudo service postgresql start`).
+- Apply schema with `npm run db:deploy` (non-interactive). Use `npm run demo:seed` after migrations.
+- Redis is optional unless `QUEUE_BACKEND=bullmq`.
+
+### Dev server vs. production build
+
+- Product dev: `npm run dev` → `http://127.0.0.1:3000` (demo session; no Clerk).
+- **Do not run `npm run build` while `npm run dev` is running** — it corrupts `.next` and API routes return 500 until you remove `.next` and restart dev (or use `npm start` on a dedicated build).
+- E2E (`npm run test:e2e:*`) starts its own Next server on port **3100** via Playwright; needs Postgres + `npx playwright install chromium`.
+
+### Quick verification
+
+| Check | Command |
+| --- | --- |
+| Health | `curl -sf http://127.0.0.1:3000/api/health` |
+| Unit gate | `npm test`, `npm run lint`, `npm run typecheck` |
+| Full gate | `npm run validate` (includes e2e smoke when Postgres + Playwright are present) |
+| Core API flow | CSV import → `POST /api/campaigns` → preflight (see `e2e/demo-path.spec.ts`) |
+
+### Long-running processes
+
+Use a dedicated tmux session for `npm run dev` (e.g. `next-dev-server`). Optional: `npm run worker:watch` for scheduled campaign sends via the dummy provider.
