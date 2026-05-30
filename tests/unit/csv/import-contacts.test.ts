@@ -14,11 +14,11 @@ describe("CSV contact import", () => {
     ]);
   });
 
-  it("maps CSV rows into contact create payloads", () => {
-    const result = parseContactImport(
+  it("maps CSV rows into contact create payloads", async () => {
+    const result = await parseContactImport(
       "phone,email,first_name,consent_status,tags,lists\n+15555550100,ada@example.com,Ada,opted_in,vip|trial,Leads"
     );
-
+ 
     expect(result).toEqual({
       totalRows: 1,
       errors: [],
@@ -34,10 +34,10 @@ describe("CSV contact import", () => {
       ]
     });
   });
-
-  it("returns row-scoped errors for invalid contacts", () => {
-    const result = parseContactImport("phone,email\nshort,not-an-email");
-
+ 
+  it("returns row-scoped errors for invalid contacts", async () => {
+    const result = await parseContactImport("phone,email\nshort,not-an-email");
+ 
     expect(result.contacts).toEqual([]);
     expect(result.errors).toEqual([expect.objectContaining({ row: 2 })]);
   });

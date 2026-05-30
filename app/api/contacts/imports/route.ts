@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid import payload.", issues: payload.error.issues }, { status: 400 });
   }
 
-  const parsed = parseContactImport(payload.data.csv);
+  const parsed = await parseContactImport(payload.data.csv);
   const contactImport = await importContacts(currentOrg.orgId, parsed, payload.data.filename);
 
   return NextResponse.json({

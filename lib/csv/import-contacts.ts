@@ -1,6 +1,7 @@
 import { ConsentStatus } from "@prisma/client";
 import { parseCsv } from "@/lib/csv/parse";
 import { contactCreateSchema, type ContactCreateInput } from "@/lib/validation/contacts";
+import { evaluatePhoneNumberLookup } from "@/lib/validation/lookup";
 
 export type ParsedContactImport = {
   contacts: ContactCreateInput[];
@@ -8,14 +9,29 @@ export type ParsedContactImport = {
   totalRows: number;
 };
 
-export function parseContactImport(csv: string): ParsedContactImport {
+export async function parseContactImport(
+  csv: string,
+  env: Record<string, string | undefined> = process.env
+): Promise<ParsedContactImport> {
   const rows = parseCsv(csv);
   const contacts: ContactCreateInput[] = [];
   const errors: Array<{ row: number; message: string }> = [];
 
-  rows.forEach((row, index) => {
+  for (let index = 0; index < rows.length; index++) {
+    const row = rows[index];
+    const rawPhone = pick(row, "phone", "mobile", "mobile_phone", "phone_number");
+    
+    const lookup = await evaluatePhoneNumberLookup(rawPhone, env);
+    if (!lookup.valid) {
+      errors.push({
+        row: index + 2,
+        message: lookup.error || "Invalid phone number."
+      });
+      continue;
+    }
+
     const parsed = contactCreateSchema.safeParse({
-      phone: pick(row, "phone", "mobile", "mobile_phone", "phone_number"),
+      phone: lookup.formattedPhone || rawPhone,
       email: emptyToUndefined(pick(row, "email", "email_address")),
       firstName: emptyToUndefined(pick(row, "first_name", "firstname")),
       lastName: emptyToUndefined(pick(row, "last_name", "lastname")),
@@ -30,17 +46,17 @@ export function parseContactImport(csv: string): ParsedContactImport {
 
     if (parsed.success) {
       contacts.push(parsed.data);
-      return;
+    } else {
+      errors.push({
+        row: index + 2,
+        message: parsed.error.issues.map((issue) => issue.message).join("; ")
+      });
     }
-
-    errors.push({
-      row: index + 2,
-      message: parsed.error.issues.map((issue) => issue.message).join("; ")
-    });
-  });
+  }
 
   return { contacts, errors, totalRows: rows.length };
 }
+
 
 function pick(row: Record<string, string>, ...keys: string[]) {
   for (const key of keys) {
