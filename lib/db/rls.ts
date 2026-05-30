@@ -22,3 +22,18 @@ export async function withTenantRls<T>(
     return fn(tx);
   });
 }
+
+export function rlsIsEnabled(env: Record<string, string | undefined> = process.env): boolean {
+  return env.DATABASE_RLS_ENFORCED === "true";
+}
+
+export async function withOptionalTenantRls<T>(
+  orgId: string,
+  fn: (tx: Prisma.TransactionClient) => Promise<T>,
+  env: Record<string, string | undefined> = process.env
+): Promise<T> {
+  if (rlsIsEnabled(env)) {
+    return withTenantRls(orgId, fn);
+  }
+  return fn(prisma);
+}

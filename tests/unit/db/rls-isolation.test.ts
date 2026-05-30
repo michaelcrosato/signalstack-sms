@@ -1,6 +1,6 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { prisma } from "@/lib/db/prisma";
-import { withTenantRls } from "@/lib/db/rls";
+import { withTenantRls, withOptionalTenantRls } from "@/lib/db/rls";
 
 // Integration proof for SPEC-010. Hits a real Postgres with the RLS migration applied, so it is gated on
 // RUN_DB_TESTS (the default `npm test` skips it — it never touches the DB). Run it with:
@@ -40,5 +40,14 @@ describe.runIf(run)("RLS tenant isolation (integration; requires Postgres + RUN_
     await expect(
       withTenantRls(orgAId, (tx) => tx.contact.create({ data: { orgId: orgBId, phone: `+1700${suffix}3` } }))
     ).rejects.toThrow();
+  });
+});
+
+describe("withOptionalTenantRls (unit)", () => {
+  it("executes wrapped queries on the global prisma instance if RLS is disabled", async () => {
+    const mockFn = vi.fn().mockImplementation(() => Promise.resolve("done"));
+    const result = await withOptionalTenantRls("org-123", mockFn, { DATABASE_RLS_ENFORCED: "false" });
+    expect(result).toBe("done");
+    expect(mockFn.mock.calls[0][0]).toBe(prisma);
   });
 });

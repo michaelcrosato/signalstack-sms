@@ -9,32 +9,36 @@ const contactInclude = {
   listLinks: { include: { list: true } }
 } satisfies Prisma.ContactInclude;
 
-export async function listContacts(orgId: string) {
-  return prisma.contact.findMany({
+export async function listContacts(orgId: string, tx: Prisma.TransactionClient = prisma) {
+  return tx.contact.findMany({
     where: { orgId, archivedAt: null },
     orderBy: { updatedAt: "desc" },
     include: contactInclude
   });
 }
 
-export async function listArchivedContacts(orgId: string) {
-  return prisma.contact.findMany({
+export async function listArchivedContacts(orgId: string, tx: Prisma.TransactionClient = prisma) {
+  return tx.contact.findMany({
     where: { orgId, archivedAt: { not: null } },
     orderBy: { archivedAt: "desc" },
     include: contactInclude
   });
 }
 
-export async function getContact(orgId: string, contactId: string) {
-  return prisma.contact.findFirst({
+export async function getContact(orgId: string, contactId: string, tx: Prisma.TransactionClient = prisma) {
+  return tx.contact.findFirst({
     where: orgWhere(orgId, { id: contactId }),
     include: contactInclude
   });
 }
 
-export async function upsertContact(orgId: string, input: ContactCreateInput) {
-  return prisma.$transaction(async (tx) => {
-    const existing = await tx.contact.findUnique({
+export async function upsertContact(
+  orgId: string,
+  input: ContactCreateInput,
+  tx: Prisma.TransactionClient = prisma
+) {
+  const execute = async (t: Prisma.TransactionClient) => {
+    const existing = await t.contact.findUnique({
       where: { orgId_phone: { orgId, phone: input.phone } }
     });
 
@@ -42,7 +46,7 @@ export async function upsertContact(orgId: string, input: ContactCreateInput) {
       verifyConsentEvidenceImmutability(existing, input);
     }
 
-    const contact = await tx.contact.upsert({
+    const contact = await t.contact.upsert({
       where: { orgId_phone: { orgId, phone: input.phone } },
       update: contactWriteData(input),
       create: {
@@ -52,9 +56,14 @@ export async function upsertContact(orgId: string, input: ContactCreateInput) {
       }
     });
 
-    await syncContactLabels(tx, orgId, contact.id, input.tagNames, input.listNames);
-    return tx.contact.findUniqueOrThrow({ where: { id: contact.id }, include: contactInclude });
-  });
+    await syncContactLabels(t, orgId, contact.id, input.tagNames, input.listNames);
+    return t.contact.findUniqueOrThrow({ where: { id: contact.id }, include: contactInclude });
+  };
+
+  if (tx === prisma) {
+    return prisma.$transaction(async (t) => execute(t));
+  }
+  return execute(tx);
 }
 
 export async function updateContact(orgId: string, contactId: string, input: ContactUpdateInput) {

@@ -43,3 +43,14 @@ Perpetual resume log for autonomous engineering sessions. Disk is the single sou
   - Verified 100% green linter, typecheck, 475 unit tests, Playwright smoke tests, and Next.js production build (full 19/19 gate verification suite).
 - **Next spec in-scope:** SPEC-020 (PostgreSQL RLS Production Enablement).
 - **Current active branch:** feat/spec-019-otel-exporter.
+
+## Cycle 5 (2026-05-30)
+- **Status:** Shipped SPEC-020 (PostgreSQL RLS Production Enablement).
+- **Accomplishments:**
+  - Shipped the centralized RLS session routing wrappers `rlsIsEnabled` and `withOptionalTenantRls` in `lib/db/rls.ts`, supporting progressive database-enforced row level security contexts.
+  - Configured critical multi-tenant database repositories (`lib/db/repositories/contacts.ts` list/archived/get/upsert) and route API endpoints (`app/api/contacts/route.ts` GET/POST) to execute within the RLS-scoped transaction when active.
+  - Enforced full backward compatibility and demo-safe defaults: active RLS session wrappers execute on standard `prisma` instances by default and activate only when `DATABASE_RLS_ENFORCED=true`.
+  - Added unit tests in `tests/unit/db/rls-isolation.test.ts` verifying that `withOptionalTenantRls` behaves correctly under positive and negative environments.
+  - Verified 100% green linter, typecheck, 476 unit tests, Playwright smoke tests, and Next.js production build (full 19/19 gate verification suite).
+- **Next wave generated:** Completed all Phase 7 specifications! Ready to replenish backlog or await further human instructions.
+- **Current active branch:** feat/spec-020-postgres-rls-production.

@@ -6,9 +6,13 @@ import { listContacts, upsertContact } from "@/lib/db/repositories/contacts";
 import { contactCreateSchema } from "@/lib/validation/contacts";
 import { evaluatePhoneNumberLookup } from "@/lib/validation/lookup";
 
+import { withOptionalTenantRls } from "@/lib/db/rls";
+
 export async function GET() {
   const currentOrg = await getOrCreateCurrentOrg();
-  const contacts = await listContacts(currentOrg.orgId);
+  const contacts = await withOptionalTenantRls(currentOrg.orgId, async (tx) => {
+    return listContacts(currentOrg.orgId, tx);
+  });
 
   return NextResponse.json({ contacts });
 }
@@ -34,7 +38,9 @@ export async function POST(request: Request) {
 
   payload.data.phone = lookup.formattedPhone || payload.data.phone;
 
-  const contact = await upsertContact(currentOrg.orgId, payload.data);
+  const contact = await withOptionalTenantRls(currentOrg.orgId, async (tx) => {
+    return upsertContact(currentOrg.orgId, payload.data, tx);
+  });
   return NextResponse.json({ contact }, { status: 201 });
 }
 
