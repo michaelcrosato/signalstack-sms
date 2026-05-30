@@ -25,6 +25,9 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 | SPEC-015 delivery-metrics | 5 | **Done** | feat/spec-015-delivery-metrics-counters | `npm run validate` green | AFK queue; flag-gated delivery/queue/webhook counters, no PII |
 | SPEC-016 bullmq-hardening | 6 | **Done** | working tree | `npm test` green | BullMQ Worker production hardening |
 | SPEC-017 lookup-validation | 6 | **Done** | working tree | `npm test` green | Phone Number Lookup Validation Seam |
+| SPEC-018 redis-rate-limiter | 7 | **Todo** | | | Distributed Redis-Backed Rate Limiter |
+| SPEC-019 otel-exporter | 7 | **Todo** | | | OpenTelemetry Exporter Integration |
+| SPEC-020 postgres-rls-production | 7 | **Todo** | | | PostgreSQL RLS Production Enablement |
 
 ## Checklist (downstream agents)
 - [x] SPEC-001 — Docker `start` script
@@ -46,6 +49,9 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 - [x] SPEC-015 — delivery/queue/webhook metrics counters (AFK queue)
 - [x] SPEC-016 — BullMQ Worker production hardening
 - [x] SPEC-017 — Phone Number Lookup Validation Seam
+- [ ] SPEC-018 — Distributed Redis-Backed Rate Limiter
+- [ ] SPEC-019 — OpenTelemetry Exporter Integration
+- [ ] SPEC-020 — PostgreSQL RLS Production Enablement
 
 ## Log (most recent first)
 - 2026-05-30 — **SPEC-017 Phone Number Lookup Validation Seam DONE.** Shipped the centralized `lib/validation/lookup.ts` containing the `evaluatePhoneNumberLookup()` resolver which format-sanitizes strings to E.164 natively by default, and gates a live Twilio Lookup API validator (`client.lookups.v2.phoneNumbers` via fetch) checking for mobile line-types if `LIVE_LOOKUP_ENABLED=true`. Integrated into the single contact create (`app/api/contacts/route.ts` POST) and batch CSV import (`lib/csv/import-contacts.ts` + API route). Added 12 vitest unit tests covering local standardization, mock live responses, landline rejections, and graceful fallback behaviors. Verified 100% green linting and 467 tests successfully passing.

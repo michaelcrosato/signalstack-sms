@@ -42,6 +42,9 @@ Scores 1–5, **higher is better**: Impact (value), Feasibility (ease/small blas
 | SPEC-015 | Delivery/queue/webhook metrics counters | Sec/Qual | 4 | 4 | 4 | 4 | **16** | observability depth; flag-gated, no PII |
 | SPEC-016 | BullMQ Worker production hardening | Infra | 4 | 4 | 4 | 4 | **16** | grace close, custom lock durations, error hooks |
 | SPEC-017 | Phone Number Lookup Validation Seam | Quality | 4 | 3 | 4 | 5 | **16** | sanitization and formatting at input/CSV boundaries |
+| SPEC-018 | Distributed Redis-Backed Rate Limiter | Quality | 4 | 4 | 4 | 5 | **17** | Replace in-memory rate limiter with Redis, safe fallback |
+| SPEC-019 | OpenTelemetry Exporter Integration | Quality | 4 | 4 | 5 | 4 | **17** | Wire vercel/otel exporter under root instrumentation |
+| SPEC-020 | PostgreSQL RLS Production Enablement | Future | 4 | 3 | 3 | 5 | **15** | Run queries wrapped in withTenantRls using app_rls |
 
 ## DAG (dependencies)
 ```
@@ -49,7 +52,7 @@ Phase 0 (independent quick wins — parallel-safe, separate worktrees):
   SPEC-001 ─┐
   SPEC-004 ─┤  no deps
   SPEC-002 ─┤
-  SPEC-005 ─┤
+  SPEC-005 ─┘
   SPEC-003 ─┘
 
 Phase 1 (product backbone):
@@ -78,6 +81,11 @@ Phase 5 (AFK continuation queue — demo-safe, no secrets, verifiable; SPEC-001.
 Phase 6 (infrastructure resilience & validation):
   SPEC-016 (bullmq hardening)        ── after SPEC-015 (done)
   SPEC-017 (lookup validation seam)  ── after SPEC-014 (done)
+
+Phase 7 (distributed infrastructure & production enablement):
+  SPEC-018 (Redis rate limiter)      ── after SPEC-016 (done)
+  SPEC-019 (OTel exporter)           ── after SPEC-006 (done)
+  SPEC-020 (RLS prod enablement)     ── after SPEC-010 (done) & TICKET009
 ```
 
 ## Phases (sequenced)
@@ -91,7 +99,8 @@ Phase 6 (infrastructure resilience & validation):
   review-before-send; fake provider stays default.
 - **Phase 4 — Future-proofing:** SPEC-010 (RLS), then staged major upgrades from BACKLOG.
 - **Phase 5 — AFK continuation queue (done):** SPEC-011, SPEC-012, SPEC-013, SPEC-014, SPEC-015.
-- **Phase 6 — Infrastructure resilience & input validation:** SPEC-016 (done), SPEC-017 (Todo).
+- **Phase 6 — Infrastructure resilience & input validation (done):** SPEC-016 (done), SPEC-017 (done).
+- **Phase 7 — Distributed infrastructure & production enablement:** SPEC-018 (Todo), SPEC-019 (Todo), SPEC-020 (Todo).
 
 
 ## Risks / blockers
