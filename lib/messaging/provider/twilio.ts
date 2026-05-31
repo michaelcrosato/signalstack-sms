@@ -10,8 +10,9 @@ export class TwilioProviderError extends Error {
 export const twilioProvider: MessagingProvider = {
   name: "twilio",
   async send(input: MessageSendInput): Promise<MessageSendResult> {
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const env = input.env ?? process.env;
+    const accountSid = env.TWILIO_ACCOUNT_SID;
+    const authToken = env.TWILIO_AUTH_TOKEN;
 
     if (!accountSid || !authToken) {
       throw new TwilioProviderError("AUTH_FAILURE");

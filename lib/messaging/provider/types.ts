@@ -6,6 +6,7 @@ export interface MessageSendInput {
   body: string;
   orgId: string;
   idempotencyKey: string;
+  env?: Record<string, string | undefined>;
 }
 
 export interface MessageSendResult {

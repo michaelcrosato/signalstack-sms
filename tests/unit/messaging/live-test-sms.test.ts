@@ -11,7 +11,14 @@ import { liveTestSmsSchema } from "@/lib/validation/live-test-sms";
 const mocks = vi.hoisted(() => ({
   messageCreate: vi.fn(),
   readinessAuditCreate: vi.fn(),
-  transaction: vi.fn()
+  transaction: vi.fn(),
+  twilioSend: vi.fn()
+}));
+
+vi.mock("@/lib/messaging/provider/twilio", () => ({
+  twilioProvider: {
+    send: mocks.twilioSend
+  }
 }));
 
 vi.mock("@/lib/db/prisma", () => ({
@@ -116,16 +123,10 @@ describe("live test SMS gates", () => {
   });
 
   it("normalizes accepted Twilio response statuses before local audit and message storage", async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: true,
-      status: 201,
-      statusText: "Created",
-      json: async () => ({
-        sid: "SM_live_test",
-        status: " ACCEPTED "
-      })
-    }));
-    vi.stubGlobal("fetch", fetchMock);
+    mocks.twilioSend.mockResolvedValue({
+      providerMessageId: "SM_live_test",
+      status: "accepted"
+    });
 
     await expect(
       sendLiveTestSms({
@@ -153,7 +154,12 @@ describe("live test SMS gates", () => {
       blockers: []
     });
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(mocks.twilioSend).toHaveBeenCalledTimes(1);
+    expect(mocks.twilioSend).toHaveBeenCalledWith(expect.objectContaining({
+      to: "+15879873814",
+      from: "+15555550199",
+      body: "Hello from the gated local test path"
+    }));
     expect(mocks.messageCreate).toHaveBeenCalledWith({
       data: expect.objectContaining({
         orgId: "org_1",

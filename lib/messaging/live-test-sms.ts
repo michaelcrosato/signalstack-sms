@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { prisma } from "@/lib/db/prisma";
 import { liveTestSmsConfirmation } from "@/lib/messaging/live-test-sms-constants";
+import { twilioProvider } from "@/lib/messaging/provider/twilio";
 
 export { liveTestSmsConfirmation };
 
@@ -37,11 +38,6 @@ export function normalizeNorthAmericanPhone(value: string) {
   }
 
   return trimmed;
-}
-
-function normalizeTwilioMessageStatus(value: string | undefined) {
-  const normalized = value?.trim().toLowerCase();
-  return normalized || "queued";
 }
 
 export function parseLiveTestSmsAllowlist(env: LiveTestSmsEnv = process.env) {
@@ -117,14 +113,16 @@ export async function sendLiveTestSms(input: LiveTestSmsSendInput) {
     };
   }
 
-  const providerResult = await sendTwilioSms({
-    accountSid,
-    authToken,
-    from,
-    to,
-    body
-  });
   const idempotencyKey = `live-test-sms:${input.orgId}:${randomUUID()}`;
+
+  const providerResult = await twilioProvider.send({
+    to,
+    from,
+    body,
+    orgId: input.orgId,
+    idempotencyKey,
+    env
+  });
 
   await prisma.$transaction([
     prisma.message.create({
@@ -132,7 +130,7 @@ export async function sendLiveTestSms(input: LiveTestSmsSendInput) {
         orgId: input.orgId,
         direction: "OUTBOUND",
         body,
-        providerMessageId: providerResult.sid,
+        providerMessageId: providerResult.providerMessageId,
         providerStatus: providerResult.status,
         idempotencyKey
       }
@@ -143,7 +141,7 @@ export async function sendLiveTestSms(input: LiveTestSmsSendInput) {
         actorUserId: input.actorUserId,
         action: "LIVE_TEST_SMS_SENT",
         subjectType: "Message",
-        subjectId: providerResult.sid,
+        subjectId: providerResult.providerMessageId,
         metadata: {
           provider: "twilio",
           toLast4: to.slice(-4),
@@ -157,46 +155,10 @@ export async function sendLiveTestSms(input: LiveTestSmsSendInput) {
 
   return {
     sent: true,
-    providerMessageId: providerResult.sid,
+    providerMessageId: providerResult.providerMessageId,
     providerStatus: providerResult.status,
     toLast4: to.slice(-4),
     fromLast4: from.slice(-4),
     blockers: []
-  };
-}
-
-async function sendTwilioSms(input: {
-  accountSid: string;
-  authToken: string;
-  from: string;
-  to: string;
-  body: string;
-}) {
-  const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(input.accountSid)}/Messages.json`, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${Buffer.from(`${input.accountSid}:${input.authToken}`).toString("base64")}`,
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: new URLSearchParams({
-      To: input.to,
-      From: input.from,
-      Body: input.body
-    })
-  });
-  const payload = (await response.json().catch(() => ({}))) as {
-    sid?: string;
-    status?: string;
-    message?: string;
-    code?: number;
-  };
-
-  if (!response.ok || !payload.sid) {
-    throw new Error(`Twilio live test SMS failed: ${payload.code ?? response.status} ${payload.message ?? response.statusText}`);
-  }
-
-  return {
-    sid: payload.sid,
-    status: normalizeTwilioMessageStatus(payload.status)
   };
 }
