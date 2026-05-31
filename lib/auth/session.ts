@@ -1,4 +1,5 @@
 import { MembershipRole, MembershipStatus } from "@prisma/client";
+import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db/prisma";
 import type { CurrentOrg } from "@/lib/auth/current-org";
 
@@ -68,8 +69,6 @@ export const resolveActiveMembershipFromDb: MembershipResolver = async (subject)
     role: membership.role
   };
 };
-
-import { auth } from "@clerk/nextjs/server";
 
 // Resolve the current org/role from a verified production subject, or null (fail closed). Never falls
 // back to the demo session — a null result must be denied by the caller, not silently downgraded.

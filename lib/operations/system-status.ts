@@ -1,5 +1,6 @@
 import { getQueueBackend } from "@/lib/queue/bullmq";
 import { getApiRateLimitPolicy } from "@/lib/rate-limit/api-rate-limit";
+import { redactSecret } from "@/lib/env/redact";
 
 export type SystemSafetyStatus = {
   demoMode: boolean;
@@ -31,6 +32,11 @@ export type SystemStatus = {
     enabled: boolean;
     limit: number;
     windowSeconds: number;
+  };
+  credentialsInventory: {
+    databaseUrl: string | null;
+    clerkSecretKey: string | null;
+    twilioAuthToken: string | null;
   };
 };
 
@@ -67,6 +73,11 @@ export function getSystemStatus(env: Record<string, string | undefined> = proces
       enabled: rateLimit.enabled,
       limit: rateLimit.limit,
       windowSeconds: rateLimit.windowMs / 1000
+    },
+    credentialsInventory: {
+      databaseUrl: redactSecret(env.DATABASE_URL),
+      clerkSecretKey: redactSecret(env.CLERK_SECRET_KEY),
+      twilioAuthToken: redactSecret(env.TWILIO_AUTH_TOKEN)
     }
   };
 }

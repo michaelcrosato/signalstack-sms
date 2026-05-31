@@ -1,5 +1,6 @@
 import { A2pRegistrationStatus, type ComplianceProfile, type ProviderCredential } from "@prisma/client";
 import { complianceProfileIsComplete, evaluateMessagingHardGate } from "@/lib/compliance/gates";
+import { redactSecret } from "@/lib/env/redact";
 
 export type ProviderSettingsInput = {
   demoMode: boolean;
@@ -44,8 +45,12 @@ export function getProviderSettings(input: ProviderSettingsInput) {
       fromNumberConfigured: Boolean(input.env.TWILIO_FROM_NUMBER || input.providerCredential?.fromNumberRedacted),
       configured: twilioConfigured,
       source: metadataTwilioConfigured ? input.providerCredential?.source ?? "local_metadata" : "environment",
-      accountSidRedacted: input.providerCredential?.accountSidRedacted ?? null,
-      fromNumberRedacted: input.providerCredential?.fromNumberRedacted ?? null
+      accountSidRedacted: metadataTwilioConfigured
+        ? input.providerCredential?.accountSidRedacted ?? null
+        : redactSecret(input.env.TWILIO_ACCOUNT_SID),
+      fromNumberRedacted: metadataTwilioConfigured
+        ? input.providerCredential?.fromNumberRedacted ?? null
+        : redactSecret(input.env.TWILIO_FROM_NUMBER)
     },
     compliance: {
       complete: complianceProfileIsComplete(input.complianceProfile),

@@ -23,6 +23,11 @@ describe("getSystemStatus", () => {
       limit: 120,
       windowSeconds: 60
     });
+    expect(status.credentialsInventory).toMatchObject({
+      databaseUrl: null,
+      clerkSecretKey: null,
+      twilioAuthToken: null
+    });
   });
 
   it("surfaces review state when live-impact flags are present", () => {
@@ -60,5 +65,22 @@ describe("getSystemStatus", () => {
       limit: 25,
       windowSeconds: 5
     });
+    expect(status.credentialsInventory).toMatchObject({
+      databaseUrl: null,
+      clerkSecretKey: null,
+      twilioAuthToken: null
+    });
+  });
+
+  it("redacts credentials safely", () => {
+    const status = getSystemStatus({
+      DATABASE_URL: "postgresql://user:pass@localhost/db",
+      CLERK_SECRET_KEY: "sk_test_1234567890",
+      TWILIO_AUTH_TOKEN: "abc123def456"
+    });
+
+    expect(status.credentialsInventory.databaseUrl).toBe("po********t/db");
+    expect(status.credentialsInventory.clerkSecretKey).toBe("sk********7890");
+    expect(status.credentialsInventory.twilioAuthToken).toBe("ab********f456");
   });
 });

@@ -51,8 +51,8 @@ describe("provider settings", () => {
       fromNumberConfigured: true,
       configured: true,
       source: "environment",
-      accountSidRedacted: null,
-      fromNumberRedacted: null
+      accountSidRedacted: "AC*****",
+      fromNumberRedacted: "+1********0199"
     });
     expect(JSON.stringify(settings)).not.toContain("secret");
   });
