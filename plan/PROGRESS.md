@@ -1,3 +1,4 @@
 - [x] 001_cve_resolution.md
 - [x] 002_query_optimization.md
-- [~] 003_refactor_live_test_sms.md
+- [x] 003_refactor_live_test_sms.md
+- [~] 004_analytics_reports_tests.md
