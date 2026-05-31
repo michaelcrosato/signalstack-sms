@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { MembershipRole } from "@prisma/client";
 import { requireApiRole } from "@/lib/auth/api-authorization";
 import {
@@ -7,6 +7,12 @@ import {
   resolveProductionCurrentOrg,
   type MembershipResolver
 } from "@/lib/auth/session";
+
+vi.mock("@clerk/nextjs/server", () => ({
+  auth: vi.fn().mockResolvedValue({ userId: "mock_clerk_id", orgId: "mock_clerk_org" })
+}));
+
+import { auth } from "@clerk/nextjs/server";
 
 const activeMember: MembershipResolver = async () => ({
   orgId: "org_live",
@@ -33,8 +39,27 @@ describe("productionAuthIsEnabled / clerkConfigIsPresent", () => {
 });
 
 describe("resolveProductionCurrentOrg (fail-closed)", () => {
-  it("returns null for an unauthenticated request (no subject)", async () => {
+  it("returns null for an unauthenticated request (no subject explicitly passed)", async () => {
     await expect(resolveProductionCurrentOrg(null, activeMember)).resolves.toBeNull();
+  });
+
+  it("extracts subject from clerk auth() if subject is not provided", async () => {
+    vi.mocked(auth).mockResolvedValueOnce({ userId: "user_implicit", orgId: "org_implicit" } as unknown as Awaited<ReturnType<typeof auth>>);
+    const resolverSpy = vi.fn().mockResolvedValue(await activeMember({ clerkUserId: "dummy" }));
+
+    const result = await resolveProductionCurrentOrg(undefined, resolverSpy);
+    expect(resolverSpy).toHaveBeenCalledWith({ clerkUserId: "user_implicit", clerkOrgId: "org_implicit" });
+    expect(result?.orgId).toBe("org_live");
+  });
+
+  it("returns null if auth() throws", async () => {
+    vi.mocked(auth).mockRejectedValueOnce(new Error("Auth Error"));
+    await expect(resolveProductionCurrentOrg(undefined, activeMember)).resolves.toBeNull();
+  });
+
+  it("returns null if auth() returns no userId", async () => {
+    vi.mocked(auth).mockResolvedValueOnce({ userId: null, orgId: null } as unknown as Awaited<ReturnType<typeof auth>>);
+    await expect(resolveProductionCurrentOrg(undefined, activeMember)).resolves.toBeNull();
   });
 
   it("returns null when the subject has no active membership", async () => {

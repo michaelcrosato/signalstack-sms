@@ -1,6 +1,7 @@
 import { MembershipRole, MembershipStatus } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 import { getDemoSession } from "@/lib/auth/demo-session";
+import { productionAuthIsEnabled, resolveProductionCurrentOrg } from "@/lib/auth/session";
 
 export type CurrentOrg = {
   orgId: string;
@@ -13,6 +14,14 @@ export type CurrentOrg = {
 };
 
 export async function getOrCreateCurrentOrg(): Promise<CurrentOrg> {
+  if (productionAuthIsEnabled()) {
+    const resolved = await resolveProductionCurrentOrg();
+    if (!resolved) {
+      throw new Error("Forbidden - No active membership");
+    }
+    return resolved;
+  }
+
   const session = getDemoSession();
 
   const user = await prisma.appUser.upsert({

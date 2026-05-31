@@ -69,17 +69,34 @@ export const resolveActiveMembershipFromDb: MembershipResolver = async (subject)
   };
 };
 
+import { auth } from "@clerk/nextjs/server";
+
 // Resolve the current org/role from a verified production subject, or null (fail closed). Never falls
 // back to the demo session — a null result must be denied by the caller, not silently downgraded.
 export async function resolveProductionCurrentOrg(
-  subject: ProductionAuthSubject | null,
+  subject?: ProductionAuthSubject | null,
   resolver: MembershipResolver = resolveActiveMembershipFromDb
 ): Promise<CurrentOrg | null> {
-  if (!subject || !subject.clerkUserId) {
+  let resolvedSubject = subject;
+
+  if (resolvedSubject === undefined) {
+    try {
+      const { userId, orgId } = await auth();
+      if (userId) {
+        resolvedSubject = { clerkUserId: userId, clerkOrgId: orgId };
+      } else {
+        resolvedSubject = null;
+      }
+    } catch {
+      resolvedSubject = null;
+    }
+  }
+
+  if (!resolvedSubject || !resolvedSubject.clerkUserId) {
     return null;
   }
 
-  const resolution = await resolver(subject);
+  const resolution = await resolver(resolvedSubject);
   if (!resolution) {
     return null;
   }

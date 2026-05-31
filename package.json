@@ -55,10 +55,12 @@
     "premerge": "npm run validate"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.4.2",
     "@prisma/client": "^6.19.3",
     "@vercel/otel": "^2.1.2",
     "bullmq": "^5.76.10",
     "ioredis": "^5.11.0",
+    "jose": "^6.2.3",
     "next": "^15.5.18",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",

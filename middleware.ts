@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { clerkMiddleware } from "@clerk/nextjs/server";
 import {
   apiRateLimitHeaders,
   checkApiRateLimit,
@@ -6,7 +7,7 @@ import {
   getApiRateLimitPolicy
 } from "@/lib/rate-limit/api-rate-limit";
 
-export async function middleware(request: NextRequest) {
+export default clerkMiddleware(async (auth, request) => {
   const policy = getApiRateLimitPolicy();
   const result = await checkApiRateLimit({
     key: getApiRateLimitClientKey(request.headers),
@@ -21,13 +22,17 @@ export async function middleware(request: NextRequest) {
     );
   }
 
+  if (process.env.PRODUCTION_AUTH_ENABLED === "true") {
+    await auth.protect();
+  }
+
   const response = NextResponse.next();
   for (const [key, value] of Object.entries(headers)) {
     response.headers.set(key, value);
   }
 
   return response;
-}
+});
 
 export const config = {
   matcher: ["/api/:path*"]
