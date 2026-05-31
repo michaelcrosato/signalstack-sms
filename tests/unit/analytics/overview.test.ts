@@ -12,9 +12,10 @@ import {
 type CountArgs = { where: Record<string, unknown> };
 
 const mocks = vi.hoisted(() => ({
-  contactCount: vi.fn(),
-  campaignCount: vi.fn(),
-  conversationCount: vi.fn(),
+  contactGroupBy: vi.fn(),
+  campaignGroupBy: vi.fn(),
+  conversationGroupBy: vi.fn(),
+  messageGroupBy: vi.fn(),
   messageCount: vi.fn(),
   messageFindFirst: vi.fn(),
   usageEventFindMany: vi.fn()
@@ -22,10 +23,10 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@/lib/db/prisma", () => ({
   prisma: {
-    contact: { count: mocks.contactCount },
-    campaign: { count: mocks.campaignCount },
-    conversation: { count: mocks.conversationCount },
-    message: { count: mocks.messageCount, findFirst: mocks.messageFindFirst },
+    contact: { groupBy: mocks.contactGroupBy },
+    campaign: { groupBy: mocks.campaignGroupBy },
+    conversation: { groupBy: mocks.conversationGroupBy },
+    message: { groupBy: mocks.messageGroupBy, count: mocks.messageCount, findFirst: mocks.messageFindFirst },
     usageEvent: { findMany: mocks.usageEventFindMany }
   }
 }));
@@ -33,18 +34,28 @@ vi.mock("@/lib/db/prisma", () => ({
 describe("analytics usage aggregation", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.contactCount.mockImplementation(async ({ where }: CountArgs) => {
-      if (where.consentStatus === "OPTED_IN") {
-        return 6;
-      }
-      if (where.consentStatus === "OPTED_OUT") {
-        return 2;
-      }
 
-      return 10;
-    });
-    mocks.campaignCount.mockImplementation(async ({ where }: CountArgs) => (where.status === "SCHEDULED" ? 3 : 7));
-    mocks.conversationCount.mockImplementation(async ({ where }: CountArgs) => (where.status === "OPEN" ? 4 : 9));
+    mocks.contactGroupBy.mockResolvedValue([
+      { consentStatus: "OPTED_IN", _count: { _all: 6 } },
+      { consentStatus: "OPTED_OUT", _count: { _all: 2 } },
+      { consentStatus: "UNKNOWN", _count: { _all: 2 } }
+    ]);
+
+    mocks.campaignGroupBy.mockResolvedValue([
+      { status: "SCHEDULED", _count: { _all: 3 } },
+      { status: "DRAFT", _count: { _all: 4 } }
+    ]);
+
+    mocks.conversationGroupBy.mockResolvedValue([
+      { status: "OPEN", _count: { _all: 4 } },
+      { status: "RESOLVED", _count: { _all: 5 } }
+    ]);
+
+    mocks.messageGroupBy.mockResolvedValue([
+      { direction: "INBOUND", _count: { _all: 11 } },
+      { direction: "OUTBOUND", _count: { _all: 5 } }
+    ]);
+
     mocks.messageCount.mockImplementation(async ({ where }: CountArgs) => {
       if (where.deliveredAt && where.failedAt === null) {
         return 3;
@@ -55,14 +66,8 @@ describe("analytics usage aggregation", () => {
       if (where.OR) {
         return 1;
       }
-      if (where.direction === "INBOUND") {
-        return 11;
-      }
-      if (where.direction === "OUTBOUND") {
-        return 5;
-      }
 
-      return 16;
+      return 0;
     });
     mocks.usageEventFindMany.mockResolvedValue([
       { type: UsageEventType.CONTACT_IMPORTED, quantity: 10 },
@@ -114,9 +119,10 @@ describe("analytics usage aggregation", () => {
       }
     });
 
-    expect(mocks.messageCount).toHaveBeenCalledWith({ where: { orgId: "org_analytics" } });
-    expect(mocks.messageCount).toHaveBeenCalledWith({ where: { orgId: "org_analytics", direction: "INBOUND" } });
-    expect(mocks.messageCount).toHaveBeenCalledWith({ where: outboundMessageWhere("org_analytics") });
+    expect(mocks.contactGroupBy).toHaveBeenCalledWith({ by: ["consentStatus"], where: { orgId: "org_analytics", archivedAt: null }, _count: { _all: true } });
+    expect(mocks.campaignGroupBy).toHaveBeenCalledWith({ by: ["status"], where: { orgId: "org_analytics" }, _count: { _all: true } });
+    expect(mocks.conversationGroupBy).toHaveBeenCalledWith({ by: ["status"], where: { orgId: "org_analytics" }, _count: { _all: true } });
+    expect(mocks.messageGroupBy).toHaveBeenCalledWith({ by: ["direction"], where: { orgId: "org_analytics" }, _count: { _all: true } });
     expect(mocks.messageCount).toHaveBeenCalledWith({ where: outboundDeliveredMessageWhere("org_analytics") });
     expect(mocks.messageCount).toHaveBeenCalledWith({ where: outboundPendingMessageWhere("org_analytics") });
     expect(mocks.messageCount).toHaveBeenCalledWith({ where: outboundFailedMessageWhere("org_analytics") });

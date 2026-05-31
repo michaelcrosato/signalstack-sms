@@ -389,6 +389,8 @@ model Message {
 
   @@unique([orgId, idempotencyKey])
   @@index([orgId])
+  @@index([orgId, direction])
+  @@index([orgId, providerStatus])
   @@index([conversationId])
   @@index([contactId])
   @@index([providerMessageId])
