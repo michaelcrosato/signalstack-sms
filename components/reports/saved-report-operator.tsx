@@ -26,8 +26,31 @@ export function SavedReportOperator() {
         throw new Error(data?.error || `Request failed with status ${res.status}`);
       }
 
-      const data = await res.json();
-      setMessage(data.message || `Successfully executed ${action}`);
+      const contentType = res.headers.get("Content-Type");
+      if (contentType && contentType.includes("text/csv")) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+
+        const contentDisposition = res.headers.get("Content-Disposition");
+        let filename = `export-${Date.now()}.csv`;
+        if (contentDisposition && contentDisposition.includes("filename=")) {
+          filename = contentDisposition.split("filename=")[1].replace(/"/g, "");
+        }
+
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        setMessage("Report exported successfully.");
+      } else {
+        const data = await res.json();
+        setMessage(data.message || `Successfully executed ${action}`);
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred");
     } finally {

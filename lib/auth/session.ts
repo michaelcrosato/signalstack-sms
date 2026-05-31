@@ -42,20 +42,16 @@ export type MembershipResolver = (subject: ProductionAuthSubject) => Promise<Mem
 // Default resolver: map a verified subject to its ACTIVE local membership (optionally scoped to a
 // specific Clerk org). Returns null when the user or an active membership is absent (fail closed).
 export const resolveActiveMembershipFromDb: MembershipResolver = async (subject) => {
-  const user = await prisma.appUser.findUnique({ where: { clerkUserId: subject.clerkUserId } });
-  if (!user) {
-    return null;
-  }
-
   const membership = await prisma.membership.findFirst({
     where: {
-      userId: user.id,
+      user: { clerkUserId: subject.clerkUserId },
       status: MembershipStatus.ACTIVE,
       ...(subject.clerkOrgId ? { org: { clerkOrgId: subject.clerkOrgId } } : {})
     },
-    include: { org: true }
+    include: { org: true, user: true }
   });
-  if (!membership) {
+
+  if (!membership || !membership.user) {
     return null;
   }
 
@@ -64,8 +60,8 @@ export const resolveActiveMembershipFromDb: MembershipResolver = async (subject)
     orgSlug: membership.org.slug,
     orgName: membership.org.name,
     demoMode: membership.org.demoMode,
-    userId: user.id,
-    email: user.email,
+    userId: membership.user.id,
+    email: membership.user.email,
     role: membership.role
   };
 };
