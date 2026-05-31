@@ -34,7 +34,10 @@ export default clerkMiddleware(async (auth, request) => {
   }
 
   if (process.env.PRODUCTION_AUTH_ENABLED === "true" && isProtectedRoute(request)) {
-    await auth.protect();
+    const session = await auth();
+    if (!session.userId) {
+      return new NextResponse(null, { status: 401 });
+    }
   }
 
   return response;

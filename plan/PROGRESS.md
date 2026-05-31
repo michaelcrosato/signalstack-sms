@@ -1,2 +1,2 @@
-- [~] 001_cve_resolution.md
-- [ ] 002_query_optimization.md
+- [x] 001_cve_resolution.md
+- [x] 002_query_optimization.md
