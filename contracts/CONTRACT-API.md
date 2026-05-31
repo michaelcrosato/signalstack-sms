@@ -192,6 +192,10 @@ Returns deterministic fake lead qualification score, stage, and reasons from sup
 
 Returns tenant-scoped counts for contacts, total and scheduled campaigns, conversations, local outbound message delivery breakdowns including delivered, pending, failed outbound counts, the newest outbound local message timestamp, and local usage totals. Delivered outbound counts exclude rows with terminal failure evidence so stale delivery timestamps do not inflate delivery rates.
 
+### `POST /api/analytics/reports`
+
+Processes a request to either save a local snapshot or generate an export of current tenant analytics. It is restricted to the ADMIN role and returns a stubbed success response for UI workflows without initiating background jobs.
+
 ### `GET /api/billing/usage`
 
 Returns the org billing metadata record, live-billing blocked state, local usage totals, and recent usage events.

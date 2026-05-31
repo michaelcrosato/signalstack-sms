@@ -26,6 +26,13 @@ const apiRouteRbacMatrixItems = [
   {
     auth: "role",
     method: "POST",
+    path: "app/api/analytics/reports/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "save or export local analytics reports"
+  },
+  {
+    auth: "role",
+    method: "POST",
     path: "app/api/ai/campaign-copy/route.ts",
     requiredRole: MembershipRole.ADMIN,
     scope: "generate local fake-AI campaign copy"

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getProductAnalytics } from "@/lib/product/analytics";
 import { productNavigation } from "@/lib/product/dashboard";
+import { SavedReportOperator } from "@/components/reports/saved-report-operator";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +41,8 @@ export default async function AnalyticsPage() {
           </nav>
         </div>
       </header>
+
+      <SavedReportOperator />
 
       <div className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-6">
         <section aria-label="Analytics metrics" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

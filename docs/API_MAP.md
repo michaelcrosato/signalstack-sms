@@ -66,6 +66,7 @@ Milestone 7:
 Milestone 8:
 
 - `GET /api/analytics/overview`: returns tenant-scoped aggregate analytics, including scheduled campaign counts, outbound-only local delivered, pending, and failed message delivery breakdowns, and the latest outbound local message timestamp.
+- `POST /api/analytics/reports`: handles requests to save or export analytics snapshot reports.
 - `GET /api/billing/usage`: returns local billing metadata and usage totals.
 - `POST /api/billing/usage`: records a local usage event only.
 

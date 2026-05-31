@@ -14,7 +14,7 @@ function parsePlaywrightPort(value: string | undefined): number {
 }
 
 const e2ePort = parsePlaywrightPort(process.env.PLAYWRIGHT_PORT);
-const baseURL = `http://127.0.0.1:${e2ePort}`;
+const baseURL = `http://localhost:${e2ePort}`;
 
 export default defineConfig({
   testDir: ".",
@@ -26,7 +26,7 @@ export default defineConfig({
     trace: "on-first-retry"
   },
   webServer: {
-    command: `npm run dev -- --hostname 127.0.0.1 --port ${e2ePort}`,
+    command: `npm run dev -- --port ${e2ePort}`,
     url: baseURL,
     reuseExistingServer: process.env.PLAYWRIGHT_REUSE_EXISTING_SERVER === "true",
     timeout: 120_000
