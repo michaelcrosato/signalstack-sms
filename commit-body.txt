@@ -1,0 +1,8 @@
+🎯 **What:** Added missing unit tests for `liveAiIsBlocked`, `evaluateAiHardGate`, and `readAiHardGateInput` in `lib/ai/ai-gate.ts` to ensure proper gate evaluations.
+
+📊 **Coverage:** Covered all test scenarios:
+- Environment variable mapping (`readAiHardGateInput`).
+- Condition checking with individual failure reasons and combinations (`evaluateAiHardGate`).
+- Blockage evaluation and fallback behavior to `process.env` (`liveAiIsBlocked`).
+
+✨ **Result:** Enhanced reliability and predictability of AI provider evaluation, avoiding unhandled fail-safes and ensuring missing or invalid keys correctly trigger standard failure cases. Increased test coverage for `lib/ai/ai-gate.ts` from 0% to 100%.
