@@ -39,3 +39,10 @@ export type ContactCreateInput = z.infer<typeof contactCreateSchema>;
 export type ContactUpdateInput = z.infer<typeof contactUpdateSchema>;
 export type ContactMergeInput = z.infer<typeof contactMergeSchema>;
 export type ContactImportRequest = z.infer<typeof contactImportRequestSchema>;
+
+export const segmentFilterSchema = z.object({
+  tagNames: z.array(z.string().trim().min(1).max(120)).optional(),
+  consentStatuses: z.array(z.nativeEnum(ConsentStatus)).optional(),
+  minLeadScore: z.number().int().optional(),
+  maxLeadScore: z.number().int().optional()
+});

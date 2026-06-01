@@ -2,6 +2,7 @@ import { ConsentStatus } from "@prisma/client";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { evaluateSegmentContacts, type SegmentFilter } from "@/lib/db/repositories/segments";
 import { withOptionalTenantRls } from "@/lib/db/rls";
+import { segmentFilterSchema } from "@/lib/validation/contacts";
 
 export async function GET(request: Request) {
   const currentOrg = await getOrCreateCurrentOrg();
@@ -12,7 +13,12 @@ export async function GET(request: Request) {
   const filterJson = searchParams.get("filter");
   if (filterJson) {
     try {
-      filter = JSON.parse(filterJson);
+      const parsedJson = JSON.parse(filterJson);
+      const validationResult = segmentFilterSchema.safeParse(parsedJson);
+      if (!validationResult.success) {
+        return new Response("Invalid filter parameters.", { status: 400 });
+      }
+      filter = validationResult.data;
     } catch {
       return new Response("Invalid JSON in filter parameter.", { status: 400 });
     }
