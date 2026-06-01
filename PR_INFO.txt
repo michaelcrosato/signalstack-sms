@@ -1,0 +1,7 @@
+Title: "🧪 [Jules] Add tests for idempotency keys"
+
+Description:
+🎯 **What:** Added unit tests for idempotency key generator functions (`scheduledCampaignIdempotencyKey` and `outboundCampaignMessageIdempotencyKey`) which were previously untested in `lib/queue/idempotency.ts`.
+
+📊 **Coverage:** Covered successful deterministic key generation matching the expected pattern, unique keys generated for unique dates and parameters.
+✨ **Result:** Improved test suite coverage for idempotent queue operation building blocks.

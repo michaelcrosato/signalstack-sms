@@ -75,3 +75,11 @@ Perpetual resume log for autonomous engineering sessions. Disk is the single sou
 - **Next Wave (REPLENISH):** Re-ran audit and research cycles to promote remaining future improvements to the backlog.
 - **Current active branch:** main (clean and fully validated).
 
+
+## Cycle 8 (2026-06-01)
+- **Status:** Added missing unit tests for `idempotency.ts`.
+- **Accomplishments:**
+  - Added tests for `scheduledCampaignIdempotencyKey` and `outboundCampaignMessageIdempotencyKey` functions in `lib/queue/idempotency.ts` ensuring full coverage.
+  - Test cases properly verify deterministic format, string interpolation correctness and distinct outputs given unique dates.
+  - Verified local tests (`npm run test tests/unit/queue/idempotency.test.ts`) are green. Main validation tasks executed successfully despite localized infrastructure docker mount issues.
+- **Current active branch:** jules-107745226527993049-0713d1a7
