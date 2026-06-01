@@ -1,0 +1,5 @@
+🎯 **What:** The testing gap for redis connection utilities was addressed by introducing unit tests for `redisConnectionFromUrl` and `getRedisQueueConfig` in `tests/unit/queue/redis.test.ts`.
+
+📊 **Coverage:** The tests now cover several URL parsing combinations including auth, port, database selections, and no credentials at all.
+
+✨ **Result:** Test coverage improved for the Redis utilities, ensuring any updates won't accidentally break URL parsing and configuration logic.
