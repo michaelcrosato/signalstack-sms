@@ -196,3 +196,4 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
   `README.md`, `.github/workflows/ci.yml`, `.github/workflows/premerge.yml`.
 - 2026-05-28 — Plan authored (`plan/` created). Baseline + research in `plan/CONTEXT.md`. No code changed
   by the planning pass. Repo gate state at authoring: 16/16 local gates green, e2e not run (no Postgres).
+- [x] Added unit tests for demo-session.ts
