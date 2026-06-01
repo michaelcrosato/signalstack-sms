@@ -3,6 +3,14 @@ import { NextResponse } from "next/server";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { evaluateSegmentContacts, type SegmentFilter } from "@/lib/db/repositories/segments";
 import { withOptionalTenantRls } from "@/lib/db/rls";
+import { z } from "zod";
+
+const segmentFilterSchema = z.object({
+  tagNames: z.array(z.string()).optional(),
+  consentStatuses: z.array(z.nativeEnum(ConsentStatus)).optional(),
+  minLeadScore: z.number().optional(),
+  maxLeadScore: z.number().optional(),
+});
 
 export async function GET(request: Request) {
   const currentOrg = await getOrCreateCurrentOrg();
@@ -13,7 +21,12 @@ export async function GET(request: Request) {
   const filterJson = searchParams.get("filter");
   if (filterJson) {
     try {
-      filter = JSON.parse(filterJson);
+      const parsed = JSON.parse(filterJson);
+      const validationResult = segmentFilterSchema.safeParse(parsed);
+      if (!validationResult.success) {
+        return NextResponse.json({ error: "Invalid filter schema.", details: validationResult.error.format() }, { status: 400 });
+      }
+      filter = validationResult.data;
     } catch {
       return NextResponse.json({ error: "Invalid JSON in filter parameter." }, { status: 400 });
     }

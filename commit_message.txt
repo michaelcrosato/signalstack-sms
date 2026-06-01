@@ -1,0 +1,10 @@
+🔒 Fix: Add missing input validation on segment filter
+
+🎯 What:
+Added Zod validation schema to the `filter` parameter inside the GET `/api/contacts/segments` endpoint.
+
+⚠️ Risk:
+The `filter` URL parameter was previously parsed from a JSON string using `JSON.parse` and directly passed to the underlying Prisma query (`evaluateSegmentContacts`) without any type or schema checking. This meant an attacker could supply arbitrary structured JSON which would be blindly merged into the Prisma `where` clause, potentially bypassing segment authorization rules, extracting unauthorized data, or causing unexpected exceptions leading to Denial of Service (DoS).
+
+🛡️ Solution:
+Defined a strict Zod schema (`segmentFilterSchema`) that precisely matches the intended `SegmentFilter` type definition: `tagNames`, `consentStatuses`, `minLeadScore`, `maxLeadScore`. Validated the JSON payload using `segmentFilterSchema.safeParse` before assigning it to the `filter` variable.
