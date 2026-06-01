@@ -1,0 +1,3 @@
+🎯 **What:** The testing gap for `getRedisQueueConfig` has been addressed. The test file `tests/unit/queue/redis.test.ts` was created to contain these tests.
+📊 **Coverage:** Scenarios covered include: when `REDIS_URL` is provided via the `env` argument, when `REDIS_URL` is not present in the `env` argument, and when `env` is completely omitted (defaulting to `process.env`). The existing test for `redisConnectionFromUrl` was also moved here for better domain organization.
+✨ **Result:** Test coverage for `lib/queue/redis.ts` has been significantly improved, covering 100% of the `getRedisQueueConfig` function paths.

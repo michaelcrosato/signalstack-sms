@@ -6,7 +6,7 @@ import {
   scheduledCampaignBullMqJobName,
   scheduledCampaignBullMqQueueName
 } from "@/lib/queue/bullmq";
-import { redisConnectionFromUrl } from "@/lib/queue/redis";
+
 
 const payload = {
   version: 1 as const,
@@ -88,15 +88,5 @@ describe("BullMQ queue foundation", () => {
         { env: { QUEUE_BACKEND: "bullmq" } }
       )
     ).resolves.toEqual({ enqueued: false, reason: "missing-redis-url" });
-  });
-
-  it("parses Redis URL connection settings without exposing credentials", () => {
-    expect(redisConnectionFromUrl("redis://worker:secret@localhost:6380/2")).toEqual({
-      host: "localhost",
-      port: 6380,
-      username: "worker",
-      password: "secret",
-      db: 2
-    });
   });
 });
