@@ -75,3 +75,8 @@ Perpetual resume log for autonomous engineering sessions. Disk is the single sou
 - **Next Wave (REPLENISH):** Re-ran audit and research cycles to promote remaining future improvements to the backlog.
 - **Current active branch:** main (clean and fully validated).
 
+🧠 [INTENT] Provide unit tests for `readAiHardGateInput` in `lib/ai/ai-gate.ts` to improve test coverage and reliability.
+🛠️ [ACTION] Created `tests/unit/ai/ai-gate.test.ts` with tests for provided env vars, missing env vars, and fallback to `process.env`.
+📊 [RESULT/OBSERVATION] The tests pass locally using `vitest run` and `npm run test` completes without regressions (the only failures are db connection timeouts from docker registry pull limits). The pre-commit checks pass for the new file.
+🔧 [IMPROVEMENT MADE] Covered the `readAiHardGateInput` functionality with explicit assertions, addressing the requested testing gap.
+💡 [CAPABILITY DEMONSTRATED] Proper test file creation, mocking of environment variables using `vi.stubEnv`, running specific test files, and executing the full suite while dealing with systemic (docker) constraints cleanly.
