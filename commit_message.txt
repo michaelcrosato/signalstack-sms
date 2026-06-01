@@ -1,0 +1,5 @@
+🧪 [testing improvement] test: add evaluateAiHardGate unit tests
+
+🎯 What: Adds missing unit tests for the evaluateAiHardGate function in lib/ai/ai-gate.ts.
+📊 Coverage: Covers happy path (all conditions met), single failure paths (AI_PROVIDER_NOT_LIVE, LIVE_AI_DISABLED, MISSING_API_KEY, COST_NOT_ACKNOWLEDGED), whitespace-only API keys, and multiple simultaneous failures.
+✨ Result: Improved test coverage and reliability of the AI hard gate logic.
