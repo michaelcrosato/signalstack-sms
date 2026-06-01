@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { prisma } from "@/lib/db/prisma";
-import { withTenantRls, withOptionalTenantRls } from "@/lib/db/rls";
+import { withTenantRls, withOptionalTenantRls, rlsIsEnabled } from "@/lib/db/rls";
 
 // Integration proof for SPEC-010. Hits a real Postgres with the RLS migration applied, so it is gated on
 // RUN_DB_TESTS (the default `npm test` skips it — it never touches the DB). Run it with:
@@ -40,6 +40,25 @@ describe.runIf(run)("RLS tenant isolation (integration; requires Postgres + RUN_
     await expect(
       withTenantRls(orgAId, (tx) => tx.contact.create({ data: { orgId: orgBId, phone: `+1700${suffix}3` } }))
     ).rejects.toThrow();
+  });
+});
+
+
+describe("rlsIsEnabled (unit)", () => {
+  it("returns true when DATABASE_RLS_ENFORCED is 'true'", () => {
+    expect(rlsIsEnabled({ DATABASE_RLS_ENFORCED: "true" })).toBe(true);
+  });
+
+  it("returns false when DATABASE_RLS_ENFORCED is 'false'", () => {
+    expect(rlsIsEnabled({ DATABASE_RLS_ENFORCED: "false" })).toBe(false);
+  });
+
+  it("returns false when DATABASE_RLS_ENFORCED is undefined", () => {
+    expect(rlsIsEnabled({})).toBe(false);
+  });
+
+  it("returns false when DATABASE_RLS_ENFORCED is some other string", () => {
+    expect(rlsIsEnabled({ DATABASE_RLS_ENFORCED: "something_else" })).toBe(false);
   });
 });
 
