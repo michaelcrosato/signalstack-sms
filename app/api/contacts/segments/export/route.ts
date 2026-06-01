@@ -1,7 +1,16 @@
+import { z } from "zod";
 import { ConsentStatus } from "@prisma/client";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { evaluateSegmentContacts, type SegmentFilter } from "@/lib/db/repositories/segments";
 import { withOptionalTenantRls } from "@/lib/db/rls";
+
+
+const segmentFilterSchema = z.object({
+  tagNames: z.array(z.string()).optional(),
+  consentStatuses: z.array(z.nativeEnum(ConsentStatus)).optional(),
+  minLeadScore: z.number().int().optional(),
+  maxLeadScore: z.number().int().optional(),
+});
 
 export async function GET(request: Request) {
   const currentOrg = await getOrCreateCurrentOrg();
@@ -12,7 +21,12 @@ export async function GET(request: Request) {
   const filterJson = searchParams.get("filter");
   if (filterJson) {
     try {
-      filter = JSON.parse(filterJson);
+      const parsed = JSON.parse(filterJson);
+      const result = segmentFilterSchema.safeParse(parsed);
+      if (!result.success) {
+        return new Response("Invalid filter format.", { status: 400 });
+      }
+      filter = result.data;
     } catch {
       return new Response("Invalid JSON in filter parameter.", { status: 400 });
     }
