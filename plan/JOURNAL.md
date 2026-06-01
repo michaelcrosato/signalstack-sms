@@ -75,3 +75,8 @@ Perpetual resume log for autonomous engineering sessions. Disk is the single sou
 - **Next Wave (REPLENISH):** Re-ran audit and research cycles to promote remaining future improvements to the backlog.
 - **Current active branch:** main (clean and fully validated).
 
+🧠 [INTENT] Remove unused `resetApiRateLimitStore` function from `lib/rate-limit/api-rate-limit.ts` to improve code health.
+🛠️ [ACTION] Ran `grep` to verify it's not used, then used `sed` to remove the function from the file, and verified with `npm run lint` and `vitest`.
+📊 [RESULT/OBSERVATION] The unused function was removed, and all linting and rate-limit unit tests pass successfully.
+🔧 [IMPROVEMENT MADE] Codebase is cleaner with dead code removed.
+💡 [CAPABILITY DEMONSTRATED] Autonomous identification and safe removal of dead code with test verification.

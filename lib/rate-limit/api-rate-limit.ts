@@ -213,9 +213,6 @@ export function apiRateLimitHeaders(result: RateLimitResult): HeadersInit {
   return headers;
 }
 
-export function resetApiRateLimitStore(store: RateLimitStore = globalRateLimitStore) {
-  store.clear();
-}
 
 function parseBoolean(value: string | undefined, fallback: boolean) {
   if (value === undefined || value.trim() === "") {
