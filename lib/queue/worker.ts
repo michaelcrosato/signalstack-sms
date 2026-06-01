@@ -223,14 +223,10 @@ export async function processDueScheduledCampaignJobs(
     take: options.maxJobsPerPoll ?? DEFAULT_WORKER_MAX_JOBS_PER_POLL
   });
 
-  let processed = 0;
-  let skipped = 0;
+  const results = await Promise.all(jobs.map(job => processScheduledCampaignQueueJob(job, now)));
 
-  for (const job of jobs) {
-    const result = await processScheduledCampaignQueueJob(job, now);
-    processed += result.processed;
-    skipped += result.skipped;
-  }
+  const processed = results.reduce((acc, result) => acc + result.processed, 0);
+  const skipped = results.reduce((acc, result) => acc + result.skipped, 0);
 
   return {
     processed,

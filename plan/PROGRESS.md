@@ -2,4 +2,5 @@
 - [x] 002_query_optimization.md
 - [x] 003_refactor_live_test_sms.md
 - [x] 004_analytics_reports_tests.md
-- [~] 005_observability_type_cleanup.md
+- [x] 005_observability_type_cleanup.md
+- [~] 006_worker_concurrency.md
