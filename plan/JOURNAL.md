@@ -75,3 +75,8 @@ Perpetual resume log for autonomous engineering sessions. Disk is the single sou
 - **Next Wave (REPLENISH):** Re-ran audit and research cycles to promote remaining future improvements to the backlog.
 - **Current active branch:** main (clean and fully validated).
 
+🧠 [INTENT] Ensure the codebase has proper test coverage for `aiDraftDailyCap` and `aiDraftCapExceeded` in `lib/ai/usage.ts` by adding missing unit tests.
+🛠️ [ACTION] Created `tests/unit/ai/usage.test.ts` with tests testing various edge cases and happy paths for both functions.
+📊 [RESULT/OBSERVATION] Tests ran successfully and successfully pass locally. Type check and linting also pass.
+🔧 [IMPROVEMENT MADE] Added unit tests for AI usage cap calculations, increasing test coverage.
+💡 [CAPABILITY DEMONSTRATED] Analyzing missing test cases, identifying missing test areas, proactively generating robust unit tests handling edge cases, running the tests via Vitest, and completing pre-commit validation.
