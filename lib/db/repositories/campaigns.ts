@@ -274,10 +274,21 @@ async function syncCampaignRecipients(
 ) {
   await tx.campaignRecipient.deleteMany({ where: { orgId, campaignId } });
 
-  for (const contactId of [...new Set(contactIds)]) {
-    const contact = await tx.contact.findFirst({ where: orgWhere(orgId, { id: contactId }) });
-    if (contact) {
-      await tx.campaignRecipient.create({ data: { orgId, campaignId, contactId } });
-    }
+  const uniqueContactIds = [...new Set(contactIds)];
+  if (uniqueContactIds.length === 0) return;
+
+  const existingContacts = await tx.contact.findMany({
+    where: orgWhere(orgId, { id: { in: uniqueContactIds } }),
+    select: { id: true }
+  });
+
+  if (existingContacts.length > 0) {
+    await tx.campaignRecipient.createMany({
+      data: existingContacts.map((contact) => ({
+        orgId,
+        campaignId,
+        contactId: contact.id
+      }))
+    });
   }
 }
