@@ -9,7 +9,7 @@ import {
 export async function middleware(request: NextRequest) {
   const policy = getApiRateLimitPolicy();
   const result = await checkApiRateLimit({
-    key: getApiRateLimitClientKey(request.headers),
+    key: getApiRateLimitClientKey(request),
     policy
   });
   const headers = apiRateLimitHeaders(result);
