@@ -5,6 +5,7 @@ import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-au
 import { getReadinessAuditOperationLinks } from "@/lib/operations/operator-surfaces";
 import { buildReadinessAuditExportHref, getReadinessAuditOperationsStatus } from "@/lib/operations/readiness-audit-operations";
 import { readinessAuditQueryLimitDefault, readinessAuditQuerySchema } from "@/lib/validation/readiness-audit";
+import { FilterLink } from "@/components/ui/filter-link";
 
 export const dynamic = "force-dynamic";
 
@@ -159,20 +160,4 @@ function Panel({ title, children }: { title: string; children: ReactNode }) {
     </section>
   );
 }
-
-function FilterLink({ href, label, active }: { href: string; label: string; active: boolean }) {
-  return (
-    <Link
-      className={
-        active
-          ? "rounded border border-slate-950 bg-slate-950 px-3 py-1 text-xs font-semibold text-white"
-          : "rounded border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700"
-      }
-      href={href}
-    >
-      {label}
-    </Link>
-  );
-}
-
 

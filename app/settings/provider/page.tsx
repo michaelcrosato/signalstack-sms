@@ -6,6 +6,7 @@ import { getProviderSettings } from "@/lib/messaging/provider/settings";
 import { getProviderOperationLinks } from "@/lib/operations/operator-surfaces";
 import { providerCredentialRotationActionSchema, type ProviderCredentialRotationAction } from "@/lib/validation/provider";
 import { ProviderCredentialForm } from "./provider-credential-form";
+import { FilterLink } from "@/components/ui/filter-link";
 
 export const dynamic = "force-dynamic";
 
@@ -120,21 +121,6 @@ export default async function ProviderSettingsPage({ searchParams }: ProviderSet
   );
 }
 
-function FilterLink({ href, label, active }: { href: string; label: string; active: boolean }) {
-  return (
-    <Link
-      className={
-        active
-          ? "rounded border border-slate-950 bg-slate-950 px-3 py-1 text-xs font-semibold text-white"
-          : "rounded border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700"
-      }
-      href={href}
-    >
-      {label}
-    </Link>
-  );
-}
-
 function StatusRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-2">
@@ -143,5 +129,3 @@ function StatusRow({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-
-
