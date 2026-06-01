@@ -1,3 +1,4 @@
+import { FilterLink } from "@/components/ui/filter-link";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
@@ -471,21 +472,6 @@ function Panel({ title, children }: { title: string; children: ReactNode }) {
       <h2 className="text-lg font-semibold text-slate-950">{title}</h2>
       <div className="mt-4">{children}</div>
     </section>
-  );
-}
-
-function FilterLink({ href, label, active }: { href: string; label: string; active: boolean }) {
-  return (
-    <Link
-      className={
-        active
-          ? "rounded border border-slate-950 bg-slate-950 px-3 py-1 text-xs font-semibold text-white"
-          : "rounded border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700"
-      }
-      href={href}
-    >
-      {label}
-    </Link>
   );
 }
 
