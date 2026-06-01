@@ -166,7 +166,7 @@ describe("scheduled campaign worker processing", () => {
       data: { status: CampaignRecipientStatus.PENDING, blockReason: null }
     });
     expect(mocks.campaignRecipientUpdateMany).toHaveBeenNthCalledWith(2, {
-      where: { orgId: "org_demo", id: "campaign_recipient_blocked" },
+      where: { orgId: "org_demo", id: { in: ["campaign_recipient_blocked"] } },
       data: {
         status: CampaignRecipientStatus.BLOCKED,
         blockReason: "CONSENT_NOT_OPTED_IN,CONTACT_OPTED_OUT"
