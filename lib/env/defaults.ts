@@ -14,11 +14,3 @@ export function applyDemoSafeRuntimeDefaults(env: Record<string, string | undefi
   }
   env.DATABASE_URL ??= localDatabaseUrl;
 }
-
-export function assertDemoSafeDefaults(values: Record<string, string | undefined>) {
-  for (const [key, expected] of Object.entries(envDefaults)) {
-    if (values[key] !== expected) {
-      throw new Error(`${key} must default to ${expected}`);
-    }
-  }
-}
