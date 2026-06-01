@@ -44,7 +44,7 @@ describe("getProviderSettings", () => {
         source: "local_metadata",
         accountSidRedacted: "AC***123",
         authTokenConfigured: true,
-        fromNumberRedacted: "+123***890"
+        fromNumberRedacted: "+123***890", accountSidLast4: "123", authTokenFingerprint: "fingerprint", fromNumberLast4: "890"
       }
     };
 
