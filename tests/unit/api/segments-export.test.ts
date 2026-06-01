@@ -3,7 +3,6 @@ import { GET } from "@/app/api/contacts/segments/export/route";
 import { NextRequest } from "next/server";
 
 // Mock auth
-import * as auth from "@/lib/auth/current-org";
 import { vi } from "vitest";
 
 vi.mock("@/lib/auth/current-org", () => ({
