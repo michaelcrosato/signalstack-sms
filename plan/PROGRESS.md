@@ -3,4 +3,4 @@
 - [x] 003_refactor_live_test_sms.md
 - [x] 004_analytics_reports_tests.md
 - [x] 005_observability_type_cleanup.md
-- [~] 006_worker_concurrency.md
+- [x] 006_worker_concurrency.md
