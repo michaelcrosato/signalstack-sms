@@ -1,4 +1,5 @@
 - [x] 001_cve_resolution.md
 - [x] 002_query_optimization.md
 - [x] 003_refactor_live_test_sms.md
-- [~] 004_analytics_reports_tests.md
+- [x] 004_analytics_reports_tests.md
+- [~] 005_observability_type_cleanup.md

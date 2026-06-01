@@ -162,8 +162,7 @@ describe("getProductInbox", () => {
         messages: [],
         internalNotes: []
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ] as any);
+    ] as unknown as Awaited<ReturnType<typeof listConversations>>);
 
     const result = await getProductInbox("org_1", "conversation_3");
     expect(result.selectedConversation?.statusRows).toContainEqual({

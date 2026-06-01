@@ -1,5 +1,6 @@
 import { ConsentStatus, ConversationStatus, type Prisma } from "@prisma/client";
 import { classifyInboundKeyword, type InboundKeywordAction } from "@/lib/compliance/opt-out";
+import { logger } from "@/lib/observability/logger";
 import { prisma } from "@/lib/db/prisma";
 import { orgWhere } from "@/lib/db/tenant";
 import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
@@ -261,7 +262,7 @@ export function triggerConversationSentimentAnalysis(orgId: string, conversation
         }
       });
     } catch (error) {
-      console.error("[SentimentAnalysis] Failed:", error);
+      logger.error("sentiment_analysis_failed", { error: error instanceof Error ? error.message : String(error) });
     }
   }, 10);
 }
