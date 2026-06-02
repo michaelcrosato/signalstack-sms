@@ -83,3 +83,8 @@ Perpetual resume log for autonomous engineering sessions. Disk is the single sou
   - Created a new test file tests/unit/queue/idempotency.test.ts to properly segregate testing logic.
   - Ensured stable CI results.
   - Verified 100% green linter and testing pipeline.
+- **Status:** Omni-Loop V2 task blocked.
+- **Accomplishments:**
+  - Encountered unrecoverable GitHub Actions CI billing error during submission (`The job was not started because recent account payments have failed`).
+  - Documented the exact error in `plan/BLOCKED.md` according to the Omni-Loop V2 protocol since this is an environmental failure outside my control.
+  - The tests and code previously verified are correct and ready for human intervention regarding the billing issues.
