@@ -199,3 +199,4 @@ in `git log`. "Verified" = the real commands ran and passed (e2e is "not run" wi
 [x] Create test file tests/unit/ai/usage.test.ts
 [x] Implement test for aiDraftDailyCap
 [x] Implement test for aiDraftCapExceeded
+[x] Extend test file tests/unit/ai/usage.test.ts to test recordFakeAiUsage, recordLiveAiUsage, and countAiRequestsSince

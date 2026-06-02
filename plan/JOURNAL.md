@@ -80,3 +80,8 @@ Perpetual resume log for autonomous engineering sessions. Disk is the single sou
 📊 [RESULT/OBSERVATION] Tests ran successfully and successfully pass locally. Type check and linting also pass.
 🔧 [IMPROVEMENT MADE] Added unit tests for AI usage cap calculations, increasing test coverage.
 💡 [CAPABILITY DEMONSTRATED] Analyzing missing test cases, identifying missing test areas, proactively generating robust unit tests handling edge cases, running the tests via Vitest, and completing pre-commit validation.
+🧠 [INTENT] Ensure the codebase has proper test coverage for `recordFakeAiUsage`, `recordLiveAiUsage`, and `countAiRequestsSince` in `lib/ai/usage.ts` by updating the missing unit tests.
+🛠️ [ACTION] Updated `tests/unit/ai/usage.test.ts` with tests validating calls to mocked functions.
+📊 [RESULT/OBSERVATION] Tests ran successfully and successfully pass locally. Type check and linting also pass.
+🔧 [IMPROVEMENT MADE] Added unit tests for AI usage tracking features, increasing test coverage.
+💡 [CAPABILITY DEMONSTRATED] Understanding scope and verifying dependencies, utilizing mocked database structures in Vitest, generating new tests, and ensuring all functions within a core file are correctly and successfully validated.
