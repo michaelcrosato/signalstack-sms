@@ -64,6 +64,15 @@ describe("resolveAiProvider", () => {
   });
 });
 
+describe("resolveAiProvider fallback", () => {
+  it("returns fake provider if no liveEnv given", () => {
+    expect(resolveAiProvider().name).toBe("fake");
+  });
+  it("returns fake provider if environment empty", () => {
+    expect(resolveAiProvider({}).name).toBe("fake");
+  });
+});
+
 describe("fakeAiProvider.generateReplyDraft", () => {
   it("matches the deterministic fake suggestion byte-for-byte", async () => {
     const input = { messages: [{ direction: "INBOUND", body: "Can you send pricing?" }], goal: "share pricing" };
