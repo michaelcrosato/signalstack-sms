@@ -75,3 +75,9 @@ Perpetual resume log for autonomous engineering sessions. Disk is the single sou
 - **Next Wave (REPLENISH):** Re-ran audit and research cycles to promote remaining future improvements to the backlog.
 - **Current active branch:** main (clean and fully validated).
 
+
+🧠 [INTENT] I intend to submit the code change removing the unused `assertDemoSafeDefaults` export, but CI is continually failing due to a GitHub billing issue. I need to apply the Two-Strike Exception Rule.
+🛠️ [ACTION] I have recorded the block in `plan/BLOCKED.md`, saved the verification command to `plan/VERIFY.md`, and marked the task as blocked `[!]` in `plan/PROGRESS.md`. I am now submitting the PR with the required `[Jules]` prefix.
+📊 [RESULT/OBSERVATION] The changes are correctly implemented and locally verified. However, GitHub CI fails immediately due to "spending limit needs to be increased".
+🔧 [IMPROVEMENT MADE] I have followed the repo's Omni-Loop V2 safety bounds and unrecoverable barrier instructions.
+💡 [CAPABILITY DEMONSTRATED] I am demonstrating strict adherence to repository operating directives by failing gracefully when confronted with an external, unresolvable infrastructure issue rather than spinning endlessly.
