@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { SettingsLink } from "@/components/settings/SettingsLink";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getValidationOperationLinks } from "@/lib/operations/operator-surfaces";
@@ -16,18 +16,24 @@ export default async function ValidationOperationsPage() {
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
         <nav aria-label="Related settings" className="flex flex-wrap gap-2">
           {operationLinks.map((link) => (
-            <Link key={link.href} className="rounded border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-teal-700 transition hover:border-teal-300 hover:bg-teal-50" href={link.href}>
+            <SettingsLink key={link.href} href={link.href}>
               {link.label}
-            </Link>
+            </SettingsLink>
           ))}
         </nav>
         <div>
-          <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
-          <h1 className="text-4xl font-semibold text-slate-950">Validation Operations</h1>
+          <p className="text-sm font-semibold uppercase text-slate-500">
+            Settings
+          </p>
+          <h1 className="text-4xl font-semibold text-slate-950">
+            Validation Operations
+          </h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-            Read-only validation gate review for {currentOrg.orgName}. This page displays local check inventory and
-            repair signals only; it does not execute commands, inspect logs, scan files, mutate records, call providers,
-            create billing records, send notifications, expose secrets, or enable live features.
+            Read-only validation gate review for {currentOrg.orgName}. This page
+            displays local check inventory and repair signals only; it does not
+            execute commands, inspect logs, scan files, mutate records, call
+            providers, create billing records, send notifications, expose
+            secrets, or enable live features.
           </p>
         </div>
       </header>
@@ -37,14 +43,22 @@ export default async function ValidationOperationsPage() {
         <Metric label="Command execution" value={status.commandExecution} />
         <Metric label="External impact" value={status.externalImpact} />
         <Metric label="Mutation" value={status.mutation} />
-        <Metric label="Secrets displayed" value={String(status.secretsDisplayed)} />
+        <Metric
+          label="Secrets displayed"
+          value={String(status.secretsDisplayed)}
+        />
       </section>
 
       <Panel title="Gate Inventory">
         <ul className="grid gap-3 text-sm">
           {status.gateCommands.map((gate) => (
-            <li key={gate.command} className="grid gap-2 border-b border-slate-100 pb-3 lg:grid-cols-[16rem_10rem_1fr]">
-              <span className="break-words font-mono text-xs font-semibold text-slate-950">{gate.command}</span>
+            <li
+              key={gate.command}
+              className="grid gap-2 border-b border-slate-100 pb-3 lg:grid-cols-[16rem_10rem_1fr]"
+            >
+              <span className="break-words font-mono text-xs font-semibold text-slate-950">
+                {gate.command}
+              </span>
               <span className="text-slate-700">{gate.area}</span>
               <span className="text-slate-600">{gate.boundary}</span>
             </li>
@@ -63,10 +77,22 @@ export default async function ValidationOperationsPage() {
 
         <Panel title="Safety Boundary">
           <ul className="grid gap-2 text-sm text-slate-700">
-            <li>This view displays static command metadata and the current demo organization name only.</li>
-            <li>It does not run `npm`, `prisma`, Playwright, validation scripts, shell commands, or database migrations.</li>
-            <li>It does not read `.env.local`, validation logs, test reports, raw secrets, or provider credentials.</li>
-            <li>No provider calls, live AI, Stripe calls, notifications, email, SMS, mutations, or live feature enablement occur here.</li>
+            <li>
+              This view displays static command metadata and the current demo
+              organization name only.
+            </li>
+            <li>
+              It does not run `npm`, `prisma`, Playwright, validation scripts,
+              shell commands, or database migrations.
+            </li>
+            <li>
+              It does not read `.env.local`, validation logs, test reports, raw
+              secrets, or provider credentials.
+            </li>
+            <li>
+              No provider calls, live AI, Stripe calls, notifications, email,
+              SMS, mutations, or live feature enablement occur here.
+            </li>
           </ul>
         </Panel>
       </section>
@@ -91,5 +117,3 @@ function Panel({ title, children }: { title: string; children: ReactNode }) {
     </section>
   );
 }
-
-

@@ -1,7 +1,11 @@
+import { SettingsLink } from "@/components/settings/SettingsLink";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
-import { complianceProfileIsComplete, evaluateMessagingHardGate } from "@/lib/compliance/gates";
+import {
+  complianceProfileIsComplete,
+  evaluateMessagingHardGate,
+} from "@/lib/compliance/gates";
 import { getOrCreateComplianceProfile } from "@/lib/db/repositories/compliance";
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
 import { getComplianceOperationLinks } from "@/lib/operations/operator-surfaces";
@@ -14,20 +18,22 @@ const profileFields = [
   { key: "messagingUseCase", label: "Messaging use case" },
   { key: "optInDescription", label: "Opt-in description" },
   { key: "privacyPolicyUrl", label: "Privacy policy URL" },
-  { key: "termsOfServiceUrl", label: "Terms of service URL" }
+  { key: "termsOfServiceUrl", label: "Terms of service URL" },
 ] as const;
 
 export default async function ComplianceSettingsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
   const [profile, auditEvents] = await Promise.all([
     getOrCreateComplianceProfile(currentOrg.orgId),
-    listLiveReadinessAuditEvents(currentOrg.orgId, 8, { subjectType: "ComplianceProfile" })
+    listLiveReadinessAuditEvents(currentOrg.orgId, 8, {
+      subjectType: "ComplianceProfile",
+    }),
   ]);
   const gate = evaluateMessagingHardGate({
     demoMode: currentOrg.demoMode,
     liveMessagingEnabled: process.env.LIVE_MESSAGING_ENABLED === "true",
     messagingProvider: process.env.MESSAGING_PROVIDER ?? "dummy",
-    complianceProfile: profile
+    complianceProfile: profile,
   });
   const complete = complianceProfileIsComplete(profile);
   const operationLinks = getComplianceOperationLinks();
@@ -37,17 +43,22 @@ export default async function ComplianceSettingsPage() {
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
         <nav aria-label="Related settings" className="flex flex-wrap gap-2">
           {operationLinks.map((link) => (
-            <Link key={link.href} className="rounded border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-teal-700 transition hover:border-teal-300 hover:bg-teal-50" href={link.href}>
+            <SettingsLink key={link.href} href={link.href}>
               {link.label}
-            </Link>
+            </SettingsLink>
           ))}
         </nav>
         <div>
-          <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
-          <h1 className="text-4xl font-semibold text-slate-950">Compliance Detail</h1>
+          <p className="text-sm font-semibold uppercase text-slate-500">
+            Settings
+          </p>
+          <h1 className="text-4xl font-semibold text-slate-950">
+            Compliance Detail
+          </h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-            Read-only compliance profile and hard-gate status for {currentOrg.orgName}. Live messaging remains blocked by
-            demo-safe runtime defaults.
+            Read-only compliance profile and hard-gate status for{" "}
+            {currentOrg.orgName}. Live messaging remains blocked by demo-safe
+            runtime defaults.
           </p>
         </div>
       </header>
@@ -55,7 +66,10 @@ export default async function ComplianceSettingsPage() {
       <section className="grid gap-3 md:grid-cols-4">
         <Metric label="Profile complete" value={String(complete)} />
         <Metric label="A2P status" value={profile.a2pRegistrationStatus} />
-        <Metric label="Live messaging" value={gate.allowed ? "review" : "blocked"} />
+        <Metric
+          label="Live messaging"
+          value={gate.allowed ? "review" : "blocked"}
+        />
         <Metric label="Blockers" value={String(gate.reasons.length)} />
       </section>
 
@@ -63,36 +77,63 @@ export default async function ComplianceSettingsPage() {
         <Panel title="Compliance Profile">
           <dl className="grid gap-3 text-sm">
             {profileFields.map((field) => (
-              <StatusRow key={field.key} label={field.label} value={profile[field.key] ? "present" : "missing"} />
+              <StatusRow
+                key={field.key}
+                label={field.label}
+                value={profile[field.key] ? "present" : "missing"}
+              />
             ))}
-            <StatusRow label="Created" value={profile.createdAt.toISOString()} />
-            <StatusRow label="Updated" value={profile.updatedAt.toISOString()} />
+            <StatusRow
+              label="Created"
+              value={profile.createdAt.toISOString()}
+            />
+            <StatusRow
+              label="Updated"
+              value={profile.updatedAt.toISOString()}
+            />
           </dl>
         </Panel>
 
         <Panel title="Hard Gate">
           <dl className="grid gap-3 text-sm">
             <StatusRow label="Demo mode" value={String(currentOrg.demoMode)} />
-            <StatusRow label="Live flag" value={String(process.env.LIVE_MESSAGING_ENABLED === "true")} />
-            <StatusRow label="Provider" value={process.env.MESSAGING_PROVIDER ?? "dummy"} />
+            <StatusRow
+              label="Live flag"
+              value={String(process.env.LIVE_MESSAGING_ENABLED === "true")}
+            />
+            <StatusRow
+              label="Provider"
+              value={process.env.MESSAGING_PROVIDER ?? "dummy"}
+            />
             <StatusRow label="Checklist complete" value={String(complete)} />
-            <StatusRow label="Live messaging allowed" value={String(gate.allowed)} />
+            <StatusRow
+              label="Live messaging allowed"
+              value={String(gate.allowed)}
+            />
           </dl>
         </Panel>
       </section>
 
       <Panel title="Blockers">
         <ul className="grid gap-2 text-sm text-slate-700">
-          {gate.reasons.length > 0 ? gate.reasons.map((reason) => <li key={reason}>{reason}</li>) : <li>No blockers recorded.</li>}
+          {gate.reasons.length > 0 ? (
+            gate.reasons.map((reason) => <li key={reason}>{reason}</li>)
+          ) : (
+            <li>No blockers recorded.</li>
+          )}
         </ul>
       </Panel>
 
       <Panel title="Compliance Audit">
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <p className="text-sm text-slate-600">Recent local readiness audit events for the compliance profile.</p>
+          <p className="text-sm text-slate-600">
+            Recent local readiness audit events for the compliance profile.
+          </p>
           <Link
             className="text-sm font-medium text-teal-700"
-            href={buildReadinessAuditExportHref({ subjectType: "ComplianceProfile" })}
+            href={buildReadinessAuditExportHref({
+              subjectType: "ComplianceProfile",
+            })}
           >
             Export Compliance CSV
           </Link>
@@ -100,15 +141,25 @@ export default async function ComplianceSettingsPage() {
         <ul className="grid gap-3 text-sm">
           {auditEvents.length > 0 ? (
             auditEvents.map((event) => (
-              <li key={event.id} className="grid gap-1 border-b border-slate-100 pb-3 md:grid-cols-[1fr_auto]">
-                <span className="font-medium text-slate-950">{event.action}</span>
-                <time className="text-slate-600" dateTime={event.createdAt.toISOString()}>
+              <li
+                key={event.id}
+                className="grid gap-1 border-b border-slate-100 pb-3 md:grid-cols-[1fr_auto]"
+              >
+                <span className="font-medium text-slate-950">
+                  {event.action}
+                </span>
+                <time
+                  className="text-slate-600"
+                  dateTime={event.createdAt.toISOString()}
+                >
                   {event.createdAt.toISOString()}
                 </time>
               </li>
             ))
           ) : (
-            <li className="text-slate-600">No compliance audit events recorded.</li>
+            <li className="text-slate-600">
+              No compliance audit events recorded.
+            </li>
           )}
         </ul>
       </Panel>
@@ -142,5 +193,3 @@ function StatusRow({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-
-
