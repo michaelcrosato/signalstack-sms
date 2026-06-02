@@ -1,5 +1,6 @@
-# plan/BLOCKED.md — Deferred / Blocked Items
+# Blocked Task
 
-This file logs items that are deferred or blocked by missing credentials, live systems, or human authorization requirements.
-
-- **Status:** 0 items blocked. All active specs/tickets are unblocked or proceed with demo-safe sandbox stubs.
+**Date:** 2026-06-01
+**Task:** 🧪 Testing Improvement Task for `lib/ai/ai-gate.ts:17`
+**Reason:** CI checks are failing due to a GitHub billing error: "The job was not started because recent account payments have failed or your spending limit needs to be increased." This is an unrecoverable infrastructure barrier.
+**Action Taken:** I have completed the local unit test implementation. It passes locally. I have submitted the PR 3 times. Following the Two-Strike Exception Rule, I am marking this task as blocked and stopping further attempts to fix the unfixable CI.
