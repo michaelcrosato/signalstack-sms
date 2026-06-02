@@ -1,5 +1,1 @@
-# plan/BLOCKED.md — Deferred / Blocked Items
-
-This file logs items that are deferred or blocked by missing credentials, live systems, or human authorization requirements.
-
-- **Status:** 0 items blocked. All active specs/tickets are unblocked or proceed with demo-safe sandbox stubs.
+CI failed due to a billing issue on the GitHub account: The job was not started because recent account payments have failed or your spending limit needs to be increased. This cannot be fixed via code.
