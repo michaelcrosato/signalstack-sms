@@ -1,5 +1,10 @@
-# plan/BLOCKED.md — Deferred / Blocked Items
+# BLOCKED
 
-This file logs items that are deferred or blocked by missing credentials, live systems, or human authorization requirements.
+The GitHub CI is failing due to an account billing issue, which I cannot fix by changing code.
 
-- **Status:** 0 items blocked. All active specs/tickets are unblocked or proceed with demo-safe sandbox stubs.
+```
+[FAILURE] File: .github, Line: 1
+Message: The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings
+```
+
+I have successfully added tests for `parseCsv` in `lib/csv/parse.ts` and they pass locally. No further code changes can resolve this CI issue.
