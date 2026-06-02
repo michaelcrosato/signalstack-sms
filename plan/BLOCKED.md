@@ -1,5 +1,6 @@
-# plan/BLOCKED.md — Deferred / Blocked Items
+# Blocked Task
 
-This file logs items that are deferred or blocked by missing credentials, live systems, or human authorization requirements.
+The GitHub Actions CI check "validate" failed with the following error:
+"The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
 
-- **Status:** 0 items blocked. All active specs/tickets are unblocked or proceed with demo-safe sandbox stubs.
+This is a billing issue on the GitHub account and is an unrecoverable barrier outside code control. The task was successfully implemented, verified locally, and code review passed. Proceeding with submission.
