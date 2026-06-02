@@ -76,3 +76,4 @@ Perpetual resume log for autonomous engineering sessions. Disk is the single sou
 - **Current active branch:** main (clean and fully validated).
 
 CI failed due to GitHub billing issue (not a code issue). The job was not started because recent account payments have failed or your spending limit needs to be increased. The code changes are complete and correct.
+CI is still failing because of GitHub billing issues. No code changes are required.
