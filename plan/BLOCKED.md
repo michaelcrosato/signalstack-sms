@@ -1,5 +1,1 @@
-# plan/BLOCKED.md — Deferred / Blocked Items
-
-This file logs items that are deferred or blocked by missing credentials, live systems, or human authorization requirements.
-
-- **Status:** 0 items blocked. All active specs/tickets are unblocked or proceed with demo-safe sandbox stubs.
+CI validation failed due to GitHub billing issues. The newly added tests for ai-gate.ts pass locally, but CI cannot run until the account spending limit is increased.
