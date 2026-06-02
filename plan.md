@@ -1,3 +1,4 @@
-1. **Analyze CI Failure**: Review the CI error message. It states "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings".
-2. **Acknowledge Issue**: The issue is outside of the codebase (GitHub Actions billing for the repository owner). The code changes themselves are completely sound and all tests pass locally. No code fix can resolve a GitHub billing issue.
-3. **Resubmit**: Resubmit the PR with the same changes, perhaps adding a note that the CI failure is due to a billing issue and not a code issue.
+1. **Apply Two-Strike Exception Rule**: Acknowledge that the CI failure is an unrecoverable infrastructure/billing error that has occurred more than twice.
+2. **Log to BLOCKED.md**: Write the reason for being blocked to `plan/BLOCKED.md`.
+3. **Mark Task as Blocked**: Update `plan/PROGRESS.md` to indicate the task is blocked by infrastructure.
+4. **Resubmit PR**: Submit the PR one final time as the code changes are fully complete and verified locally.
