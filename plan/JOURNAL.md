@@ -75,3 +75,4 @@ Perpetual resume log for autonomous engineering sessions. Disk is the single sou
 - **Next Wave (REPLENISH):** Re-ran audit and research cycles to promote remaining future improvements to the backlog.
 - **Current active branch:** main (clean and fully validated).
 
+CI failed due to GitHub billing issue (not a code issue). The job was not started because recent account payments have failed or your spending limit needs to be increased. The code changes are complete and correct.
