@@ -1,5 +1,4 @@
 import { QueueJobStatus } from "@prisma/client";
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { prisma } from "@/lib/db/prisma";
@@ -7,6 +6,7 @@ import { getQueueOperationLinks } from "@/lib/operations/operator-surfaces";
 import { getQueueOperationsStatus } from "@/lib/operations/queue-operations";
 import { getSystemStatus } from "@/lib/operations/system-status";
 import { scheduledCampaignJobSchema } from "@/lib/queue/jobs";
+import { SettingsLink } from "@/app/settings/components/settings-link";
 
 export const dynamic = "force-dynamic";
 
@@ -22,20 +22,28 @@ export default async function QueueOperationsPage() {
             id: true,
             name: true,
             status: true,
-            scheduledAt: true
-          }
-        }
+            scheduledAt: true,
+          },
+        },
       },
       orderBy: [{ runAt: "asc" }, { createdAt: "desc" }],
-      take: 30
+      take: 30,
     }),
-    prisma.campaign.count({ where: { orgId: currentOrg.orgId } })
+    prisma.campaign.count({ where: { orgId: currentOrg.orgId } }),
   ]);
   const status = getSystemStatus(process.env);
-  const queuedJobs = queueJobs.filter((job) => job.status === QueueJobStatus.QUEUED);
-  const dueJobs = queuedJobs.filter((job) => job.runAt.getTime() <= now.getTime());
-  const futureJobs = queuedJobs.filter((job) => job.runAt.getTime() > now.getTime());
-  const invalidPayloadJobs = queueJobs.filter((job) => !scheduledCampaignJobSchema.safeParse(job.payload).success);
+  const queuedJobs = queueJobs.filter(
+    (job) => job.status === QueueJobStatus.QUEUED,
+  );
+  const dueJobs = queuedJobs.filter(
+    (job) => job.runAt.getTime() <= now.getTime(),
+  );
+  const futureJobs = queuedJobs.filter(
+    (job) => job.runAt.getTime() > now.getTime(),
+  );
+  const invalidPayloadJobs = queueJobs.filter(
+    (job) => !scheduledCampaignJobSchema.safeParse(job.payload).success,
+  );
   const operationLinks = getQueueOperationLinks();
   const queueOperationsStatus = getQueueOperationsStatus();
 
@@ -44,18 +52,23 @@ export default async function QueueOperationsPage() {
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
         <nav aria-label="Related settings" className="flex flex-wrap gap-2">
           {operationLinks.map((link) => (
-            <Link key={link.href} className="rounded border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-teal-700 transition hover:border-teal-300 hover:bg-teal-50" href={link.href}>
+            <SettingsLink key={link.href} href={link.href}>
               {link.label}
-            </Link>
+            </SettingsLink>
           ))}
         </nav>
         <div>
-          <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
-          <h1 className="text-4xl font-semibold text-slate-950">Queue Operations</h1>
+          <p className="text-sm font-semibold uppercase text-slate-500">
+            Settings
+          </p>
+          <h1 className="text-4xl font-semibold text-slate-950">
+            Queue Operations
+          </h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-            Read-only scheduled-campaign queue review for {currentOrg.orgName}. This page does not enqueue jobs, run
-            workers, update campaign status, call Redis, call providers, create billing records, send notifications, send
-            SMS, or enable live messaging.
+            Read-only scheduled-campaign queue review for {currentOrg.orgName}.
+            This page does not enqueue jobs, run workers, update campaign
+            status, call Redis, call providers, create billing records, send
+            notifications, send SMS, or enable live messaging.
           </p>
         </div>
       </header>
@@ -64,30 +77,69 @@ export default async function QueueOperationsPage() {
         <Metric label="Queue jobs" value={String(queueJobs.length)} />
         <Metric label="Due queued" value={String(dueJobs.length)} />
         <Metric label="Backend" value={status.queue.backend} />
-        <Metric label="Jobs per poll" value={String(status.queue.workerMaxJobsPerPoll)} />
+        <Metric
+          label="Jobs per poll"
+          value={String(status.queue.workerMaxJobsPerPoll)}
+        />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
         <Panel title="Queue Status">
           <dl className="grid gap-3 text-sm">
-            <StatusRow label="Queued" value={String(countJobs(queueJobs, QueueJobStatus.QUEUED))} />
-            <StatusRow label="Completed" value={String(countJobs(queueJobs, QueueJobStatus.COMPLETED))} />
-            <StatusRow label="Cancelled" value={String(countJobs(queueJobs, QueueJobStatus.CANCELLED))} />
-            <StatusRow label="Failed" value={String(countJobs(queueJobs, QueueJobStatus.FAILED))} />
-            <StatusRow label="Invalid payloads" value={String(invalidPayloadJobs.length)} />
+            <StatusRow
+              label="Queued"
+              value={String(countJobs(queueJobs, QueueJobStatus.QUEUED))}
+            />
+            <StatusRow
+              label="Completed"
+              value={String(countJobs(queueJobs, QueueJobStatus.COMPLETED))}
+            />
+            <StatusRow
+              label="Cancelled"
+              value={String(countJobs(queueJobs, QueueJobStatus.CANCELLED))}
+            />
+            <StatusRow
+              label="Failed"
+              value={String(countJobs(queueJobs, QueueJobStatus.FAILED))}
+            />
+            <StatusRow
+              label="Invalid payloads"
+              value={String(invalidPayloadJobs.length)}
+            />
           </dl>
         </Panel>
 
         <Panel title="Worker Boundary">
           <dl className="grid gap-3 text-sm">
-            <StatusRow label="Live messaging" value={String(status.safety.liveMessagingEnabled)} />
-            <StatusRow label="Messaging provider" value={status.safety.messagingProvider} />
-            <StatusRow label="Redis configured" value={String(status.queue.redisConfigured)} />
+            <StatusRow
+              label="Live messaging"
+              value={String(status.safety.liveMessagingEnabled)}
+            />
+            <StatusRow
+              label="Messaging provider"
+              value={status.safety.messagingProvider}
+            />
+            <StatusRow
+              label="Redis configured"
+              value={String(status.queue.redisConfigured)}
+            />
             <StatusRow label="Campaigns" value={String(campaignCount)} />
-            <StatusRow label="Command execution" value={queueOperationsStatus.commandExecution} />
-            <StatusRow label="External impact" value={queueOperationsStatus.externalImpact} />
-            <StatusRow label="Mutation" value={queueOperationsStatus.mutation} />
-            <StatusRow label="Secrets displayed" value={String(queueOperationsStatus.secretsDisplayed)} />
+            <StatusRow
+              label="Command execution"
+              value={queueOperationsStatus.commandExecution}
+            />
+            <StatusRow
+              label="External impact"
+              value={queueOperationsStatus.externalImpact}
+            />
+            <StatusRow
+              label="Mutation"
+              value={queueOperationsStatus.mutation}
+            />
+            <StatusRow
+              label="Secrets displayed"
+              value={String(queueOperationsStatus.secretsDisplayed)}
+            />
           </dl>
         </Panel>
       </section>
@@ -95,9 +147,14 @@ export default async function QueueOperationsPage() {
       <Panel title="Worker Command References">
         <ul className="grid gap-3 text-sm">
           {queueOperationsStatus.workerCommands.map((command) => (
-            <li key={command.command} className="border-b border-slate-100 pb-3">
+            <li
+              key={command.command}
+              className="border-b border-slate-100 pb-3"
+            >
               <p className="font-medium text-slate-950">{command.command}</p>
-              <p className="mt-1 text-xs uppercase text-slate-500">{command.mode}</p>
+              <p className="mt-1 text-xs uppercase text-slate-500">
+                {command.mode}
+              </p>
               <p className="mt-1 text-slate-700">{command.boundary}</p>
             </li>
           ))}
@@ -107,7 +164,10 @@ export default async function QueueOperationsPage() {
       <Panel title="Scheduled Timing">
         <dl className="grid gap-3 text-sm md:grid-cols-3">
           <StatusRow label="Due queued jobs" value={String(dueJobs.length)} />
-          <StatusRow label="Future queued jobs" value={String(futureJobs.length)} />
+          <StatusRow
+            label="Future queued jobs"
+            value={String(futureJobs.length)}
+          />
           <StatusRow label="Reference time" value={now.toISOString()} />
         </dl>
       </Panel>
@@ -116,18 +176,29 @@ export default async function QueueOperationsPage() {
         <ul className="grid gap-3 text-sm">
           {queueJobs.length > 0 ? (
             queueJobs.map((job) => (
-              <li key={job.id} className="grid gap-2 border-b border-slate-100 pb-3 lg:grid-cols-[1fr_auto]">
+              <li
+                key={job.id}
+                className="grid gap-2 border-b border-slate-100 pb-3 lg:grid-cols-[1fr_auto]"
+              >
                 <div>
                   <p className="font-medium text-slate-950">
-                    {job.type} / {job.status} / {job.campaign?.name ?? "no campaign"}
+                    {job.type} / {job.status} /{" "}
+                    {job.campaign?.name ?? "no campaign"}
                   </p>
-                  <p className="mt-1 break-words text-xs text-slate-600">{job.idempotencyKey}</p>
+                  <p className="mt-1 break-words text-xs text-slate-600">
+                    {job.idempotencyKey}
+                  </p>
                   <p className="mt-1 text-xs text-slate-600">
-                    Payload: {scheduledCampaignJobSchema.safeParse(job.payload).success ? "valid scheduled campaign job" : "invalid scheduled campaign job"}
+                    Payload:{" "}
+                    {scheduledCampaignJobSchema.safeParse(job.payload).success
+                      ? "valid scheduled campaign job"
+                      : "invalid scheduled campaign job"}
                   </p>
                 </div>
                 <div className="text-sm text-slate-600">
-                  <time dateTime={job.runAt.toISOString()}>{job.runAt.toISOString()}</time>
+                  <time dateTime={job.runAt.toISOString()}>
+                    {job.runAt.toISOString()}
+                  </time>
                 </div>
               </li>
             ))
@@ -148,7 +219,10 @@ export default async function QueueOperationsPage() {
   );
 }
 
-function countJobs(jobs: Awaited<ReturnType<typeof prisma.queueJob.findMany>>, status: QueueJobStatus) {
+function countJobs(
+  jobs: Awaited<ReturnType<typeof prisma.queueJob.findMany>>,
+  status: QueueJobStatus,
+) {
   return jobs.filter((job) => job.status === status).length;
 }
 
@@ -178,5 +252,3 @@ function StatusRow({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-
-
