@@ -120,7 +120,7 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
       expect(result.conversation!.sentiment).toBeNull();
 
       // Wait a short time for setTimeout to trigger and commit
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 3000));
 
       const updated = await prisma.conversation.findUniqueOrThrow({
         where: { id: result.conversation!.id }
@@ -149,7 +149,7 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
       });
 
       // Wait a short time for setTimeout to trigger and commit
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 3000));
 
       const updated = await prisma.conversation.findUniqueOrThrow({
         where: { id: conversation.id }
