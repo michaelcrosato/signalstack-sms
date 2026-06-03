@@ -24,18 +24,27 @@ export default async function InboxPage({ searchParams }: InboxPageProps) {
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-6 py-6">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-2">
-              <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">Inbox</p>
+              <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">
+                Inbox
+              </p>
               <h1 className="text-3xl font-semibold">Inbox workspace</h1>
               <p className="max-w-3xl text-base leading-7 text-slate-700">
-                Review local conversation threads, simulate inbound replies, add internal notes, assign ownership, and
-                resolve work without provider sends.
+                Review local conversation threads, simulate inbound replies, add
+                internal notes, assign ownership, and resolve work without
+                provider sends.
               </p>
             </div>
-            <Link className="rounded border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700" href="/dashboard">
+            <Link
+              className="rounded border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700"
+              href="/dashboard"
+            >
               Dashboard
             </Link>
           </div>
-          <nav aria-label="Product areas" className="flex gap-2 overflow-x-auto pb-1">
+          <nav
+            aria-label="Product areas"
+            className="flex gap-2 overflow-x-auto pb-1"
+          >
             {productNavigation.map((item) => (
               <Link
                 key={item.href}
@@ -50,9 +59,16 @@ export default async function InboxPage({ searchParams }: InboxPageProps) {
       </header>
 
       <div className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-6">
-        <section aria-label="Inbox metrics" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <section
+          aria-label="Inbox metrics"
+          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+        >
           {inbox.metrics.map((metric) => (
-            <Metric key={metric.key} label={metric.label} value={metric.value} />
+            <Metric
+              key={metric.key}
+              label={metric.label}
+              value={metric.value}
+            />
           ))}
         </section>
 

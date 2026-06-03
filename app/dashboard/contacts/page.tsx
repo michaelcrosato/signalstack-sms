@@ -8,7 +8,9 @@ export const dynamic = "force-dynamic";
 
 export default async function ContactsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
-  const { archivedContacts, contacts, metrics } = await getProductContacts(currentOrg.orgId);
+  const { archivedContacts, contacts, metrics } = await getProductContacts(
+    currentOrg.orgId,
+  );
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
@@ -16,17 +18,26 @@ export default async function ContactsPage() {
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-6 py-6">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-2">
-              <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">Contacts</p>
+              <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">
+                Contacts
+              </p>
               <h1 className="text-3xl font-semibold">Audience workspace</h1>
               <p className="max-w-3xl text-base leading-7 text-slate-700">
-                Review opted-in contacts, consent state, lists, and tags before building a campaign.
+                Review opted-in contacts, consent state, lists, and tags before
+                building a campaign.
               </p>
             </div>
-            <Link className="rounded border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700" href="/dashboard">
+            <Link
+              className="rounded border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700"
+              href="/dashboard"
+            >
               Dashboard
             </Link>
           </div>
-          <nav aria-label="Product areas" className="flex gap-2 overflow-x-auto pb-1">
+          <nav
+            aria-label="Product areas"
+            className="flex gap-2 overflow-x-auto pb-1"
+          >
             {productNavigation.map((item) => (
               <Link
                 key={item.href}
@@ -41,9 +52,16 @@ export default async function ContactsPage() {
       </header>
 
       <div className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-6">
-        <section aria-label="Contact metrics" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <section
+          aria-label="Contact metrics"
+          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5"
+        >
           {metrics.map((metric) => (
-            <Metric key={metric.key} label={metric.label} value={metric.value} />
+            <Metric
+              key={metric.key}
+              label={metric.label}
+              value={metric.value}
+            />
           ))}
         </section>
 
@@ -51,7 +69,9 @@ export default async function ContactsPage() {
           <div className="rounded border border-slate-200 bg-white">
             <div className="border-b border-slate-200 p-5">
               <h2 className="text-xl font-semibold">Contact list</h2>
-              <p className="mt-1 text-sm text-slate-600">Tenant-scoped contacts from the existing contacts API model.</p>
+              <p className="mt-1 text-sm text-slate-600">
+                Tenant-scoped contacts from the existing contacts API model.
+              </p>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[760px] border-collapse text-left text-sm">
@@ -68,9 +88,13 @@ export default async function ContactsPage() {
                   {contacts.map((contact) => (
                     <tr className="border-t border-slate-100" key={contact.id}>
                       <td className="px-4 py-3">
-                        <div className="font-medium text-slate-950">{contact.displayName}</div>
+                        <div className="font-medium text-slate-950">
+                          {contact.displayName}
+                        </div>
                         <div className="text-slate-600">{contact.phone}</div>
-                        {contact.email ? <div className="text-slate-500">{contact.email}</div> : null}
+                        {contact.email ? (
+                          <div className="text-slate-500">{contact.email}</div>
+                        ) : null}
                         <Link
                           aria-label={`View ${contact.displayName}`}
                           className="mt-2 inline-flex text-xs font-semibold text-teal-700"
@@ -84,9 +108,15 @@ export default async function ContactsPage() {
                           {contact.consentStatus}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-slate-700">{contact.lists.join(", ") || "None"}</td>
-                      <td className="px-4 py-3 text-slate-700">{contact.tags.join(", ") || "None"}</td>
-                      <td className="px-4 py-3 text-slate-700">{contact.optInSource ?? contact.source ?? "Unknown"}</td>
+                      <td className="px-4 py-3 text-slate-700">
+                        {contact.lists.join(", ") || "None"}
+                      </td>
+                      <td className="px-4 py-3 text-slate-700">
+                        {contact.tags.join(", ") || "None"}
+                      </td>
+                      <td className="px-4 py-3 text-slate-700">
+                        {contact.optInSource ?? contact.source ?? "Unknown"}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -97,7 +127,8 @@ export default async function ContactsPage() {
           <section className="rounded border border-slate-200 bg-white p-5">
             <h2 className="text-xl font-semibold">CSV import</h2>
             <p className="mt-1 text-sm text-slate-600">
-              Paste demo CSV rows to create or update contacts through the existing local import endpoint.
+              Paste demo CSV rows to create or update contacts through the
+              existing local import endpoint.
             </p>
             <div className="mt-5">
               <ContactImportForm />
@@ -109,7 +140,8 @@ export default async function ContactsPage() {
           <div className="border-b border-slate-200 p-5">
             <h2 className="text-xl font-semibold">Archived contacts</h2>
             <p className="mt-1 text-sm text-slate-600">
-              Soft-archived contacts are excluded from campaigns until restored from their detail page.
+              Soft-archived contacts are excluded from campaigns until restored
+              from their detail page.
             </p>
           </div>
           {archivedContacts.length > 0 ? (
@@ -127,7 +159,9 @@ export default async function ContactsPage() {
                   {archivedContacts.map((contact) => (
                     <tr className="border-t border-slate-100" key={contact.id}>
                       <td className="px-4 py-3">
-                        <div className="font-medium text-slate-950">{contact.displayName}</div>
+                        <div className="font-medium text-slate-950">
+                          {contact.displayName}
+                        </div>
                         <div className="text-slate-600">{contact.phone}</div>
                       </td>
                       <td className="px-4 py-3">
@@ -135,7 +169,9 @@ export default async function ContactsPage() {
                           {contact.consentStatus}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-slate-700">{contact.lists.join(", ") || "None"}</td>
+                      <td className="px-4 py-3 text-slate-700">
+                        {contact.lists.join(", ") || "None"}
+                      </td>
                       <td className="px-4 py-3">
                         <Link
                           aria-label={`Restore ${contact.displayName}`}

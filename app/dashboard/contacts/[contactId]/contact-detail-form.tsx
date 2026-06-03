@@ -37,13 +37,17 @@ export function ContactDetailForm({ contact }: ContactDetailFormProps) {
   const [lastName, setLastName] = useState(contact.lastName);
   const [displayName, setDisplayName] = useState(contact.displayName);
   const [email, setEmail] = useState(contact.email);
-  const [consentStatus, setConsentStatus] = useState<ConsentStatus>(contact.consentStatus);
+  const [consentStatus, setConsentStatus] = useState<ConsentStatus>(
+    contact.consentStatus,
+  );
   const [optInSource, setOptInSource] = useState(contact.optInSource);
   const [source, setSource] = useState(contact.source);
   const [notes, setNotes] = useState(contact.notes);
   const [tagNames, setTagNames] = useState(contact.tags.join(", "));
   const [listNames, setListNames] = useState(contact.lists.join(", "));
-  const [sourceContactId, setSourceContactId] = useState(contact.mergeCandidates[0]?.id ?? "");
+  const [sourceContactId, setSourceContactId] = useState(
+    contact.mergeCandidates[0]?.id ?? "",
+  );
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -57,18 +61,20 @@ export function ContactDetailForm({ contact }: ContactDetailFormProps) {
     const response = await fetch(`/api/contacts/${contact.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(cleanPayload({
-        firstName,
-        lastName,
-        displayName,
-        email,
-        consentStatus,
-        optInSource,
-        source,
-        notes,
-        tagNames: splitLabels(tagNames),
-        listNames: splitLabels(listNames)
-      }))
+      body: JSON.stringify(
+        cleanPayload({
+          firstName,
+          lastName,
+          displayName,
+          email,
+          consentStatus,
+          optInSource,
+          source,
+          notes,
+          tagNames: splitLabels(tagNames),
+          listNames: splitLabels(listNames),
+        }),
+      ),
     });
     const payload = await response.json();
 
@@ -78,7 +84,9 @@ export function ContactDetailForm({ contact }: ContactDetailFormProps) {
       return;
     }
 
-    setStatus("Contact updated locally. Campaign sends remain gated by preflight.");
+    setStatus(
+      "Contact updated locally. Campaign sends remain gated by preflight.",
+    );
     setPending(false);
     router.refresh();
   }
@@ -88,7 +96,9 @@ export function ContactDetailForm({ contact }: ContactDetailFormProps) {
     setStatus(null);
     setError(null);
 
-    const response = await fetch(`/api/contacts/${contact.id}`, { method: "DELETE" });
+    const response = await fetch(`/api/contacts/${contact.id}`, {
+      method: "DELETE",
+    });
 
     if (!response.ok) {
       const payload = await response.json();
@@ -109,7 +119,7 @@ export function ContactDetailForm({ contact }: ContactDetailFormProps) {
     const response = await fetch(`/api/contacts/${contact.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ archived: false })
+      body: JSON.stringify({ archived: false }),
     });
     const payload = await response.json();
 
@@ -119,7 +129,9 @@ export function ContactDetailForm({ contact }: ContactDetailFormProps) {
       return;
     }
 
-    setStatus("Contact restored locally. Campaign sends still require consent and preflight.");
+    setStatus(
+      "Contact restored locally. Campaign sends still require consent and preflight.",
+    );
     setPending(false);
     router.refresh();
   }
@@ -137,7 +149,7 @@ export function ContactDetailForm({ contact }: ContactDetailFormProps) {
     const response = await fetch(`/api/contacts/${contact.id}/merge`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sourceContactId })
+      body: JSON.stringify({ sourceContactId }),
     });
     const payload = await response.json();
 
@@ -192,7 +204,9 @@ export function ContactDetailForm({ contact }: ContactDetailFormProps) {
           Consent status
           <select
             className="rounded border border-slate-300 px-3 py-2 text-slate-950"
-            onChange={(event) => setConsentStatus(event.target.value as ConsentStatus)}
+            onChange={(event) =>
+              setConsentStatus(event.target.value as ConsentStatus)
+            }
             value={consentStatus}
           >
             {productContactConsentOptions.map((option) => (
@@ -271,26 +285,37 @@ export function ContactDetailForm({ contact }: ContactDetailFormProps) {
             Archive Contact
           </button>
         )}
-        <p className="text-sm text-slate-600">Local metadata only. No provider calls, SMS, live AI, or billing actions run.</p>
+        <p className="text-sm text-slate-600">
+          Local metadata only. No provider calls, SMS, live AI, or billing
+          actions run.
+        </p>
       </div>
 
       {status ? (
-        <div className="rounded border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950" role="status">
+        <div
+          className="rounded border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950"
+          role="status"
+        >
           {status}
         </div>
       ) : null}
       {error ? (
-        <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-950" role="alert">
+        <div
+          className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-950"
+          role="alert"
+        >
           {error}
         </div>
       ) : null}
 
       <section className="grid gap-3 border-t border-slate-200 pt-5">
         <div>
-          <h3 className="text-lg font-semibold text-slate-950">Merge duplicate</h3>
+          <h3 className="text-lg font-semibold text-slate-950">
+            Merge duplicate
+          </h3>
           <p className="mt-1 text-sm text-slate-600">
-            Merge another active contact into this one. The source contact is soft-archived and no SMS, billing, AI, or
-            provider work runs.
+            Merge another active contact into this one. The source contact is
+            soft-archived and no SMS, billing, AI, or provider work runs.
           </p>
         </div>
         {contact.mergeCandidates.length > 0 ? (
@@ -304,7 +329,8 @@ export function ContactDetailForm({ contact }: ContactDetailFormProps) {
               >
                 {contact.mergeCandidates.map((candidate) => (
                   <option key={candidate.id} value={candidate.id}>
-                    {candidate.displayName} - {candidate.phone} - {candidate.consentStatus}
+                    {candidate.displayName} - {candidate.phone} -{" "}
+                    {candidate.consentStatus}
                   </option>
                 ))}
               </select>
@@ -329,7 +355,14 @@ export function ContactDetailForm({ contact }: ContactDetailFormProps) {
 }
 
 function splitLabels(value: string) {
-  return [...new Set(value.split(",").map((label) => label.trim()).filter(Boolean))];
+  return [
+    ...new Set(
+      value
+        .split(",")
+        .map((label) => label.trim())
+        .filter(Boolean),
+    ),
+  ];
 }
 
 function cleanPayload(payload: Record<string, unknown>) {
@@ -339,6 +372,6 @@ function cleanPayload(payload: Record<string, unknown>) {
         return value.trim().length > 0;
       }
       return value !== undefined;
-    })
+    }),
   );
 }
