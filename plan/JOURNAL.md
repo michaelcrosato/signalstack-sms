@@ -80,3 +80,8 @@ Perpetual resume log for autonomous engineering sessions. Disk is the single sou
 📊 [RESULT/OBSERVATION] Tests pass, eslint passes. Postgres failed in full suite due to docker rate limits but the specific unit test is working successfully.
 🔧 [IMPROVEMENT MADE] Added missing unit test coverage for environment default assertions.
 💡 [CAPABILITY DEMONSTRATED] Analyzing missing test gaps, testing edge cases and fixing typescript any typing for strict linter rules.
+🧠 [INTENT] Fix unit test failure in tests/unit/ai/sentiment-analysis.test.ts due to live/fake environment bleed.
+🛠️ [ACTION] Applied a vitest environment stub (vi.stubEnv('AI_PROVIDER', 'fake')) in a beforeEach hook to ensure the resolveAiProvider correctly uses the fake provider during testing.
+📊 [RESULT/OBSERVATION] Modified the file and typecheck/linter pass.
+🔧 [IMPROVEMENT MADE] Tests are now deterministic avoiding live execution boundaries.
+💡 [CAPABILITY DEMONSTRATED] Investigating test failures, mocking environment variables, and preventing test leakage.

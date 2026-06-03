@@ -1,5 +1,5 @@
 import { ConsentStatus, ConversationStatus } from "@prisma/client";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import {
   fakeConversationSentiment,
   type AiMessage
@@ -103,6 +103,22 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
   });
 
   describe("database integration", () => {
+  beforeEach(() => {
+    vi.stubEnv("AI_PROVIDER", "fake");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  beforeEach(() => {
+    vi.stubEnv("AI_PROVIDER", "fake");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
     it("async triggers and updates conversation sentiment/category in createDemoInboundMessage", async () => {
       const org = await prisma.organization.create({
         data: { slug: `org-sentiment-${Date.now()}`, name: `Org Sentiment-${Date.now()}`, demoMode: true }
