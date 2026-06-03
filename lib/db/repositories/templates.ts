@@ -47,3 +47,9 @@ export async function updateTemplate(orgId: string, templateId: string, input: T
     }
   });
 }
+
+export async function countTemplates(orgId: string) {
+  return prisma.messageTemplate.count({
+    where: { orgId }
+  });
+}
