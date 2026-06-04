@@ -1,0 +1,5 @@
+🧪 Add missing unit test for readAiHardGateInput
+
+🎯 **What:** Adds missing unit tests for `readAiHardGateInput` in `lib/ai/ai-gate.ts` to ensure it correctly maps environment variables.
+📊 **Coverage:** Covered extraction from a fully populated `process.env`, graceful fallback when vars are missing, and handling of an explicitly provided empty env object.
+✨ **Result:** Improved test coverage and reliability for the AI hard gate configuration logic.
