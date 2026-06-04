@@ -47,6 +47,15 @@ describe("AI hard gate", () => {
   it("treats an empty environment as blocked", () => {
     expect(liveAiIsBlocked({})).toBe(true);
   });
+
+  it("liveAiIsBlocked returns false when all conditions are met", () => {
+    expect(liveAiIsBlocked(liveEnv)).toBe(false);
+  });
+
+  it("liveAiIsBlocked returns true when any condition fails", () => {
+    expect(liveAiIsBlocked({ ...liveEnv, AI_API_KEY: "" })).toBe(true);
+    expect(liveAiIsBlocked({ ...liveEnv, AI_PROVIDER: "fake" })).toBe(true);
+  });
 });
 
 describe("resolveAiProvider", () => {
