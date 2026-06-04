@@ -1,0 +1,6 @@
+🧹 [code health improvement description]
+
+🎯 **What:** The `FilterLink` component was duplicated across three different files in the `app/settings` directory (`page.tsx`, `provider/page.tsx`, `readiness-audit/page.tsx`). Extracted it into a shared `components/ui/filter-link.tsx` component.
+💡 **Why:** Reduces code duplication, making it easier to maintain and style the application consistently moving forward.
+✅ **Verification:** Verified by running `npm run lint` and `npm run typecheck` which both pass. Confirmed UI logic matches identically.
+✨ **Result:** Better modularity, zero functional changes, improved repository maintainability.

@@ -1,3 +1,4 @@
+import { FilterLink } from "@/components/ui/filter-link";
 import Link from "next/link";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getOrCreateComplianceProfile } from "@/lib/db/repositories/compliance";
@@ -117,21 +118,6 @@ export default async function ProviderSettingsPage({ searchParams }: ProviderSet
         </ul>
       </section>
     </main>
-  );
-}
-
-function FilterLink({ href, label, active }: { href: string; label: string; active: boolean }) {
-  return (
-    <Link
-      className={
-        active
-          ? "rounded border border-slate-950 bg-slate-950 px-3 py-1 text-xs font-semibold text-white"
-          : "rounded border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700"
-      }
-      href={href}
-    >
-      {label}
-    </Link>
   );
 }
 
