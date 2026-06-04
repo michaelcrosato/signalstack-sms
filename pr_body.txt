@@ -1,0 +1,5 @@
+🎯 **What:** Added missing unit tests for `applyDemoSafeRuntimeDefaults` and `assertDemoSafeDefaults` in `lib/env/defaults.ts`.
+
+📊 **Coverage:** Covered happy paths (empty env, exact match) and edge cases (existing values, missing defaults, mismatched defaults, extra properties) for both functions.
+
+✨ **Result:** Test coverage for environment defaults is now complete, ensuring that the critical `DEMO_MODE` and other safe defaults function properly and do not unexpectedly override custom configurations.
