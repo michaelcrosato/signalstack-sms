@@ -80,6 +80,11 @@
     "tsx": "^4.22.3",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.59.4",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.8"
+  },
+  "overrides": {
+    "next": {
+      "postcss": "8.5.15"
+    }
   }
 }
