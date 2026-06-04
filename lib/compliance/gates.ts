@@ -41,9 +41,6 @@ export type MessagingHardGateResult = {
   reasons: string[];
 };
 
-export function liveMessagingIsBlocked() {
-  return process.env.LIVE_MESSAGING_ENABLED !== "true";
-}
 
 export function evaluateMessagingHardGate(input: MessagingHardGateInput): MessagingHardGateResult {
   const reasons: string[] = [];
