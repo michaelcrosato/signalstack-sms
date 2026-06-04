@@ -44,7 +44,9 @@ export function CampaignDetailForm({ campaign }: CampaignDetailFormProps) {
 
   function onTemplateChange(nextTemplateId: string) {
     setTemplateId(nextTemplateId);
-    const template = campaign.templates.find((candidate) => candidate.id === nextTemplateId);
+    const template = campaign.templates.find(
+      (candidate) => candidate.id === nextTemplateId,
+    );
     if (template) {
       setBody(template.body);
     }
@@ -52,7 +54,9 @@ export function CampaignDetailForm({ campaign }: CampaignDetailFormProps) {
 
   function toggleContact(contactId: string) {
     setContactIds((current) =>
-      current.includes(contactId) ? current.filter((id) => id !== contactId) : [...current, contactId]
+      current.includes(contactId)
+        ? current.filter((id) => id !== contactId)
+        : [...current, contactId],
     );
   }
 
@@ -69,8 +73,8 @@ export function CampaignDetailForm({ campaign }: CampaignDetailFormProps) {
         name,
         body,
         templateId: templateId || undefined,
-        contactIds
-      })
+        contactIds,
+      }),
     });
     const payload = await response.json();
 
@@ -80,7 +84,9 @@ export function CampaignDetailForm({ campaign }: CampaignDetailFormProps) {
       return;
     }
 
-    setStatus("Campaign draft updated locally. Run preflight again before scheduling.");
+    setStatus(
+      "Campaign draft updated locally. Run preflight again before scheduling.",
+    );
     setPending(false);
     router.refresh();
   }
@@ -90,7 +96,9 @@ export function CampaignDetailForm({ campaign }: CampaignDetailFormProps) {
     setStatus(null);
     setError(null);
 
-    const response = await fetch(`/api/campaigns/${campaign.id}/cancel`, { method: "POST" });
+    const response = await fetch(`/api/campaigns/${campaign.id}/cancel`, {
+      method: "POST",
+    });
     const payload = await response.json();
 
     if (!response.ok) {
@@ -145,10 +153,15 @@ export function CampaignDetailForm({ campaign }: CampaignDetailFormProps) {
         </label>
 
         <fieldset className="grid gap-2">
-          <legend className="text-sm font-medium text-slate-700">Recipients</legend>
+          <legend className="text-sm font-medium text-slate-700">
+            Recipients
+          </legend>
           <div className="grid max-h-60 gap-2 overflow-y-auto rounded border border-slate-200 bg-slate-50 p-3">
             {campaign.contacts.map((contact) => (
-              <label className="flex items-start gap-3 text-sm text-slate-700" key={contact.id}>
+              <label
+                className="flex items-start gap-3 text-sm text-slate-700"
+                key={contact.id}
+              >
                 <input
                   checked={contactIds.includes(contact.id)}
                   className="mt-1"
@@ -157,7 +170,9 @@ export function CampaignDetailForm({ campaign }: CampaignDetailFormProps) {
                   type="checkbox"
                 />
                 <span>
-                  <span className="block font-medium text-slate-950">{contact.displayName}</span>
+                  <span className="block font-medium text-slate-950">
+                    {contact.displayName}
+                  </span>
                   <span className="block text-slate-600">
                     {contact.phone} - {contact.consentStatus}
                     {contact.disabled ? " - blocked for sends" : ""}
@@ -177,16 +192,19 @@ export function CampaignDetailForm({ campaign }: CampaignDetailFormProps) {
             {pending ? "Saving" : "Save Draft"}
           </button>
           <p className="text-sm text-slate-600">
-            Draft edits are local only. Non-draft campaigns are locked from editing.
+            Draft edits are local only. Non-draft campaigns are locked from
+            editing.
           </p>
         </div>
       </form>
 
       <section className="grid gap-3 rounded border border-slate-200 bg-slate-50 p-4">
-        <h3 className="text-lg font-semibold text-slate-950">Lifecycle control</h3>
+        <h3 className="text-lg font-semibold text-slate-950">
+          Lifecycle control
+        </h3>
         <p className="text-sm text-slate-600">
-          Canceling pauses the campaign and cancels queued local jobs. It does not call providers, send SMS, notify
-          users, bill, or run workers.
+          Canceling pauses the campaign and cancels queued local jobs. It does
+          not call providers, send SMS, notify users, bill, or run workers.
         </p>
         <button
           className="w-fit rounded border border-amber-300 px-4 py-2 text-sm font-semibold text-amber-800 disabled:cursor-not-allowed disabled:text-slate-400"
@@ -199,12 +217,18 @@ export function CampaignDetailForm({ campaign }: CampaignDetailFormProps) {
       </section>
 
       {status ? (
-        <div className="rounded border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950" role="status">
+        <div
+          className="rounded border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950"
+          role="status"
+        >
           {status}
         </div>
       ) : null}
       {error ? (
-        <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-950" role="alert">
+        <div
+          className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-950"
+          role="alert"
+        >
           {error}
         </div>
       ) : null}

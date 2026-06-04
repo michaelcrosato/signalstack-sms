@@ -3,11 +3,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "SignalStack SMS",
-  description: "Demo-safe SMB texting SaaS scaffold"
+  description: "Demo-safe SMB texting SaaS scaffold",
 };
 
 export default function RootLayout({
-  children
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {

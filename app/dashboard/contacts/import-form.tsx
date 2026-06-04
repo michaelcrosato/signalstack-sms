@@ -20,8 +20,12 @@ export function ContactImportForm() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const submittedFilename = String(formData.get("filename") ?? productContactImportDefaults.filename);
-    const submittedCsv = String(formData.get("csv") ?? productContactImportDefaults.csv);
+    const submittedFilename = String(
+      formData.get("filename") ?? productContactImportDefaults.filename,
+    );
+    const submittedCsv = String(
+      formData.get("csv") ?? productContactImportDefaults.csv,
+    );
     setPending(true);
     setError(null);
     setSummary(null);
@@ -29,7 +33,7 @@ export function ContactImportForm() {
     const response = await fetch("/api/contacts/imports", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ filename: submittedFilename, csv: submittedCsv })
+      body: JSON.stringify({ filename: submittedFilename, csv: submittedCsv }),
     });
     const payload = await response.json();
 
@@ -70,15 +74,24 @@ export function ContactImportForm() {
         >
           {pending ? "Importing" : "Import Contacts"}
         </button>
-        <p className="text-sm text-slate-600">Local import only. No SMS, provider calls, or billing actions run.</p>
+        <p className="text-sm text-slate-600">
+          Local import only. No SMS, provider calls, or billing actions run.
+        </p>
       </div>
       {summary ? (
-        <div className="rounded border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950" role="status">
-          Imported {summary.importedRows} of {summary.totalRows} rows. Failed rows: {summary.failedRows}.
+        <div
+          className="rounded border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950"
+          role="status"
+        >
+          Imported {summary.importedRows} of {summary.totalRows} rows. Failed
+          rows: {summary.failedRows}.
         </div>
       ) : null}
       {error ? (
-        <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-950" role="alert">
+        <div
+          className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-950"
+          role="alert"
+        >
           {error}
         </div>
       ) : null}

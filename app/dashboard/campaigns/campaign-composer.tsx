@@ -36,18 +36,35 @@ const defaultSchedule = () => {
   return nextHour.toISOString().slice(0, 16);
 };
 
-export function CampaignComposer({ contacts, templates }: { contacts: ComposerContact[]; templates: ComposerTemplate[] }) {
+export function CampaignComposer({
+  contacts,
+  templates,
+}: {
+  contacts: ComposerContact[];
+  templates: ComposerTemplate[];
+}) {
   const router = useRouter();
   const firstTemplate = templates[0];
-  const readyContacts = useMemo(() => contacts.filter((contact) => !contact.disabled), [contacts]);
-  const [name, setName] = useState<string>(productCampaignComposerDefaults.name);
-  const [body, setBody] = useState<string>(firstTemplate?.body ?? productCampaignComposerDefaults.body);
+  const readyContacts = useMemo(
+    () => contacts.filter((contact) => !contact.disabled),
+    [contacts],
+  );
+  const [name, setName] = useState<string>(
+    productCampaignComposerDefaults.name,
+  );
+  const [body, setBody] = useState<string>(
+    firstTemplate?.body ?? productCampaignComposerDefaults.body,
+  );
   const [templateId, setTemplateId] = useState(firstTemplate?.id ?? "");
-  const [contactIds, setContactIds] = useState<string[]>(readyContacts.slice(0, 3).map((contact) => contact.id));
+  const [contactIds, setContactIds] = useState<string[]>(
+    readyContacts.slice(0, 3).map((contact) => contact.id),
+  );
   const [campaignId, setCampaignId] = useState<string | null>(null);
   const [preflight, setPreflight] = useState<PreflightResult | null>(null);
   const [scheduledAt, setScheduledAt] = useState(defaultSchedule);
-  const [copyPrompt, setCopyPrompt] = useState<string>(productCampaignComposerDefaults.copyPrompt);
+  const [copyPrompt, setCopyPrompt] = useState<string>(
+    productCampaignComposerDefaults.copyPrompt,
+  );
   const [copyVariants, setCopyVariants] = useState<string[]>([]);
   const [aiPending, setAiPending] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
@@ -56,7 +73,9 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
 
   function onTemplateChange(nextTemplateId: string) {
     setTemplateId(nextTemplateId);
-    const nextTemplate = templates.find((template) => template.id === nextTemplateId);
+    const nextTemplate = templates.find(
+      (template) => template.id === nextTemplateId,
+    );
     if (nextTemplate) {
       setBody(nextTemplate.body);
     }
@@ -64,7 +83,9 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
 
   function toggleContact(contactId: string) {
     setContactIds((current) =>
-      current.includes(contactId) ? current.filter((id) => id !== contactId) : [...current, contactId]
+      current.includes(contactId)
+        ? current.filter((id) => id !== contactId)
+        : [...current, contactId],
     );
   }
 
@@ -79,13 +100,18 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
       body: JSON.stringify({
         prompt: copyPrompt,
         businessName: productCampaignComposerDefaults.aiBusinessName,
-        tone: productCampaignComposerDefaults.aiTone
-      })
+        tone: productCampaignComposerDefaults.aiTone,
+      }),
     });
-    const payload = (await response.json()) as AiCopyResult | { error?: string };
+    const payload = (await response.json()) as
+      | AiCopyResult
+      | { error?: string };
 
     if (!response.ok || !("variants" in payload)) {
-      setError(("error" in payload && payload.error) || "Fake AI copy could not be generated.");
+      setError(
+        ("error" in payload && payload.error) ||
+          "Fake AI copy could not be generated.",
+      );
       setAiPending(false);
       return;
     }
@@ -105,7 +131,12 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
     const response = await fetch("/api/campaigns", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, body, templateId: templateId || undefined, contactIds })
+      body: JSON.stringify({
+        name,
+        body,
+        templateId: templateId || undefined,
+        contactIds,
+      }),
     });
     const payload = await response.json();
 
@@ -118,11 +149,14 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
     const nextCampaignId = payload.campaign.id as string;
     setCampaignId(nextCampaignId);
 
-    const preflightResponse = await fetch(`/api/campaigns/${nextCampaignId}/preflight`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({})
-    });
+    const preflightResponse = await fetch(
+      `/api/campaigns/${nextCampaignId}/preflight`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      },
+    );
     const preflightPayload = await preflightResponse.json();
 
     if (!preflightResponse.ok) {
@@ -149,7 +183,9 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
     const response = await fetch(`/api/campaigns/${campaignId}/schedule`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ scheduledAt: new Date(scheduledAt).toISOString() })
+      body: JSON.stringify({
+        scheduledAt: new Date(scheduledAt).toISOString(),
+      }),
     });
     const payload = await response.json();
 
@@ -192,11 +228,17 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
           </select>
         </label>
 
-        <section aria-label="Fake AI copy assist" className="grid gap-3 rounded border border-slate-200 bg-slate-50 p-4">
+        <section
+          aria-label="Fake AI copy assist"
+          className="grid gap-3 rounded border border-slate-200 bg-slate-50 p-4"
+        >
           <div>
-            <h3 className="font-semibold text-slate-950">Fake AI copy assist</h3>
+            <h3 className="font-semibold text-slate-950">
+              Fake AI copy assist
+            </h3>
             <p className="mt-1 text-sm text-slate-600">
-              Generates deterministic local copy only. Live AI providers stay blocked.
+              Generates deterministic local copy only. Live AI providers stay
+              blocked.
             </p>
           </div>
           <label className="grid gap-2 text-sm font-medium text-slate-700">
@@ -218,7 +260,10 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
           {copyVariants.length > 0 ? (
             <div className="grid gap-2">
               {copyVariants.map((variant, index) => (
-                <div className="grid gap-2 rounded border border-slate-200 bg-white p-3" key={variant}>
+                <div
+                  className="grid gap-2 rounded border border-slate-200 bg-white p-3"
+                  key={variant}
+                >
                   <p className="text-sm text-slate-700">{variant}</p>
                   <button
                     className="justify-self-start rounded border border-teal-700 px-3 py-1.5 text-sm font-semibold text-teal-700"
@@ -243,10 +288,15 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
         </label>
 
         <fieldset className="grid gap-2">
-          <legend className="text-sm font-medium text-slate-700">Recipients</legend>
+          <legend className="text-sm font-medium text-slate-700">
+            Recipients
+          </legend>
           <div className="grid max-h-52 gap-2 overflow-y-auto rounded border border-slate-200 bg-slate-50 p-3">
             {contacts.map((contact) => (
-              <label className="flex items-start gap-3 text-sm text-slate-700" key={contact.id}>
+              <label
+                className="flex items-start gap-3 text-sm text-slate-700"
+                key={contact.id}
+              >
                 <input
                   checked={contactIds.includes(contact.id)}
                   className="mt-1"
@@ -255,7 +305,9 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
                   type="checkbox"
                 />
                 <span>
-                  <span className="block font-medium text-slate-950">{contact.displayName}</span>
+                  <span className="block font-medium text-slate-950">
+                    {contact.displayName}
+                  </span>
                   <span className="block text-slate-600">
                     {contact.phone} · {contact.consentStatus}
                   </span>
@@ -274,7 +326,10 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
         </button>
       </form>
 
-      <section aria-label="Campaign preflight" className="rounded border border-slate-200 bg-slate-50 p-4">
+      <section
+        aria-label="Campaign preflight"
+        className="rounded border border-slate-200 bg-slate-50 p-4"
+      >
         <h3 className="font-semibold text-slate-950">Preflight</h3>
         {preflight ? (
           <dl className="mt-3 grid gap-2 text-sm">
@@ -292,7 +347,9 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
             </div>
           </dl>
         ) : (
-          <p className="mt-2 text-sm text-slate-600">Save a draft to run local consent and opt-out checks.</p>
+          <p className="mt-2 text-sm text-slate-600">
+            Save a draft to run local consent and opt-out checks.
+          </p>
         )}
       </section>
 
@@ -314,16 +371,25 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
         >
           Schedule Locally
         </button>
-        <p className="text-sm text-slate-600">Scheduling writes a local queue job only. Campaign sending remains gated.</p>
+        <p className="text-sm text-slate-600">
+          Scheduling writes a local queue job only. Campaign sending remains
+          gated.
+        </p>
       </section>
 
       {status ? (
-        <div className="rounded border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950" role="status">
+        <div
+          className="rounded border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950"
+          role="status"
+        >
           {status}
         </div>
       ) : null}
       {error ? (
-        <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-950" role="alert">
+        <div
+          className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-950"
+          role="alert"
+        >
           {error}
         </div>
       ) : null}

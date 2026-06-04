@@ -27,7 +27,7 @@ export function TemplateDetailForm({ template }: { template: TemplateDetail }) {
     const response = await fetch(`/api/templates/${template.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, body })
+      body: JSON.stringify({ name, body }),
     });
     const payload = await response.json();
 
@@ -62,9 +62,14 @@ export function TemplateDetailForm({ template }: { template: TemplateDetail }) {
           value={body}
         />
       </label>
-      <section aria-label="Detected variables" className="rounded border border-slate-200 bg-slate-50 p-3 text-sm">
+      <section
+        aria-label="Detected variables"
+        className="rounded border border-slate-200 bg-slate-50 p-3 text-sm"
+      >
         <h3 className="font-semibold text-slate-950">Detected variables</h3>
-        <p className="mt-2 text-slate-700">{variables.length > 0 ? variables.join(", ") : "none"}</p>
+        <p className="mt-2 text-slate-700">
+          {variables.length > 0 ? variables.join(", ") : "none"}
+        </p>
       </section>
       <div className="flex flex-wrap items-center gap-3">
         <button
@@ -74,15 +79,24 @@ export function TemplateDetailForm({ template }: { template: TemplateDetail }) {
         >
           {pending ? "Saving" : "Save Template"}
         </button>
-        <p className="text-sm text-slate-600">Local template edit only. No provider calls, SMS, live AI, or billing actions run.</p>
+        <p className="text-sm text-slate-600">
+          Local template edit only. No provider calls, SMS, live AI, or billing
+          actions run.
+        </p>
       </div>
       {status ? (
-        <div className="rounded border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950" role="status">
+        <div
+          className="rounded border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950"
+          role="status"
+        >
           {status}
         </div>
       ) : null}
       {error ? (
-        <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-950" role="alert">
+        <div
+          className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-950"
+          role="alert"
+        >
           {error}
         </div>
       ) : null}
@@ -91,5 +105,11 @@ export function TemplateDetailForm({ template }: { template: TemplateDetail }) {
 }
 
 function extractVariables(body: string) {
-  return [...new Set([...body.matchAll(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g)].map((match) => match[1]))].sort();
+  return [
+    ...new Set(
+      [...body.matchAll(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g)].map(
+        (match) => match[1],
+      ),
+    ),
+  ].sort();
 }

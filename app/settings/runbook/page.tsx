@@ -1,13 +1,14 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { getRunbookAdminLinks } from "@/lib/operations/operator-surfaces";
+import { SettingsLayout } from "@/components/layout/settings-layout";
 
 const requiredDefaults = [
   ["DEMO_MODE", "true"],
   ["LIVE_MESSAGING_ENABLED", "false"],
   ["LIVE_BILLING_ENABLED", "false"],
   ["MESSAGING_PROVIDER", "dummy"],
-  ["AI_PROVIDER", "fake"]
+  ["AI_PROVIDER", "fake"],
 ];
 
 const dailyStartCommands = [
@@ -16,7 +17,7 @@ const dailyStartCommands = [
   "$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run db:migrate",
   "$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed",
   "npm run validate",
-  "$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo"
+  "$env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo",
 ];
 
 const workerCommands = [
@@ -25,7 +26,7 @@ const workerCommands = [
   "npm run worker",
   "$env:WORKER_MAX_ITERATIONS='1'",
   "$env:WORKER_POLL_INTERVAL_MS='1000'",
-  "npm run worker:watch"
+  "npm run worker:watch",
 ];
 
 const bullmqCommands = [
@@ -33,7 +34,7 @@ const bullmqCommands = [
   "$env:REDIS_URL='redis://localhost:6379'",
   "$env:LIVE_MESSAGING_ENABLED='false'",
   "$env:MESSAGING_PROVIDER='dummy'",
-  "npm run queue:bullmq:smoke"
+  "npm run queue:bullmq:smoke",
 ];
 
 const repairSteps = [
@@ -41,14 +42,14 @@ const repairSteps = [
   "Repair the local code, docs, contracts, or tests.",
   "Rerun the smallest failing command.",
   "Rerun npm run validate.",
-  "Rerun npm run test:e2e:demo when the seeded demo path is touched."
+  "Rerun npm run test:e2e:demo when the seeded demo path is touched.",
 ];
 
 const adminLinks = getRunbookAdminLinks();
 
 export default function OperatorRunbookPage() {
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10">
+    <SettingsLayout>
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
         <nav aria-label="Related settings" className="flex flex-wrap gap-2">
           <HeaderLink href="/settings" label="Go-Live Readiness" />
@@ -56,11 +57,17 @@ export default function OperatorRunbookPage() {
           <HeaderLink href="/settings/demo" label="Demo Operations" />
         </nav>
         <div>
-          <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
-          <h1 className="text-4xl font-semibold text-slate-950">Operator Runbook</h1>
+          <p className="text-sm font-semibold uppercase text-slate-500">
+            Settings
+          </p>
+          <h1 className="text-4xl font-semibold text-slate-950">
+            Operator Runbook
+          </h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-            Read-only local checklist for demo-safe operation. This page displays commands and safety boundaries only; it does not
-            execute commands, mutate records, call providers, create billing records, send notifications, or enable live messaging.
+            Read-only local checklist for demo-safe operation. This page
+            displays commands and safety boundaries only; it does not execute
+            commands, mutate records, call providers, create billing records,
+            send notifications, or enable live messaging.
           </p>
         </div>
       </header>
@@ -107,22 +114,34 @@ export default function OperatorRunbookPage() {
       </section>
 
       <Panel title="Local Admin Views">
-        <nav aria-label="Local admin views" className="grid gap-3 text-sm md:grid-cols-4">
+        <nav
+          aria-label="Local admin views"
+          className="grid gap-3 text-sm md:grid-cols-4"
+        >
           {adminLinks.map((link) => (
             <AdminLink key={link.href} href={link.href} label={link.label} />
           ))}
         </nav>
       </Panel>
-    </main>
+    </SettingsLayout>
   );
 }
 
-function CommandPanel({ title, commands }: { title: string; commands: string[] }) {
+function CommandPanel({
+  title,
+  commands,
+}: {
+  title: string;
+  commands: string[];
+}) {
   return (
     <Panel title={title}>
       <ol className="grid gap-3">
         {commands.map((command) => (
-          <li key={command} className="break-words rounded border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-xs text-slate-800">
+          <li
+            key={command}
+            className="break-words rounded border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-xs text-slate-800"
+          >
             {command}
           </li>
         ))}
@@ -133,7 +152,10 @@ function CommandPanel({ title, commands }: { title: string; commands: string[] }
 
 function AdminLink({ href, label }: { href: string; label: string }) {
   return (
-    <Link className="rounded border border-slate-200 px-3 py-2 font-semibold text-teal-700" href={href}>
+    <Link
+      className="rounded border border-slate-200 px-3 py-2 font-semibold text-teal-700"
+      href={href}
+    >
       {label}
     </Link>
   );

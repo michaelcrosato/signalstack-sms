@@ -59,30 +59,39 @@ type AiInsights = {
 export function InboxWorkspace({
   conversations,
   currentUserId,
-  selectedConversation
+  selectedConversation,
 }: {
   conversations: InboxConversationRow[];
   currentUserId: string;
   selectedConversation: SelectedConversation | null;
 }) {
   const router = useRouter();
-  const [messageBody, setMessageBody] = useState<string>(productInboxWorkspaceDefaults.inboundReply);
-  const [noteBody, setNoteBody] = useState<string>(productInboxWorkspaceDefaults.internalNote);
+  const [messageBody, setMessageBody] = useState<string>(
+    productInboxWorkspaceDefaults.inboundReply,
+  );
+  const [noteBody, setNoteBody] = useState<string>(
+    productInboxWorkspaceDefaults.internalNote,
+  );
   const [replyBody, setReplyBody] = useState<string>("");
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [aiPending, setAiPending] = useState(false);
   const [aiInsights, setAiInsights] = useState<AiInsights | null>(null);
-  const [localThreadStatus, setLocalThreadStatus] = useState(selectedConversation?.status ?? "OPEN");
+  const [localThreadStatus, setLocalThreadStatus] = useState(
+    selectedConversation?.status ?? "OPEN",
+  );
   const threadStatus = localThreadStatus;
-  const orderedMessages = useMemo(() => selectedConversation?.messages ?? [], [selectedConversation]);
+  const orderedMessages = useMemo(
+    () => selectedConversation?.messages ?? [],
+    [selectedConversation],
+  );
 
   async function submitJson(
     path: string,
     body: unknown,
     successMessage: string | ((payload: Record<string, unknown>) => string),
-    refresh = true
+    refresh = true,
   ) {
     setPending(true);
     setStatus(null);
@@ -91,17 +100,25 @@ export function InboxWorkspace({
     const response = await fetch(path, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     });
     const payload = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      setError(typeof payload.error === "string" ? payload.error : "Inbox action failed.");
+      setError(
+        typeof payload.error === "string"
+          ? payload.error
+          : "Inbox action failed.",
+      );
       setPending(false);
       return;
     }
 
-    setStatus(typeof successMessage === "function" ? successMessage(payload) : successMessage);
+    setStatus(
+      typeof successMessage === "function"
+        ? successMessage(payload)
+        : successMessage,
+    );
     setPending(false);
     if (refresh) {
       router.refresh();
@@ -117,7 +134,7 @@ export function InboxWorkspace({
     void submitJson(
       `/api/inbox/conversations/${selectedConversation.id}/messages`,
       { body: messageBody },
-      (payload) => inboundStatusMessage(payload)
+      (payload) => inboundStatusMessage(payload),
     );
   }
 
@@ -133,7 +150,7 @@ export function InboxWorkspace({
       (payload) =>
         payload.deduped
           ? "Duplicate reply ignored (idempotent). No provider send ran."
-          : "Local outbound reply recorded via the dummy provider. No live SMS was sent."
+          : "Local outbound reply recorded via the dummy provider. No live SMS was sent.",
     );
   }
 
@@ -146,7 +163,7 @@ export function InboxWorkspace({
     void submitJson(
       `/api/inbox/conversations/${selectedConversation.id}/notes`,
       { body: noteBody },
-      "Internal note added."
+      "Internal note added.",
     );
   }
 
@@ -158,7 +175,7 @@ export function InboxWorkspace({
     void submitJson(
       `/api/inbox/conversations/${selectedConversation.id}/assign`,
       { assignedToUserId: currentUserId },
-      "Conversation assigned to you."
+      "Conversation assigned to you.",
     );
   }
 
@@ -172,7 +189,7 @@ export function InboxWorkspace({
       `/api/inbox/conversations/${selectedConversation.id}/resolve`,
       { resolved },
       resolved ? "Conversation resolved." : "Conversation reopened.",
-      false
+      false,
     );
   }
 
@@ -188,15 +205,15 @@ export function InboxWorkspace({
     const request = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ conversationId: selectedConversation.id })
+      body: JSON.stringify({ conversationId: selectedConversation.id }),
     };
     const [summaryResponse, qualificationResponse] = await Promise.all([
       fetch("/api/ai/conversation-summary", request),
-      fetch("/api/ai/lead-qualification", request)
+      fetch("/api/ai/lead-qualification", request),
     ]);
     const [summaryPayload, qualificationPayload] = await Promise.all([
       summaryResponse.json().catch(() => ({})),
-      qualificationResponse.json().catch(() => ({}))
+      qualificationResponse.json().catch(() => ({})),
     ]);
 
     if (!summaryResponse.ok || !qualificationResponse.ok) {
@@ -214,14 +231,27 @@ export function InboxWorkspace({
     const reasonsPayload: unknown = qualificationPayload.reasons;
 
     setAiInsights({
-      summary: typeof summaryPayload.summary === "string" ? summaryPayload.summary : "No summary returned.",
-      stage: typeof qualificationPayload.stage === "string" ? qualificationPayload.stage : "UNKNOWN",
-      score: typeof qualificationPayload.score === "number" ? qualificationPayload.score : 0,
+      summary:
+        typeof summaryPayload.summary === "string"
+          ? summaryPayload.summary
+          : "No summary returned.",
+      stage:
+        typeof qualificationPayload.stage === "string"
+          ? qualificationPayload.stage
+          : "UNKNOWN",
+      score:
+        typeof qualificationPayload.score === "number"
+          ? qualificationPayload.score
+          : 0,
       reasons: Array.isArray(reasonsPayload)
-        ? reasonsPayload.filter((reason: unknown): reason is string => typeof reason === "string")
-        : []
+        ? reasonsPayload.filter(
+            (reason: unknown): reason is string => typeof reason === "string",
+          )
+        : [],
     });
-    setStatus("Fake AI inbox insights generated locally. Live AI remains blocked.");
+    setStatus(
+      "Fake AI inbox insights generated locally. Live AI remains blocked.",
+    );
     setAiPending(false);
   }
 
@@ -230,7 +260,9 @@ export function InboxWorkspace({
       <div className="rounded border border-slate-200 bg-white">
         <div className="border-b border-slate-200 p-5">
           <h2 className="text-xl font-semibold">Conversation list</h2>
-          <p className="mt-1 text-sm text-slate-600">Most recent tenant-scoped threads from the existing inbox API model.</p>
+          <p className="mt-1 text-sm text-slate-600">
+            Most recent tenant-scoped threads from the existing inbox API model.
+          </p>
         </div>
         <div className="divide-y divide-slate-100">
           {conversations.map((conversation) => (
@@ -247,14 +279,18 @@ export function InboxWorkspace({
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h3 className="font-semibold text-slate-950">{conversation.contactName}</h3>
+                  <h3 className="font-semibold text-slate-950">
+                    {conversation.contactName}
+                  </h3>
                   <p className="text-sm text-slate-600">{conversation.phone}</p>
                 </div>
                 <span className="rounded border border-slate-300 bg-slate-50 px-2 py-1 text-xs font-semibold">
                   {conversation.status}
                 </span>
               </div>
-              <p className="line-clamp-2 text-sm text-slate-700">{conversation.latestMessage}</p>
+              <p className="line-clamp-2 text-sm text-slate-700">
+                {conversation.latestMessage}
+              </p>
               <dl className="grid gap-1 text-xs text-slate-600">
                 <div className="flex justify-between gap-3">
                   <dt>Assigned</dt>
@@ -282,20 +318,32 @@ export function InboxWorkspace({
                     : "No conversations yet"}
                 </p>
                 {selectedConversation ? (
-                  <dl aria-label="Thread status" className="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
+                  <dl
+                    aria-label="Thread status"
+                    className="mt-2 flex flex-wrap gap-2 text-xs font-semibold"
+                  >
                     {selectedConversation.statusRows.map((row) => {
-                      const value = row.key === "thread" ? threadStatus : row.value;
-                      let themeClasses = "border-slate-300 bg-slate-50 text-slate-800";
+                      const value =
+                        row.key === "thread" ? threadStatus : row.value;
+                      let themeClasses =
+                        "border-slate-300 bg-slate-50 text-slate-800";
                       if (row.key === "sentiment") {
                         if (value === "POSITIVE") {
-                          themeClasses = "border-emerald-300 bg-emerald-50 text-emerald-800";
+                          themeClasses =
+                            "border-emerald-300 bg-emerald-50 text-emerald-800";
                         } else if (value === "NEGATIVE") {
-                          themeClasses = "border-rose-300 bg-rose-50 text-rose-800";
+                          themeClasses =
+                            "border-rose-300 bg-rose-50 text-rose-800";
                         } else if (value === "NEUTRAL") {
-                          themeClasses = "border-sky-300 bg-sky-50 text-sky-800";
+                          themeClasses =
+                            "border-sky-300 bg-sky-50 text-sky-800";
                         }
-                      } else if (row.key === "category" && value !== "Not categorized") {
-                        themeClasses = "border-violet-300 bg-violet-50 text-violet-800";
+                      } else if (
+                        row.key === "category" &&
+                        value !== "Not categorized"
+                      ) {
+                        themeClasses =
+                          "border-violet-300 bg-violet-50 text-violet-800";
                       }
                       return (
                         <div
@@ -314,7 +362,10 @@ export function InboxWorkspace({
                 <div className="flex flex-wrap gap-2">
                   <button
                     className="rounded border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 disabled:text-slate-400"
-                    disabled={pending || selectedConversation.assignedToUserId === currentUserId}
+                    disabled={
+                      pending ||
+                      selectedConversation.assignedToUserId === currentUserId
+                    }
                     onClick={assignToMe}
                     type="button"
                   >
@@ -341,7 +392,9 @@ export function InboxWorkspace({
               >
                 <div className="flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
                   <span>{message.direction}</span>
-                  <span>{new Date(message.createdAt).toLocaleString("en-US")}</span>
+                  <span>
+                    {new Date(message.createdAt).toLocaleString("en-US")}
+                  </span>
                 </div>
                 <p className="mt-2 text-sm text-slate-800">{message.body}</p>
               </article>
@@ -354,7 +407,8 @@ export function InboxWorkspace({
             <div>
               <h2 className="text-xl font-semibold">Fake AI insights</h2>
               <p className="mt-1 text-sm text-slate-600">
-                Generates deterministic local summary and lead score only; live AI providers stay blocked.
+                Generates deterministic local summary and lead score only; live
+                AI providers stay blocked.
               </p>
             </div>
             <button
@@ -370,19 +424,29 @@ export function InboxWorkspace({
           {aiInsights ? (
             <div className="mt-4 grid gap-3 md:grid-cols-[1.5fr_1fr]">
               <article className="rounded border border-slate-200 bg-slate-50 p-4">
-                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Summary</h3>
-                <p className="mt-2 text-sm text-slate-800">{aiInsights.summary}</p>
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                  Summary
+                </h3>
+                <p className="mt-2 text-sm text-slate-800">
+                  {aiInsights.summary}
+                </p>
               </article>
               <article className="rounded border border-slate-200 bg-slate-50 p-4">
-                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Lead qualification</h3>
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                  Lead qualification
+                </h3>
                 <dl className="mt-2 grid gap-2 text-sm">
                   <div className="flex justify-between gap-3">
                     <dt className="text-slate-600">Stage</dt>
-                    <dd className="font-semibold text-slate-950">{aiInsights.stage}</dd>
+                    <dd className="font-semibold text-slate-950">
+                      {aiInsights.stage}
+                    </dd>
                   </div>
                   <div className="flex justify-between gap-3">
                     <dt className="text-slate-600">Score</dt>
-                    <dd className="font-semibold text-slate-950">{aiInsights.score}</dd>
+                    <dd className="font-semibold text-slate-950">
+                      {aiInsights.score}
+                    </dd>
                   </div>
                 </dl>
                 <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-700">
@@ -395,10 +459,14 @@ export function InboxWorkspace({
           ) : null}
         </section>
 
-        <form className="grid gap-3 rounded border border-slate-200 bg-white p-5" onSubmit={sendReply}>
+        <form
+          className="grid gap-3 rounded border border-slate-200 bg-white p-5"
+          onSubmit={sendReply}
+        >
           <h2 className="text-xl font-semibold">Send reply</h2>
           <p className="text-sm text-slate-600">
-            Records a local OUTBOUND message via the dummy provider. Opted-out or archived contacts are blocked; no live SMS is sent.
+            Records a local OUTBOUND message via the dummy provider. Opted-out
+            or archived contacts are blocked; no live SMS is sent.
           </p>
           <label className="grid gap-2 text-sm font-medium text-slate-700">
             Reply message
@@ -411,7 +479,9 @@ export function InboxWorkspace({
           </label>
           <button
             className="rounded bg-teal-700 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-400"
-            disabled={pending || !selectedConversation || replyBody.trim().length === 0}
+            disabled={
+              pending || !selectedConversation || replyBody.trim().length === 0
+            }
             type="submit"
           >
             Send Reply
@@ -419,9 +489,15 @@ export function InboxWorkspace({
         </form>
 
         <section className="grid gap-6 md:grid-cols-2">
-          <form className="grid gap-3 rounded border border-slate-200 bg-white p-5" onSubmit={addInboundMessage}>
+          <form
+            className="grid gap-3 rounded border border-slate-200 bg-white p-5"
+            onSubmit={addInboundMessage}
+          >
             <h2 className="text-xl font-semibold">Demo inbound</h2>
-            <p className="text-sm text-slate-600">Creates a local inbound message only; SMS providers remain blocked.</p>
+            <p className="text-sm text-slate-600">
+              Creates a local inbound message only; SMS providers remain
+              blocked.
+            </p>
             <label className="grid gap-2 text-sm font-medium text-slate-700">
               Reply body
               <textarea
@@ -432,16 +508,25 @@ export function InboxWorkspace({
             </label>
             <button
               className="rounded bg-teal-700 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-400"
-              disabled={pending || !selectedConversation || messageBody.trim().length === 0}
+              disabled={
+                pending ||
+                !selectedConversation ||
+                messageBody.trim().length === 0
+              }
               type="submit"
             >
               Add Local Reply
             </button>
           </form>
 
-          <form className="grid gap-3 rounded border border-slate-200 bg-white p-5" onSubmit={addNote}>
+          <form
+            className="grid gap-3 rounded border border-slate-200 bg-white p-5"
+            onSubmit={addNote}
+          >
             <h2 className="text-xl font-semibold">Internal note</h2>
-            <p className="text-sm text-slate-600">Stores a tenant-scoped note for team handoff.</p>
+            <p className="text-sm text-slate-600">
+              Stores a tenant-scoped note for team handoff.
+            </p>
             <label className="grid gap-2 text-sm font-medium text-slate-700">
               Note body
               <textarea
@@ -452,7 +537,9 @@ export function InboxWorkspace({
             </label>
             <button
               className="rounded border border-teal-700 px-4 py-2 text-sm font-semibold text-teal-700 disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-400"
-              disabled={pending || !selectedConversation || noteBody.trim().length === 0}
+              disabled={
+                pending || !selectedConversation || noteBody.trim().length === 0
+              }
               type="submit"
             >
               Add Note
@@ -464,10 +551,14 @@ export function InboxWorkspace({
           <h2 className="text-xl font-semibold">Notes</h2>
           <div className="mt-3 grid gap-3">
             {(selectedConversation?.notes ?? []).map((note) => (
-              <article className="rounded border border-slate-200 bg-slate-50 p-3 text-sm" key={note.id}>
+              <article
+                className="rounded border border-slate-200 bg-slate-50 p-3 text-sm"
+                key={note.id}
+              >
                 <p className="text-slate-800">{note.body}</p>
                 <p className="mt-2 text-xs text-slate-500">
-                  {note.authorName} · {new Date(note.createdAt).toLocaleString("en-US")}
+                  {note.authorName} ·{" "}
+                  {new Date(note.createdAt).toLocaleString("en-US")}
                 </p>
               </article>
             ))}
@@ -475,12 +566,18 @@ export function InboxWorkspace({
         </section>
 
         {status ? (
-          <div className="rounded border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950" role="status">
+          <div
+            className="rounded border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950"
+            role="status"
+          >
             {status}
           </div>
         ) : null}
         {error ? (
-          <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-950" role="alert">
+          <div
+            className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-950"
+            role="alert"
+          >
             {error}
           </div>
         ) : null}

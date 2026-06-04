@@ -8,7 +8,9 @@ export const dynamic = "force-dynamic";
 
 export default async function TemplatesPage() {
   const currentOrg = await getOrCreateCurrentOrg();
-  const { metrics, templates, variableNames } = await getProductTemplates(currentOrg.orgId);
+  const { metrics, templates, variableNames } = await getProductTemplates(
+    currentOrg.orgId,
+  );
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
@@ -16,18 +18,27 @@ export default async function TemplatesPage() {
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-6 py-6">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-2">
-              <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">Templates</p>
+              <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">
+                Templates
+              </p>
               <h1 className="text-3xl font-semibold">Template workspace</h1>
               <p className="max-w-3xl text-base leading-7 text-slate-700">
-                Create reusable SMS copy, review variables, and see where templates are used without rendering live outbound
-                messages or sending provider traffic.
+                Create reusable SMS copy, review variables, and see where
+                templates are used without rendering live outbound messages or
+                sending provider traffic.
               </p>
             </div>
-            <Link className="rounded border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700" href="/dashboard">
+            <Link
+              className="rounded border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700"
+              href="/dashboard"
+            >
               Dashboard
             </Link>
           </div>
-          <nav aria-label="Product areas" className="flex gap-2 overflow-x-auto pb-1">
+          <nav
+            aria-label="Product areas"
+            className="flex gap-2 overflow-x-auto pb-1"
+          >
             {productNavigation.map((item) => (
               <Link
                 key={item.href}
@@ -42,16 +53,25 @@ export default async function TemplatesPage() {
       </header>
 
       <div className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-6">
-        <section aria-label="Template metrics" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <section
+          aria-label="Template metrics"
+          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+        >
           {metrics.map((metric) => (
-            <Metric key={metric.key} label={metric.label} value={metric.value} />
+            <Metric
+              key={metric.key}
+              label={metric.label}
+              value={metric.value}
+            />
           ))}
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <section className="rounded border border-slate-200 bg-white p-5">
             <h2 className="text-xl font-semibold">Template editor</h2>
-            <p className="mt-1 text-sm text-slate-600">Saving uses the existing local template API and upserts by name.</p>
+            <p className="mt-1 text-sm text-slate-600">
+              Saving uses the existing local template API and upserts by name.
+            </p>
             <div className="mt-5">
               <TemplateForm />
             </div>
@@ -60,7 +80,9 @@ export default async function TemplatesPage() {
           <section className="rounded border border-slate-200 bg-white">
             <div className="border-b border-slate-200 p-5">
               <h2 className="text-xl font-semibold">Saved templates</h2>
-              <p className="mt-1 text-sm text-slate-600">Reusable local copy for campaign drafts.</p>
+              <p className="mt-1 text-sm text-slate-600">
+                Reusable local copy for campaign drafts.
+              </p>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[760px] border-collapse text-left text-sm">
@@ -74,18 +96,32 @@ export default async function TemplatesPage() {
                 </thead>
                 <tbody>
                   {templates.map((template) => (
-                    <tr className="border-t border-slate-100 align-top" key={template.id}>
+                    <tr
+                      className="border-t border-slate-100 align-top"
+                      key={template.id}
+                    >
                       <td className="px-4 py-3">
-                        <Link className="font-medium text-teal-700 underline-offset-2 hover:underline" href={`/dashboard/templates/${template.id}`}>
+                        <Link
+                          className="font-medium text-teal-700 underline-offset-2 hover:underline"
+                          href={`/dashboard/templates/${template.id}`}
+                        >
                           {template.name}
                         </Link>
-                        <div className="mt-1 max-w-xl text-slate-600">{template.body}</div>
+                        <div className="mt-1 max-w-xl text-slate-600">
+                          {template.body}
+                        </div>
                       </td>
                       <td className="px-4 py-3 text-slate-700">
-                        {template.variables.length > 0 ? template.variables.join(", ") : "none"}
+                        {template.variables.length > 0
+                          ? template.variables.join(", ")
+                          : "none"}
                       </td>
-                      <td className="px-4 py-3 text-slate-700">{template.campaignUsage}</td>
-                      <td className="px-4 py-3 text-slate-700">{template.updatedAt.toLocaleString("en-US")}</td>
+                      <td className="px-4 py-3 text-slate-700">
+                        {template.campaignUsage}
+                      </td>
+                      <td className="px-4 py-3 text-slate-700">
+                        {template.updatedAt.toLocaleString("en-US")}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -97,14 +133,22 @@ export default async function TemplatesPage() {
         <section className="grid gap-6 lg:grid-cols-2">
           <Panel title="Variable Library">
             <p className="text-sm leading-6 text-slate-700">
-              {variableNames.length > 0 ? variableNames.join(", ") : "No variables recorded yet."}
+              {variableNames.length > 0
+                ? variableNames.join(", ")
+                : "No variables recorded yet."}
             </p>
           </Panel>
           <Panel title="Safety Boundary">
             <ul className="grid gap-2 text-sm text-slate-700">
               <li>Template saves are local database mutations only.</li>
-              <li>Campaign preflight remains the gate for consent and opted-out recipients.</li>
-              <li>No provider calls, SMS, live AI requests, billing records, or live feature enablement occur here.</li>
+              <li>
+                Campaign preflight remains the gate for consent and opted-out
+                recipients.
+              </li>
+              <li>
+                No provider calls, SMS, live AI requests, billing records, or
+                live feature enablement occur here.
+              </li>
             </ul>
           </Panel>
         </section>
@@ -122,7 +166,13 @@ function Metric({ label, value }: { label: string; value: number | string }) {
   );
 }
 
-function Panel({ title, children }: { title: string; children: React.ReactNode }) {
+function Panel({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="rounded border border-slate-200 bg-white p-5">
       <h2 className="text-xl font-semibold text-slate-950">{title}</h2>
