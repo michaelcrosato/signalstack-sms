@@ -59,13 +59,50 @@ describe("API rate limiting", () => {
     });
   });
 
-  it("separates callers by forwarded client address", () => {
-    const headers = new Headers({
-      "x-forwarded-for": "203.0.113.10, 10.0.0.1",
-      "x-real-ip": "198.51.100.5"
-    });
+  it("securely resolves caller IP by priority", () => {
+    // Priority 1: request.ip
+    expect(
+      getApiRateLimitClientKey({
+        headers: new Headers({
+          "cf-connecting-ip": "1.1.1.1",
+          "x-real-ip": "2.2.2.2",
+          "x-forwarded-for": "3.3.3.3, 4.4.4.4"
+        }),
+        ip: "5.5.5.5"
+      })
+    ).toBe("5.5.5.5");
 
-    expect(getApiRateLimitClientKey(headers)).toBe("203.0.113.10");
+    // Priority 2: cf-connecting-ip
+    expect(
+      getApiRateLimitClientKey({
+        headers: new Headers({
+          "cf-connecting-ip": "1.1.1.1",
+          "x-real-ip": "2.2.2.2",
+          "x-forwarded-for": "3.3.3.3, 4.4.4.4"
+        })
+      })
+    ).toBe("1.1.1.1");
+
+    // Priority 3: x-real-ip
+    expect(
+      getApiRateLimitClientKey({
+        headers: new Headers({
+          "x-real-ip": "2.2.2.2",
+          "x-forwarded-for": "3.3.3.3, 4.4.4.4"
+        })
+      })
+    ).toBe("2.2.2.2");
+
+    // Priority 4: rightmost x-forwarded-for
+    expect(
+      getApiRateLimitClientKey({
+        headers: new Headers({
+          "x-forwarded-for": "3.3.3.3, 4.4.4.4"
+        })
+      })
+    ).toBe("4.4.4.4");
+
+    // Priority 5: fallback
     expect(getApiRateLimitClientKey(new Headers())).toBe("local-demo-client");
   });
 });

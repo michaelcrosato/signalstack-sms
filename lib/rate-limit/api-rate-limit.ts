@@ -78,12 +78,35 @@ export function getApiRateLimitPolicy(env: RateLimitEnvironment = process.env): 
   };
 }
 
-export function getApiRateLimitClientKey(headers: Headers) {
-  const forwardedFor = headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  const realIp = headers.get("x-real-ip")?.trim();
-  const connectingIp = headers.get("cf-connecting-ip")?.trim();
+export function getApiRateLimitClientKey(request: { headers: Headers; ip?: string } | Headers) {
+  const headers = request instanceof Headers ? request : request.headers;
+  const ip = request instanceof Headers ? undefined : request.ip;
 
-  return forwardedFor || realIp || connectingIp || "local-demo-client";
+  if (ip) {
+    return ip;
+  }
+
+  const connectingIp = headers.get("cf-connecting-ip")?.trim();
+  if (connectingIp) {
+    return connectingIp;
+  }
+
+  const realIp = headers.get("x-real-ip")?.trim();
+  if (realIp) {
+    return realIp;
+  }
+
+  const forwardedForHeader = headers.get("x-forwarded-for");
+  if (forwardedForHeader) {
+    // The rightmost IP is the one directly connecting to our proxy, which is the most trustworthy in the chain.
+    const ips = forwardedForHeader.split(",");
+    const rightmostIp = ips[ips.length - 1]?.trim();
+    if (rightmostIp) {
+      return rightmostIp;
+    }
+  }
+
+  return "local-demo-client";
 }
 
 export async function checkApiRateLimit({
