@@ -315,12 +315,21 @@ async function processScheduledCampaignQueueJob(
     });
   }
 
+  const blockedRecipientsByReason = new Map<string, string[]>();
   for (const { recipient, preflight } of blockedRecipients) {
+    const reason = preflight?.reasons.join(",") || "SEND_TIME_PREFLIGHT_BLOCKED";
+    if (!blockedRecipientsByReason.has(reason)) {
+      blockedRecipientsByReason.set(reason, []);
+    }
+    blockedRecipientsByReason.get(reason)!.push(recipient.id);
+  }
+
+  for (const [reason, recipientIds] of blockedRecipientsByReason) {
     await prisma.campaignRecipient.updateMany({
-      where: { orgId: job.orgId, id: recipient.id },
+      where: { orgId: job.orgId, id: { in: recipientIds } },
       data: {
         status: CampaignRecipientStatus.BLOCKED,
-        blockReason: preflight?.reasons.join(",") || "SEND_TIME_PREFLIGHT_BLOCKED"
+        blockReason: reason
       }
     });
   }
