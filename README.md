@@ -7,6 +7,9 @@ gates. The only intentional live path is the multi-gated `/demo` live-test SMS f
 
 ## Quick start
 
+This repo uses npm as the canonical package manager; `package-lock.json` is the only committed
+package-manager metadata.
+
 ```bash
 bash scripts/agent/bootstrap.sh        # copy .env, install deps, generate Prisma client
 docker compose up -d postgres redis    # local backing services
