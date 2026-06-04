@@ -1,15 +1,27 @@
+import { SettingsLink } from "@/components/settings/SettingsLink";
 import Link from "next/link";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { getOrCreateComplianceProfile } from "@/lib/db/repositories/compliance";
-import { getProviderCredential, listProviderCredentialRotations } from "@/lib/db/repositories/provider-credentials";
+import {
+  getProviderCredential,
+  listProviderCredentialRotations,
+} from "@/lib/db/repositories/provider-credentials";
 import { getProviderSettings } from "@/lib/messaging/provider/settings";
 import { getProviderOperationLinks } from "@/lib/operations/operator-surfaces";
-import { providerCredentialRotationActionSchema, type ProviderCredentialRotationAction } from "@/lib/validation/provider";
+import {
+  providerCredentialRotationActionSchema,
+  type ProviderCredentialRotationAction,
+} from "@/lib/validation/provider";
 import { ProviderCredentialForm } from "./provider-credential-form";
 
 export const dynamic = "force-dynamic";
 
-const rotationActions: ProviderCredentialRotationAction[] = ["CONFIGURED", "REFRESHED", "ROTATED", "DELETED"];
+const rotationActions: ProviderCredentialRotationAction[] = [
+  "CONFIGURED",
+  "REFRESHED",
+  "ROTATED",
+  "DELETED",
+];
 
 type ProviderSettingsPageProps = {
   searchParams?: Promise<{
@@ -17,15 +29,24 @@ type ProviderSettingsPageProps = {
   }>;
 };
 
-export default async function ProviderSettingsPage({ searchParams }: ProviderSettingsPageProps) {
+export default async function ProviderSettingsPage({
+  searchParams,
+}: ProviderSettingsPageProps) {
   const params = await searchParams;
-  const actionFilter = providerCredentialRotationActionSchema.safeParse(params?.action);
+  const actionFilter = providerCredentialRotationActionSchema.safeParse(
+    params?.action,
+  );
   const selectedAction = actionFilter.success ? actionFilter.data : undefined;
   const currentOrg = await getOrCreateCurrentOrg();
   const [complianceProfile, providerCredential, rotations] = await Promise.all([
     getOrCreateComplianceProfile(currentOrg.orgId),
     getProviderCredential(currentOrg.orgId, "twilio"),
-    listProviderCredentialRotations(currentOrg.orgId, "twilio", 12, selectedAction)
+    listProviderCredentialRotations(
+      currentOrg.orgId,
+      "twilio",
+      12,
+      selectedAction,
+    ),
   ]);
   const providerSettings = getProviderSettings({
     demoMode: currentOrg.demoMode,
@@ -33,7 +54,7 @@ export default async function ProviderSettingsPage({ searchParams }: ProviderSet
     messagingProvider: process.env.MESSAGING_PROVIDER ?? "dummy",
     complianceProfile,
     providerCredential,
-    env: process.env
+    env: process.env,
   });
   const operationLinks = getProviderOperationLinks();
 
@@ -42,36 +63,64 @@ export default async function ProviderSettingsPage({ searchParams }: ProviderSet
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
         <nav aria-label="Related settings" className="flex flex-wrap gap-2">
           {operationLinks.map((link) => (
-            <Link key={link.href} className="rounded border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-teal-700 transition hover:border-teal-300 hover:bg-teal-50" href={link.href}>
+            <SettingsLink key={link.href} href={link.href}>
               {link.label}
-            </Link>
+            </SettingsLink>
           ))}
         </nav>
         <div>
-          <p className="text-sm font-semibold uppercase text-slate-500">Settings</p>
-          <h1 className="text-4xl font-semibold text-slate-950">Provider Details</h1>
+          <p className="text-sm font-semibold uppercase text-slate-500">
+            Settings
+          </p>
+          <h1 className="text-4xl font-semibold text-slate-950">
+            Provider Details
+          </h1>
         </div>
       </header>
 
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
         <section className="rounded border border-slate-200 bg-white p-5">
-          <h2 className="text-lg font-semibold text-slate-950">Twilio Metadata</h2>
+          <h2 className="text-lg font-semibold text-slate-950">
+            Twilio Metadata
+          </h2>
           <dl className="mt-4 grid gap-3 text-sm">
-            <StatusRow label="Account SID" value={String(providerSettings.twilio.accountSidConfigured)} />
-            <StatusRow label="Auth token" value={String(providerSettings.twilio.authTokenConfigured)} />
-            <StatusRow label="From number" value={String(providerSettings.twilio.fromNumberConfigured)} />
-            <StatusRow label="Configured" value={String(providerSettings.twilio.configured)} />
+            <StatusRow
+              label="Account SID"
+              value={String(providerSettings.twilio.accountSidConfigured)}
+            />
+            <StatusRow
+              label="Auth token"
+              value={String(providerSettings.twilio.authTokenConfigured)}
+            />
+            <StatusRow
+              label="From number"
+              value={String(providerSettings.twilio.fromNumberConfigured)}
+            />
+            <StatusRow
+              label="Configured"
+              value={String(providerSettings.twilio.configured)}
+            />
             <StatusRow label="Source" value={providerSettings.twilio.source} />
-            <StatusRow label="Account" value={providerSettings.twilio.accountSidRedacted ?? "not stored"} />
-            <StatusRow label="From" value={providerSettings.twilio.fromNumberRedacted ?? "not stored"} />
+            <StatusRow
+              label="Account"
+              value={providerSettings.twilio.accountSidRedacted ?? "not stored"}
+            />
+            <StatusRow
+              label="From"
+              value={providerSettings.twilio.fromNumberRedacted ?? "not stored"}
+            />
           </dl>
         </section>
 
         <section className="rounded border border-slate-200 bg-white p-5">
-          <h2 className="text-lg font-semibold text-slate-950">Live Blockers</h2>
+          <h2 className="text-lg font-semibold text-slate-950">
+            Live Blockers
+          </h2>
           <ul className="mt-4 grid gap-2 text-sm text-slate-700">
             {providerSettings.blockers.length > 0 ? (
-              providerSettings.blockers.map((blocker) => <li key={blocker}>{blocker}</li>)
+              providerSettings.blockers.map((blocker) => (
+                <li key={blocker}>{blocker}</li>
+              ))
             ) : (
               <li>No blockers recorded.</li>
             )}
@@ -83,7 +132,9 @@ export default async function ProviderSettingsPage({ searchParams }: ProviderSet
 
       <section className="rounded border border-slate-200 bg-white p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <h2 className="text-lg font-semibold text-slate-950">Credential Rotation History</h2>
+          <h2 className="text-lg font-semibold text-slate-950">
+            Credential Rotation History
+          </h2>
           <div className="flex flex-wrap gap-2">
             <Link
               className="rounded border border-teal-700 px-3 py-1 text-xs font-semibold text-teal-700"
@@ -91,10 +142,22 @@ export default async function ProviderSettingsPage({ searchParams }: ProviderSet
             >
               Export Rotations CSV
             </Link>
-            <nav aria-label="Credential rotation filters" className="flex flex-wrap gap-2">
-              <FilterLink href="/settings/provider" label="All" active={!selectedAction} />
+            <nav
+              aria-label="Credential rotation filters"
+              className="flex flex-wrap gap-2"
+            >
+              <FilterLink
+                href="/settings/provider"
+                label="All"
+                active={!selectedAction}
+              />
               {rotationActions.map((action) => (
-                <FilterLink key={action} href={`/settings/provider?action=${action}`} label={action} active={selectedAction === action} />
+                <FilterLink
+                  key={action}
+                  href={`/settings/provider?action=${action}`}
+                  label={action}
+                  active={selectedAction === action}
+                />
               ))}
             </nav>
           </div>
@@ -102,17 +165,26 @@ export default async function ProviderSettingsPage({ searchParams }: ProviderSet
         <ul className="mt-4 grid gap-3 text-sm">
           {rotations.length > 0 ? (
             rotations.map((rotation) => (
-              <li key={rotation.id} className="grid gap-1 border-b border-slate-100 pb-3 md:grid-cols-[1fr_auto]">
+              <li
+                key={rotation.id}
+                className="grid gap-1 border-b border-slate-100 pb-3 md:grid-cols-[1fr_auto]"
+              >
                 <span className="font-medium text-slate-950">
-                  {rotation.action} / {rotation.provider} / {rotation.fromNumberRedacted ?? "not stored"}
+                  {rotation.action} / {rotation.provider} /{" "}
+                  {rotation.fromNumberRedacted ?? "not stored"}
                 </span>
-                <time className="text-slate-600" dateTime={rotation.createdAt.toISOString()}>
+                <time
+                  className="text-slate-600"
+                  dateTime={rotation.createdAt.toISOString()}
+                >
                   {rotation.createdAt.toISOString()}
                 </time>
               </li>
             ))
           ) : (
-            <li className="text-slate-600">No credential rotation history recorded.</li>
+            <li className="text-slate-600">
+              No credential rotation history recorded.
+            </li>
           )}
         </ul>
       </section>
@@ -120,7 +192,15 @@ export default async function ProviderSettingsPage({ searchParams }: ProviderSet
   );
 }
 
-function FilterLink({ href, label, active }: { href: string; label: string; active: boolean }) {
+function FilterLink({
+  href,
+  label,
+  active,
+}: {
+  href: string;
+  label: string;
+  active: boolean;
+}) {
   return (
     <Link
       className={
@@ -143,5 +223,3 @@ function StatusRow({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-
-
