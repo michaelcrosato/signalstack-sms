@@ -1,6 +1,7 @@
 import { UsageEventType } from "@prisma/client";
 import { aggregateUsageEvents } from "@/lib/billing/metering";
 import { prisma } from "@/lib/db/prisma";
+import { countTemplates } from "@/lib/db/repositories/templates";
 import {
   outboundDeliveredMessageWhere,
   outboundFailedMessageWhere,
@@ -168,7 +169,7 @@ export async function getProductDashboard(orgId: string) {
     prisma.campaign.count({ where: { orgId, status: "DRAFT" } }),
     prisma.campaign.count({ where: { orgId, status: "SCHEDULED" } }),
     prisma.conversation.count({ where: { orgId, status: "OPEN" } }),
-    prisma.messageTemplate.count({ where: { orgId } }),
+    countTemplates(orgId),
     prisma.message.count({ where: { orgId } }),
     prisma.message.count({ where: outboundMessageWhere(orgId) }),
     prisma.message.count({ where: outboundDeliveredMessageWhere(orgId) }),
