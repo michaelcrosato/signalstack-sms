@@ -27,9 +27,9 @@ export function ProviderCredentialForm() {
         twilio: {
           accountSid: String(formData.get("accountSid") ?? ""),
           authToken: String(formData.get("authToken") ?? ""),
-          fromNumber: String(formData.get("fromNumber") ?? "")
-        }
-      })
+          fromNumber: String(formData.get("fromNumber") ?? ""),
+        },
+      }),
     });
 
     if (!response.ok) {
@@ -44,12 +44,15 @@ export function ProviderCredentialForm() {
 
   async function handleDelete() {
     if (!clearConfirmed) {
-      setState({ kind: "error", message: "Confirm local metadata clearing first." });
+      setState({
+        kind: "error",
+        message: "Confirm local metadata clearing first.",
+      });
       return;
     }
 
     const response = await fetch("/api/settings/provider", {
-      method: "DELETE"
+      method: "DELETE",
     });
 
     if (!response.ok) {
@@ -65,8 +68,13 @@ export function ProviderCredentialForm() {
   return (
     <section className="rounded border border-slate-200 bg-white p-5">
       <div className="flex flex-col gap-1">
-        <h2 className="text-lg font-semibold text-slate-950">Credential Metadata</h2>
-        <p className="text-sm text-slate-600">Local readiness record only. Raw tokens are not shown after submission.</p>
+        <h2 className="text-lg font-semibold text-slate-950">
+          Credential Metadata
+        </h2>
+        <p className="text-sm text-slate-600">
+          Local readiness record only. Raw tokens are not shown after
+          submission.
+        </p>
       </div>
 
       <form className="mt-5 grid gap-4" onSubmit={handleSubmit}>
@@ -122,7 +130,8 @@ export function ProviderCredentialForm() {
             checked={clearConfirmed}
             onChange={(event) => setClearConfirmed(event.currentTarget.checked)}
           />
-          Clear only local readiness metadata; no provider-side credential is revoked.
+          Clear only local readiness metadata; no provider-side credential is
+          revoked.
         </label>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -142,7 +151,13 @@ export function ProviderCredentialForm() {
             Clear Metadata
           </button>
           {state.message ? (
-            <p className={state.kind === "error" ? "text-sm font-medium text-red-700" : "text-sm font-medium text-teal-700"}>
+            <p
+              className={
+                state.kind === "error"
+                  ? "text-sm font-medium text-red-700"
+                  : "text-sm font-medium text-teal-700"
+              }
+            >
               {state.message}
             </p>
           ) : null}
