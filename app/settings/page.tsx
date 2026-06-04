@@ -11,6 +11,7 @@ import { buildReadinessAuditExportHref, getReadinessAuditOperationsStatus } from
 import { getQueueBackend } from "@/lib/queue/bullmq";
 import { getApiRateLimitPolicy } from "@/lib/rate-limit/api-rate-limit";
 import { readinessAuditQuerySchema } from "@/lib/validation/readiness-audit";
+import { FilterLink } from "@/components/ui/filter-link";
 
 export const dynamic = "force-dynamic";
 
@@ -474,21 +475,6 @@ function Panel({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-function FilterLink({ href, label, active }: { href: string; label: string; active: boolean }) {
-  return (
-    <Link
-      className={
-        active
-          ? "rounded border border-slate-950 bg-slate-950 px-3 py-1 text-xs font-semibold text-white"
-          : "rounded border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700"
-      }
-      href={href}
-    >
-      {label}
-    </Link>
-  );
-}
-
 function StatusRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-2">
@@ -497,5 +483,3 @@ function StatusRow({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-
-
