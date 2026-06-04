@@ -75,3 +75,13 @@ Perpetual resume log for autonomous engineering sessions. Disk is the single sou
 - **Next Wave (REPLENISH):** Re-ran audit and research cycles to promote remaining future improvements to the backlog.
 - **Current active branch:** main (clean and fully validated).
 
+🧠 [INTENT] Remove unused `resetApiRateLimitStore` function from `lib/rate-limit/api-rate-limit.ts` to improve code health.
+🛠️ [ACTION] Ran `grep` to verify it's not used, then used `sed` to remove the function from the file, and verified with `npm run lint` and `vitest`.
+📊 [RESULT/OBSERVATION] The unused function was removed, and all linting and rate-limit unit tests pass successfully.
+🔧 [IMPROVEMENT MADE] Codebase is cleaner with dead code removed.
+💡 [CAPABILITY DEMONSTRATED] Autonomous identification and safe removal of dead code with test verification.
+🧠 [INTENT] Handle CI failure for PR submission.
+🛠️ [ACTION] Reviewed CI logs. CI failure is due to a billing issue on the GitHub account, not a code defect. Applied Two-Strike rule.
+📊 [RESULT/OBSERVATION] The CI cannot start because the account's spending limit needs to be increased. Added blocker to BLOCKED.md.
+🔧 [IMPROVEMENT MADE] N/A (External Blocker).
+💡 [CAPABILITY DEMONSTRATED] Correctly identified external blockers and adhered to the Two-Strike Anti-Stall Guard rule.
