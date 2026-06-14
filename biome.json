@@ -12,7 +12,13 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noRedundantUseStrict": "off"
+        "noRedundantUseStrict": "off",
+        "noUnknownAtRules": "off",
+        "noExplicitAny": "off",
+        "noImplicitAnyLet": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off"
       }
     }
   }

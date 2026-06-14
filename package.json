@@ -9,13 +9,65 @@
     "state": "ts-node scripts/update-state.ts",
     "state:validate": "ts-node scripts/update-state.ts --validate",
     "typecheck": "tsc --noEmit",
-    "lint": "biome lint scripts"
+    "lint": "biome lint src scripts workers tests",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "vitest run",
+    "worker": "tsx workers/index.ts",
+    "worker:watch": "tsx workers/index.ts --watch",
+    "worker:bullmq": "tsx workers/bullmq.ts",
+    "queue:bullmq:smoke": "tsx scripts/bullmq-smoke.ts",
+    "db:generate": "prisma generate",
+    "db:validate": "prisma validate",
+    "validate": "tsx scripts/validate.ts",
+    "contracts:check": "tsx scripts/contracts-check.ts",
+    "compliance:check": "tsx scripts/compliance-check.ts",
+    "production:gate": "tsx scripts/production-gate.ts",
+    "production-auth:check": "tsx scripts/production-auth-rbac-check.ts",
+    "production-worker:check": "tsx scripts/production-worker-policy-check.ts",
+    "observability:check": "tsx scripts/observability-check.ts",
+    "operator:check": "tsx scripts/operator-runbook-check.ts",
+    "platform:check": "tsx scripts/platform-notes-check.ts",
+    "context:check": "tsx scripts/context-budget-check.ts",
+    "security:check": "tsx scripts/security-headers-check.ts",
+    "ai:check": "tsx scripts/ai-check.ts",
+    "secrets:scan": "tsx scripts/secrets-scan.ts",
+    "test:e2e:demo": "playwright test e2e/demo-path.spec.ts --project=chromium",
+    "test:e2e:smoke": "playwright test e2e/smoke.spec.ts --project=chromium",
+    "agent:brief": "bash .claude/hooks/session-brief.sh"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "@rolldown/binding-linux-x64-gnu": "^1.0.3",
+    "@vercel/otel": "^2.1.2",
+    "bullmq": "^5.76.10",
+    "ioredis": "^5.11.0",
+    "next": "^15.5.18",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.16",
+    "@playwright/test": "^1.60.0",
+    "@tailwindcss/forms": "^0.5.11",
     "@types/node": "^25.9.2",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.15",
+    "prisma": "^6.19.3",
     "shellcheck": "^4.1.0",
+    "tailwindcss": "^3.4.19",
     "ts-node": "^10.9.2",
-    "typescript": "^6.0.3"
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
+  },
+  "overrides": {
+    "next": {
+      "postcss": "8.5.15"
+    }
   }
 }

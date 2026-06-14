@@ -4,6 +4,7 @@ node_modules/
 # Build output
 dist/
 build/
+.next/
 *.tsbuildinfo
 
 # Environment & secrets — agents are prohibited from reading these (CLAUDE.md §6)
@@ -27,6 +28,10 @@ Thumbs.db
 
 # Claude Code local (personal) overrides — project settings stay checked in
 .claude/settings.local.json
+
+# Ephemeral agent worktrees (workflow/Agent isolation) — auto-created/removed,
+# never committed (mirrors the engine template's .gitignore)
+.claude/worktrees/
 
 # Playwright / E2E artifacts (evidence is curated into roadmap/evidence/ instead)
 test-results/
