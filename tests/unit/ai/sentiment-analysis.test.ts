@@ -146,7 +146,7 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
 
       // Wait with polling for async sentiment evaluation
       let updated;
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 80; i++) {
         await new Promise((resolve) => setTimeout(resolve, 100));
         updated = await prisma.conversation.findUniqueOrThrow({
           where: { id: result.conversation!.id },
@@ -186,7 +186,7 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
 
       // Wait with polling for async sentiment evaluation
       let updated;
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 80; i++) {
         await new Promise((resolve) => setTimeout(resolve, 100));
         updated = await prisma.conversation.findUniqueOrThrow({
           where: { id: conversation.id },

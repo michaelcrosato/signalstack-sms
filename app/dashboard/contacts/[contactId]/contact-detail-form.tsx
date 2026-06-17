@@ -334,11 +334,13 @@ function splitLabels(value: string) {
 
 function cleanPayload(payload: Record<string, unknown>) {
   return Object.fromEntries(
-    Object.entries(payload).filter(([, value]) => {
-      if (typeof value === "string") {
-        return value.trim().length > 0;
-      }
-      return value !== undefined;
-    })
+    Object.entries(payload)
+      .map(([key, value]) => {
+        if (typeof value === "string" && value.trim().length === 0) {
+          return [key, null];
+        }
+        return [key, value];
+      })
+      .filter(([, value]) => value !== undefined)
   );
 }

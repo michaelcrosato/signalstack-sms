@@ -218,7 +218,7 @@ export function CampaignComposer({ contacts, templates }: { contacts: ComposerCo
           {copyVariants.length > 0 ? (
             <div className="grid gap-2">
               {copyVariants.map((variant, index) => (
-                <div className="grid gap-2 rounded border border-slate-200 bg-white p-3" key={variant}>
+                <div className="grid gap-2 rounded border border-slate-200 bg-white p-3" key={`${variant}-${index}`}>
                   <p className="text-sm text-slate-700">{variant}</p>
                   <button
                     className="justify-self-start rounded border border-teal-700 px-3 py-1.5 text-sm font-semibold text-teal-700"

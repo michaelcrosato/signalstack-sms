@@ -2,12 +2,21 @@ import { ConsentStatus } from "@prisma/client";
 import { z } from "zod";
 
 const phoneSchema = z.string().trim().min(7).max(32);
-const optionalText = z.string().trim().min(1).max(500).optional();
-const optionalShortText = z.string().trim().min(1).max(120).optional();
+const optionalText = z.preprocess(
+  (val) => (typeof val === "string" && val.trim() === "" ? null : val),
+  z.string().trim().min(1).max(500).nullable().optional()
+);
+const optionalShortText = z.preprocess(
+  (val) => (typeof val === "string" && val.trim() === "" ? null : val),
+  z.string().trim().min(1).max(120).nullable().optional()
+);
 
 export const contactCreateSchema = z.object({
   phone: phoneSchema,
-  email: z.string().trim().email().max(254).optional(),
+  email: z.preprocess(
+    (val) => (typeof val === "string" && val.trim() === "" ? null : val),
+    z.string().trim().email().max(254).nullable().optional()
+  ),
   firstName: optionalShortText,
   lastName: optionalShortText,
   displayName: optionalShortText,

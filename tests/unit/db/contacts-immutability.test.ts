@@ -265,7 +265,48 @@ describe("consent evidence write-once immutability", () => {
       );
       expect(mocks.update).not.toHaveBeenCalled();
     });
+
+    it("propagates null values for cleared contact fields to Prisma update", async () => {
+      mocks.findFirst.mockResolvedValue(existingWithoutEvidence);
+      mocks.update.mockResolvedValue({
+        ...existingWithoutEvidence,
+        firstName: null,
+        lastName: null,
+        displayName: null,
+        notes: null
+      });
+      mocks.findUniqueOrThrow.mockResolvedValue({
+        ...existingWithoutEvidence,
+        firstName: null,
+        lastName: null,
+        displayName: null,
+        notes: null,
+        tagLinks: [],
+        listLinks: []
+      });
+
+      const input = {
+        firstName: null,
+        lastName: null,
+        displayName: null,
+        notes: null
+      };
+
+      const result = await updateContact(orgId, contactId, input);
+      expect(result).toBeDefined();
+      expect(mocks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            firstName: null,
+            lastName: null,
+            displayName: null,
+            notes: null
+          })
+        })
+      );
+    });
   });
+
 
   describe("importContacts", () => {
     it("allows first capture on import", async () => {
