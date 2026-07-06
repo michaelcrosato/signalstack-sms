@@ -10,3 +10,5 @@ test-results/
 *.tsbuildinfo
 dist/
 prisma/migrations/dev/
+.agents/
+.agent-cleaner/
