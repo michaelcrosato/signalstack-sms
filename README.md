@@ -61,3 +61,23 @@ before `npm run test:e2e:smoke` or `npm run validate` (Linux Playwright support 
 - [`AGENTS.md`](AGENTS.md) + [`docs/ai/REPO_MAP.md`](docs/ai/REPO_MAP.md) — autonomous-agent instructions and where code lives.
 - [`plan/`](plan/) — research-informed transformation plan (specs, roadmap, execution prompt).
 - [`docs/CANONICAL_IMPLEMENTATION_PLAN.md`](docs/CANONICAL_IMPLEMENTATION_PLAN.md) — governing implementation contract.
+
+## Windows Development Quickstart & Troubleshooting
+
+When developing on Windows:
+
+- **WSL2 Backing Services**: If your backing services (Postgres, Redis) run in WSL2, standard localhost ports might not be directly available from the Windows host. To connect:
+  1. Retrieve the WSL2 IP address by running:
+     ```powershell
+     wsl -d Ubuntu hostname -I
+     ```
+  2. Configure your `DATABASE_URL` and `REDIS_URL` in `.env` to point to that IP address (e.g., `postgresql://user:pass@<WSL2_IP>:5432/db` and `redis://<WSL2_IP>:6379`).
+- **Clean Builds**: If you run into routing errors or `PageNotFoundError` during development or testing, delete the `.next/` directory and build cleanly:
+  ```powershell
+  Remove-Item -Recurse -Force .next
+  npm run build
+  ```
+- **Sequential E2E Tests**: To run end-to-end tests successfully and avoid resource contention or database locking issues, execute them sequentially with a single worker:
+  ```bash
+  npx playwright test --workers=1
+  ```

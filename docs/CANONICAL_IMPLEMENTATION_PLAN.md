@@ -269,9 +269,6 @@ signalstack-sms/
 │  ├─ ui/
 │  │  └─ README.md
 │  ├─ layout/
-│  │  ├─ app-shell.tsx
-│  │  ├─ side-nav.tsx
-│  │  └─ top-nav.tsx
 │  ├─ contacts/
 │  ├─ campaigns/
 │  ├─ inbox/
