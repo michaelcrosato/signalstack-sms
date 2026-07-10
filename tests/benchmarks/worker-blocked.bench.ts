@@ -1,4 +1,4 @@
-import { describe, bench, expect } from "vitest";
+import { describe, bench } from "vitest";
 
 describe("Worker blocked updates", () => {
   const job = { orgId: "org1" };
@@ -40,7 +40,7 @@ describe("Worker blocked updates", () => {
       campaignRecipient: {
         updateMany: () => ({ count: 100 })
       },
-      $transaction: async (queries: any[]) => queries.map(q => q())
+      $transaction: async (queries: unknown[]) => queries.map((q) => (q as () => unknown)())
     };
 
     const updates = Array.from(data).map(([reason, recipientIds]) =>
