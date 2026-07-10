@@ -226,8 +226,8 @@ export async function processDueScheduledCampaignJobs(
   let processed = 0;
   let skipped = 0;
 
-  for (const job of jobs) {
-    const result = await processScheduledCampaignQueueJob(job, now);
+  const results = await Promise.all(jobs.map((job) => processScheduledCampaignQueueJob(job, now)));
+  for (const result of results) {
     processed += result.processed;
     skipped += result.skipped;
   }
