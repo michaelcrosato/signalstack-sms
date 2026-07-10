@@ -4,18 +4,19 @@ import {
   runContinuousScheduledCampaignWorker
 } from "@/lib/queue/worker";
 import { applyDemoSafeRuntimeDefaults } from "@/lib/env/defaults";
+import { logger } from "@/lib/observability/logger";
 
 applyDemoSafeRuntimeDefaults();
 
 function logResult(result: Awaited<ReturnType<typeof processDueScheduledCampaignJobs>>, prefix = "SignalStack SMS worker") {
   if (result.blocked) {
-    console.log(
+    logger.info(
       result.reason === "production-worker-blocked"
         ? `${prefix} blocked: worker execution is local/demo-only and disabled in production-like runtimes.`
         : `${prefix} blocked: only dummy provider with live messaging disabled is supported.`
     );
   } else {
-    console.log(`${prefix} processed ${result.processed} scheduled campaign job(s), skipped ${result.skipped}.`);
+    logger.info(`${prefix} processed ${result.processed} scheduled campaign job(s), skipped ${result.skipped}.`);
   }
 }
 
@@ -35,7 +36,7 @@ async function main() {
   process.once("SIGINT", stop);
   process.once("SIGTERM", stop);
 
-  console.log(`SignalStack SMS worker polling every ${options.pollIntervalMs}ms with up to ${options.maxJobsPerPoll} job(s) per poll.`);
+  logger.info(`SignalStack SMS worker polling every ${options.pollIntervalMs}ms with up to ${options.maxJobsPerPoll} job(s) per poll.`);
   await runContinuousScheduledCampaignWorker({
     pollIntervalMs: options.pollIntervalMs,
     maxJobsPerPoll: options.maxJobsPerPoll,
@@ -46,6 +47,6 @@ async function main() {
 }
 
 main().catch((error: unknown) => {
-  console.error(error instanceof Error ? error.message : error);
+  logger.error(error instanceof Error ? error.message : String(error));
   process.exit(1);
 });
