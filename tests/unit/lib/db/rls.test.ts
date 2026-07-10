@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { withTenantRls, rlsIsEnabled, withOptionalTenantRls } from '@/lib/db/rls';
 import { prisma } from '@/lib/db/prisma';
-import { Prisma } from '@prisma/client';
 
 vi.mock('@/lib/db/prisma', () => {
   return {
@@ -47,7 +46,7 @@ describe('rls.ts', () => {
       const mockFn = vi.fn().mockResolvedValue('test-result');
 
       vi.mocked(prisma.$transaction).mockImplementationOnce(async (callback) => {
-        return (callback as any)(mockTx);
+        return (callback as (tx: unknown) => unknown)(mockTx);
       });
 
       const result = await withTenantRls('org-123', mockFn);
@@ -69,7 +68,7 @@ describe('rls.ts', () => {
       const mockFn = vi.fn().mockResolvedValue('test-result');
 
       vi.mocked(prisma.$transaction).mockImplementationOnce(async (callback) => {
-        return (callback as any)(mockTx);
+        return (callback as (tx: unknown) => unknown)(mockTx);
       });
 
       const env = { DATABASE_RLS_ENFORCED: 'true' };
