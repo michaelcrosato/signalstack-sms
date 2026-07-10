@@ -16,11 +16,22 @@ const mocks = vi.hoisted(() => ({
   dummySend: vi.fn(),
   messageUpsert: vi.fn(),
   queueJobFindFirst: vi.fn(),
-  queueJobUpdate: vi.fn()
+  queueJobUpdate: vi.fn(),
+  $transaction: vi.fn(async (args) => {
+    // If it's an array of promises, await them
+    if (Array.isArray(args)) {
+      return Promise.all(args);
+    }
+    // If it's a callback, execute it
+    if (typeof args === "function") {
+      return args(mocks);
+    }
+  })
 }));
 
 vi.mock("@/lib/db/prisma", () => ({
   prisma: {
+    $transaction: mocks.$transaction,
     campaign: {
       findFirst: mocks.campaignFindFirst,
       update: mocks.campaignUpdate
