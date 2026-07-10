@@ -276,22 +276,34 @@ async function syncContactLabels(
   await tx.contactTag.deleteMany({ where: { orgId, contactId } });
   await tx.contactListMember.deleteMany({ where: { orgId, contactId } });
 
-  for (const name of uniqueNames(tagNames)) {
-    const tag = await tx.tag.upsert({
-      where: { orgId_name: { orgId, name } },
-      update: {},
-      create: { orgId, name }
+  const uTags = uniqueNames(tagNames);
+  if (uTags.length > 0) {
+    await tx.tag.createMany({
+      data: uTags.map((name) => ({ orgId, name })),
+      skipDuplicates: true
     });
-    await tx.contactTag.create({ data: { orgId, contactId, tagId: tag.id } });
+    const tags = await tx.tag.findMany({
+      where: { orgId, name: { in: uTags } }
+    });
+    await tx.contactTag.createMany({
+      data: tags.map((tag) => ({ orgId, contactId, tagId: tag.id })),
+      skipDuplicates: true
+    });
   }
 
-  for (const name of uniqueNames(listNames)) {
-    const list = await tx.contactList.upsert({
-      where: { orgId_name: { orgId, name } },
-      update: {},
-      create: { orgId, name }
+  const uLists = uniqueNames(listNames);
+  if (uLists.length > 0) {
+    await tx.contactList.createMany({
+      data: uLists.map((name) => ({ orgId, name })),
+      skipDuplicates: true
     });
-    await tx.contactListMember.create({ data: { orgId, contactId, listId: list.id } });
+    const lists = await tx.contactList.findMany({
+      where: { orgId, name: { in: uLists } }
+    });
+    await tx.contactListMember.createMany({
+      data: lists.map((list) => ({ orgId, contactId, listId: list.id })),
+      skipDuplicates: true
+    });
   }
 }
 
@@ -302,29 +314,33 @@ async function mergeContactLabels(
   tagNames: string[],
   listNames: string[]
 ) {
-  for (const name of uniqueNames(tagNames)) {
-    const tag = await tx.tag.upsert({
-      where: { orgId_name: { orgId, name } },
-      update: {},
-      create: { orgId, name }
+  const uTags = uniqueNames(tagNames);
+  if (uTags.length > 0) {
+    await tx.tag.createMany({
+      data: uTags.map((name) => ({ orgId, name })),
+      skipDuplicates: true
     });
-    await tx.contactTag.upsert({
-      where: { contactId_tagId: { contactId, tagId: tag.id } },
-      update: {},
-      create: { orgId, contactId, tagId: tag.id }
+    const tags = await tx.tag.findMany({
+      where: { orgId, name: { in: uTags } }
+    });
+    await tx.contactTag.createMany({
+      data: tags.map((tag) => ({ orgId, contactId, tagId: tag.id })),
+      skipDuplicates: true
     });
   }
 
-  for (const name of uniqueNames(listNames)) {
-    const list = await tx.contactList.upsert({
-      where: { orgId_name: { orgId, name } },
-      update: {},
-      create: { orgId, name }
+  const uLists = uniqueNames(listNames);
+  if (uLists.length > 0) {
+    await tx.contactList.createMany({
+      data: uLists.map((name) => ({ orgId, name })),
+      skipDuplicates: true
     });
-    await tx.contactListMember.upsert({
-      where: { listId_contactId: { listId: list.id, contactId } },
-      update: {},
-      create: { orgId, listId: list.id, contactId }
+    const lists = await tx.contactList.findMany({
+      where: { orgId, name: { in: uLists } }
+    });
+    await tx.contactListMember.createMany({
+      data: lists.map((list) => ({ orgId, contactId, listId: list.id })),
+      skipDuplicates: true
     });
   }
 }
