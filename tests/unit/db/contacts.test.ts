@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ConsentStatus } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import {
   listContacts,
   listArchivedContacts,
@@ -65,7 +66,7 @@ describe("contacts repository", () => {
     it("returns unarchived contacts for the org", async () => {
       mocks.findMany.mockResolvedValue([defaultContact]);
 
-      const result = await listContacts(orgId, prisma as any);
+      const result = await listContacts(orgId, prisma as unknown as Prisma.TransactionClient);
 
       expect(result).toEqual([defaultContact]);
       expect(mocks.findMany).toHaveBeenCalledWith({
@@ -81,7 +82,7 @@ describe("contacts repository", () => {
       const archivedContact = { ...defaultContact, archivedAt: new Date() };
       mocks.findMany.mockResolvedValue([archivedContact]);
 
-      const result = await listArchivedContacts(orgId, prisma as any);
+      const result = await listArchivedContacts(orgId, prisma as unknown as Prisma.TransactionClient);
 
       expect(result).toEqual([archivedContact]);
       expect(mocks.findMany).toHaveBeenCalledWith({
@@ -96,7 +97,7 @@ describe("contacts repository", () => {
     it("returns a specific contact by id", async () => {
       mocks.findFirst.mockResolvedValue(defaultContact);
 
-      const result = await getContact(orgId, contactId, prisma as any);
+      const result = await getContact(orgId, contactId, prisma as unknown as Prisma.TransactionClient);
 
       expect(result).toEqual(defaultContact);
       expect(mocks.findFirst).toHaveBeenCalledWith({
