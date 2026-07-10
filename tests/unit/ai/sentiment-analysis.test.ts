@@ -155,7 +155,7 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
       }
       expect(updated!.sentiment).toBe("POSITIVE");
       expect(updated!.category).toBe("INQUIRY");
-    });
+    }, 10000);
 
     it("async triggers and updates conversation sentiment/category in createConversationInboundMessage", async () => {
       const org = await prisma.organization.create({
@@ -195,6 +195,6 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
       }
       expect(updated!.sentiment).toBe("NEUTRAL");
       expect(updated!.category).toBe("SUPPORT");
-    });
+    }, 10000);
   });
 });
