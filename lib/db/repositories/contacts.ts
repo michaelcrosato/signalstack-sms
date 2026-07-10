@@ -273,25 +273,41 @@ async function syncContactLabels(
   tagNames: string[],
   listNames: string[]
 ) {
-  await tx.contactTag.deleteMany({ where: { orgId, contactId } });
-  await tx.contactListMember.deleteMany({ where: { orgId, contactId } });
+  await Promise.all([
+    tx.contactTag.deleteMany({ where: { orgId, contactId } }),
+    tx.contactListMember.deleteMany({ where: { orgId, contactId } })
+  ]);
 
-  for (const name of uniqueNames(tagNames)) {
-    const tag = await tx.tag.upsert({
-      where: { orgId_name: { orgId, name } },
-      update: {},
-      create: { orgId, name }
-    });
-    await tx.contactTag.create({ data: { orgId, contactId, tagId: tag.id } });
+  const CHUNK_SIZE = 50;
+
+  const uniqueTagNames = uniqueNames(tagNames);
+  for (let i = 0; i < uniqueTagNames.length; i += CHUNK_SIZE) {
+    const chunk = uniqueTagNames.slice(i, i + CHUNK_SIZE);
+    await Promise.all(
+      chunk.map(async (name) => {
+        const tag = await tx.tag.upsert({
+          where: { orgId_name: { orgId, name } },
+          update: {},
+          create: { orgId, name }
+        });
+        await tx.contactTag.create({ data: { orgId, contactId, tagId: tag.id } });
+      })
+    );
   }
 
-  for (const name of uniqueNames(listNames)) {
-    const list = await tx.contactList.upsert({
-      where: { orgId_name: { orgId, name } },
-      update: {},
-      create: { orgId, name }
-    });
-    await tx.contactListMember.create({ data: { orgId, contactId, listId: list.id } });
+  const uniqueListNames = uniqueNames(listNames);
+  for (let i = 0; i < uniqueListNames.length; i += CHUNK_SIZE) {
+    const chunk = uniqueListNames.slice(i, i + CHUNK_SIZE);
+    await Promise.all(
+      chunk.map(async (name) => {
+        const list = await tx.contactList.upsert({
+          where: { orgId_name: { orgId, name } },
+          update: {},
+          create: { orgId, name }
+        });
+        await tx.contactListMember.create({ data: { orgId, contactId, listId: list.id } });
+      })
+    );
   }
 }
 
@@ -302,30 +318,44 @@ async function mergeContactLabels(
   tagNames: string[],
   listNames: string[]
 ) {
-  for (const name of uniqueNames(tagNames)) {
-    const tag = await tx.tag.upsert({
-      where: { orgId_name: { orgId, name } },
-      update: {},
-      create: { orgId, name }
-    });
-    await tx.contactTag.upsert({
-      where: { contactId_tagId: { contactId, tagId: tag.id } },
-      update: {},
-      create: { orgId, contactId, tagId: tag.id }
-    });
+  const CHUNK_SIZE = 50;
+
+  const uniqueTagNames = uniqueNames(tagNames);
+  for (let i = 0; i < uniqueTagNames.length; i += CHUNK_SIZE) {
+    const chunk = uniqueTagNames.slice(i, i + CHUNK_SIZE);
+    await Promise.all(
+      chunk.map(async (name) => {
+        const tag = await tx.tag.upsert({
+          where: { orgId_name: { orgId, name } },
+          update: {},
+          create: { orgId, name }
+        });
+        await tx.contactTag.upsert({
+          where: { contactId_tagId: { contactId, tagId: tag.id } },
+          update: {},
+          create: { orgId, contactId, tagId: tag.id }
+        });
+      })
+    );
   }
 
-  for (const name of uniqueNames(listNames)) {
-    const list = await tx.contactList.upsert({
-      where: { orgId_name: { orgId, name } },
-      update: {},
-      create: { orgId, name }
-    });
-    await tx.contactListMember.upsert({
-      where: { listId_contactId: { listId: list.id, contactId } },
-      update: {},
-      create: { orgId, listId: list.id, contactId }
-    });
+  const uniqueListNames = uniqueNames(listNames);
+  for (let i = 0; i < uniqueListNames.length; i += CHUNK_SIZE) {
+    const chunk = uniqueListNames.slice(i, i + CHUNK_SIZE);
+    await Promise.all(
+      chunk.map(async (name) => {
+        const list = await tx.contactList.upsert({
+          where: { orgId_name: { orgId, name } },
+          update: {},
+          create: { orgId, name }
+        });
+        await tx.contactListMember.upsert({
+          where: { listId_contactId: { listId: list.id, contactId } },
+          update: {},
+          create: { orgId, listId: list.id, contactId }
+        });
+      })
+    );
   }
 }
 
