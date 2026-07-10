@@ -21,13 +21,13 @@ describe("Worker blocked updates", () => {
   bench("baseline (for-loop with updateMany)", async () => {
     const mockPrisma = {
       campaignRecipient: {
-        updateMany: async () => ({ count: 100 })
+        updateMany: async () => ({ count: 100 }) as unknown
       }
     };
 
     const promises = [];
     for (const [reason, recipientIds] of data) {
-      promises.push(mockPrisma.campaignRecipient.updateMany({
+      promises.push((mockPrisma.campaignRecipient.updateMany as (args: unknown) => unknown)({
         where: { orgId: job.orgId, id: { in: recipientIds } },
         data: { status: "BLOCKED", blockReason: reason }
       }));
@@ -38,13 +38,13 @@ describe("Worker blocked updates", () => {
   bench("optimized (transaction)", async () => {
     const mockPrisma = {
       campaignRecipient: {
-        updateMany: () => ({ count: 100 })
+        updateMany: (() => ({ count: 100 })) as unknown
       },
-      $transaction: async (queries: unknown[]) => queries.map((q) => (q as () => unknown)())
+      $transaction: async (queries: unknown[]) => { for (const q of queries) { await q; } }
     };
 
     const updates = Array.from(data).map(([reason, recipientIds]) =>
-      mockPrisma.campaignRecipient.updateMany({
+      (mockPrisma.campaignRecipient.updateMany as (args: unknown) => unknown)({
         where: { orgId: job.orgId, id: { in: recipientIds } },
         data: { status: "BLOCKED", blockReason: reason }
       })
