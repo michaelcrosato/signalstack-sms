@@ -34,7 +34,7 @@ describe("serializeProviderCredentialRotationsCsv", () => {
     const csv = serializeProviderCredentialRotationsCsv(rotations);
 
     const expectedHeader = "id,provider,action,providerCredentialId,actorUserId,accountSidRedacted,accountSidLast4,fromNumberRedacted,fromNumberLast4,authTokenConfigured,previousAccountSidLast4,previousFromNumberLast4,previousAuthTokenConfigured,source,createdAt";
-    const expectedRow = "\"rot_1\",\"twilio\",\"create\",\"cred_1\",\"user_1\",\"AC***1234\",\"1234\",\"+1***5678\",\"5678\",\"true\",\"\",\"\",\"false\",\"api\",\"2024-01-01T12:00:00.000Z\"";
+    const expectedRow = "\"rot_1\",\"twilio\",\"create\",\"cred_1\",\"user_1\",\"AC***1234\",\"1234\",\"'+1***5678\",\"5678\",\"true\",\"\",\"\",\"false\",\"api\",\"2024-01-01T12:00:00.000Z\"";
 
     expect(csv).toBe(`${expectedHeader}\n${expectedRow}`);
   });

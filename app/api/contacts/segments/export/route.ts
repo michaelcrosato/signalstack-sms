@@ -60,7 +60,10 @@ export async function GET(request: Request) {
     const lists = c.listLinks.map((ll) => ll.list.name).join(";");
 
     const escapeCsv = (val: unknown) => {
-      const str = String(val);
+      let str = String(val);
+      if (/^[=+\-@\t\r]/.test(str)) {
+        str = "'" + str;
+      }
       if (str.includes(",") || str.includes('"') || str.includes("\n")) {
         return `"${str.replace(/"/g, '""')}"`;
       }

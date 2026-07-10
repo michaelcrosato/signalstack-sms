@@ -13,7 +13,10 @@ export type ReadinessAuditExportEvent = {
 const readinessAuditCsvColumns = ["id", "action", "subjectType", "subjectId", "actorUserId", "createdAt", "metadata"];
 
 function csvCell(value: string | null | undefined) {
-  const normalized = value ?? "";
+  let normalized = value ?? "";
+  if (/^[=+\-@\t\r]/.test(normalized)) {
+    normalized = "'" + normalized;
+  }
   return `"${normalized.replace(/"/g, "\"\"")}"`;
 }
 
