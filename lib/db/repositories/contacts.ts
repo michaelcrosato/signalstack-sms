@@ -142,30 +142,30 @@ export async function mergeContacts(orgId: string, targetContactId: string, sour
       ...source.listLinks.map((link) => link.list.name)
     ]);
 
-    const targetCampaignIds = new Set(
-      (await tx.campaignRecipient.findMany({
-        where: { orgId, contactId: target.id },
-        select: { campaignId: true }
-      })).map((recipient) => recipient.campaignId)
-    );
-    const sourceCampaignRecipients = await tx.campaignRecipient.findMany({
-      where: { orgId, contactId: source.id },
-      select: { id: true, campaignId: true }
-    });
+    const targetCampaignIds = (await tx.campaignRecipient.findMany({
+      where: { orgId, contactId: target.id },
+      select: { campaignId: true }
+    })).map((recipient) => recipient.campaignId);
 
-    for (const recipient of sourceCampaignRecipients) {
-      if (targetCampaignIds.has(recipient.campaignId)) {
-        await tx.campaignRecipient.update({
-          where: { id: recipient.id },
-          data: { status: "BLOCKED", blockReason: `Merged into contact ${target.id}` }
-        });
-      } else {
-        await tx.campaignRecipient.update({
-          where: { id: recipient.id },
-          data: { contactId: target.id }
-        });
-      }
+    if (targetCampaignIds.length > 0) {
+      await tx.campaignRecipient.updateMany({
+        where: {
+          orgId,
+          contactId: source.id,
+          campaignId: { in: targetCampaignIds }
+        },
+        data: { status: "BLOCKED", blockReason: `Merged into contact ${target.id}` }
+      });
     }
+
+    await tx.campaignRecipient.updateMany({
+      where: {
+        orgId,
+        contactId: source.id,
+        ...(targetCampaignIds.length > 0 ? { campaignId: { notIn: targetCampaignIds } } : {})
+      },
+      data: { contactId: target.id }
+    });
 
     await tx.conversation.updateMany({ where: { orgId, contactId: source.id }, data: { contactId: target.id } });
     await tx.message.updateMany({ where: { orgId, contactId: source.id }, data: { contactId: target.id } });
