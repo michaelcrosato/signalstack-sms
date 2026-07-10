@@ -198,29 +198,37 @@ export async function importContacts(
       }
     });
 
-    for (const contact of parsed.contacts) {
-      const existing = await tx.contact.findUnique({
-        where: { orgId_phone: { orgId, phone: contact.phone } }
-      });
-
-      if (existing) {
-        verifyConsentEvidenceImmutability(existing, contact);
+    const existingContacts = await tx.contact.findMany({
+      where: {
+        orgId,
+        phone: { in: parsed.contacts.map((c) => c.phone) }
       }
+    });
+    const existingByPhone = new Map(existingContacts.map((c) => [c.phone, c]));
 
-      const saved = await tx.contact.upsert({
-        where: { orgId_phone: { orgId, phone: contact.phone } },
-        update: contactWriteData(contact),
-        create: { orgId, phone: contact.phone, ...contactWriteData(contact) }
-      });
+    await Promise.all(
+      parsed.contacts.map(async (contact) => {
+        const existing = existingByPhone.get(contact.phone);
 
-      if (saved.consentStatus === ConsentStatus.PENDING_DOUBLE_OPT_IN) {
-        if (!existing || existing.consentStatus !== ConsentStatus.PENDING_DOUBLE_OPT_IN) {
-          await sendDoubleOptInRequest(tx, orgId, saved.id, saved.phone);
+        if (existing) {
+          verifyConsentEvidenceImmutability(existing, contact);
         }
-      }
 
-      await syncContactLabels(tx, orgId, saved.id, contact.tagNames, contact.listNames);
-    }
+        const saved = await tx.contact.upsert({
+          where: { orgId_phone: { orgId, phone: contact.phone } },
+          update: contactWriteData(contact),
+          create: { orgId, phone: contact.phone, ...contactWriteData(contact) }
+        });
+
+        if (saved.consentStatus === ConsentStatus.PENDING_DOUBLE_OPT_IN) {
+          if (!existing || existing.consentStatus !== ConsentStatus.PENDING_DOUBLE_OPT_IN) {
+            await sendDoubleOptInRequest(tx, orgId, saved.id, saved.phone);
+          }
+        }
+
+        await syncContactLabels(tx, orgId, saved.id, contact.tagNames, contact.listNames);
+      })
+    );
 
     return tx.contactImport.update({
       where: { id: importRecord.id },

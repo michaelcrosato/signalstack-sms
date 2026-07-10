@@ -5,6 +5,7 @@ import { upsertContact, updateContact, importContacts } from "@/lib/db/repositor
 const mocks = vi.hoisted(() => ({
   transaction: vi.fn(),
   findUnique: vi.fn(),
+  findMany: vi.fn(),
   findFirst: vi.fn(),
   upsert: vi.fn(),
   update: vi.fn(),
@@ -73,6 +74,7 @@ describe("consent evidence write-once immutability", () => {
       callback({
         contact: {
           findUnique: mocks.findUnique,
+          findMany: mocks.findMany,
           findFirst: mocks.findFirst,
           upsert: mocks.upsert,
           update: mocks.update,
@@ -310,7 +312,7 @@ describe("consent evidence write-once immutability", () => {
 
   describe("importContacts", () => {
     it("allows first capture on import", async () => {
-      mocks.findUnique.mockResolvedValue(null);
+      mocks.findMany.mockResolvedValue([]);
       mocks.upsert.mockResolvedValue(existingWithEvidence);
 
       const parsed = {
@@ -335,7 +337,7 @@ describe("consent evidence write-once immutability", () => {
     });
 
     it("rejects changing already set evidence on import", async () => {
-      mocks.findUnique.mockResolvedValue(existingWithEvidence);
+      mocks.findMany.mockResolvedValue([existingWithEvidence]);
 
       const parsed = {
         contacts: [
