@@ -10,7 +10,7 @@ describe("complianceProfileUpdateSchema", () => {
       optInDescription: "Users opt in via our website form.",
       privacyPolicyUrl: "https://example.com/privacy",
       termsOfServiceUrl: "https://example.com/terms",
-      a2pRegistrationStatus: A2pRegistrationStatus.REGISTERED
+      a2pRegistrationStatus: A2pRegistrationStatus.APPROVED
     };
 
     expect(complianceProfileUpdateSchema.parse(validData)).toEqual(validData);
