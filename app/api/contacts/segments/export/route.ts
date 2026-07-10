@@ -3,6 +3,7 @@ import { ConsentStatus } from "@prisma/client";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { evaluateSegmentContacts, type SegmentFilter } from "@/lib/db/repositories/segments";
 import { withOptionalTenantRls } from "@/lib/db/rls";
+import { escapeCsv } from "@/lib/csv/escape";
 
 
 const segmentFilterSchema = z.object({
@@ -58,14 +59,6 @@ export async function GET(request: Request) {
     const leadScore = c.leadScore !== null && c.leadScore !== undefined ? c.leadScore : "";
     const tags = c.tagLinks.map((tl) => tl.tag.name).join(";");
     const lists = c.listLinks.map((ll) => ll.list.name).join(";");
-
-    const escapeCsv = (val: unknown) => {
-      const str = String(val);
-      if (str.includes(",") || str.includes('"') || str.includes("\n")) {
-        return `"${str.replace(/"/g, '""')}"`;
-      }
-      return str;
-    };
 
     csvContent += `${escapeCsv(c.phone)},${escapeCsv(email)},${escapeCsv(firstName)},${escapeCsv(lastName)},${escapeCsv(displayName)},${escapeCsv(consentStatus)},${escapeCsv(leadScore)},${escapeCsv(tags)},${escapeCsv(lists)}\n`;
   }

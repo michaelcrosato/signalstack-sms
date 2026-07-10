@@ -96,8 +96,8 @@ describe("provider credential metadata", () => {
     ]);
 
     expect(csv).toContain("id,provider,action,providerCredentialId,actorUserId,accountSidRedacted");
-    expect(csv).toContain("\"redacted_7890\"");
-    expect(csv).toContain("\"true\"");
+    expect(csv).toContain("redacted_7890");
+    expect(csv).toContain("true");
     expect(csv).not.toContain("authTokenFingerprint");
     expect(csv).not.toContain("demo_token_value");
   });

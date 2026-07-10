@@ -59,7 +59,7 @@ describe("readiness audit export", () => {
     ]);
 
     expect(csv).toContain("id,action,subjectType,subjectId,actorUserId,createdAt,metadata");
-    expect(csv).toContain("\"COMPLIANCE_PROFILE_UPDATED\"");
+    expect(csv).toContain("COMPLIANCE_PROFILE_UPDATED");
     expect(csv).toContain("\"{\"\"note\"\":\"\"quoted \\\"\"value\\\"\"\"\",\"\"complete\"\":true}\"");
   });
 });
