@@ -35,7 +35,10 @@ const providerCredentialRotationCsvColumns = [
 ];
 
 function csvCell(value: string | boolean | null | undefined) {
-  const normalized = value === undefined || value === null ? "" : String(value);
+  let normalized = value === undefined || value === null ? "" : String(value);
+  if (/^[=+\-@]/.test(normalized)) {
+    normalized = "'" + normalized;
+  }
   return `"${normalized.replace(/"/g, "\"\"")}"`;
 }
 
