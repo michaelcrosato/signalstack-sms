@@ -27,7 +27,7 @@ describe("getOrganizationSummary", () => {
       }
     };
 
-    vi.mocked(prisma.organization.findUnique).mockResolvedValue(mockOrg as any);
+    vi.mocked(prisma.organization.findUnique).mockResolvedValue(mockOrg as unknown as null);
 
     const result = await getOrganizationSummary("org1");
 
