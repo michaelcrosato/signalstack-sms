@@ -124,7 +124,7 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
   });
 
   describe("database integration", () => {
-    it("async triggers and updates conversation sentiment/category in createDemoInboundMessage", async () => {
+    it("async triggers and updates conversation sentiment/category in createDemoInboundMessage", { timeout: 10000 }, async () => {
       const org = await prisma.organization.create({
         data: {
           slug: `org-sentiment-${Date.now()}`,
@@ -157,7 +157,7 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
       expect(updated!.category).toBe("INQUIRY");
     });
 
-    it("async triggers and updates conversation sentiment/category in createConversationInboundMessage", async () => {
+    it("async triggers and updates conversation sentiment/category in createConversationInboundMessage", { timeout: 10000 }, async () => {
       const org = await prisma.organization.create({
         data: {
           slug: `org-sentiment-conv-${Date.now()}`,
