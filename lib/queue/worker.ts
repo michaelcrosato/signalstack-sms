@@ -341,31 +341,37 @@ async function processScheduledCampaignQueueJob(
     return { processed: 0, skipped: 1, blocked: false, reason: "send-preflight-failed" };
   }
 
-  for (const recipient of sendableRecipients) {
-    const idempotencyKey = outboundCampaignMessageIdempotencyKey(job.orgId, job.id, recipient.contactId);
-    const body = renderTemplate(campaign.body, campaignMessageValues(recipient.contact));
-    const result = await dummyProvider.send({
-      to: recipient.contact.phone,
-      from: "demo-signalstack",
-      body,
-      orgId: job.orgId,
-      idempotencyKey
-    });
+  const BATCH_SIZE = 50;
+  for (let i = 0; i < sendableRecipients.length; i += BATCH_SIZE) {
+    const batch = sendableRecipients.slice(i, i + BATCH_SIZE);
+    await Promise.all(
+      batch.map(async (recipient) => {
+        const idempotencyKey = outboundCampaignMessageIdempotencyKey(job.orgId, job.id, recipient.contactId);
+        const body = renderTemplate(campaign.body, campaignMessageValues(recipient.contact));
+        const result = await dummyProvider.send({
+          to: recipient.contact.phone,
+          from: "demo-signalstack",
+          body,
+          orgId: job.orgId,
+          idempotencyKey
+        });
 
-    await prisma.message.upsert({
-      where: { orgId_idempotencyKey: { orgId: job.orgId, idempotencyKey } },
-      update: {},
-      create: {
-        orgId: job.orgId,
-        contactId: recipient.contactId,
-        campaignId: campaign.id,
-        direction: "OUTBOUND",
-        body,
-        providerMessageId: result.providerMessageId,
-        providerStatus: result.status,
-        idempotencyKey
-      }
-    });
+        await prisma.message.upsert({
+          where: { orgId_idempotencyKey: { orgId: job.orgId, idempotencyKey } },
+          update: {},
+          create: {
+            orgId: job.orgId,
+            contactId: recipient.contactId,
+            campaignId: campaign.id,
+            direction: "OUTBOUND",
+            body,
+            providerMessageId: result.providerMessageId,
+            providerStatus: result.status,
+            idempotencyKey
+          }
+        });
+      })
+    );
   }
 
   await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.COMPLETED } });
