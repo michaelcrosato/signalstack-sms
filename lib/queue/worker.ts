@@ -324,14 +324,20 @@ async function processScheduledCampaignQueueJob(
     blockedRecipientsByReason.get(reason)!.push(recipient.id);
   }
 
+  const blockedRecipientUpdates = [];
   for (const [reason, recipientIds] of blockedRecipientsByReason) {
-    await prisma.campaignRecipient.updateMany({
-      where: { orgId: job.orgId, id: { in: recipientIds } },
-      data: {
-        status: CampaignRecipientStatus.BLOCKED,
-        blockReason: reason
-      }
-    });
+    blockedRecipientUpdates.push(
+      prisma.campaignRecipient.updateMany({
+        where: { orgId: job.orgId, id: { in: recipientIds } },
+        data: {
+          status: CampaignRecipientStatus.BLOCKED,
+          blockReason: reason
+        }
+      })
+    );
+  }
+  if (blockedRecipientUpdates.length > 0) {
+    await prisma.$transaction(blockedRecipientUpdates);
   }
 
   if (sendableRecipients.length === 0) {

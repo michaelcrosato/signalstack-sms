@@ -16,11 +16,13 @@ const mocks = vi.hoisted(() => ({
   dummySend: vi.fn(),
   messageUpsert: vi.fn(),
   queueJobFindFirst: vi.fn(),
-  queueJobUpdate: vi.fn()
+  queueJobUpdate: vi.fn(),
+  transaction: vi.fn((promises) => Promise.all(promises))
 }));
 
 vi.mock("@/lib/db/prisma", () => ({
   prisma: {
+    $transaction: mocks.transaction,
     campaign: {
       findFirst: mocks.campaignFindFirst,
       update: mocks.campaignUpdate
