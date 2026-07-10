@@ -276,24 +276,22 @@ async function syncContactLabels(
   await tx.contactTag.deleteMany({ where: { orgId, contactId } });
   await tx.contactListMember.deleteMany({ where: { orgId, contactId } });
 
-  const uTagNames = uniqueNames(tagNames);
-  if (uTagNames.length > 0) {
-    const tags = await Promise.all(uTagNames.map(name => tx.tag.upsert({
+  for (const name of uniqueNames(tagNames)) {
+    const tag = await tx.tag.upsert({
       where: { orgId_name: { orgId, name } },
       update: {},
       create: { orgId, name }
-    })));
-    await tx.contactTag.createMany({ data: tags.map(tag => ({ orgId, contactId, tagId: tag.id })) });
+    });
+    await tx.contactTag.create({ data: { orgId, contactId, tagId: tag.id } });
   }
 
-  const uListNames = uniqueNames(listNames);
-  if (uListNames.length > 0) {
-    const lists = await Promise.all(uListNames.map(name => tx.contactList.upsert({
+  for (const name of uniqueNames(listNames)) {
+    const list = await tx.contactList.upsert({
       where: { orgId_name: { orgId, name } },
       update: {},
       create: { orgId, name }
-    })));
-    await tx.contactListMember.createMany({ data: lists.map(list => ({ orgId, contactId, listId: list.id })) });
+    });
+    await tx.contactListMember.create({ data: { orgId, contactId, listId: list.id } });
   }
 }
 
