@@ -28,6 +28,11 @@ vi.mock("@/lib/db/prisma", () => ({
     campaignRecipient: {
       updateMany: mocks.campaignRecipientUpdateMany
     },
+    $transaction: async (queries) => {
+      for (const q of queries) {
+        await q;
+      }
+    },
     message: {
       upsert: mocks.messageUpsert
     },
