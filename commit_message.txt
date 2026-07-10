@@ -1,0 +1,3 @@
+refactor: optimize tag and list association queries
+
+Replaced sequential N+1 UPSERT queries for tags and lists in `syncContactLabels` and `mergeContactLabels` with batch `createMany` queries with `skipDuplicates: true`. This decreases the database round-trips from O(N) to O(1).
