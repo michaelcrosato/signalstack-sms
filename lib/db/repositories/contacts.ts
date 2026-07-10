@@ -276,23 +276,23 @@ async function syncContactLabels(
   await tx.contactTag.deleteMany({ where: { orgId, contactId } });
   await tx.contactListMember.deleteMany({ where: { orgId, contactId } });
 
-  for (const name of uniqueNames(tagNames)) {
+  await Promise.all(uniqueNames(tagNames).map(async (name) => {
     const tag = await tx.tag.upsert({
       where: { orgId_name: { orgId, name } },
       update: {},
       create: { orgId, name }
     });
     await tx.contactTag.create({ data: { orgId, contactId, tagId: tag.id } });
-  }
+  }));
 
-  for (const name of uniqueNames(listNames)) {
+  await Promise.all(uniqueNames(listNames).map(async (name) => {
     const list = await tx.contactList.upsert({
       where: { orgId_name: { orgId, name } },
       update: {},
       create: { orgId, name }
     });
     await tx.contactListMember.create({ data: { orgId, contactId, listId: list.id } });
-  }
+  }));
 }
 
 async function mergeContactLabels(
@@ -302,7 +302,7 @@ async function mergeContactLabels(
   tagNames: string[],
   listNames: string[]
 ) {
-  for (const name of uniqueNames(tagNames)) {
+  await Promise.all(uniqueNames(tagNames).map(async (name) => {
     const tag = await tx.tag.upsert({
       where: { orgId_name: { orgId, name } },
       update: {},
@@ -313,9 +313,9 @@ async function mergeContactLabels(
       update: {},
       create: { orgId, contactId, tagId: tag.id }
     });
-  }
+  }));
 
-  for (const name of uniqueNames(listNames)) {
+  await Promise.all(uniqueNames(listNames).map(async (name) => {
     const list = await tx.contactList.upsert({
       where: { orgId_name: { orgId, name } },
       update: {},
@@ -326,7 +326,7 @@ async function mergeContactLabels(
       update: {},
       create: { orgId, listId: list.id, contactId }
     });
-  }
+  }));
 }
 
 function mergedConsentData(
