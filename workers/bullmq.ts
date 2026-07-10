@@ -1,4 +1,5 @@
 import { applyDemoSafeRuntimeDefaults } from "@/lib/env/defaults";
+import { logger } from "@/lib/observability/logger";
 import { startScheduledCampaignBullMqWorker } from "@/lib/queue/bullmq-worker";
 
 applyDemoSafeRuntimeDefaults();
@@ -6,11 +7,11 @@ applyDemoSafeRuntimeDefaults();
 async function main() {
   const result = startScheduledCampaignBullMqWorker(process.env);
   if (!result.started) {
-    console.log(`SignalStack SMS BullMQ worker blocked: ${result.reason}.`);
+    logger.info(`SignalStack SMS BullMQ worker blocked: ${result.reason}.`);
     return;
   }
 
-  console.log("SignalStack SMS BullMQ worker started for scheduled campaign jobs.");
+  logger.info("SignalStack SMS BullMQ worker started for scheduled campaign jobs.");
 
   await new Promise<void>((resolve) => {
     const stop = async () => {
@@ -24,6 +25,6 @@ async function main() {
 }
 
 main().catch((error: unknown) => {
-  console.error(error instanceof Error ? error.message : error);
+  logger.error(error instanceof Error ? error.message : String(error));
   process.exit(1);
 });
