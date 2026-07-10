@@ -87,6 +87,7 @@ describe("Message Template Variable Substitution Validator & Preview Seam", () =
     expect(json.unused).toEqual([]);
   });
 
+
   it("returns 404 for non-existent templates", async () => {
     mocks.getOrCreateCurrentOrg.mockResolvedValue({
       orgId: "some_org",
@@ -106,5 +107,13 @@ describe("Message Template Variable Substitution Validator & Preview Seam", () =
 
     const response = await previewTemplateRoute(request);
     expect(response.status).toBe(404);
+  });
+
+  it("escapes HTML in template variables to prevent XSS", () => {
+    const body = "Welcome {{name}}!";
+    const res = renderTemplatePreview(body, { name: '<script>alert("XSS")</script>' });
+
+    expect(res.success).toBe(true);
+    expect(res.rendered).toBe("Welcome &lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;!");
   });
 });
