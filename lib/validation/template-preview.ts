@@ -2,6 +2,16 @@
  * Render template body by replacing placeholders in the format {{variableName}} with values.
  * Returns the fully rendered output and lists of missing or unused variables.
  */
+
+function escapeHTML(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 export function renderTemplatePreview(body: string, variables: Record<string, string>) {
   const missing: string[] = [];
   const unused = new Set(Object.keys(variables));
@@ -15,7 +25,8 @@ export function renderTemplatePreview(body: string, variables: Record<string, st
   for (const key of requiredKeys) {
     if (key in variables) {
       const val = variables[key] ?? "";
-      rendered = rendered.replaceAll(`{{${key}}}`, val);
+      const escapedVal = escapeHTML(val);
+      rendered = rendered.replaceAll(`{{${key}}}`, escapedVal);
       unused.delete(key);
     } else {
       missing.push(key);
