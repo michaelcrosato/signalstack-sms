@@ -47,7 +47,15 @@ export async function GET(request: Request) {
   });
 
   // Build CSV content
-  let csvContent = "Phone,Email,FirstName,LastName,DisplayName,ConsentStatus,LeadScore,Tags,Lists\n";
+  const csvLines = ["Phone,Email,FirstName,LastName,DisplayName,ConsentStatus,LeadScore,Tags,Lists"];
+
+  const escapeCsv = (val: unknown) => {
+    const str = String(val);
+    if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
 
   for (const c of contacts) {
     const email = c.email || "";
@@ -59,18 +67,10 @@ export async function GET(request: Request) {
     const tags = c.tagLinks.map((tl) => tl.tag.name).join(";");
     const lists = c.listLinks.map((ll) => ll.list.name).join(";");
 
-    const escapeCsv = (val: unknown) => {
-      const str = String(val);
-      if (str.includes(",") || str.includes('"') || str.includes("\n")) {
-        return `"${str.replace(/"/g, '""')}"`;
-      }
-      return str;
-    };
-
-    csvContent += `${escapeCsv(c.phone)},${escapeCsv(email)},${escapeCsv(firstName)},${escapeCsv(lastName)},${escapeCsv(displayName)},${escapeCsv(consentStatus)},${escapeCsv(leadScore)},${escapeCsv(tags)},${escapeCsv(lists)}\n`;
+    csvLines.push(`${escapeCsv(c.phone)},${escapeCsv(email)},${escapeCsv(firstName)},${escapeCsv(lastName)},${escapeCsv(displayName)},${escapeCsv(consentStatus)},${escapeCsv(leadScore)},${escapeCsv(tags)},${escapeCsv(lists)}`);
   }
 
-  return new Response(csvContent, {
+  return new Response(csvLines.join("\n") + "\n", {
     status: 200,
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
