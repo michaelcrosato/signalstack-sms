@@ -97,4 +97,13 @@ describe("recordWebhookEvent", () => {
 
     await expect(recordWebhookEvent(webhookInput)).rejects.toBe(persistenceError);
   });
+
+  it("rethrows unique constraint errors if a concurrent duplicate is ultimately not found", async () => {
+    const uniqueConstraintError = Object.assign(new Error("Unique constraint failed"), { code: "P2002" });
+    mocks.webhookEventFindUnique.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
+    mocks.webhookEventCreate.mockRejectedValue(uniqueConstraintError);
+
+    await expect(recordWebhookEvent(webhookInput)).rejects.toBe(uniqueConstraintError);
+    expect(mocks.webhookEventFindUnique).toHaveBeenCalledTimes(2);
+  });
 });
