@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { prisma } from "@/lib/db/prisma";
 import { persistContactLeadQualification } from "@/lib/db/repositories/lead-qualification";
 
-function fakeDb(conversation: { contactId: string } | null) {
+function fakeDb(conversation: { contactId: string | null } | null) {
   return {
     conversation: { findFirst: vi.fn().mockResolvedValue(conversation) },
     contact: { updateMany: vi.fn().mockResolvedValue({ count: conversation ? 1 : 0 }) }
@@ -32,6 +32,19 @@ describe("persistContactLeadQualification (tenant-scoped)", () => {
       "org1",
       "missing",
       { score: 10, stage: "NURTURE" },
+      db as unknown as typeof prisma
+    );
+
+    expect(ok).toBe(false);
+    expect(db.contact.updateMany).not.toHaveBeenCalled();
+  });
+
+  it("returns false and writes nothing when the conversation has no contactId", async () => {
+    const db = fakeDb({ contactId: null });
+    const ok = await persistContactLeadQualification(
+      "org1",
+      "conv1",
+      { score: 50, stage: "COLD" },
       db as unknown as typeof prisma
     );
 
