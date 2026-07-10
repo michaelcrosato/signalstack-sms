@@ -25,8 +25,8 @@ describe("ReadinessAudit repository", () => {
 
       const input = {
         actorUserId: "user-1",
-        action: "TEST_ACTION",
-        subjectType: "TEST_SUBJECT",
+        action: "PROVIDER_NUMBER_UPSERTED",
+        subjectType: "ProviderPhoneNumber",
         subjectId: "sub-1",
         metadata: { key: "value" }
       };
@@ -37,8 +37,8 @@ describe("ReadinessAudit repository", () => {
         data: {
           orgId: "org-1",
           actorUserId: "user-1",
-          action: "TEST_ACTION",
-          subjectType: "TEST_SUBJECT",
+          action: "PROVIDER_NUMBER_UPSERTED",
+          subjectType: "ProviderPhoneNumber",
           subjectId: "sub-1",
           metadata: { key: "value" }
         }
@@ -49,8 +49,8 @@ describe("ReadinessAudit repository", () => {
     it("should create an event omitting optional fields if not provided", async () => {
       mockPrisma.liveReadinessAuditEvent.create.mockResolvedValue({} as never);
       const input = {
-        action: "TEST_ACTION",
-        subjectType: "TEST_SUBJECT",
+        action: "PROVIDER_NUMBER_UPSERTED",
+        subjectType: "ProviderPhoneNumber",
       };
 
       await recordLiveReadinessAuditEvent("org-1", input);
@@ -59,8 +59,8 @@ describe("ReadinessAudit repository", () => {
         data: {
           orgId: "org-1",
           actorUserId: undefined,
-          action: "TEST_ACTION",
-          subjectType: "TEST_SUBJECT",
+          action: "PROVIDER_NUMBER_UPSERTED",
+          subjectType: "ProviderPhoneNumber",
           subjectId: undefined,
           metadata: undefined
         }
@@ -98,10 +98,10 @@ describe("ReadinessAudit repository", () => {
     it("should apply action filter when provided", async () => {
       mockPrisma.liveReadinessAuditEvent.findMany.mockResolvedValue([] as never);
 
-      await listLiveReadinessAuditEvents("org-1", 50, { action: "LOGIN" });
+      await listLiveReadinessAuditEvents("org-1", 50, { action: "COMPLIANCE_PROFILE_UPDATED" });
 
       expect(mockPrisma.liveReadinessAuditEvent.findMany).toHaveBeenCalledWith({
-        where: { orgId: "org-1", action: "LOGIN" },
+        where: { orgId: "org-1", action: "COMPLIANCE_PROFILE_UPDATED" },
         orderBy: { createdAt: "desc" },
         take: 50
       });
@@ -110,10 +110,10 @@ describe("ReadinessAudit repository", () => {
     it("should apply subjectType filter when provided", async () => {
       mockPrisma.liveReadinessAuditEvent.findMany.mockResolvedValue([] as never);
 
-      await listLiveReadinessAuditEvents("org-1", 50, { subjectType: "USER" });
+      await listLiveReadinessAuditEvents("org-1", 50, { subjectType: "ComplianceProfile" });
 
       expect(mockPrisma.liveReadinessAuditEvent.findMany).toHaveBeenCalledWith({
-        where: { orgId: "org-1", subjectType: "USER" },
+        where: { orgId: "org-1", subjectType: "ComplianceProfile" },
         orderBy: { createdAt: "desc" },
         take: 50
       });
@@ -122,10 +122,10 @@ describe("ReadinessAudit repository", () => {
     it("should apply both action and subjectType filters when provided", async () => {
       mockPrisma.liveReadinessAuditEvent.findMany.mockResolvedValue([] as never);
 
-      await listLiveReadinessAuditEvents("org-1", 50, { action: "LOGIN", subjectType: "USER" });
+      await listLiveReadinessAuditEvents("org-1", 50, { action: "COMPLIANCE_PROFILE_UPDATED", subjectType: "ComplianceProfile" });
 
       expect(mockPrisma.liveReadinessAuditEvent.findMany).toHaveBeenCalledWith({
-        where: { orgId: "org-1", action: "LOGIN", subjectType: "USER" },
+        where: { orgId: "org-1", action: "COMPLIANCE_PROFILE_UPDATED", subjectType: "ComplianceProfile" },
         orderBy: { createdAt: "desc" },
         take: 50
       });
