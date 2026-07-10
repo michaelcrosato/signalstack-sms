@@ -4,13 +4,20 @@ import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { evaluateSegmentContacts, type SegmentFilter } from "@/lib/db/repositories/segments";
 import { withOptionalTenantRls } from "@/lib/db/rls";
 
-
 const segmentFilterSchema = z.object({
   tagNames: z.array(z.string()).optional(),
   consentStatuses: z.array(z.nativeEnum(ConsentStatus)).optional(),
   minLeadScore: z.number().int().optional(),
   maxLeadScore: z.number().int().optional(),
 });
+
+const escapeCsv = (val: unknown) => {
+  const str = String(val);
+  if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+};
 
 export async function GET(request: Request) {
   const currentOrg = await getOrCreateCurrentOrg();
@@ -47,7 +54,7 @@ export async function GET(request: Request) {
   });
 
   // Build CSV content
-  let csvContent = "Phone,Email,FirstName,LastName,DisplayName,ConsentStatus,LeadScore,Tags,Lists\n";
+  const csvRows: string[] = ["Phone,Email,FirstName,LastName,DisplayName,ConsentStatus,LeadScore,Tags,Lists"];
 
   for (const c of contacts) {
     const email = c.email || "";
@@ -59,16 +66,10 @@ export async function GET(request: Request) {
     const tags = c.tagLinks.map((tl) => tl.tag.name).join(";");
     const lists = c.listLinks.map((ll) => ll.list.name).join(";");
 
-    const escapeCsv = (val: unknown) => {
-      const str = String(val);
-      if (str.includes(",") || str.includes('"') || str.includes("\n")) {
-        return `"${str.replace(/"/g, '""')}"`;
-      }
-      return str;
-    };
-
-    csvContent += `${escapeCsv(c.phone)},${escapeCsv(email)},${escapeCsv(firstName)},${escapeCsv(lastName)},${escapeCsv(displayName)},${escapeCsv(consentStatus)},${escapeCsv(leadScore)},${escapeCsv(tags)},${escapeCsv(lists)}\n`;
+    csvRows.push(`${escapeCsv(c.phone)},${escapeCsv(email)},${escapeCsv(firstName)},${escapeCsv(lastName)},${escapeCsv(displayName)},${escapeCsv(consentStatus)},${escapeCsv(leadScore)},${escapeCsv(tags)},${escapeCsv(lists)}`);
   }
+
+  const csvContent = csvRows.join("\n") + "\n";
 
   return new Response(csvContent, {
     status: 200,
