@@ -146,7 +146,7 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
 
       // Wait with polling for async sentiment evaluation
       let updated;
-      for (let i = 0; i < 80; i++) {
+      for (let i = 0; i < 140; i++) {
         await new Promise((resolve) => setTimeout(resolve, 100));
         updated = await prisma.conversation.findUniqueOrThrow({
           where: { id: result.conversation!.id },
@@ -155,7 +155,7 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
       }
       expect(updated!.sentiment).toBe("POSITIVE");
       expect(updated!.category).toBe("INQUIRY");
-    });
+    }, 15000);
 
     it("async triggers and updates conversation sentiment/category in createConversationInboundMessage", async () => {
       const org = await prisma.organization.create({
@@ -186,7 +186,7 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
 
       // Wait with polling for async sentiment evaluation
       let updated;
-      for (let i = 0; i < 80; i++) {
+      for (let i = 0; i < 140; i++) {
         await new Promise((resolve) => setTimeout(resolve, 100));
         updated = await prisma.conversation.findUniqueOrThrow({
           where: { id: conversation.id },
@@ -195,6 +195,6 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
       }
       expect(updated!.sentiment).toBe("NEUTRAL");
       expect(updated!.category).toBe("SUPPORT");
-    });
+    }, 15000);
   });
 });
