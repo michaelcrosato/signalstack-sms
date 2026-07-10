@@ -153,18 +153,29 @@ export async function mergeContacts(orgId: string, targetContactId: string, sour
       select: { id: true, campaignId: true }
     });
 
+    const blockedIds: string[] = [];
+    const moveIds: string[] = [];
+
     for (const recipient of sourceCampaignRecipients) {
       if (targetCampaignIds.has(recipient.campaignId)) {
-        await tx.campaignRecipient.update({
-          where: { id: recipient.id },
-          data: { status: "BLOCKED", blockReason: `Merged into contact ${target.id}` }
-        });
+        blockedIds.push(recipient.id);
       } else {
-        await tx.campaignRecipient.update({
-          where: { id: recipient.id },
-          data: { contactId: target.id }
-        });
+        moveIds.push(recipient.id);
       }
+    }
+
+    if (blockedIds.length > 0) {
+      await tx.campaignRecipient.updateMany({
+        where: { id: { in: blockedIds } },
+        data: { status: "BLOCKED", blockReason: `Merged into contact ${target.id}` }
+      });
+    }
+
+    if (moveIds.length > 0) {
+      await tx.campaignRecipient.updateMany({
+        where: { id: { in: moveIds } },
+        data: { contactId: target.id }
+      });
     }
 
     await tx.conversation.updateMany({ where: { orgId, contactId: source.id }, data: { contactId: target.id } });
