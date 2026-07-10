@@ -100,7 +100,6 @@ test.describe("Challenger verification", () => {
     const warnings = consoleLogs.filter((log) => 
       (log.includes("warning") || log.includes("key")) && log.includes("each child in a list")
     );
-    console.log("Captured console logs:", consoleLogs);
     expect(warnings.length).toBe(0);
   });
 });
