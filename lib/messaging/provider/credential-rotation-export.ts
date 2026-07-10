@@ -31,15 +31,21 @@ const providerCredentialRotationCsvColumns = [
   "previousFromNumberLast4",
   "previousAuthTokenConfigured",
   "source",
-  "createdAt"
+  "createdAt",
 ];
 
 function csvCell(value: string | boolean | null | undefined) {
   const normalized = value === undefined || value === null ? "" : String(value);
-  return `"${normalized.replace(/"/g, "\"\"")}"`;
+  let safeValue = normalized.replace(/"/g, '""');
+  if (/^[=+\-@]/.test(safeValue)) {
+    safeValue = "'" + safeValue;
+  }
+  return `"${safeValue}"`;
 }
 
-export function serializeProviderCredentialRotationsCsv(rotations: ProviderCredentialRotationExportRow[]) {
+export function serializeProviderCredentialRotationsCsv(
+  rotations: ProviderCredentialRotationExportRow[],
+) {
   const rows = rotations.map((rotation) =>
     [
       rotation.id,
@@ -56,10 +62,10 @@ export function serializeProviderCredentialRotationsCsv(rotations: ProviderCrede
       rotation.previousFromNumberLast4,
       rotation.previousAuthTokenConfigured,
       rotation.source,
-      rotation.createdAt.toISOString()
+      rotation.createdAt.toISOString(),
     ]
       .map(csvCell)
-      .join(",")
+      .join(","),
   );
 
   return [providerCredentialRotationCsvColumns.join(","), ...rows].join("\n");

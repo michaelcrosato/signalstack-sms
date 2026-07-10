@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { serializeProviderCredentialRotationsCsv, ProviderCredentialRotationExportRow } from "@/lib/messaging/provider/credential-rotation-export";
+import {
+  serializeProviderCredentialRotationsCsv,
+  ProviderCredentialRotationExportRow,
+} from "@/lib/messaging/provider/credential-rotation-export";
 
 describe("serializeProviderCredentialRotationsCsv", () => {
   it("serializes an empty array", () => {
     const rotations: ProviderCredentialRotationExportRow[] = [];
     const csv = serializeProviderCredentialRotationsCsv(rotations);
     expect(csv).toBe(
-      "id,provider,action,providerCredentialId,actorUserId,accountSidRedacted,accountSidLast4,fromNumberRedacted,fromNumberLast4,authTokenConfigured,previousAccountSidLast4,previousFromNumberLast4,previousAuthTokenConfigured,source,createdAt"
+      "id,provider,action,providerCredentialId,actorUserId,accountSidRedacted,accountSidLast4,fromNumberRedacted,fromNumberLast4,authTokenConfigured,previousAccountSidLast4,previousFromNumberLast4,previousAuthTokenConfigured,source,createdAt",
     );
   });
 
@@ -27,22 +30,54 @@ describe("serializeProviderCredentialRotationsCsv", () => {
         previousFromNumberLast4: null,
         previousAuthTokenConfigured: false,
         source: "api",
-        createdAt: new Date("2024-01-01T12:00:00Z")
-      }
+        createdAt: new Date("2024-01-01T12:00:00Z"),
+      },
     ];
 
     const csv = serializeProviderCredentialRotationsCsv(rotations);
 
-    const expectedHeader = "id,provider,action,providerCredentialId,actorUserId,accountSidRedacted,accountSidLast4,fromNumberRedacted,fromNumberLast4,authTokenConfigured,previousAccountSidLast4,previousFromNumberLast4,previousAuthTokenConfigured,source,createdAt";
-    const expectedRow = "\"rot_1\",\"twilio\",\"create\",\"cred_1\",\"user_1\",\"AC***1234\",\"1234\",\"+1***5678\",\"5678\",\"true\",\"\",\"\",\"false\",\"api\",\"2024-01-01T12:00:00.000Z\"";
+    const expectedHeader =
+      "id,provider,action,providerCredentialId,actorUserId,accountSidRedacted,accountSidLast4,fromNumberRedacted,fromNumberLast4,authTokenConfigured,previousAccountSidLast4,previousFromNumberLast4,previousAuthTokenConfigured,source,createdAt";
+    const expectedRow =
+      '"rot_1","twilio","create","cred_1","user_1","AC***1234","1234","\'+1***5678","5678","true","","","false","api","2024-01-01T12:00:00.000Z"';
 
     expect(csv).toBe(`${expectedHeader}\n${expectedRow}`);
+  });
+
+  it("escapes CSV injection payloads", () => {
+    const rotations: ProviderCredentialRotationExportRow[] = [
+      {
+        id: "rot_3",
+        provider: "=cmd|' /C calc'!A0",
+        action: "+1+1",
+        providerCredentialId: "-1+1",
+        actorUserId: "@SUM(1+1)",
+        accountSidRedacted: null,
+        accountSidLast4: null,
+        fromNumberRedacted: null,
+        fromNumberLast4: null,
+        authTokenConfigured: false,
+        previousAccountSidLast4: null,
+        previousFromNumberLast4: null,
+        previousAuthTokenConfigured: false,
+        source: "api",
+        createdAt: new Date("2024-01-03T12:00:00Z"),
+      },
+    ];
+
+    const csv = serializeProviderCredentialRotationsCsv(rotations);
+    const row = csv.split("\n")[1];
+
+    expect(row).toContain("\"'=cmd|' /C calc'!A0\"");
+    expect(row).toContain('"\'+1+1"');
+    expect(row).toContain('"\'-1+1"');
+    expect(row).toContain('"\'@SUM(1+1)"');
   });
 
   it("escapes double quotes in values", () => {
     const rotations: ProviderCredentialRotationExportRow[] = [
       {
-        id: 'rot_2',
+        id: "rot_2",
         provider: 'twil"io',
         action: "update",
         providerCredentialId: "cred_2",
@@ -56,12 +91,12 @@ describe("serializeProviderCredentialRotationsCsv", () => {
         previousFromNumberLast4: null,
         previousAuthTokenConfigured: true,
         source: "dashboard",
-        createdAt: new Date("2024-01-02T12:00:00Z")
-      }
+        createdAt: new Date("2024-01-02T12:00:00Z"),
+      },
     ];
 
     const csv = serializeProviderCredentialRotationsCsv(rotations);
-    const row = csv.split('\n')[1];
+    const row = csv.split("\n")[1];
 
     expect(row).toContain('"twil""io"');
   });
