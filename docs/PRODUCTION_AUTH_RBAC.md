@@ -10,7 +10,7 @@ Current supported auth mode: deterministic demo session.
 - The demo organization remains `demoMode: true`.
 - The local app membership model is already canonical: `Organization`, `AppUser`, and `Membership`.
 - `requireApiRole` enforces the local `OWNER > ADMIN > MEMBER` role hierarchy for API mutations that already accept local demo actions.
-- The `/settings/team` surface is read-only and must not invite users, create users, change roles, suspend members, delete memberships, call Clerk, send email, send notifications, call providers, create billing records, send SMS, or enable live messaging.
+- The consolidated `/settings` team/membership summary is read-only and must not invite users, create users, change roles, suspend members, delete memberships, call Clerk, send email, send notifications, call providers, create billing records, send SMS, or enable live messaging.
 
 ## Route RBAC Matrix
 

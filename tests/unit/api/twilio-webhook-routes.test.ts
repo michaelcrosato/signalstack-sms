@@ -8,19 +8,26 @@ const originalTwilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
 const mocks = vi.hoisted(() => ({
   createDemoInboundMessage: vi.fn(),
   getOrCreateCurrentOrg: vi.fn(),
-  messageUpdateMany: vi.fn(),
-  recordWebhookEvent: vi.fn()
+  markWebhookEventProcessed: vi.fn(),
+  recordMetric: vi.fn(),
+  recordWebhookEvent: vi.fn(),
+  releaseWebhookEventClaim: vi.fn(),
+  updateMessageFromTwilioStatus: vi.fn()
 }));
 
 vi.mock("@/lib/auth/current-org", () => ({
   getOrCreateCurrentOrg: mocks.getOrCreateCurrentOrg
 }));
 
-vi.mock("@/lib/db/prisma", () => ({
-  prisma: {
-    message: {
-      updateMany: mocks.messageUpdateMany
-    }
+vi.mock("@/lib/observability/metrics", () => ({
+  recordMetric: mocks.recordMetric,
+  smsPipelineMetrics: {
+    deliveryRate: "sms.delivery.rate",
+    sendToDeliveredLatencyMs: "sms.delivery.latency_ms",
+    queueDepth: "queue.depth",
+    queueThroughput: "queue.throughput",
+    failureByErrorCode: "sms.failure.by_error_code",
+    webhookVerificationFailureRate: "webhook.verification.failure_rate"
   }
 }));
 
@@ -29,7 +36,10 @@ vi.mock("@/lib/db/repositories/inbox", () => ({
 }));
 
 vi.mock("@/lib/db/repositories/webhooks", () => ({
-  recordWebhookEvent: mocks.recordWebhookEvent
+  markWebhookEventProcessed: mocks.markWebhookEventProcessed,
+  recordWebhookEvent: mocks.recordWebhookEvent,
+  releaseWebhookEventClaim: mocks.releaseWebhookEventClaim,
+  updateMessageFromTwilioStatus: mocks.updateMessageFromTwilioStatus
 }));
 
 function sign(url: string, params: Record<string, string>) {
@@ -63,7 +73,22 @@ describe("Twilio webhook routes", () => {
     vi.clearAllMocks();
     process.env.TWILIO_AUTH_TOKEN = "test_token";
     mocks.getOrCreateCurrentOrg.mockResolvedValue({ orgId: "org_demo", userId: "user_demo", role: "OWNER" });
-    mocks.recordWebhookEvent.mockResolvedValue({ duplicate: false });
+    mocks.createDemoInboundMessage.mockResolvedValue({ message: { id: "message_demo" } });
+    mocks.recordWebhookEvent.mockResolvedValue({
+      event: { id: "event_demo", processedAt: null },
+      outcome: "claimed",
+      duplicate: false,
+      claimed: true,
+      claimToken: "claim_owner",
+      retryAfterSeconds: null
+    });
+    mocks.markWebhookEventProcessed.mockResolvedValue({ count: 1 });
+    mocks.releaseWebhookEventClaim.mockResolvedValue({ count: 1 });
+    mocks.updateMessageFromTwilioStatus.mockResolvedValue({
+      matched: true,
+      updated: true,
+      createdAt: new Date("2026-01-01T00:00:00.000Z")
+    });
   });
 
   afterEach(() => {
@@ -82,6 +107,8 @@ describe("Twilio webhook routes", () => {
     expect(mocks.getOrCreateCurrentOrg).not.toHaveBeenCalled();
     expect(mocks.recordWebhookEvent).not.toHaveBeenCalled();
     expect(mocks.createDemoInboundMessage).not.toHaveBeenCalled();
+    expect(mocks.markWebhookEventProcessed).not.toHaveBeenCalled();
+    expect(mocks.releaseWebhookEventClaim).not.toHaveBeenCalled();
   });
 
   it("rejects invalid inbound signatures before tenant lookup or local mutations", async () => {
@@ -98,6 +125,8 @@ describe("Twilio webhook routes", () => {
     expect(mocks.getOrCreateCurrentOrg).not.toHaveBeenCalled();
     expect(mocks.recordWebhookEvent).not.toHaveBeenCalled();
     expect(mocks.createDemoInboundMessage).not.toHaveBeenCalled();
+    expect(mocks.markWebhookEventProcessed).not.toHaveBeenCalled();
+    expect(mocks.releaseWebhookEventClaim).not.toHaveBeenCalled();
   });
 
   it("records valid inbound events and creates local inbox messages only once", async () => {
@@ -119,16 +148,80 @@ describe("Twilio webhook routes", () => {
       idempotencyKey: "twilio:inbound:SM123",
       rawPayload: params
     });
-    expect(mocks.createDemoInboundMessage).toHaveBeenCalledWith("org_demo", {
-      phone: "+15555550100",
-      body: "STOP",
-      providerMessageId: "SM123",
-      idempotencyKey: "twilio:inbound:SM123"
-    });
+    expect(mocks.createDemoInboundMessage).toHaveBeenCalledWith(
+      "org_demo",
+      {
+        phone: "+15555550100",
+        body: "STOP",
+        providerMessageId: "SM123",
+        idempotencyKey: "twilio:inbound:SM123"
+      },
+      { analyzeSentiment: false, sendKeywordAutoReply: false }
+    );
+    expect(mocks.markWebhookEventProcessed).toHaveBeenCalledWith(
+      "org_demo",
+      "event_demo",
+      "claim_owner"
+    );
+    expect(mocks.createDemoInboundMessage.mock.invocationCallOrder[0]).toBeLessThan(
+      mocks.markWebhookEventProcessed.mock.invocationCallOrder[0]
+    );
+    expect(mocks.releaseWebhookEventClaim).not.toHaveBeenCalled();
   });
 
-  it("does not create inbound messages for duplicate webhook events", async () => {
-    mocks.recordWebhookEvent.mockResolvedValue({ duplicate: true });
+  it("leaves inbound events unprocessed when local message creation fails", async () => {
+    mocks.createDemoInboundMessage.mockRejectedValue(new Error("local persistence failed"));
+
+    await expect(
+      inboundWebhookRoute(
+        twilioFormRequest("/api/webhooks/twilio/inbound", {
+          From: "+15555550100",
+          Body: "HELP",
+          MessageSid: "SM123"
+        })
+      )
+    ).rejects.toThrow("local persistence failed");
+
+    expect(mocks.recordWebhookEvent).toHaveBeenCalled();
+    expect(mocks.markWebhookEventProcessed).not.toHaveBeenCalled();
+    expect(mocks.releaseWebhookEventClaim).toHaveBeenCalledWith(
+      "org_demo",
+      "event_demo",
+      "claim_owner"
+    );
+  });
+
+  it("does not create inbound messages when another request owns the event claim", async () => {
+    mocks.recordWebhookEvent.mockResolvedValue({
+      outcome: "in_progress",
+      duplicate: true,
+      claimed: false,
+      retryAfterSeconds: 17
+    });
+
+    const response = await inboundWebhookRoute(
+      twilioFormRequest("/api/webhooks/twilio/inbound", {
+        From: "+15555550100",
+        Body: "HELP",
+        MessageSid: "SM123"
+      })
+    );
+
+    expect(response.status).toBe(409);
+    expect(response.headers.get("retry-after")).toBe("17");
+    expect(mocks.recordWebhookEvent).toHaveBeenCalled();
+    expect(mocks.createDemoInboundMessage).not.toHaveBeenCalled();
+    expect(mocks.markWebhookEventProcessed).not.toHaveBeenCalled();
+    expect(mocks.releaseWebhookEventClaim).not.toHaveBeenCalled();
+  });
+
+  it("returns 204 without inbound mutations for an already processed event", async () => {
+    mocks.recordWebhookEvent.mockResolvedValue({
+      outcome: "processed",
+      duplicate: true,
+      claimed: false,
+      retryAfterSeconds: null
+    });
 
     const response = await inboundWebhookRoute(
       twilioFormRequest("/api/webhooks/twilio/inbound", {
@@ -139,7 +232,7 @@ describe("Twilio webhook routes", () => {
     );
 
     expect(response.status).toBe(204);
-    expect(mocks.recordWebhookEvent).toHaveBeenCalled();
+    expect(response.headers.get("retry-after")).toBeNull();
     expect(mocks.createDemoInboundMessage).not.toHaveBeenCalled();
   });
 
@@ -150,7 +243,9 @@ describe("Twilio webhook routes", () => {
     await expect(response.json()).resolves.toEqual({ error: "Invalid Twilio form payload." });
     expect(mocks.getOrCreateCurrentOrg).not.toHaveBeenCalled();
     expect(mocks.recordWebhookEvent).not.toHaveBeenCalled();
-    expect(mocks.messageUpdateMany).not.toHaveBeenCalled();
+    expect(mocks.updateMessageFromTwilioStatus).not.toHaveBeenCalled();
+    expect(mocks.markWebhookEventProcessed).not.toHaveBeenCalled();
+    expect(mocks.releaseWebhookEventClaim).not.toHaveBeenCalled();
   });
 
   it("updates only current-tenant messages for non-duplicate status events", async () => {
@@ -170,22 +265,110 @@ describe("Twilio webhook routes", () => {
       idempotencyKey: "twilio:status:SM123:undelivered:30007",
       rawPayload: params
     });
-    expect(mocks.messageUpdateMany).toHaveBeenCalledWith({
-      where: {
-        orgId: "org_demo",
-        providerMessageId: "SM123"
-      },
-      data: {
-        providerStatus: "undelivered",
-        providerErrorCode: "30007",
-        deliveredAt: null,
-        failedAt: expect.any(Date)
-      }
+    expect(mocks.updateMessageFromTwilioStatus).toHaveBeenCalledWith({
+      orgId: "org_demo",
+      providerMessageId: "SM123",
+      status: "undelivered",
+      errorCode: "30007"
     });
+    expect(mocks.markWebhookEventProcessed).toHaveBeenCalledWith(
+      "org_demo",
+      "event_demo",
+      "claim_owner"
+    );
+    expect(mocks.updateMessageFromTwilioStatus.mock.invocationCallOrder[0]).toBeLessThan(
+      mocks.markWebhookEventProcessed.mock.invocationCallOrder[0]
+    );
   });
 
-  it("does not update delivery state for duplicate status webhook events", async () => {
-    mocks.recordWebhookEvent.mockResolvedValue({ duplicate: true });
+  it("records canceled as a terminal delivery failure using the shared status vocabulary", async () => {
+    const response = await statusWebhookRoute(
+      twilioFormRequest("/api/webhooks/twilio/status", {
+        MessageSid: "SM123",
+        MessageStatus: "Canceled",
+        ErrorCode: "30008"
+      })
+    );
+
+    expect(response.status).toBe(204);
+    expect(mocks.recordMetric).toHaveBeenCalledWith("sms.delivery.rate", { status: "failure" });
+    expect(mocks.recordMetric).toHaveBeenCalledWith("sms.failure.by_error_code", { errorCode: "30008" });
+  });
+
+  it("leaves status events unprocessed when the delivery mutation fails", async () => {
+    mocks.updateMessageFromTwilioStatus.mockRejectedValue(new Error("delivery persistence failed"));
+
+    await expect(
+      statusWebhookRoute(
+        twilioFormRequest("/api/webhooks/twilio/status", {
+          MessageSid: "SM123",
+          MessageStatus: "sent"
+        })
+      )
+    ).rejects.toThrow("delivery persistence failed");
+
+    expect(mocks.recordWebhookEvent).toHaveBeenCalled();
+    expect(mocks.markWebhookEventProcessed).not.toHaveBeenCalled();
+    expect(mocks.releaseWebhookEventClaim).toHaveBeenCalledWith(
+      "org_demo",
+      "event_demo",
+      "claim_owner"
+    );
+  });
+
+  it("releases an unmatched early status callback for a later retry", async () => {
+    mocks.updateMessageFromTwilioStatus.mockResolvedValue({
+      matched: false,
+      updated: false,
+      createdAt: null
+    });
+
+    const response = await statusWebhookRoute(
+      twilioFormRequest("/api/webhooks/twilio/status", {
+        MessageSid: "SM123",
+        MessageStatus: "sent"
+      })
+    );
+
+    expect(response.status).toBe(409);
+    expect(response.headers.get("retry-after")).toBe("5");
+    expect(mocks.releaseWebhookEventClaim).toHaveBeenCalledWith(
+      "org_demo",
+      "event_demo",
+      "claim_owner"
+    );
+    expect(mocks.markWebhookEventProcessed).not.toHaveBeenCalled();
+  });
+
+  it("records unknown early provider statuses and then marks the event processed", async () => {
+    const response = await statusWebhookRoute(
+      twilioFormRequest("/api/webhooks/twilio/status", {
+        MessageSid: "SM123",
+        MessageStatus: "Provider-Accepted-V2"
+      })
+    );
+
+    expect(response.status).toBe(204);
+    expect(mocks.updateMessageFromTwilioStatus).toHaveBeenCalledWith({
+      orgId: "org_demo",
+      providerMessageId: "SM123",
+      status: "provider-accepted-v2",
+      errorCode: undefined
+    });
+    expect(mocks.markWebhookEventProcessed).toHaveBeenCalledWith(
+      "org_demo",
+      "event_demo",
+      "claim_owner"
+    );
+  });
+
+  it("does not update delivery state when another request owns the event claim", async () => {
+    mocks.recordWebhookEvent.mockResolvedValue({
+      outcome: "in_progress",
+      duplicate: true,
+      claimed: false,
+      retryAfterSeconds: 23
+    });
 
     const response = await statusWebhookRoute(
       twilioFormRequest("/api/webhooks/twilio/status", {
@@ -194,8 +377,31 @@ describe("Twilio webhook routes", () => {
       })
     );
 
-    expect(response.status).toBe(204);
+    expect(response.status).toBe(409);
+    expect(response.headers.get("retry-after")).toBe("23");
     expect(mocks.recordWebhookEvent).toHaveBeenCalled();
-    expect(mocks.messageUpdateMany).not.toHaveBeenCalled();
+    expect(mocks.updateMessageFromTwilioStatus).not.toHaveBeenCalled();
+    expect(mocks.markWebhookEventProcessed).not.toHaveBeenCalled();
+    expect(mocks.releaseWebhookEventClaim).not.toHaveBeenCalled();
+  });
+
+  it("fails closed and releases its token when completion ownership is lost", async () => {
+    mocks.markWebhookEventProcessed.mockResolvedValue({ count: 0 });
+
+    await expect(
+      statusWebhookRoute(
+        twilioFormRequest("/api/webhooks/twilio/status", {
+          MessageSid: "SM123",
+          MessageStatus: "sent"
+        })
+      )
+    ).rejects.toThrow("Webhook event claim was lost before status processing completed.");
+
+    expect(mocks.updateMessageFromTwilioStatus).toHaveBeenCalledTimes(1);
+    expect(mocks.releaseWebhookEventClaim).toHaveBeenCalledWith(
+      "org_demo",
+      "event_demo",
+      "claim_owner"
+    );
   });
 });

@@ -30,7 +30,7 @@ describe("preflightCampaign", () => {
 
     expect(mocks.campaignFindFirst).toHaveBeenCalledWith({
       where: { orgId: "org_demo", id: "missing_campaign" },
-      include: { recipients: true }
+      include: { recipients: { where: { orgId: "org_demo" } } }
     });
     expect(mocks.contactFindMany).not.toHaveBeenCalled();
   });

@@ -41,6 +41,14 @@ export async function PATCH(request: Request, { params }: CampaignParams) {
     }
     return NextResponse.json({ campaign });
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Campaign update failed." }, { status: 409 });
+    const conflictMessages = new Set([
+      "Campaign template not found.",
+      "Only draft campaigns can be edited."
+    ]);
+    if (!(error instanceof Error) || !conflictMessages.has(error.message)) {
+      return NextResponse.json({ error: "Campaign update failed." }, { status: 500 });
+    }
+
+    return NextResponse.json({ error: error.message }, { status: 409 });
   }
 }

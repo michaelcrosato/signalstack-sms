@@ -26,6 +26,8 @@ All endpoints select their provider through `resolveAiProvider()`:
 
 Successful fake AI endpoint calls record one local `AI_REQUEST` usage event with fake-provider metadata. This is local analytics/metering only and must not call billing providers, live AI providers, messaging providers, notifications, or external services.
 
+Demo/inbox inbound repository calls may classify conversation sentiment only after the inbound database transaction commits. The best-effort analysis is awaited so it cannot race an open transaction or depend on an untracked timer; analysis failure is logged without rolling back the stored message. Explicit inbound duplicates do not repeat analysis. Signed provider webhook handling disables this hook entirely, so webhook acknowledgement never depends on fake or live AI.
+
 ## Outbound/Inbound Isolation & Safety Rules
 
 All live AI provider interactions must adhere to strict safety bounds:
@@ -36,7 +38,7 @@ All live AI provider interactions must adhere to strict safety bounds:
 
 ## Post-MVP Local AI Operations
 
-`/settings/ai` renders the local AI safety boundary. It may display selected provider metadata, fake-provider readiness, endpoint coverage, AI usage totals, and recent local `AI_REQUEST` usage events.
+The consolidated `/settings` readiness view renders the local AI safety boundary. It may display selected provider metadata, fake-provider readiness, endpoint coverage, AI usage totals, and recent local `AI_REQUEST` usage events. Interactive AI assists remain within their product workflows; there is no dedicated AI settings page.
 
 This view is read-only. It must not submit prompts, call live AI providers, mutate conversations, expose API keys, create billing provider artifacts, send notifications, or enable live AI.
 

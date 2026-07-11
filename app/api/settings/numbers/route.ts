@@ -5,6 +5,10 @@ import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { listProviderPhoneNumbers, upsertProviderPhoneNumber } from "@/lib/db/repositories/provider-numbers";
 import { providerPhoneNumberSchema } from "@/lib/validation/provider";
 
+function isUniqueConstraintConflict(error: unknown) {
+  return typeof error === "object" && error !== null && "code" in error && error.code === "P2002";
+}
+
 export async function GET() {
   const currentOrg = await getOrCreateCurrentOrg();
   const numbers = await listProviderPhoneNumbers(currentOrg.orgId);
@@ -26,9 +30,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid provider number payload.", issues: payload.error.issues }, { status: 400 });
   }
 
-  const number = await upsertProviderPhoneNumber(currentOrg.orgId, payload.data, {
-    actorUserId: currentOrg.userId
-  });
+  try {
+    const number = await upsertProviderPhoneNumber(currentOrg.orgId, payload.data, {
+      actorUserId: currentOrg.userId
+    });
 
-  return NextResponse.json({ number }, { status: 201 });
+    return NextResponse.json({ number }, { status: 201 });
+  } catch (error) {
+    if (!isUniqueConstraintConflict(error)) {
+      return NextResponse.json({ error: "Provider number metadata update failed." }, { status: 500 });
+    }
+
+    return NextResponse.json(
+      { error: "Provider number metadata conflicted with another update." },
+      { status: 409 }
+    );
+  }
 }

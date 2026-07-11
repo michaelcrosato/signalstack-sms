@@ -6,6 +6,7 @@ import { POST as importContactsRoute } from "@/app/api/contacts/imports/route";
 
 const mocks = vi.hoisted(() => ({
   archiveContact: vi.fn(),
+  evaluatePhoneNumberLookup: vi.fn(),
   getContact: vi.fn(),
   getOrCreateCurrentOrg: vi.fn(),
   importContacts: vi.fn(),
@@ -39,11 +40,21 @@ vi.mock("@/lib/db/repositories/contacts", () => ({
   upsertContact: mocks.upsertContact
 }));
 
+vi.mock("@/lib/validation/lookup", () => ({
+  evaluatePhoneNumberLookup: mocks.evaluatePhoneNumberLookup,
+  liveLookupOperatorHeaderName: "x-signalstack-lookup-token"
+}));
+
 describe("contact JSON mutation routes", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.getOrCreateCurrentOrg.mockResolvedValue({ orgId: "org_demo", userId: "user_demo", role: "OWNER" });
     mocks.requireApiRole.mockReturnValue(null);
+    mocks.evaluatePhoneNumberLookup.mockResolvedValue({
+      valid: true,
+      formattedPhone: "+15555550100",
+      carrierType: "mobile"
+    });
   });
 
   it("rejects malformed create JSON without upserting a local contact", async () => {
@@ -61,6 +72,49 @@ describe("contact JSON mutation routes", () => {
       issues: [expect.objectContaining({ path: [] })]
     });
     expect(mocks.upsertContact).not.toHaveBeenCalled();
+  });
+
+  it("returns service unavailable without writing when explicitly requested live lookup is unavailable", async () => {
+    mocks.evaluatePhoneNumberLookup.mockResolvedValue({
+      valid: false,
+      formattedPhone: "+15555550100",
+      unavailable: true,
+      error: "Live phone lookup timed out."
+    });
+
+    const response = await postContact(
+      new Request("http://localhost/api/contacts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: "+15555550100" })
+      })
+    );
+
+    expect(response.status).toBe(503);
+    await expect(response.json()).resolves.toEqual({ error: "Live phone lookup timed out." });
+    expect(mocks.upsertContact).not.toHaveBeenCalled();
+  });
+
+  it("passes the dedicated lookup operator header to the paid-lookup boundary", async () => {
+    const operatorToken = "lookup-operator-token-0123456789abcdef";
+    mocks.upsertContact.mockResolvedValue({ id: "contact_demo", phone: "+15555550100" });
+
+    const response = await postContact(
+      new Request("http://localhost/api/contacts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-signalstack-lookup-token": operatorToken
+        },
+        body: JSON.stringify({ phone: "+15555550100" })
+      })
+    );
+
+    expect(response.status).toBe(201);
+    expect(mocks.evaluatePhoneNumberLookup).toHaveBeenCalledWith("+15555550100", process.env, {
+      operatorToken
+    });
+    expect(mocks.upsertContact).toHaveBeenCalledTimes(1);
   });
 
   it("rejects malformed update JSON without updating a tenant contact", async () => {

@@ -25,6 +25,8 @@ async function main() {
 }
 
 main().catch((error: unknown) => {
-  logger.error("bullmq_worker_fatal_error", { error: error instanceof Error ? error.message : error });
+  logger.error("bullmq_worker_fatal_error", {
+    errorType: error instanceof Error ? error.name : "UnknownError"
+  });
   process.exit(1);
 });

@@ -1,15 +1,17 @@
 import { prisma } from "@/lib/db/prisma";
+import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { isTerminalDeliveryFailureProviderStatus } from "@/lib/messaging/delivery-status";
 import { observabilityIsEnabled } from "@/lib/observability/logger";
-import { webhookVerificationFailuresCount } from "@/lib/observability/metrics";
 
 export async function GET() {
   if (!observabilityIsEnabled()) {
     return new Response(null, { status: 404 });
   }
+  const currentOrg = await getOrCreateCurrentOrg();
 
   // 1. Get delivery rate totals (delivered, failed, sent, queued)
   const outboundMessages = await prisma.message.findMany({
-    where: { direction: "OUTBOUND" },
+    where: { orgId: currentOrg.orgId, direction: "OUTBOUND" },
     select: { providerStatus: true, createdAt: true, deliveredAt: true }
   });
 
@@ -33,7 +35,7 @@ export async function GET() {
           latencies.push(latencySec);
         }
       }
-    } else if (status === "failed") {
+    } else if (isTerminalDeliveryFailureProviderStatus(status)) {
       counts.failed++;
     } else if (status === "sent") {
       counts.sent++;
@@ -89,10 +91,6 @@ export async function GET() {
   // Queue Depth Gauge
   addMetricMetadata("signalstack_sms_queue_depth", "gauge", "Current number of messages in queued or sending status.");
   prometheusExposition += `signalstack_sms_queue_depth ${queueDepth}\n\n`;
-
-  // Webhook Failures Counter
-  addMetricMetadata("signalstack_sms_webhook_failures_total", "counter", "Total number of webhook verification signature failures.");
-  prometheusExposition += `signalstack_sms_webhook_failures_total ${webhookVerificationFailuresCount}\n`;
 
   return new Response(prometheusExposition, {
     status: 200,

@@ -14,12 +14,28 @@ Milestone 6 central gate requirements:
 Post-MVP live test SMS exception:
 
 - `/api/demo/live-test-sms` is a narrow investor-demo exception for one allowlisted Twilio test SMS.
-- It must require `LIVE_TEST_SMS_ENABLED=true`, `LIVE_MESSAGING_ENABLED=true`, `MESSAGING_PROVIDER=twilio`, complete Twilio environment credentials, an allowlisted recipient, and an exact confirmation phrase before any Twilio call.
+- It must require `LIVE_TEST_SMS_ENABLED=true`, `LIVE_MESSAGING_ENABLED=true`, `MESSAGING_PROVIDER=twilio`, complete Twilio environment credentials, an allowlisted recipient, an exact confirmation phrase, and a constant-time match against a server-only `LIVE_TEST_SMS_OPERATOR_TOKEN` of 32-256 characters before any Twilio call.
 - It must not use locally stored provider credential metadata for live sends; raw Twilio credentials must come from environment variables only.
-- It must not enable campaign sends, queue workers, bulk sends, billing, live AI, notification delivery, non-allowlisted recipients, or provider credential display.
-- Successful sends must create local audit evidence without storing raw auth tokens.
+- It must not enable campaign sends, queue workers, bulk sends, billing, live AI, notification delivery, non-allowlisted recipients, or provider credential display. Public readiness exposes only configured counts, last-four hints, booleans, and blocker codes; full allowlist/from values, the confirmation phrase, and the operator token must never be rendered, prefilled, logged, persisted, or returned.
+- Every request must include a client-generated UUID `requestId` and an operator-entered token. Operator authorization is required before both new-send reservation and existing-request lookup. For a new tenant/request key, all live, provider, credential, allowlist, body, confirmation, and operator gates must pass before the server reserves anything or calls Twilio.
+- The reservation must atomically create both the tenant-unique `(orgId, idempotencyKey)` `Message` and a `LIVE_TEST_SMS_RESERVED` readiness audit tied to that message. Audit metadata stores only an HMAC-SHA-256 fingerprint of the normalized actor/recipient/body tuple keyed by the server-side operator secret, original recipient/from last-four, and body length; it must not store the full recipient, full body, operator token, or provider credentials.
+- After operator authorization, an existing tenant/request key must be looked up before current live-state gates so later live flag, allowlist, or provider-credential changes do not hide its stored outcome. Matching actor and HMAC-bound requests return the stored sent, failed, or reserved/pending outcome and original audit-backed last-four without another Twilio call, including after a concurrent reservation race.
+- Reusing the same tenant/request key with a different actor, normalized recipient, or trimmed body, or without valid reservation evidence, returns `409` and must not call Twilio.
+- Successful nonterminal sends must update the reserved message with the provider identifier and normalized status and create local audit evidence without storing raw auth tokens. A validated 4xx Twilio rejection with an integer provider error code and no provider SID, plus immediate terminal `failed`, `undelivered`, or `canceled` statuses, marks the reservation failed with a secret-safe error code. Network errors, bounded timeouts, 5xx/other non-4xx responses, a 4xx response without that validated error shape, any non-2xx response carrying a provider SID, successful responses without a provider identifier, and provider-result persistence failures are ambiguous: they leave the durable reservation pending and return `202`, so an exact retry can inspect it but never resend.
+- `LIVE_TEST_SMS_TIMEOUT_MS` is clamped between 1000 and 10000 milliseconds, with a 5000 millisecond default, and every Twilio create request must use an abort signal.
 - Twilio response status values must be trimmed and lowercased before local message rows, readiness audit metadata, or API responses consume them; blank or missing statuses default to `queued`.
-- A complete compliance profile and `APPROVED` A2P status are necessary but not sufficient; demo mode and live flags must also permit external impact.
+- The general campaign/live-worker compliance profile, per-contact consent, quiet-hours, and `APPROVED` A2P hard gate does not authorize this isolated human-approved demo exception, which has no campaign/contact input and runs in the demo workspace. Passing this exception's narrower operator, allowlist, provider, credential, confirmation, reservation, and idempotency controls is not evidence of campaign or production readiness; all broader live-send paths remain blocked by their full compliance gates.
+
+Post-MVP paid Twilio phone lookup boundary:
+
+- Contact phone validation is local-only by default. Unset, empty, or exactly `false` `LIVE_LOOKUP_ENABLED` values must not call Twilio.
+- A paid Twilio Lookup request requires exact `LIVE_LOOKUP_ENABLED=true`, exact `LIVE_LOOKUP_COST_ACK=true`, complete `TWILIO_ACCOUNT_SID` plus `TWILIO_AUTH_TOKEN` environment credentials, and a constant-time match between the dedicated `x-signalstack-lookup-token` request header and a server-only `LIVE_LOOKUP_OPERATOR_TOKEN` of 32-256 characters. The deterministic demo membership role is not sufficient authorization for a paid call.
+- Operator authorization must fail closed before any provider fetch. The lookup token must never be rendered, prefilled, logged, persisted, returned, or forwarded to Twilio.
+- Malformed enablement, invalid or missing operator authorization, missing acknowledgement, missing credentials, provider errors, malformed provider responses, network failures, and timeouts fail closed without creating or updating the contact.
+- A successful Twilio response must contain a `phone_number` that locally normalizes to exactly the requested E.164 number. A missing, invalid, or mismatched response number is a malformed response and fails closed.
+- `LIVE_LOOKUP_TIMEOUT_MS` is clamped between 250 and 10000 milliseconds, with a 3000 millisecond default, and every live request must use an abort signal.
+- CSV contact imports always use local phone normalization and validation. Import parsing must ignore live lookup configuration and must never call Twilio once per row or in bulk.
+- Lookup failures and logs must not expose raw credentials or provider response messages.
 
 Post-MVP provider settings foundation:
 
@@ -53,7 +69,7 @@ Post-MVP provider credential metadata UI:
 Post-MVP provider number foundation:
 
 - `GET /api/settings/numbers` and `POST /api/settings/numbers` manage local phone-number metadata only.
-- `/settings/numbers` renders existing local phone-number metadata as a read-only operator view.
+- The consolidated `/settings` readiness view renders existing local phone-number metadata; `/settings/provider` retains focused credential-readiness detail.
 - Number metadata may record provider name, capabilities, local status, and default selection.
 - Number metadata must not be treated as proof that a live Twilio number is owned, provisioned, or safe to send from.
-- The numbers view must not provision provider numbers, verify ownership, mutate metadata, expose credentials, enable live messaging, or send SMS.
+- The consolidated number summary must not provision provider numbers, verify ownership, mutate metadata, expose credentials, enable live messaging, or send SMS.

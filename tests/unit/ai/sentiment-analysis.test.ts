@@ -124,7 +124,7 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
   });
 
   describe("database integration", () => {
-    it("async triggers and updates conversation sentiment/category in createDemoInboundMessage", async () => {
+    it("updates sentiment after committing createDemoInboundMessage", async () => {
       const org = await prisma.organization.create({
         data: {
           slug: `org-sentiment-${Date.now()}`,
@@ -140,24 +140,19 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
         providerMessageId: `msg_${Date.now()}`,
       });
 
-      // Initially sentiment/category might be null as the transaction is executing,
+      // The returned transaction snapshot predates analysis, while the persisted row is updated
+      // before the repository call resolves.
       expect(result.conversation).not.toBeNull();
       expect(result.conversation!.sentiment).toBeNull();
 
-      // Wait with polling for async sentiment evaluation
-      let updated;
-      for (let i = 0; i < 80; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        updated = await prisma.conversation.findUniqueOrThrow({
-          where: { id: result.conversation!.id },
-        });
-        if (updated.sentiment !== null) break;
-      }
-      expect(updated!.sentiment).toBe("POSITIVE");
-      expect(updated!.category).toBe("INQUIRY");
+      const updated = await prisma.conversation.findUniqueOrThrow({
+        where: { id: result.conversation!.id },
+      });
+      expect(updated.sentiment).toBe("POSITIVE");
+      expect(updated.category).toBe("INQUIRY");
     });
 
-    it("async triggers and updates conversation sentiment/category in createConversationInboundMessage", async () => {
+    it("updates sentiment after committing createConversationInboundMessage", async () => {
       const org = await prisma.organization.create({
         data: {
           slug: `org-sentiment-conv-${Date.now()}`,
@@ -184,17 +179,11 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
         providerMessageId: `msg_${Date.now()}`,
       });
 
-      // Wait with polling for async sentiment evaluation
-      let updated;
-      for (let i = 0; i < 80; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        updated = await prisma.conversation.findUniqueOrThrow({
-          where: { id: conversation.id },
-        });
-        if (updated.sentiment !== null) break;
-      }
-      expect(updated!.sentiment).toBe("NEUTRAL");
-      expect(updated!.category).toBe("SUPPORT");
+      const updated = await prisma.conversation.findUniqueOrThrow({
+        where: { id: conversation.id },
+      });
+      expect(updated.sentiment).toBe("NEUTRAL");
+      expect(updated.category).toBe("SUPPORT");
     });
   });
 });

@@ -10,6 +10,7 @@ const REDACTED = "[redacted]";
 const REDACTED_KEYS = new Set(
   [
     "phone",
+    "email",
     "to",
     "from",
     "body",
@@ -29,13 +30,14 @@ const REDACTED_KEYS = new Set(
 
 // Phone-like runs (E.164 / long digit sequences). Over-redaction is acceptable; leaking is not.
 const PHONE_PATTERN = /\+?\d[\d\-\s().]{6,}\d/g;
+const EMAIL_PATTERN = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
 
 export function redactValue(value: unknown, key?: string): unknown {
   if (key !== undefined && REDACTED_KEYS.has(key.toLowerCase())) {
     return REDACTED;
   }
   if (typeof value === "string") {
-    return value.replace(PHONE_PATTERN, REDACTED);
+    return value.replace(PHONE_PATTERN, REDACTED).replace(EMAIL_PATTERN, REDACTED);
   }
   if (Array.isArray(value)) {
     return value.map((item) => redactValue(item));

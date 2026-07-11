@@ -551,13 +551,16 @@ async function main() {
     }
   });
 
-  logger.info(
-    `Seeded demo organization ${org.slug} for ${user.email} with ${MembershipRole.OWNER} role.`
-  );
+  logger.info("demo_seed_completed", {
+    orgSlug: org.slug,
+    role: MembershipRole.OWNER
+  });
 }
 
 main().catch((error) => {
-  logger.error("demo_seed_failed", { error: error instanceof Error ? error.message : String(error) });
+  logger.error("demo_seed_failed", {
+    errorType: error instanceof Error ? error.name : "UnknownError"
+  });
   process.exit(1);
 }).finally(async () => {
   await prisma.$disconnect();

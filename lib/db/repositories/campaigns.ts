@@ -1,4 +1,4 @@
-import { CampaignStatus, QueueJobStatus, QueueJobType, type Prisma } from "@prisma/client";
+import { CampaignStatus, QueueJobStatus, QueueJobType, type Prisma, type QueueJob } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 import { recordMetric, smsPipelineMetrics } from "@/lib/observability/metrics";
 import { orgWhere } from "@/lib/db/tenant";
@@ -7,36 +7,51 @@ import { scheduledCampaignIdempotencyKey } from "@/lib/queue/idempotency";
 import { scheduledCampaignJobSchema } from "@/lib/queue/jobs";
 import type { CampaignCreateInput, CampaignUpdateInput } from "@/lib/validation/campaigns";
 
-const campaignListInclude = {
-  template: true,
-  recipients: { include: { contact: true } }
-} satisfies Prisma.CampaignInclude;
-
-const campaignListDeliveryInclude = {
-  template: true,
-  recipients: { include: { contact: true } },
-  messages: {
-    where: { direction: "OUTBOUND" },
-    select: {
-      direction: true,
-      providerStatus: true,
-      deliveredAt: true,
-      failedAt: true,
-      createdAt: true
+function campaignListInclude(orgId: string) {
+  return {
+    template: { where: { orgId } },
+    recipients: {
+      where: { orgId, contact: { orgId } },
+      include: { contact: true }
     }
-  }
-} satisfies Prisma.CampaignInclude;
+  } satisfies Prisma.CampaignInclude;
+}
 
-const campaignDetailInclude = {
-  template: true,
-  recipients: { include: { contact: true } },
-  messages: {
-    where: { direction: "OUTBOUND" },
-    include: { contact: true },
-    orderBy: { createdAt: "desc" },
-    take: 30
-  }
-} satisfies Prisma.CampaignInclude;
+function campaignListDeliveryInclude(orgId: string) {
+  return {
+    template: { where: { orgId } },
+    recipients: {
+      where: { orgId, contact: { orgId } },
+      include: { contact: true }
+    },
+    messages: {
+      where: { orgId, direction: "OUTBOUND" },
+      select: {
+        direction: true,
+        providerStatus: true,
+        deliveredAt: true,
+        failedAt: true,
+        createdAt: true
+      }
+    }
+  } satisfies Prisma.CampaignInclude;
+}
+
+function campaignDetailInclude(orgId: string) {
+  return {
+    template: { where: { orgId } },
+    recipients: {
+      where: { orgId, contact: { orgId } },
+      include: { contact: true }
+    },
+    messages: {
+      where: { orgId, direction: "OUTBOUND" },
+      include: { contact: { where: { orgId } } },
+      orderBy: { createdAt: "desc" },
+      take: 30
+    }
+  } satisfies Prisma.CampaignInclude;
+}
 
 const campaignDetailDeliveryMessageSelect = {
   direction: true,
@@ -51,7 +66,7 @@ export async function listCampaigns(orgId: string) {
   return prisma.campaign.findMany({
     where: { orgId },
     orderBy: { updatedAt: "desc" },
-    include: campaignListInclude
+    include: campaignListInclude(orgId)
   });
 }
 
@@ -59,21 +74,21 @@ export async function listCampaignsWithDelivery(orgId: string) {
   return prisma.campaign.findMany({
     where: { orgId },
     orderBy: { updatedAt: "desc" },
-    include: campaignListDeliveryInclude
+    include: campaignListDeliveryInclude(orgId)
   });
 }
 
 export async function getCampaign(orgId: string, campaignId: string) {
   return prisma.campaign.findFirst({
     where: orgWhere(orgId, { id: campaignId }),
-    include: campaignListInclude
+    include: campaignListInclude(orgId)
   });
 }
 
 export async function getCampaignWithMessages(orgId: string, campaignId: string) {
   const campaign = await prisma.campaign.findFirst({
     where: orgWhere(orgId, { id: campaignId }),
-    include: campaignDetailInclude
+    include: campaignDetailInclude(orgId)
   });
 
   if (!campaign) {
@@ -94,6 +109,8 @@ export async function getCampaignWithMessages(orgId: string, campaignId: string)
 
 export async function createCampaign(orgId: string, input: CampaignCreateInput) {
   return prisma.$transaction(async (tx) => {
+    await assertCampaignTemplateBelongsToOrg(tx, orgId, input.templateId);
+
     const campaign = await tx.campaign.create({
       data: {
         orgId,
@@ -104,7 +121,10 @@ export async function createCampaign(orgId: string, input: CampaignCreateInput) 
     });
 
     await syncCampaignRecipients(tx, orgId, campaign.id, input.contactIds);
-    return tx.campaign.findUniqueOrThrow({ where: { id: campaign.id }, include: campaignListInclude });
+    return tx.campaign.findUniqueOrThrow({
+      where: { id: campaign.id },
+      include: campaignListInclude(orgId)
+    });
   });
 }
 
@@ -117,6 +137,7 @@ export async function updateCampaign(orgId: string, campaignId: string, input: C
     if (existing.status !== CampaignStatus.DRAFT) {
       throw new Error("Only draft campaigns can be edited.");
     }
+    await assertCampaignTemplateBelongsToOrg(tx, orgId, input.templateId);
 
     const campaign = await tx.campaign.update({
       where: { id: campaignId },
@@ -131,14 +152,17 @@ export async function updateCampaign(orgId: string, campaignId: string, input: C
       await syncCampaignRecipients(tx, orgId, campaign.id, input.contactIds);
     }
 
-    return tx.campaign.findUniqueOrThrow({ where: { id: campaign.id }, include: campaignListInclude });
+    return tx.campaign.findUniqueOrThrow({
+      where: { id: campaign.id },
+      include: campaignListInclude(orgId)
+    });
   });
 }
 
 export async function preflightCampaign(orgId: string, campaignId: string, contactIds?: string[]) {
   const campaign = await prisma.campaign.findFirst({
     where: orgWhere(orgId, { id: campaignId }),
-    include: { recipients: true }
+    include: { recipients: { where: { orgId } } }
   });
 
   if (!campaign) {
@@ -167,7 +191,7 @@ export async function scheduleCampaign(orgId: string, campaignId: string, schedu
   return prisma.$transaction(async (tx) => {
     const campaign = await tx.campaign.findFirst({
       where: orgWhere(orgId, { id: campaignId }),
-      include: { recipients: true }
+      include: { recipients: { where: { orgId } } }
     });
 
     if (!campaign) {
@@ -175,6 +199,19 @@ export async function scheduleCampaign(orgId: string, campaignId: string, schedu
     }
     if (campaign.status !== CampaignStatus.DRAFT && campaign.status !== CampaignStatus.PAUSED) {
       throw new Error("Only draft or paused campaigns can be scheduled.");
+    }
+
+    const processingJob = await tx.queueJob.findFirst({
+      where: {
+        orgId,
+        campaignId,
+        type: QueueJobType.SCHEDULED_CAMPAIGN,
+        status: QueueJobStatus.PROCESSING
+      },
+      select: { id: true }
+    });
+    if (processingJob) {
+      throw new Error("Campaign schedule is already processing.");
     }
 
     const contacts = await tx.contact.findMany({
@@ -212,23 +249,45 @@ export async function scheduleCampaign(orgId: string, campaignId: string, schedu
       data: { status: CampaignStatus.SCHEDULED, scheduledAt }
     });
 
-    const queueJob = await tx.queueJob.upsert({
-      where: { orgId_idempotencyKey: { orgId, idempotencyKey } },
-      update: {
-        status: QueueJobStatus.QUEUED,
-        payload,
-        runAt: scheduledAt
-      },
-      create: {
-        orgId,
-        campaignId,
-        type: QueueJobType.SCHEDULED_CAMPAIGN,
-        status: QueueJobStatus.QUEUED,
-        idempotencyKey,
-        payload,
-        runAt: scheduledAt
+    const queueJobWhere = { orgId_idempotencyKey: { orgId, idempotencyKey } };
+    const existingQueueJob = await tx.queueJob.findUnique({ where: queueJobWhere });
+    let queueJob: QueueJob;
+    if (existingQueueJob) {
+      const reopened = await tx.queueJob.updateMany({
+        where: {
+          id: existingQueueJob.id,
+          orgId,
+          type: QueueJobType.SCHEDULED_CAMPAIGN,
+          status: {
+            in: [QueueJobStatus.QUEUED, QueueJobStatus.CANCELLED, QueueJobStatus.FAILED]
+          }
+        },
+        data: {
+          status: QueueJobStatus.QUEUED,
+          payload,
+          runAt: scheduledAt,
+          generation: { increment: 1 },
+          processingToken: null,
+          processingExpiresAt: null
+        }
+      });
+      if (reopened.count !== 1) {
+        throw new Error("Campaign schedule is already processing or complete.");
       }
-    });
+      queueJob = await tx.queueJob.findUniqueOrThrow({ where: { id: existingQueueJob.id } });
+    } else {
+      queueJob = await tx.queueJob.create({
+        data: {
+          orgId,
+          campaignId,
+          type: QueueJobType.SCHEDULED_CAMPAIGN,
+          status: QueueJobStatus.QUEUED,
+          idempotencyKey,
+          payload,
+          runAt: scheduledAt
+        }
+      });
+    }
 
     const depth = typeof tx.queueJob.count === "function"
       ? await tx.queueJob.count({
@@ -252,17 +311,47 @@ export async function cancelCampaign(orgId: string, campaignId: string) {
       throw new Error("Only scheduled campaigns can be canceled.");
     }
 
+    // Cancel queued work first so the row locks form the serialization boundary
+    // with a concurrent QUEUED -> PROCESSING claim. If the worker already won,
+    // the update skips that row and the subsequent fresh read observes PROCESSING.
     await tx.queueJob.updateMany({
-      where: { orgId, campaignId, status: QueueJobStatus.QUEUED },
-      data: { status: QueueJobStatus.CANCELLED }
+      where: {
+        orgId,
+        campaignId,
+        type: QueueJobType.SCHEDULED_CAMPAIGN,
+        status: QueueJobStatus.QUEUED
+      },
+      data: {
+        status: QueueJobStatus.CANCELLED,
+        processingToken: null,
+        processingExpiresAt: null
+      }
     });
 
-    recordMetric(smsPipelineMetrics.queueThroughput, { action: "cancel", status: "success", backend: "database" });
+    const processingJob = await tx.queueJob.findFirst({
+      where: {
+        orgId,
+        campaignId,
+        type: QueueJobType.SCHEDULED_CAMPAIGN,
+        status: QueueJobStatus.PROCESSING
+      },
+      select: { id: true }
+    });
+    if (processingJob) {
+      throw new Error("A processing campaign cannot be canceled.");
+    }
 
-    return tx.campaign.update({
-      where: { id: campaignId },
+    const paused = await tx.campaign.updateMany({
+      where: { id: campaignId, orgId, status: CampaignStatus.SCHEDULED },
       data: { status: CampaignStatus.PAUSED }
     });
+    if (paused.count !== 1) {
+      throw new Error("Campaign cancellation conflicted with another transition.");
+    }
+
+    const pausedCampaign = await tx.campaign.findFirstOrThrow({ where: orgWhere(orgId, { id: campaignId }) });
+    recordMetric(smsPipelineMetrics.queueThroughput, { action: "cancel", status: "success", backend: "database" });
+    return pausedCampaign;
   });
 }
 
@@ -279,5 +368,23 @@ async function syncCampaignRecipients(
     if (contact) {
       await tx.campaignRecipient.create({ data: { orgId, campaignId, contactId } });
     }
+  }
+}
+
+async function assertCampaignTemplateBelongsToOrg(
+  tx: Prisma.TransactionClient,
+  orgId: string,
+  templateId: string | undefined
+) {
+  if (templateId === undefined) {
+    return;
+  }
+
+  const template = await tx.messageTemplate.findFirst({
+    where: orgWhere(orgId, { id: templateId }),
+    select: { id: true }
+  });
+  if (!template) {
+    throw new Error("Campaign template not found.");
   }
 }

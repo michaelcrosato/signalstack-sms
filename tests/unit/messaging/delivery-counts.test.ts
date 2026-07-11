@@ -17,19 +17,19 @@ describe("delivery count query helpers", () => {
       direction: "OUTBOUND",
       deliveredAt: { not: null },
       failedAt: null,
-      OR: [{ providerStatus: null }, { providerStatus: { notIn: ["failed", "undelivered"] } }]
+      OR: [{ providerStatus: null }, { providerStatus: { notIn: ["failed", "undelivered", "canceled"] } }]
     });
     expect(outboundPendingMessageWhere("org_demo")).toEqual({
       orgId: "org_demo",
       direction: "OUTBOUND",
       deliveredAt: null,
       failedAt: null,
-      OR: [{ providerStatus: null }, { providerStatus: { notIn: ["failed", "undelivered"] } }]
+      OR: [{ providerStatus: null }, { providerStatus: { notIn: ["failed", "undelivered", "canceled"] } }]
     });
     expect(outboundFailedMessageWhere("org_demo")).toEqual({
       orgId: "org_demo",
       direction: "OUTBOUND",
-      OR: [{ failedAt: { not: null } }, { providerStatus: { in: ["failed", "undelivered"] } }]
+      OR: [{ failedAt: { not: null } }, { providerStatus: { in: ["failed", "undelivered", "canceled"] } }]
     });
   });
 
@@ -48,13 +48,13 @@ describe("delivery count query helpers", () => {
     deliveredStatuses.push("caller-mutated");
 
     expect(outboundDeliveredMessageWhere("org_demo")).toMatchObject({
-      OR: [{ providerStatus: null }, { providerStatus: { notIn: ["failed", "undelivered"] } }]
+      OR: [{ providerStatus: null }, { providerStatus: { notIn: ["failed", "undelivered", "canceled"] } }]
     });
     expect(outboundPendingMessageWhere("org_demo")).toMatchObject({
-      OR: [{ providerStatus: null }, { providerStatus: { notIn: ["failed", "undelivered"] } }]
+      OR: [{ providerStatus: null }, { providerStatus: { notIn: ["failed", "undelivered", "canceled"] } }]
     });
     expect(outboundFailedMessageWhere("org_demo")).toMatchObject({
-      OR: [{ failedAt: { not: null } }, { providerStatus: { in: ["failed", "undelivered"] } }]
+      OR: [{ failedAt: { not: null } }, { providerStatus: { in: ["failed", "undelivered", "canceled"] } }]
     });
   });
 });

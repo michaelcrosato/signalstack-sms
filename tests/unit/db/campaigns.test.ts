@@ -19,6 +19,7 @@ const mocks = vi.hoisted(() => ({
   campaignRecipientDeleteMany: vi.fn(),
   campaignRecipientCreate: vi.fn(),
   contactFindFirst: vi.fn(),
+  templateFindFirst: vi.fn(),
   transaction: vi.fn()
 }));
 
@@ -137,6 +138,9 @@ describe("Campaigns Repository", () => {
           },
           contact: {
             findFirst: mocks.contactFindFirst,
+          },
+          messageTemplate: {
+            findFirst: mocks.templateFindFirst,
           }
         });
       });
@@ -149,6 +153,7 @@ describe("Campaigns Repository", () => {
 
       mocks.campaignCreate.mockResolvedValue(createdCampaign);
       mocks.contactFindFirst.mockResolvedValue({ id: "contact1" });
+      mocks.templateFindFirst.mockResolvedValue({ id: "t1" });
       mocks.campaignFindUniqueOrThrow.mockResolvedValue(finalCampaign);
 
       const result = await createCampaign("org1", input);
@@ -171,6 +176,25 @@ describe("Campaigns Repository", () => {
         include: expect.any(Object)
       });
     });
+
+    it("rejects a missing or cross-tenant template before creating the campaign", async () => {
+      mocks.templateFindFirst.mockResolvedValue(null);
+
+      await expect(
+        createCampaign("org1", {
+          name: "Test Campaign",
+          body: "Hello",
+          templateId: "foreign-template",
+          contactIds: []
+        })
+      ).rejects.toThrow("Campaign template not found.");
+
+      expect(mocks.templateFindFirst).toHaveBeenCalledWith({
+        where: { orgId: "org1", id: "foreign-template" },
+        select: { id: true }
+      });
+      expect(mocks.campaignCreate).not.toHaveBeenCalled();
+    });
   });
 
   describe("updateCampaign", () => {
@@ -188,6 +212,9 @@ describe("Campaigns Repository", () => {
           },
           contact: {
             findFirst: mocks.contactFindFirst,
+          },
+          messageTemplate: {
+            findFirst: mocks.templateFindFirst,
           }
         });
       });
@@ -243,6 +270,21 @@ describe("Campaigns Repository", () => {
         where: { id: "c1" },
         include: expect.any(Object)
       });
+    });
+
+    it("rejects a cross-tenant template before changing a draft", async () => {
+      mocks.campaignFindFirst.mockResolvedValue({ id: "c1", status: CampaignStatus.DRAFT });
+      mocks.templateFindFirst.mockResolvedValue(null);
+
+      await expect(
+        updateCampaign("org1", "c1", { templateId: "foreign-template" })
+      ).rejects.toThrow("Campaign template not found.");
+
+      expect(mocks.templateFindFirst).toHaveBeenCalledWith({
+        where: { orgId: "org1", id: "foreign-template" },
+        select: { id: true }
+      });
+      expect(mocks.campaignUpdate).not.toHaveBeenCalled();
     });
   });
 

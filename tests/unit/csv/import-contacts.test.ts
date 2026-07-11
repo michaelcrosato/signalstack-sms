@@ -1,9 +1,14 @@
 import { ConsentStatus } from "@prisma/client";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { parseContactImport } from "@/lib/csv/import-contacts";
 import { parseCsv } from "@/lib/csv/parse";
 
 describe("CSV contact import", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
   it("parses quoted cells and normalized headers", () => {
     expect(parseCsv('Phone,Full Name,Tags\n"+15555550100","Ada, Inc.","vip|trial"')).toEqual([
       {
@@ -40,5 +45,22 @@ describe("CSV contact import", () => {
  
     expect(result.contacts).toEqual([]);
     expect(result.errors).toEqual([expect.objectContaining({ row: 2 })]);
+  });
+
+  it("never performs paid live lookups during bulk import", async () => {
+    vi.stubEnv("LIVE_LOOKUP_ENABLED", "true");
+    vi.stubEnv("LIVE_LOOKUP_COST_ACK", "true");
+    vi.stubEnv("LIVE_LOOKUP_OPERATOR_TOKEN", "lookup-operator-token-0123456789abcdef");
+    vi.stubEnv("TWILIO_ACCOUNT_SID", "AC123");
+    vi.stubEnv("TWILIO_AUTH_TOKEN", "token123");
+    const mockFetch = vi.fn();
+    vi.stubGlobal("fetch", mockFetch);
+
+    const result = await parseContactImport(
+      "phone,first_name\n+15555550100,Ada\n+15555550101,Grace"
+    );
+
+    expect(result.contacts.map((contact) => contact.phone)).toEqual(["+15555550100", "+15555550101"]);
+    expect(mockFetch).not.toHaveBeenCalled();
   });
 });

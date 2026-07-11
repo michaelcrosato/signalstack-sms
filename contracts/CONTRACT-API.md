@@ -48,6 +48,8 @@ Creates or updates a contact by `(orgId, phone)`.
 
 Accepted fields: `phone`, `email`, `firstName`, `lastName`, `displayName`, `consentStatus`, `optInSource`, `source`, `notes`, `tagNames`, `listNames`.
 
+Phone normalization is local-only by default and does not require an operator header. When paid Twilio Lookup is explicitly enabled, the caller must provide `x-signalstack-lookup-token`, which must constant-time match a server-only 32-256 character `LIVE_LOOKUP_OPERATOR_TOKEN` in addition to cost acknowledgement and complete provider credentials. Missing or invalid operator authorization, provider unavailability, a response `phone_number` that does not normalize to the exact requested number, or timeout returns `503` without writing the contact; invalid or non-mobile numbers return `400`. The operator token must not be logged, stored, returned, or forwarded to Twilio.
+
 ### `GET /api/contacts/:contactId`
 
 Returns a single contact only when it belongs to the current organization.
@@ -67,6 +69,8 @@ Merges another tenant-scoped contact into the target contact from `{ "sourceCont
 ### `POST /api/contacts/imports`
 
 Accepts JSON `{ "filename": "contacts.csv", "csv": "..." }`, parses demo-safe CSV locally, upserts valid contacts, and stores an org-scoped `ContactImport` audit record. Invalid rows are returned with row numbers.
+
+CSV parsing always uses local phone normalization and must not call paid Twilio Lookup even when live lookup environment flags and credentials are present.
 
 ### `GET /api/templates`
 
@@ -90,7 +94,9 @@ Returns draft and future campaign records for the current organization.
 
 ### `POST /api/campaigns`
 
-Creates a draft campaign and optional recipient set. This does not schedule or send messages.
+Creates a draft campaign and optional recipient set. Any supplied `templateId` must resolve inside
+the current organization; missing and cross-tenant template IDs fail without creating a campaign.
+This does not schedule or send messages.
 
 ### `GET /api/campaigns/:campaignId`
 
@@ -98,7 +104,8 @@ Returns a tenant-scoped campaign with template and recipient contacts.
 
 ### `PATCH /api/campaigns/:campaignId`
 
-Updates draft campaigns only. Non-draft campaigns return conflict.
+Updates draft campaigns only. Non-draft campaigns return conflict. Any supplied `templateId` must
+resolve inside the current organization before the campaign is changed.
 
 ### `POST /api/campaigns/:campaignId/preflight`
 
@@ -106,11 +113,20 @@ Runs a compliance preflight over campaign recipients or the provided `contactIds
 
 ### `POST /api/campaigns/:campaignId/schedule`
 
-Runs preflight, marks a campaign `SCHEDULED`, cancels any other queued local jobs for the same campaign, and stores the active queued job record. This does not call providers.
+Runs preflight, marks a campaign `SCHEDULED`, cancels any other queued local jobs for the same
+campaign, and stores the active queued job record. The response also reports whether the optional
+BullMQ mirror was enqueued, disabled, or failed; the database job remains authoritative. This does
+not call messaging providers. Expected campaign-state, active-processing, and preflight conflicts
+return `409`; unexpected persistence or runtime failures return a generic `500` without reflecting
+internal exception text.
 
 ### `POST /api/campaigns/:campaignId/cancel`
 
-Marks queued campaign jobs `CANCELLED` and returns the paused campaign. Missing tenant-scoped campaigns return `404`; existing non-scheduled campaigns return `409` without queue or campaign mutations.
+Atomically wins or loses against a worker claim: it marks tenant-scoped queued campaign jobs
+`CANCELLED` before pausing the still-`SCHEDULED` campaign, while an active processing claim or a
+concurrent terminal transition returns `409` and rolls the cancellation back. Missing tenant-scoped
+campaigns return `404`. Unexpected persistence failures return a generic `500` without reflecting
+internal exception text.
 
 ### `GET /api/inbox/conversations`
 
@@ -158,11 +174,11 @@ Demo-only inbound entrypoint with the same behavior as `POST /api/inbox/conversa
 
 ### `GET /api/demo/live-test-sms`
 
-Returns live test SMS readiness for the local investor demo: enabled state, redacted/secret-free blockers, configured from-number presence, and allowlisted recipients. It must not call Twilio, send SMS, mutate records, expose auth tokens, or enable campaign/live messaging by itself.
+Returns live test SMS readiness for the local investor demo: enabled state, redacted/secret-free blockers, allowlisted-recipient count and last-four hints, and configured from-number presence/last-four. It must not return full allowlist/from values, the confirmation phrase, the server-only operator token, or provider credentials; call Twilio; send SMS; mutate records; or enable campaign/live messaging by itself.
 
 ### `POST /api/demo/live-test-sms`
 
-Sends exactly one Twilio-backed live test SMS only when `LIVE_TEST_SMS_ENABLED=true`, `LIVE_MESSAGING_ENABLED=true`, `MESSAGING_PROVIDER=twilio`, Twilio env credentials are configured, the recipient is in `LIVE_TEST_SMS_TO_ALLOWLIST`, and the request includes the exact confirmation phrase. It records a local outbound message and readiness audit event after Twilio accepts the message. This endpoint is the only live-send demo surface and does not enable bulk campaign sends, workers, billing, AI, notifications, or non-allowlisted recipients.
+Accepts a client-generated UUID `requestId`, recipient, body, exact confirmation phrase, and operator-entered token. Every POST, including an existing-request status lookup, must constant-time match the 32-256 character server-only `LIVE_TEST_SMS_OPERATOR_TOKEN` before reading or reserving a request. A new Twilio-backed send additionally requires `LIVE_TEST_SMS_ENABLED=true`, `LIVE_MESSAGING_ENABLED=true`, `MESSAGING_PROVIDER=twilio`, complete Twilio environment credentials, and membership in `LIVE_TEST_SMS_TO_ALLOWLIST`. After those gates pass, it atomically reserves a tenant-scoped outbound `Message` plus `LIVE_TEST_SMS_RESERVED` audit before Twilio is called. The audit stores an HMAC-SHA-256 actor/recipient/body binding keyed by the server-side operator secret plus original recipient/from last-four, never the full recipient, full body, operator token, or provider credentials. Authorized existing keys are resolved before current live-state gates: an exact actor/binding retry returns its stored sent, failed, or reserved/pending outcome and audit-backed last-four without another Twilio call; changed actor, recipient, or body returns `409` without a provider call. A validated Twilio 4xx rejection with an integer error code and no provider SID and immediate terminal provider statuses durably fail the reservation and return `502`; network/timeout, 5xx/other non-4xx, malformed-4xx, non-2xx-with-SID, 2xx-without-provider-ID, or provider-result persistence ambiguity leaves the reservation pending and returns `202`. Provider calls use a 1-10 second bounded timeout (5 seconds by default). This endpoint is the only live-send demo surface and does not enable bulk campaign sends, workers, billing, AI, notifications, or non-allowlisted recipients.
 
 ### `GET /api/settings/compliance`
 
@@ -202,11 +218,11 @@ Records a local usage event. This endpoint must not call Stripe or create live b
 
 ### `POST /api/webhooks/twilio/inbound`
 
-Accepts Twilio `application/x-www-form-urlencoded` inbound message webhooks. The request must pass `X-Twilio-Signature` validation with `TWILIO_AUTH_TOKEN`; unsigned requests are rejected. Valid payloads are stored as raw org-scoped webhook events by idempotency key and create local inbound inbox messages only. The handler returns `204` and does not send automatic SMS replies.
+Accepts Twilio `application/x-www-form-urlencoded` inbound message webhooks. The request must pass `X-Twilio-Signature` validation with `TWILIO_AUTH_TOKEN`; unsigned requests are rejected. Valid payloads are stored as raw org-scoped webhook events by idempotency key and create local inbound inbox messages only after acquiring an expiring owner lease. Successful and already processed events return `204`; an unprocessed event owned by another request returns `409` with an advisory `Retry-After`. Upstream retry behavior must be configured explicitly. The handler disables sentiment analysis and keyword auto-replies, and does not send SMS or invoke AI.
 
 ### `POST /api/webhooks/twilio/status`
 
-Accepts Twilio `application/x-www-form-urlencoded` delivery status webhooks. The request must pass `X-Twilio-Signature` validation with `TWILIO_AUTH_TOKEN`; unsigned requests are rejected. Valid payloads are stored as raw org-scoped webhook events by idempotency key. The handler returns `204` and does not call any provider.
+Accepts Twilio `application/x-www-form-urlencoded` delivery status webhooks. The request must pass `X-Twilio-Signature` validation with `TWILIO_AUTH_TOKEN`; unsigned requests are rejected. Valid payloads are stored as raw org-scoped webhook events by idempotency key and mutate local delivery state only after acquiring an expiring owner lease. Successful and already processed events return `204`; an unprocessed event owned by another request returns `409` with an advisory `Retry-After`. Upstream retry behavior must be configured explicitly. The handler does not call any provider.
 
 ### `GET /api/settings/provider`
 
@@ -228,37 +244,25 @@ Returns recent tenant-scoped provider credential metadata history for the curren
 
 Returns a CSV export of recent tenant-scoped provider credential metadata history for the current organization using the same allowlisted `action` and bounded `limit` filters as the JSON rotation endpoint. The export includes redacted local credential metadata only. It must not include raw auth tokens, token fingerprints, provider verification results, provider-side state, or trigger provider calls, live messaging, billing records, notifications, or mutations.
 
+### `/settings`
+
+Renders the consolidated go-live readiness view for the current organization. It may summarize demo operations, runtime and environment posture, campaigns, queue state, contacts, data, audiences, templates, inbox, webhooks, delivery, team, billing, reporting, AI, notifications, integrations, workflows, releases, provider-number metadata, and current blockers from existing local data and static policy. It must not execute commands, mutate records, call providers, Stripe, Redis, or live AI, send messages or notifications, expose secrets, or enable live features.
+
 ### `/settings/provider`
 
-Renders the provider details UI for the current organization. It may submit local Twilio credential metadata to `PATCH /api/settings/provider`, clear local metadata through `DELETE /api/settings/provider`, filter local rotation history by action, and link to the local CSV rotation-history export. The page must render/export redacted values only after submission and must not expose raw auth tokens, token fingerprints, provider verification status, live-send controls, or provider-side revocation controls.
+Renders provider details for the current organization. It may submit local Twilio credential metadata to `PATCH /api/settings/provider`, clear local metadata through `DELETE /api/settings/provider`, filter local rotation history, and link to its bounded CSV export. It must render and export redacted values only and must not expose raw auth tokens or token fingerprints, claim provider verification, call providers, revoke provider-side credentials, offer live-send controls, or enable live messaging.
 
 ### `/dashboard/campaigns/:campaignId`
 
 Renders the owner-facing campaign detail workflow for the current organization. It may read one tenant-scoped campaign, display aggregate local recipient readiness counts, display each selected recipient's local consent/archive/send-state/block-reason snapshot, display aggregate all-outbound local campaign delivery metrics with a derived review status, last-outbound-message metadata, provider-status and provider-error-code summaries, and a visible recent-evidence row count plus recent outbound message rows with mutually exclusive delivered/failed/pending row state and provider error-code evidence, edit draft name/body/template/recipients through `PATCH /api/campaigns/:campaignId`, and cancel queued scheduled work through `POST /api/campaigns/:campaignId/cancel`. It must not edit non-draft campaign content, send SMS, call providers, run workers, create billing records, call live AI, expose secrets, send notifications, bypass preflight, hard-delete records, mutate message delivery state, retry deliveries, or enable live messaging.
 
-### `/settings/numbers`
-
-Renders a read-only provider phone-number metadata view for the current organization. It may display locally stored number labels, provider names, local statuses, capabilities, and default-number markers. The page must not create or update number records, provision provider numbers, verify Twilio ownership, expose credentials, call providers, send notifications, create billing records, or enable live messaging.
-
 ### `/settings/compliance`
 
 Renders a read-only compliance detail view for the current organization. It may display compliance profile fields, checklist completeness, A2P metadata status, hard-gate blockers, demo/live flags, and links to local readiness audit exports. The page must not mutate compliance records, enable live messaging, call providers, send notifications, create billing records, expose secrets, or perform provider-side verification.
 
-### `/settings/system`
-
-Renders a read-only local operations snapshot for the current organization. It may display demo/live flags, selected messaging and AI providers, production-like deployment markers, queue backend metadata, Redis presence, local worker jobs-per-poll limits, and API rate-limit policy. The page must not mutate records, expose secrets, call providers, send notifications, create billing records, or enable live messaging.
-
 ### `/settings/health`
 
-Renders a read-only local health operations checkpoint. It may display the existing `GET /api/health` contract, static service name, demo-safe defaults, runtime blockers, and links to local system/API/security/validation surfaces. The page must not execute health probes, call APIs, run commands, mutate records, expose raw environment values or secrets, call providers, call Stripe, call live AI, send SMS, send email, send notifications, create billing records, or enable live features.
-
-### `/settings/environment`
-
-Renders a read-only local environment operations checkpoint. It may display demo-safe defaults, allowlisted configuration category names, derived runtime status, and links to local system/security/validation/release surfaces. The page must not read environment files, display `.env.local` contents, expose raw environment values, expose credentials or token fingerprints, mutate configuration, write files, execute commands, call APIs, call Redis, call providers, call Stripe, call live AI, send SMS, send email, send notifications, create billing records, deploy, or enable live features.
-
-### `/settings/demo`
-
-Renders a read-only local demo operations checkpoint for the current organization. It may display seeded demo readiness, workflow links projected from the shared operator surface inventory, local contact/campaign/conversation/message/number metrics, local usage totals, and derived runtime gates. The page must not import data, schedule or cancel campaigns, run workers, create inbox messages or replies, submit prompts, execute reports, create exports, mutate records, enqueue jobs, call Redis, call providers, call Stripe, call live AI, send SMS, send email, send notifications, expose secrets, expose full message bodies, or enable live messaging, live billing, live AI, or other live features.
+Renders a read-only local health operations checkpoint. It may display the existing `GET /api/health` contract, static service name, demo-safe defaults, runtime blockers, and links to the surviving operations, security, and validation surfaces. The page must not execute health probes, call APIs, run commands, mutate records, expose raw environment values or secrets, call providers, call Stripe, call live AI, send SMS, send email, send notifications, create billing records, or enable live features.
 
 ### `/settings/operations`
 
@@ -268,81 +272,9 @@ Renders a read-only local operations index for existing operator surfaces. It ma
 
 Renders a read-only local operator checklist based on `docs/LOCAL_OPERATOR_RUNBOOK.md`. It may display local validation, database migration/seed, worker, BullMQ smoke, admin export, and repair-loop commands. The page must not execute commands, mutate records, expose secrets, call providers, send notifications, create billing records, or enable live messaging.
 
-### `/settings/usage`
-
-Renders a read-only local usage and analytics view for the current organization. It may display tenant-scoped contact, campaign, conversation, message, local usage totals, billing account metadata, and recent local usage events. The page must not mutate records, call Stripe, create billing provider artifacts, send notifications, call providers, expose secrets, or enable live messaging.
-
-### `/settings/campaigns`
-
-Renders a read-only campaign operations view for the current organization. It may display existing campaign status counts, recipient counts, scheduled campaign metadata, queue job status counts, idempotency keys, and local worker boundary text. The page must not create, update, schedule, cancel, send, or delete campaigns; run workers; mutate queue rows; call messaging providers; create billing records; send notifications; expose secrets; or enable live messaging.
-
 ### `/settings/queue`
 
 Renders a read-only queue operations view for the current organization. It may display scheduled-campaign queue job status counts, due versus future queued jobs, payload validity, idempotency keys, worker poll settings, queue backend metadata, Redis presence, and related campaign names. The page must not enqueue jobs, run workers, mutate queue rows, update campaign status, call Redis, call messaging providers, create billing records, send notifications, expose secrets, send SMS, or enable live messaging.
-
-### `/settings/contacts`
-
-Renders a read-only contact operations view for the current organization. It may display active contact counts, consent status counts, contact import status counts, imported/failed row totals, tag counts, list counts, and recent contact/import metadata. The page must not import contacts, create or update contacts, update consent, mutate tags/lists, hard-delete records, call messaging providers, send notifications, create billing records, expose secrets, send SMS, or enable live messaging.
-
-### `/settings/data`
-
-Renders a read-only data operations view for the current organization. It may display tenant-scoped local record totals, active versus archived contact counts, import row totals, local audit/export boundary status, and recent archived contact metadata. The page must not hard-delete data, restore archived records, run exports, mutate records, call providers, create billing records, send notifications, expose secrets, send SMS, call live AI, or enable live messaging, live billing, or live AI.
-
-### `/settings/audience`
-
-Renders a read-only audience operations view for the current organization. It may display tag counts, list member counts, saved segment names, segment definitions, and segment update timestamps. The page must not create or update tags/lists/segments, change contact memberships, evaluate segments for campaign sending, call messaging providers, send notifications, create billing records, expose secrets, send SMS, or enable live messaging.
-
-### `/settings/templates`
-
-Renders a read-only template operations view for the current organization. It may display message template counts, variable names, campaign usage counts, and local text previews. The page must not create templates, update template copy, render live outbound messages, schedule campaigns, call messaging providers, send notifications, create billing records, expose secrets, send SMS, or enable live messaging.
-
-### `/settings/inbox`
-
-Renders a read-only inbox operations view for the current organization. It may display conversation status counts, assignment counts, recent message/note counts, contact display names, assignee display names, and local inbox safety-boundary text. The page must not create messages, assign conversations, resolve conversations, add notes, mutate contacts or consent, call messaging providers, send notifications, create billing records, expose secrets, send SMS, or enable live messaging.
-
-### `/settings/webhooks`
-
-Renders a read-only webhook operations view for the current organization. It may display Twilio webhook route coverage, local stored webhook event counts, provider/event-type summaries, recent idempotency keys, received timestamps, and webhook safety-boundary text. The page must not replay webhooks, create webhook events, mutate messages or contacts, call Twilio, send automatic replies, send notifications, expose secrets, create billing records, send SMS, or enable live messaging.
-
-### `/settings/delivery`
-
-Renders a read-only delivery operations view for the current organization. It may display existing tenant-scoped message direction counts, delivery metadata, provider status labels, provider message ID presence, campaign/conversation context, idempotency keys, and delivery safety-boundary text. The page must not send SMS, retry deliveries, replay webhooks, mutate messages, mutate campaigns, call providers, create billing records, send notifications, expose secrets, or enable live messaging.
-
-### `/settings/team`
-
-Renders a read-only team operations view for the current organization. It may display organization metadata, membership role/status counts, member display names, member emails, assigned conversation counts, authored internal-note counts, and local team safety-boundary text. The page must not invite users, create users, update roles, suspend members, delete memberships, call Clerk, send email, send notifications, expose secrets, create billing records, call messaging providers, send SMS, or enable live messaging.
-
-### `/settings/billing`
-
-Renders a read-only billing operations view for the current organization. It may display local billing account status, live billing gate status, Stripe placeholder presence, usage-event totals, recent local usage-event metadata, and billing safety-boundary text. The page must not create billing accounts beyond the existing local demo-safe upsert helper, call Stripe, create subscriptions, create invoices, collect payment methods, charge cards, send email, send notifications, expose secrets, call messaging providers, send SMS, or enable live billing.
-
-### `/settings/reports`
-
-Renders a read-only reporting index for the current organization. It may display existing local report links, tenant-scoped analytics counts, local usage totals, readiness audit signals, and reporting safety-boundary text. The page must not execute report jobs, create exports, mutate records, call providers, call Stripe, call live AI, send SMS, send email, send notifications, expose secrets, or enable live messaging, live billing, or live AI.
-
-### `/settings/integrations`
-
-Renders a read-only integration operations view for the current organization. It may display existing local integration surfaces for messaging provider metadata, provider numbers, inbound webhooks, fake AI, local billing, and notification no-send boundaries. The page must not call providers, submit prompts, call live AI, call Stripe, send SMS, send email, send notifications, emit outbound webhooks, expose secrets or token fingerprints, mutate records, enqueue jobs, create exports, or enable live messaging, live billing, or live AI.
-
-### `/settings/workflows`
-
-Renders a read-only workflow operations view for the current organization. It may display existing local demo workflow checkpoints across contacts, campaigns, queue, inbox, delivery, AI, usage, and reporting surfaces. The page must not import contacts, schedule or cancel campaigns, run workers, create inbox replies, retry deliveries, submit prompts, execute reports, create exports, mutate records, enqueue jobs, call Redis, call providers, call Stripe, call live AI, send SMS, send email, send notifications, expose secrets, or enable live messaging, live billing, or live AI.
-
-### `/settings/releases`
-
-Renders a read-only release operations view for the current organization. It may display local release checklist commands, protected gate expectations, seeded demo path expectations, premerge validation metadata, release surface links, and runtime safety boundaries. The page must not execute commands, run scripts, run migrations, launch tests or browsers, perform git operations, deploy, mutate records, enqueue jobs, create exports, call Redis, call providers, call Stripe, call live AI, send SMS, send email, send notifications, expose secrets/logs/diffs/env values, or enable live messaging, live billing, or live AI.
-
-### `/settings/ai`
-
-Renders a read-only AI operations view for the current organization. It may display the selected AI provider, fake-provider readiness, live-AI blocked state, deterministic AI endpoint coverage, local AI usage totals, recent local AI usage-event metadata, and AI safety-boundary text. The page must not submit prompts, mutate conversations, call live AI providers, create paid model requests, expose API keys, create billing provider artifacts, send notifications, call messaging providers, send SMS, or enable live AI.
-
-### `/settings/api`
-
-Renders a read-only API operations view for the current organization. It may display static local API route inventory, route areas, read/write classification, external-impact classification, local safety notes, and API rate-limit policy. The page must not execute API handlers, create or mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, expose secrets, disable rate limits, or enable live messaging, live billing, or live AI.
-
-### `/settings/contracts`
-
-Renders a read-only contract operations view for the current organization. It may display static local contract inventory, drift controls, validation command references, and contract safety-boundary text. The page may display the current demo organization name, but must not read contract file contents, execute validation commands, scan files, create or mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, expose secrets, disable rate limits, or enable live messaging, live billing, or live AI.
 
 ### `/settings/validation`
 
@@ -352,13 +284,13 @@ Renders a read-only validation operations view for the current organization. It 
 
 Renders a read-only security operations view for the current organization. It may display demo-safe gate status, external-impact boundary status, API rate-limit policy, production override state, documented secret-storage boundaries, and validation-command references. The page must not scan files, read or expose raw environment values, reveal `.env.local`, reveal provider tokens or API keys, create or mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, disable rate limits, or enable live messaging, live billing, or live AI.
 
-### `/settings/notifications`
-
-Renders a read-only notification operations view for the current organization. It may display demo-safe notification channel boundaries, no-send controls, live messaging/billing status, provider status, and future notification-provider gate requirements. The page must not create notification recipients, subscriptions, templates, jobs, sends, alerts, or webhooks; call email, SMS, browser notification, provider, Stripe, or live AI services; expose secrets; send notifications; send SMS; send email; mutate records; or enable live messaging, live billing, or live AI.
-
 ### `/settings/readiness-audit`
 
 Renders a read-only local go-live readiness audit view for the current organization. It may display tenant-scoped audit events, allowlisted action/subject filters, local metadata, timestamps, actor IDs, and links to the existing bounded CSV export. The page must not create, update, delete, replay, or mutate audit events; expose secrets, raw provider credentials, token fingerprints, provider verification results, or environment values; call providers, Stripe, live AI, SMS, email, or notification services; create billing records; or enable live messaging, live billing, or live AI.
+
+### `/settings/exports`
+
+Renders the allowlisted local administrative exports. It may link to the current tenant-scoped CSV endpoints for contacts, campaigns, provider credential-rotation metadata, and readiness-audit events. It must not execute exports during render, mutate records, expose secrets or token fingerprints, call providers, create billing records, send notifications, or enable live features.
 
 ### `/dashboard`
 
@@ -398,7 +330,7 @@ Renders the product-facing compliance readiness workspace for the current organi
 
 ### `/`
 
-Renders the local launch dashboard. It may display demo-safe runtime defaults and links to existing local-only demo, readiness, provider metadata, system, usage, and admin export views. The page must not require database access, mutate records, call providers, create billing artifacts, send notifications, expose secrets, or enable live messaging.
+Renders the local launch dashboard. It may display demo-safe runtime defaults and links to `/demo`, the consolidated `/settings` readiness view, `/settings/operations`, `/settings/provider`, `/settings/compliance`, and `/settings/exports`. The page must not require database access, mutate records, call providers, create billing artifacts, send notifications, expose secrets, or enable live messaging.
 
 ### `GET /api/settings/numbers`
 
@@ -406,7 +338,7 @@ Returns tenant-scoped provider phone-number metadata for the current organizatio
 
 ### `POST /api/settings/numbers`
 
-Creates or updates tenant-scoped provider phone-number metadata from `{ "phoneNumber": "+15555550123", "provider": "dummy", "capabilities": ["sms"], "isDefault": true }`. This endpoint is local metadata only; it must not provision numbers, validate live ownership, store secrets, enable live messaging, or send SMS.
+Creates or updates tenant-scoped provider phone-number metadata from `{ "phoneNumber": "+15555550123", "provider": "dummy", "capabilities": ["sms"], "isDefault": true }`. At most one number per organization may be the default. This endpoint is local metadata only; it must not provision numbers, validate live ownership, store secrets, enable live messaging, or send SMS.
 
 ### `GET /api/settings/readiness-audit`
 
@@ -414,11 +346,17 @@ Returns recent tenant-scoped live-readiness audit events for the current organiz
 
 ### `GET /api/settings/readiness-audit/export`
 
-Returns a CSV export of tenant-scoped live-readiness audit events for the current organization using the same bounded `limit`, allowlisted `action`, and allowlisted `subjectType` filters as the JSON audit endpoint. The export includes local audit metadata only. It must not expose secrets, call providers, send notifications, create billing records, enable live messaging, or mutate audit records.
+Returns a CSV export of tenant-scoped live-readiness audit events for the current organization using the same bounded `limit`, allowlisted `action`, and allowlisted `subjectType` filters as the JSON audit endpoint. Every exported cell must be RFC-style quoted/escaped as needed and neutralize spreadsheet formula and row-injection prefixes. The export includes local audit metadata only. It must not expose secrets, call providers, send notifications, create billing records, enable live messaging, or mutate audit records.
 
 ### `GET /api/metrics`
 
-Returns SMS pipeline metrics in standard Prometheus plaintext exposition format, gated behind `OBSERVABILITY_ENABLED=true`.
+Returns current-organization SMS pipeline metrics in standard Prometheus plaintext exposition format,
+gated behind `OBSERVABILITY_ENABLED=true` and the current authenticated/demo-safe organization
+context. The route must not scan or aggregate another tenant's messages. Delivery failures use the
+shared terminal provider-status vocabulary (`failed`, `undelivered`, and `canceled`). The response
+must not expose process-global counters as if they were tenant-scoped. In particular, signature
+verification failures occur before trusted organization resolution and remain redacted observability
+events rather than a counter in this current-organization response.
 
 ### `GET /api/contacts/segments`
 
@@ -426,11 +364,16 @@ Evaluates dynamic contact segment filters (tags, consent status, lead score rang
 
 ### `GET /api/contacts/segments/export`
 
-Exports matching contact segment queries directly to a downloadable standard CSV file.
+Exports matching contact segment queries directly to a downloadable standard CSV file. Every cell
+must neutralize spreadsheet formula prefixes and quote commas, quotes, carriage returns, and line
+feeds so data cannot inject formulas or rows.
 
 ### `POST /api/templates/preview`
 
-Validates placeholder variable substitutions and returns the fully rendered preview string along with any missing or unused parameter warning list.
+Accepts a non-empty tenant-scoped `templateId` and a plain object whose keys and values are strings.
+It returns the plain-text SMS preview plus missing/unused parameter lists. Replacement is single-pass
+so variable values cannot introduce a second placeholder expansion. HTML encoding is intentionally
+not applied at this domain layer; any future HTML sink must encode at that sink.
 
 Product endpoints must be specified here before implementation.
 

@@ -22,7 +22,7 @@ Tenant rule: every tenant-scoped table must include `orgId` unless explicitly do
 
 Contacts now include profile, consent, and import metadata:
 
-- `Contact` stores phone, optional identity fields, consent state, opt-in/out timestamps, source, notes, and `archivedAt`.
+- `Contact` stores phone, optional identity fields, consent state, opt-in/out timestamps, source, notes, and `archivedAt`. Captured consent timestamp, method, and disclosure form an all-or-none, write-once bundle at both the application and database layers so concurrent writers cannot replace or combine separate evidence.
 - `Tag`/`ContactTag` provide reusable labels.
 - `ContactList`/`ContactListMember` provide static list membership.
 - `Segment` stores saved segment definitions as JSON for later campaign targeting.
@@ -40,7 +40,7 @@ Preflight reads contacts and returns compliance reasons. It does not create mess
 
 ## Milestone 4 Queue Jobs
 
-`QueueJob` stores durable scheduled campaign jobs with idempotency keys that are unique per organization. Scheduling creates a queued record after preflight. Cancelling marks queued jobs cancelled. Workers and provider sends remain gated future work.
+`QueueJob` stores durable scheduled campaign jobs with idempotency keys that are unique per organization and a monotonic generation for optional BullMQ mirroring. Scheduling creates or safely reopens a queued record after preflight but never resets a processing/completed row. Processing uses an expiring owner token that is renewed before provider calls and cleared on terminal transition, so an abandoned job is recoverable without letting an old owner finish it. Queue/campaign terminal state commits atomically. Cancellation and claiming serialize through the queued-row update: exactly one wins, and cancellation never reports success over active work. Workers and provider sends remain gated future work.
 
 ## Milestone 5 Shared Inbox
 
@@ -63,7 +63,7 @@ These records do not trigger Stripe or any live billing provider behavior.
 
 ## Post-MVP Webhook Foundations
 
-`WebhookEvent` stores org-scoped raw provider webhook payloads with an idempotency key unique within that organization. It is used by Twilio inbound and status webhook foundations to preserve provider data without live external side effects.
+`WebhookEvent` stores org-scoped raw provider webhook payloads with an idempotency key unique within that organization. Nullable `claimToken` and `claimExpiresAt` fields provide an atomic, expiring owner lease for unprocessed events: only one active claimant may run downstream work, only that owner may complete or release it, and an abandoned claim becomes recoverable after expiry. It is used by Twilio inbound and status webhook foundations to preserve provider data without live external side effects.
 
 ## Post-MVP Status Transition Processing
 
@@ -72,7 +72,7 @@ Provider delivery state is stored on `Message` rows:
 - `providerStatus`: latest normalized provider status string.
 - `providerErrorCode`: latest provider error code when present.
 - `deliveredAt`: set when a provider status reaches `delivered`.
-- `failedAt`: set when a provider status reaches `failed` or `undelivered`.
+- `failedAt`: set when a provider status reaches the shared terminal-failure vocabulary: `failed`, `undelivered`, or `canceled`.
 
 ## Post-MVP Provider Number Foundation
 

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth/api-authorization";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { orgWhere } from "@/lib/db/tenant";
-import { renderTemplatePreview } from "@/lib/validation/template-preview";
+import { renderTemplatePreview, templatePreviewSchema } from "@/lib/validation/template-preview";
 import { withOptionalTenantRls } from "@/lib/db/rls";
 
 export async function POST(request: Request) {
@@ -14,15 +14,18 @@ export async function POST(request: Request) {
   }
 
   const rawPayload = await request.json().catch(() => undefined);
-
-  if (!rawPayload || !rawPayload.templateId || typeof rawPayload.variables !== "object") {
+  const payload = templatePreviewSchema.safeParse(rawPayload);
+  if (!payload.success) {
     return NextResponse.json(
-      { error: "Invalid template preview request payload. Requires templateId and variables object." },
+      {
+        error: "Invalid template preview request payload. Requires templateId and string variables.",
+        issues: payload.error.issues
+      },
       { status: 400 }
     );
   }
 
-  const { templateId, variables } = rawPayload;
+  const { templateId, variables } = payload.data;
 
   const template = await withOptionalTenantRls(currentOrg.orgId, async (tx) => {
     return tx.messageTemplate.findFirst({

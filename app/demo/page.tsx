@@ -39,7 +39,7 @@ export default async function DemoPage() {
       <header className="flex flex-col gap-6 border-b border-slate-200 pb-6">
         <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium text-teal-700" aria-label="Primary demo navigation">
           <Link href="/">SignalStack SMS</Link>
-          <Link href="/settings/demo">Demo Ops</Link>
+          <Link href="/settings/operations">Demo Ops</Link>
           <Link href="/settings">Readiness</Link>
           <Link href="/settings/operations">Operations</Link>
         </nav>
@@ -63,8 +63,10 @@ export default async function DemoPage() {
       <LiveTestSmsForm
         enabled={liveTestSmsStatus.enabled}
         blockers={liveTestSmsStatus.blockers}
-        allowedRecipients={liveTestSmsStatus.allowedRecipients}
-        fromNumber={liveTestSmsStatus.fromNumber}
+        allowedRecipientCount={liveTestSmsStatus.allowedRecipientCount}
+        allowedRecipientLast4={liveTestSmsStatus.allowedRecipientLast4}
+        fromNumberConfigured={liveTestSmsStatus.fromNumberConfigured}
+        fromNumberLast4={liveTestSmsStatus.fromNumberLast4}
       />
 
       <section className="border-y border-slate-200 py-5" aria-label="Demo console operations">

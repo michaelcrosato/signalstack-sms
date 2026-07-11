@@ -1,6 +1,7 @@
-import { ContactImportStatus, ConsentStatus, type Prisma } from "@prisma/client";
+import { ContactImportStatus, ConsentStatus, type Contact, type Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 import { orgWhere } from "@/lib/db/tenant";
+import { hasAnyConsentEvidence, hasCompleteConsentEvidence } from "@/lib/compliance/consent-evidence";
 import type { ContactCreateInput, ContactUpdateInput } from "@/lib/validation/contacts";
 import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
 import type { ParsedContactImport } from "@/lib/csv/import-contacts";
@@ -9,6 +10,8 @@ const contactInclude = {
   tagLinks: { include: { tag: true } },
   listLinks: { include: { list: true } }
 } satisfies Prisma.ContactInclude;
+
+const CONTACT_IMPORT_PREFETCH_BATCH_SIZE = 10_000;
 
 export async function listContacts(orgId: string, tx: Prisma.TransactionClient = prisma) {
   return tx.contact.findMany({
@@ -46,6 +49,7 @@ export async function upsertContact(
     if (existing) {
       verifyConsentEvidenceImmutability(existing, input);
     }
+    verifyConsentEvidenceCompleteness(existing, input);
 
     const contact = await t.contact.upsert({
       where: { orgId_phone: { orgId, phone: input.phone } },
@@ -81,6 +85,7 @@ export async function updateContact(orgId: string, contactId: string, input: Con
     }
 
     verifyConsentEvidenceImmutability(existing, input);
+    verifyConsentEvidenceCompleteness(existing, input);
 
     const contact = await tx.contact.update({
       where: { id: contactId },
@@ -198,10 +203,22 @@ export async function importContacts(
       }
     });
 
+    const existingContacts: Contact[] = [];
+    const uniquePhones = [...new Set(parsed.contacts.map((contact) => contact.phone))];
+    for (let index = 0; index < uniquePhones.length; index += CONTACT_IMPORT_PREFETCH_BATCH_SIZE) {
+      existingContacts.push(
+        ...(await tx.contact.findMany({
+          where: {
+            orgId,
+            phone: { in: uniquePhones.slice(index, index + CONTACT_IMPORT_PREFETCH_BATCH_SIZE) }
+          }
+        }))
+      );
+    }
+    const existingByPhone = new Map(existingContacts.map((contact) => [contact.phone, contact]));
+
     for (const contact of parsed.contacts) {
-      const existing = await tx.contact.findUnique({
-        where: { orgId_phone: { orgId, phone: contact.phone } }
-      });
+      const existing = existingByPhone.get(contact.phone);
 
       if (existing) {
         verifyConsentEvidenceImmutability(existing, contact);
@@ -212,6 +229,7 @@ export async function importContacts(
         update: contactWriteData(contact),
         create: { orgId, phone: contact.phone, ...contactWriteData(contact) }
       });
+      existingByPhone.set(saved.phone, saved);
 
       if (saved.consentStatus === ConsentStatus.PENDING_DOUBLE_OPT_IN) {
         if (!existing || existing.consentStatus !== ConsentStatus.PENDING_DOUBLE_OPT_IN) {
@@ -235,7 +253,7 @@ export async function importContacts(
 
 function contactWriteData(input: Partial<ContactCreateInput>) {
   let finalStatus = input.consentStatus;
-  if (process.env.DOUBLE_OPT_IN_REQUIRED === "true") {
+  if (finalStatus !== undefined && process.env.DOUBLE_OPT_IN_REQUIRED === "true") {
     if (finalStatus !== ConsentStatus.OPTED_OUT) {
       finalStatus = ConsentStatus.PENDING_DOUBLE_OPT_IN;
     }
@@ -276,22 +294,36 @@ async function syncContactLabels(
   await tx.contactTag.deleteMany({ where: { orgId, contactId } });
   await tx.contactListMember.deleteMany({ where: { orgId, contactId } });
 
-  for (const name of uniqueNames(tagNames)) {
-    const tag = await tx.tag.upsert({
-      where: { orgId_name: { orgId, name } },
-      update: {},
-      create: { orgId, name }
+  const uniqueTagNames = uniqueNames(tagNames);
+  if (uniqueTagNames.length > 0) {
+    await tx.tag.createMany({
+      data: uniqueTagNames.map((name) => ({ orgId, name })),
+      skipDuplicates: true
     });
-    await tx.contactTag.create({ data: { orgId, contactId, tagId: tag.id } });
+    const tags = await tx.tag.findMany({
+      where: { orgId, name: { in: uniqueTagNames } },
+      select: { id: true }
+    });
+    await tx.contactTag.createMany({
+      data: tags.map((tag) => ({ orgId, contactId, tagId: tag.id })),
+      skipDuplicates: true
+    });
   }
 
-  for (const name of uniqueNames(listNames)) {
-    const list = await tx.contactList.upsert({
-      where: { orgId_name: { orgId, name } },
-      update: {},
-      create: { orgId, name }
+  const uniqueListNames = uniqueNames(listNames);
+  if (uniqueListNames.length > 0) {
+    await tx.contactList.createMany({
+      data: uniqueListNames.map((name) => ({ orgId, name })),
+      skipDuplicates: true
     });
-    await tx.contactListMember.create({ data: { orgId, contactId, listId: list.id } });
+    const lists = await tx.contactList.findMany({
+      where: { orgId, name: { in: uniqueListNames } },
+      select: { id: true }
+    });
+    await tx.contactListMember.createMany({
+      data: lists.map((list) => ({ orgId, contactId, listId: list.id })),
+      skipDuplicates: true
+    });
   }
 }
 
@@ -302,35 +334,48 @@ async function mergeContactLabels(
   tagNames: string[],
   listNames: string[]
 ) {
-  for (const name of uniqueNames(tagNames)) {
-    const tag = await tx.tag.upsert({
-      where: { orgId_name: { orgId, name } },
-      update: {},
-      create: { orgId, name }
+  const uniqueTagNames = uniqueNames(tagNames);
+  if (uniqueTagNames.length > 0) {
+    await tx.tag.createMany({
+      data: uniqueTagNames.map((name) => ({ orgId, name })),
+      skipDuplicates: true
     });
-    await tx.contactTag.upsert({
-      where: { contactId_tagId: { contactId, tagId: tag.id } },
-      update: {},
-      create: { orgId, contactId, tagId: tag.id }
+    const tags = await tx.tag.findMany({
+      where: { orgId, name: { in: uniqueTagNames } },
+      select: { id: true }
+    });
+    await tx.contactTag.createMany({
+      data: tags.map((tag) => ({ orgId, contactId, tagId: tag.id })),
+      skipDuplicates: true
     });
   }
 
-  for (const name of uniqueNames(listNames)) {
-    const list = await tx.contactList.upsert({
-      where: { orgId_name: { orgId, name } },
-      update: {},
-      create: { orgId, name }
+  const uniqueListNames = uniqueNames(listNames);
+  if (uniqueListNames.length > 0) {
+    await tx.contactList.createMany({
+      data: uniqueListNames.map((name) => ({ orgId, name })),
+      skipDuplicates: true
     });
-    await tx.contactListMember.upsert({
-      where: { listId_contactId: { listId: list.id, contactId } },
-      update: {},
-      create: { orgId, listId: list.id, contactId }
+    const lists = await tx.contactList.findMany({
+      where: { orgId, name: { in: uniqueListNames } },
+      select: { id: true }
+    });
+    await tx.contactListMember.createMany({
+      data: lists.map((list) => ({ orgId, listId: list.id, contactId })),
+      skipDuplicates: true
     });
   }
 }
 
 function mergedConsentData(
-  target: { consentStatus: ConsentStatus; optInAt: Date | null; optedOutAt: Date | null },
+  target: {
+    consentStatus: ConsentStatus;
+    optInAt: Date | null;
+    optedOutAt: Date | null;
+    consentCapturedAt: Date | null;
+    consentMethod: string | null;
+    consentDisclosure: string | null;
+  },
   source: { consentStatus: ConsentStatus; optInAt: Date | null; optedOutAt: Date | null }
 ) {
   if (target.consentStatus === ConsentStatus.OPTED_OUT || source.consentStatus === ConsentStatus.OPTED_OUT) {
@@ -341,10 +386,22 @@ function mergedConsentData(
     };
   }
 
-  if (target.consentStatus === ConsentStatus.UNKNOWN && source.consentStatus === ConsentStatus.OPTED_IN) {
+  if (target.consentStatus === ConsentStatus.OPTED_IN && !hasCompleteConsentEvidence(target)) {
+    return {
+      consentStatus: ConsentStatus.UNKNOWN,
+      optInAt: null,
+      optedOutAt: null
+    };
+  }
+
+  if (
+    target.consentStatus === ConsentStatus.UNKNOWN &&
+    source.consentStatus === ConsentStatus.OPTED_IN &&
+    hasCompleteConsentEvidence(target)
+  ) {
     return {
       consentStatus: ConsentStatus.OPTED_IN,
-      optInAt: target.optInAt ?? source.optInAt ?? new Date(),
+      optInAt: target.optInAt ?? target.consentCapturedAt,
       optedOutAt: null
     };
   }
@@ -389,22 +446,48 @@ function verifyConsentEvidenceImmutability(
     consentDisclosure?: string | null;
   }>
 ) {
-  if (existing.consentCapturedAt && input.consentCapturedAt !== undefined && input.consentCapturedAt !== null) {
-    const existingTime = existing.consentCapturedAt.getTime();
-    const inputTime = new Date(input.consentCapturedAt).getTime();
-    if (existingTime !== inputTime) {
+  if (existing.consentCapturedAt && input.consentCapturedAt !== undefined) {
+    if (
+      input.consentCapturedAt === null ||
+      existing.consentCapturedAt.getTime() !== input.consentCapturedAt.getTime()
+    ) {
       throw new Error("Consent evidence (consentCapturedAt) is write-once and cannot be changed");
     }
   }
-  if (existing.consentMethod && input.consentMethod !== undefined && input.consentMethod !== null && input.consentMethod !== "") {
-    if (existing.consentMethod !== input.consentMethod) {
-      throw new Error("Consent evidence (consentMethod) is write-once and cannot be changed");
-    }
+  if (existing.consentMethod && input.consentMethod !== undefined && existing.consentMethod !== input.consentMethod) {
+    throw new Error("Consent evidence (consentMethod) is write-once and cannot be changed");
   }
-  if (existing.consentDisclosure && input.consentDisclosure !== undefined && input.consentDisclosure !== null && input.consentDisclosure !== "") {
-    if (existing.consentDisclosure !== input.consentDisclosure) {
-      throw new Error("Consent evidence (consentDisclosure) is write-once and cannot be changed");
-    }
+  if (
+    existing.consentDisclosure &&
+    input.consentDisclosure !== undefined &&
+    existing.consentDisclosure !== input.consentDisclosure
+  ) {
+    throw new Error("Consent evidence (consentDisclosure) is write-once and cannot be changed");
+  }
+}
+
+function verifyConsentEvidenceCompleteness(
+  existing: {
+    consentCapturedAt: Date | null;
+    consentMethod: string | null;
+    consentDisclosure: string | null;
+  } | null,
+  input: Partial<{
+    consentCapturedAt?: Date | null;
+    consentMethod?: string | null;
+    consentDisclosure?: string | null;
+  }>
+) {
+  const resultingEvidence = {
+    consentCapturedAt:
+      input.consentCapturedAt === undefined ? existing?.consentCapturedAt ?? null : input.consentCapturedAt,
+    consentMethod: input.consentMethod === undefined ? existing?.consentMethod ?? null : input.consentMethod,
+    consentDisclosure:
+      input.consentDisclosure === undefined ? existing?.consentDisclosure ?? null : input.consentDisclosure
+  };
+
+  if (hasAnyConsentEvidence(resultingEvidence) && !hasCompleteConsentEvidence(resultingEvidence)) {
+    throw new Error("Consent evidence requires capturedAt, method, and disclosure together");
   }
 }
 

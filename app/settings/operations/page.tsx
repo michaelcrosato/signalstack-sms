@@ -16,7 +16,7 @@ export default function OperationsIndexPage() {
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-6">
         <nav aria-label="Related settings" className="flex flex-wrap gap-2">
           <HeaderLink href="/" label="Local Launch Dashboard" />
-          <HeaderLink href="/settings/demo" label="Demo Operations" />
+          <HeaderLink href="/demo" label="Demo Console" />
           <HeaderLink href="/settings/runbook" label="Operator Runbook" />
         </nav>
         <div>

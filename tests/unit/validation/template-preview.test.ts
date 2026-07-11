@@ -45,6 +45,21 @@ describe("Message Template Variable Substitution Validator & Preview Seam", () =
     const resMulti = renderTemplatePreview(bodyMulti, { name: "Dave" });
     expect(resMulti.success).toBe(true);
     expect(resMulti.rendered).toBe("Dave! Welcome Dave!");
+
+    const resSinglePass = renderTemplatePreview("{{first}} {{second}}", {
+      first: "{{second}}",
+      second: "safe"
+    });
+    expect(resSinglePass.rendered).toBe("{{second}} safe");
+  });
+
+  it("uses only own string variables and does not apply HTML encoding to SMS text", () => {
+    const variables = Object.create({ inherited: "unsafe" }) as Record<string, string>;
+    variables.name = "<b>Ada & Bob</b>";
+
+    const result = renderTemplatePreview("{{name}} {{inherited}}", variables);
+    expect(result.rendered).toBe("<b>Ada & Bob</b> {{inherited}}");
+    expect(result.missing).toEqual(["inherited"]);
   });
 
   it("handles preview endpoint POST requests correctly", async () => {
@@ -106,5 +121,29 @@ describe("Message Template Variable Substitution Validator & Preview Seam", () =
 
     const response = await previewTemplateRoute(request);
     expect(response.status).toBe(404);
+  });
+
+  it.each([
+    { templateId: "template_1", variables: null },
+    { templateId: "template_1", variables: [] },
+    { templateId: "template_1", variables: { name: { nested: true } } },
+    { templateId: "template_1", variables: { "invalid-key!": "value" } }
+  ])("rejects non-string variable records before database access", async (body) => {
+    mocks.getOrCreateCurrentOrg.mockResolvedValue({
+      orgId: "some_org",
+      slug: "some_slug",
+      name: "some_name",
+      role: "ADMIN"
+    });
+
+    const response = await previewTemplateRoute(
+      new Request("http://localhost/api/templates/preview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      })
+    );
+
+    expect(response.status).toBe(400);
   });
 });

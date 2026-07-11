@@ -33,7 +33,7 @@ Milestone 3:
 Milestone 4:
 
 - `POST /api/campaigns/:campaignId/schedule`: stores a queued scheduled-campaign job after preflight.
-- `POST /api/campaigns/:campaignId/cancel`: cancels queued jobs and pauses scheduled campaigns; existing non-scheduled campaigns return `409` without mutation.
+- `POST /api/campaigns/:campaignId/cancel`: atomically cancels queued jobs and pauses a still-scheduled campaign; active processing or a concurrent terminal transition returns `409` and rolls cancellation back.
 
 Milestone 5:
 
@@ -48,8 +48,8 @@ Milestone 5:
 - `POST /api/inbox/conversations/:conversationId/notes`: creates an internal note.
 - `POST /api/inbox/conversations/:conversationId/resolve`: resolves or reopens a conversation.
 - `POST /api/demo/inbound`: creates a demo-safe inbound message.
-- `GET /api/demo/live-test-sms`: returns live test SMS readiness without sending or exposing secrets.
-- `POST /api/demo/live-test-sms`: sends one Twilio-backed allowlisted live test SMS only when explicit live-test gates and confirmation pass.
+- `GET /api/demo/live-test-sms`: returns only redacted live-test readiness counts, last-four hints, and blockers without sending or exposing full numbers or secrets.
+- `POST /api/demo/live-test-sms`: reserves and sends one Twilio-backed allowlisted live-test SMS only when explicit live-test gates, confirmation, and constant-time server-only operator-token authorization pass; ambiguous provider outcomes remain pending and return `202` without resend.
 
 Milestone 6:
 
@@ -75,8 +75,8 @@ Milestone 9:
 
 Post-MVP webhook foundation:
 
-- `POST /api/webhooks/twilio/inbound`: validates a Twilio form webhook signature, stores raw inbound payloads idempotently, and creates a local inbound inbox message without sending replies.
-- `POST /api/webhooks/twilio/status`: validates a Twilio form webhook signature and stores raw delivery-status payloads idempotently without provider callbacks.
+- `POST /api/webhooks/twilio/inbound`: validates a Twilio form webhook signature, stores raw inbound payloads idempotently, and creates a local inbound inbox message under an expiring owner lease without AI or automatic replies. Active-lease conflicts return `409` with advisory `Retry-After`; processed duplicates return `204`.
+- `POST /api/webhooks/twilio/status`: validates a Twilio form webhook signature and stores raw delivery-status payloads idempotently, applying local state under an expiring owner lease without provider callbacks. Active-lease conflicts return `409` with advisory `Retry-After`; processed duplicates return `204`.
 
 Post-MVP provider settings foundation:
 
@@ -91,43 +91,23 @@ Post-MVP provider settings foundation:
 - `/dashboard/templates/:templateId`: renders a product-facing template detail/edit workflow backed by `GET/PATCH /api/templates/:templateId` without live outbound rendering, scheduling campaigns, provider calls, SMS, billing, live AI, secrets, hard deletion, or live messaging enablement.
 - `/dashboard/analytics`: renders a product-facing analytics workspace with tenant-scoped contact, campaign, scheduled-campaign, inbox, outbound-only message delivery counts, latest outbound evidence, campaign-level delivery review links, and usage totals backed by existing local analytics and campaign records without report execution, exports, mutations, delivery retries, worker execution, provider calls, Stripe calls, billing artifacts, live AI, SMS, secrets, or live feature enablement.
 - `/dashboard/compliance`: renders a product-facing compliance readiness workspace with required profile fields, A2P status, runtime hard-gate blockers, and demo-safe live messaging state without registering A2P campaigns, provider calls, SMS, billing, live AI, secrets, or live feature enablement.
-- `/settings/demo`: renders a read-only local demo operations checkpoint with seeded demo readiness, shared-inventory workflow links, local metrics, usage totals, and runtime gates without imports, campaign scheduling, worker execution, inbox replies, report execution, exports, mutations, provider calls, billing records, notifications, live feature enablement, or secrets.
-- `/settings/operations`: renders a read-only local operations index with grouped existing operator surfaces, route names, static counts, and safety-boundary text without command execution, file inspection, API probes, mutations, exports, provider calls, billing records, notifications, live feature enablement, or secrets.
+- `/settings`: renders the consolidated go-live readiness view, including demo operations, runtime/environment, provider-number, webhook, delivery, team, billing, reporting, AI, notification, workflow, and blocker summaries without performing external-impact actions.
+- `/settings/operations`: renders the canonical grouped index for the surviving operator surfaces.
+- `/settings/health`: renders the read-only health contract, demo-safe defaults, runtime blockers, and local operations links without executing probes.
+- `/settings/security`: renders the read-only security boundary, production override posture, rate-limit policy, and validation references without exposing secrets or enabling live features.
+- `/settings/validation`: renders the read-only local validation inventory and repair signals without executing commands or inspecting logs.
+- `/settings/queue`: renders read-only scheduled-job timing, payload validity, worker settings, and queue-backend metadata without enqueueing jobs, running workers, or calling Redis/providers.
 - `GET /api/settings/provider`: returns secret-safe provider readiness, live messaging blockers, and Twilio credential presence booleans.
 - `PATCH /api/settings/provider`: stores local redacted Twilio credential readiness metadata without raw token persistence, provider calls, or live sends.
 - `DELETE /api/settings/provider`: clears local Twilio credential readiness metadata without provider calls or live-send side effects.
 - `GET /api/settings/provider/rotations`: lists recent local provider credential metadata history with optional allowlisted action filtering and bounded limits, without raw tokens, token fingerprints, provider calls, or live sends.
 - `GET /api/settings/provider/rotations/export`: exports filtered local provider credential metadata history as CSV without raw tokens, token fingerprints, provider calls, billing records, notifications, live sends, or mutations.
-- `/settings/provider`: renders provider details, a local-only credential metadata form, local metadata deletion, redacted readiness, rotation history, and a rotation CSV export link without provider calls or live-send controls.
-- `/settings/numbers`: renders read-only local provider phone-number metadata, default-number status, capabilities, and safety boundary without provisioning, provider calls, billing records, notifications, live messaging, mutations, or secrets.
-- `/settings/compliance`: renders a read-only compliance detail view with profile fields, checklist completeness, A2P status, live-message blockers, and local readiness audit export links without mutations, provider calls, billing records, notifications, live messaging, or secrets.
-- `/settings/system`: renders a read-only operations snapshot with demo/live flags, runtime markers, queue backend metadata, worker poll limits, and API rate-limit policy without mutations, provider calls, billing records, notifications, live messaging, or secrets.
-- `/settings/environment`: renders a read-only environment operations checkpoint with demo-safe defaults, allowlisted configuration categories, and derived runtime status without reading environment files, exposing raw values or secrets, mutating configuration, provider calls, billing records, notifications, live messaging, or live feature enablement.
-- `/settings/health`: renders a read-only health operations checkpoint with the `GET /api/health` contract, demo-safe defaults, runtime blockers, and local operations links without executing probes, calling APIs, mutating records, exposing secrets, provider calls, billing records, notifications, live messaging, or live feature enablement.
-- `/settings/runbook`: renders a read-only local operator checklist with validation, seed, worker, export, repair-loop commands, and links to current local admin views without executing commands, mutations, provider calls, billing records, notifications, live messaging, or secrets.
-- `/settings/usage`: renders a read-only local usage and analytics view with tenant-scoped metrics, billing boundary status, and recent usage events without Stripe calls, billing provider artifacts, notifications, provider calls, live messaging, mutations, or secrets.
-- `/settings/reports`: renders a read-only local reporting index with existing report links, tenant metrics, readiness signals, and safety-boundary text without executing reports, creating exports, mutating records, provider calls, billing records, notifications, live feature enablement, or secrets.
-- `/settings/integrations`: renders a read-only integration operations view with existing provider, number, webhook, AI, billing, and notification boundaries without provider calls, prompt submission, billing artifacts, notifications, mutations, enqueueing, exports, secrets, or live feature enablement.
-- `/settings/workflows`: renders a read-only workflow operations view with existing contacts, campaigns, queue, inbox, delivery, AI, usage, and reporting checkpoints without importing, scheduling, running workers, replying, retrying, submitting prompts, executing reports, exporting, mutating records, provider calls, billing records, notifications, live feature enablement, or secrets.
-- `/settings/releases`: renders a read-only release operations view with local release checklist, protected gate expectations, seeded demo path, premerge metadata, release surface links, and safety-boundary text without executing commands, migrations, tests, browsers, git operations, deploys, mutations, provider calls, billing records, notifications, live feature enablement, logs, diffs, env values, or secrets.
-- `/settings/campaigns`: renders a read-only local campaign operations view with campaign status, recipient counts, queue job status, and worker safety-boundary metadata without scheduling, running workers, provider calls, billing records, notifications, live messaging, mutations, or secrets.
-- `/settings/queue`: renders a read-only local queue operations view with scheduled job timing, due/future status, payload validity, worker settings, queue backend metadata, and safety-boundary text without enqueueing jobs, running workers, mutating queue rows, calling Redis, calling providers, billing records, notifications, live messaging, mutations, or secrets.
-- `/settings/contacts`: renders a read-only local contact operations view with consent status, import status, tag counts, list counts, and recent contact/import metadata without importing contacts, mutating consent, changing labels, provider calls, billing records, notifications, live messaging, mutations, or secrets.
-- `/settings/data`: renders a read-only local data operations view with tenant-scoped record totals, active/archived contact counts, import row totals, retention signals, recent archived contact metadata, and safety-boundary text without hard deletion, exports, provider calls, billing records, notifications, live AI, live messaging, mutations, or secrets.
-- `/settings/audience`: renders a read-only local audience operations view with tag counts, list member counts, saved segment definitions, and segment update timestamps without changing memberships, evaluating segments for sends, provider calls, billing records, notifications, live messaging, mutations, or secrets.
-- `/settings/templates`: renders a read-only local template operations view with template counts, variable names, campaign usage, and text previews without editing copy, rendering live outbound messages, scheduling campaigns, provider calls, billing records, notifications, live messaging, mutations, or secrets.
-- `/settings/inbox`: renders a read-only local inbox operations view with conversation status, assignment counts, recent message/note counts, and inbox safety-boundary metadata without creating messages, assigning, resolving, provider calls, billing records, notifications, live messaging, mutations, or secrets.
-- `/settings/webhooks`: renders a read-only local webhook operations view with Twilio route coverage, local stored webhook counts, provider/event-type summaries, recent idempotency keys, and safety-boundary metadata without replaying payloads, provider calls, outbound replies, message/contact mutation, billing records, notifications, live messaging, mutations, or secrets.
-- `/settings/delivery`: renders a read-only local delivery operations view with existing message direction counts, delivery status metadata, provider status labels, provider message ID presence, campaign/conversation context, and safety-boundary text without sends, retries, webhook replays, message mutation, provider calls, billing records, notifications, live messaging, mutations, or secrets.
-- `/settings/team`: renders a read-only local team operations view with organization metadata, membership role/status counts, assigned conversation counts, authored-note counts, and team safety-boundary metadata without inviting users, role changes, suspensions, membership deletion, Clerk calls, email, notifications, provider calls, billing records, live messaging, mutations, or secrets.
-- `/settings/billing`: renders a read-only local billing operations view with billing account status, live billing gate status, Stripe placeholder presence, usage totals, recent usage metadata, and billing safety-boundary text without Stripe calls, subscriptions, invoices, payment collection, card charges, email, notifications, provider calls, SMS, live billing, mutations, or secrets.
-- `/settings/ai`: renders a read-only local AI operations view with selected AI provider state, fake-provider readiness, deterministic endpoint coverage, local AI usage totals, recent AI usage metadata, and safety-boundary text without prompt submission, live AI calls, paid model requests, billing artifacts, notifications, provider calls, SMS, live AI enablement, mutations, or secrets.
-- `/settings/api`: renders a read-only local API operations view with static route inventory, route areas, read/write classification, external-impact classification, no-impact summary states, safety notes, and rate-limit policy without executing handlers, mutating records, provider calls, Stripe calls, live AI, notifications, SMS, email, secrets, or live feature enablement.
-- `/settings/contracts`: renders a read-only local contract operations view with static contract inventory, drift controls, validation command references, and safety-boundary text without reading contract file contents, executing checks, scanning files, mutating records, provider calls, Stripe calls, live AI, notifications, SMS, email, secrets, or live feature enablement.
-- `/settings/validation`: renders a read-only local validation operations view with static local gate inventory, repair signals, no-impact summary states, and safety-boundary text without executing commands, inspecting logs, scanning files, mutating records, provider calls, Stripe calls, live AI, notifications, SMS, email, secrets, or live feature enablement.
-- `/settings/security`: renders a read-only local security operations view with demo-safe gate status, external-impact boundary status, API rate-limit policy, production override state, no-impact summary labels, documented secret-storage boundaries, and validation-command references without scanning files, exposing env values or secrets, mutating records, provider calls, Stripe calls, live AI, notifications, SMS, email, or live feature enablement.
-- `/settings/notifications`: renders a read-only local notification operations view with email, in-app, SMS alert, and webhook notification boundaries, no-send controls, runtime gate status, no-impact summary states, and future provider-gate requirements without creating recipients, templates, jobs, sends, alerts, webhooks, provider calls, billing records, live AI calls, notifications, SMS, email, mutations, or secrets.
-- `/settings/readiness-audit`: renders a read-only local go-live readiness audit view with tenant-scoped audit events, action/subject filters, local metadata, and bounded CSV export links without mutating audit events, exposing secrets, provider calls, billing records, live AI calls, notifications, SMS, email, or live feature enablement.
+- `/settings/provider`: renders provider details, local credential-metadata controls, redacted readiness, rotation history, and the bounded CSV export without provider calls or live-send controls.
+- `/settings/compliance`: renders compliance-profile completeness, A2P status, live-message blockers, and local readiness-audit export links without mutations or provider calls.
+- `/settings/readiness-audit`: renders tenant-scoped go-live readiness events, allowlisted filters, and bounded CSV export links without mutating audit events.
+- `/settings/exports`: renders the allowlisted local administrative exports and their no-secret/no-mutation boundary.
+- `/settings/runbook`: renders the read-only local operator checklist and command references without executing commands.
+- Legacy per-area settings paths are not application routes. Their remaining readiness signals are consolidated into `/settings`; product work belongs under `/dashboard/contacts`, `/dashboard/campaigns`, `/dashboard/inbox`, `/dashboard/templates`, `/dashboard/analytics`, and `/dashboard/compliance`, while the seeded demo checkpoint is `/demo`.
 
 Post-MVP provider number foundation:
 
@@ -141,7 +121,7 @@ Post-MVP live-readiness audit foundation:
 
 Post-MVP metrics foundation:
 
-- `GET /api/metrics`: returns SMS pipeline metrics in standard Prometheus plaintext exposition format, gated behind `OBSERVABILITY_ENABLED=true`.
+- `GET /api/metrics`: returns current-organization, message-derived SMS pipeline metrics in standard Prometheus plaintext exposition format, gated behind `OBSERVABILITY_ENABLED=true`. It classifies `failed`, `undelivered`, and `canceled` as terminal delivery failures and omits process-global signature-failure counters that cannot be attributed to the current tenant.
 
 Post-MVP segment synchronization foundation:
 

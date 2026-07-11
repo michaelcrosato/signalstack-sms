@@ -1,0 +1,7 @@
+# Protected gate hashes are byte-for-byte LF hashes. Override Windows core.autocrlf so a clean
+# checkout verifies the same bytes as CI without modifying the human-owned protected files.
+docs/AXIOMS.md text eol=lf
+scripts/assert-gate-integrity.ps1 text eol=lf
+scripts/local-gate.ps1 text eol=lf
+scripts/gate-integrity-manifest.json text eol=lf
+scripts/run-codex-yolo-loop.ps1 text eol=lf

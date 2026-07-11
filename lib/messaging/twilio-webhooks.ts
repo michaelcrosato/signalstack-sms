@@ -1,4 +1,8 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import {
+  isTerminalDeliveryFailureProviderStatus,
+  terminalDeliveryFailureProviderStatuses
+} from "@/lib/messaging/delivery-status";
 import type { TwilioWebhookPayload } from "@/lib/validation/webhooks";
 import { recordMetric, smsPipelineMetrics } from "@/lib/observability/metrics";
 
@@ -23,6 +27,36 @@ export type MessageStatusTransition = {
   deliveredAt?: Date | null;
   failedAt?: Date | null;
 };
+
+export type MessageStatusUpdateGuard = {
+  deliveredAt?: null;
+  failedAt?: null;
+  OR: Array<
+    | { providerStatus: null }
+    | { providerStatus: { in: string[] } }
+    | { providerStatus: { notIn: string[] } }
+  >;
+};
+
+const twilioProgressiveStatusGroups: readonly (readonly string[])[] = [
+  ["scheduled", "accepted"],
+  ["queued", "receiving"],
+  ["sending"],
+  ["sent"],
+  ["delivered", "received"],
+  ["read"]
+] as const;
+const twilioKnownStatuses = [
+  ...twilioProgressiveStatusGroups.flat(),
+  ...terminalDeliveryFailureProviderStatuses
+];
+const twilioTerminalStatuses = new Set<string>([
+  "delivered",
+  "received",
+  "read",
+  ...terminalDeliveryFailureProviderStatuses
+]);
+const twilioEarlyStatuses = twilioProgressiveStatusGroups.slice(0, 2).flat();
 
 function normalizeRequiredProviderValue(value: string | undefined) {
   const normalized = value?.trim();
@@ -152,6 +186,56 @@ export function twilioStatusTransition(input: { status: string; errorCode?: stri
     providerStatus: status,
     providerErrorCode: errorCode ?? null,
     ...(status === "delivered" ? { deliveredAt: now, failedAt: null } : {}),
-    ...(status === "failed" || status === "undelivered" ? { deliveredAt: null, failedAt: now } : {})
+    ...(isTerminalDeliveryFailureProviderStatus(status) ? { deliveredAt: null, failedAt: now } : {})
+  };
+}
+
+/**
+ * Builds an atomic Prisma update guard for an out-of-order Twilio callback.
+ *
+ * Known statuses may advance from an earlier known status or from a provider status that this
+ * version does not yet recognize. Unknown statuses are retained only while the message is still
+ * in an early, non-terminal state. Terminal success and failure timestamps also guard against an
+ * unknown status accidentally reopening a completed delivery.
+ */
+export function twilioStatusUpdateGuard(nextStatusInput: string): MessageStatusUpdateGuard {
+  const nextStatus = nextStatusInput.trim().toLowerCase();
+  const progressiveGroupIndex = twilioProgressiveStatusGroups.findIndex((statuses) =>
+    statuses.includes(nextStatus)
+  );
+  const isFailure = isTerminalDeliveryFailureProviderStatus(nextStatus);
+
+  let allowedKnownStatuses: string[];
+  if (isFailure) {
+    allowedKnownStatuses = [
+      ...twilioProgressiveStatusGroups.slice(0, 4).flat(),
+      nextStatus
+    ];
+  } else if (progressiveGroupIndex >= 0) {
+    allowedKnownStatuses = [
+      ...twilioProgressiveStatusGroups.slice(0, progressiveGroupIndex + 1).flat()
+    ];
+
+    if (twilioTerminalStatuses.has(nextStatus)) {
+      allowedKnownStatuses = allowedKnownStatuses.filter(
+        (status) =>
+          !twilioTerminalStatuses.has(status) ||
+          status === nextStatus ||
+          (nextStatus === "read" && (status === "delivered" || status === "received"))
+      );
+    }
+  } else {
+    allowedKnownStatuses = [...twilioEarlyStatuses];
+  }
+
+  return {
+    ...(isFailure ? { deliveredAt: null } : {}),
+    ...(!isFailure && twilioTerminalStatuses.has(nextStatus) ? { failedAt: null } : {}),
+    ...(!twilioTerminalStatuses.has(nextStatus) ? { deliveredAt: null, failedAt: null } : {}),
+    OR: [
+      { providerStatus: null },
+      { providerStatus: { in: allowedKnownStatuses } },
+      { providerStatus: { notIn: [...twilioKnownStatuses] } }
+    ]
   };
 }

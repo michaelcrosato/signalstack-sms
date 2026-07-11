@@ -8,6 +8,12 @@ type CampaignParams = {
   params: Promise<{ campaignId: string }>;
 };
 
+const campaignCancelConflictMessages = new Set([
+  "Only scheduled campaigns can be canceled.",
+  "A processing campaign cannot be canceled.",
+  "Campaign cancellation conflicted with another transition."
+]);
+
 export async function POST(_request: Request, { params }: CampaignParams) {
   const [{ campaignId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
   const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
@@ -24,6 +30,10 @@ export async function POST(_request: Request, { params }: CampaignParams) {
 
     return NextResponse.json({ campaign });
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Campaign cancel failed." }, { status: 409 });
+    if (error instanceof Error && campaignCancelConflictMessages.has(error.message)) {
+      return NextResponse.json({ error: error.message }, { status: 409 });
+    }
+
+    return NextResponse.json({ error: "Campaign cancel failed." }, { status: 500 });
   }
 }

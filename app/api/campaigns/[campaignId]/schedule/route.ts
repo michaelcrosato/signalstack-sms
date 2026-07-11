@@ -10,6 +10,13 @@ type CampaignParams = {
   params: Promise<{ campaignId: string }>;
 };
 
+const campaignScheduleConflictMessages = new Set([
+  "Only draft or paused campaigns can be scheduled.",
+  "Campaign schedule is already processing.",
+  "Campaign preflight failed.",
+  "Campaign schedule is already processing or complete."
+]);
+
 export async function POST(request: Request, { params }: CampaignParams) {
   const [{ campaignId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
   const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
@@ -35,9 +42,13 @@ export async function POST(request: Request, { params }: CampaignParams) {
     if (!queueJob) {
       return NextResponse.json({ error: "Campaign not found." }, { status: 404 });
     }
-    await enqueueScheduledCampaignBullMqJob(queueJob);
-    return NextResponse.json({ queueJob }, { status: 201 });
+    const bullMq = await enqueueScheduledCampaignBullMqJob(queueJob);
+    return NextResponse.json({ queueJob, bullMq }, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Campaign schedule failed." }, { status: 409 });
+    if (error instanceof Error && campaignScheduleConflictMessages.has(error.message)) {
+      return NextResponse.json({ error: error.message }, { status: 409 });
+    }
+
+    return NextResponse.json({ error: "Campaign schedule failed." }, { status: 500 });
   }
 }

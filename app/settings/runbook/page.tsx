@@ -56,7 +56,7 @@ export default function OperatorRunbookPage() {
           <SettingsLink href="/settings/operations">
             Operations Index
           </SettingsLink>
-          <SettingsLink href="/settings/demo">Demo Operations</SettingsLink>
+          <SettingsLink href="/demo">Demo Console</SettingsLink>
         </nav>
         <div>
           <p className="text-sm font-semibold uppercase text-slate-500">

@@ -12,18 +12,20 @@ import { processScheduledCampaignQueueJobById } from "@/lib/queue/worker";
 const mocks = vi.hoisted(() => ({
   campaignFindFirst: vi.fn(),
   campaignRecipientUpdateMany: vi.fn(),
-  campaignUpdate: vi.fn(),
+  campaignUpdateMany: vi.fn(),
   dummySend: vi.fn(),
   messageUpsert: vi.fn(),
   queueJobFindFirst: vi.fn(),
-  queueJobUpdate: vi.fn()
+  queueJobUpdateMany: vi.fn(),
+  transaction: vi.fn()
 }));
 
 vi.mock("@/lib/db/prisma", () => ({
   prisma: {
+    $transaction: mocks.transaction,
     campaign: {
       findFirst: mocks.campaignFindFirst,
-      update: mocks.campaignUpdate
+      updateMany: mocks.campaignUpdateMany
     },
     campaignRecipient: {
       updateMany: mocks.campaignRecipientUpdateMany
@@ -33,7 +35,7 @@ vi.mock("@/lib/db/prisma", () => ({
     },
     queueJob: {
       findFirst: mocks.queueJobFindFirst,
-      update: mocks.queueJobUpdate
+      updateMany: mocks.queueJobUpdateMany
     }
   }
 }));
@@ -61,6 +63,9 @@ describe("scheduled campaign worker processing", () => {
       scheduledAt: "2026-05-24T12:00:00.000Z"
     },
     runAt: now,
+    processingToken: null,
+    processingExpiresAt: null,
+    generation: 1,
     createdAt: now,
     updatedAt: now
   } as QueueJob;
@@ -75,6 +80,14 @@ describe("scheduled campaign worker processing", () => {
     vi.stubEnv("DEPLOYMENT_ENV", "");
     vi.stubEnv("APP_ENV", "");
     mocks.queueJobFindFirst.mockResolvedValue(queueJob);
+    mocks.queueJobUpdateMany.mockResolvedValue({ count: 1 });
+    mocks.campaignUpdateMany.mockResolvedValue({ count: 1 });
+    mocks.transaction.mockImplementation((callback) =>
+      callback({
+        campaign: { updateMany: mocks.campaignUpdateMany },
+        queueJob: { updateMany: mocks.queueJobUpdateMany }
+      })
+    );
     mocks.dummySend.mockResolvedValue({
       providerMessageId: "dummy_dummy-outbound:org_demo:queue_job_demo:contact_allowed",
       status: "queued"
@@ -172,14 +185,53 @@ describe("scheduled campaign worker processing", () => {
         blockReason: "CONSENT_NOT_OPTED_IN,CONTACT_OPTED_OUT"
       }
     });
-    expect(mocks.queueJobUpdate).toHaveBeenCalledWith({
-      where: { id: "queue_job_demo" },
-      data: { status: QueueJobStatus.COMPLETED }
+    const claimCall = mocks.queueJobUpdateMany.mock.calls.find(
+      ([input]) => input.data.status === QueueJobStatus.PROCESSING
+    )?.[0];
+    expect(claimCall).toEqual({
+      where: expect.objectContaining({
+        id: "queue_job_demo",
+        orgId: "org_demo",
+        type: QueueJobType.SCHEDULED_CAMPAIGN,
+        runAt: { lte: now }
+      }),
+      data: {
+        status: QueueJobStatus.PROCESSING,
+        processingToken: expect.any(String),
+        processingExpiresAt: expect.any(Date)
+      }
     });
-    expect(mocks.campaignUpdate).toHaveBeenCalledWith({
-      where: { id: "campaign_demo" },
+    const renewalCallIndex = mocks.queueJobUpdateMany.mock.calls.findIndex(
+      ([input]) => input.data.processingExpiresAt instanceof Date && input.data.status === undefined
+    );
+    expect(renewalCallIndex).toBeGreaterThan(-1);
+    expect(mocks.queueJobUpdateMany.mock.invocationCallOrder[renewalCallIndex]).toBeLessThan(
+      mocks.dummySend.mock.invocationCallOrder[0]
+    );
+    expect(mocks.queueJobUpdateMany).toHaveBeenCalledWith({
+      where: {
+        id: "queue_job_demo",
+        orgId: "org_demo",
+        type: QueueJobType.SCHEDULED_CAMPAIGN,
+        status: QueueJobStatus.PROCESSING,
+        processingToken: claimCall!.data.processingToken
+      },
+      data: {
+        status: QueueJobStatus.COMPLETED,
+        processingToken: null,
+        processingExpiresAt: null
+      }
+    });
+    expect(mocks.campaignUpdateMany).toHaveBeenCalledWith({
+      where: {
+        id: "campaign_demo",
+        orgId: "org_demo",
+        status: CampaignStatus.SCHEDULED,
+        scheduledAt: now
+      },
       data: { status: CampaignStatus.COMPLETED }
     });
+    expect(mocks.transaction).toHaveBeenCalledTimes(1);
   });
 
   it("cancels stale queued jobs before they can send from an old schedule", async () => {
@@ -199,13 +251,292 @@ describe("scheduled campaign worker processing", () => {
       reason: "stale-schedule"
     });
 
-    expect(mocks.queueJobUpdate).toHaveBeenCalledWith({
-      where: { id: "queue_job_demo" },
-      data: { status: QueueJobStatus.CANCELLED }
+    const staleClaimCall = mocks.queueJobUpdateMany.mock.calls.find(
+      ([input]) => input.data.status === QueueJobStatus.PROCESSING
+    )?.[0];
+    expect(staleClaimCall?.data.processingToken).toEqual(expect.any(String));
+    expect(mocks.queueJobUpdateMany).toHaveBeenCalledWith({
+      where: {
+        id: "queue_job_demo",
+        orgId: "org_demo",
+        type: QueueJobType.SCHEDULED_CAMPAIGN,
+        status: QueueJobStatus.PROCESSING,
+        processingToken: staleClaimCall!.data.processingToken
+      },
+      data: {
+        status: QueueJobStatus.CANCELLED,
+        processingToken: null,
+        processingExpiresAt: null
+      }
     });
     expect(mocks.campaignRecipientUpdateMany).not.toHaveBeenCalled();
     expect(mocks.dummySend).not.toHaveBeenCalled();
     expect(mocks.messageUpsert).not.toHaveBeenCalled();
-    expect(mocks.campaignUpdate).not.toHaveBeenCalled();
+    expect(mocks.campaignUpdateMany).not.toHaveBeenCalled();
+  });
+
+  it("does not claim a scheduled job before its durable run time", async () => {
+    mocks.queueJobFindFirst.mockResolvedValue({
+      ...queueJob,
+      runAt: new Date("2026-05-24T13:00:00.000Z")
+    });
+
+    await expect(processScheduledCampaignQueueJobById("queue_job_demo", now)).resolves.toEqual({
+      processed: 0,
+      skipped: 1,
+      blocked: false,
+      reason: "not-due"
+    });
+
+    expect(mocks.queueJobUpdateMany).not.toHaveBeenCalled();
+    expect(mocks.campaignFindFirst).not.toHaveBeenCalled();
+    expect(mocks.dummySend).not.toHaveBeenCalled();
+  });
+
+  it("recovers an expired processing lease with a new owner token", async () => {
+    mocks.queueJobFindFirst.mockResolvedValue({
+      ...queueJob,
+      status: QueueJobStatus.PROCESSING,
+      processingToken: "abandoned-token",
+      processingExpiresAt: new Date(now.getTime() - 1)
+    });
+    mocks.campaignFindFirst.mockResolvedValue({
+      id: "campaign_demo",
+      orgId: "org_demo",
+      status: CampaignStatus.SCHEDULED,
+      scheduledAt: new Date("2026-05-24T13:00:00.000Z"),
+      body: "Hi {{firstName}}",
+      recipients: []
+    });
+
+    await expect(processScheduledCampaignQueueJobById("queue_job_demo", now)).resolves.toEqual({
+      processed: 0,
+      skipped: 1,
+      blocked: false,
+      reason: "stale-schedule"
+    });
+
+    const claimCall = mocks.queueJobUpdateMany.mock.calls[0][0];
+    expect(claimCall.where.OR).toEqual([
+      { status: QueueJobStatus.QUEUED },
+      {
+        status: QueueJobStatus.PROCESSING,
+        OR: [
+          { processingToken: null },
+          { processingExpiresAt: null },
+          { processingExpiresAt: { lte: now } }
+        ]
+      }
+    ]);
+    expect(claimCall.data.processingToken).not.toBe("abandoned-token");
+    expect(claimCall.data.processingToken).toEqual(expect.any(String));
+  });
+
+  it("applies the demo-only provider gate before reading or claiming durable jobs", async () => {
+    vi.stubEnv("LIVE_MESSAGING_ENABLED", "true");
+
+    await expect(processScheduledCampaignQueueJobById("queue_job_demo", now)).resolves.toEqual({
+      processed: 0,
+      skipped: 0,
+      blocked: true,
+      reason: "provider-blocked"
+    });
+
+    expect(mocks.queueJobFindFirst).not.toHaveBeenCalled();
+    expect(mocks.queueJobUpdateMany).not.toHaveBeenCalled();
+    expect(mocks.campaignFindFirst).not.toHaveBeenCalled();
+    expect(mocks.dummySend).not.toHaveBeenCalled();
+  });
+
+  it("allows only one concurrent worker to claim and process the same queued job", async () => {
+    const contact = {
+      id: "contact_allowed",
+      phone: "+15555550100",
+      email: null,
+      firstName: "Ada",
+      lastName: null,
+      displayName: null,
+      consentStatus: ConsentStatus.OPTED_IN,
+      optedOutAt: null,
+      archivedAt: null
+    };
+    mocks.campaignFindFirst.mockResolvedValue({
+      id: "campaign_demo",
+      orgId: "org_demo",
+      status: CampaignStatus.SCHEDULED,
+      scheduledAt: now,
+      body: "Hi {{firstName}}, your local demo invite is ready.",
+      recipients: [
+        {
+          id: "campaign_recipient_allowed",
+          orgId: "org_demo",
+          campaignId: "campaign_demo",
+          contactId: contact.id,
+          contact
+        }
+      ]
+    });
+
+    let claimed = false;
+    mocks.queueJobUpdateMany.mockImplementation(async (input) => {
+      if (input.data.status !== QueueJobStatus.PROCESSING) {
+        return { count: 1 };
+      }
+
+      if (claimed) {
+        return { count: 0 };
+      }
+
+      claimed = true;
+      return { count: 1 };
+    });
+
+    const results = await Promise.all([
+      processScheduledCampaignQueueJobById("queue_job_demo", now),
+      processScheduledCampaignQueueJobById("queue_job_demo", now)
+    ]);
+
+    expect(results).toEqual([
+      { processed: 1, skipped: 0, blocked: false },
+      { processed: 0, skipped: 1, blocked: false, reason: "already-claimed" }
+    ]);
+    expect(mocks.dummySend).toHaveBeenCalledTimes(1);
+    expect(mocks.messageUpsert).toHaveBeenCalledTimes(1);
+    expect(mocks.campaignUpdateMany).toHaveBeenCalledTimes(1);
+  });
+
+  it("refuses a completion whose tenant schedule guard changed and uses the atomic failure path", async () => {
+    const contact = {
+      id: "contact_allowed",
+      phone: "+15555550100",
+      email: null,
+      firstName: "Ada",
+      lastName: null,
+      displayName: null,
+      consentStatus: ConsentStatus.OPTED_IN,
+      optedOutAt: null,
+      archivedAt: null
+    };
+    mocks.campaignFindFirst.mockResolvedValue({
+      id: "campaign_demo",
+      orgId: "org_demo",
+      status: CampaignStatus.SCHEDULED,
+      scheduledAt: now,
+      body: "Hi {{firstName}}",
+      recipients: [
+        {
+          id: "campaign_recipient_allowed",
+          orgId: "org_demo",
+          campaignId: "campaign_demo",
+          contactId: contact.id,
+          contact
+        }
+      ]
+    });
+    mocks.campaignUpdateMany.mockResolvedValue({ count: 0 });
+
+    await expect(processScheduledCampaignQueueJobById("queue_job_demo", now)).resolves.toEqual({
+      processed: 0,
+      skipped: 1,
+      blocked: false,
+      reason: "processing-failed"
+    });
+
+    expect(mocks.transaction).toHaveBeenCalledTimes(2);
+    expect(mocks.queueJobUpdateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: QueueJobStatus.COMPLETED })
+      })
+    );
+    expect(mocks.queueJobUpdateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: QueueJobStatus.FAILED })
+      })
+    );
+    expect(mocks.campaignUpdateMany).toHaveBeenNthCalledWith(1, {
+      where: {
+        id: "campaign_demo",
+        orgId: "org_demo",
+        status: CampaignStatus.SCHEDULED,
+        scheduledAt: now
+      },
+      data: { status: CampaignStatus.COMPLETED }
+    });
+    expect(mocks.campaignUpdateMany).toHaveBeenNthCalledWith(2, {
+      where: {
+        id: "campaign_demo",
+        orgId: "org_demo",
+        status: CampaignStatus.SCHEDULED,
+        scheduledAt: now
+      },
+      data: { status: CampaignStatus.PAUSED }
+    });
+  });
+
+  it("fails the claimed job and pauses its tenant campaign when processing throws", async () => {
+    const contact = {
+      id: "contact_allowed",
+      phone: "+15555550100",
+      email: null,
+      firstName: "Ada",
+      lastName: null,
+      displayName: null,
+      consentStatus: ConsentStatus.OPTED_IN,
+      optedOutAt: null,
+      archivedAt: null
+    };
+    mocks.campaignFindFirst.mockResolvedValue({
+      id: "campaign_demo",
+      orgId: "org_demo",
+      status: CampaignStatus.SCHEDULED,
+      scheduledAt: now,
+      body: "Hi {{firstName}}, your local demo invite is ready.",
+      recipients: [
+        {
+          id: "campaign_recipient_allowed",
+          orgId: "org_demo",
+          campaignId: "campaign_demo",
+          contactId: contact.id,
+          contact
+        }
+      ]
+    });
+    mocks.dummySend.mockRejectedValueOnce(new Error("simulated provider failure"));
+
+    await expect(processScheduledCampaignQueueJobById("queue_job_demo", now)).resolves.toEqual({
+      processed: 0,
+      skipped: 1,
+      blocked: false,
+      reason: "processing-failed"
+    });
+
+    const failedClaimCall = mocks.queueJobUpdateMany.mock.calls.find(
+      ([input]) => input.data.status === QueueJobStatus.PROCESSING
+    )?.[0];
+    expect(mocks.queueJobUpdateMany).toHaveBeenCalledWith({
+      where: {
+        id: "queue_job_demo",
+        orgId: "org_demo",
+        type: QueueJobType.SCHEDULED_CAMPAIGN,
+        status: QueueJobStatus.PROCESSING,
+        processingToken: failedClaimCall!.data.processingToken
+      },
+      data: {
+        status: QueueJobStatus.FAILED,
+        processingToken: null,
+        processingExpiresAt: null
+      }
+    });
+    expect(mocks.campaignUpdateMany).toHaveBeenCalledWith({
+      where: {
+        id: "campaign_demo",
+        orgId: "org_demo",
+        status: CampaignStatus.SCHEDULED,
+        scheduledAt: now
+      },
+      data: { status: CampaignStatus.PAUSED }
+    });
+    expect(mocks.messageUpsert).not.toHaveBeenCalled();
+    expect(mocks.transaction).toHaveBeenCalledTimes(1);
   });
 });

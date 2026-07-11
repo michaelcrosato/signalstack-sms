@@ -6,6 +6,14 @@ import { localWorkerReadiness, processScheduledCampaignQueueJobById } from "@/li
 import { logger } from "@/lib/observability/logger";
 import { recordMetric, smsPipelineMetrics } from "@/lib/observability/metrics";
 
+const terminalBullMqQueueJobReasons = new Set([
+  "missing-job",
+  "invalid-payload",
+  "invalid-campaign",
+  "stale-schedule",
+  "send-preflight-failed"
+]);
+
 export type BullMqWorkerStartResult =
   | { started: true; worker: Worker }
   | {
@@ -58,7 +66,15 @@ export function createScheduledCampaignBullMqWorker(env: Record<string, string |
     scheduledCampaignBullMqQueueName,
     async (job) => {
       const payload = scheduledCampaignBullMqJobDataSchema.parse(job.data);
-      return processScheduledCampaignQueueJobById(payload.queueJobId);
+      const result = await processScheduledCampaignQueueJobById(payload.queueJobId);
+      if (result.processed === 1 || (result.reason && terminalBullMqQueueJobReasons.has(result.reason))) {
+        return result;
+      }
+
+      // BullMQ may acknowledge only a completed or durably terminal database
+      // outcome. Recoverable states must consume an attempt and follow the
+      // configured backoff instead of disappearing from the mirror queue.
+      throw new Error("Durable queue job has not reached a terminal state.");
     },
     {
       connection: redisConnectionFromUrl(redisUrl),
@@ -73,7 +89,7 @@ export function createScheduledCampaignBullMqWorker(env: Record<string, string |
     logger.error("bullmq_worker_job_failed", {
       jobId: job?.id || "[unknown]",
       jobName: job?.name || "[unknown]",
-      error: err.message
+      errorType: err.name
     });
     recordMetric(smsPipelineMetrics.queueThroughput, {
       action: "job_failed",
@@ -85,7 +101,7 @@ export function createScheduledCampaignBullMqWorker(env: Record<string, string |
 
   worker.on("error", (err) => {
     logger.error("bullmq_worker_error", {
-      error: err.message
+      errorType: err.name
     });
   });
 
@@ -110,8 +126,9 @@ export function registerGracefulShutdown(worker: Worker) {
         await w.close();
         logger.info("bullmq_worker_closed_gracefully");
       } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        logger.error("bullmq_worker_close_failed", { error: message });
+        logger.error("bullmq_worker_close_failed", {
+          errorType: err instanceof Error ? err.name : "UnknownError"
+        });
       }
     });
 

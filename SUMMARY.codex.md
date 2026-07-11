@@ -1,15 +1,9 @@
 # Codex Summary
 
-Run number: 830
+Run number: 831
 
-- **Repo-cleanup pass is GREEN on `chore/agent-cleaner`.** `npm run validate` passes contracts, secrets,
-  compliance, production gates, lint, typecheck, Prisma validate/generate, **91 Vitest files / 539 passing
-  tests / 2 skipped**, **e2e:smoke**, and `next build` (Postgres/Redis running via `docker compose`).
-- **Dead code removed.** Deleted unused layout stubs `components/layout/{app-shell,side-nav,top-nav}.tsx`
-  (imported nowhere) and pruned them from the `docs/CANONICAL_IMPLEMENTATION_PLAN.md` file tree.
-- **Agent workspace hygiene.** `.gitignore` now excludes `.agents/` and `.agent-cleaner/`; stray root
-  artifacts from prior agent runs (`ORIGINAL_REQUEST.md`, `PROJECT.md`, `.agent-cleaner/`) were moved
-  under the ignored `.agents/archive/`.
-- **README** gained a Windows quickstart (WSL2 backing-service IPs, clean `.next` rebuilds, sequential e2e).
-- Live SMS/billing/AI/Clerk enablement + RLS production role wiring remain human-gated.
-- History in `git log`; start with `npm run agent:brief`.
+- **PR review consolidation is green.** Every original open PR from #60 through #153 has a recorded patch-level disposition in `docs/PR_REVIEW_2026-07-10.md`; selected original commits are retained and valid ideas with unsafe/stale implementations were repaired.
+- **Validation:** contracts, secrets, compliance, production/auth/worker/observability/operator/platform/context/security/AI gates, lint, typecheck, Prisma validate/generate, **115 Vitest files / 778 passing / 2 skipped**, Playwright Chromium smoke, and the production build pass against migrated/seeded Postgres.
+- **Durability/security repairs:** tenant-scoped nested campaign data, atomic consent evidence, recoverable queue and webhook owner leases, Postgres-tested cancel/claim serialization, atomic queue/campaign terminal transitions, generation-safe BullMQ replay, monotonic delivery state, redacted/idempotent operator-gated live test SMS, operator-gated paid lookup, and shared safe CSV serialization.
+- **Production remains intentionally blocked.** TICKET023 owns verified identity/membership, production RLS role tests, trusted webhook tenant routing, composite tenant foreign keys, provider retry configuration, secret/cost provisioning, and human-reviewed integrity-gate changes.
+- History is in `git log`; start with `npm run agent:brief`.

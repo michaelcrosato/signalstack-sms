@@ -6,8 +6,11 @@ const mocks = vi.hoisted(() => ({
   campaignFindFirst: vi.fn(),
   campaignUpdate: vi.fn(),
   contactFindMany: vi.fn(),
+  queueJobCreate: vi.fn(),
+  queueJobFindFirst: vi.fn(),
+  queueJobFindUnique: vi.fn(),
+  queueJobFindUniqueOrThrow: vi.fn(),
   queueJobUpdateMany: vi.fn(),
-  queueJobUpsert: vi.fn(),
   transaction: vi.fn()
 }));
 
@@ -33,11 +36,17 @@ describe("scheduleCampaign", () => {
           findMany: mocks.contactFindMany
         },
         queueJob: {
+          create: mocks.queueJobCreate,
+          findFirst: mocks.queueJobFindFirst,
+          findUnique: mocks.queueJobFindUnique,
+          findUniqueOrThrow: mocks.queueJobFindUniqueOrThrow,
           updateMany: mocks.queueJobUpdateMany,
-          upsert: mocks.queueJobUpsert
         }
       })
     );
+    mocks.queueJobFindFirst.mockResolvedValue(null);
+    mocks.queueJobFindUnique.mockResolvedValue(null);
+    mocks.queueJobUpdateMany.mockResolvedValue({ count: 1 });
   });
 
   it("returns null without queue mutations when the tenant campaign is missing", async () => {
@@ -47,7 +56,7 @@ describe("scheduleCampaign", () => {
 
     expect(mocks.contactFindMany).not.toHaveBeenCalled();
     expect(mocks.queueJobUpdateMany).not.toHaveBeenCalled();
-    expect(mocks.queueJobUpsert).not.toHaveBeenCalled();
+    expect(mocks.queueJobCreate).not.toHaveBeenCalled();
     expect(mocks.campaignUpdate).not.toHaveBeenCalled();
   });
 
@@ -65,7 +74,25 @@ describe("scheduleCampaign", () => {
 
     expect(mocks.contactFindMany).not.toHaveBeenCalled();
     expect(mocks.queueJobUpdateMany).not.toHaveBeenCalled();
-    expect(mocks.queueJobUpsert).not.toHaveBeenCalled();
+    expect(mocks.queueJobCreate).not.toHaveBeenCalled();
+    expect(mocks.campaignUpdate).not.toHaveBeenCalled();
+  });
+
+  it("rejects rescheduling while a worker owns a processing lease", async () => {
+    mocks.campaignFindFirst.mockResolvedValue({
+      id: "campaign_demo",
+      orgId: "org_demo",
+      status: CampaignStatus.PAUSED,
+      recipients: [{ contactId: "contact_allowed" }]
+    });
+    mocks.queueJobFindFirst.mockResolvedValue({ id: "queue_job_processing" });
+
+    await expect(scheduleCampaign("org_demo", "campaign_demo", scheduledAt)).rejects.toThrow(
+      "Campaign schedule is already processing."
+    );
+
+    expect(mocks.contactFindMany).not.toHaveBeenCalled();
+    expect(mocks.queueJobCreate).not.toHaveBeenCalled();
     expect(mocks.campaignUpdate).not.toHaveBeenCalled();
   });
 
@@ -101,7 +128,7 @@ describe("scheduleCampaign", () => {
         archivedAt: null
       }
     ]);
-    mocks.queueJobUpsert.mockResolvedValue(queueJob);
+    mocks.queueJobCreate.mockResolvedValue(queueJob);
 
     await expect(scheduleCampaign("org_demo", "campaign_demo", scheduledAt)).resolves.toEqual(queueJob);
 
@@ -118,14 +145,8 @@ describe("scheduleCampaign", () => {
       where: { id: "campaign_demo" },
       data: { status: CampaignStatus.SCHEDULED, scheduledAt }
     });
-    expect(mocks.queueJobUpsert).toHaveBeenCalledWith({
-      where: { orgId_idempotencyKey: { orgId: "org_demo", idempotencyKey } },
-      update: {
-        status: QueueJobStatus.QUEUED,
-        payload: queueJob.payload,
-        runAt: scheduledAt
-      },
-      create: {
+    expect(mocks.queueJobCreate).toHaveBeenCalledWith({
+      data: {
         orgId: "org_demo",
         campaignId: "campaign_demo",
         type: QueueJobType.SCHEDULED_CAMPAIGN,
@@ -136,8 +157,76 @@ describe("scheduleCampaign", () => {
       }
     });
     expect(mocks.queueJobUpdateMany.mock.invocationCallOrder[0]).toBeLessThan(
-      mocks.queueJobUpsert.mock.invocationCallOrder[0]
+      mocks.queueJobCreate.mock.invocationCallOrder[0]
     );
+  });
+
+  it("reopens a canceled same-timestamp job only through a guarded non-processing transition", async () => {
+    const existingQueueJob = {
+      id: "queue_job_existing",
+      orgId: "org_demo",
+      campaignId: "campaign_demo",
+      type: QueueJobType.SCHEDULED_CAMPAIGN,
+      status: QueueJobStatus.CANCELLED,
+      idempotencyKey,
+      payload: {},
+      runAt: scheduledAt,
+      processingToken: null,
+      processingExpiresAt: null,
+      createdAt: scheduledAt,
+      updatedAt: scheduledAt
+    };
+    const reopenedQueueJob = {
+      ...existingQueueJob,
+      status: QueueJobStatus.QUEUED,
+      payload: {
+        version: 1,
+        orgId: "org_demo",
+        campaignId: "campaign_demo",
+        scheduledAt: scheduledAt.toISOString()
+      }
+    };
+    mocks.campaignFindFirst.mockResolvedValue({
+      id: "campaign_demo",
+      orgId: "org_demo",
+      status: CampaignStatus.PAUSED,
+      recipients: [{ contactId: "contact_allowed" }]
+    });
+    mocks.contactFindMany.mockResolvedValue([
+      {
+        id: "contact_allowed",
+        phone: "+15555550100",
+        consentStatus: ConsentStatus.OPTED_IN,
+        optedOutAt: null,
+        archivedAt: null
+      }
+    ]);
+    mocks.queueJobFindUnique.mockResolvedValue(existingQueueJob);
+    mocks.queueJobFindUniqueOrThrow.mockResolvedValue(reopenedQueueJob);
+
+    await expect(scheduleCampaign("org_demo", "campaign_demo", scheduledAt)).resolves.toEqual(
+      reopenedQueueJob
+    );
+
+    expect(mocks.queueJobCreate).not.toHaveBeenCalled();
+    expect(mocks.queueJobUpdateMany).toHaveBeenCalledWith({
+      where: {
+        id: existingQueueJob.id,
+        orgId: "org_demo",
+        type: QueueJobType.SCHEDULED_CAMPAIGN,
+        status: {
+          in: [QueueJobStatus.QUEUED, QueueJobStatus.CANCELLED, QueueJobStatus.FAILED]
+        }
+      },
+      data: {
+        status: QueueJobStatus.QUEUED,
+        payload: reopenedQueueJob.payload,
+        runAt: scheduledAt,
+        generation: { increment: 1 },
+        processingToken: null,
+        processingExpiresAt: null
+      }
+    });
   });
 
   it("rejects failed preflight without cancelling or creating queue jobs", async () => {
@@ -162,7 +251,7 @@ describe("scheduleCampaign", () => {
     );
 
     expect(mocks.queueJobUpdateMany).not.toHaveBeenCalled();
-    expect(mocks.queueJobUpsert).not.toHaveBeenCalled();
+    expect(mocks.queueJobCreate).not.toHaveBeenCalled();
     expect(mocks.campaignUpdate).not.toHaveBeenCalled();
   });
 
@@ -184,7 +273,7 @@ describe("scheduleCampaign", () => {
       select: { id: true, phone: true, consentStatus: true, optedOutAt: true, archivedAt: true }
     });
     expect(mocks.queueJobUpdateMany).not.toHaveBeenCalled();
-    expect(mocks.queueJobUpsert).not.toHaveBeenCalled();
+    expect(mocks.queueJobCreate).not.toHaveBeenCalled();
     expect(mocks.campaignUpdate).not.toHaveBeenCalled();
   });
 });

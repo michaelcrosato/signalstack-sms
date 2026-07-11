@@ -47,6 +47,8 @@ async function main() {
 }
 
 main().catch((error: unknown) => {
-  logger.error(error instanceof Error ? error.message : String(error));
+  logger.error("scheduled_campaign_worker_fatal_error", {
+    errorType: error instanceof Error ? error.name : "UnknownError"
+  });
   process.exit(1);
 });

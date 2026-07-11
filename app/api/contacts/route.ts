@@ -4,7 +4,7 @@ import { requireApiRole } from "@/lib/auth/api-authorization";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
 import { listContacts, upsertContact } from "@/lib/db/repositories/contacts";
 import { contactCreateSchema } from "@/lib/validation/contacts";
-import { evaluatePhoneNumberLookup } from "@/lib/validation/lookup";
+import { evaluatePhoneNumberLookup, liveLookupOperatorHeaderName } from "@/lib/validation/lookup";
 
 import { withOptionalTenantRls } from "@/lib/db/rls";
 
@@ -31,9 +31,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid contact payload.", issues: payload.error.issues }, { status: 400 });
   }
 
-  const lookup = await evaluatePhoneNumberLookup(payload.data.phone);
+  const lookup = await evaluatePhoneNumberLookup(payload.data.phone, process.env, {
+    operatorToken: request.headers.get(liveLookupOperatorHeaderName)
+  });
   if (!lookup.valid) {
-    return NextResponse.json({ error: lookup.error || "Invalid phone number." }, { status: 400 });
+    return NextResponse.json(
+      { error: lookup.error || "Invalid phone number." },
+      { status: lookup.unavailable ? 503 : 400 }
+    );
   }
 
   payload.data.phone = lookup.formattedPhone || payload.data.phone;

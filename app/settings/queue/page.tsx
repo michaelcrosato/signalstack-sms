@@ -91,6 +91,10 @@ export default async function QueueOperationsPage() {
               value={String(countJobs(queueJobs, QueueJobStatus.QUEUED))}
             />
             <StatusRow
+              label="Processing"
+              value={String(countJobs(queueJobs, QueueJobStatus.PROCESSING))}
+            />
+            <StatusRow
               label="Completed"
               value={String(countJobs(queueJobs, QueueJobStatus.COMPLETED))}
             />

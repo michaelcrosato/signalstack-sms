@@ -22,7 +22,7 @@ const mocks = vi.hoisted(() => ({
 const mocksMerge = vi.hoisted(() => ({
   campaignRecipient: {
     findMany: vi.fn(),
-    update: vi.fn()
+    updateMany: vi.fn()
   },
   conversation: { updateMany: vi.fn() },
   message: { updateMany: vi.fn() }
@@ -116,10 +116,10 @@ describe("contacts repository", () => {
             update: mocks.update,
             findUniqueOrThrow: mocks.findUniqueOrThrow
           },
-          contactTag: { deleteMany: vi.fn(), create: vi.fn(), upsert: vi.fn() },
-          contactListMember: { deleteMany: vi.fn(), create: vi.fn(), upsert: vi.fn() },
-          tag: { upsert: vi.fn() },
-          contactList: { upsert: vi.fn() }
+          contactTag: { deleteMany: vi.fn(), createMany: vi.fn() },
+          contactListMember: { deleteMany: vi.fn(), createMany: vi.fn() },
+          tag: { createMany: vi.fn(), findMany: vi.fn() },
+          contactList: { createMany: vi.fn(), findMany: vi.fn() }
         })
       );
     });
@@ -142,6 +142,7 @@ describe("contacts repository", () => {
   describe("mergeContacts", () => {
     const targetContactId = "target_123";
     const sourceContactId = "source_123";
+    const targetConsentCapturedAt = new Date("2026-05-01T12:00:00.000Z");
 
     const targetContact = {
       id: targetContactId,
@@ -150,6 +151,9 @@ describe("contacts repository", () => {
       consentStatus: ConsentStatus.UNKNOWN,
       optInAt: null,
       optedOutAt: null,
+      consentCapturedAt: targetConsentCapturedAt,
+      consentMethod: "web_form",
+      consentDisclosure: "I agree to receive messages at the target number.",
       notes: "Target notes",
       displayName: "Target Name",
       tagLinks: [],
@@ -163,6 +167,9 @@ describe("contacts repository", () => {
       consentStatus: ConsentStatus.OPTED_IN,
       optInAt: new Date(),
       optedOutAt: null,
+      consentCapturedAt: new Date("2026-04-01T12:00:00.000Z"),
+      consentMethod: "sms_keyword",
+      consentDisclosure: "Source-number consent evidence.",
       notes: "Source notes",
       displayName: "Source Name",
       tagLinks: [],
@@ -180,15 +187,15 @@ describe("contacts repository", () => {
           campaignRecipient: mocksMerge.campaignRecipient,
           conversation: mocksMerge.conversation,
           message: mocksMerge.message,
-          contactTag: { deleteMany: vi.fn(), create: vi.fn(), upsert: vi.fn() },
-          contactListMember: { deleteMany: vi.fn(), create: vi.fn(), upsert: vi.fn() },
-          tag: { upsert: vi.fn() },
-          contactList: { upsert: vi.fn() }
+          contactTag: { deleteMany: vi.fn(), createMany: vi.fn() },
+          contactListMember: { deleteMany: vi.fn(), createMany: vi.fn() },
+          tag: { createMany: vi.fn(), findMany: vi.fn() },
+          contactList: { createMany: vi.fn(), findMany: vi.fn() }
         })
       );
 
       mocksMerge.campaignRecipient.findMany.mockResolvedValue([]);
-      mocksMerge.campaignRecipient.update.mockResolvedValue({});
+      mocksMerge.campaignRecipient.updateMany.mockResolvedValue({ count: 0 });
       mocksMerge.conversation.updateMany.mockResolvedValue({ count: 0 });
       mocksMerge.message.updateMany.mockResolvedValue({ count: 0 });
     });
@@ -243,6 +250,52 @@ describe("contacts repository", () => {
       });
 
       expect(result).toEqual(targetContact);
+    });
+
+    it("does not transfer opted-in status when the target lacks its own complete evidence", async () => {
+      const targetWithoutEvidence = {
+        ...targetContact,
+        consentCapturedAt: null,
+        consentMethod: null,
+        consentDisclosure: null
+      };
+      mocks.findFirst.mockResolvedValueOnce(targetWithoutEvidence).mockResolvedValueOnce(sourceContact);
+      mocks.findUniqueOrThrow.mockResolvedValue(targetWithoutEvidence);
+
+      await mergeContacts(orgId, targetContactId, sourceContactId);
+
+      const targetUpdate = mocks.update.mock.calls.find(([call]) => call.where.id === targetContactId)?.[0];
+      expect(targetUpdate.data.consentStatus).toBeUndefined();
+      expect(targetUpdate.data.optInAt).toBeUndefined();
+    });
+
+    it("demotes an opted-in target whose consent evidence is incomplete", async () => {
+      const optedInWithoutEvidence = {
+        ...targetContact,
+        consentStatus: ConsentStatus.OPTED_IN,
+        consentCapturedAt: null,
+        consentMethod: null,
+        consentDisclosure: null
+      };
+      const unknownSource = {
+        ...sourceContact,
+        consentStatus: ConsentStatus.UNKNOWN
+      };
+      mocks.findFirst.mockResolvedValueOnce(optedInWithoutEvidence).mockResolvedValueOnce(unknownSource);
+      mocks.findUniqueOrThrow.mockResolvedValue(optedInWithoutEvidence);
+
+      await mergeContacts(orgId, targetContactId, sourceContactId);
+
+      expect(mocks.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: targetContactId },
+          data: expect.objectContaining({
+            consentStatus: ConsentStatus.UNKNOWN,
+            optInAt: null,
+            optedOutAt: null
+          })
+        })
+      );
     });
   });
 });

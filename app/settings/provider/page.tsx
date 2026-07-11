@@ -1,7 +1,7 @@
 import { SettingsLink } from "@/components/settings/SettingsLink";
 import Link from "next/link";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
-import { getOrCreateComplianceProfile } from "@/lib/db/repositories/compliance";
+import { getComplianceProfile } from "@/lib/db/repositories/compliance";
 import {
   getProviderCredential,
   listProviderCredentialRotations,
@@ -39,7 +39,7 @@ export default async function ProviderSettingsPage({
   const selectedAction = actionFilter.success ? actionFilter.data : undefined;
   const currentOrg = await getOrCreateCurrentOrg();
   const [complianceProfile, providerCredential, rotations] = await Promise.all([
-    getOrCreateComplianceProfile(currentOrg.orgId),
+    getComplianceProfile(currentOrg.orgId),
     getProviderCredential(currentOrg.orgId, "twilio"),
     listProviderCredentialRotations(
       currentOrg.orgId,
