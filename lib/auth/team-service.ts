@@ -12,7 +12,12 @@ import {
   safeEqualSecret,
   type OpaqueToken
 } from "@/lib/auth/crypto";
-import { prisma } from "@/lib/db/prisma";
+import {
+  setAuthTransactionContext,
+  withAuthDatabaseContext,
+  withTenantTransaction,
+  type AuthDatabaseContext
+} from "@/lib/db/tenant-context";
 import {
   inviteAcceptSchema,
   teamInviteCreateSchema,
@@ -240,32 +245,37 @@ type ProjectedInvite = Prisma.AuthTokenGetPayload<{ select: typeof inviteProject
 
 export const prismaTeamServiceStore: TeamServiceStore = {
   async inviteAvailable(tokenHash, now) {
-    const invite = await prisma.authToken.findFirst({
-      where: {
-        tokenHash,
-        type: AuthTokenType.INVITE,
-        orgId: { not: null },
-        email: { not: null },
-        role: { not: null },
-        consumedAt: null,
-        revokedAt: null,
-        expiresAt: { gt: now }
-      },
-      select: { orgId: true, role: true, issuedByUserId: true }
-    });
+    const invite = await withAuthDatabaseContext({ tokenHash, purpose: "invite" }, (client) =>
+      client.authToken.findFirst({
+        where: {
+          tokenHash,
+          type: AuthTokenType.INVITE,
+          orgId: { not: null },
+          email: { not: null },
+          role: { not: null },
+          consumedAt: null,
+          revokedAt: null,
+          expiresAt: { gt: now }
+        },
+        select: { orgId: true, role: true, issuedByUserId: true }
+      })
+    );
     if (!invite?.orgId || !invite.role || !invite.issuedByUserId) {
       return false;
     }
-    const issuerMembership = await prisma.membership.findUnique({
-      where: {
-        orgId_userId: { orgId: invite.orgId, userId: invite.issuedByUserId }
-      },
-      select: {
-        role: true,
-        status: true,
-        user: { select: { disabledAt: true } }
-      }
-    });
+    const issuerMembership = await withTenantTransaction(
+      { orgId: invite.orgId, userId: invite.issuedByUserId },
+      (client) => client.membership.findUnique({
+        where: {
+          orgId_userId: { orgId: invite.orgId!, userId: invite.issuedByUserId! }
+        },
+        select: {
+          role: true,
+          status: true,
+          user: { select: { disabledAt: true } }
+        }
+      })
+    );
     return Boolean(
       issuerMembership?.status === MembershipStatus.ACTIVE &&
         !issuerMembership.user.disabledAt &&
@@ -274,7 +284,7 @@ export const prismaTeamServiceStore: TeamServiceStore = {
   },
 
   async listTeam(actor, now) {
-    return prisma.$transaction(async (transaction) => {
+    return withTenantTransaction(actor, async (transaction) => {
       const actorRole = await findEligibleActorRole(transaction, actor);
       if (!actorRole) {
         return failure("ACTOR_DENIED");
@@ -313,7 +323,7 @@ export const prismaTeamServiceStore: TeamServiceStore = {
   },
 
   async createInvite(input) {
-    return runSerializable(async (transaction) => {
+    return runTenantSerializable(input.actor, async (transaction) => {
       await lockOrganization(transaction, input.actor.orgId);
       const actorRole = await findEligibleActorRole(transaction, input.actor);
       if (!actorRole) {
@@ -372,7 +382,7 @@ export const prismaTeamServiceStore: TeamServiceStore = {
   },
 
   async revokeInvite(input) {
-    return runSerializable(async (transaction) => {
+    return runTenantSerializable(input.actor, async (transaction) => {
       await lockOrganization(transaction, input.actor.orgId);
       const actorRole = await findEligibleActorRole(transaction, input.actor);
       if (!actorRole) {
@@ -425,7 +435,9 @@ export const prismaTeamServiceStore: TeamServiceStore = {
 
   async acceptInvite(input) {
     try {
-      return await runSerializable(async (transaction) => {
+      return await runAuthSerializable(
+        { tokenHash: input.tokenHash, purpose: "invite" },
+        async (transaction) => {
         await lockInviteToken(transaction, input.tokenHash);
         const invite = await transaction.authToken.findUnique({
           where: { tokenHash: input.tokenHash },
@@ -463,6 +475,13 @@ export const prismaTeamServiceStore: TeamServiceStore = {
           return failure("INVITE_UNAVAILABLE");
         }
 
+        await setAuthTransactionContext(transaction, {
+          orgId: invite.orgId,
+          userId: invite.issuedByUserId,
+          tokenHash: input.tokenHash,
+          loginEmail: invite.email,
+          purpose: "invite"
+        });
         const acceptedAt = laterDate(input.now, invite.createdAt);
         await lockOrganization(transaction, invite.orgId);
         const issuerRole = await findEligibleActorRole(transaction, {
@@ -558,6 +577,14 @@ export const prismaTeamServiceStore: TeamServiceStore = {
           sessionAuthVersion = user.authVersion;
         }
 
+        await setAuthTransactionContext(transaction, {
+          orgId: invite.orgId,
+          userId: user.id,
+          tokenHash: input.tokenHash,
+          loginEmail: invite.email,
+          purpose: "invite"
+        });
+
         const existingMembership = await transaction.membership.findUnique({
           where: { orgId_userId: { orgId: invite.orgId, userId: user.id } },
           select: { id: true }
@@ -593,7 +620,8 @@ export const prismaTeamServiceStore: TeamServiceStore = {
           accountCreated,
           sessionAuthVersion
         });
-      });
+        }
+      );
     } catch (error) {
       if (isUniqueConstraintError(error)) {
         return failure("INVITE_AUTHENTICATION_REQUIRED");
@@ -912,7 +940,7 @@ async function mutateMember(
   input: UpdateTeamMemberRoleStoreInput | TeamMemberMutationStoreInput,
   kind: MemberMutationKind
 ): Promise<TeamStoreResult<TeamMemberSummary>> {
-  return runSerializable(async (transaction) => {
+  return runTenantSerializable(input.actor, async (transaction) => {
     await lockOrganization(transaction, input.actor.orgId);
     const actorRole = await findEligibleActorRole(transaction, input.actor);
     if (!actorRole) {
@@ -966,7 +994,19 @@ async function mutateMember(
       return failure("FINAL_OWNER");
     }
 
-    const auditMetadata: Record<string, unknown> = {};
+    const auditMetadata: Record<string, unknown> = { role: target.role };
+    if (kind !== "REACTIVATED") {
+      // Revoke issuer authority while the membership still exists. The tenant-integrity triggers
+      // validate historical audit/token references at write time without preventing hard deletion.
+      auditMetadata.revokedPendingInviteCount = await revokePendingInvitesIssuedBy(
+        transaction,
+        input.actor.orgId,
+        input.targetUserId,
+        input.now
+      );
+    }
+
+    let auditCreatedBeforeMembershipDelete = false;
     let result: ProjectedMember;
     if (kind === "ROLE_UPDATED") {
       result = await transaction.membership.update({
@@ -988,14 +1028,12 @@ async function mutateMember(
         input.targetUserId,
         input.now
       );
-      auditMetadata.role = target.role;
     } else if (kind === "REACTIVATED") {
       result = await transaction.membership.update({
         where: { id: target.id },
         data: { status: MembershipStatus.ACTIVE },
         select: memberProjection
       });
-      auditMetadata.role = target.role;
     } else {
       result = target;
       await revokeOrganizationSessions(
@@ -1004,27 +1042,28 @@ async function mutateMember(
         input.targetUserId,
         input.now
       );
+      await createTeamAuditEvent(transaction, {
+        orgId: input.actor.orgId,
+        actorUserId: input.actor.userId,
+        action: `TEAM_MEMBER_${kind}`,
+        subjectType: "Membership",
+        subjectId: target.id,
+        metadata: auditMetadata
+      });
+      auditCreatedBeforeMembershipDelete = true;
       await transaction.membership.delete({ where: { id: target.id }, select: { id: true } });
-      auditMetadata.role = target.role;
     }
 
-    if (kind !== "REACTIVATED") {
-      auditMetadata.revokedPendingInviteCount = await revokePendingInvitesIssuedBy(
-        transaction,
-        input.actor.orgId,
-        input.targetUserId,
-        input.now
-      );
+    if (!auditCreatedBeforeMembershipDelete) {
+      await createTeamAuditEvent(transaction, {
+        orgId: input.actor.orgId,
+        actorUserId: input.actor.userId,
+        action: `TEAM_MEMBER_${kind}`,
+        subjectType: "Membership",
+        subjectId: target.id,
+        metadata: auditMetadata
+      });
     }
-
-    await createTeamAuditEvent(transaction, {
-      orgId: input.actor.orgId,
-      actorUserId: input.actor.userId,
-      action: `TEAM_MEMBER_${kind}`,
-      subjectType: "Membership",
-      subjectId: target.id,
-      metadata: auditMetadata
-    });
     return success(toMemberSummary(result));
   });
 }
@@ -1196,14 +1235,32 @@ async function createTeamAuditEvent(
   });
 }
 
-async function runSerializable<T>(
+async function runTenantSerializable<T>(
+  context: TeamActor,
   operation: (transaction: Prisma.TransactionClient) => Promise<T>
 ): Promise<T> {
+  return runSerializableAttempt(() =>
+    withTenantTransaction(context, operation, {
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable
+    })
+  );
+}
+
+async function runAuthSerializable<T>(
+  context: AuthDatabaseContext,
+  operation: (transaction: Prisma.TransactionClient) => Promise<T>
+): Promise<T> {
+  return runSerializableAttempt(() =>
+    withAuthDatabaseContext(context, operation, {
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable
+    })
+  );
+}
+
+async function runSerializableAttempt<T>(operation: () => Promise<T>): Promise<T> {
   for (let attempt = 0; attempt < SERIALIZABLE_ATTEMPTS; attempt += 1) {
     try {
-      return await prisma.$transaction(operation, {
-        isolationLevel: Prisma.TransactionIsolationLevel.Serializable
-      });
+      return await operation();
     } catch (error) {
       if (!isSerializableConflict(error) || attempt === SERIALIZABLE_ATTEMPTS - 1) {
         throw error;

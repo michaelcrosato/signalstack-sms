@@ -6,10 +6,10 @@ import {
 } from "@/lib/auth/session-cookie";
 import { hashLocalSessionToken, hashOpaqueToken } from "@/lib/auth/crypto";
 import { createPrismaOperatorPasswordResetService } from "@/lib/auth/operator-password-reset";
-import { prisma } from "@/lib/db/prisma";
 import {
   cleanupLocalAuthE2eFixtures,
   disconnectLocalAuthE2eDatabase,
+  localAuthE2eOwnerPrisma,
   localAuthE2eFixture as fixture,
   requireLocalAuthE2eProfile
 } from "./local-auth-fixtures";
@@ -28,6 +28,7 @@ test("first-owner, organization, invitation, role, and revocation path", async (
 }) => {
   test.setTimeout(240_000);
   const profile = requireLocalAuthE2eProfile();
+  const prisma = localAuthE2eOwnerPrisma();
   const expectedBaseURL = requireBaseURL(baseURL);
   const secureCookie = expectsProductionCookie();
   const ownerBrowserLog = collectBrowserLog(page);

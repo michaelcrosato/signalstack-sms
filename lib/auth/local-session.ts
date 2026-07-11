@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { MembershipStatus, type MembershipRole } from "@prisma/client";
 import {
   createOpaqueToken,
@@ -5,7 +6,7 @@ import {
   hashOpaqueToken,
   type OpaqueToken
 } from "@/lib/auth/crypto";
-import { prisma } from "@/lib/db/prisma";
+import { withAuthDatabaseContext, withTenantTransaction } from "@/lib/db/tenant-context";
 
 const MINUTE_MS = 60_000;
 const HOUR_MS = 60 * MINUTE_MS;
@@ -148,30 +149,32 @@ const storedSessionSelect = {
 
 const prismaLocalSessionStore: LocalSessionStore = {
   async findPrincipal(userId, orgId) {
-    const membership = await prisma.membership.findUnique({
-      where: { orgId_userId: { orgId, userId } },
-      select: {
-        role: true,
-        status: true,
-        user: {
-          select: {
-            id: true,
-            email: true,
-            displayName: true,
-            disabledAt: true,
-            authVersion: true
-          }
-        },
-        org: {
-          select: {
-            id: true,
-            slug: true,
-            name: true,
-            demoMode: true
+    const membership = await withTenantTransaction({ orgId, userId }, (client) =>
+      client.membership.findUnique({
+        where: { orgId_userId: { orgId, userId } },
+        select: {
+          role: true,
+          status: true,
+          user: {
+            select: {
+              id: true,
+              email: true,
+              displayName: true,
+              disabledAt: true,
+              authVersion: true
+            }
+          },
+          org: {
+            select: {
+              id: true,
+              slug: true,
+              name: true,
+              demoMode: true
+            }
           }
         }
-      }
-    });
+      })
+    );
 
     if (!membership) {
       return null;
@@ -188,7 +191,7 @@ const prismaLocalSessionStore: LocalSessionStore = {
   },
 
   async createSession(input) {
-    return prisma.$transaction(async (transaction) => {
+    return withTenantTransaction({ orgId: input.orgId, userId: input.userId }, async (transaction) => {
       // Password reset uses the same subject lock. Either this session commits first and is then
       // revoked by the reset, or the reset commits first and this generation check rejects it.
       await transaction.$queryRaw`
@@ -230,40 +233,48 @@ const prismaLocalSessionStore: LocalSessionStore = {
   },
 
   async findSessionByTokenHash(tokenHash) {
-    return prisma.authSession.findUnique({
-      where: { tokenHash },
-      select: storedSessionSelect
-    });
+    return withAuthDatabaseContext({ sessionHash: tokenHash, purpose: "session" }, (client) =>
+      client.authSession.findUnique({
+        where: { tokenHash },
+        select: storedSessionSelect
+      })
+    );
   },
 
   async refreshSession(input) {
-    const result = await prisma.authSession.updateMany({
-      where: {
-        id: input.sessionId,
-        userId: input.userId,
-        orgId: input.orgId,
-        authVersion: input.authVersion,
-        revokedAt: null,
-        idleExpiresAt: { gt: input.now },
-        absoluteExpiresAt: { gt: input.now }
-      },
-      data: {
-        lastSeenAt: input.lastSeenAt,
-        idleExpiresAt: input.idleExpiresAt
-      }
-    });
+    const result = await withTenantTransaction(
+      { orgId: input.orgId, userId: input.userId },
+      (client) => client.authSession.updateMany({
+        where: {
+          id: input.sessionId,
+          userId: input.userId,
+          orgId: input.orgId,
+          authVersion: input.authVersion,
+          revokedAt: null,
+          idleExpiresAt: { gt: input.now },
+          absoluteExpiresAt: { gt: input.now }
+        },
+        data: {
+          lastSeenAt: input.lastSeenAt,
+          idleExpiresAt: input.idleExpiresAt
+        }
+      })
+    );
     return result.count === 1;
   },
 
   async revokeSessionByTokenHash(tokenHash, now) {
-    return prisma.$transaction(async (transaction) => {
-      const session = await transaction.authSession.findUnique({
+    const session = await withAuthDatabaseContext(
+      { sessionHash: tokenHash, purpose: "session" },
+      (client) => client.authSession.findUnique({
         where: { tokenHash },
         select: { id: true, userId: true, orgId: true, revokedAt: true }
-      });
-      if (!session || session.revokedAt) {
-        return false;
-      }
+      })
+    );
+    if (!session || session.revokedAt) {
+      return false;
+    }
+    return withTenantTransaction({ orgId: session.orgId, userId: session.userId }, async (transaction) => {
       const result = await transaction.authSession.updateMany({
         where: { id: session.id, revokedAt: null },
         data: { revokedAt: now }
@@ -287,7 +298,9 @@ const prismaLocalSessionStore: LocalSessionStore = {
   },
 
   async revokeAllSessions(userId, now, auditOrgId) {
-    return prisma.$transaction(async (transaction) => {
+    return withAuthDatabaseContext(
+      { userId, ...(auditOrgId ? { orgId: auditOrgId } : {}), purpose: "session" },
+      async (transaction) => {
       // Serialize against session creation and password/reset operations for the same subject. The
       // request was already authenticated before this store call; a concurrent membership change
       // must not turn an authenticated self-revocation into a false successful no-op.
@@ -307,36 +320,35 @@ const prismaLocalSessionStore: LocalSessionStore = {
         data: { revokedAt: now }
       });
       if (auditOrgId) {
-        // Membership may have been suspended or removed after request authentication. Audit against
-        // the authenticated organization when it still exists, locking that row so a concurrent
-        // organization delete cannot roll back the security-critical revocation transaction.
-        const auditOrganizations = await transaction.$queryRaw<Array<{ id: string }>>`
-          SELECT "id"
-          FROM "Organization"
-          WHERE "id" = ${auditOrgId}
-          FOR KEY SHARE
+        // INSERT ... SELECT both checks exact organization evidence and lets the foreign key acquire
+        // its key-share lock. If the organization disappeared after request authentication, zero
+        // audit rows are inserted while the security-critical revocation still commits.
+        await transaction.$executeRaw`
+          INSERT INTO "LiveReadinessAuditEvent" (
+            "id", "orgId", "actorUserId", "action", "subjectType", "subjectId", "metadata", "createdAt"
+          )
+          SELECT
+            ${randomUUID()},
+            organization."id",
+            ${userId},
+            'LOCAL_SESSIONS_REVOKED_ALL',
+            'AppUser',
+            ${userId},
+            jsonb_build_object('revokedSessions', ${sessions.count}),
+            ${now}
+          FROM "Organization" organization
+          WHERE organization."id" = ${auditOrgId}
         `;
-        if (auditOrganizations.length === 1) {
-          await transaction.liveReadinessAuditEvent.create({
-            data: {
-              orgId: auditOrgId,
-              actorUserId: userId,
-              action: "LOCAL_SESSIONS_REVOKED_ALL",
-              subjectType: "AppUser",
-              subjectId: userId,
-              metadata: { revokedSessions: sessions.count },
-              createdAt: now
-            },
-            select: { id: true }
-          });
-        }
       }
-      return sessions.count;
-    });
+        return sessions.count;
+      }
+    );
   },
 
   async switchSessionOrg(input) {
-    return prisma.$transaction(async (transaction) => {
+    return withAuthDatabaseContext(
+      { orgId: input.toOrgId, userId: input.userId, purpose: "session" },
+      async (transaction) => {
       const targetMembership = await transaction.membership.findUnique({
         where: { orgId_userId: { orgId: input.toOrgId, userId: input.userId } },
         select: {
@@ -378,8 +390,9 @@ const prismaLocalSessionStore: LocalSessionStore = {
         },
         select: { id: true }
       });
-      return true;
-    });
+        return true;
+      }
+    );
   }
 };
 

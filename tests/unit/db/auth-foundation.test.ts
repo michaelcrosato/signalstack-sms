@@ -95,6 +95,9 @@ describe.runIf(run)("built-in auth foundation database invariants", () => {
     const org = await prisma.organization.create({
       data: { name: "Auth Token Organization", slug: `auth-token-${suffix}` }
     });
+    await prisma.membership.create({
+      data: { orgId: org.id, userId: user.id, role: MembershipRole.OWNER }
+    });
     const tokenHash = testTokenHash(`auth-token-hash-${suffix}`);
 
     await prisma.authToken.create({
@@ -178,7 +181,8 @@ describe.runIf(run)("built-in auth foundation database invariants", () => {
     await prisma.membership.createMany({
       data: [
         { userId: user.id, orgId: orgA.id, role: MembershipRole.OWNER },
-        { userId: user.id, orgId: orgB.id, role: MembershipRole.ADMIN }
+        { userId: user.id, orgId: orgB.id, role: MembershipRole.ADMIN },
+        { userId: issuer.id, orgId: orgA.id, role: MembershipRole.ADMIN }
       ]
     });
     const credential = await prisma.localCredential.create({
@@ -218,9 +222,10 @@ describe.runIf(run)("built-in auth foundation database invariants", () => {
       [sessionAHash, orgA.id, user.id],
       [sessionBHash, orgB.id, user.id]
     ].sort(([left], [right]) => left.localeCompare(right));
-    expect(sessions.map((session) => [session.tokenHash, session.org.id, session.user.id])).toEqual(
-      expectedSessionRelations
-    );
+    const actualSessionRelations = sessions
+      .map((session) => [session.tokenHash, session.org.id, session.user.id])
+      .sort(([left], [right]) => left.localeCompare(right));
+    expect(actualSessionRelations).toEqual(expectedSessionRelations);
 
     await expect(
       prisma.authSession.create({

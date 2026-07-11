@@ -1,7 +1,7 @@
 import { createHmac, randomUUID } from "node:crypto";
 import { isIP } from "node:net";
 import { AuthThrottleScope, Prisma } from "@prisma/client";
-import { prisma } from "@/lib/db/prisma";
+import { withAuthDatabaseContext } from "@/lib/db/tenant-context";
 
 const SECOND_MS = 1_000;
 const MINUTE_MS = 60 * SECOND_MS;
@@ -102,8 +102,10 @@ export const prismaAuthThrottleStore: AuthThrottleStore = Object.freeze({
   async consume(input: ConsumeStoredAuthThrottleInput) {
     const { scope, keyHash, now, policy } = input;
     const id = randomUUID();
-    const rows = await prisma.$queryRaw<StoredAuthThrottleState[]>(Prisma.sql`
-      INSERT INTO "AuthThrottle" (
+    const rows = await withAuthDatabaseContext(
+      { tokenHash: keyHash, purpose: "login" },
+      (client) => client.$queryRaw<StoredAuthThrottleState[]>(Prisma.sql`
+        INSERT INTO "AuthThrottle" (
         "id",
         "scope",
         "keyHash",
@@ -151,11 +153,12 @@ export const prismaAuthThrottleStore: AuthThrottleStore = Object.freeze({
           ELSE NULL
         END,
         "updatedAt" = ${now}
-      RETURNING
-        "attempts",
-        "windowStartedAt",
-        "blockedUntil"
-    `);
+        RETURNING
+          "attempts",
+          "windowStartedAt",
+          "blockedUntil"
+      `)
+    );
 
     const state = rows[0];
     if (!state) {
@@ -165,14 +168,16 @@ export const prismaAuthThrottleStore: AuthThrottleStore = Object.freeze({
   },
 
   async inspect(scope: AuthThrottleScope, keyHash: string) {
-    return prisma.authThrottle.findUnique({
-      where: { scope_keyHash: { scope, keyHash } },
-      select: {
-        attempts: true,
-        windowStartedAt: true,
-        blockedUntil: true
-      }
-    });
+    return withAuthDatabaseContext({ tokenHash: keyHash, purpose: "login" }, (client) =>
+      client.authThrottle.findUnique({
+        where: { scope_keyHash: { scope, keyHash } },
+        select: {
+          attempts: true,
+          windowStartedAt: true,
+          blockedUntil: true
+        }
+      })
+    );
   }
 });
 

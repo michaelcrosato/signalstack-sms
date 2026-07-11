@@ -1,6 +1,5 @@
-import { AuthThrottleScope } from "@prisma/client";
+import { AuthThrottleScope, PrismaClient } from "@prisma/client";
 import { deriveAuthThrottleKeyHash } from "@/lib/auth/auth-throttle";
-import { prisma } from "@/lib/db/prisma";
 
 export const localAuthE2eFixture = Object.freeze({
   ownerEmail: "local-auth-e2e-owner@example.com",
@@ -51,7 +50,11 @@ export function requireLocalAuthE2eProfile(
     throw new Error("The local-auth browser proof requires demo-safe external-impact settings.");
   }
 
-  requireDedicatedLoopbackPostgres(environment.DATABASE_URL);
+  requireDedicatedLoopbackPostgres(environment.DATABASE_URL, "runtime");
+  requireDedicatedLoopbackPostgres(environment.MIGRATION_DATABASE_URL, "migration");
+  if (environment.DATABASE_URL === environment.MIGRATION_DATABASE_URL) {
+    throw new Error("The local-auth browser proof requires separate runtime and migration credentials.");
+  }
   const bootstrapToken = requireBoundedSecret(environment.BOOTSTRAP_TOKEN, "bootstrap token", 192);
   const throttleSecret = requireBoundedSecret(
     environment.AUTH_THROTTLE_SECRET,
@@ -86,7 +89,7 @@ export function requireLocalAuthE2eProfile(
 /** Delete only deterministic fixture identities, organizations, and their exact HMAC throttle keys. */
 export async function cleanupLocalAuthE2eFixtures(throttleSecret: string): Promise<void> {
   const throttleKeys = localAuthThrottleKeys(throttleSecret);
-  await prisma.$transaction(async (transaction) => {
+  await localAuthE2eOwnerPrisma().$transaction(async (transaction) => {
     await transaction.organization.deleteMany({
       where: {
         slug: {
@@ -109,7 +112,17 @@ export async function cleanupLocalAuthE2eFixtures(throttleSecret: string): Promi
 }
 
 export async function disconnectLocalAuthE2eDatabase(): Promise<void> {
-  await prisma.$disconnect();
+  await cleanupClient?.$disconnect();
+  cleanupClient = undefined;
+}
+
+let cleanupClient: PrismaClient | undefined;
+
+export function localAuthE2eOwnerPrisma(): PrismaClient {
+  const migrationUrl = process.env.MIGRATION_DATABASE_URL;
+  requireDedicatedLoopbackPostgres(migrationUrl, "migration");
+  cleanupClient ??= new PrismaClient({ datasourceUrl: migrationUrl, log: ["error"] });
+  return cleanupClient;
 }
 
 function localAuthThrottleKeys(secret: string) {
@@ -128,12 +141,15 @@ function localAuthThrottleKeys(secret: string) {
   }));
 }
 
-function requireDedicatedLoopbackPostgres(value: string | undefined): void {
+function requireDedicatedLoopbackPostgres(
+  value: string | undefined,
+  credential: "runtime" | "migration"
+): void {
   let parsed: URL;
   try {
     parsed = new URL(value ?? "");
   } catch {
-    throw new Error("The local-auth browser proof requires an explicit PostgreSQL URL.");
+    throw new Error(`The local-auth browser proof requires an explicit ${credential} PostgreSQL URL.`);
   }
 
   const loopbackHosts = new Set(["localhost", "127.0.0.1", "[::1]", "::1"]);
@@ -144,7 +160,7 @@ function requireDedicatedLoopbackPostgres(value: string | undefined): void {
     parsed.searchParams.get("schema") !== "public"
   ) {
     throw new Error(
-      `The local-auth browser proof accepts only the loopback ${localAuthE2eDatabaseName} database with schema=public.`
+      `The local-auth browser proof accepts only a loopback ${credential} credential for ${localAuthE2eDatabaseName} with schema=public.`
     );
   }
 }

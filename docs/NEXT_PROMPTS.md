@@ -45,9 +45,14 @@ This is the compact handoff for the next automated loop. History lives in `git l
 
 ## Next Work
 
-M0 and M1 in `docs/STANDALONE_ROADMAP.md` are DONE. The active queue is M2: same-tenant composite
-constraints, a non-owner application database role, fail-closed request-local tenant context/RLS, and
-mandatory two-tenant PostgreSQL proof. Continue to M3/M4 only after that trust boundary closes.
+M0–M2 in `docs/STANDALONE_ROADMAP.md` are DONE. M2 evidence is a fresh 40-migration/no-diff install under
+a non-superuser/non-BYPASSRLS table owner, owner capability barred from runtimes, 27-table fail-closed RLS
+with semantic policy fingerprints, composite tenant integrity, exact command-specific control policies,
+atomic database-timed dispatch with no public ACL, short tenant/control/dispatch contexts, zero migration-
+debt imports, the mandatory eight-file / 33-test tenant matrix, 37 PostgreSQL files / 186 tests, nine auth
+database files / 38 tests, and production local-auth build/browser proof 1/1 under a non-owner login. The
+active queue is M3 public integrations and M4 provider ownership/secrets in parallel; do not claim M5–M11
+early.
 
 Rules: run the protected gate (`pwsh scripts/local-gate.ps1`, now fully green incl `e2e:smoke` after
 `npm run afk:preflight`) before treating work as green; commit only when green. Keep all live

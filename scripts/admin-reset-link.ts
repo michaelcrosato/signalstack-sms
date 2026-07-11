@@ -92,7 +92,10 @@ export async function runAdminResetLink(
 function defaultDependencies() {
   return {
     async loadService() {
-      const prisma = new PrismaClient({ log: [] });
+      const prisma = new PrismaClient({
+        log: [],
+        datasourceUrl: process.env.MIGRATION_DATABASE_URL ?? process.env.DATABASE_URL
+      });
       return {
         issue: await createPrismaOperatorPasswordResetService(prisma),
         close: () => prisma.$disconnect()

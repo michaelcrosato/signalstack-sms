@@ -355,7 +355,10 @@ function defaultDependencies(): AdminCreateDependencies {
       ]);
       // The operator boundary owns a silent client so Prisma cannot print connection strings,
       // query diagnostics, or filesystem details around the command's code-only error handling.
-      const prisma = new PrismaClient({ log: [] });
+      const prisma = new PrismaClient({
+        log: [],
+        datasourceUrl: process.env.MIGRATION_DATABASE_URL ?? process.env.DATABASE_URL
+      });
       return {
         service: await createPrismaOperatorAdminService({ ...input, prismaClient: prisma }),
         close: () => prisma.$disconnect()

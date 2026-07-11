@@ -131,7 +131,8 @@ describe("runtime configuration", () => {
         AUTH_PROVIDER: "local",
         AUTH_SESSION_SECRET: sessionSecret,
         AUTH_THROTTLE_SECRET: throttleSecret,
-        TRUST_PROXY: "true"
+        TRUST_PROXY: "true",
+        DATABASE_RLS_ENFORCED: "true"
       })
     ).not.toThrow();
   });
@@ -214,6 +215,7 @@ describe("runtime configuration", () => {
       AUTH_SESSION_SECRET: sessionSecret,
       AUTH_THROTTLE_SECRET: throttleSecret,
       TRUST_PROXY: "true",
+      DATABASE_RLS_ENFORCED: "true",
       MESSAGING_PROVIDER: "twilio",
       LIVE_MESSAGING_ENABLED: "true"
     });
@@ -251,6 +253,7 @@ describe("runtime configuration", () => {
       AUTH_SESSION_SECRET: sessionSecret,
       AUTH_THROTTLE_SECRET: throttleSecret,
       TRUST_PROXY: "true",
+      DATABASE_RLS_ENFORCED: "true",
       MESSAGING_PROVIDER: "twilio",
       LIVE_MESSAGING_ENABLED: "true",
       TWILIO_ACCOUNT_SID: twilioAccountSid,
@@ -289,6 +292,34 @@ describe("runtime configuration", () => {
     expect(config.queue).toEqual({ backend: "bullmq", redisConfigured: true });
     expect(JSON.stringify(config)).not.toContain(redisUrl);
     expect(JSON.stringify(config)).not.toContain("queue-secret");
+  });
+
+  it("requires fail-closed RLS in production and keeps owner credentials out of the process", () => {
+    const missingBoundary = captureConfigError({ APP_ENV: "production" });
+    expect(missingBoundary.issues).toContainEqual(
+      expect.objectContaining({ path: "DATABASE_RLS_ENFORCED" })
+    );
+
+    const sharedCredential = "postgresql://runtime:secret@db.example.test/signalstack";
+    const sharedError = captureConfigError({
+      DATABASE_URL: sharedCredential,
+      MIGRATION_DATABASE_URL: sharedCredential
+    });
+    expect(sharedError.issues).toContainEqual(
+      expect.objectContaining({ path: "MIGRATION_DATABASE_URL", message: expect.stringContaining("distinct") })
+    );
+
+    const productionOwnerLeak = captureConfigError({
+      APP_ENV: "production",
+      DATABASE_RLS_ENFORCED: "true",
+      MIGRATION_DATABASE_URL: "postgresql://owner:secret@db.example.test/signalstack"
+    });
+    expect(productionOwnerLeak.issues).toContainEqual(
+      expect.objectContaining({
+        path: "MIGRATION_DATABASE_URL",
+        message: expect.stringContaining("running production process")
+      })
+    );
   });
 
   it("validates encrypted backup and off-site readiness without returning keys or URLs", () => {

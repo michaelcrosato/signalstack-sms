@@ -49,6 +49,7 @@ export type RuntimeConfig = Readonly<{
     configured: boolean;
     usesLocalDefault: boolean;
     rlsEnforced: boolean;
+    migrationCredentialSupplied: boolean;
   }>;
   worker: Readonly<{
     enabled: boolean;
@@ -192,6 +193,20 @@ const databaseUrl = z.preprocess(
     .refine((value) => hasProtocol(value, ["postgres:", "postgresql:"]), "DATABASE_URL must be PostgreSQL.")
 );
 
+const optionalDatabaseUrl = z.preprocess(
+  blankToUndefined,
+  z
+    .string()
+    .trim()
+    .min(1)
+    .max(4096)
+    .optional()
+    .refine(
+      (value) => value === undefined || hasProtocol(value, ["postgres:", "postgresql:"]),
+      "MIGRATION_DATABASE_URL must be PostgreSQL."
+    )
+);
+
 const redisUrl = z.preprocess(
   blankToUndefined,
   z
@@ -219,6 +234,7 @@ const runtimeEnvironmentSchema = z
     TRUST_PROXY: booleanFromEnv(false),
 
     DATABASE_URL: databaseUrl,
+    MIGRATION_DATABASE_URL: optionalDatabaseUrl,
     DATABASE_RLS_ENFORCED: booleanFromEnv(false),
 
     WORKER_ENABLED: booleanFromEnv(false),
@@ -269,6 +285,32 @@ const runtimeEnvironmentSchema = z
   })
   .strip()
   .superRefine((config, context) => {
+    const production = resolveEnvironment(config) === "production";
+    if (production && !config.DATABASE_RLS_ENFORCED) {
+      addIssue(
+        context,
+        "DATABASE_RLS_ENFORCED",
+        "Production requires the fail-closed non-owner database tenant boundary."
+      );
+    }
+    if (
+      config.MIGRATION_DATABASE_URL !== undefined &&
+      config.MIGRATION_DATABASE_URL === config.DATABASE_URL
+    ) {
+      addIssue(
+        context,
+        "MIGRATION_DATABASE_URL",
+        "Migration and runtime database credentials must be distinct."
+      );
+    }
+    if (production && config.MIGRATION_DATABASE_URL !== undefined) {
+      addIssue(
+        context,
+        "MIGRATION_DATABASE_URL",
+        "Do not supply the table-owner migration credential to a running production process."
+      );
+    }
+
     if (config.DEMO_MODE && config.MESSAGING_PROVIDER !== "dummy") {
       addIssue(context, "MESSAGING_PROVIDER", "Demo mode requires the dummy messaging provider.");
     }
@@ -424,7 +466,8 @@ function buildSafeRuntimeConfig(config: ParsedRuntimeEnvironment): RuntimeConfig
     database: Object.freeze({
       configured: Boolean(config.DATABASE_URL),
       usesLocalDefault: config.DATABASE_URL === localDatabaseUrl,
-      rlsEnforced: config.DATABASE_RLS_ENFORCED
+      rlsEnforced: config.DATABASE_RLS_ENFORCED,
+      migrationCredentialSupplied: Boolean(config.MIGRATION_DATABASE_URL)
     }),
     worker: Object.freeze({
       enabled: config.WORKER_ENABLED,

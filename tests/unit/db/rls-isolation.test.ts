@@ -26,6 +26,12 @@ describe.runIf(run)("RLS tenant isolation (integration; requires Postgres + RUN_
       }
     });
     authUserId = authUser.id;
+    await prisma.membership.createMany({
+      data: [
+        { orgId: orgAId, userId: authUserId },
+        { orgId: orgBId, userId: authUserId }
+      ]
+    });
     await prisma.contact.create({ data: { orgId: orgAId, phone: `+1700${suffix}1` } });
     await prisma.contact.create({ data: { orgId: orgBId, phone: `+1700${suffix}2` } });
     await prisma.authSession.createMany({
@@ -92,10 +98,10 @@ function sessionHash(label: string, suffix: string) {
 }
 
 describe("withOptionalTenantRls (unit)", () => {
-  it("executes wrapped queries on the global prisma instance if RLS is disabled", async () => {
+  it("keeps tenant enforcement mandatory when the legacy flag is false", async () => {
     const mockFn = vi.fn().mockImplementation(() => Promise.resolve("done"));
     const result = await withOptionalTenantRls("org-123", mockFn, { DATABASE_RLS_ENFORCED: "false" });
     expect(result).toBe("done");
-    expect(mockFn.mock.calls[0][0]).toBe(prisma);
+    expect(mockFn.mock.calls[0][0]).not.toBe(prisma);
   });
 });

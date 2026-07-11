@@ -20,14 +20,14 @@ are optional adapters or accelerators, never core requirements.
 - Local/demo product workflows and defensive backend foundations are substantial and validated.
 - Built-in local identity, onboarding, team lifecycle, operator recovery, and production-session browser
   proof are complete; deterministic identity remains only in explicit demo mode.
-- Remaining production trust gaps are database tenant enforcement, demo-tenant webhook routing,
-  metadata-only provider credentials, dummy-only campaign worker, and no
-  public integration identity/event-delivery platform.
+- Database-enforced tenant integrity is complete. Remaining production trust gaps include demo-tenant
+  webhook routing, metadata-only provider credentials, a dummy-only campaign worker, and no public
+  integration identity/event-delivery platform.
 - Deployment is not a standalone package: current Compose contains backing services only; no hardened
   app/worker/ingress/migration/backup stack or restore proof exists.
 - Live external impact remains disabled while implementation proceeds.
 
-## Active move: M2 database-enforced tenant integrity
+## Active move: M3 public integrations and M4 provider ownership
 
 ### Completed: M0 — Roadmap and package safety
 
@@ -46,18 +46,36 @@ are optional adapters or accelerators, never core requirements.
 - One fail-closed current-user/current-org resolver used by pages and APIs outside explicit demo mode.
 - Two-user/two-org auth and browser E2E.
 
+### Completed: M2 — Database-enforced tenant integrity
+
+- Same-tenant composite keys/foreign keys, a PII-free aborting preflight, and triggers for historical
+  actor/subject references.
+- All 40 migrations install through a table-owning credential that may be non-superuser and
+  non-BYPASSRLS by selecting the explicit NOLOGIN `signalstack_owner` capability; runtime provisioning
+  removes that capability and production posture rejects it.
+- Forced, fail-closed RLS across all 27 protected tables, with runtime attestation of each policy's
+  command, role, permissiveness, and predicate shape.
+- Explicit short tenant, auth-control, and worker-dispatch transactions. Tenant-root/global-user control
+  policies bind each command to exact evidence and expose no control DELETE on those tables.
+- The queue claim is installed atomically as a narrow security-definer capability, uses database-derived
+  time, rejects null/out-of-range arguments, revokes `PUBLIC`, and grants execution only to workers.
+- Zero tenant migration-debt imports and mandatory two-tenant A/B, missing-context, forgery, and pool
+  isolation proof.
+- Database evidence: 37 files / 186 tests; tenant gate: eight files / 33 tests; auth database run: nine
+  files / 38 tests. A fresh least-privilege install proves all migrations, historical triggers, dispatch,
+  and revoked public function access; production local-auth browser proof runs under a non-owner login.
+
 ## Following dependency queue
 
-1. M2 database-enforced tenant integrity.
-2. M3 scoped API keys, `/api/v1`, OpenAPI, and durable signed customer webhooks.
-3. M4 encrypted provider credentials and trusted account/number tenant routing.
-4. M5 direct-message outbox and Twilio transport with ambiguity reconciliation.
-5. M6 inbound/status/shared-inbox production path.
-6. M7 campaign worker, audiences, throttling, DLQ/replay, and kill switches.
-7. M8 compliance evidence, audit, suppression, retention, and privacy lifecycle.
-8. M9 complete setup/product/admin UX and local entitlements/quotas.
-9. M10 clean-host package, health/metrics, backups, restore, and upgrades.
-10. M11 complete production/API/provider/container/recovery proof.
+1. M3 scoped API keys, `/api/v1`, OpenAPI, and durable signed customer webhooks, in parallel with M4
+   encrypted provider credentials and trusted account/number tenant routing.
+2. M5 direct-message outbox and Twilio transport with ambiguity reconciliation.
+3. M6 inbound/status/shared-inbox production path.
+4. M7 campaign worker, audiences, throttling, DLQ/replay, and kill switches.
+5. M8 compliance evidence, audit, suppression, retention, and privacy lifecycle.
+6. M9 complete setup/product/admin UX and local entitlements/quotas.
+7. M10 clean-host package, health/metrics, backups, restore, and upgrades.
+8. M11 complete production/API/provider/container/recovery proof.
 
 ## Validation rule
 

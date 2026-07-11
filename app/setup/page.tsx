@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { prisma } from "@/lib/db/prisma";
+import { withAuthDatabaseContext } from "@/lib/db/tenant-context";
 import { getRuntimeConfig } from "@/lib/env/runtime-config";
 import { SetupForm } from "./setup-form";
 
@@ -22,7 +22,10 @@ export default async function SetupPage() {
     );
   }
 
-  const setupOpen = (await prisma.localCredential.count()) === 0;
+  const setupOpen = await withAuthDatabaseContext(
+    { purpose: "bootstrap" },
+    async (client) => (await client.localCredential.count()) === 0
+  );
   if (!setupOpen) {
     return (
       <AuthShell eyebrow="First-run setup" title="Setup is already complete">

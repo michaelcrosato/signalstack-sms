@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/db/prisma";
 import { type Prisma, ConsentStatus } from "@prisma/client";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 
 export type SegmentFilter = {
   tagNames?: string[];
@@ -14,7 +14,7 @@ export type SegmentFilter = {
 export async function evaluateSegmentContacts(
   orgId: string,
   filter: SegmentFilter,
-  tx: Prisma.TransactionClient = prisma
+  tx?: Prisma.TransactionClient
 ) {
   const whereClause: Prisma.ContactWhereInput = {
     orgId,
@@ -46,7 +46,7 @@ export async function evaluateSegmentContacts(
     };
   }
 
-  return tx.contact.findMany({
+  const execute = (client: Prisma.TransactionClient) => client.contact.findMany({
     where: whereClause,
     orderBy: { updatedAt: "desc" },
     include: {
@@ -54,4 +54,6 @@ export async function evaluateSegmentContacts(
       listLinks: { include: { list: true } }
     }
   });
+
+  return tx ? execute(tx) : withTenantTransaction({ orgId }, execute);
 }

@@ -44,11 +44,33 @@
     },
     {
       "id": "M2",
-      "status": "partial foundation",
+      "status": "done",
       "evidence": [
-        "lib/db/rls.ts",
-        "prisma/migrations/20260529130000_tenant_rls/migration.sql",
-        "tests/unit/db/rls-isolation.test.ts"
+        "plan/specs/SPEC-020-postgres-rls-production.md",
+        "lib/db/tenant-manifest.ts",
+        "lib/db/tenant-context.ts",
+        "lib/db/runtime-posture.ts",
+        "lib/db/queue-dispatch.ts",
+        "scripts/tenant-integrity-preflight.ts",
+        "scripts/tenant-boundary-check.ts",
+        "scripts/provision-runtime-role.ts",
+        "scripts/tenant-db-test.ts",
+        "prisma/migrations/20260711030000_tenant_relation_integrity/migration.sql",
+        "prisma/migrations/20260711033000_fail_closed_tenant_runtime/migration.sql",
+        "prisma/migrations/20260711034000_auth_control_boundaries/migration.sql",
+        "prisma/migrations/20260711035000_worker_dispatch_and_bootstrap_scope/migration.sql",
+        "prisma/migrations/20260711036000_auth_control_mutation_scope/migration.sql",
+        "prisma/migrations/20260711037000_worker_role_separation/migration.sql",
+        "prisma/migrations/20260711038000_owner_capability_and_dispatch_hardening/migration.sql",
+        "prisma/migrations/20260711039000_control_policy_hardening/migration.sql",
+        "tests/unit/db/control-policy-hardening.test.ts",
+        "tests/unit/db/least-privilege-owner.test.ts",
+        "tests/unit/db/runtime-posture-policy.test.ts",
+        "tests/unit/db/tenant-relation-integrity.test.ts",
+        "tests/unit/db/tenant-runtime-role.test.ts",
+        "tests/unit/db/worker-runtime-dispatch.test.ts",
+        "e2e/local-auth-path.spec.ts",
+        "scripts/local-auth-e2e-production.ts"
       ]
     },
     {

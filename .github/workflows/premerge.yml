@@ -59,7 +59,9 @@ jobs:
       RUNTIME_PROCESS: web
       DEMO_MODE: "false"
       AUTH_PROVIDER: local
-      DATABASE_URL: postgresql://signalstack:signalstack@localhost:5432/signalstack_sms_local_auth_e2e?schema=public
+      MIGRATION_DATABASE_URL: postgresql://signalstack:signalstack@localhost:5432/signalstack_sms_local_auth_e2e?schema=public
+      DATABASE_URL: postgresql://signalstack_web_e2e:signalstack-runtime-e2e-password@localhost:5432/signalstack_sms_local_auth_e2e?schema=public
+      DATABASE_RLS_ENFORCED: "true"
       QUEUE_BACKEND: database
       WORKER_ENABLED: "false"
       MESSAGING_PROVIDER: dummy
@@ -113,6 +115,7 @@ jobs:
             echo "LOCAL_AUTH_E2E_MEMBER_PASSWORD=$member_password"
           } >> "$GITHUB_ENV"
       - run: npm run db:deploy
+      - run: npm run db:provision:web
       - id: local_auth_browser
         name: Run production-build local-auth browser proof
         run: npm run test:e2e:local-auth:production

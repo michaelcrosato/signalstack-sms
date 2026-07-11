@@ -6,6 +6,55 @@ Owner: backend-data.
 
 Every tenant-scoped model must include `orgId` unless explicitly documented here. Repositories and route handlers must resolve the current organization before reading or writing tenant data.
 
+## Standalone M2 Database Boundary
+
+PostgreSQL independently enforces the tenant rule; repository predicates are defense in depth, not the
+authorization boundary:
+
+- The canonical manifest contains 22 ordinary tenant tables plus five identity/control tables
+  (`Organization`, `Membership`, `AppUser`, `AuthSession`, and `AuthToken`). All 27 enable and force RLS,
+  deny missing context, and expose no `PUBLIC` read/write privilege. Runtime posture verifies the exact
+  tenant policy name, command, role, permissiveness, `USING`, and `WITH CHECK` expression for every table;
+  a catalog with the right policy count but weakened semantics is rejected.
+- Same-tenant composite foreign keys protect live relations. The upgrade runs a PII-free preflight that
+  reports only invariant names/counts and aborts before constraints are added. Historical actor/subject
+  references use insert/update validation triggers where parent deletion must preserve audit history.
+  Operators must stage and schedule these relation/policy migrations in a maintenance window for large
+  existing installations because constraint/index construction and policy changes can hold table locks.
+- `LocalCredential` and `AuthThrottle` are installation-global control tables. A `PASSWORD_RESET`
+  `AuthToken` is user-global by its documented null-organization shape; all other protected special-table
+  access requires the matching bounded control evidence.
+- Control purposes are routing labels, not authority. Command-specific policies on `Organization`,
+  `Membership`, and `AppUser` require the exact applicable organization ID/slug, user ID, email, subject,
+  or token evidence. Those three control paths expose SELECT/INSERT/UPDATE only and have no control-role
+  DELETE grant or policy.
+- `MIGRATION_DATABASE_URL` is the distinct table-owning migration/operator credential. The NOLOGIN,
+  NOSUPERUSER, NOBYPASSRLS `signalstack_owner` capability supplies explicit forced-RLS access, so the
+  table owner need not be a superuser or use BYPASSRLS. Web and worker `DATABASE_URL` values identify
+  separately provisioned LOGIN NOINHERIT roles. Runtime provisioning revokes `signalstack_owner`, and
+  runtime posture rejects owner membership as well as table ownership, superuser, or BYPASSRLS. Running
+  processes never receive the migration credential.
+- Tenant repository work runs in `withTenantTransaction`; identity/bootstrap/session work runs in
+  `withAuthDatabaseContext`; global queue discovery runs in `withWorkerDispatchTransaction`. Each selects
+  one fixed role and writes every context setting with transaction-local scope so pooled connections
+  cannot retain authorization state.
+- Due jobs are claimed only through the bounded `claim_due_queue_jobs` security-definer function. Its
+  create/replace, ownership, ACL revocation, and worker-only EXECUTE grant are one atomic migration. It
+  uses `clock_timestamp()` for eligibility/lease state, bounds caller time to 60 seconds of the database,
+  rejects null or out-of-range limits/leases/tokens, fixes its search path, and exposes no `PUBLIC` or
+  ordinary table access.
+- The direct-Prisma inventory permits reviewed control-plane/context seams only. M2 closes with zero
+  `tenant-migration-debt` imports; new tenant paths must use the transaction boundary and join its tests.
+
+Mandatory proof covers tenant A and B across all 27 protected tables, missing context, cross-tenant
+read/write/relation forgery, rollback, command-specific control policy denial, runtime policy semantic
+fingerprints, worker dispatch, and multi-connection pool reuse. `npm run test:tenant-db` is the eight-file
+/ 33-test gate; the full database run is 37 files / 186 tests, and the focused auth database run is nine
+files / 38 tests. The least-privilege test creates a fresh database, applies all 40 migrations through a
+non-superuser/non-BYPASSRLS table owner, exercises historical triggers and dispatch, and proves the
+dispatch function has no `PUBLIC` EXECUTE ACL. Production local-auth browser proof uses separate
+owner/runtime credentials and serves the app under the non-owner login.
+
 ## Milestone 1 Foundation
 
 Canonical organization/auth models:

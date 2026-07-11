@@ -199,7 +199,10 @@ describe("BullMQ worker foundation", () => {
     const completed = { processed: 1, skipped: 0, blocked: false };
     mocks.processQueueJob.mockResolvedValueOnce(completed);
     await expect(processor({ data: bullMqJobData })).resolves.toEqual(completed);
-    expect(mocks.processQueueJob).toHaveBeenLastCalledWith("queue_job_demo");
+    expect(mocks.processQueueJob).toHaveBeenLastCalledWith({
+      queueJobId: "queue_job_demo",
+      expectedOrgId: "org_demo"
+    });
 
     const terminal = { processed: 0, skipped: 1, blocked: false, reason: "stale-schedule" };
     mocks.processQueueJob.mockResolvedValueOnce(terminal);

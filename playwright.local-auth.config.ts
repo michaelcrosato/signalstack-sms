@@ -27,6 +27,7 @@ export default defineConfig({
   webServer: {
     command: serverCommand,
     url: baseURL,
+    env: applicationServerEnvironment(process.env),
     reuseExistingServer: false,
     timeout: 180_000,
     stdout: "ignore",
@@ -60,4 +61,15 @@ function requireProductionServerMode(value: string | undefined): void {
   if (value !== undefined && value !== "production") {
     throw new Error("LOCAL_AUTH_E2E_SERVER_MODE must be production when provided.");
   }
+}
+
+function applicationServerEnvironment(environment: NodeJS.ProcessEnv): Record<string, string> {
+  return {
+    ...Object.fromEntries(
+    Object.entries(environment).filter(
+      (entry): entry is [string, string] => entry[1] !== undefined && entry[0] !== "MIGRATION_DATABASE_URL"
+    )
+    ),
+    MIGRATION_DATABASE_URL: ""
+  };
 }

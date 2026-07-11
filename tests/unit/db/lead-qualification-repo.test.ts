@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { prisma } from "@/lib/db/prisma";
+import type { Prisma } from "@prisma/client";
 import { persistContactLeadQualification } from "@/lib/db/repositories/lead-qualification";
 
 function fakeDb(conversation: { contactId: string | null } | null) {
@@ -16,7 +16,7 @@ describe("persistContactLeadQualification (tenant-scoped)", () => {
       "org1",
       "conv1",
       { score: 82, stage: "HOT" },
-      db as unknown as typeof prisma
+      db as unknown as Prisma.TransactionClient
     );
 
     expect(ok).toBe(true);
@@ -32,7 +32,7 @@ describe("persistContactLeadQualification (tenant-scoped)", () => {
       "org1",
       "missing",
       { score: 10, stage: "NURTURE" },
-      db as unknown as typeof prisma
+      db as unknown as Prisma.TransactionClient
     );
 
     expect(ok).toBe(false);
@@ -45,7 +45,7 @@ describe("persistContactLeadQualification (tenant-scoped)", () => {
       "org1",
       "conv1",
       { score: 50, stage: "COLD" },
-      db as unknown as typeof prisma
+      db as unknown as Prisma.TransactionClient
     );
 
     expect(ok).toBe(false);

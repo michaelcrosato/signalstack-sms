@@ -15,7 +15,7 @@ its own software while requiring no application SaaS beyond an unavoidable carri
 | --- | --- | --- |
 | M0 | Truth, build-context safety, executable acceptance | done |
 | M1 | Built-in identity, onboarding, team administration | done |
-| M2 | Database-enforced tenant integrity | partial foundation |
+| M2 | Database-enforced tenant integrity | done |
 | M3 | Public API identity and customer webhooks | not started |
 | M4 | Provider secrets, accounts, and owned-number routing | partial foundation |
 | M5 | Durable direct-message outbox and Twilio transport | partial foundation |
@@ -26,16 +26,16 @@ its own software while requiring no application SaaS beyond an unavoidable carri
 | M10 | Self-contained production package and operations | not started |
 | M11 | Full release proof | not started |
 
-M1 and M2 establish trust. M3 and M4 may then proceed in parallel. Live provider work starts only
-after provider ownership, secrets, tenant routing, and durable-before-external semantics exist.
+M1 and M2 establish trust and are complete. M2 closes with a least-privileged 40-migration install,
+database-enforced tenant relations, forced RLS with semantic policy attestation, and exact runtime/control/
+dispatch capabilities. M3 and M4 may now proceed in parallel. Live provider work starts only after
+provider ownership, secrets, tenant routing, and durable-before-external semantics exist.
 
 ## Immediate execution queue
 
-1. Implement M2: composite tenant constraints, fail-closed non-owner RLS, and mandatory two-tenant
-   Postgres tests.
-2. Build M3 API credentials + `/api/v1` + customer webhook outbox and M4 encrypted provider ownership
+1. Build M3 API credentials + `/api/v1` + customer webhook outbox and M4 encrypted provider ownership
    control plane.
-3. Continue through M5–M11 without narrowing the completion definition.
+2. Continue through M5–M11 without narrowing the completion definition.
 
 ## Rules
 

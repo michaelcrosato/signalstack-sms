@@ -1,6 +1,6 @@
 import { UsageEventType } from "@prisma/client";
 import { aggregateUsageEvents } from "@/lib/billing/metering";
-import { prisma } from "@/lib/db/prisma";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 import {
   outboundDeliveredMessageWhere,
   outboundFailedMessageWhere,
@@ -143,6 +143,7 @@ export const productDashboardSections = Object.freeze(
 );
 
 export async function getProductDashboard(orgId: string) {
+  return withTenantTransaction({ orgId }, async (prisma) => {
   const [
     contacts,
     optedInContacts,
@@ -322,7 +323,7 @@ export async function getProductDashboard(orgId: string) {
     liveAi: "blocked"
   };
 
-  return {
+    return {
     ...dashboard,
     metrics: productDashboardMetricRows.map((row) => {
       const metric = metricValues[row.key];
@@ -360,5 +361,6 @@ export async function getProductDashboard(orgId: string) {
         value: sectionStatusValues[row.key]
       }))
     }))
-  };
+    };
+  });
 }

@@ -14,8 +14,9 @@ const environment = {
   ...process.env,
   LOCAL_AUTH_E2E_SERVER_MODE: "production"
 };
+const applicationEnvironment = { ...environment, MIGRATION_DATABASE_URL: undefined };
 
-runNpmScript("build", environment);
+runNpmScript("build", applicationEnvironment);
 runNpmScript("test:e2e:local-auth", environment);
 
 function runNpmScript(name: string, env: NodeJS.ProcessEnv) {

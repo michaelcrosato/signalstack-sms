@@ -33,7 +33,7 @@ describe("Automated Contact Segment Synchronization Seam", () => {
         phone: `+1555900${Math.floor(1000 + Math.random() * 9000)}`,
         consentStatus: ConsentStatus.OPTED_IN,
         leadScore: 90,
-        tagLinks: { create: { tagId: tag.id, orgId: org.id } }
+        tagLinks: { create: { tagId: tag.id } }
       }
     });
 

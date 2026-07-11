@@ -7,7 +7,10 @@ import {
   switchLocalSessionOrganization,
   type ResolvedLocalSession
 } from "@/lib/auth/local-session";
-import { prisma } from "@/lib/db/prisma";
+import {
+  setAuthTransactionContext,
+  withAuthDatabaseContext
+} from "@/lib/db/tenant-context";
 import {
   organizationCreateSchema,
   sessionOrganizationSelectSchema
@@ -133,33 +136,44 @@ type ProjectedMembership = Prisma.MembershipGetPayload<{
 
 const prismaOrganizationServiceStore: OrganizationServiceStore = {
   async listActiveMembershipsForUser(userId) {
-    const memberships = await prisma.membership.findMany({
-      where: {
-        userId,
-        status: MembershipStatus.ACTIVE,
-        user: { disabledAt: null }
-      },
-      select: membershipProjection,
-      orderBy: [{ org: { name: "asc" } }, { orgId: "asc" }]
-    });
+    const memberships = await withAuthDatabaseContext({ userId, purpose: "session" }, (client) =>
+      client.membership.findMany({
+        where: {
+          userId,
+          status: MembershipStatus.ACTIVE,
+          user: { disabledAt: null }
+        },
+        select: membershipProjection,
+        orderBy: [{ org: { name: "asc" } }, { orgId: "asc" }]
+      })
+    );
     return memberships.map(toOrganizationMembershipRecord);
   },
 
   async findActiveMembershipForUser(userId, organizationId) {
-    const membership = await prisma.membership.findFirst({
-      where: {
-        userId,
-        orgId: organizationId,
-        status: MembershipStatus.ACTIVE,
-        user: { disabledAt: null }
-      },
-      select: membershipProjection
-    });
+    const membership = await withAuthDatabaseContext(
+      { userId, orgId: organizationId, purpose: "session" },
+      (client) => client.membership.findFirst({
+        where: {
+          userId,
+          orgId: organizationId,
+          status: MembershipStatus.ACTIVE,
+          user: { disabledAt: null }
+        },
+        select: membershipProjection
+      })
+    );
     return membership ? toOrganizationMembershipRecord(membership) : null;
   },
 
   async createOwnedOrganization(input) {
-    return prisma.$transaction(async (transaction) => {
+    return withAuthDatabaseContext(
+      {
+        userId: input.actorUserId,
+        orgSlug: input.slug,
+        purpose: "organization_create"
+      },
+      async (transaction) => {
       const enabledUser = await transaction.appUser.findFirst({
         where: { id: input.actorUserId, disabledAt: null },
         select: { id: true }
@@ -176,6 +190,12 @@ const prismaOrganizationServiceStore: OrganizationServiceStore = {
           demoMode: false
         },
         select: organizationProjection
+      });
+      await setAuthTransactionContext(transaction, {
+        orgId: organization.id,
+        orgSlug: organization.slug,
+        userId: enabledUser.id,
+        purpose: "organization_create"
       });
       const membership = await transaction.membership.create({
         data: {
@@ -203,14 +223,15 @@ const prismaOrganizationServiceStore: OrganizationServiceStore = {
         select: { id: true }
       });
 
-      return {
-        userId: membership.userId,
-        userDisabledAt: null,
-        status: membership.status,
-        role: membership.role,
-        organization
-      };
-    });
+        return {
+          userId: membership.userId,
+          userDisabledAt: null,
+          status: membership.status,
+          role: membership.role,
+          organization
+        };
+      }
+    );
   }
 };
 

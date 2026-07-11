@@ -89,13 +89,13 @@ and queue recovery. Redis must never be required to reconstruct accepted work.
 
 ## Current-State Acceptance Matrix
 
-Status values: `done`, `partial`, `missing`, `blocked-by-live-proof`.
+Area status values: `complete`, `partial`, `missing`, `blocked-by-live-proof`.
 
 | Area | Current status | Completion evidence required |
 | --- | --- | --- |
 | Self-hosted install | partial | Production compose boots ingress, web, migration, worker, and Postgres from a clean host; no secret or host build artifact enters the image. |
 | Identity and onboarding | complete | Built-in credential/session, owner bootstrap, operator recovery, organization/team lifecycle, authorization, PostgreSQL races, and production browser proof are green. |
-| Tenant database boundary | partial | Same-tenant composite foreign keys, fail-closed RLS under a non-owner role, two-tenant read/write/relation tests in CI. |
+| Tenant database boundary | complete | A least-privileged 40-migration install, composite tenant integrity, 27-table fail-closed RLS with semantic policy attestation, exact control/dispatch capabilities under NOINHERIT web/worker logins, and the mandatory two-tenant matrix are green. |
 | Public integration API | missing | Scoped API keys, `/api/v1`, OpenAPI, idempotency, pagination, errors, SDK examples, rotation/revocation, audit, and integration E2E. |
 | Customer event webhooks | missing | Endpoint subscriptions, per-endpoint HMAC secrets, durable delivery outbox, retries/backoff, replay, disable-on-failure controls, event catalog, and receiver tests. |
 | Provider control plane | partial | Encrypted credentials, verified account/number ownership, provider factory, rotation, health/readiness, tenant routing, and secret-leak tests. |
@@ -151,6 +151,8 @@ sessions rather than the deterministic demo owner.
 
 ### M2 — Database-enforced tenant integrity
 
+Status: **done**.
+
 Deliverables:
 
 - Add same-tenant composite keys/foreign keys for all tenant-owned relations and migrate existing rows
@@ -160,8 +162,18 @@ Deliverables:
 - Wrap every tenant request/worker operation in explicit tenant context without leaking pooled state.
 - Make two-tenant Postgres isolation, missing-context, forged relation, and worker tests mandatory in CI.
 
-Exit proof: the database rejects cross-tenant relations and missing/foreign tenant context even when a
-repository filter is accidentally omitted.
+Exit proof: a PII-free preflight aborts invalid upgrades; composite constraints and historical-reference
+triggers reject forged relations; all 40 migrations install with no schema diff under a table-owning
+NOSUPERUSER/NOBYPASSRLS login using the explicit `signalstack_owner` capability; and runtimes cannot hold
+that capability. All 27 protected tables fail closed for missing/foreign context, with semantic policy
+fingerprints checked at runtime. Tenant-root/global-user control policies are command-specific, require
+exact org/user/email/token/slug evidence, and provide no control DELETE on those tables. The
+security-definer dispatch function is installed atomically, uses database-derived time, rejects null or
+out-of-range arguments, revokes `PUBLIC`, and remains transaction-local under NOINHERIT worker logins.
+The mandatory A/B, missing-context, forgery, control, dispatch, and pool matrix is eight files / 33 tests;
+the full database run is 37 files / 186 tests and the auth database run is nine files / 38 tests. The
+production local-auth build/browser proof passes 1/1 under a non-owner login, and the direct-Prisma
+inventory has zero tenant migration-debt imports.
 
 ### M3 — Public API identity and customer webhook platform
 
@@ -343,8 +355,8 @@ This table is updated only from current evidence.
 | Milestone | Status | Authoritative evidence |
 | --- | --- | --- |
 | M0 | done | Source docs aligned; machine-readable ledger, Docker-context exclusion check, and lazy runtime-config validation pass. |
-| M1 | done | Built-in credentials and keyed sessions, bootstrap/operator recovery, organization/team lifecycle, fail-closed authorization, 152 PostgreSQL tests, production browser proof, and final security audit pass. |
-| M2 | partial foundation | Tenant filters and limited RLS exist; fail-closed RLS/composite FK proof pending. |
+| M1 | done | Built-in credentials and keyed sessions, bootstrap/operator recovery, organization/team lifecycle, fail-closed authorization, production browser proof, and final security audit pass. |
+| M2 | done | Fresh 40-migration/no-diff install under a non-superuser/non-BYPASSRLS table owner; owner capability excluded from runtimes; composite FKs/preflight/triggers; NOINHERIT web/worker provisioning; 27-table fail-closed RLS with semantic fingerprints; exact command-specific control policies; atomic database-timed security-definer dispatch with no public ACL; zero migration-debt imports; eight-file/33-test tenant matrix, 37-file/186-test DB run, nine-file/38-test auth DB run, and non-owner production browser proof. |
 | M3 | not started | No API credentials, `/api/v1`, OpenAPI, or customer webhook outbox. |
 | M4 | partial foundation | Provider metadata exists; encrypted secrets and trusted tenant routing pending. |
 | M5 | partial foundation | Dummy sends and isolated live test exist; general durable live outbox pending. |

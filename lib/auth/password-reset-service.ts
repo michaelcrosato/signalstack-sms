@@ -1,7 +1,7 @@
 import { AuthTokenType, MembershipRole, Prisma } from "@prisma/client";
 import { evaluatePasswordPolicy, hashOpaqueToken, hashPassword } from "@/lib/auth/crypto";
 import { isValidAuthToken } from "@/lib/auth/auth-token-policy";
-import { prisma } from "@/lib/db/prisma";
+import { setAuthTransactionContext, withAuthDatabaseContext } from "@/lib/db/tenant-context";
 
 const SERIALIZABLE_ATTEMPTS = 4;
 const RESET_TOKEN_PATTERN = /^ss_reset_[A-Za-z0-9_-]{43}$/;
@@ -64,28 +64,50 @@ class ResetTransactionUnavailableError extends Error {}
 
 export const prismaPasswordResetStore: PasswordResetStore = {
   async resetAvailable(tokenHash, now) {
-    const token = await prisma.authToken.findFirst({
-      where: {
-        tokenHash,
-        type: AuthTokenType.PASSWORD_RESET,
-        userId: { not: null },
-        orgId: null,
-        email: null,
-        role: null,
-        issuedByUserId: null,
-        consumedAt: null,
-        revokedAt: null,
-        expiresAt: { gt: now },
-        user: { disabledAt: null, memberships: { some: {} } }
-      },
-      select: { id: true }
-    });
-    return Boolean(token);
+    const token = await withAuthDatabaseContext(
+      { tokenHash, purpose: "password_reset" },
+      (client) => client.authToken.findFirst({
+        where: {
+          tokenHash,
+          type: AuthTokenType.PASSWORD_RESET,
+          userId: { not: null },
+          orgId: null,
+          email: null,
+          role: null,
+          issuedByUserId: null,
+          consumedAt: null,
+          revokedAt: null,
+          expiresAt: { gt: now }
+        },
+        select: { userId: true }
+      })
+    );
+    if (!token?.userId) {
+      return false;
+    }
+    const userId = token.userId;
+    const account = await withAuthDatabaseContext(
+      { userId, purpose: "password_reset" },
+      async (client) => {
+        const [user, membership] = await Promise.all([
+          client.appUser.findFirst({
+            where: { id: userId, disabledAt: null },
+            select: { id: true }
+          }),
+          client.membership.findFirst({
+            where: { userId },
+            select: { id: true }
+          })
+        ]);
+        return { user, membership };
+      }
+    );
+    return Boolean(account.user && account.membership);
   },
 
   async completeReset(input) {
     try {
-      return await runSerializable(async (transaction) => {
+      return await runSerializable(input.tokenHash, async (transaction) => {
         await lockResetToken(transaction, input.tokenHash);
         const token = await transaction.authToken.findUnique({
           where: { tokenHash: input.tokenHash },
@@ -106,6 +128,11 @@ export const prismaPasswordResetStore: PasswordResetStore = {
           return resetUnavailable();
         }
 
+        await setAuthTransactionContext(transaction, {
+          tokenHash: input.tokenHash,
+          userId: token.userId,
+          purpose: "password_reset"
+        });
         await lockResetSubject(transaction, token.userId);
         const subject = await transaction.appUser.findUnique({
           where: { id: token.userId },
@@ -338,13 +365,18 @@ function resetTokenIsAvailable(
 }
 
 async function runSerializable<T>(
+  tokenHash: string,
   operation: (transaction: Prisma.TransactionClient) => Promise<T>
 ): Promise<T> {
   for (let attempt = 0; attempt < SERIALIZABLE_ATTEMPTS; attempt += 1) {
     try {
-      return await prisma.$transaction(operation, {
+      return await withAuthDatabaseContext(
+        { tokenHash, purpose: "password_reset" },
+        operation,
+        {
         isolationLevel: Prisma.TransactionIsolationLevel.Serializable
-      });
+        }
+      );
     } catch (error) {
       if (!isSerializableConflict(error) || attempt === SERIALIZABLE_ATTEMPTS - 1) throw error;
       await new Promise((resolve) => setTimeout(resolve, 5 * (attempt + 1)));

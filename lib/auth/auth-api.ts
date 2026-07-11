@@ -18,7 +18,7 @@ import {
   setLocalSessionCookie
 } from "@/lib/auth/session-cookie";
 import { requestHasTrustedOrigin } from "@/lib/auth/request-origin";
-import { prisma } from "@/lib/db/prisma";
+import { withAuthDatabaseContext } from "@/lib/db/tenant-context";
 import { getRuntimeConfig, type RuntimeConfig } from "@/lib/env/runtime-config";
 import { authLoginSchema, authSetupSchema } from "@/lib/validation/auth";
 
@@ -120,11 +120,14 @@ export async function handleLocalAuthLogin(request: Request): Promise<NextRespon
       return invalidCredentialsResponse();
     }
 
-    const membership = await prisma.membership.findFirst({
-      where: { userId: result.user.id, status: MembershipStatus.ACTIVE },
-      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
-      select: { orgId: true }
-    });
+    const membership = await withAuthDatabaseContext(
+      { userId: result.user.id, purpose: "login" },
+      (client) => client.membership.findFirst({
+        where: { userId: result.user.id, status: MembershipStatus.ACTIVE },
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+        select: { orgId: true }
+      })
+    );
     if (!membership) {
       return invalidCredentialsResponse();
     }

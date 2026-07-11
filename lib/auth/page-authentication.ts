@@ -4,7 +4,7 @@ import {
   getOrCreateCurrentOrg,
   type CurrentOrg
 } from "@/lib/auth/current-org";
-import { prisma } from "@/lib/db/prisma";
+import { withAuthDatabaseContext } from "@/lib/db/tenant-context";
 
 /** Resolve a protected Server Component boundary and turn only expected missing-auth state into navigation. */
 export async function requireProtectedPage(redirectTo: string): Promise<CurrentOrg> {
@@ -16,7 +16,10 @@ export async function requireProtectedPage(redirectTo: string): Promise<CurrentO
     }
   }
 
-  const setupRequired = (await prisma.localCredential.count()) === 0;
+  const setupRequired = await withAuthDatabaseContext(
+    { purpose: "bootstrap" },
+    async (client) => (await client.localCredential.count()) === 0
+  );
   redirect(setupRequired ? "/setup" : `/login?redirectTo=${encodeURIComponent(safeRedirect(redirectTo))}`);
 }
 

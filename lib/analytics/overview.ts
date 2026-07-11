@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/db/prisma";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 import { aggregateUsageEvents } from "@/lib/billing/metering";
 import {
   outboundDeliveredMessageWhere,
@@ -8,6 +8,7 @@ import {
 } from "@/lib/messaging/delivery-counts";
 
 export async function getAnalyticsOverview(orgId: string) {
+  return withTenantTransaction({ orgId }, async (prisma) => {
   const [
     contacts,
     optedInContacts,
@@ -46,7 +47,7 @@ export async function getAnalyticsOverview(orgId: string) {
     prisma.usageEvent.findMany({ where: { orgId }, select: { type: true, quantity: true } })
   ]);
 
-  return {
+    return {
     contacts: {
       total: contacts,
       optedIn: optedInContacts,
@@ -71,5 +72,6 @@ export async function getAnalyticsOverview(orgId: string) {
       lastOutboundAt: lastOutboundMessage?.createdAt.toISOString() ?? null
     },
     usage: aggregateUsageEvents(usageEvents)
-  };
+    };
+  });
 }

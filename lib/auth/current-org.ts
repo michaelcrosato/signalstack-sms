@@ -7,7 +7,10 @@ import {
   type ResolvedLocalSession
 } from "@/lib/auth/local-session";
 import { readLocalSessionToken } from "@/lib/auth/session-cookie";
-import { prisma } from "@/lib/db/prisma";
+import {
+  setAuthTransactionContext,
+  withAuthDatabaseContext
+} from "@/lib/db/tenant-context";
 import { getRuntimeConfig, type RuntimeConfig } from "@/lib/env/runtime-config";
 
 export type CurrentOrg = Readonly<{
@@ -141,60 +144,76 @@ async function resolveDemoCurrentOrg(): Promise<CurrentOrg> {
   const session = getDemoSession();
   const normalizedEmail = normalizeEmail(session.email);
 
-  const user = await prisma.appUser.upsert({
-    where: { clerkUserId: session.clerkUserId },
-    update: {
-      email: session.email,
-      normalizedEmail,
-      displayName: session.displayName
-    },
-    create: {
-      clerkUserId: session.clerkUserId,
-      email: session.email,
-      normalizedEmail,
-      displayName: session.displayName
-    }
-  });
-
-  const org = await prisma.organization.upsert({
-    where: { slug: session.orgSlug },
-    update: {
-      name: session.orgName,
-      demoMode: true
-    },
-    create: {
-      slug: session.orgSlug,
-      name: session.orgName,
-      demoMode: true
-    }
-  });
-
-  const membership = await prisma.membership.upsert({
-    where: {
-      orgId_userId: {
-        orgId: org.id,
-        userId: user.id
+  return withAuthDatabaseContext({
+    loginEmail: normalizedEmail,
+    orgSlug: session.orgSlug,
+    tokenHash: session.clerkUserId,
+    purpose: "bootstrap"
+  }, async (client) => {
+    const user = await client.appUser.upsert({
+      where: { clerkUserId: session.clerkUserId },
+      update: {
+        email: session.email,
+        normalizedEmail,
+        displayName: session.displayName
+      },
+      create: {
+        clerkUserId: session.clerkUserId,
+        email: session.email,
+        normalizedEmail,
+        displayName: session.displayName
       }
-    },
-    update: {
-      role: session.role,
-      status: MembershipStatus.ACTIVE
-    },
-    create: {
-      orgId: org.id,
-      userId: user.id,
-      role: session.role,
-      status: MembershipStatus.ACTIVE
-    }
-  });
+    });
 
-  return Object.freeze({
-    orgId: org.id,
-    orgSlug: org.slug,
-    orgName: org.name,
-    userId: user.id,
-    email: user.email,
-    role: membership.role,
-    demoMode: org.demoMode
+    const org = await client.organization.upsert({
+      where: { slug: session.orgSlug },
+      update: {
+        name: session.orgName,
+        demoMode: true
+      },
+      create: {
+        slug: session.orgSlug,
+        name: session.orgName,
+        demoMode: true
+      }
+    });
+
+    await setAuthTransactionContext(client, {
+      orgId: org.id,
+      orgSlug: org.slug,
+      userId: user.id,
+      loginEmail: normalizedEmail,
+      tokenHash: session.clerkUserId,
+      purpose: "bootstrap"
+    });
+
+    const membership = await client.membership.upsert({
+      where: {
+        orgId_userId: {
+          orgId: org.id,
+          userId: user.id
+        }
+      },
+      update: {
+        role: session.role,
+        status: MembershipStatus.ACTIVE
+      },
+      create: {
+        orgId: org.id,
+        userId: user.id,
+        role: session.role,
+        status: MembershipStatus.ACTIVE
+      }
+    });
+
+    return Object.freeze({
+      orgId: org.id,
+      orgSlug: org.slug,
+      orgName: org.name,
+      userId: user.id,
+      email: user.email,
+      role: membership.role,
+      demoMode: org.demoMode
+    });
   });
 }

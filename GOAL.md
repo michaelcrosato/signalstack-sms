@@ -19,11 +19,17 @@ The detailed product contract, milestone graph, acceptance matrix, and verificat
 - Strong demo-safe foundations: tenant-scoped repositories, contacts/imports, templates, campaigns,
   durable database queue jobs, optional BullMQ mirroring, shared inbox, compliance gates, dummy provider,
   fake/local AI, Twilio webhook parsing, provider metadata, observability seams, and product UI.
-- The seeded browser product path works at `/dashboard`; the current gate has 143 unit files / 1,046
-  passing tests, 29 PostgreSQL files / 152 passing tests, Playwright smoke and production local-auth flows,
-  and a production build.
+- The seeded browser product path works at `/dashboard`; current database evidence is 37 PostgreSQL
+  files / 186 passing tests, including the mandatory eight-file / 33-test tenant gate and nine-file /
+  38-test auth database run. Playwright smoke, a production local-auth browser proof under a non-owner
+  login, and the production build are green.
 - M1 built-in identity is complete: local credentials, keyed opaque sessions, onboarding/team lifecycle,
   operator recovery, and fail-closed authorization replace deterministic identity outside explicit demo.
+- M2 database-enforced tenant integrity is complete: all 40 migrations install under a non-superuser,
+  non-BYPASSRLS table owner; same-tenant constraints, 27-table fail-closed RLS with semantic policy
+  attestation, separate non-owner web/worker capabilities, exact control policies, short
+  tenant/control/dispatch transactions, and mandatory two-tenant missing-context/forgery/pool proof are
+  enforced.
 - The repository is not yet a production SMS platform. Twilio callbacks still route to the demo tenant;
   provider secrets are not stored for real sends; the campaign
   worker is dummy-only and production-blocked; there is no public API-key surface, outbound customer
@@ -54,8 +60,8 @@ ledger in `docs/STANDALONE_ROADMAP.md` to be backed by current tests or deployme
 
 - Package manager: npm. Node 22+; TypeScript strict; Next.js App Router.
 - PostgreSQL is the authoritative database and default durable queue. Redis is optional acceleration.
-- Every tenant row/query/relation carries `orgId`; production completion requires fail-closed RLS and
-  same-tenant database constraints.
+- Every tenant row/query/relation carries `orgId`; fail-closed RLS and same-tenant database constraints
+  enforce that boundary independently of repository filters.
 - Zod validates API, webhook, queue, import, provider, and configuration boundaries.
 - Secrets never enter Git, images, logs, API responses, or browser state.
 - Default provider is `dummy`; carrier calls require explicit, evidence-backed activation.

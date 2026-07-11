@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/db/prisma";
 import { authenticateApiRequest } from "@/lib/auth/api-authentication";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 import { isTerminalDeliveryFailureProviderStatus } from "@/lib/messaging/delivery-status";
 import { observabilityIsEnabled } from "@/lib/observability/logger";
 
@@ -14,10 +14,12 @@ export async function GET() {
   const { currentOrg } = authentication;
 
   // 1. Get delivery rate totals (delivered, failed, sent, queued)
-  const outboundMessages = await prisma.message.findMany({
-    where: { orgId: currentOrg.orgId, direction: "OUTBOUND" },
-    select: { providerStatus: true, createdAt: true, deliveredAt: true }
-  });
+  const outboundMessages = await withTenantTransaction({ orgId: currentOrg.orgId }, (tx) =>
+    tx.message.findMany({
+      where: { orgId: currentOrg.orgId, direction: "OUTBOUND" },
+      select: { providerStatus: true, createdAt: true, deliveredAt: true }
+    })
+  );
 
   const counts: Record<string, number> = {
     delivered: 0,

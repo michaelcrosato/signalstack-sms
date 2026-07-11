@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { ConsentStatus } from "@prisma/client";
+import { ConsentStatus, type Prisma } from "@prisma/client";
 import { evaluateSegmentContacts } from "@/lib/db/repositories/segments";
-import type { prisma } from "@/lib/db/prisma";
 
 function fakeDb() {
   return {
@@ -17,7 +16,7 @@ describe("evaluateSegmentContacts", () => {
     const result = await evaluateSegmentContacts(
       "org-1",
       {},
-      db as unknown as typeof prisma
+      db as unknown as Prisma.TransactionClient
     );
 
     expect(result).toEqual([{ id: "contact-1" }]);
@@ -39,7 +38,7 @@ describe("evaluateSegmentContacts", () => {
     await evaluateSegmentContacts(
       "org-1",
       { consentStatuses: [ConsentStatus.OPTED_IN] },
-      db as unknown as typeof prisma
+      db as unknown as Prisma.TransactionClient
     );
 
     expect(db.contact.findMany).toHaveBeenCalledWith(
@@ -56,7 +55,7 @@ describe("evaluateSegmentContacts", () => {
     await evaluateSegmentContacts(
       "org-1",
       { minLeadScore: 10, maxLeadScore: 90 },
-      db as unknown as typeof prisma
+      db as unknown as Prisma.TransactionClient
     );
 
     expect(db.contact.findMany).toHaveBeenCalledWith(
@@ -73,7 +72,7 @@ describe("evaluateSegmentContacts", () => {
     await evaluateSegmentContacts(
       "org-1",
       { minLeadScore: 50 },
-      db as unknown as typeof prisma
+      db as unknown as Prisma.TransactionClient
     );
 
     expect(db.contact.findMany).toHaveBeenCalledWith(
@@ -90,7 +89,7 @@ describe("evaluateSegmentContacts", () => {
     await evaluateSegmentContacts(
       "org-1",
       { maxLeadScore: 100 },
-      db as unknown as typeof prisma
+      db as unknown as Prisma.TransactionClient
     );
 
     expect(db.contact.findMany).toHaveBeenCalledWith(
@@ -107,7 +106,7 @@ describe("evaluateSegmentContacts", () => {
     await evaluateSegmentContacts(
       "org-1",
       { tagNames: ["VIP", "Newsletter"] },
-      db as unknown as typeof prisma
+      db as unknown as Prisma.TransactionClient
     );
 
     expect(db.contact.findMany).toHaveBeenCalledWith(
@@ -134,7 +133,7 @@ describe("evaluateSegmentContacts", () => {
         minLeadScore: 80,
         tagNames: ["Active"],
       },
-      db as unknown as typeof prisma
+      db as unknown as Prisma.TransactionClient
     );
 
     expect(db.contact.findMany).toHaveBeenCalledWith(
