@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db/prisma";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { isTerminalDeliveryFailureProviderStatus } from "@/lib/messaging/delivery-status";
 import { observabilityIsEnabled } from "@/lib/observability/logger";
 
@@ -7,7 +7,11 @@ export async function GET() {
   if (!observabilityIsEnabled()) {
     return new Response(null, { status: 404 });
   }
-  const currentOrg = await getOrCreateCurrentOrg();
+  const authentication = await authenticateApiRequest();
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
 
   // 1. Get delivery rate totals (delivered, failed, sent, queued)
   const outboundMessages = await prisma.message.findMany({

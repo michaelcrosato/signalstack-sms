@@ -34,8 +34,8 @@ This is the compact handoff for the next automated loop. History lives in `git l
 - Run 803 adds an executable API RBAC matrix at `lib/auth/api-rbac-matrix.ts` and cross-checks it against every mutating `app/api/**/route.ts` method plus the signed Twilio webhook exceptions.
 - The backend foundation is strong: tenant helpers, contacts, campaigns with missing/cross-tenant requested preflight contact IDs blocked, queue jobs with schedule-time stale queued-job cancellation, tenant-explicit local outbound worker idempotency keys, per-recipient send-time skips, local outbound provider-status preservation, BullMQ worker startup and direct construction gates, inbox with explicit inbound duplicate side-effect prevention, compliance gates, fake AI, local billing/analytics, provider metadata, Twilio webhook foundations with duplicate-race handling, readiness audit, operations inventory, and validation gates.
 - The browser product has a usable local demo path across dashboard with seeded delivered/pending/failed local outbound evidence, next-step delivery evidence review, and centralized outbound-only local delivery evidence/rate/pending/failure/review/latest-evidence signals, contacts import/detail/archive/restore/merge, campaign fake-AI copy/preflight count/schedule/detail/edit/cancel plus campaign-list recipient readiness and delivered/pending/failed/rate/review-status/latest-evidence reporting, campaign-detail aggregate recipient readiness, all-outbound delivery-rate/count/review-status/last-message/provider-status/provider-error-code metrics, visible recent-evidence row count, explicit recent-row boundary copy and newest-first recent delivery rows with provider error-code evidence, recipient send-state/human-readable block reasons, mutually exclusive outbound-only delivery detail visibility with per-row delivery states, inbox query-selected thread work, template create/detail/edit, analytics delivery review/latest-evidence status plus campaign-level delivery review summary/links with failed/pending count labels and delivery operations with outbound-only `failed`/`undelivered` breakdowns, and compliance readiness.
-- Live campaign sending, live billing, live AI, production auth, production secrets, production workers, and production deployment remain blocked by default.
-- Production auth/RBAC now has a checked planning document at `docs/PRODUCTION_AUTH_RBAC.md`, an executable mutating-route RBAC matrix, `npm run production-auth:check` as part of validation, and production-like demo deployments reject Clerk auth configuration with `CLERK_AUTH_CONFIG_PRESENT` until explicit controls exist.
+- Live campaign sending, live billing, live AI, provider secrets, production workers, and the complete production package remain blocked by default. Built-in local identity is complete and deterministic identity is demo-only.
+- Production auth/RBAC has a checked implementation contract at `docs/PRODUCTION_AUTH_RBAC.md`, an executable mutating-route RBAC matrix, `npm run production-auth:check`, keyed opaque sessions, operator recovery, and a production browser proof; Clerk remains optional and accidental configuration is blocked with `CLERK_AUTH_CONFIG_PRESENT`.
 - GitHub `ci` and `premerge` workflows now run `pwsh ./scripts/local-gate.ps1` with demo-safe defaults after install/browser setup, and unit coverage pins that they do not treat raw `npm run validate`/`premerge` calls as green.
 - The only intentional live external-impact route is the isolated `/demo` live-test SMS path, gated by explicit Twilio credentials, live flags, recipient allowlist, confirmation phrase, and a server-only operator token; public readiness is last-four/count only, and ambiguous provider outcomes stay durably pending without resend.
 - Twilio webhook handlers fail closed on malformed or unsupported form bodies before tenant lookup or local mutation, acquire expiring owner leases for valid signed events, release failed/unmatched work for explicit upstream retry, return processed duplicates as no-ops, and apply monotonic current-tenant status updates. Trusted provider-account/number tenant routing remains TICKET023.
@@ -45,14 +45,9 @@ This is the compact handoff for the next automated loop. History lives in `git l
 
 ## Next Work
 
-All plan specs SPEC-001..010 + TICKET003/009 are DONE (see `plan/PROGRESS.md`). The active queue is the
-demo-safe **AFK continuation set** `plan/specs/SPEC-011..015` — work them lowest-effort / highest-Σ first:
-
-1. SPEC-011 — surface the lead score in the inbox workspace (render-verifiable).
-2. SPEC-013 — per-US-state TCPA quiet-hour variants (pure logic, no migration).
-3. SPEC-014 — write-once immutability for stored consent evidence (app-level guard).
-4. SPEC-015 — flag-gated delivery/queue/webhook metrics counters (no PII).
-5. SPEC-012 — route campaign-copy + conversation-summary through the AI provider seam (serialize vs other `lib/ai` edits).
+M0 and M1 in `docs/STANDALONE_ROADMAP.md` are DONE. The active queue is M2: same-tenant composite
+constraints, a non-owner application database role, fail-closed request-local tenant context/RLS, and
+mandatory two-tenant PostgreSQL proof. Continue to M3/M4 only after that trust boundary closes.
 
 Rules: run the protected gate (`pwsh scripts/local-gate.ps1`, now fully green incl `e2e:smoke` after
 `npm run afk:preflight`) before treating work as green; commit only when green. Keep all live

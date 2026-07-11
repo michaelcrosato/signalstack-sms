@@ -1,12 +1,18 @@
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import {
+  apiRouteRbacOperatorBoundaryExceptions,
+  apiRouteRbacPublicAuthExceptions,
+  apiRouteRbacSignedWebhookExceptions
+} from "@/lib/auth/api-rbac-matrix";
 
 const mutatingMethods = ["POST", "PATCH", "PUT", "DELETE"] as const;
 const defaultRequestParameterName = "request";
 const roleGateExceptionRoutes = new Set([
-  "app/api/webhooks/twilio/inbound/route.ts",
-  "app/api/webhooks/twilio/status/route.ts"
+  ...apiRouteRbacOperatorBoundaryExceptions.map((entry) => entry.path),
+  ...apiRouteRbacPublicAuthExceptions.map((entry) => entry.path),
+  ...apiRouteRbacSignedWebhookExceptions.map((entry) => entry.path)
 ]);
 
 function toRepoPath(filePath: string) {

@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { listProviderCredentialRotations } from "@/lib/db/repositories/provider-credentials";
 import { serializeProviderCredentialRotationsCsv } from "@/lib/messaging/provider/credential-rotation-export";
 import { providerCredentialRotationQuerySchema } from "@/lib/validation/provider";
 
 export async function GET(request: Request) {
-  const currentOrg = await getOrCreateCurrentOrg();
+  const authentication = await authenticateApiRequest();
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
   const url = new URL(request.url);
   const query = providerCredentialRotationQuerySchema.safeParse({
     action: url.searchParams.get("action") ?? undefined,

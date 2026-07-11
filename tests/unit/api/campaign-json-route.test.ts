@@ -37,7 +37,7 @@ describe("campaign JSON mutation routes", () => {
     const response = await POST(
       new Request("http://localhost/api/campaigns", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: "{"
       })
     );
@@ -56,7 +56,7 @@ describe("campaign JSON mutation routes", () => {
     const response = await POST(
       new Request("http://localhost/api/campaigns", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: JSON.stringify({
           name: "Campaign",
           body: "Hello",
@@ -76,7 +76,7 @@ describe("campaign JSON mutation routes", () => {
     const response = await POST(
       new Request("http://localhost/api/campaigns", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: JSON.stringify({ name: "Campaign", body: "Hello", contactIds: [] })
       })
     );
@@ -89,7 +89,7 @@ describe("campaign JSON mutation routes", () => {
     const response = await PATCH(
       new Request("http://localhost/api/campaigns/campaign_demo", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: "{"
       }),
       { params: Promise.resolve({ campaignId: "campaign_demo" }) }
@@ -109,7 +109,7 @@ describe("campaign JSON mutation routes", () => {
     const response = await PATCH(
       new Request("http://localhost/api/campaigns/campaign_demo", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: JSON.stringify({ name: "Updated" })
       }),
       { params: Promise.resolve({ campaignId: "campaign_demo" }) }
@@ -119,3 +119,7 @@ describe("campaign JSON mutation routes", () => {
     await expect(response.json()).resolves.toEqual({ error: "Campaign update failed." });
   });
 });
+
+function sameOriginJsonHeaders() {
+  return { "Content-Type": "application/json", Origin: "http://localhost", Host: "localhost" };
+}

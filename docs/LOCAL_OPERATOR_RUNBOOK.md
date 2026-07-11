@@ -1,5 +1,30 @@
 # Local Operator Runbook
 
+## Run the built-in identity profile
+
+Use a production build for every browser session backed by built-in local auth:
+
+```text
+npm run build
+npm run start
+```
+
+Built-in local auth intentionally fails closed under `npm run dev` because the current Next development
+Flight debug payload exposes request Cookie headers to page HTML. `npm run dev` remains suitable for the
+credential-free deterministic demo profile.
+
+Production local auth also requires a trusted reverse proxy or ingress. Bind the application port only
+to loopback or a private container network; expose the proxy instead. The proxy must discard inbound
+`X-Forwarded-For`, `X-Forwarded-Host`, and `X-Forwarded-Proto`, replace them with connection-derived
+values, and only then may the application set `TRUST_PROXY=true`. Direct public exposure with
+`TRUST_PROXY=true` lets clients spoof rate-limit identities; `TRUST_PROXY=false` is rejected for the
+production local-auth profile because all clients would share one fallback throttle bucket.
+
+Use distinct randomly generated values for `AUTH_SESSION_SECRET` and `AUTH_THROTTLE_SECRET`. Session rows
+store only a domain-separated HMAC lookup hash. Rotating `AUTH_SESSION_SECRET` is a global sign-out: every
+existing browser session becomes unusable and users must authenticate again. A production process fails
+closed rather than reverting to unkeyed session lookup when this secret is absent.
+
 This runbook covers local and demo-safe operations only. It does not authorize live SMS, live email, live notifications, live billing, real Stripe charges, real Twilio sends, provider-side credential changes, real secrets, destructive production database operations, irreversible deletion, spam, or data leakage.
 
 The same local-only checklist is available at `/settings/runbook`. That page is read-only: it displays commands and safety boundaries, but it must not execute commands, mutate records, call providers, create billing records, send notifications, expose secrets, or enable live messaging.
@@ -33,6 +58,65 @@ $env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalsta
 $env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run demo:seed
 npm run validate
 ```
+
+## Built-in Administrator Bootstrap and Recovery
+
+`npm run admin:create` is a noninteractive local-auth operation. It accepts no command-line arguments.
+Never place a password or bootstrap token after the command, in `ADMIN_CREATE_PASSWORD`, in shell history,
+or in a support transcript. The command requires an explicit PostgreSQL target, `AUTH_PROVIDER=local`, and
+`DEMO_MODE=false`.
+
+Set these one-shot environment values before invoking the command:
+
+```powershell
+$env:DEMO_MODE='false'
+$env:AUTH_PROVIDER='local'
+$env:DATABASE_URL='<postgresql-url>'
+$env:ADMIN_CREATE_MODE='existing-org'
+$env:ADMIN_CREATE_EMAIL='recovery-owner@example.com'
+$env:ADMIN_CREATE_DISPLAY_NAME='Recovery Owner'
+$env:ADMIN_CREATE_ORG_SLUG='exact-existing-slug'
+$env:ADMIN_CREATE_PASSWORD_FILE='C:\protected\signalstack-admin-password'
+$env:ADMIN_CREATE_PASSWORD_STDIN='false'
+npm run admin:create
+```
+
+Use `ADMIN_CREATE_MODE=bootstrap` for a clean installation and also set
+`ADMIN_CREATE_ORG_NAME`, `ADMIN_CREATE_TIMEZONE`, and the server-only `BOOTSTRAP_TOKEN`. That mode reuses
+the same one-time serializable bootstrap claim as the setup API. Existing-organization mode refuses demo
+organizations and any email already present in the user table; it never replaces a credential or adopts an
+existing identity.
+
+The password file must contain the exact intended UTF-8 bytes, be no larger than 256 bytes, and should not
+include a trailing newline unless that newline is intentionally part of the password. Symlinks are refused.
+On POSIX, set mode `0600`; group/world permission bits are refused. Windows emits a warning because Node
+cannot portably prove ACL safety, so restrict the file to the service/operator account before proceeding.
+For a protected pipeline instead of a file, set `ADMIN_CREATE_PASSWORD_STDIN=true`, leave
+`ADMIN_CREATE_PASSWORD_FILE` empty, and pipe exact bytes from a secret manager; interactive terminal input
+is refused. Success prints only sanitized user ID/email, organization ID/slug, and `OWNER` role.
+
+## Operator Password Reset Link
+
+Tenant roles cannot issue password-reset links because one local credential is shared across all of a
+user's organization memberships. Use the zero-argument operator command from a protected service shell:
+
+```powershell
+$env:DEMO_MODE='false'
+$env:AUTH_PROVIDER='local'
+$env:DATABASE_URL='<postgresql-url>'
+$env:ADMIN_RESET_EMAIL='member@example.com'
+$env:ADMIN_RESET_ORG_SLUG='exact-active-org-slug'
+$env:ADMIN_RESET_EXPIRES_MINUTES='60'
+npm run admin:reset-link
+```
+
+The enabled subject must have an ACTIVE membership in that exact non-demo organization. The command
+supports multi-organization identities, revokes their previous unused reset links, stores only the new
+hash, and prints one `/reset#token=...` fragment with its expiry. Deliver that fragment through a trusted
+out-of-band channel and clear it from the terminal as operational policy permits. Do not place the bearer
+in environment variables, command arguments, logs, tickets, screenshots, shell history, or source control.
+The recipient opens the complete link and chooses a replacement password; completion revokes every session
+for that identity across organizations. Failures print only a stable sanitized code.
 
 ## Autonomous Codex Loop
 
@@ -147,4 +231,7 @@ If a local dependency blocks progress, record the exact command, error, suspecte
 
 ## Production Boundary
 
-Production-like demo deployment is covered by `docs/PRODUCTION_DEPLOYMENT.md`. Future live SMS, live billing, live AI, live provider verification, real notifications, production auth/RLS, or provider-side credential operations require separate human-approved go-live gates and are outside this local runbook.
+Production-like demo deployment is covered by `docs/PRODUCTION_DEPLOYMENT.md`. Future live SMS, live
+billing, live AI, live provider verification, real notifications, production RLS/package completion, or
+provider-side credential operations require separate human-approved go-live gates and are outside this
+local runbook. Built-in local identity itself is implemented under the requirements above.

@@ -1,6 +1,9 @@
 # Production Deployment Runbook
 
-This runbook covers production-like demo deployments only. It does not authorize live SMS, live billing, live AI, Twilio verification, Stripe calls, provider-side credential changes, or real notifications.
+This runbook covers the currently packaged demo-safe deployment class. Built-in local identity is
+implemented, but M10 has not yet delivered the full self-contained production stack. This runbook does not
+authorize live SMS, live billing, live AI, Twilio verification, Stripe calls, provider-side credential
+changes, or real notifications.
 
 ## Deployment Class
 
@@ -92,7 +95,11 @@ Platform-specific hosting notes are documented in `docs/DEPLOYMENT_PLATFORM_NOTE
 
 Production worker execution is separately blocked today. The planning gate for any future live worker deployment is documented in `docs/PRODUCTION_WORKER_POLICY.md`; the current deployment class does not run scheduled campaign workers in production-like runtimes.
 
-Production auth/RBAC planning is documented in `docs/PRODUCTION_AUTH_RBAC.md`. The current deployment class uses the deterministic demo session only; Clerk configuration, user invitations, role changes, suspensions, membership deletion, email, notifications, and real customer access remain blocked until a future auth milestone adds executable controls.
+Production auth/RBAC is documented in `docs/PRODUCTION_AUTH_RBAC.md`. Built-in local credentials,
+sessions, organization selection, invitations, roles, suspension, membership deletion, and operator
+recovery are implemented without Clerk. This deployment recipe still selects explicit demo mode until the
+M10 package adds the hardened local-auth ingress/secrets/backup profile; identity completion does not enable
+email, notifications, provider calls, or live customer messaging.
 
 ## Rollback
 

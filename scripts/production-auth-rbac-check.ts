@@ -8,15 +8,15 @@ type RequiredText = {
 const requiredTexts: RequiredText[] = [
   {
     file: "docs/PRODUCTION_AUTH_RBAC.md",
-    text: "does not authorize production auth"
+    text: "does not authorize live SMS"
   },
   {
     file: "docs/PRODUCTION_AUTH_RBAC.md",
-    text: "Current supported auth mode: deterministic demo session"
+    text: "Current supported auth modes: explicit demo and built-in local"
   },
   {
     file: "docs/PRODUCTION_AUTH_RBAC.md",
-    text: "getOrCreateCurrentOrg"
+    text: "resolveLocalSession"
   },
   {
     file: "docs/PRODUCTION_AUTH_RBAC.md",
@@ -36,7 +36,7 @@ const requiredTexts: RequiredText[] = [
   },
   {
     file: "docs/PRODUCTION_AUTH_RBAC.md",
-    text: "mutating API route must resolve the current organization and pass role authorization before reading a request body"
+    text: "shared authentication boundary"
   },
   {
     file: "docs/PRODUCTION_AUTH_RBAC.md",
@@ -44,11 +44,15 @@ const requiredTexts: RequiredText[] = [
   },
   {
     file: "docs/PRODUCTION_AUTH_RBAC.md",
-    text: "No Clerk calls, invitations, role changes, suspensions, email, notifications, provider calls, billing records, live SMS, or live feature enablement are allowed by this plan"
+    text: "AUTH_SESSION_SECRET"
   },
   {
     file: "docs/PRODUCTION_AUTH_RBAC.md",
-    text: "Clerk secrets and publishable keys must remain absent from production-like demo deployments"
+    text: "TRUST_PROXY=true"
+  },
+  {
+    file: "docs/PRODUCTION_AUTH_RBAC.md",
+    text: "Clerk secrets and publishable keys remain absent"
   },
   {
     file: "docs/PRODUCTION_AUTH_RBAC.md",
@@ -106,7 +110,7 @@ const requiredTexts: RequiredText[] = [
     file: "package.json",
     text: "\"production-auth:check\": \"tsx scripts/production-auth-rbac-check.ts\""
   },
-  // TICKET009 — gated session seam stays demo-by-default, flag-gated, and fail-closed (no secrets read).
+  // Legacy optional external-identity seam stays flag-gated and fail-closed (no provider calls).
   {
     file: "lib/auth/session.ts",
     text: "PRODUCTION_AUTH_ENABLED"
@@ -118,10 +122,6 @@ const requiredTexts: RequiredText[] = [
   {
     file: "lib/auth/session.ts",
     text: "Fail closed"
-  },
-  {
-    file: "docs/PRODUCTION_AUTH_RBAC.md",
-    text: "demo session remains the default"
   },
   {
     file: "docs/PRODUCTION_AUTH_RBAC.md",
@@ -150,4 +150,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Production auth/RBAC plan verified.");
+console.log("Production auth/RBAC contract verified.");

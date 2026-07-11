@@ -3,6 +3,9 @@ import { spawnSync } from "node:child_process";
 
 const scripts = [
   "contracts:check",
+  "standalone:check",
+  "docker:context:check",
+  "runtime:check",
   "secrets:scan",
   "compliance:check",
   "production:gate",

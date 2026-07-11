@@ -1,11 +1,15 @@
 import { ConsentStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { evaluateSegmentContacts, type SegmentFilter } from "@/lib/db/repositories/segments";
 import { withOptionalTenantRls } from "@/lib/db/rls";
 
 export async function GET(request: Request) {
-  const currentOrg = await getOrCreateCurrentOrg();
+  const authentication = await authenticateApiRequest();
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
   const { searchParams } = new URL(request.url);
 
   let filter: SegmentFilter = {};

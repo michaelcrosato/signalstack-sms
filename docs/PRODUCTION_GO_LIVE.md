@@ -44,7 +44,8 @@ A future live-send milestone must add and validate all of these before any live 
 - Explicit org-level live messaging enablement separate from environment flags.
 - Complete compliance profile with approved A2P status.
 - Provider credential storage through a real secret manager, not raw database fields.
-- Production auth/RBAC adapter, membership-status enforcement, and route matrix as documented in `docs/PRODUCTION_AUTH_RBAC.md`.
+- The implemented built-in auth/RBAC boundary plus completed M2 database tenant enforcement, as documented
+  in `docs/PRODUCTION_AUTH_RBAC.md`; an external OIDC adapter is optional, not a go-live dependency.
 - Provider number ownership/readiness verification.
 - A dedicated production worker policy gate as documented in `docs/PRODUCTION_WORKER_POLICY.md`.
 - Send-rate limits and queue backpressure appropriate for provider limits.

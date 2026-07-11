@@ -20,6 +20,18 @@ enum MembershipStatus {
   SUSPENDED
 }
 
+enum AuthTokenType {
+  INVITE
+  PASSWORD_RESET
+}
+
+enum AuthThrottleScope {
+  LOGIN_EMAIL
+  LOGIN_NETWORK
+  SETUP_NETWORK
+  RESET_EMAIL
+}
+
 enum ConsentStatus {
   UNKNOWN
   OPTED_IN
@@ -119,18 +131,101 @@ model Organization {
   providerCredentials ProviderCredential[]
   providerCredentialRotations ProviderCredentialRotation[]
   liveReadinessAuditEvents LiveReadinessAuditEvent[]
+  authSessions  AuthSession[]
+  authTokens    AuthToken[]
 }
 
 model AppUser {
-  id          String       @id @default(cuid())
-  clerkUserId String       @unique
-  email       String       @unique
-  displayName String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  memberships Membership[]
+  id              String       @id @default(cuid())
+  /// Legacy optional external identity subject. Built-in users do not require Clerk.
+  clerkUserId     String?      @unique
+  email           String       @unique
+  normalizedEmail String       @unique
+  displayName     String?
+  emailVerifiedAt DateTime?
+  disabledAt      DateTime?
+  authVersion     Int          @default(1)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  memberships     Membership[]
   assignedConversations Conversation[] @relation("ConversationAssignee")
   internalNotes InternalNote[]
+  localCredential LocalCredential?
+  authSessions AuthSession[]
+  authTokens AuthToken[] @relation("AuthTokenSubject")
+  issuedAuthTokens AuthToken[] @relation("AuthTokenIssuer")
+
+  @@index([disabledAt])
+}
+
+model LocalCredential {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  passwordHash      String
+  passwordChangedAt DateTime @default(now())
+  failedAttempts    Int      @default(0)
+  lockedUntil       DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              AppUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([lockedUntil])
+}
+
+model AuthSession {
+  id                String        @id @default(cuid())
+  tokenHash         String        @unique
+  userId            String
+  orgId             String
+  authVersion       Int
+  createdAt         DateTime      @default(now())
+  lastSeenAt        DateTime      @default(now())
+  idleExpiresAt     DateTime
+  absoluteExpiresAt DateTime
+  revokedAt         DateTime?
+  user              AppUser       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org               Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+  @@index([orgId, revokedAt])
+  @@index([idleExpiresAt])
+  @@index([absoluteExpiresAt])
+}
+
+model AuthToken {
+  id             String          @id @default(cuid())
+  type           AuthTokenType
+  tokenHash      String          @unique
+  userId         String?
+  orgId          String?
+  email          String?
+  role           MembershipRole?
+  issuedByUserId String?
+  expiresAt      DateTime
+  consumedAt     DateTime?
+  revokedAt      DateTime?
+  createdAt      DateTime        @default(now())
+  user           AppUser?        @relation("AuthTokenSubject", fields: [userId], references: [id], onDelete: Cascade)
+  org            Organization?   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  issuedBy       AppUser?        @relation("AuthTokenIssuer", fields: [issuedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([type, expiresAt])
+  @@index([userId, type])
+  @@index([orgId, type])
+  @@index([issuedByUserId])
+}
+
+model AuthThrottle {
+  id              String            @id @default(cuid())
+  scope           AuthThrottleScope
+  keyHash         String
+  windowStartedAt DateTime          @default(now())
+  attempts        Int               @default(0)
+  blockedUntil    DateTime?
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([scope, keyHash])
+  @@index([blockedUntil])
 }
 
 model Membership {

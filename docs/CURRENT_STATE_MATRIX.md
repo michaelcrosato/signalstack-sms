@@ -1,24 +1,41 @@
 # Current State Matrix
 
-Last updated: 2026-07-10.
+Last updated: 2026-07-10. Governing roadmap: `docs/STANDALONE_ROADMAP.md`.
 
-This file is intentionally compact. Historical run notes live in `git log`; current agents should use this matrix plus targeted searches instead of loading old run history.
+This file is intentionally compact. Historical detail belongs in Git and the standalone verification
+ledger; the rows below describe current implementation truth only.
 
-Latest validated posture: the 94-PR review consolidation records every disposition in `docs/PR_REVIEW_2026-07-10.md`, retains selected original commits, and adds repaired tenant, consent, queue, webhook, provider-access, CSV, and observability invariants. Production identity, RLS, trusted webhook tenant routing, secret provisioning, cost caps, and protected-gate changes remain human-gated under TICKET023.
+SignalStack is a strong demo-safe product foundation, not yet a standalone production SMS platform.
+Built-in local identity is complete and validated, but database-enforced tenant isolation, provider
+routing, durable external sends, public integrations, packaging, and recovery remain incomplete.
 
 | Area | Backend/API State | Browser State | Main Gap | Next Action |
 | --- | --- | --- | --- | --- |
-| Contacts | Tenant-scoped contacts, archive/restore/merge, tags/lists/segments, chunked CSV import, local phone normalization, operator-gated paid lookup, and an all-or-none write-once consent-evidence database invariant. | Contact list, import, detail, archive/restore, and merge workflows. | Merge remains local-only and intentionally preserves the source through soft archive. | Keep CSV/local validation provider-free; provision paid-lookup secrets and caps only through TICKET023. |
-| Campaigns | Tenant-scoped templates, recipients, nested contacts/messages, preflight, schedule/cancel, queue records, and delivery evidence. Cancel/claim and queue/campaign terminal transitions are transactional and race-tested. | Composer, preflight counts, scheduling, detail/edit/cancel, recipient readiness, and delivery review. | No advanced history beyond summary and recent local evidence. | Keep live sends blocked; add deeper reporting only after product feedback. |
-| Inbox | Tenant-scoped conversations, messages, assignment, notes, resolve/reopen, idempotent demo inbound, STOP/HELP handling, and dummy-provider replies. | Inbox list/thread, demo inbound/reply, fake-AI insights, notes, assignment, and resolution. | Live provider replies remain blocked by design. | Keep local-only until production identity/provider gates are complete. |
-| Templates | Tenant-scoped create/read/update with own-property, single-pass plaintext preview substitution. | Template create/list/detail/edit workflows. | No delete/archive lifecycle. | Revisit lifecycle controls after product feedback. |
-| Compliance | Profile/checklist APIs, readiness audit, central send gates, quiet hours, double opt-in, and atomic write-once timestamp/method/disclosure evidence. | Compliance readiness and operations pages. | Per-contact timezone and jurisdiction-specific quiet-hour rules are future work. | Keep campaign/live-worker sends blocked pending approved production compliance depth. |
-| Twilio/Provider | Signed webhook parsing, expiring owner claims, stale recovery, unmatched-status retry, monotonic delivery transitions, redacted provider metadata, an operator-authorized idempotent live-test exception, and operator-authorized paid lookup. | Provider operations plus redacted `/demo` live-test controls. | Webhooks still need trusted provider-account/number-to-tenant routing; live secrets and cost caps are not provisioned. | Complete TICKET023 before any production external impact. |
-| AI | Deterministic fake provider and local metered AI endpoints. | Campaign copy and inbox insight surfaces use fake output. | No live model or cost/data controls. | Keep fake AI until explicit live-provider governance exists. |
-| Billing | Local usage and billing-account metadata only. | Read-only billing/usage operations. | No Stripe, invoices, payments, or subscriptions. | Defer behind live billing gates. |
-| Auth/RBAC | Demo identity, role helpers, tenant filters, mutating-route RBAC checks, and production-gate denial for incomplete Clerk configuration. | Demo-safe single-user experience plus read-only team operations. | No verified production session/membership resolver. | Implement only with the human-approved TICKET023 identity design. |
-| Queue/Worker | Durable owner-token leases, expiry/recovery, Postgres-tested cancel/claim serialization, atomic queue/campaign terminal writes, generation-safe BullMQ mirroring, recoverable Bull retries, tenant-explicit idempotency, and dummy/local-only runtime gates. | Read-only queue operations page. | No production/live worker class is authorized. | Keep local/demo-only and complete every production-worker control before enablement. |
-| Rate Limiting | Local in-memory API middleware. | Visible in operations status. | Not distributed or production-grade. | Move to approved shared infrastructure with production deployment work. |
-| Operations Surfaces | Inventory-backed, mutation-free settings reads consolidated to ten frozen release-safety child routes. | `/settings/{operations,health,security,validation,queue,provider,compliance,readiness-audit,exports,runbook}` plus the index. | Remaining gaps are infrastructure/security decisions, not more settings pages. | Keep the route allowlist frozen and execute TICKET023 deliberately. |
-| Tests/Gates | Contracts, secrets, compliance, auth, worker, observability, operator, platform, context, security, AI, lint, typecheck, Prisma, Vitest, Playwright smoke, build, and protected integrity gates. Focused Postgres tests cover consent, default-number, webhook-claim, and both queue cancel/claim race directions. | Seeded smoke and product paths cover the primary local workflows. | Production readiness remains intentionally gated; protected files require human review. | Keep `npm run validate` and a clean-checkout protected gate green; update the PR ledger with final counts. |
-| Docs/Planning | Canonical contracts, compact handoffs, TICKET023 production blockers, and the durable 94-PR review ledger. | N/A | Handoffs must remain current and compact. | Start with `npm run agent:brief`; keep history in git and final PR dispositions in the ledger. |
+| Standalone platform | Strong demo-safe domain/queue foundation plus complete built-in identity. | Seeded product and real local-auth workflows are usable. | Database tenant trust, integrations, carrier execution, packaging, and recovery are incomplete. | Execute M2 through M11 in `docs/STANDALONE_ROADMAP.md`. |
+
+| Area | Implemented now | Missing for standalone completion | Roadmap |
+| --- | --- | --- | --- |
+| Identity/team | Built-in scrypt credentials; keyed opaque sessions; owner bootstrap; operator create/reset CLIs; login/logout/reset; organization selection; invite/reinvite/role/suspend/revoke; fail-closed page/API auth; explicit demo-only fallback. | Optional OIDC and verified invite delivery remain adapters, not standalone requirements. | M1 done |
+| Tenant database boundary | `orgId` repository filters, limited RLS helpers/tests, tenant-aware idempotency. | Same-tenant composite FKs, non-owner DB role, fail-closed missing context, all-request RLS, mandatory two-tenant DB tests. | M2 |
+| Public integrations | Internal browser JSON routes and provider callback routes. | Scoped API keys, `/api/v1`, OpenAPI, pagination/errors, SDK examples, outbound signed webhook outbox/retry/replay. | M3 |
+| Provider control plane | Dummy provider; redacted Twilio metadata/rotation history; local number metadata; isolated env-backed live test. | Encrypted recoverable secrets, account/number verification, globally unique ownership, provider factory, trusted tenant routing, health. | M4 |
+| Direct outbound | Dummy inbox reply and isolated reserved live-test send. | General durable message/attempt outbox, public send API, real Twilio adapter, callback correlation, reconciliation, ambiguity UI. | M5 |
+| Inbound/status | Twilio form parsing/signatures, durable webhook leases, idempotency, monotonic status updates. | Resolve account + destination to one tenant, tenant credential validation, live replies, media, full keyword behavior, customer events. | M6 |
+| Campaigns/queue | Draft/preflight/schedule/cancel, durable DB jobs, owner leases, race-tested terminal transitions, optional BullMQ mirror, dummy worker. | Production live worker, final hard gate, provider throttling/backpressure, per-recipient attempts, retry/DLQ/replay, kill switch, saved audiences. | M7 |
+| Contacts/audiences | Contact lifecycle, tags/lists in schema, CSV parse/import, archive/restore/merge, ad-hoc segment query/export. | First-class tag/list/saved-segment APIs/UI, file mapping, suppression workflows, audience snapshots/estimates and campaign targeting. | M7/M9 |
+| Inbox | Demo inbound/reply, notes, assignment, resolve/reopen, sentiment/summary/lead signals. | Trusted production inbound/live replies, real team administration, unread/search/filter/SLA, media, safe refresh and customer events. | M6/M9 |
+| Templates/MMS | Template CRUD and plaintext preview engine; campaign copy assistance. | Archive/versioning, preview integration, media model/storage, MMS provider path, test-send and richer campaign history. | M7/M9 |
+| Compliance | Central gates, consent state/evidence constraint, double opt-in seam, quiet-hours logic, STOP/START classification, readiness profile. | Complete evidence-bearing registration/business fields, append-only consent/audit events, authoritative timezone/policy, suppression, retention and provider proof. | M8 |
+| AI | Deterministic fake provider and optional gated Anthropic seam. | No hosted dependency is required; finish UX/governance only as optional value. | M9 |
+| Plans/quotas | Local usage events and demo billing-account metadata. | Built-in entitlements/quotas and owner controls; optional billing adapter. | M9 |
+| Analytics/ops | Product counts/delivery evidence, structured logs, local metrics, read-only operations pages. | Protected metrics, worker heartbeat, time ranges, queue/provider SLIs, alerts, audit search/export, customer reports. | M9/M10 |
+| Privacy/lifecycle | Redaction helpers, secret scan, write-once consent bundle. | Message/media/webhook retention, export/delete/legal hold, cleanup jobs, complete secret scanning and audit immutability. | M8/M10 |
+| Packaging | Safe Docker context, web Dockerfile, Compose for Postgres and optional Redis, demo runbooks. | Non-root standalone image, ingress/web/migration/worker/backup stack, internal networks/secrets/health/resource controls. | M0 done / M10 |
+| Backup/upgrade | Prisma forward migrations and app-image rollback note. | Scheduled encrypted backups, off-host option, RPO/RTO, restore drill, pre-migration snapshot, expand/contract upgrades and rollback rehearsal. | M10 |
+| Verification | Full gate: 143 unit files / 1,046 pass, 29 PostgreSQL files / 152 pass, smoke browser, production local-auth browser, production build, and adversarial M1 audit. | Mandatory public API/provider/two-tenant/container/restore E2E and release evidence remain. | M11 |
+
+## Immediate implementation order
+
+1. Complete M2 database tenant integrity.
+2. Build M3 public integration identity/events and M4 provider ownership/secrets in parallel.
+3. Continue through M5–M11 without treating demo-only behavior as completion proof.

@@ -1,7 +1,7 @@
 import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth/api-authorization";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { listContacts, upsertContact } from "@/lib/db/repositories/contacts";
 import { contactCreateSchema } from "@/lib/validation/contacts";
 import { evaluatePhoneNumberLookup, liveLookupOperatorHeaderName } from "@/lib/validation/lookup";
@@ -9,7 +9,11 @@ import { evaluatePhoneNumberLookup, liveLookupOperatorHeaderName } from "@/lib/v
 import { withOptionalTenantRls } from "@/lib/db/rls";
 
 export async function GET() {
-  const currentOrg = await getOrCreateCurrentOrg();
+  const authentication = await authenticateApiRequest();
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
   const contacts = await withOptionalTenantRls(currentOrg.orgId, async (tx) => {
     return listContacts(currentOrg.orgId, tx);
   });
@@ -18,7 +22,11 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const currentOrg = await getOrCreateCurrentOrg();
+  const authentication = await authenticateApiRequest(request);
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
   const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
   if (roleResponse) {
     return roleResponse;

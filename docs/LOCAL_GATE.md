@@ -89,7 +89,9 @@ Production auth/RBAC planning check:
 npm run production-auth:check
 ```
 
-The production auth/RBAC check is included in `npm run validate` and verifies that `docs/PRODUCTION_AUTH_RBAC.md`, the executable API RBAC matrix, the production deployment runbook, and the production gate keep Clerk-backed auth disabled for demo-safe production-like deployments until explicit auth controls exist.
+The production auth/RBAC check is included in `npm run validate` and verifies the implemented built-in
+local-auth boundary, executable API RBAC matrix, production deployment requirements, optional external-
+identity fail-close, and the continued absence of required Clerk configuration.
 
 Production worker policy validation is included in `npm run validate`. It verifies that the local/demo-only worker boundary remains documented, source-enforced, and covered by tests before any future live worker design proceeds.
 

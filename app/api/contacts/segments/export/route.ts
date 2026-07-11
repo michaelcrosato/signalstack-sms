@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ConsentStatus } from "@prisma/client";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { evaluateSegmentContacts, type SegmentFilter } from "@/lib/db/repositories/segments";
 import { withOptionalTenantRls } from "@/lib/db/rls";
 import { escapeCsvCell } from "@/lib/csv/escape";
@@ -14,7 +14,11 @@ const segmentFilterSchema = z.object({
 });
 
 export async function GET(request: Request) {
-  const currentOrg = await getOrCreateCurrentOrg();
+  const authentication = await authenticateApiRequest();
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
   const { searchParams } = new URL(request.url);
 
   let filter: SegmentFilter = {};

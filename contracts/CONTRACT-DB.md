@@ -11,8 +11,23 @@ Every tenant-scoped model must include `orgId` unless explicitly documented here
 Canonical organization/auth models:
 
 - `Organization`: `id`, unique `slug`, optional unique `clerkOrgId`, `name`, `demoMode`, `timezone`.
-- `AppUser`: `id`, unique `clerkUserId`, unique `email`, optional `displayName`.
+- `AppUser`: `id`, optional unique legacy `clerkUserId`, unique `email` and `normalizedEmail`, optional
+  `displayName`, `emailVerifiedAt`, `disabledAt`, and an incrementing `authVersion` used to revoke stale
+  sessions after credential/security changes.
 - `Membership`: unique `(orgId, userId)`, `role`, `status`.
+- `LocalCredential`: global (not tenant-scoped), unique per user, with a versioned memory-hard password
+  hash, password-change timestamp, bounded failed-attempt count, and optional lock expiry. Raw passwords
+  are never stored.
+- `AuthSession`: organization-scoped selected-membership session with a globally unique,
+  `AUTH_SESSION_SECRET`-keyed HMAC lookup hash of a random bearer token, user/org/auth-version links,
+  idle/absolute expiry, last-seen time, and revocation time.
+  Raw session tokens are returned only at creation and never persisted.
+- `AuthToken`: globally unique hashed single-use bearer. `INVITE` rows are organization scoped and
+  carry intended email/role plus a non-null issuer. `PASSWORD_RESET` rows are platform-operator-issued,
+  user-global, and must have non-null `userId` with `orgId`, `email`, `role`, and `issuedByUserId` all
+  null. Both shapes record expiry, consumption, and revocation; plaintext bearers are never stored.
+- `AuthThrottle`: global (not tenant-scoped) hashed identity/network throttle state, unique by
+  `(scope, keyHash)`, with bounded window/attempt/block metadata.
 
 Canonical roles:
 
@@ -26,7 +41,9 @@ Canonical membership statuses:
 - `INVITED`
 - `SUSPENDED`
 
-Demo auth uses a deterministic local owner and organization until Clerk is wired behind the same contract.
+Explicit demo mode may use a deterministic local owner and organization. The standalone production
+profile uses built-in credentials and opaque sessions; optional external identity is an adapter and is
+not required for core operation.
 
 Baseline tenant-scoped product models remain: `Contact`, `Campaign`, `Conversation`, `Message`.
 

@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "roadmap": "docs/STANDALONE_ROADMAP.md",
+  "milestones": [
+    {
+      "id": "M0",
+      "status": "done",
+      "evidence": [
+        "docs/STANDALONE_ROADMAP.md",
+        "GOAL.md",
+        "ROADMAP.md",
+        "PLAN.md",
+        "docs/CURRENT_STATE_MATRIX.md",
+        ".dockerignore",
+        "scripts/docker-context-check.ts",
+        "scripts/standalone-roadmap-check.ts",
+        "lib/env/runtime-config.ts",
+        "tests/unit/env/runtime-config.test.ts"
+      ]
+    },
+    {
+      "id": "M1",
+      "status": "done",
+      "evidence": [
+        "plan/specs/SPEC-030-self-hosted-identity.md",
+        "lib/auth/crypto.ts",
+        "lib/auth/local-credentials.ts",
+        "lib/auth/local-session.ts",
+        "lib/auth/team-service.ts",
+        "lib/auth/operator-password-reset.ts",
+        "prisma/migrations/20260711010000_self_hosted_auth_foundation/migration.sql",
+        "prisma/migrations/20260711020000_operator_global_password_reset/migration.sql",
+        "lib/auth/current-org.ts",
+        "contracts/CONTRACT-AUTH.md",
+        "tests/unit/auth/api-route-authorization.test.ts",
+        "tests/unit/db/team-service.test.ts",
+        "tests/unit/db/password-reset-service.test.ts",
+        "e2e/local-auth-path.spec.ts",
+        "playwright.local-auth.config.ts",
+        "scripts/local-auth-e2e-production.ts",
+        ".github/workflows/ci.yml",
+        ".github/workflows/premerge.yml"
+      ]
+    },
+    {
+      "id": "M2",
+      "status": "partial foundation",
+      "evidence": [
+        "lib/db/rls.ts",
+        "prisma/migrations/20260529130000_tenant_rls/migration.sql",
+        "tests/unit/db/rls-isolation.test.ts"
+      ]
+    },
+    {
+      "id": "M3",
+      "status": "not started",
+      "evidence": [
+        "contracts/CONTRACT-API.md",
+        "docs/API_MAP.md"
+      ]
+    },
+    {
+      "id": "M4",
+      "status": "partial foundation",
+      "evidence": [
+        "prisma/schema.prisma",
+        "lib/db/repositories/provider-numbers.ts",
+        "lib/messaging/provider/settings.ts",
+        "tests/unit/db/provider-numbers.test.ts"
+      ]
+    },
+    {
+      "id": "M5",
+      "status": "partial foundation",
+      "evidence": [
+        "lib/messaging/live-test-sms.ts",
+        "lib/messaging/provider/dummy-provider.ts",
+        "lib/queue/worker.ts",
+        "tests/unit/messaging/live-test-sms.test.ts"
+      ]
+    },
+    {
+      "id": "M6",
+      "status": "partial foundation",
+      "evidence": [
+        "app/api/webhooks/twilio/inbound/route.ts",
+        "app/api/webhooks/twilio/status/route.ts",
+        "lib/db/repositories/inbox.ts",
+        "tests/unit/api/twilio-webhook-routes.test.ts"
+      ]
+    },
+    {
+      "id": "M7",
+      "status": "partial foundation",
+      "evidence": [
+        "lib/queue/worker.ts",
+        "lib/queue/bullmq.ts",
+        "lib/queue/bullmq-worker.ts",
+        "tests/unit/db/queue-cancel-claim-race.test.ts",
+        "tests/unit/queue/bullmq-worker.test.ts"
+      ]
+    },
+    {
+      "id": "M8",
+      "status": "partial foundation",
+      "evidence": [
+        "lib/compliance/gates.ts",
+        "lib/compliance/quiet-hours.ts",
+        "tests/unit/compliance/hard-gates.test.ts",
+        "tests/unit/db/contact-consent-evidence-constraint.test.ts"
+      ]
+    },
+    {
+      "id": "M9",
+      "status": "partial foundation",
+      "evidence": [
+        "app/dashboard/page.tsx",
+        "e2e/product-demo-path.spec.ts",
+        "docs/CURRENT_STATE_MATRIX.md"
+      ]
+    },
+    {
+      "id": "M10",
+      "status": "not started",
+      "evidence": [
+        "docker-compose.yml",
+        "docs/PRODUCTION_DEPLOYMENT.md",
+        "docs/PRODUCTION_OBSERVABILITY.md"
+      ]
+    },
+    {
+      "id": "M11",
+      "status": "not started",
+      "evidence": [
+        "scripts/validate.ts",
+        ".github/workflows/ci.yml",
+        "playwright.config.ts",
+        "e2e/smoke.spec.ts"
+      ]
+    }
+  ]
+}

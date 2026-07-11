@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { getConversation } from "@/lib/db/repositories/inbox";
 
 type ConversationParams = {
@@ -7,7 +7,12 @@ type ConversationParams = {
 };
 
 export async function GET(_request: Request, { params }: ConversationParams) {
-  const [{ conversationId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
+  const authentication = await authenticateApiRequest();
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
+  const { conversationId } = await params;
   const conversation = await getConversation(currentOrg.orgId, conversationId);
 
   if (!conversation) {

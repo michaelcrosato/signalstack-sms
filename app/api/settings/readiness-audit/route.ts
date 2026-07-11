@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
 import { readinessAuditQuerySchema } from "@/lib/validation/readiness-audit";
 
 export async function GET(request: Request) {
-  const currentOrg = await getOrCreateCurrentOrg();
+  const authentication = await authenticateApiRequest();
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
   const url = new URL(request.url);
   const query = readinessAuditQuerySchema.safeParse({
     action: url.searchParams.get("action") ?? undefined,

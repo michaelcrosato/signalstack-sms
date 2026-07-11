@@ -37,7 +37,7 @@ describe("campaign schedule route", () => {
     const response = await POST(
       new Request("http://localhost/api/campaigns/campaign_demo/schedule", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: "{"
       }),
       { params: Promise.resolve({ campaignId: "campaign_demo" }) }
@@ -53,7 +53,7 @@ describe("campaign schedule route", () => {
     const response = await POST(
       new Request("http://localhost/api/campaigns/campaign_demo/schedule", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: "{"
       }),
       { params: Promise.resolve({ campaignId: "campaign_demo" }) }
@@ -69,7 +69,7 @@ describe("campaign schedule route", () => {
     const response = await POST(
       new Request("http://localhost/api/campaigns/campaign_demo/schedule", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: JSON.stringify({ scheduledAt: "tomorrow" })
       }),
       { params: Promise.resolve({ campaignId: "campaign_demo" }) }
@@ -90,7 +90,7 @@ describe("campaign schedule route", () => {
     const response = await POST(
       new Request("http://localhost/api/campaigns/missing_campaign/schedule", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: JSON.stringify({ scheduledAt: "2026-05-23T18:00:00.000Z" })
       }),
       { params: Promise.resolve({ campaignId: "missing_campaign" }) }
@@ -124,7 +124,7 @@ describe("campaign schedule route", () => {
     const response = await POST(
       new Request("http://localhost/api/campaigns/campaign_demo/schedule", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: JSON.stringify({ scheduledAt: "2026-05-23T18:00:00.000Z" })
       }),
       { params: Promise.resolve({ campaignId: "campaign_demo" }) }
@@ -155,7 +155,7 @@ describe("campaign schedule route", () => {
     const response = await POST(
       new Request("http://localhost/api/campaigns/campaign_demo/schedule", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: JSON.stringify({ scheduledAt: "2026-05-23T18:00:00.000Z" })
       }),
       { params: Promise.resolve({ campaignId: "campaign_demo" }) }
@@ -172,7 +172,7 @@ describe("campaign schedule route", () => {
     const response = await POST(
       new Request("http://localhost/api/campaigns/campaign_demo/schedule", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: JSON.stringify({ scheduledAt: "2026-05-23T18:00:00.000Z" })
       }),
       { params: Promise.resolve({ campaignId: "campaign_demo" }) }
@@ -183,3 +183,7 @@ describe("campaign schedule route", () => {
     expect(mocks.enqueueScheduledCampaignBullMqJob).not.toHaveBeenCalled();
   });
 });
+
+function sameOriginJsonHeaders() {
+  return { "Content-Type": "application/json", Origin: "http://localhost", Host: "localhost" };
+}

@@ -2,53 +2,86 @@
 
 ## Purpose
 
-SignalStack SMS is a demo-safe, multi-tenant SMB SMS/MMS marketing + shared-inbox + lead-qualification
-SaaS (Next.js App Router + TypeScript + Prisma/Postgres + BullMQ). It is built to be driven by
-autonomous coding agents: every policy is an executable gate, not prose. See `docs/CANONICAL_IMPLEMENTATION_PLAN.md`
-for the full product/architecture contract.
+SignalStack SMS is a self-hostable, multi-tenant SMS/MMS platform for companies that need contacts,
+audiences, campaigns, transactional messaging, a shared inbox, compliance controls, analytics, and a
+stable integration API. The complete product must run from one supported package on infrastructure the
+operator controls.
 
-## Current state (2026-05)
+The only unavoidable external boundary is access to the mobile carrier network through Twilio, another
+CPaaS, or a direct carrier/SMSC connection. Clerk, Stripe, Vercel, Redis, hosted AI, hosted email,
+hosted monitoring, and hosted object storage must not be core requirements.
 
-- Strong backend + contract foundations: tenant-scoped repos, contacts/CSV import, campaigns + preflight,
-  durable queue jobs, shared inbox, compliance gates, fake AI, local usage/billing, Twilio webhook ingestion,
-  provider metadata, readiness audit, operations surfaces.
-- Browser product path at `/dashboard` (contacts, campaigns, inbox, templates, analytics, compliance).
-- `npm run validate` green locally except `test:e2e:smoke` (needs Postgres + Playwright browsers).
-- ~384 unit tests passing; lint + typecheck + build clean.
-- Live SMS/billing/AI, production auth, production workers, and production deploy are intentionally **off**,
-  behind hard gates. The only live external path is the isolated, multi-gated `/demo` live-test SMS form.
+The detailed product contract, milestone graph, acceptance matrix, and verification ledger are in
+`docs/STANDALONE_ROADMAP.md`.
+
+## Current state (2026-07-10)
+
+- Strong demo-safe foundations: tenant-scoped repositories, contacts/imports, templates, campaigns,
+  durable database queue jobs, optional BullMQ mirroring, shared inbox, compliance gates, dummy provider,
+  fake/local AI, Twilio webhook parsing, provider metadata, observability seams, and product UI.
+- The seeded browser product path works at `/dashboard`; the current gate has 143 unit files / 1,046
+  passing tests, 29 PostgreSQL files / 152 passing tests, Playwright smoke and production local-auth flows,
+  and a production build.
+- M1 built-in identity is complete: local credentials, keyed opaque sessions, onboarding/team lifecycle,
+  operator recovery, and fail-closed authorization replace deterministic identity outside explicit demo.
+- The repository is not yet a production SMS platform. Twilio callbacks still route to the demo tenant;
+  provider secrets are not stored for real sends; the campaign
+  worker is dummy-only and production-blocked; there is no public API-key surface, outbound customer
+  webhook delivery, production container bundle, or backup/restore proof.
+- Live SMS, billing, and hosted AI remain off by default. The isolated operator-gated live-test SMS path
+  is not evidence of production campaign readiness.
 
 ## Desired end state
 
-A repo any agent can pick up cold and advance safely in one focused session: oriented in minutes via
-`GOAL.md` + `docs/ai/REPO_MAP.md` + `npm run agent:brief`; a single green gate (`npm run validate`);
-atomic tickets in `tickets/`; demo-safe defaults; hard gates protecting all real-world impact.
+A company can install SignalStack on a clean host, bootstrap an owner, create and administer an
+organization, connect an owned provider account/number, import and segment contacts, prove consent,
+send and receive direct or campaign SMS/MMS, work replies in a team inbox, integrate its own software
+through `/api/v1` and signed event webhooks, monitor the system, and restore or upgrade it without using
+another application SaaS beyond carrier connectivity.
+
+Feature completion requires every row in the acceptance matrix and every milestone in the verification
+ledger in `docs/STANDALONE_ROADMAP.md` to be backed by current tests or deployment evidence.
 
 ## Non-goals
 
-- No live SMS/MMS, live billing, or live AI by default.
-- No production deployment automation, production auth, or production workers until their hard gates are designed and approved.
-- No competitor asset/UI cloning. No voice/WhatsApp/short-code. No full-CRM scope.
-- Not chasing more low-value syntactic test variants (see `docs/NEXT_PROMPTS.md`); prefer product + correctness work.
+- Operating a mobile carrier network or pretending carrier/number/A2P relationships can be embedded.
+- Live sends, paid provider calls, billing charges, or hosted-AI calls in defaults, tests, or CI.
+- Voice, WhatsApp, or full CRM replacement before the SMS/MMS platform is complete.
+- Treating an administrator toggle or a narrow mocked test as proof of legal or production readiness.
+- Low-value syntactic test permutations that do not improve a real trust, recovery, or product boundary.
 
-## Constraints & assumptions
+## Constraints
 
-- Package manager: **npm** (`package-lock.json`). Node 22+ (dev uses 24).
-- Postgres required for `db:migrate`/`db:seed`/e2e; `scripts/validate.ts` injects a demo `DATABASE_URL` for gate steps that only need it present.
-- Windows-first dev (PowerShell gate `scripts/local-gate.ps1`); POSIX `scripts/agent/*.sh` wrappers added for cross-platform/CI.
-- Secrets never committed: `.env` is gitignored; `.env.example` holds demo-safe placeholders; `npm run secrets:scan` gates it.
-- Gate scripts + `docs/AXIOMS.md` are integrity-pinned; only humans change them.
+- Package manager: npm. Node 22+; TypeScript strict; Next.js App Router.
+- PostgreSQL is the authoritative database and default durable queue. Redis is optional acceleration.
+- Every tenant row/query/relation carries `orgId`; production completion requires fail-closed RLS and
+  same-tenant database constraints.
+- Zod validates API, webhook, queue, import, provider, and configuration boundaries.
+- Secrets never enter Git, images, logs, API responses, or browser state.
+- Default provider is `dummy`; carrier calls require explicit, evidence-backed activation.
+- Protected axioms and integrity-gate files remain human-owned.
 
 ## Agent guidance
 
-- Read-first order, the loop, full command reference, and autonomous-vs-ask rules: **`AGENTS.md`**.
-- Where things live and what to skip: **`docs/ai/REPO_MAP.md`**.
-- Phased plan mapped to tickets: **`ROADMAP.md`**; product roadmap: `PLAN.md`.
-- Follow demo-safe defaults; keep `orgId` on every tenant query; validate at boundaries with Zod; contracts before features.
+- Read `docs/STANDALONE_ROADMAP.md`, this file, `docs/CURRENT_STATE_MATRIX.md`, and
+  `docs/ai/REPO_MAP.md` before selecting work.
+- Follow the dependency order in the standalone roadmap. Do not substitute demo polish for a missing
+  production trust boundary.
+- Contracts before behavior; targeted checks before the full protected gate; current evidence before
+  status claims.
 
 ## Definition of done (per change)
 
-- `npm run validate` attempted; green, or each failure explained and ticketed.
-- Worked ticket + relevant docs updated; follow-ups filed.
-- No secret exposure; no hard-gate bypass.
-- Honest status: a check is "passed" only if it ran and passed; unavailable gates recorded as "not run".
+- The change advances a named standalone milestone and updates its evidence truthfully.
+- Tenant, idempotency, external-impact, secret, compliance, and recovery invariants are preserved.
+- Targeted tests pass, then `npm run validate` is attempted; failures are explained and not relabeled.
+- Docs/contracts/migrations/operator steps are updated with the implementation.
+- No secret exposure, unapproved external send, destructive production action, or hard-gate bypass.
+
+## Definition of product complete
+
+- Every required standalone milestone is `done` with authoritative evidence.
+- Clean-host install, authenticated setup, public API integration, direct send, inbound reply, STOP
+  suppression, campaign execution, status/customer callbacks, restart recovery, backup restore, and
+  upgrade/rollback drills pass.
+- The only required external service is the configured carrier/network connection.

@@ -46,7 +46,7 @@ const conversationParams = { params: Promise.resolve({ conversationId: "conversa
 function malformedJsonRequest(path: string) {
   return new Request(`http://localhost${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: sameOriginJsonHeaders(),
     body: "{"
   });
 }
@@ -156,7 +156,7 @@ describe("inbox JSON mutation routes", () => {
     const response = await replyConversationRoute(
       new Request("http://localhost/api/inbox/conversations/conversation_demo/reply", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+      headers: sameOriginJsonHeaders(),
         body: JSON.stringify({ body: "Thanks for reaching out!" })
       }),
       conversationParams
@@ -179,7 +179,7 @@ describe("inbox JSON mutation routes", () => {
     const response = await replyConversationRoute(
       new Request("http://localhost/api/inbox/conversations/conversation_demo/reply", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+      headers: sameOriginJsonHeaders(),
         body: JSON.stringify({ body: "Thanks for reaching out!" })
       }),
       conversationParams
@@ -205,7 +205,7 @@ describe("inbox JSON mutation routes", () => {
     const response = await replyConversationRoute(
       new Request("http://localhost/api/inbox/conversations/conversation_demo/reply", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+      headers: sameOriginJsonHeaders(),
         body: JSON.stringify({ body: "Thanks again!", idempotencyKey: "reply-1" })
       }),
       conversationParams
@@ -215,3 +215,7 @@ describe("inbox JSON mutation routes", () => {
     await expect(response.json()).resolves.toMatchObject({ deduped: true });
   });
 });
+
+function sameOriginJsonHeaders() {
+  return { "Content-Type": "application/json", Origin: "http://localhost", Host: "localhost" };
+}

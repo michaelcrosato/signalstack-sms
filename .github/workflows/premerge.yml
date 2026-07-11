@@ -14,6 +14,7 @@ jobs:
       AI_PROVIDER: fake
       DATABASE_URL: postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public
       REDIS_URL: redis://localhost:6379
+      RUN_DB_TESTS: "true"
     services:
       postgres:
         image: postgres:16-alpine
@@ -48,3 +49,73 @@ jobs:
       - run: npm run db:deploy
       - run: npm run demo:seed
       - run: pwsh ./scripts/local-gate.ps1
+
+  local-auth-e2e:
+    needs: premerge
+    runs-on: ubuntu-latest
+    env:
+      RUN_LOCAL_AUTH_E2E: "true"
+      APP_ENV: production
+      RUNTIME_PROCESS: web
+      DEMO_MODE: "false"
+      AUTH_PROVIDER: local
+      DATABASE_URL: postgresql://signalstack:signalstack@localhost:5432/signalstack_sms_local_auth_e2e?schema=public
+      QUEUE_BACKEND: database
+      WORKER_ENABLED: "false"
+      MESSAGING_PROVIDER: dummy
+      LIVE_MESSAGING_ENABLED: "false"
+      LIVE_BILLING_ENABLED: "false"
+      AI_PROVIDER: fake
+      TRUST_PROXY: "true"
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:3201
+      WEB_HOST: 127.0.0.1
+      WEB_PORT: "3201"
+      PLAYWRIGHT_PORT: "3201"
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: signalstack_sms_local_auth_e2e
+          POSTGRES_USER: signalstack
+          POSTGRES_PASSWORD: signalstack
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U signalstack"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - id: local_auth_secrets
+        name: Generate disposable local-auth secrets
+        shell: bash
+        run: |
+          session_secret="$(openssl rand -hex 32)"
+          throttle_secret="$(openssl rand -hex 32)"
+          bootstrap_token="$(openssl rand -hex 32)"
+          owner_password="$(openssl rand -hex 32)"
+          member_password="$(openssl rand -hex 32)"
+          for value in "$session_secret" "$throttle_secret" "$bootstrap_token" "$owner_password" "$member_password"; do
+            echo "::add-mask::$value"
+          done
+          {
+            echo "AUTH_SESSION_SECRET=$session_secret"
+            echo "AUTH_THROTTLE_SECRET=$throttle_secret"
+            echo "BOOTSTRAP_TOKEN=$bootstrap_token"
+            echo "LOCAL_AUTH_E2E_OWNER_PASSWORD=$owner_password"
+            echo "LOCAL_AUTH_E2E_MEMBER_PASSWORD=$member_password"
+          } >> "$GITHUB_ENV"
+      - run: npm run db:deploy
+      - id: local_auth_browser
+        name: Run production-build local-auth browser proof
+        run: npm run test:e2e:local-auth:production
+      - name: Clean exact local-auth fixtures
+        if: ${{ always() && steps.local_auth_secrets.outcome == 'success' }}
+        run: npm run test:e2e:local-auth:cleanup

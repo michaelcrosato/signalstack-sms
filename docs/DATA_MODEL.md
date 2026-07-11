@@ -7,7 +7,8 @@
 SignalStack is multi-tenant from the first product milestone:
 
 - `Organization` represents a customer workspace.
-- `AppUser` represents the local app user record mapped from Clerk later.
+- `AppUser` represents the built-in local identity; an optional future OIDC adapter may map a verified
+  external subject to the same record and membership model.
 - `Membership` connects users to organizations with a role and status.
 
 Demo mode uses:
