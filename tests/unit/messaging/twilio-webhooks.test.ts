@@ -6,6 +6,7 @@ import {
   normalizeTwilioStatus,
   readTwilioFormPayload,
   twilioStatusTransition,
+  twilioStatusUpdateGuard,
   validateTwilioSignature
 } from "@/lib/messaging/twilio-webhooks";
 
@@ -353,6 +354,12 @@ describe("Twilio webhook helpers", () => {
       deliveredAt: null,
       failedAt: now
     });
+    expect(twilioStatusTransition({ status: " CANCELED ", now })).toEqual({
+      providerStatus: "canceled",
+      providerErrorCode: null,
+      deliveredAt: null,
+      failedAt: now
+    });
   });
 
   it("keeps terminal delivery transitions mutually exclusive when applied to stale local metadata", () => {
@@ -381,5 +388,31 @@ describe("Twilio webhook helpers", () => {
       deliveredAt: null,
       failedAt
     });
+  });
+
+  it("allows read after delivered without allowing failure terminals to replace delivery", () => {
+    const readGuard = twilioStatusUpdateGuard("read");
+    const allowedReadStatuses = (readGuard.OR[1] as { providerStatus: { in: string[] } }).providerStatus.in;
+    expect(readGuard.failedAt).toBeNull();
+    expect(allowedReadStatuses).toEqual(
+      expect.arrayContaining(["sent", "delivered", "received", "read"])
+    );
+    expect(allowedReadStatuses).not.toContain("failed");
+    expect(allowedReadStatuses).not.toContain("undelivered");
+
+    const failedGuard = twilioStatusUpdateGuard("failed");
+    const allowedFailureStatuses = (failedGuard.OR[1] as { providerStatus: { in: string[] } }).providerStatus.in;
+    expect(failedGuard.deliveredAt).toBeNull();
+    expect(allowedFailureStatuses).toContain("sent");
+    expect(allowedFailureStatuses).toContain("failed");
+    expect(allowedFailureStatuses).not.toContain("delivered");
+    expect(allowedFailureStatuses).not.toContain("undelivered");
+
+    const canceledGuard = twilioStatusUpdateGuard("canceled");
+    const allowedCanceledStatuses = (canceledGuard.OR[1] as { providerStatus: { in: string[] } }).providerStatus.in;
+    expect(canceledGuard.deliveredAt).toBeNull();
+    expect(allowedCanceledStatuses).toContain("sent");
+    expect(allowedCanceledStatuses).toContain("canceled");
+    expect(allowedCanceledStatuses).not.toContain("delivered");
   });
 });

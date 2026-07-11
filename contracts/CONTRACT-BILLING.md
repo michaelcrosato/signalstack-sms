@@ -18,4 +18,4 @@ No endpoint may create Stripe customers, subscriptions, invoices, checkout sessi
 
 ## Post-MVP Local Usage View
 
-`/settings/usage` renders existing tenant-scoped analytics and local usage records for operator review. It is read-only and must not create usage events, call Stripe, create billing provider artifacts, expose secrets, send notifications, call providers, or enable live messaging.
+The consolidated `/settings` readiness view renders a local usage and billing-boundary summary, while `/dashboard/analytics` provides the detailed product analytics workflow. These views are read-only with respect to billing and must not create usage events, call Stripe, create billing provider artifacts, expose secrets, send notifications, call providers, or enable live messaging.

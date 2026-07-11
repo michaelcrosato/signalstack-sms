@@ -1,4 +1,4 @@
-export const terminalDeliveryFailureProviderStatuses = Object.freeze(["failed", "undelivered"] as const);
+export const terminalDeliveryFailureProviderStatuses = Object.freeze(["failed", "undelivered", "canceled"] as const);
 
 export type TerminalDeliveryFailureProviderStatus = (typeof terminalDeliveryFailureProviderStatuses)[number];
 

@@ -1,14 +1,15 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useState } from "react";
-import { liveTestSmsConfirmation } from "@/lib/messaging/live-test-sms-constants";
+import { useRef, useState } from "react";
 
 type LiveTestSmsFormProps = {
   enabled: boolean;
   blockers: string[];
-  allowedRecipients: string[];
-  fromNumber: string | null;
+  allowedRecipientCount: number;
+  allowedRecipientLast4: string[];
+  fromNumberConfigured: boolean;
+  fromNumberLast4: string | null;
 };
 
 type SendState =
@@ -16,26 +17,56 @@ type SendState =
   | { status: "sending"; message: string }
   | { status: "sent"; message: string }
   | { status: "blocked"; message: string }
+  | { status: "pending"; message: string }
   | { status: "failed"; message: string };
 
-export function LiveTestSmsForm({ enabled, blockers, allowedRecipients, fromNumber }: LiveTestSmsFormProps) {
-  const [to, setTo] = useState(allowedRecipients[0] ?? "");
+export function LiveTestSmsForm({
+  enabled,
+  blockers,
+  allowedRecipientCount,
+  allowedRecipientLast4,
+  fromNumberConfigured,
+  fromNumberLast4
+}: LiveTestSmsFormProps) {
+  const [to, setTo] = useState("");
   const [body, setBody] = useState("SignalStack live investor demo test.");
   const [confirmation, setConfirmation] = useState("");
+  const [operatorToken, setOperatorToken] = useState("");
   const [state, setState] = useState<SendState>({ status: "idle", message: "No live test SMS sent from this page yet." });
+  const requestIdRef = useRef<string | null>(null);
 
   async function submitLiveTestSms(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setState({ status: "sending", message: "Sending live test SMS through Twilio." });
 
-    const response = await fetch("/api/demo/live-test-sms", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ to, body, confirmation })
-    });
-    const payload = await response.json();
+    const requestId = requestIdRef.current ?? crypto.randomUUID();
+    requestIdRef.current = requestId;
+
+    let response: Response;
+    let payload: Record<string, unknown>;
+    try {
+      response = await fetch("/api/demo/live-test-sms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId, to, body, confirmation, operatorToken })
+      });
+      payload = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+    } catch {
+      setOperatorToken("");
+      setConfirmation("");
+      setState({
+        status: "pending",
+        message:
+          "The result could not be confirmed. Re-enter both operator controls and retry to check the same idempotent request without sending twice."
+      });
+      return;
+    }
+
+    setOperatorToken("");
+    setConfirmation("");
 
     if (response.ok && payload.sent) {
+      requestIdRef.current = null;
       setState({
         status: "sent",
         message: `Sent through Twilio. Provider status: ${payload.providerStatus}; recipient ending ${payload.toLast4}.`
@@ -43,18 +74,46 @@ export function LiveTestSmsForm({ enabled, blockers, allowedRecipients, fromNumb
       return;
     }
 
+    if (response.status === 202 && payload.pending) {
+      setState({
+        status: "pending",
+        message:
+          "This request is reserved and its provider outcome is uncertain. Re-enter both operator controls and retry to inspect the same request; do not start a new request."
+      });
+      return;
+    }
+
     if (response.status === 403) {
       setState({
         status: "blocked",
-        message: `Blocked: ${(payload.blockers ?? []).join(", ")}`
+        message: `Blocked: ${Array.isArray(payload.blockers) ? payload.blockers.join(", ") : "live-send gate rejected the request"}`
+      });
+      return;
+    }
+
+    if (response.status >= 500 && payload.failed !== true) {
+      setState({
+        status: "pending",
+        message:
+          "The result could not be confirmed. Re-enter both operator controls and retry to inspect the same idempotent request."
       });
       return;
     }
 
     setState({
       status: "failed",
-      message: payload.error ?? "Live test SMS failed."
+      message: typeof payload.error === "string" ? payload.error : "Live test SMS failed."
     });
+  }
+
+  function beginNewRequest(update: () => void) {
+    requestIdRef.current = null;
+    update();
+  }
+
+  function explicitlyStartNewRequest() {
+    requestIdRef.current = null;
+    setState({ status: "idle", message: "A new live-test request will be created on the next submit." });
   }
 
   return (
@@ -64,14 +123,25 @@ export function LiveTestSmsForm({ enabled, blockers, allowedRecipients, fromNumb
         <h2 className="text-xl font-semibold text-slate-950">Send One Investor Demo Text</h2>
         <p className="text-sm leading-6 text-slate-700">
           This is the only live-send surface. It requires explicit Twilio environment credentials, a recipient allowlist,
-          live messaging, and the confirmation phrase before it calls Twilio.
+          live messaging, a server-configured operator token, and the confirmation phrase before it calls Twilio. Neither
+          operator control is rendered or retained after a request.
         </p>
       </div>
 
       <dl className="mt-4 grid gap-3 text-sm md:grid-cols-3">
         <Status label="Status" value={enabled ? "enabled" : "blocked"} />
-        <Status label="From" value={fromNumber ?? "not configured"} />
-        <Status label="Allowlist" value={allowedRecipients.length > 0 ? allowedRecipients.join(", ") : "empty"} />
+        <Status
+          label="From"
+          value={fromNumberConfigured && fromNumberLast4 ? `configured (ending ${fromNumberLast4})` : "not configured"}
+        />
+        <Status
+          label="Allowlist"
+          value={
+            allowedRecipientCount > 0
+              ? `${allowedRecipientCount} configured (endings ${allowedRecipientLast4.join(", ")})`
+              : "empty"
+          }
+        />
       </dl>
 
       {blockers.length > 0 ? (
@@ -86,8 +156,8 @@ export function LiveTestSmsForm({ enabled, blockers, allowedRecipients, fromNumb
           <input
             className="rounded border border-slate-300 px-3 py-2 font-normal text-slate-950"
             value={to}
-            onChange={(event) => setTo(event.target.value)}
-            placeholder="+15879873814"
+            onChange={(event) => beginNewRequest(() => setTo(event.target.value))}
+            placeholder="Enter the full allowlisted number"
           />
         </label>
         <label className="grid gap-1 text-sm font-medium text-slate-800">
@@ -96,7 +166,7 @@ export function LiveTestSmsForm({ enabled, blockers, allowedRecipients, fromNumb
             className="min-h-24 rounded border border-slate-300 px-3 py-2 font-normal text-slate-950"
             value={body}
             maxLength={320}
-            onChange={(event) => setBody(event.target.value)}
+            onChange={(event) => beginNewRequest(() => setBody(event.target.value))}
           />
         </label>
         <label className="grid gap-1 text-sm font-medium text-slate-800">
@@ -105,7 +175,22 @@ export function LiveTestSmsForm({ enabled, blockers, allowedRecipients, fromNumb
             className="rounded border border-slate-300 px-3 py-2 font-normal text-slate-950"
             value={confirmation}
             onChange={(event) => setConfirmation(event.target.value)}
-            placeholder={liveTestSmsConfirmation}
+            placeholder="Enter the operator confirmation phrase"
+            autoComplete="off"
+          />
+        </label>
+        <label className="grid gap-1 text-sm font-medium text-slate-800">
+          Operator token
+          <input
+            className="rounded border border-slate-300 px-3 py-2 font-normal text-slate-950"
+            type="password"
+            value={operatorToken}
+            minLength={32}
+            maxLength={256}
+            onChange={(event) => setOperatorToken(event.target.value)}
+            placeholder="Enter the server-configured operator token"
+            autoComplete="off"
+            spellCheck={false}
           />
         </label>
         <button
@@ -115,6 +200,15 @@ export function LiveTestSmsForm({ enabled, blockers, allowedRecipients, fromNumb
         >
           Send Live Test SMS
         </button>
+        {state.status === "failed" ? (
+          <button
+            className="w-fit text-sm font-medium text-teal-800 underline"
+            type="button"
+            onClick={explicitlyStartNewRequest}
+          >
+            Start a deliberate new request
+          </button>
+        ) : null}
       </form>
       <p className="mt-4 text-sm text-slate-700" role="status">
         {state.message}

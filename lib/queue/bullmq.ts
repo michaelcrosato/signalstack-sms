@@ -7,6 +7,7 @@ import {
   type ScheduledCampaignJob
 } from "@/lib/queue/jobs";
 import { recordMetric, smsPipelineMetrics } from "@/lib/observability/metrics";
+import { QUEUE_JOB_PROCESSING_LEASE_MS } from "@/lib/queue/claim-lease";
 
 export const scheduledCampaignBullMqQueueName = "signalstack-scheduled-campaigns";
 export const scheduledCampaignBullMqJobName = "scheduled-campaign";
@@ -23,7 +24,7 @@ export function getQueueBackend(env: Record<string, string | undefined> = proces
 
 export function buildScheduledCampaignBullMqJob(input: {
   queueJobId: string;
-  idempotencyKey: string;
+  queueJobGeneration: number;
   payload: ScheduledCampaignJob;
   runAt: Date;
   now?: Date;
@@ -32,6 +33,7 @@ export function buildScheduledCampaignBullMqJob(input: {
   const now = input.now ?? new Date();
   const delayMs = Math.max(input.runAt.getTime() - now.getTime(), 0);
   const env = input.env ?? process.env;
+  const bullMqJobId = `${input.queueJobId}-${input.queueJobGeneration}`;
 
   const removeOnCompleteAge = env.BULLMQ_REMOVE_ON_COMPLETE_AGE_SEC
     ? Number.parseInt(env.BULLMQ_REMOVE_ON_COMPLETE_AGE_SEC, 10)
@@ -47,9 +49,10 @@ export function buildScheduledCampaignBullMqJob(input: {
       ...input.payload
     },
     options: {
-      jobId: input.idempotencyKey,
+      jobId: bullMqJobId,
       delay: delayMs,
       attempts: 3,
+      backoff: { type: "fixed", delay: QUEUE_JOB_PROCESSING_LEASE_MS },
       removeOnComplete: { age: removeOnCompleteAge },
       removeOnFail: { age: removeOnFailAge }
     } satisfies JobsOptions,
@@ -58,7 +61,7 @@ export function buildScheduledCampaignBullMqJob(input: {
 }
 
 export async function enqueueScheduledCampaignBullMqJob(
-  queueJob: Pick<QueueJob, "id" | "idempotencyKey" | "payload" | "runAt">,
+  queueJob: Pick<QueueJob, "id" | "idempotencyKey" | "payload" | "runAt" | "generation">,
   input: { env?: Record<string, string | undefined>; now?: Date } = {}
 ): Promise<BullMqEnqueueResult> {
   const env = input.env ?? process.env;
@@ -78,7 +81,7 @@ export async function enqueueScheduledCampaignBullMqJob(
 
   const job = buildScheduledCampaignBullMqJob({
     queueJobId: queueJob.id,
-    idempotencyKey: queueJob.idempotencyKey,
+    queueJobGeneration: queueJob.generation,
     payload: payload.data,
     runAt: queueJob.runAt,
     now: input.now,
@@ -88,11 +91,12 @@ export async function enqueueScheduledCampaignBullMqJob(
   if (!jobData.success) {
     return { enqueued: false, reason: "invalid-payload", error: jobData.error.message };
   }
-  const queue = new Queue(scheduledCampaignBullMqQueueName, {
-    connection: redisConnectionFromUrl(redisUrl)
-  });
+  let queue: Queue | undefined;
 
   try {
+    queue = new Queue(scheduledCampaignBullMqQueueName, {
+      connection: redisConnectionFromUrl(redisUrl)
+    });
     await queue.add(job.name, job.data, job.options);
     
     // Record BullMQ queue depth and throughput
@@ -110,18 +114,24 @@ export async function enqueueScheduledCampaignBullMqJob(
       enqueued: true,
       queueName: scheduledCampaignBullMqQueueName,
       jobName: job.name,
-      jobId: queueJob.idempotencyKey,
+      jobId: job.options.jobId,
       delayMs: job.delayMs
     };
-  } catch (error) {
+  } catch {
     recordMetric(smsPipelineMetrics.queueThroughput, { action: "enqueue", status: "failure", backend: "bullmq" });
     return {
       enqueued: false,
       reason: "enqueue-failed",
-      error: error instanceof Error ? error.message : "Unknown BullMQ enqueue failure."
+      error: "BullMQ enqueue failed."
     };
   } finally {
-    await queue.close();
+    if (queue) {
+      try {
+        await queue.close();
+      } catch {
+        // Mirroring is best-effort and must never make the authoritative database schedule fail.
+      }
+    }
   }
 }
 

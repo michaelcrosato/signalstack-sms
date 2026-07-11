@@ -2,6 +2,10 @@ import { A2pRegistrationStatus } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 import type { ComplianceProfileUpdateInput } from "@/lib/validation/compliance";
 
+export async function getComplianceProfile(orgId: string) {
+  return prisma.complianceProfile.findUnique({ where: { orgId } });
+}
+
 export async function getOrCreateComplianceProfile(orgId: string) {
   return prisma.complianceProfile.upsert({
     where: { orgId },

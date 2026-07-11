@@ -2,13 +2,9 @@
 
 This runbook covers local and demo-safe operations only. It does not authorize live SMS, live email, live notifications, live billing, real Stripe charges, real Twilio sends, provider-side credential changes, real secrets, destructive production database operations, irreversible deletion, spam, or data leakage.
 
-The same local-only checklist is available in the app at `/settings/runbook`. That page is read-only: it displays commands and safety boundaries, but it must not execute commands, mutate records, call providers, create billing records, send notifications, expose secrets, or enable live messaging.
-
-The root launch dashboard, runbook admin links, go-live readiness navigation, and focused safety/runtime operation links are projected from the shared local operator surface inventory. Unit coverage keeps those projections aligned with implemented `app/**/page.tsx` files, and the root/browser demo checks verify visible links from that same inventory before green handoff.
+The same local-only checklist is available at `/settings/runbook`. That page is read-only: it displays commands and safety boundaries, but it must not execute commands, mutate records, call providers, create billing records, send notifications, expose secrets, or enable live messaging.
 
 ## Required Defaults
-
-Use these defaults for local operation:
 
 ```bash
 DEMO_MODE=true
@@ -17,6 +13,16 @@ LIVE_BILLING_ENABLED=false
 MESSAGING_PROVIDER=dummy
 AI_PROVIDER=fake
 ```
+
+## Human-Gated Live-Test SMS
+
+This runbook does not authorize a live send. If a human explicitly approves the isolated `/demo` exception, its environment must include a randomly generated, server-only `LIVE_TEST_SMS_OPERATOR_TOKEN` between 32 and 256 characters and a bounded `LIVE_TEST_SMS_TIMEOUT_MS` (default `5000`, clamped to `1000..10000`). Keep the token out of source control, screenshots, logs, support artifacts, browser configuration, and provider/readiness metadata.
+
+The operator enters the complete allowlisted recipient, the confirmation phrase, and the operator token for each POST. The page never prefills or renders those operator controls and clears them from component state after a response. Readiness shows only recipient counts and last-four hints, never complete allowlist or from-number values. Re-enter the controls when retrying a request that returned `202`; the unchanged UUID plus actor/recipient/body binding retrieves the pending reservation without a second provider call. Use a new UUID only after a definitive failure and an intentional human decision to attempt a new send.
+
+## Human-Gated Paid Phone Lookup
+
+Local contact normalization and every CSV import remain free and provider-independent. If a human separately authorizes paid Twilio Lookup for a single-contact create, configure a random server-only `LIVE_LOOKUP_OPERATOR_TOKEN` between 32 and 256 characters and supply that exact secret only in the `x-signalstack-lookup-token` request header. The deterministic demo membership role does not authorize the paid request. Keep this token out of source control, URLs, browser-delivered configuration, screenshots, logs, and support artifacts; the server neither persists nor forwards it to Twilio.
 
 ## Daily Local Start
 
@@ -30,13 +36,11 @@ npm run validate
 
 ## Autonomous Codex Loop
 
-For the unattended local loop:
-
 ```powershell
 .\codex-skynet-max.ps1 -FullYolo -KeepAwake
 ```
 
-This launch path is endless by default and should stop only when the PowerShell process is interrupted or killed. Use `-FuseMinutes <minutes>` only when a capped run is wanted. If `codex exec` or the protected local gate exits nonzero, the loop waits briefly and starts a fresh iteration; failed gates are not treated as green.
+The loop is endless by default. Use `-FuseMinutes <minutes>` only for a capped run. Failed commands or protected gates are not green handoffs.
 
 For a strict one-shot launch check:
 
@@ -44,7 +48,7 @@ For a strict one-shot launch check:
 .\codex-skynet-max.ps1 -PreflightOnly
 ```
 
-Run the seeded investor path after changes that touch pages, APIs, seed data, provider metadata, exports, campaigns, inbox, AI, analytics, billing, or middleware:
+Run the seeded investor path after changes to pages, APIs, seed data, provider metadata, exports, campaigns, inbox, AI, analytics, billing, or middleware:
 
 ```bash
 $env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public'; npm run test:e2e:demo
@@ -70,7 +74,7 @@ $env:MESSAGING_PROVIDER='dummy'
 npm run worker:watch
 ```
 
-Optional BullMQ/Redis checks remain local and must not be used to bypass the durable database job record:
+Optional BullMQ/Redis checks remain local and must not bypass the durable database job record:
 
 ```bash
 $env:QUEUE_BACKEND='bullmq'
@@ -87,385 +91,47 @@ Use `/settings/exports` for read-only local CSV exports:
 - Readiness audit events: `/api/settings/readiness-audit/export`
 - Redacted provider credential rotation history: `/api/settings/provider/rotations/export`
 
-Its navigation links are projected from the shared local operator surface inventory.
-
 Exports are tenant-scoped local metadata only. They must not expose raw auth tokens, provider token fingerprints, customer secrets, provider verification results, full message bodies, live billing identifiers, or provider-side state. Export routes must not mutate records, call providers, create billing records, send notifications, or enable live messaging.
 
-## System Status
+## Canonical Settings Model
 
-Use `/settings/system` for a read-only local operations snapshot before demos or repair work. It displays:
+The implemented settings child-page allowlist is exactly:
 
-- demo/live messaging/live billing flags
-- selected messaging and AI providers
-- production-like runtime markers
-- queue backend and Redis presence
-- local worker jobs-per-poll limit
-- API rate-limit policy
+- `/settings/operations`
+- `/settings/health`
+- `/settings/security`
+- `/settings/validation`
+- `/settings/queue`
+- `/settings/provider`
+- `/settings/compliance`
+- `/settings/readiness-audit`
+- `/settings/exports`
+- `/settings/runbook`
 
-The page is display-only. It must not mutate records, expose secrets, call providers, send notifications, create billing records, or enable live messaging.
+`/settings` is the consolidated go-live readiness view. Runtime, environment, number, campaign, contact, data, audience, template, inbox, webhook, delivery, team, billing, reporting, AI, notification, integration, workflow, release, and blocker summaries live there instead of on separate per-area settings pages.
 
-## Health Operations
+Legacy per-area settings paths are not routes. Interactive product work belongs under `/dashboard/contacts`, `/dashboard/campaigns`, `/dashboard/inbox`, `/dashboard/templates`, `/dashboard/analytics`, and `/dashboard/compliance`; the seeded demo checkpoint is `/demo`.
 
-Use `/settings/health` for a read-only local health checkpoint before demos or release work. It displays:
+The shared operator-surface inventory drives the root launch view, demo console, settings directory, operations index, and runbook links. Unit coverage pins the allowlist and rejects static links to non-allowlisted settings pages.
 
-- the existing `GET /api/health` endpoint contract
-- service identity
-- demo-safe defaults
-- runtime blockers
-- links to system, API, security, and validation operations
+## Focused Operator Views
 
-Those operation links are projected from the shared local operator surface inventory.
+- Use `/settings/operations` to navigate the surviving operator surfaces.
+- Use `/settings/health` to review the health contract, demo-safe defaults, and runtime blockers. Rendering it does not execute a probe.
+- Use `/settings/queue` to review due/future jobs, payload validity, worker settings, and queue-backend metadata. Rendering it does not enqueue jobs, run workers, call Redis, or call providers.
+- Use `/settings/provider` to manage local redacted credential metadata and bounded rotation-history exports. It does not verify or revoke provider-side credentials or enable live messaging.
+- Use `/settings/security` to review demo-safe gates, rate-limit policy, production overrides, and secret-storage boundaries. It does not scan files or expose environment values.
+- Use `/settings/readiness-audit` to review tenant-scoped readiness events and bounded exports. It does not mutate or replay events.
 
-The page is display-only. It must not execute probes, call APIs, run commands, mutate records, expose raw environment values or secrets, call providers, create billing records, send notifications, send SMS, send email, or enable live features.
-
-## Environment Operations
-
-Use `/settings/environment` for a read-only local configuration checkpoint before demos, release work, or repair work. It displays:
-
-- demo-safe defaults
-- allowlisted configuration categories
-- derived runtime status
-- links to system, security, validation, and release operations
-
-Those operation links are projected from the shared local operator surface inventory.
-
-The page is display-only. It must not read environment files, expose raw values or secrets, mutate configuration, write files, execute commands, call APIs, call Redis, call providers, create billing records, send notifications, send SMS, send email, deploy, or enable live features.
-
-## Provider Numbers
-
-Use `/settings/numbers` for read-only local number metadata review before demos or repair work. It displays:
-
-- tenant-scoped provider phone-number metadata
-- local status and provider labels
-- default-number marker
-- recorded capabilities
-
-The page is display-only. It must not provision numbers, verify provider ownership, mutate metadata, expose secrets, call providers, send notifications, create billing records, or enable live messaging.
-
-## Usage And Analytics
-
-Use `/settings/usage` for read-only local metering review before demos or repair work. It displays:
-
-- tenant-scoped contact, campaign, conversation, and message counts
-- local usage totals by event type
-- demo billing account status and live-billing blocked state
-- recent local usage events and metadata
-
-The page is display-only. It must not mutate records, call Stripe, create billing provider artifacts, expose secrets, call providers, send notifications, or enable live messaging.
-
-## Reporting Index
-
-Use `/settings/reports` for read-only local report discovery before demos or reporting repair work. It displays:
-
-- existing local reporting surfaces
-- tenant-scoped analytics counts
-- local usage totals
-- recent readiness audit signals
-- reporting safety boundaries
-
-The page is display-only. It must not execute reports, create exports, mutate records, expose secrets, call providers, call Stripe, call live AI, send notifications, send SMS, send email, or enable live features.
-
-## Integration Operations
-
-Use `/settings/integrations` for read-only integration boundary review before demos or integration repair work. It displays:
-
-- messaging provider metadata boundary
-- provider number metadata boundary
-- inbound webhook boundary
-- fake AI provider boundary
-- local billing ledger boundary
-- notification no-send boundary
-
-The page is display-only. It must not call providers, submit prompts, call live AI, call Stripe, send notifications, send SMS, send email, emit outbound webhooks, expose secrets, mutate records, enqueue jobs, create exports, or enable live features.
-
-## Workflow Operations
-
-Use `/settings/workflows` for read-only demo workflow review before demos or workflow repair work. It displays:
-
-- audience intake checkpoint
-- campaign readiness checkpoint
-- queue handoff checkpoint
-- inbox response checkpoint
-- delivery evidence checkpoint
-- fake AI, usage, and reporting checkpoint
-
-The page is display-only. It must not import contacts, schedule or cancel campaigns, run workers, create inbox replies, retry deliveries, submit prompts, execute reports, create exports, mutate records, enqueue jobs, call Redis, expose secrets, call providers, create billing records, send notifications, send SMS, send email, or enable live features.
-
-## Demo Operations
-
-Use `/settings/demo` for read-only seeded demo readiness review before demos or demo-path repair work. Its readiness checkpoint signals and operational links are projected from the shared local operator surface inventory. It displays:
-
-- seeded workspace readiness checkpoints
-- workflow links for audience, campaigns, inbox, usage, and reporting
-- local contact, campaign, conversation, message, number, and usage signals
-- derived runtime gates and safety boundaries
-
-The page is display-only. It must not import contacts, schedule or cancel campaigns, run workers, create inbox replies, submit prompts, execute reports, create exports, mutate records, enqueue jobs, call Redis, expose secrets, call providers, create billing records, send notifications, send SMS, send email, or enable live features.
-
-## Operations Index
-
-Use `/settings/operations` for read-only local operator surface discovery before demos, repair work, or handoff. It displays:
-
-- grouped links to existing local operator views
-- static local surface counts
-- route names for current demo-safe pages
-- safety boundaries for the index itself
-
-The operations index inventory is backed by a unit test so route-count drift, duplicate surface links, missing page implementations, implemented operator pages missing from the inventory, and missing safety-sensitive surfaces are caught before the seeded browser demo path.
-
-The runbook admin-link list is projected from the same shared inventory, excluding only non-settings surfaces such as the demo console. Unit coverage keeps runbook labels and backing app pages aligned with the operations index.
-
-The go-live readiness page navigation is also projected from the shared inventory, excluding the current `/settings` page and non-settings surfaces. Unit coverage keeps readiness navigation, runbook navigation, and the operations index aligned, and seeded browser coverage verifies the rendered readiness navigation labels and link targets from the same inventory.
-
-The page is display-only. It must not execute commands, inspect files, call APIs, mutate records, create exports, enqueue jobs, call Redis, expose secrets, call providers, call Stripe, call live AI, create billing records, send notifications, send SMS, send email, or enable live features.
-
-## API Operations Inventory
-
-Use `/settings/api` for read-only local API route inventory review before API or contract handoff work. Its unit coverage verifies:
-
-- unique route-method rows
-- backing `app/**/route.ts` files for listed API paths
-- reverse coverage for implemented local API route methods
-- current local route count
-- external-impact route count remains one, limited to `POST /api/demo/live-test-sms`
-
-The page and inventory tests are local metadata checks only. They must not execute route handlers, mutate records, call providers, create billing records, send notifications, send SMS, send email, expose secrets, or enable live features.
-
-## Release Operations
-
-Use `/settings/releases` for read-only local release readiness review before integration or handoff work. It displays:
-
-- protected local gate expectations
-- local migration, demo seed, and seeded demo path command references
-- premerge validation metadata
-- links to validation, contract, security, system, runbook, and workflow surfaces
-- runtime safety boundaries
-
-The page is display-only. It must not execute commands, run scripts, start migrations, launch tests or browsers, perform git operations, deploy, mutate records, create exports, enqueue jobs, call Redis, expose logs, diffs, environment values, or secrets, call providers, create billing records, send notifications, send SMS, send email, or enable live features.
-
-## Campaign Operations
-
-Use `/settings/campaigns` for read-only campaign and queue review before demos or worker repair work. It displays:
-
-- campaign status counts
-- recipient counts and scheduled timestamps
-- queue job status counts
-- local worker execution boundary
-
-The page is display-only. It must not schedule campaigns, cancel campaigns, run workers, mutate queue rows, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
-
-## Queue Operations
-
-Use `/settings/queue` for read-only scheduled queue review before demos or worker repair work. It displays:
-
-- scheduled job status counts
-- due versus future queued jobs
-- scheduled-campaign payload validity
-- worker poll settings and queue backend metadata
-- Redis presence without opening Redis connections
-
-The page is display-only. It must not enqueue jobs, run workers, mutate queue rows, update campaign status, call Redis, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
-
-## Contact Operations
-
-Use `/settings/contacts` for read-only contact data review before demos or import repair work. It displays:
-
-- contact consent status counts
-- CSV import status and row totals
-- tag and list counts
-- recent local contact metadata
-
-The page is display-only. It must not import contacts, create contacts, update consent, mutate tags or lists, hard-delete records, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
-
-## Data Operations
-
-Use `/settings/data` for read-only local data governance review before demos or retention-boundary repair work. It displays:
-
-- tenant-scoped local record totals
-- active and archived contact counts
-- import ledger row totals
-- retention signals and recent archived contact metadata
-
-The page is display-only. It must not hard-delete records, restore archived contacts, run exports, mutate records, expose secrets, call providers, create billing records, send notifications, call live AI, send SMS, or enable live features.
-
-## Audience Operations
-
-Use `/settings/audience` for read-only audience label and saved segment review before demos or campaign repair work. It displays:
-
-- tag counts
-- list member counts
-- saved segment definitions
-- segment update timestamps
-
-The page is display-only. It must not create tags, update lists, change contact memberships, evaluate segments for sends, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
-
-## Template Operations
-
-Use `/settings/templates` for read-only message template review before demos or campaign repair work. It displays:
-
-- message template counts
-- variable names used by templates
-- campaign usage counts
-- local text previews
-
-The page is display-only. It must not create templates, edit template copy, render live outbound messages, schedule campaigns, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
-
-## Inbox Operations
-
-Use `/settings/inbox` for read-only shared inbox review before demos or inbox repair work. It displays:
-
-- conversation status counts
-- assignment counts
-- recent local message and note counts
-- local inbox safety boundary
-
-The page is display-only. It must not create messages, assign conversations, resolve conversations, add notes, mutate contacts or consent, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
-
-## Delivery Operations
-
-Use `/settings/delivery` for read-only delivery review before demos or delivery repair work. It displays:
-
-- message direction counts
-- delivery status metadata
-- provider status labels and provider message ID presence
-- campaign/conversation context and recent idempotency keys
-
-Its navigation links are projected from the shared local operator surface inventory.
-
-The page is display-only. It must not send SMS, retry deliveries, replay webhooks, mutate messages, expose secrets, call providers, create billing records, send notifications, or enable live messaging.
-
-## Webhook Operations
-
-Use `/settings/webhooks` for read-only webhook review before demos or webhook repair work. It displays:
-
-- Twilio webhook route coverage
-- local stored webhook event counts
-- provider and event-type summaries
-- recent webhook idempotency keys
-- local webhook safety boundary
-
-Its navigation links are projected from the shared local operator surface inventory.
-
-The page is display-only. It must not replay payloads, create webhook events, mutate messages or contacts, call Twilio, send automatic replies, expose secrets, create billing records, send notifications, send SMS, or enable live messaging.
-
-## Team Operations
-
-Use `/settings/team` for read-only organization and membership review before demos or auth repair work. It displays:
-
-- organization metadata
-- membership role and status counts
-- assigned conversation counts
-- authored internal-note counts
-- member display names and emails
-
-Its navigation links are projected from the shared local operator surface inventory.
-
-The page is display-only. It must not invite users, create users, change roles, suspend members, delete memberships, call Clerk, send email, expose secrets, call providers, create billing records, send notifications, send SMS, or enable live messaging.
-
-## Billing Operations
-
-Use `/settings/billing` for read-only local billing boundary review before demos or metering repair work. It displays:
-
-- local billing account status
-- live billing gate status
-- Stripe placeholder presence
-- usage-event totals
-- recent usage-event metadata
-
-The page is display-only. It must not call Stripe, create subscriptions, create invoices, collect payment methods, charge cards, send email, expose secrets, call providers, create external billing artifacts, send notifications, send SMS, or enable live billing.
-
-## AI Operations
-
-Use `/settings/ai` for read-only fake AI boundary review before demos or AI repair work. It displays:
-
-- selected AI provider state
-- fake-provider readiness
-- deterministic AI endpoint coverage
-- local AI usage totals
-- recent AI usage-event metadata
-
-The page is display-only. It must not submit prompts, call live AI, create paid model requests, mutate conversations, expose API keys, create billing artifacts, call providers, send notifications, send SMS, or enable live AI.
-
-## API Operations
-
-Use `/settings/api` for read-only API surface review before demos or route-contract repair work. It displays:
-
-- static local API route inventory
-- route area and read/write classification
-- external-impact classification
-- route-level safety notes
-- API rate-limit policy and middleware matcher
-
-The page is display-only. It must not execute API handlers, create or mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, expose secrets, disable rate limits, or enable live messaging, live billing, or live AI.
-
-## Security Operations
-
-Use `/settings/security` for read-only safety and security control review before demos or production-boundary repair work. It displays:
-
-- demo-safe gate status
-- external-impact boundary status
-- API rate-limit policy
-- production override state
-- documented secret-storage boundaries
-- validation-command references
-
-The page is display-only. It must not scan files, read or expose raw environment values, reveal `.env.local`, reveal provider tokens or API keys, create or mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, disable rate limits, or enable live messaging, live billing, or live AI.
-
-## Notification Operations
-
-Use `/settings/notifications` for read-only notification no-send boundary review before demos or production-boundary repair work. It displays:
-
-- email, in-app, SMS alert, and webhook notification boundaries
-- runtime live messaging and live billing gate status
-- provider and production override status
-- future notification-provider gate requirements
-
-The page is display-only. It must not create recipients, subscriptions, templates, jobs, sends, alerts, or webhooks; call providers, call Stripe, call live AI, send SMS, send email, send notifications, mutate records, expose secrets, or enable live features.
-
-## Billing And AI Operations
-
-Use `/settings/billing` and `/settings/ai` for read-only review of local billing metadata and fake-AI boundaries before demos or production-boundary repair work.
-
-Their navigation links are projected from the shared local operator surface inventory.
-
-These pages are display-only. They must not call Stripe, call live AI, submit prompts, create paid model requests, mutate conversations, create billing provider artifacts, call providers, send SMS, send email, send notifications, expose secrets, or enable live billing or live AI.
-
-## Contract Operations
-
-Use `/settings/contracts` for read-only contract and drift-control review before demos or route-contract repair work. It displays:
-
-- contract file inventory
-- validation command references
-- drift-control expectations
-- safety-boundary text
-
-Its navigation links are projected from the shared local operator surface inventory.
-
-The page is display-only. It must not read contract file contents, execute validation commands, scan files, mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, expose secrets, or enable live features.
+All operator views are demo-safe and display-focused. They must not mutate records, call providers, create billing records, send notifications, or enable live messaging.
 
 ## Validation Operations
 
-Use `/settings/validation` for read-only local gate review before demos or validation repair work. It displays:
-
-- validation command inventory
-- gate areas and safety boundaries
-- repair-loop signals
-- validation safety-boundary text
-
-Its navigation links are projected from the shared local operator surface inventory.
-
-The page is display-only. It must not execute commands, inspect logs or test reports, scan files, read `.env.local`, mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, expose secrets, or enable live features.
+Use `/settings/validation` for read-only local gate review before demos or repair work. It displays the validation inventory, gate boundaries, repair signals, and no-impact states. It must not execute commands, inspect logs or test reports, scan files, read `.env.local`, mutate records, call providers, call live AI, call Stripe, send SMS, email, or notifications, expose secrets, or enable live features.
 
 ## Compliance Detail
 
-Use `/settings/compliance` for read-only compliance profile review before demos or repair work. It displays:
-
-- profile field completeness
-- demo A2P metadata status
-- live-message hard-gate blockers
-- recent local compliance readiness audit events and CSV export link
-
-The page is display-only. It must not mutate compliance records, verify provider registration, expose secrets, call providers, send notifications, create billing records, or enable live messaging.
+Use `/settings/compliance` for read-only compliance profile review. It displays profile completeness, demo A2P metadata status, live-message hard-gate blockers, recent local readiness events, and the CSV export link. It must not mutate compliance records, verify provider registration, expose secrets, call providers, send notifications, create billing records, or enable live messaging.
 
 ## Repair Loop
 
@@ -477,8 +143,8 @@ When validation fails:
 4. Rerun `npm run validate`.
 5. Rerun `npm run test:e2e:demo` when the change touches the seeded demo path.
 
-If a local environment dependency blocks progress, record the exact command, exact error, suspected cause, and next repair step in `BLOCKERS.codex.md`.
+If a local dependency blocks progress, record the exact command, error, suspected cause, and next repair step in `BLOCKERS.codex.md`.
 
 ## Production Boundary
 
-Production-like demo deployment is covered by `docs/PRODUCTION_DEPLOYMENT.md`. Future live SMS, live billing, live AI, live provider verification, real notifications, or provider-side credential operations require a separate go-live gate and are outside this local runbook.
+Production-like demo deployment is covered by `docs/PRODUCTION_DEPLOYMENT.md`. Future live SMS, live billing, live AI, live provider verification, real notifications, production auth/RLS, or provider-side credential operations require separate human-approved go-live gates and are outside this local runbook.

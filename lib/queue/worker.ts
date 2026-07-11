@@ -1,4 +1,5 @@
 import { setTimeout as sleep } from "node:timers/promises";
+import { randomUUID } from "node:crypto";
 import {
   CampaignRecipientStatus,
   CampaignStatus,
@@ -15,6 +16,7 @@ import { liveWorkerDeploymentClassIsAuthorized } from "@/lib/queue/live-worker-c
 import { preflightCampaignRecipients } from "@/lib/messaging/send-preflight";
 import { scheduledCampaignJobSchema } from "@/lib/queue/jobs";
 import { outboundCampaignMessageIdempotencyKey } from "@/lib/queue/idempotency";
+import { QUEUE_JOB_PROCESSING_LEASE_MS } from "@/lib/queue/claim-lease";
 import { recordMetric, smsPipelineMetrics } from "@/lib/observability/metrics";
 
 export type WorkerSafetyInput = {
@@ -46,11 +48,13 @@ export type SingleQueueJobProcessResult = {
     | "provider-blocked"
     | "production-worker-blocked"
     | "missing-job"
+    | "already-claimed"
     | "not-due"
     | "invalid-payload"
     | "invalid-campaign"
     | "stale-schedule"
-    | "send-preflight-failed";
+    | "send-preflight-failed"
+    | "processing-failed";
 };
 
 export type WorkerReadinessResult =
@@ -74,6 +78,11 @@ const DEFAULT_WORKER_MAX_JOBS_PER_POLL = 25;
 const MIN_WORKER_MAX_JOBS_PER_POLL = 1;
 const MAX_WORKER_MAX_JOBS_PER_POLL = 100;
 export const supportedWorkerDeploymentClasses = Object.freeze(["local-demo"] as const);
+
+type ClaimedQueueJob = QueueJob & {
+  processingToken: string;
+  processingExpiresAt: Date;
+};
 
 function liveMessagingFlagIsDisabled(value: unknown) {
   return value === undefined || value === "" || value === "false";
@@ -189,6 +198,181 @@ export function scheduledCampaignSendIsAllowed(
   return preflightCampaignRecipients(contacts).allowed;
 }
 
+async function claimScheduledCampaignQueueJob(queueJobId: string, now: Date) {
+  const candidate = await prisma.queueJob.findFirst({
+    where: {
+      id: queueJobId,
+      type: QueueJobType.SCHEDULED_CAMPAIGN,
+      status: { in: [QueueJobStatus.QUEUED, QueueJobStatus.PROCESSING] }
+    }
+  });
+
+  if (!candidate) {
+    return { claimed: false, reason: "missing-job" } as const;
+  }
+
+  if (candidate.runAt.getTime() > now.getTime()) {
+    return { claimed: false, reason: "not-due" } as const;
+  }
+
+  const processingToken = randomUUID();
+  const processingExpiresAt = new Date(now.getTime() + QUEUE_JOB_PROCESSING_LEASE_MS);
+  const claim = await prisma.queueJob.updateMany({
+    where: {
+      id: candidate.id,
+      orgId: candidate.orgId,
+      type: QueueJobType.SCHEDULED_CAMPAIGN,
+      runAt: { lte: now },
+      OR: [
+        { status: QueueJobStatus.QUEUED },
+        {
+          status: QueueJobStatus.PROCESSING,
+          OR: [
+            { processingToken: null },
+            { processingExpiresAt: null },
+            { processingExpiresAt: { lte: now } }
+          ]
+        }
+      ]
+    },
+    data: {
+      status: QueueJobStatus.PROCESSING,
+      processingToken,
+      processingExpiresAt
+    }
+  });
+
+  if (claim.count !== 1) {
+    return { claimed: false, reason: "already-claimed" } as const;
+  }
+
+  return {
+    claimed: true,
+    job: {
+      ...candidate,
+      status: QueueJobStatus.PROCESSING,
+      processingToken,
+      processingExpiresAt
+    } as ClaimedQueueJob
+  } as const;
+}
+
+async function renewClaimedQueueJob(job: ClaimedQueueJob, now = new Date()) {
+  const processingExpiresAt = new Date(now.getTime() + QUEUE_JOB_PROCESSING_LEASE_MS);
+  const renewed = await prisma.queueJob.updateMany({
+    where: {
+      id: job.id,
+      orgId: job.orgId,
+      type: QueueJobType.SCHEDULED_CAMPAIGN,
+      status: QueueJobStatus.PROCESSING,
+      processingToken: job.processingToken
+    },
+    data: { processingExpiresAt }
+  });
+
+  if (renewed.count !== 1) {
+    throw new Error("Queue job processing claim was lost.");
+  }
+
+  job.processingExpiresAt = processingExpiresAt;
+}
+
+async function transitionClaimedQueueJob(job: ClaimedQueueJob, status: QueueJobStatus) {
+  const transitioned = await prisma.queueJob.updateMany({
+    where: {
+      id: job.id,
+      orgId: job.orgId,
+      type: QueueJobType.SCHEDULED_CAMPAIGN,
+      status: QueueJobStatus.PROCESSING,
+      processingToken: job.processingToken
+    },
+    data: {
+      status,
+      processingToken: null,
+      processingExpiresAt: null
+    }
+  });
+
+  if (transitioned.count !== 1) {
+    throw new Error("Queue job processing claim was lost before transition.");
+  }
+
+  return transitioned;
+}
+
+async function transitionClaimedQueueJobWithCampaign(
+  job: ClaimedQueueJob,
+  input: {
+    queueStatus: QueueJobStatus;
+    campaignId: string;
+    campaignStatus: CampaignStatus;
+    scheduledAt: Date;
+    requireCampaignTransition: boolean;
+  }
+) {
+  await prisma.$transaction(async (tx) => {
+    const transitioned = await tx.queueJob.updateMany({
+      where: {
+        id: job.id,
+        orgId: job.orgId,
+        type: QueueJobType.SCHEDULED_CAMPAIGN,
+        status: QueueJobStatus.PROCESSING,
+        processingToken: job.processingToken
+      },
+      data: {
+        status: input.queueStatus,
+        processingToken: null,
+        processingExpiresAt: null
+      }
+    });
+
+    if (transitioned.count !== 1) {
+      throw new Error("Queue job processing claim was lost before transition.");
+    }
+
+    const campaignTransition = await tx.campaign.updateMany({
+      where: {
+        id: input.campaignId,
+        orgId: job.orgId,
+        status: CampaignStatus.SCHEDULED,
+        scheduledAt: input.scheduledAt
+      },
+      data: { status: input.campaignStatus }
+    });
+
+    if (input.requireCampaignTransition && campaignTransition.count !== 1) {
+      throw new Error("Campaign schedule changed before queue completion.");
+    }
+  });
+}
+
+async function failClaimedQueueJob(
+  job: ClaimedQueueJob,
+  options: { requireCampaignTransition?: boolean } = {}
+) {
+  const payload = scheduledCampaignJobSchema.safeParse(job.payload);
+
+  try {
+    if (
+      payload.success &&
+      job.campaignId === payload.data.campaignId &&
+      job.orgId === payload.data.orgId
+    ) {
+      await transitionClaimedQueueJobWithCampaign(job, {
+        queueStatus: QueueJobStatus.FAILED,
+        campaignId: payload.data.campaignId,
+        campaignStatus: CampaignStatus.PAUSED,
+        scheduledAt: new Date(payload.data.scheduledAt),
+        requireCampaignTransition: options.requireCampaignTransition ?? false
+      });
+    } else {
+      await transitionClaimedQueueJob(job, QueueJobStatus.FAILED);
+    }
+  } catch {
+    return;
+  }
+}
+
 export async function processDueScheduledCampaignJobs(
   now = new Date(),
   options: { maxJobsPerPoll?: number } = {}
@@ -207,7 +391,7 @@ export async function processDueScheduledCampaignJobs(
     ? await prisma.queueJob.count({
         where: {
           type: QueueJobType.SCHEDULED_CAMPAIGN,
-          status: QueueJobStatus.QUEUED
+          status: { in: [QueueJobStatus.QUEUED, QueueJobStatus.PROCESSING] }
         }
       })
     : 0;
@@ -216,8 +400,18 @@ export async function processDueScheduledCampaignJobs(
   const jobs = await prisma.queueJob.findMany({
     where: {
       type: QueueJobType.SCHEDULED_CAMPAIGN,
-      status: QueueJobStatus.QUEUED,
-      runAt: { lte: now }
+      runAt: { lte: now },
+      OR: [
+        { status: QueueJobStatus.QUEUED },
+        {
+          status: QueueJobStatus.PROCESSING,
+          OR: [
+            { processingToken: null },
+            { processingExpiresAt: null },
+            { processingExpiresAt: { lte: now } }
+          ]
+        }
+      ]
     },
     orderBy: { runAt: "asc" },
     take: options.maxJobsPerPoll ?? DEFAULT_WORKER_MAX_JOBS_PER_POLL
@@ -227,7 +421,7 @@ export async function processDueScheduledCampaignJobs(
   let skipped = 0;
 
   for (const job of jobs) {
-    const result = await processScheduledCampaignQueueJob(job, now);
+    const result = await processScheduledCampaignQueueJobById(job.id, now);
     processed += result.processed;
     skipped += result.skipped;
   }
@@ -240,58 +434,67 @@ export async function processDueScheduledCampaignJobs(
 }
 
 export async function processScheduledCampaignQueueJobById(queueJobId: string, now = new Date()) {
-  const job = await prisma.queueJob.findFirst({
-    where: {
-      id: queueJobId,
-      type: QueueJobType.SCHEDULED_CAMPAIGN,
-      status: QueueJobStatus.QUEUED
-    }
-  });
-
-  if (!job) {
-    return {
-      processed: 0,
-      skipped: 1,
-      blocked: false,
-      reason: "missing-job"
-    } satisfies SingleQueueJobProcessResult;
-  }
-
-  return processScheduledCampaignQueueJob(job, now);
-}
-
-async function processScheduledCampaignQueueJob(
-  job: QueueJob,
-  now = new Date()
-): Promise<SingleQueueJobProcessResult> {
   const readiness = currentWorkerReadiness();
   if (!readiness.allowed) {
     return { processed: 0, skipped: 0, blocked: true, reason: readiness.reason };
   }
 
-  if (job.runAt.getTime() > now.getTime()) {
-    return { processed: 0, skipped: 1, blocked: false, reason: "not-due" };
+  const claim = await claimScheduledCampaignQueueJob(queueJobId, now);
+
+  if (!claim.claimed) {
+    return {
+      processed: 0,
+      skipped: 1,
+      blocked: false,
+      reason: claim.reason
+    } satisfies SingleQueueJobProcessResult;
   }
 
+  try {
+    return await processClaimedScheduledCampaignQueueJob(claim.job);
+  } catch {
+    await failClaimedQueueJob(claim.job);
+    recordMetric(smsPipelineMetrics.queueThroughput, {
+      action: "process",
+      status: "failure",
+      reason: "processing-failed",
+      backend: "database"
+    });
+    return {
+      processed: 0,
+      skipped: 1,
+      blocked: false,
+      reason: "processing-failed"
+    } satisfies SingleQueueJobProcessResult;
+  }
+}
+
+async function processClaimedScheduledCampaignQueueJob(job: ClaimedQueueJob): Promise<SingleQueueJobProcessResult> {
   const payload = scheduledCampaignJobSchema.safeParse(job.payload);
   if (!payload.success || payload.data.orgId !== job.orgId || payload.data.campaignId !== job.campaignId) {
-    await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.FAILED } });
+    await transitionClaimedQueueJob(job, QueueJobStatus.FAILED);
     recordMetric(smsPipelineMetrics.queueThroughput, { action: "process", status: "failure", reason: "invalid-payload", backend: "database" });
     return { processed: 0, skipped: 1, blocked: false, reason: "invalid-payload" };
   }
 
   const campaign = await prisma.campaign.findFirst({
     where: { id: payload.data.campaignId, orgId: job.orgId },
-    include: { recipients: { include: { contact: true } } }
+    include: {
+      recipients: {
+        where: { orgId: job.orgId, contact: { orgId: job.orgId } },
+        include: { contact: true }
+      }
+    }
   });
   if (!campaign || campaign.status !== CampaignStatus.SCHEDULED) {
-    await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.FAILED } });
+    await transitionClaimedQueueJob(job, QueueJobStatus.FAILED);
     recordMetric(smsPipelineMetrics.queueThroughput, { action: "process", status: "failure", reason: "invalid-campaign", backend: "database" });
     return { processed: 0, skipped: 1, blocked: false, reason: "invalid-campaign" };
   }
 
-  if (campaign.scheduledAt?.toISOString() !== payload.data.scheduledAt) {
-    await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.CANCELLED } });
+  const activeScheduledAt = campaign.scheduledAt;
+  if (!activeScheduledAt || activeScheduledAt.toISOString() !== payload.data.scheduledAt) {
+    await transitionClaimedQueueJob(job, QueueJobStatus.CANCELLED);
     recordMetric(smsPipelineMetrics.queueThroughput, { action: "process", status: "cancelled", reason: "stale-schedule", backend: "database" });
     return { processed: 0, skipped: 1, blocked: false, reason: "stale-schedule" };
   }
@@ -335,13 +538,13 @@ async function processScheduledCampaignQueueJob(
   }
 
   if (sendableRecipients.length === 0) {
-    await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.FAILED } });
-    await prisma.campaign.update({ where: { id: campaign.id }, data: { status: CampaignStatus.PAUSED } });
+    await failClaimedQueueJob(job, { requireCampaignTransition: true });
     recordMetric(smsPipelineMetrics.queueThroughput, { action: "process", status: "failure", reason: "send-preflight-failed", backend: "database" });
     return { processed: 0, skipped: 1, blocked: false, reason: "send-preflight-failed" };
   }
 
   for (const recipient of sendableRecipients) {
+    await renewClaimedQueueJob(job);
     const idempotencyKey = outboundCampaignMessageIdempotencyKey(job.orgId, job.id, recipient.contactId);
     const body = renderTemplate(campaign.body, campaignMessageValues(recipient.contact));
     const result = await dummyProvider.send({
@@ -368,8 +571,13 @@ async function processScheduledCampaignQueueJob(
     });
   }
 
-  await prisma.queueJob.update({ where: { id: job.id }, data: { status: QueueJobStatus.COMPLETED } });
-  await prisma.campaign.update({ where: { id: campaign.id }, data: { status: CampaignStatus.COMPLETED } });
+  await transitionClaimedQueueJobWithCampaign(job, {
+    queueStatus: QueueJobStatus.COMPLETED,
+    campaignId: campaign.id,
+    campaignStatus: CampaignStatus.COMPLETED,
+    scheduledAt: activeScheduledAt,
+    requireCampaignTransition: true
+  });
   recordMetric(smsPipelineMetrics.queueThroughput, { action: "process", status: "success", backend: "database" });
   return { processed: 1, skipped: 0, blocked: false };
 }

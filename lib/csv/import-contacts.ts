@@ -1,7 +1,7 @@
 import { ConsentStatus } from "@prisma/client";
 import { parseCsv } from "@/lib/csv/parse";
 import { contactCreateSchema, type ContactCreateInput } from "@/lib/validation/contacts";
-import { evaluatePhoneNumberLookup } from "@/lib/validation/lookup";
+import { evaluatePhoneNumberLocally } from "@/lib/validation/lookup";
 
 export type ParsedContactImport = {
   contacts: ContactCreateInput[];
@@ -9,10 +9,7 @@ export type ParsedContactImport = {
   totalRows: number;
 };
 
-export async function parseContactImport(
-  csv: string,
-  env: Record<string, string | undefined> = process.env
-): Promise<ParsedContactImport> {
+export async function parseContactImport(csv: string): Promise<ParsedContactImport> {
   const rows = parseCsv(csv);
   const contacts: ContactCreateInput[] = [];
   const errors: Array<{ row: number; message: string }> = [];
@@ -21,7 +18,7 @@ export async function parseContactImport(
     const row = rows[index];
     const rawPhone = pick(row, "phone", "mobile", "mobile_phone", "phone_number");
     
-    const lookup = await evaluatePhoneNumberLookup(rawPhone, env);
+    const lookup = evaluatePhoneNumberLocally(rawPhone);
     if (!lookup.valid) {
       errors.push({
         row: index + 2,

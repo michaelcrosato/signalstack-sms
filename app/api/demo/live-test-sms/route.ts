@@ -29,16 +29,25 @@ export async function POST(request: Request) {
     const result = await sendLiveTestSms({
       orgId: currentOrg.orgId,
       actorUserId: currentOrg.userId,
+      requestId: payload.data.requestId,
       to: payload.data.to,
       body: payload.data.body,
-      confirmation: payload.data.confirmation
+      confirmation: payload.data.confirmation,
+      operatorToken: payload.data.operatorToken
     });
 
-    return NextResponse.json(result, { status: result.sent ? 201 : 403 });
-  } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Live test SMS failed." },
-      { status: 502 }
-    );
+    let responseStatus = 403;
+    if (result.sent) {
+      responseStatus = result.duplicate ? 200 : 201;
+    } else if ("conflict" in result) {
+      responseStatus = 409;
+    } else if ("pending" in result) {
+      responseStatus = 202;
+    } else if ("failed" in result) {
+      responseStatus = 502;
+    }
+    return NextResponse.json(result, { status: responseStatus });
+  } catch {
+    return NextResponse.json({ error: "Live test SMS failed." }, { status: 502 });
   }
 }

@@ -2,7 +2,7 @@ import { SettingsLink } from "@/components/settings/SettingsLink";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
-import { getOrCreateComplianceProfile } from "@/lib/db/repositories/compliance";
+import { getComplianceProfile } from "@/lib/db/repositories/compliance";
 import {
   getProviderCredential,
   listProviderCredentialRotations,
@@ -48,7 +48,7 @@ export default async function SettingsPage({
     providerCredential,
     credentialRotations,
   ] = await Promise.all([
-    getOrCreateComplianceProfile(currentOrg.orgId),
+    getComplianceProfile(currentOrg.orgId),
     listProviderPhoneNumbers(currentOrg.orgId),
     listLiveReadinessAuditEvents(currentOrg.orgId, 12, {
       action: selectedAuditAction,
@@ -108,7 +108,7 @@ export default async function SettingsPage({
       <Panel title="Demo Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/demo"
+          href="/demo"
         >
           Demo Operations
         </Link>
@@ -154,12 +154,12 @@ export default async function SettingsPage({
             />
             <StatusRow
               label="Privacy policy"
-              value={complianceProfile.privacyPolicyUrl ? "present" : "missing"}
+              value={complianceProfile?.privacyPolicyUrl ? "present" : "missing"}
             />
             <StatusRow
               label="Terms"
               value={
-                complianceProfile.termsOfServiceUrl ? "present" : "missing"
+                complianceProfile?.termsOfServiceUrl ? "present" : "missing"
               }
             />
           </dl>
@@ -205,7 +205,7 @@ export default async function SettingsPage({
       <Panel title="API Protection">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/environment"
+          href="/settings/health"
         >
           Environment Operations
         </Link>
@@ -217,13 +217,13 @@ export default async function SettingsPage({
         </Link>
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/api"
+          href="/settings/security"
         >
           API Operations
         </Link>
         <Link
           className="mb-4 ml-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/contracts"
+          href="/settings/validation"
         >
           Contract Operations
         </Link>
@@ -249,7 +249,7 @@ export default async function SettingsPage({
       <Panel title="Contract Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/contracts"
+          href="/settings/validation"
         >
           Contract Operations
         </Link>
@@ -293,7 +293,7 @@ export default async function SettingsPage({
       <Panel title="Environment Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/environment"
+          href="/settings/health"
         >
           Environment Operations
         </Link>
@@ -308,7 +308,7 @@ export default async function SettingsPage({
       <Panel title="Campaign Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/campaigns"
+          href="/settings/queue"
         >
           Campaign Operations
         </Link>
@@ -337,7 +337,7 @@ export default async function SettingsPage({
       <Panel title="Contact Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/contacts"
+          href="/settings/operations"
         >
           Contact Operations
         </Link>
@@ -351,7 +351,7 @@ export default async function SettingsPage({
       <Panel title="Data Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/data"
+          href="/settings/exports"
         >
           Data Operations
         </Link>
@@ -366,7 +366,7 @@ export default async function SettingsPage({
       <Panel title="Audience Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/audience"
+          href="/settings/operations"
         >
           Audience Operations
         </Link>
@@ -380,7 +380,7 @@ export default async function SettingsPage({
       <Panel title="Template Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/templates"
+          href="/settings/operations"
         >
           Template Operations
         </Link>
@@ -394,7 +394,7 @@ export default async function SettingsPage({
       <Panel title="Inbox Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/inbox"
+          href="/settings/operations"
         >
           Inbox Operations
         </Link>
@@ -408,7 +408,7 @@ export default async function SettingsPage({
       <Panel title="Webhook Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/webhooks"
+          href="/settings/health"
         >
           Webhook Operations
         </Link>
@@ -423,7 +423,7 @@ export default async function SettingsPage({
       <Panel title="Delivery Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/delivery"
+          href="/settings/health"
         >
           Delivery Operations
         </Link>
@@ -437,7 +437,7 @@ export default async function SettingsPage({
       <Panel title="Team Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/team"
+          href="/settings/security"
         >
           Team Operations
         </Link>
@@ -451,7 +451,7 @@ export default async function SettingsPage({
       <Panel title="Billing Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/billing"
+          href="/settings/operations"
         >
           Billing Operations
         </Link>
@@ -465,7 +465,7 @@ export default async function SettingsPage({
       <Panel title="Reporting Index">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/reports"
+          href="/settings/exports"
         >
           Reporting Index
         </Link>
@@ -480,7 +480,7 @@ export default async function SettingsPage({
       <Panel title="AI Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/ai"
+          href="/settings/operations"
         >
           AI Operations
         </Link>
@@ -495,7 +495,7 @@ export default async function SettingsPage({
       <Panel title="Notification Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/notifications"
+          href="/settings/operations"
         >
           Notification Operations
         </Link>
@@ -509,7 +509,7 @@ export default async function SettingsPage({
       <Panel title="Integration Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/integrations"
+          href="/settings/provider"
         >
           Integration Operations
         </Link>
@@ -524,7 +524,7 @@ export default async function SettingsPage({
       <Panel title="Workflow Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/workflows"
+          href="/settings/operations"
         >
           Workflow Operations
         </Link>
@@ -539,7 +539,7 @@ export default async function SettingsPage({
       <Panel title="Release Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/releases"
+          href="/settings/runbook"
         >
           Release Operations
         </Link>
@@ -569,7 +569,7 @@ export default async function SettingsPage({
         <Panel title="Numbers">
           <Link
             className="mb-4 inline-flex text-sm font-medium text-teal-700"
-            href="/settings/numbers"
+            href="/settings/provider"
           >
             Provider Numbers
           </Link>

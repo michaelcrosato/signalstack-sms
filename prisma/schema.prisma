@@ -56,6 +56,7 @@ enum QueueJobType {
 
 enum QueueJobStatus {
   QUEUED
+  PROCESSING
   CANCELLED
   COMPLETED
   FAILED
@@ -160,8 +161,11 @@ model Contact {
   optInSource   String?
   optInAt       DateTime?
   optedOutAt    DateTime?
+  /// Part of the all-or-none, write-once consent evidence bundle enforced by database migrations.
   consentCapturedAt DateTime?
+  /// Part of the all-or-none, write-once consent evidence bundle enforced by database migrations.
   consentMethod String?
+  /// Part of the all-or-none, write-once consent evidence bundle enforced by database migrations.
   consentDisclosure String?
   source        String?
   notes         String?
@@ -356,6 +360,10 @@ model QueueJob {
   idempotencyKey String
   payload        Json
   runAt          DateTime
+  processingToken String?
+  processingExpiresAt DateTime?
+  /// Monotonic durable generation used to distinguish reopened BullMQ mirror jobs.
+  generation     Int            @default(1)
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   org            Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
@@ -364,6 +372,7 @@ model QueueJob {
   @@unique([orgId, idempotencyKey])
   @@index([orgId])
   @@index([orgId, status])
+  @@index([status, processingExpiresAt])
   @@index([campaignId])
 }
 
@@ -463,6 +472,7 @@ model ProviderPhoneNumber {
   provider     String                    @default("dummy")
   status       ProviderPhoneNumberStatus @default(DEMO)
   capabilities Json
+  /// At most one true row per org; enforced by a partial unique index in migration SQL.
   isDefault    Boolean                   @default(false)
   createdAt    DateTime                  @default(now())
   updatedAt    DateTime                  @updatedAt
@@ -543,10 +553,13 @@ model WebhookEvent {
   rawPayload     Json
   receivedAt     DateTime     @default(now())
   processedAt    DateTime?
+  claimToken     String?
+  claimExpiresAt DateTime?
   org            Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
   @@unique([orgId, idempotencyKey])
   @@index([orgId])
   @@index([orgId, provider, eventType])
+  @@index([orgId, processedAt, claimExpiresAt])
   @@index([receivedAt])
 }

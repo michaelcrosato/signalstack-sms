@@ -97,7 +97,8 @@ After deployment, verify:
 - `/api/health`
 - `/demo`
 - `/settings`
-- `/settings/system`
+- `/settings/operations`
+- `/settings/health`
 - `/settings/provider`
 - `/settings/exports`
 

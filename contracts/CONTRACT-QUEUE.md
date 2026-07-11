@@ -9,12 +9,14 @@ Jobs must use validated payloads and idempotency keys.
 Queue job records are persisted in `QueueJob` before any worker/provider behavior:
 
 - `type`: `SCHEDULED_CAMPAIGN`
-- `status`: `QUEUED`, `CANCELLED`, `COMPLETED`, `FAILED`
+- `status`: `QUEUED`, `PROCESSING`, `CANCELLED`, `COMPLETED`, `FAILED`
 - `idempotencyKey`: stable retry key unique with `orgId`
 - `payload`: validated JSON payload
 - `runAt`: scheduled execution time
+- `processingToken` / `processingExpiresAt`: nullable owner lease evidence while `PROCESSING`
+- `generation`: durable monotonic enqueue generation, incremented whenever a terminal/queued row is reopened
 
-`POST /api/campaigns/:campaignId/schedule` creates or updates a queued job only after campaign preflight passes and cancels any other queued local jobs for the same tenant campaign before returning the active schedule. `POST /api/campaigns/:campaignId/cancel` marks queued jobs cancelled and pauses scheduled campaigns only; missing campaigns return not found, and existing non-scheduled campaigns reject without queue or campaign mutations.
+`POST /api/campaigns/:campaignId/schedule` creates or safely reopens a queued job only after campaign preflight passes and cancels any other queued local jobs for the same tenant campaign before returning the active schedule. It must not reset a `PROCESSING` or `COMPLETED` same-key row to `QUEUED`, and it rejects while any job for that campaign is processing. `POST /api/campaigns/:campaignId/cancel` first conditionally cancels tenant/type-scoped queued rows, then checks for a processing owner and guardedly pauses the still-scheduled campaign in one transaction. This ordering is the serialization boundary with a concurrent claim: cancellation wins and the claim updates zero rows, or the claim wins and cancellation rejects and rolls back.
 
 Milestone 4 does not call live providers.
 
@@ -66,12 +68,17 @@ Exact frozen control-array evidence must also remain authorized without reading 
 Exact frozen control-array evidence must remain authorized without reading inherited `Array.prototype` `Symbol.toPrimitive`, `toString`, `valueOf`, `Symbol.toStringTag`, `Symbol.asyncIterator`, constructor, `toLocaleString`, `entries`, `keys`, `values`, lookup-method metadata (`at`, `includes`, `indexOf`, `lastIndexOf`, `find`, `findIndex`, `findLast`, or `findLastIndex`), quantifier metadata (`every`), transform/reducer metadata (`filter`, `flatMap`, `map`, `reduce`, or `reduceRight`), mutator/visitor metadata (`concat`, `copyWithin`, `fill`, `flat`, `forEach`, `join`, `pop`, `push`, `reverse`, `shift`, `slice`, `some`, `sort`, `splice`, or `unshift`), copy-helper metadata (`toReversed`, `toSorted`, `toSpliced`, or `with`), `Symbol.unscopables`, `Symbol.isConcatSpreadable`, or string-method symbol metadata (`Symbol.match`, `Symbol.matchAll`, `Symbol.replace`, `Symbol.search`, or `Symbol.split`).
 
 - The worker uses validated version-1 scheduled campaign payloads.
+- Database polling and BullMQ consumption share one durable claim boundary. A due job must atomically transition from tenant-scoped `QUEUED` state—or recover an expired `PROCESSING` lease—to a new owner token before payload evaluation, recipient mutation, or provider calls.
+- A concurrent worker that loses the conditional claim skips the job without provider calls or message mutations. The owner renews its lease before every provider call; only the matching token may renew or transition the job, and terminal transitions clear lease evidence.
+- A worker crash leaves an expiring claim rather than a permanently stuck job. Database polling includes expired processing leases, while BullMQ retries active-lease, early-delivery, blocked-runtime, and uncertain processing outcomes after bounded attempts/backoff.
 - Invalid payloads or missing scheduled campaigns are marked `FAILED`.
 - Due jobs whose payload `scheduledAt` no longer matches the campaign's active `scheduledAt` are marked `CANCELLED` without sending, mutating recipients, or creating message rows.
 - Valid due jobs re-run recipient preflight at send time. Recipients that became archived, non-opted-in, or opted out after scheduling are marked `BLOCKED` and skipped; allowed recipients still create idempotent outbound `Message` rows with the dummy provider message ID and returned provider status.
+- Queue failure/completion plus the matching tenant campaign pause/completion must commit in one database transaction, guarded by owner token, scheduled campaign state, and exact schedule timestamp. A lost owner or changed schedule cannot leave a completed queue job split from campaign state.
 - Jobs are marked `FAILED` and campaigns are paused only when no sendable recipients remain after the send-time preflight.
 - Outbound message idempotency is scoped by `(orgId, idempotencyKey)`, and worker-generated outbound key strings include `orgId`, queue job ID, and contact ID before provider calls so retries cannot collide across tenants or provider request evidence.
 - Completed jobs are marked `COMPLETED`; campaigns are marked `COMPLETED`.
+- Unexpected processing errors mark the claimed job `FAILED`, pause its matching tenant campaign when still scheduled, and allow the polling loop to continue to later jobs.
 - The worker must not call Twilio or any live provider.
 
 ## Post-MVP Continuous Local Worker
@@ -94,7 +101,14 @@ Durable `QueueJob` rows remain the source of truth. BullMQ is an optional delive
 - Default queue backend is `database`; BullMQ is disabled unless `QUEUE_BACKEND=bullmq`.
 - BullMQ enqueue also requires `REDIS_URL`; missing Redis configuration must not break campaign scheduling.
 - BullMQ job names and payloads must use the same validated scheduled-campaign payload contract as `QueueJob.payload`.
-- BullMQ job IDs must use the durable `QueueJob.idempotencyKey`.
+- BullMQ job IDs must use the colon-free `<QueueJob.id>-<QueueJob.generation>` pair. Repeated mirror
+  attempts for one generation remain idempotent, while a reopened durable row cannot be suppressed
+  by its retained completed/failed BullMQ entry. The tenant-scoped `QueueJob.idempotencyKey` remains
+  the database idempotency boundary and must not be passed as a BullMQ custom job ID because BullMQ
+  rejects colon-delimited IDs.
+- Campaign scheduling responses must surface the optional BullMQ mirror outcome; a mirror failure
+  must never be reported as a successful BullMQ enqueue or erase the durable database job.
+- Redis URL parsing, queue construction, enqueue, metrics, and queue close failures must be contained inside the best-effort mirror result; none may make the already committed database schedule appear rolled back.
 - BullMQ enqueue must not call providers, send SMS, enable live messaging, store secrets, or replace database idempotency.
 - Local validation must pass without Redis running.
 
@@ -104,7 +118,7 @@ BullMQ workers may consume scheduled-campaign queue events only by referencing d
 
 - BullMQ worker payloads must include `queueJobId` plus the version-1 scheduled-campaign payload.
 - The BullMQ worker must reload and process the matching `QueueJob` row from the database.
-- Cancelled, completed, missing, invalid, or early jobs must be skipped or failed locally without provider calls.
+- Cancelled, completed, missing, invalid, or durably failed jobs must terminate locally without provider calls. Early, active-lease, blocked-runtime, or uncertain-processing results are recoverable and must throw from the BullMQ processor so attempts/backoff apply instead of acknowledging the mirror event.
 - Worker startup is blocked unless `QUEUE_BACKEND=bullmq`, `REDIS_URL` is configured, `MESSAGING_PROVIDER=dummy`, `LIVE_MESSAGING_ENABLED` is not `true`, and no production-like runtime marker is present. BullMQ worker readiness must reject every production-like runtime marker before provider or live-worker-class checks can fall through.
 - BullMQ worker startup also rejects any `WORKER_DEPLOYMENT_CLASS` other than `local-demo`.
 - BullMQ worker startup must continue to reject `WORKER_DEPLOYMENT_CLASS=production-live-campaign` until every frozen future live-worker control is implemented.

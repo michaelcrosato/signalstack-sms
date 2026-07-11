@@ -9,6 +9,7 @@ import {
   UsageEventType
 } from "@prisma/client";
 import { prisma } from "../lib/db/prisma";
+import { logger } from "../lib/observability/logger";
 
 async function main() {
   const user = await prisma.appUser.upsert({
@@ -550,13 +551,16 @@ async function main() {
     }
   });
 
-  console.log(
-    `Seeded demo organization ${org.slug} for ${user.email} with ${MembershipRole.OWNER} role.`
-  );
+  logger.info("demo_seed_completed", {
+    orgSlug: org.slug,
+    role: MembershipRole.OWNER
+  });
 }
 
 main().catch((error) => {
-  console.error(error);
+  logger.error("demo_seed_failed", {
+    errorType: error instanceof Error ? error.name : "UnknownError"
+  });
   process.exit(1);
 }).finally(async () => {
   await prisma.$disconnect();

@@ -142,28 +142,50 @@ describe("getProductInbox", () => {
   });
 
   it("exposes the selected contact's formatted lead status when present", async () => {
-    vi.mocked(listConversations).mockImplementationOnce(async () => [
-      {
-        id: "conversation_3",
-        status: ConversationStatus.OPEN,
-        contact: {
-          displayName: "Bob",
-          firstName: "Bob",
-          lastName: "Smith",
-          phone: "+15555550200",
-          consentStatus: ConsentStatus.OPTED_IN,
-          leadScore: 82,
-          leadStage: "HOT"
-        },
-        assignedTo: null,
-        assignedToUserId: null,
-        lastMessageAt: new Date("2026-01-03T10:00:00.000Z"),
-        updatedAt: new Date("2026-01-03T10:00:00.000Z"),
-        messages: [],
-        internalNotes: []
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ] as any);
+    const createdAt = new Date("2026-01-03T09:00:00.000Z");
+    const updatedAt = new Date("2026-01-03T10:00:00.000Z");
+    const conversation: Awaited<ReturnType<typeof listConversations>>[number] = {
+      id: "conversation_3",
+      orgId: "org_1",
+      contactId: "contact_3",
+      assignedToUserId: null,
+      status: ConversationStatus.OPEN,
+      lastMessageAt: updatedAt,
+      assignedAt: null,
+      resolvedAt: null,
+      sentiment: null,
+      category: null,
+      createdAt,
+      updatedAt,
+      contact: {
+        id: "contact_3",
+        orgId: "org_1",
+        phone: "+15555550200",
+        email: null,
+        firstName: "Bob",
+        lastName: "Smith",
+        displayName: "Bob",
+        consentStatus: ConsentStatus.OPTED_IN,
+        optInSource: null,
+        optInAt: null,
+        optedOutAt: null,
+        consentCapturedAt: null,
+        consentMethod: null,
+        consentDisclosure: null,
+        source: null,
+        notes: null,
+        leadScore: 82,
+        leadStage: "HOT",
+        leadQualifiedAt: updatedAt,
+        archivedAt: null,
+        createdAt,
+        updatedAt
+      },
+      assignedTo: null,
+      messages: [],
+      internalNotes: []
+    };
+    vi.mocked(listConversations).mockResolvedValueOnce([conversation]);
 
     const result = await getProductInbox("org_1", "conversation_3");
     expect(result.selectedConversation?.statusRows).toContainEqual({

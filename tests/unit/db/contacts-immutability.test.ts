@@ -1,10 +1,11 @@
 import { ConsentStatus } from "@prisma/client";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { upsertContact, updateContact, importContacts } from "@/lib/db/repositories/contacts";
 
 const mocks = vi.hoisted(() => ({
   transaction: vi.fn(),
   findUnique: vi.fn(),
+  findMany: vi.fn(),
   findFirst: vi.fn(),
   upsert: vi.fn(),
   update: vi.fn(),
@@ -12,10 +13,12 @@ const mocks = vi.hoisted(() => ({
   create: vi.fn(),
   deleteManyTags: vi.fn(),
   deleteManyLists: vi.fn(),
-  upsertTag: vi.fn(),
-  upsertList: vi.fn(),
-  createTag: vi.fn(),
-  createList: vi.fn(),
+  createManyTags: vi.fn(),
+  findManyTags: vi.fn(),
+  createManyTagLinks: vi.fn(),
+  createManyLists: vi.fn(),
+  findManyLists: vi.fn(),
+  createManyListLinks: vi.fn(),
   createImport: vi.fn(),
   updateImport: vi.fn()
 }));
@@ -73,6 +76,7 @@ describe("consent evidence write-once immutability", () => {
       callback({
         contact: {
           findUnique: mocks.findUnique,
+          findMany: mocks.findMany,
           findFirst: mocks.findFirst,
           upsert: mocks.upsert,
           update: mocks.update,
@@ -81,19 +85,19 @@ describe("consent evidence write-once immutability", () => {
         },
         contactTag: {
           deleteMany: mocks.deleteManyTags,
-          create: mocks.createTag,
-          upsert: mocks.createTag
+          createMany: mocks.createManyTagLinks
         },
         contactListMember: {
           deleteMany: mocks.deleteManyLists,
-          create: mocks.createList,
-          upsert: mocks.createList
+          createMany: mocks.createManyListLinks
         },
         tag: {
-          upsert: mocks.upsertTag
+          createMany: mocks.createManyTags,
+          findMany: mocks.findManyTags
         },
         contactList: {
-          upsert: mocks.upsertList
+          createMany: mocks.createManyLists,
+          findMany: mocks.findManyLists
         },
         contactImport: {
           create: mocks.createImport,
@@ -107,6 +111,10 @@ describe("consent evidence write-once immutability", () => {
     mocks.deleteManyLists.mockResolvedValue({ count: 0 });
     mocks.createImport.mockResolvedValue({ id: "import_123" });
     mocks.updateImport.mockResolvedValue({ id: "import_123" });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   describe("upsertContact", () => {
@@ -132,6 +140,22 @@ describe("consent evidence write-once immutability", () => {
       const result = await upsertContact(orgId, input);
       expect(result).toBeDefined();
       expect(mocks.upsert).toHaveBeenCalled();
+    });
+
+    it("rejects a partial first-capture bundle before writing", async () => {
+      mocks.findUnique.mockResolvedValue(null);
+
+      await expect(
+        upsertContact(orgId, {
+          phone,
+          consentStatus: ConsentStatus.OPTED_IN,
+          consentMethod: "web_form",
+          tagNames: [],
+          listNames: []
+        })
+      ).rejects.toThrow("Consent evidence requires capturedAt, method, and disclosure together");
+
+      expect(mocks.upsert).not.toHaveBeenCalled();
     });
 
     it("allows identical no-op writes when evidence is already set", async () => {
@@ -253,6 +277,16 @@ describe("consent evidence write-once immutability", () => {
       expect(mocks.update).toHaveBeenCalled();
     });
 
+    it("rejects a partial first-capture bundle before writing", async () => {
+      mocks.findFirst.mockResolvedValue(existingWithoutEvidence);
+
+      await expect(updateContact(orgId, contactId, { consentDisclosure: "I agree to terms" })).rejects.toThrow(
+        "Consent evidence requires capturedAt, method, and disclosure together"
+      );
+
+      expect(mocks.update).not.toHaveBeenCalled();
+    });
+
     it("rejects changing already set evidence on update", async () => {
       mocks.findFirst.mockResolvedValue(existingWithEvidence);
 
@@ -264,6 +298,55 @@ describe("consent evidence write-once immutability", () => {
         "Consent evidence (consentMethod) is write-once and cannot be changed"
       );
       expect(mocks.update).not.toHaveBeenCalled();
+    });
+
+    it("rejects clearing an existing consent timestamp with null", async () => {
+      mocks.findFirst.mockResolvedValue(existingWithEvidence);
+
+      await expect(updateContact(orgId, contactId, { consentCapturedAt: null })).rejects.toThrow(
+        "Consent evidence (consentCapturedAt) is write-once and cannot be changed"
+      );
+      expect(mocks.update).not.toHaveBeenCalled();
+    });
+
+    it.each([null, ""])("rejects clearing an existing consent method with %j", async (consentMethod) => {
+      mocks.findFirst.mockResolvedValue(existingWithEvidence);
+
+      await expect(updateContact(orgId, contactId, { consentMethod })).rejects.toThrow(
+        "Consent evidence (consentMethod) is write-once and cannot be changed"
+      );
+      expect(mocks.update).not.toHaveBeenCalled();
+    });
+
+    it.each([null, ""])(
+      "rejects clearing an existing consent disclosure with %j",
+      async (consentDisclosure) => {
+        mocks.findFirst.mockResolvedValue(existingWithEvidence);
+
+        await expect(updateContact(orgId, contactId, { consentDisclosure })).rejects.toThrow(
+          "Consent evidence (consentDisclosure) is write-once and cannot be changed"
+        );
+        expect(mocks.update).not.toHaveBeenCalled();
+      }
+    );
+
+    it("does not force pending double opt-in on an unrelated partial update", async () => {
+      vi.stubEnv("DOUBLE_OPT_IN_REQUIRED", "true");
+      mocks.findFirst.mockResolvedValue(existingWithEvidence);
+      mocks.update.mockResolvedValue({ ...existingWithEvidence, firstName: "Ada" });
+      mocks.findUniqueOrThrow.mockResolvedValue({
+        ...existingWithEvidence,
+        firstName: "Ada",
+        tagLinks: [],
+        listLinks: []
+      });
+
+      await updateContact(orgId, contactId, { firstName: "Ada" });
+
+      const updateData = mocks.update.mock.calls[0][0].data;
+      expect(updateData.consentStatus).toBeUndefined();
+      expect(updateData.optInAt).toBeUndefined();
+      expect(updateData.optedOutAt).toBeUndefined();
     });
 
     it("propagates null values for cleared contact fields to Prisma update", async () => {
@@ -310,7 +393,7 @@ describe("consent evidence write-once immutability", () => {
 
   describe("importContacts", () => {
     it("allows first capture on import", async () => {
-      mocks.findUnique.mockResolvedValue(null);
+      mocks.findMany.mockResolvedValue([]);
       mocks.upsert.mockResolvedValue(existingWithEvidence);
 
       const parsed = {
@@ -335,7 +418,7 @@ describe("consent evidence write-once immutability", () => {
     });
 
     it("rejects changing already set evidence on import", async () => {
-      mocks.findUnique.mockResolvedValue(existingWithEvidence);
+      mocks.findMany.mockResolvedValue([existingWithEvidence]);
 
       const parsed = {
         contacts: [
@@ -355,6 +438,60 @@ describe("consent evidence write-once immutability", () => {
         "Consent evidence (consentMethod) is write-once and cannot be changed"
       );
       expect(mocks.upsert).not.toHaveBeenCalled();
+    });
+
+    it("rechecks duplicate phone rows against the contact saved earlier in the same import", async () => {
+      mocks.findMany.mockResolvedValue([]);
+      mocks.upsert.mockResolvedValue(existingWithEvidence);
+
+      const parsed = {
+        contacts: [
+          {
+            phone,
+            consentStatus: ConsentStatus.OPTED_IN,
+            consentCapturedAt: date,
+            consentMethod: "web_form",
+            consentDisclosure: "I agree to terms",
+            tagNames: [],
+            listNames: []
+          },
+          {
+            phone,
+            consentStatus: ConsentStatus.OPTED_IN,
+            consentMethod: "import_overwrite",
+            tagNames: [],
+            listNames: []
+          }
+        ],
+        errors: [],
+        totalRows: 2
+      };
+
+      await expect(importContacts(orgId, parsed)).rejects.toThrow(
+        "Consent evidence (consentMethod) is write-once and cannot be changed"
+      );
+      expect(mocks.upsert).toHaveBeenCalledTimes(1);
+    });
+
+    it("chunks large existing-contact preloads below PostgreSQL bind limits", async () => {
+      const contacts = Array.from({ length: 32_768 }, (_, index) => ({
+        phone: `+1${String(index).padStart(10, "0")}`,
+        consentStatus: ConsentStatus.UNKNOWN,
+        tagNames: [],
+        listNames: []
+      }));
+      mocks.findMany.mockResolvedValue([]);
+      mocks.upsert.mockRejectedValueOnce(new Error("stop after preload"));
+
+      await expect(
+        importContacts(orgId, { contacts, errors: [], totalRows: contacts.length })
+      ).rejects.toThrow("stop after preload");
+
+      expect(mocks.findMany).toHaveBeenCalledTimes(4);
+      for (const [call] of mocks.findMany.mock.calls) {
+        expect(call.where.orgId).toBe(orgId);
+        expect(call.where.phone.in.length).toBeLessThanOrEqual(10_000);
+      }
     });
   });
 });

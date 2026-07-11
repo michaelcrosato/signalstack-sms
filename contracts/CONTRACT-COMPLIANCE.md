@@ -19,7 +19,9 @@ Milestone 2 contact storage rules:
 - `OPTED_IN` contacts should retain `optInAt` and `optInSource` when available.
 - CSV import is local-only and must not send messages or notify contacts.
 - Contact deletion is soft archive only during the MVP foundation.
-- Stored consent evidence (`consentCapturedAt`, `consentMethod`, `consentDisclosure`) is write-once. Once captured, any subsequent update that attempts to change them to a different value must be rejected at the application layer.
+- Stored consent evidence (`consentCapturedAt`, `consentMethod`, `consentDisclosure`) is an atomic, write-once bundle. A contact has either all three non-empty evidence values or none. Once captured, any subsequent update that attempts to change or clear the bundle must be rejected by application checks and database invariants; concurrent writers cannot replace or combine separate capture attempts.
+- Partial contact updates must not change consent status merely because double opt-in is enabled.
+- Contact merges and inbound opt-in keywords must never produce an `OPTED_IN` contact without a complete timestamp, method, and disclosure; existing complete evidence is preserved and incomplete evidence fails closed.
 
 Milestone 3 preflight rules:
 
@@ -34,8 +36,10 @@ Milestone 5 inbound rules:
 
 - Demo inbound APIs create local message records only.
 - Explicit local inbound idempotency duplicates must be detected before contact, conversation, timestamp, or opt-out mutations repeat.
+- Inbound messages are persisted before keyword consent effects or any demo-only confirmation row. Confirmation idempotency keys derive from the inbound idempotency key so retries cannot create another dummy response.
 - STOP, STOPALL, UNSUBSCRIBE, CANCEL, END, and QUIT update the local contact to `OPTED_OUT` and set `optedOutAt`.
 - HELP and INFO are recorded as inbound help keywords but do not opt a contact in and do not send a live or dummy outbound response yet.
+- Signed provider webhooks apply keyword consent effects without creating dummy confirmation replies and without invoking conversation sentiment analysis.
 - Inbox assignment, notes, resolve, and reopen operations are tenant-scoped.
 
 Milestone 6 hard gate rules:

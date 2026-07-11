@@ -288,6 +288,40 @@ describe("settings and operations JSON mutation routes", () => {
     expect(mocks.sendLiveTestSms).not.toHaveBeenCalled();
   });
 
+  it("returns 409 only for a concurrent provider-number uniqueness conflict", async () => {
+    mocks.upsertProviderPhoneNumber.mockRejectedValue({ code: "P2002" });
+
+    const response = await upsertNumberRoute(
+      new Request("http://localhost/api/settings/numbers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phoneNumber: "+15555550199", isDefault: true })
+      })
+    );
+
+    expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toEqual({
+      error: "Provider number metadata conflicted with another update."
+    });
+  });
+
+  it("does not misreport an unexpected provider-number failure as a conflict", async () => {
+    mocks.upsertProviderPhoneNumber.mockRejectedValue(new Error("database unavailable"));
+
+    const response = await upsertNumberRoute(
+      new Request("http://localhost/api/settings/numbers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phoneNumber: "+15555550199", isDefault: true })
+      })
+    );
+
+    expect(response.status).toBe(500);
+    await expect(response.json()).resolves.toEqual({
+      error: "Provider number metadata update failed."
+    });
+  });
+
   it("rejects malformed provider settings JSON without persisting credential metadata", async () => {
     const response = await updateProviderRoute(malformedJsonRequest("/api/settings/provider", "PATCH"));
 

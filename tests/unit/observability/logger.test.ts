@@ -31,6 +31,16 @@ describe("PII-safe observability logger", () => {
     expect(redacted.detail).toContain("[redacted]");
   });
 
+  it("redacts email addresses in both structured fields and arbitrary strings", () => {
+    const redacted = redactValue({
+      email: "owner@example.com",
+      detail: "contact admin@example.net"
+    }) as Record<string, unknown>;
+
+    expect(redacted.email).toBe("[redacted]");
+    expect(redacted.detail).toBe("contact [redacted]");
+  });
+
   it("treats OBSERVABILITY_ENABLED as opt-in (default off)", () => {
     expect(observabilityIsEnabled({})).toBe(false);
     expect(observabilityIsEnabled({ OBSERVABILITY_ENABLED: "false" })).toBe(false);

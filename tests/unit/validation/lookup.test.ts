@@ -1,9 +1,28 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanPhoneNumberLocal, evaluatePhoneNumberLookup } from "@/lib/validation/lookup";
+import {
+  cleanPhoneNumberLocal,
+  evaluatePhoneNumberLookup,
+  liveLookupOperatorHeaderName,
+  liveLookupTimeoutMs,
+  maxLiveLookupTimeoutMs,
+  minLiveLookupTimeoutMs
+} from "@/lib/validation/lookup";
+
+const operatorToken = "lookup-operator-token-0123456789abcdef";
+const authorizedLiveLookupAccess = { operatorToken } as const;
+const liveLookupEnv = {
+  LIVE_LOOKUP_ENABLED: "true",
+  LIVE_LOOKUP_COST_ACK: "true",
+  LIVE_LOOKUP_OPERATOR_TOKEN: operatorToken,
+  TWILIO_ACCOUNT_SID: "AC123",
+  TWILIO_AUTH_TOKEN: "token123"
+} as const;
 
 describe("phone number lookup validation seam", () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
   });
 
   describe("local cleaning pass", () => {
@@ -32,6 +51,9 @@ describe("phone number lookup validation seam", () => {
 
   describe("evaluatePhoneNumberLookup", () => {
     it("returns successful E.164 formatted number on local path (default off)", async () => {
+      const mockFetch = vi.fn();
+      vi.stubGlobal("fetch", mockFetch);
+
       const result = await evaluatePhoneNumberLookup("5555550100", {
         LIVE_LOOKUP_ENABLED: "false"
       });
@@ -41,6 +63,7 @@ describe("phone number lookup validation seam", () => {
         formattedPhone: "+15555550100",
         carrierType: "mobile"
       });
+      expect(mockFetch).not.toHaveBeenCalled();
     });
 
     it("rejects immediately if local E.164 format parsing fails", async () => {
@@ -52,16 +75,117 @@ describe("phone number lookup validation seam", () => {
       });
     });
 
-    it("falls back to local evaluation if live enabled but credentials missing", async () => {
+    it("fails closed without a paid-lookup acknowledgement and does not call Twilio", async () => {
+      const mockFetch = vi.fn();
+      vi.stubGlobal("fetch", mockFetch);
+
+      const result = await evaluatePhoneNumberLookup(
+        "5555550100",
+        {
+          ...liveLookupEnv,
+          LIVE_LOOKUP_COST_ACK: "false"
+        },
+        authorizedLiveLookupAccess
+      );
+
+      expect(result).toEqual({
+        valid: false,
+        formattedPhone: "+15555550100",
+        unavailable: true,
+        error: "Live phone lookup cost has not been acknowledged."
+      });
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("fails closed if live lookup is enabled but credentials are unavailable", async () => {
+      const mockFetch = vi.fn();
+      vi.stubGlobal("fetch", mockFetch);
+
+      const result = await evaluatePhoneNumberLookup(
+        "5555550100",
+        {
+          LIVE_LOOKUP_ENABLED: "true",
+          LIVE_LOOKUP_COST_ACK: "true",
+          LIVE_LOOKUP_OPERATOR_TOKEN: operatorToken
+        },
+        authorizedLiveLookupAccess
+      );
+
+      expect(result).toEqual({
+        valid: false,
+        formattedPhone: "+15555550100",
+        unavailable: true,
+        error: "Live phone lookup credentials are unavailable."
+      });
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("fails closed on malformed live enablement instead of silently choosing a mode", async () => {
+      const mockFetch = vi.fn();
+      vi.stubGlobal("fetch", mockFetch);
+
       const result = await evaluatePhoneNumberLookup("5555550100", {
-        LIVE_LOOKUP_ENABLED: "true"
+        ...liveLookupEnv,
+        LIVE_LOOKUP_ENABLED: "TRUE"
       });
 
       expect(result).toEqual({
-        valid: true,
+        valid: false,
         formattedPhone: "+15555550100",
-        carrierType: "mobile"
+        unavailable: true,
+        error: "Live phone lookup configuration is invalid."
       });
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("fails closed without a valid server-side lookup operator token", async () => {
+      const mockFetch = vi.fn();
+      vi.stubGlobal("fetch", mockFetch);
+
+      const result = await evaluatePhoneNumberLookup(
+        "5555550100",
+        {
+          ...liveLookupEnv,
+          LIVE_LOOKUP_OPERATOR_TOKEN: "x".repeat(31)
+        },
+        authorizedLiveLookupAccess
+      );
+
+      expect(result).toEqual({
+        valid: false,
+        formattedPhone: "+15555550100",
+        unavailable: true,
+        error: "Live phone lookup operator authorization failed."
+      });
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it.each([undefined, "wrong-lookup-operator-token-0123456789abcdef"])(
+      "fails closed for a missing or mismatched request operator token (%s)",
+      async (suppliedToken) => {
+        const mockFetch = vi.fn();
+        vi.stubGlobal("fetch", mockFetch);
+
+        const result = await evaluatePhoneNumberLookup("5555550100", liveLookupEnv, {
+          operatorToken: suppliedToken
+        });
+
+        expect(result).toEqual({
+          valid: false,
+          formattedPhone: "+15555550100",
+          unavailable: true,
+          error: "Live phone lookup operator authorization failed."
+        });
+        expect(mockFetch).not.toHaveBeenCalled();
+      }
+    );
+
+    it("clamps live lookup timeouts to a bounded range", () => {
+      expect(liveLookupTimeoutMs({})).toBe(3_000);
+      expect(liveLookupTimeoutMs({ LIVE_LOOKUP_TIMEOUT_MS: "not-a-number" })).toBe(3_000);
+      expect(liveLookupTimeoutMs({ LIVE_LOOKUP_TIMEOUT_MS: "1" })).toBe(minLiveLookupTimeoutMs);
+      expect(liveLookupTimeoutMs({ LIVE_LOOKUP_TIMEOUT_MS: "999999" })).toBe(maxLiveLookupTimeoutMs);
+      expect(liveLookupTimeoutMs({ LIVE_LOOKUP_TIMEOUT_MS: "4500" })).toBe(4_500);
     });
 
     it("authenticates and queries Twilio lookup API if live is enabled", async () => {
@@ -69,8 +193,9 @@ describe("phone number lookup validation seam", () => {
         ok: true,
         json: async () => ({
           valid: true,
-          phoneNumber: "+15555550100",
-          lineTypeIntelligence: {
+          phone_number: "+15555550100",
+          line_type_intelligence: {
+            error_code: null,
             type: "mobile"
           }
         })
@@ -78,11 +203,7 @@ describe("phone number lookup validation seam", () => {
 
       vi.stubGlobal("fetch", mockFetch);
 
-      const result = await evaluatePhoneNumberLookup("5555550100", {
-        LIVE_LOOKUP_ENABLED: "true",
-        TWILIO_ACCOUNT_SID: "AC123",
-        TWILIO_AUTH_TOKEN: "token123"
-      });
+      const result = await evaluatePhoneNumberLookup("5555550100", liveLookupEnv, authorizedLiveLookupAccess);
 
       expect(mockFetch).toHaveBeenCalledWith(
         "https://lookups.twilio.com/v2/PhoneNumbers/%2B15555550100?Fields=line_type_intelligence",
@@ -90,7 +211,8 @@ describe("phone number lookup validation seam", () => {
           method: "GET",
           headers: expect.objectContaining({
             Authorization: expect.stringContaining("Basic ")
-          })
+          }),
+          signal: expect.any(AbortSignal)
         })
       );
 
@@ -99,6 +221,9 @@ describe("phone number lookup validation seam", () => {
         formattedPhone: "+15555550100",
         carrierType: "mobile"
       });
+      const requestHeaders = mockFetch.mock.calls[0][1].headers as Record<string, string>;
+      expect(requestHeaders).not.toHaveProperty(liveLookupOperatorHeaderName);
+      expect(Object.values(requestHeaders)).not.toContain(operatorToken);
     });
 
     it("rejects non-mobile line types if live validation fails mobile check", async () => {
@@ -106,8 +231,9 @@ describe("phone number lookup validation seam", () => {
         ok: true,
         json: async () => ({
           valid: true,
-          phoneNumber: "+15555550100",
-          lineTypeIntelligence: {
+          phone_number: "+15555550100",
+          line_type_intelligence: {
+            error_code: null,
             type: "landline"
           }
         })
@@ -115,11 +241,7 @@ describe("phone number lookup validation seam", () => {
 
       vi.stubGlobal("fetch", mockFetch);
 
-      const result = await evaluatePhoneNumberLookup("5555550100", {
-        LIVE_LOOKUP_ENABLED: "true",
-        TWILIO_ACCOUNT_SID: "AC123",
-        TWILIO_AUTH_TOKEN: "token123"
-      });
+      const result = await evaluatePhoneNumberLookup("5555550100", liveLookupEnv, authorizedLiveLookupAccess);
 
       expect(result).toEqual({
         valid: false,
@@ -138,11 +260,7 @@ describe("phone number lookup validation seam", () => {
 
       vi.stubGlobal("fetch", mockFetch);
 
-      const result = await evaluatePhoneNumberLookup("5555550100", {
-        LIVE_LOOKUP_ENABLED: "true",
-        TWILIO_ACCOUNT_SID: "AC123",
-        TWILIO_AUTH_TOKEN: "token123"
-      });
+      const result = await evaluatePhoneNumberLookup("5555550100", liveLookupEnv, authorizedLiveLookupAccess);
 
       expect(result).toEqual({
         valid: false,
@@ -150,7 +268,7 @@ describe("phone number lookup validation seam", () => {
       });
     });
 
-    it("falls back gracefully to local evaluation if Twilio API returns non-ok status", async () => {
+    it("fails closed if Twilio returns a non-ok status", async () => {
       const mockFetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 500,
@@ -162,35 +280,100 @@ describe("phone number lookup validation seam", () => {
 
       vi.stubGlobal("fetch", mockFetch);
 
-      const result = await evaluatePhoneNumberLookup("5555550100", {
-        LIVE_LOOKUP_ENABLED: "true",
-        TWILIO_ACCOUNT_SID: "AC123",
-        TWILIO_AUTH_TOKEN: "token123"
-      });
+      const result = await evaluatePhoneNumberLookup("5555550100", liveLookupEnv, authorizedLiveLookupAccess);
 
       expect(result).toEqual({
-        valid: true,
+        valid: false,
         formattedPhone: "+15555550100",
-        carrierType: "unknown"
+        unavailable: true,
+        error: "Live phone lookup is unavailable."
       });
     });
 
-    it("falls back gracefully to local evaluation if Twilio fetch throws an exception", async () => {
+    it("fails closed when Twilio returns a malformed successful response", async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ valid: true })
+      });
+      vi.stubGlobal("fetch", mockFetch);
+
+      const result = await evaluatePhoneNumberLookup("5555550100", liveLookupEnv, authorizedLiveLookupAccess);
+
+      expect(result).toEqual({
+        valid: false,
+        formattedPhone: "+15555550100",
+        unavailable: true,
+        error: "Live phone lookup is unavailable."
+      });
+    });
+
+    it("fails closed when Twilio returns a different normalized phone number", async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          valid: true,
+          phone_number: "+15555550101",
+          line_type_intelligence: {
+            error_code: null,
+            type: "mobile"
+          }
+        })
+      });
+      vi.stubGlobal("fetch", mockFetch);
+
+      const result = await evaluatePhoneNumberLookup("5555550100", liveLookupEnv, authorizedLiveLookupAccess);
+
+      expect(result).toEqual({
+        valid: false,
+        formattedPhone: "+15555550100",
+        unavailable: true,
+        error: "Live phone lookup is unavailable."
+      });
+    });
+
+    it("fails closed if the Twilio request throws", async () => {
       const mockFetch = vi.fn().mockRejectedValue(new Error("Network connection lost"));
 
       vi.stubGlobal("fetch", mockFetch);
 
-      const result = await evaluatePhoneNumberLookup("5555550100", {
-        LIVE_LOOKUP_ENABLED: "true",
-        TWILIO_ACCOUNT_SID: "AC123",
-        TWILIO_AUTH_TOKEN: "token123"
-      });
+      const result = await evaluatePhoneNumberLookup("5555550100", liveLookupEnv, authorizedLiveLookupAccess);
 
       expect(result).toEqual({
-        valid: true,
+        valid: false,
         formattedPhone: "+15555550100",
-        carrierType: "unknown"
+        unavailable: true,
+        error: "Live phone lookup is unavailable."
       });
+    });
+
+    it("aborts a live lookup at the configured bounded timeout and fails closed", async () => {
+      vi.useFakeTimers();
+      const mockFetch = vi.fn((_url: string, init: RequestInit) => {
+        const requestSignal = init.signal as AbortSignal;
+        return new Promise((_resolve, reject) => {
+          requestSignal.addEventListener("abort", () => reject(new Error("aborted")), { once: true });
+        });
+      });
+      vi.stubGlobal("fetch", mockFetch);
+
+      const resultPromise = evaluatePhoneNumberLookup(
+        "5555550100",
+        {
+          ...liveLookupEnv,
+          LIVE_LOOKUP_TIMEOUT_MS: "1"
+        },
+        authorizedLiveLookupAccess
+      );
+      await vi.advanceTimersByTimeAsync(minLiveLookupTimeoutMs);
+
+      await expect(resultPromise).resolves.toEqual({
+        valid: false,
+        formattedPhone: "+15555550100",
+        unavailable: true,
+        error: "Live phone lookup timed out."
+      });
+      const requestOptions = mockFetch.mock.calls[0][1];
+      expect(requestOptions.signal?.aborted).toBe(true);
     });
   });
 });

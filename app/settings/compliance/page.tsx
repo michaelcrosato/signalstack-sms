@@ -1,4 +1,5 @@
 import { SettingsLink } from "@/components/settings/SettingsLink";
+import { A2pRegistrationStatus } from "@prisma/client";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
@@ -6,7 +7,7 @@ import {
   complianceProfileIsComplete,
   evaluateMessagingHardGate,
 } from "@/lib/compliance/gates";
-import { getOrCreateComplianceProfile } from "@/lib/db/repositories/compliance";
+import { getComplianceProfile } from "@/lib/db/repositories/compliance";
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
 import { getComplianceOperationLinks } from "@/lib/operations/operator-surfaces";
 import { buildReadinessAuditExportHref } from "@/lib/operations/readiness-audit-operations";
@@ -24,7 +25,7 @@ const profileFields = [
 export default async function ComplianceSettingsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
   const [profile, auditEvents] = await Promise.all([
-    getOrCreateComplianceProfile(currentOrg.orgId),
+    getComplianceProfile(currentOrg.orgId),
     listLiveReadinessAuditEvents(currentOrg.orgId, 8, {
       subjectType: "ComplianceProfile",
     }),
@@ -65,7 +66,10 @@ export default async function ComplianceSettingsPage() {
 
       <section className="grid gap-3 md:grid-cols-4">
         <Metric label="Profile complete" value={String(complete)} />
-        <Metric label="A2P status" value={profile.a2pRegistrationStatus} />
+        <Metric
+          label="A2P status"
+          value={profile?.a2pRegistrationStatus ?? A2pRegistrationStatus.NOT_STARTED}
+        />
         <Metric
           label="Live messaging"
           value={gate.allowed ? "review" : "blocked"}
@@ -80,16 +84,16 @@ export default async function ComplianceSettingsPage() {
               <StatusRow
                 key={field.key}
                 label={field.label}
-                value={profile[field.key] ? "present" : "missing"}
+                value={profile?.[field.key] ? "present" : "missing"}
               />
             ))}
             <StatusRow
               label="Created"
-              value={profile.createdAt.toISOString()}
+              value={profile ? profile.createdAt.toISOString() : "not created"}
             />
             <StatusRow
               label="Updated"
-              value={profile.updatedAt.toISOString()}
+              value={profile ? profile.updatedAt.toISOString() : "not created"}
             />
           </dl>
         </Panel>

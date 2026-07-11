@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+import { escapeCsvCell } from "@/lib/csv/escape";
 
 export type ReadinessAuditExportEvent = {
   id: string;
@@ -12,11 +13,6 @@ export type ReadinessAuditExportEvent = {
 
 const readinessAuditCsvColumns = ["id", "action", "subjectType", "subjectId", "actorUserId", "createdAt", "metadata"];
 
-function csvCell(value: string | null | undefined) {
-  const normalized = value ?? "";
-  return `"${normalized.replace(/"/g, "\"\"")}"`;
-}
-
 export function serializeReadinessAuditEventsCsv(events: ReadinessAuditExportEvent[]) {
   const rows = events.map((event) =>
     [
@@ -28,7 +24,7 @@ export function serializeReadinessAuditEventsCsv(events: ReadinessAuditExportEve
       event.createdAt.toISOString(),
       event.metadata ? JSON.stringify(event.metadata) : ""
     ]
-      .map(csvCell)
+      .map((value) => escapeCsvCell(value, { alwaysQuote: true }))
       .join(",")
   );
 

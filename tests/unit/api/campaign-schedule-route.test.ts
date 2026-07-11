@@ -135,7 +135,8 @@ describe("campaign schedule route", () => {
       queueJob: {
         ...queueJob,
         runAt: "2026-05-23T18:00:00.000Z"
-      }
+      },
+      bullMq: { enqueued: false, reason: "backend-disabled" }
     });
     expect(mocks.scheduleCampaign).toHaveBeenCalledWith(
       "org_demo",
@@ -146,5 +147,39 @@ describe("campaign schedule route", () => {
     expect(mocks.scheduleCampaign.mock.invocationCallOrder[0]).toBeLessThan(
       mocks.enqueueScheduledCampaignBullMqJob.mock.invocationCallOrder[0]
     );
+  });
+
+  it("returns a conflict for an expected campaign scheduling domain failure", async () => {
+    mocks.scheduleCampaign.mockRejectedValue(new Error("Campaign preflight failed."));
+
+    const response = await POST(
+      new Request("http://localhost/api/campaigns/campaign_demo/schedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scheduledAt: "2026-05-23T18:00:00.000Z" })
+      }),
+      { params: Promise.resolve({ campaignId: "campaign_demo" }) }
+    );
+
+    expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toEqual({ error: "Campaign preflight failed." });
+    expect(mocks.enqueueScheduledCampaignBullMqJob).not.toHaveBeenCalled();
+  });
+
+  it("does not reflect unexpected internal scheduling errors to callers", async () => {
+    mocks.scheduleCampaign.mockRejectedValue(new Error("database password leaked"));
+
+    const response = await POST(
+      new Request("http://localhost/api/campaigns/campaign_demo/schedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scheduledAt: "2026-05-23T18:00:00.000Z" })
+      }),
+      { params: Promise.resolve({ campaignId: "campaign_demo" }) }
+    );
+
+    expect(response.status).toBe(500);
+    await expect(response.json()).resolves.toEqual({ error: "Campaign schedule failed." });
+    expect(mocks.enqueueScheduledCampaignBullMqJob).not.toHaveBeenCalled();
   });
 });

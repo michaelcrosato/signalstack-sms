@@ -26,6 +26,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid campaign payload.", issues: payload.error.issues }, { status: 400 });
   }
 
-  const campaign = await createCampaign(currentOrg.orgId, payload.data);
-  return NextResponse.json({ campaign }, { status: 201 });
+  try {
+    const campaign = await createCampaign(currentOrg.orgId, payload.data);
+    return NextResponse.json({ campaign }, { status: 201 });
+  } catch (error) {
+    if (!(error instanceof Error) || error.message !== "Campaign template not found.") {
+      return NextResponse.json({ error: "Campaign creation failed." }, { status: 500 });
+    }
+
+    return NextResponse.json(
+      { error: error.message },
+      { status: 409 }
+    );
+  }
 }

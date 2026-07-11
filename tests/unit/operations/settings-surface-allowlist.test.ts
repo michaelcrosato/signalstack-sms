@@ -1,4 +1,4 @@
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -26,8 +26,30 @@ const actualSettingsSurfaces = readdirSync(settingsRoot, { withFileTypes: true }
   .map((entry) => entry.name)
   .sort();
 
+function sourceFilesUnder(directory: string): string[] {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) {
+      return sourceFilesUnder(path);
+    }
+    return /\.(?:ts|tsx)$/.test(entry.name) ? [path] : [];
+  });
+}
+
 describe("operations surface freeze", () => {
   it("keeps the /settings operations surface limited to the explicit allowlist", () => {
     expect(actualSettingsSurfaces).toEqual(allowedSettingsSurfaces);
+  });
+
+  it("does not link statically to deleted /settings pages", () => {
+    const invalidLinks = sourceFilesUnder(join(process.cwd(), "app")).flatMap((file) => {
+      const source = readFileSync(file, "utf8");
+      return [...source.matchAll(/href="\/settings\/([^"?#]+)(?:[?#][^"]*)?"/g)]
+        .map((match) => match[1])
+        .filter((surface) => !allowedSettingsSurfaces.includes(surface))
+        .map((surface) => `${file}: /settings/${surface}`);
+    });
+
+    expect(invalidLinks).toEqual([]);
   });
 });

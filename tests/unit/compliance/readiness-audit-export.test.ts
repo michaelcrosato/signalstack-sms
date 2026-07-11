@@ -62,4 +62,21 @@ describe("readiness audit export", () => {
     expect(csv).toContain("\"COMPLIANCE_PROFILE_UPDATED\"");
     expect(csv).toContain("\"{\"\"note\"\":\"\"quoted \\\"\"value\\\"\"\"\",\"\"complete\"\":true}\"");
   });
+
+  it("neutralizes formulas and keeps carriage returns inside a quoted cell", () => {
+    const csv = serializeReadinessAuditEventsCsv([
+      {
+        id: "=formula",
+        action: "\r=forged-row",
+        subjectType: "ProviderCredential",
+        subjectId: null,
+        actorUserId: null,
+        createdAt: new Date("2026-01-01T00:00:00.000Z"),
+        metadata: null
+      }
+    ]);
+
+    expect(csv).toContain("\"'=formula\"");
+    expect(csv).toContain("\"'\r=forged-row\"");
+  });
 });

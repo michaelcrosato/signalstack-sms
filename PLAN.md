@@ -4,11 +4,11 @@ This repo follows `docs/CANONICAL_IMPLEMENTATION_PLAN.md`. That canonical plan r
 
 ## Current Reality
 
-As of 2026-05-21:
+As of 2026-07-10:
 
-- The repo has strong demo-safe foundations: data model, tenant boundaries, contracts, validation gates, seed data, local worker paths, Twilio webhook foundations, read-only operations surfaces, and automated tests.
+- The repo has strong demo-safe foundations: data model, tenant boundaries, contracts, validation gates, seed data, local worker paths, Twilio webhook foundations, consolidated operations surfaces, automated tests, and a durable review ledger for PRs #60–#153.
 - The browser experience now has a product-facing dashboard, contacts, contact restore/merge, campaigns with fake-AI copy assist, campaign detail/edit/cancel, inbox, templates, template detail/edit, analytics, and compliance flow, with remaining gaps around demo polish and production readiness.
-- Live messaging remains blocked by default. The only intentional live external-impact path is the isolated `/demo` live-test SMS surface, which requires explicit Twilio credentials, live flags, a recipient allowlist, and the confirmation phrase.
+- Live messaging remains blocked by default. The only intentional live-send exception is the isolated `/demo` live-test SMS surface, which requires explicit Twilio credentials, live flags, a recipient allowlist, the confirmation phrase, constant-time operator authorization, an atomic idempotent reservation, and ambiguity-safe retry. Paid single-contact lookup is separately disabled and requires its own operator secret plus cost acknowledgement.
 - Live campaign sending, live AI, live billing, real auth, production secret management, production Redis/rate-limit infrastructure, and production deployment are not complete. Production auth/RBAC is now a checked planning boundary, and production-like demo deployments reject Clerk auth configuration until explicit controls exist.
 - Planning inputs from Claude, Gemini, Grok, and Codex are captured under `planning/`; the current consensus is summarized in `planning/CONSENSUS-2026-05-21.md`.
 
@@ -25,7 +25,7 @@ As of 2026-05-21:
 - Milestone 8: local usage/billing records, analytics overview, billing usage APIs, live billing blocked by default.
 - Milestone 9: `/demo` investor console and deterministic Playwright demo path.
 - Milestone 10: contract drift gate, tenant invariant checks, named seeded demo E2E script, local-gate documentation.
-- Post-MVP foundations: Twilio webhook ingestion/status updates, provider metadata, readiness audit, optional BullMQ/Redis queue path, production gate, rate limiting, operations inventory, local validation runner, weekend loop fuse default, and gated live-test SMS.
+- Post-MVP foundations: owner-leased Twilio webhook ingestion/status updates, provider metadata, readiness audit, recoverable owner-leased queue processing, generation-safe optional BullMQ/Redis mirroring, production gate, rate limiting, operations inventory, local validation runner, and the operator-gated live-test SMS exception.
 
 ## Planning Consensus
 
@@ -46,6 +46,7 @@ Goal: make the repo understandable in minutes and remove known correctness risks
 - Keep mutating-route RBAC enforcement covered while production auth is still pending.
 - Keep `docs/PRODUCTION_AUTH_RBAC.md`, `npm run production-auth:check`, and the production-gate `CLERK_AUTH_CONFIG_PRESENT` blocker green while production auth is still pending.
 - Keep contact consent rechecks at send time in worker/send paths, with stale blocked recipients skipped per recipient while allowed local dummy sends continue.
+- Keep consent capture as an all-or-none, write-once database bundle; keep queue cancel/claim and queue/campaign terminal transitions transactional and race-tested.
 - Keep idempotency keys tenant-scoped where cross-tenant key reuse is legitimate.
 - Keep live SMS, billing, AI, secrets, destructive DB operations, production worker execution, and production side effects hard-gated.
 - Keep `docs/PRODUCTION_WORKER_POLICY.md`, the `WORKER_DEPLOYMENT_CLASS=local-demo` executable guard, explicit all-marker production-like worker blocking, fail-closed runtime-unknown `LIVE_MESSAGING_ENABLED` worker readiness, and the frozen public-field-only `production-live-campaign` control metadata as the gate before any live campaign worker or production worker deployment work starts. Future live-worker authorization now also requires frozen data descriptors, frozen dense plain supplied control arrays with only indexed data entries, frozen entries with own enumerable data fields only in exact `id`, `status`, `requirement` order, frozen wrapper input with own enumerable frozen `workerDeploymentClass` and `controls` data fields in exact order, and malformed deployment-class, public worker-readiness, runtime, or wrapper input must deny cleanly without reading accessor-backed array slots, inherited `Object.prototype` control-entry accessors, getter-backed control fields, accessor-backed authorization fields, supplied controls for invalid classes or malformed wrapper keys, or letting descriptor, key, prototype, or frozen-state proxy reflection traps escape. The reserved `production-live-campaign` planning label remains blocked until every future live-worker control is implemented.
@@ -88,4 +89,4 @@ Goal: turn the demo-safe product into a paid production SaaS.
 1. Keep `docs/CURRENT_STATE_MATRIX.md` current.
 2. Keep the product demo path stable while collecting review feedback, including fake-AI campaign copy and inbox insights.
 3. Keep the production auth/RBAC planning check green while future Clerk-backed auth remains blocked in demo-safe production-like deployments.
-4. Continue hardening the executable `production-live-campaign` control checklist, without adding it to supported worker classes until every listed control is implemented.
+4. Complete TICKET023 only with human-approved identity, RLS role, webhook tenant routing, secret/cost controls, and protected-gate changes; do not add a live worker class before every listed control is implemented.

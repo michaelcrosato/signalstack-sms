@@ -1,3 +1,5 @@
+import { escapeCsvCell } from "@/lib/csv/escape";
+
 export type ProviderCredentialRotationExportRow = {
   id: string;
   provider: string;
@@ -34,11 +36,6 @@ const providerCredentialRotationCsvColumns = [
   "createdAt"
 ];
 
-function csvCell(value: string | boolean | null | undefined) {
-  const normalized = value === undefined || value === null ? "" : String(value);
-  return `"${normalized.replace(/"/g, "\"\"")}"`;
-}
-
 export function serializeProviderCredentialRotationsCsv(rotations: ProviderCredentialRotationExportRow[]) {
   const rows = rotations.map((rotation) =>
     [
@@ -58,7 +55,7 @@ export function serializeProviderCredentialRotationsCsv(rotations: ProviderCrede
       rotation.source,
       rotation.createdAt.toISOString()
     ]
-      .map(csvCell)
+      .map((value) => escapeCsvCell(value, { alwaysQuote: true }))
       .join(",")
   );
 

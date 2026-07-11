@@ -50,6 +50,41 @@ describe("campaign JSON mutation routes", () => {
     expect(mocks.createCampaign).not.toHaveBeenCalled();
   });
 
+  it("returns a conflict when the repository rejects a cross-tenant template", async () => {
+    mocks.createCampaign.mockRejectedValue(new Error("Campaign template not found."));
+
+    const response = await POST(
+      new Request("http://localhost/api/campaigns", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Campaign",
+          body: "Hello",
+          templateId: "foreign-template",
+          contactIds: []
+        })
+      })
+    );
+
+    expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toEqual({ error: "Campaign template not found." });
+  });
+
+  it("returns a generic server error for an unexpected campaign-create failure", async () => {
+    mocks.createCampaign.mockRejectedValue(new Error("database unavailable"));
+
+    const response = await POST(
+      new Request("http://localhost/api/campaigns", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Campaign", body: "Hello", contactIds: [] })
+      })
+    );
+
+    expect(response.status).toBe(500);
+    await expect(response.json()).resolves.toEqual({ error: "Campaign creation failed." });
+  });
+
   it("rejects malformed update JSON without updating a tenant campaign", async () => {
     const response = await PATCH(
       new Request("http://localhost/api/campaigns/campaign_demo", {
@@ -66,5 +101,21 @@ describe("campaign JSON mutation routes", () => {
       issues: [expect.objectContaining({ path: [] })]
     });
     expect(mocks.updateCampaign).not.toHaveBeenCalled();
+  });
+
+  it("returns a generic server error for an unexpected campaign-update failure", async () => {
+    mocks.updateCampaign.mockRejectedValue(new Error("database unavailable"));
+
+    const response = await PATCH(
+      new Request("http://localhost/api/campaigns/campaign_demo", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Updated" })
+      }),
+      { params: Promise.resolve({ campaignId: "campaign_demo" }) }
+    );
+
+    expect(response.status).toBe(500);
+    await expect(response.json()).resolves.toEqual({ error: "Campaign update failed." });
   });
 });

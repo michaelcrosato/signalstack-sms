@@ -13,7 +13,8 @@ const requiredPlatformText = [
   "AI_PROVIDER=fake",
   "npm run production:gate",
   "Do not run `npm run db:reset`, destructive SQL",
-  "/settings/system",
+  "/settings/operations",
+  "/settings/health",
   "must not bypass the centralized messaging hard gate",
   "live messaging, live billing, live AI, provider calls, notifications, and external telemetry remain blocked"
 ];

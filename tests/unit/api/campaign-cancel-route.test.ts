@@ -62,6 +62,33 @@ describe("campaign cancel route", () => {
     expect(mocks.cancelCampaign).toHaveBeenCalledWith("org_demo", "campaign_draft");
   });
 
+  it.each([
+    "A processing campaign cannot be canceled.",
+    "Campaign cancellation conflicted with another transition."
+  ])("returns a controlled conflict for %s", async (message) => {
+    mocks.cancelCampaign.mockRejectedValue(new Error(message));
+
+    const response = await POST(
+      new Request("http://localhost/api/campaigns/campaign_demo/cancel", { method: "POST" }),
+      { params: Promise.resolve({ campaignId: "campaign_demo" }) }
+    );
+
+    expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toEqual({ error: message });
+  });
+
+  it("does not reflect unexpected persistence failures", async () => {
+    mocks.cancelCampaign.mockRejectedValue(new Error("database password leaked"));
+
+    const response = await POST(
+      new Request("http://localhost/api/campaigns/campaign_demo/cancel", { method: "POST" }),
+      { params: Promise.resolve({ campaignId: "campaign_demo" }) }
+    );
+
+    expect(response.status).toBe(500);
+    await expect(response.json()).resolves.toEqual({ error: "Campaign cancel failed." });
+  });
+
   it("returns the locally paused campaign after canceling queued jobs", async () => {
     const campaign = {
       id: "campaign_demo",
