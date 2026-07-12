@@ -86,6 +86,63 @@ export const fakeAiProvider: AiProvider = {
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 const ANTHROPIC_VERSION = "2023-06-01";
 const DEFAULT_MODEL = "claude-haiku-4-5-20251001";
+const DEFAULT_AI_TIMEOUT_MS = 15_000;
+const MIN_AI_TIMEOUT_MS = 1_000;
+const MAX_AI_TIMEOUT_MS = 120_000;
+
+function liveAiTimeoutMs(env: Record<string, string | undefined> = process.env): number {
+  const raw = Number(env.AI_REQUEST_TIMEOUT_MS);
+  if (!Number.isFinite(raw)) {
+    return DEFAULT_AI_TIMEOUT_MS;
+  }
+  return Math.min(MAX_AI_TIMEOUT_MS, Math.max(MIN_AI_TIMEOUT_MS, Math.trunc(raw)));
+}
+
+/**
+ * Single entry point for every live Anthropic call. Adds a bounded timeout (a hung upstream must not
+ * pin the request/route indefinitely), the standard headers, and text extraction. Returns the joined
+ * message text.
+ */
+async function requestLiveAiText(prompt: string, maxTokens: number): Promise<string> {
+  const apiKey = process.env.AI_API_KEY ?? "";
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), liveAiTimeoutMs());
+
+  let response: Response;
+  try {
+    response = await fetch(ANTHROPIC_URL, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": ANTHROPIC_VERSION
+      },
+      body: JSON.stringify({
+        model: process.env.AI_MODEL ?? DEFAULT_MODEL,
+        max_tokens: maxTokens,
+        messages: [{ role: "user", content: prompt }]
+      }),
+      signal: controller.signal
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error("Live AI request timed out.");
+    }
+    throw new Error("Live AI request failed to reach the provider.");
+  } finally {
+    clearTimeout(timeout);
+  }
+
+  if (!response.ok) {
+    throw new Error(`Live AI request failed with status ${response.status}.`);
+  }
+
+  const data = (await response.json()) as { content?: Array<{ text?: string }> };
+  return (data.content ?? [])
+    .map((part) => part.text ?? "")
+    .join("")
+    .trim();
+}
 
 function buildPrompt(input: ReplyDraftInput): string {
   const goal = input.goal ?? "help the customer";
@@ -182,30 +239,7 @@ function parseConversationSentiment(text: string): { sentiment: string; category
 export const liveAiProvider: AiProvider = {
   name: "live",
   async generateReplyDraft(input) {
-    const apiKey = process.env.AI_API_KEY ?? "";
-    const response = await fetch(ANTHROPIC_URL, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": ANTHROPIC_VERSION
-      },
-      body: JSON.stringify({
-        model: process.env.AI_MODEL ?? DEFAULT_MODEL,
-        max_tokens: 320,
-        messages: [{ role: "user", content: buildPrompt(input) }]
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Live AI request failed with status ${response.status}.`);
-    }
-
-    const data = (await response.json()) as { content?: Array<{ text?: string }> };
-    const suggestion = (data.content ?? [])
-      .map((part) => part.text ?? "")
-      .join("")
-      .trim();
+    const suggestion = await requestLiveAiText(buildPrompt(input), 320);
 
     if (!suggestion) {
       throw new Error("Live AI returned an empty draft.");
@@ -214,7 +248,6 @@ export const liveAiProvider: AiProvider = {
     return { provider: "live", suggestion };
   },
   async qualifyLead(input) {
-    const apiKey = process.env.AI_API_KEY ?? "";
     const transcript = input.messages
       .map((message) => `${message.direction}: ${redactValue(message.body) as string}`)
       .join("\n");
@@ -226,34 +259,10 @@ export const liveAiProvider: AiProvider = {
       transcript
     ].join("\n");
 
-    const response = await fetch(ANTHROPIC_URL, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": ANTHROPIC_VERSION
-      },
-      body: JSON.stringify({
-        model: process.env.AI_MODEL ?? DEFAULT_MODEL,
-        max_tokens: 256,
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Live AI request failed with status ${response.status}.`);
-    }
-
-    const data = (await response.json()) as { content?: Array<{ text?: string }> };
-    const text = (data.content ?? [])
-      .map((part) => part.text ?? "")
-      .join("")
-      .trim();
-
+    const text = await requestLiveAiText(prompt, 256);
     return { provider: "live", ...parseLeadQualification(text) };
   },
   async generateCampaignCopy(input) {
-    const apiKey = process.env.AI_API_KEY ?? "";
     const businessName = redactValue(input.businessName ?? "SignalStack Demo Co") as string;
     const tone = redactValue(input.tone ?? "friendly") as string;
     const prompt = redactValue(input.prompt) as string;
@@ -265,34 +274,10 @@ export const liveAiProvider: AiProvider = {
       `Return ONLY compact JSON: {"variants": ["first variant SMS here", "second variant SMS here"]}.`
     ].join("\n");
 
-    const response = await fetch(ANTHROPIC_URL, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": ANTHROPIC_VERSION
-      },
-      body: JSON.stringify({
-        model: process.env.AI_MODEL ?? DEFAULT_MODEL,
-        max_tokens: 512,
-        messages: [{ role: "user", content: promptText }]
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Live AI request failed with status ${response.status}.`);
-    }
-
-    const data = (await response.json()) as { content?: Array<{ text?: string }> };
-    const text = (data.content ?? [])
-      .map((part) => part.text ?? "")
-      .join("")
-      .trim();
-
+    const text = await requestLiveAiText(promptText, 512);
     return { provider: "live", ...parseCampaignCopy(text) };
   },
   async summarizeConversation(input) {
-    const apiKey = process.env.AI_API_KEY ?? "";
     const transcript = input.messages
       .map((message) => `${message.direction}: ${redactValue(message.body) as string}`)
       .join("\n");
@@ -304,34 +289,10 @@ export const liveAiProvider: AiProvider = {
       transcript
     ].join("\n");
 
-    const response = await fetch(ANTHROPIC_URL, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": ANTHROPIC_VERSION
-      },
-      body: JSON.stringify({
-        model: process.env.AI_MODEL ?? DEFAULT_MODEL,
-        max_tokens: 256,
-        messages: [{ role: "user", content: promptText }]
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Live AI request failed with status ${response.status}.`);
-    }
-
-    const data = (await response.json()) as { content?: Array<{ text?: string }> };
-    const text = (data.content ?? [])
-      .map((part) => part.text ?? "")
-      .join("")
-      .trim();
-
+    const text = await requestLiveAiText(promptText, 256);
     return { provider: "live", ...parseConversationSummary(text) };
   },
   async analyzeConversationSentiment(input) {
-    const apiKey = process.env.AI_API_KEY ?? "";
     const transcript = input.messages
       .map((message) => `${message.direction}: ${redactValue(message.body) as string}`)
       .join("\n");
@@ -343,30 +304,7 @@ export const liveAiProvider: AiProvider = {
       transcript
     ].join("\n");
 
-    const response = await fetch(ANTHROPIC_URL, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": ANTHROPIC_VERSION
-      },
-      body: JSON.stringify({
-        model: process.env.AI_MODEL ?? DEFAULT_MODEL,
-        max_tokens: 256,
-        messages: [{ role: "user", content: promptText }]
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Live AI request failed with status ${response.status}.`);
-    }
-
-    const data = (await response.json()) as { content?: Array<{ text?: string }> };
-    const text = (data.content ?? [])
-      .map((part) => part.text ?? "")
-      .join("")
-      .trim();
-
+    const text = await requestLiveAiText(promptText, 256);
     return { provider: "live", ...parseConversationSentiment(text) };
   }
 };

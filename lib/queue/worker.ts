@@ -19,6 +19,7 @@ import { scheduledCampaignJobSchema } from "@/lib/queue/jobs";
 import { outboundCampaignMessageIdempotencyKey } from "@/lib/queue/idempotency";
 import { QUEUE_JOB_PROCESSING_LEASE_MS } from "@/lib/queue/claim-lease";
 import { recordMetric, smsPipelineMetrics } from "@/lib/observability/metrics";
+import { logger } from "@/lib/observability/logger";
 
 export type WorkerSafetyInput = {
   liveMessagingEnabled?: unknown;
@@ -383,8 +384,14 @@ async function failClaimedQueueJob(
     } else {
       await transitionClaimedQueueJob(job, QueueJobStatus.FAILED);
     }
-  } catch {
-    return;
+  } catch (error) {
+    // The job is already lease-expiring, so a failed FAILED-transition will be reclaimed later.
+    // Log it rather than losing the only signal that the terminal transition itself failed.
+    logger.error("queue_job_fail_transition_error", {
+      jobId: job.id,
+      orgId: job.orgId,
+      errorType: error instanceof Error ? error.name : "unknown"
+    });
   }
 }
 
@@ -414,7 +421,16 @@ async function loadDispatchedQueueJob(claim: ScheduledCampaignQueueJobClaim): Pr
 async function processClaimedQueueJobSafely(job: ClaimedQueueJob): Promise<SingleQueueJobProcessResult> {
   try {
     return await processClaimedScheduledCampaignQueueJob(job);
-  } catch {
+  } catch (error) {
+    // Surface the underlying failure: this catch marks the job FAILED and pauses its campaign, and
+    // without a log the operator has no signal (the metric is a no-op unless observability is on).
+    logger.error("queue_job_processing_failed", {
+      jobId: job.id,
+      orgId: job.orgId,
+      campaignId: job.campaignId ?? undefined,
+      errorType: error instanceof Error ? error.name : "unknown",
+      message: error instanceof Error ? error.message : String(error)
+    });
     await failClaimedQueueJob(job);
     recordMetric(smsPipelineMetrics.queueThroughput, {
       action: "process",
@@ -608,6 +624,11 @@ async function processClaimedScheduledCampaignQueueJob(job: ClaimedQueueJob): Pr
   return { processed: 1, skipped: 0, blocked: false };
 }
 
+// The continuous worker runs indefinitely, so its returned history is a bounded ring buffer: retaining
+// every poll result would leak memory in a long-lived `worker:watch` process. Per-iteration results are
+// still delivered live via `onResult`; the returned array holds only the most recent window.
+const CONTINUOUS_WORKER_RESULT_HISTORY_LIMIT = 1_000;
+
 export async function runContinuousScheduledCampaignWorker(input: ContinuousWorkerInput) {
   const results: WorkerRunResult[] = [];
   let iteration = 0;
@@ -616,6 +637,9 @@ export async function runContinuousScheduledCampaignWorker(input: ContinuousWork
     iteration += 1;
     const result = await processDueScheduledCampaignJobs(new Date(), { maxJobsPerPoll: input.maxJobsPerPoll });
     results.push(result);
+    if (results.length > CONTINUOUS_WORKER_RESULT_HISTORY_LIMIT) {
+      results.shift();
+    }
     input.onResult?.(result, iteration);
 
     if (result.blocked || (input.maxIterations && iteration >= input.maxIterations)) {

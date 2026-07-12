@@ -11,6 +11,7 @@ import {
 import { requireApiRole } from "@/lib/auth/api-authorization";
 import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { conversationAiRequestSchema } from "@/lib/validation/ai";
+import { aiRouteErrorResponse } from "@/lib/ai/ai-route-error";
 
 const CAP_WINDOW_MS = 24 * 60 * 60 * 1000;
 
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(response);
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "AI provider blocked." }, { status: 403 });
+    return aiRouteErrorResponse("conversation-summary", error);
   }
 }
 
