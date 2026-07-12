@@ -1,3 +1,12 @@
+# Canonical Implementation Plan (historical)
+
+> **Status (2026-07-12): historical reference.** This is the original bootstrap-era implementation
+> contract that transformed the predecessor CRM repo into SignalStack SMS. Its milestones through the
+> demo-safe product are complete. Current product direction, milestone graph, and acceptance evidence
+> live in `docs/STANDALONE_ROADMAP.md` (governing) with `ROADMAP.md`/`PLAN.md` as operational views.
+> Layout trees and agent-workflow details below may lag the repository; the executable gates in
+> `scripts/` and `contracts/` outrank this document wherever they differ.
+
 ## Context Loaded
 
 * current-agent: ChatGPT/orchestrator; no local clone was available in the container, so the public GitHub tree was inspected instead; latest observed `main` commit was `38c25a1` on May 19, 2026. ([GitHub][1])
@@ -153,9 +162,6 @@ signalstack-sms/
 ├─ README.md
 ├─ PLAN.md
 ├─ AGENTS.md
-├─ CONTRACTS.md
-├─ SUMMARY.bootstrap.md
-├─ BLOCKERS.bootstrap.md
 ├─ .env.example
 ├─ .gitignore
 ├─ package.json
@@ -165,7 +171,6 @@ signalstack-sms/
 ├─ eslint.config.mjs
 ├─ postcss.config.mjs
 ├─ tailwind.config.ts
-├─ components.json
 ├─ playwright.config.ts
 ├─ vitest.config.ts
 ├─ prisma.config.ts
@@ -304,23 +309,6 @@ signalstack-sms/
 │  ├─ NEXT_PROMPTS.md
 │  ├─ DECISIONS.md
 │  └─ SCHEMA_CHANGELOG.md
-├─ prompts/
-│  ├─ README.md
-│  ├─ shared/
-│  │  ├─ LOOP.md
-│  │  ├─ MERGE.md
-│  │  └─ SPRINT-ROLLOVER.md
-│  ├─ codex/
-│  │  └─ LOOP.md
-│  ├─ claude/
-│  │  └─ LOOP.md
-│  ├─ gemini/
-│  │  └─ LOOP.md
-│  ├─ grok/
-│  │  └─ LOOP.md
-│  └─ manager/
-│     ├─ INTEGRATION.md
-│     └─ DISPATCH.md
 ├─ lib/
 │  ├─ auth/
 │  │  ├─ clerk.ts
@@ -2529,7 +2517,6 @@ COMPLETE MILESTONE 0 ONLY:
    - e2e/
    - docs/
    - contracts/
-   - prompts/
    - .github/workflows/
    - .cursor/rules/
 3. Create required source-of-truth docs:

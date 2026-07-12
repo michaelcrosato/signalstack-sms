@@ -43,9 +43,13 @@ vi.mock("@/lib/auth/current-org", () => ({
 function malformedJsonRequest(path: string) {
   return new Request(`http://localhost${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: sameOriginJsonHeaders(),
     body: "{"
   });
+}
+
+function sameOriginJsonHeaders() {
+  return { "Content-Type": "application/json", Origin: "http://localhost", Host: "localhost" };
 }
 
 describe("AI JSON mutation routes", () => {

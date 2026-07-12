@@ -1,13 +1,13 @@
 import { ProviderPhoneNumberStatus } from "@prisma/client";
-import { prisma } from "@/lib/db/prisma";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 import type { ProviderPhoneNumberInput } from "@/lib/validation/provider";
 import type { ReadinessAuditInput } from "@/lib/db/repositories/readiness-audit";
 
 export async function listProviderPhoneNumbers(orgId: string) {
-  return prisma.providerPhoneNumber.findMany({
+  return withTenantTransaction({ orgId }, (tx) => tx.providerPhoneNumber.findMany({
     where: { orgId },
     orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }]
-  });
+  }));
 }
 
 export async function upsertProviderPhoneNumber(
@@ -15,7 +15,7 @@ export async function upsertProviderPhoneNumber(
   input: ProviderPhoneNumberInput,
   audit?: Pick<ReadinessAuditInput, "actorUserId">
 ) {
-  return prisma.$transaction(async (tx) => {
+  return withTenantTransaction({ orgId, userId: audit?.actorUserId }, async (tx) => {
     if (input.isDefault) {
       await tx.providerPhoneNumber.updateMany({
         where: { orgId, isDefault: true },

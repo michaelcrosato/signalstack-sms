@@ -1,5 +1,5 @@
 import { MembershipRole, MembershipStatus } from "@prisma/client";
-import { prisma } from "@/lib/db/prisma";
+import { withAuthDatabaseContext } from "@/lib/db/tenant-context";
 import type { CurrentOrg } from "@/lib/auth/current-org";
 
 // TICKET009 — gated session-provider seam. The deterministic demo session (`getDemoSession` +
@@ -41,19 +41,25 @@ export type MembershipResolver = (subject: ProductionAuthSubject) => Promise<Mem
 // Default resolver: map a verified subject to its ACTIVE local membership (optionally scoped to a
 // specific Clerk org). Returns null when the user or an active membership is absent (fail closed).
 export const resolveActiveMembershipFromDb: MembershipResolver = async (subject) => {
-  const user = await prisma.appUser.findUnique({ where: { clerkUserId: subject.clerkUserId } });
+  const user = await withAuthDatabaseContext(
+    { tokenHash: subject.clerkUserId, purpose: "login" },
+    (client) => client.appUser.findUnique({ where: { clerkUserId: subject.clerkUserId } })
+  );
   if (!user) {
     return null;
   }
 
-  const membership = await prisma.membership.findFirst({
-    where: {
-      userId: user.id,
-      status: MembershipStatus.ACTIVE,
-      ...(subject.clerkOrgId ? { org: { clerkOrgId: subject.clerkOrgId } } : {})
-    },
-    include: { org: true }
-  });
+  const membership = await withAuthDatabaseContext(
+    { userId: user.id, purpose: "login" },
+    (client) => client.membership.findFirst({
+      where: {
+        userId: user.id,
+        status: MembershipStatus.ACTIVE,
+        ...(subject.clerkOrgId ? { org: { clerkOrgId: subject.clerkOrgId } } : {})
+      },
+      include: { org: true }
+    })
+  );
   if (!membership) {
     return null;
   }

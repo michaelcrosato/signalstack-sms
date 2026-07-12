@@ -1,62 +1,60 @@
-# Production Auth and RBAC Plan
+# Production Auth and RBAC
 
-This is a planning and validation boundary only. It does not authorize production auth, Clerk calls, invitations, role changes, live messaging, billing, notifications, provider calls, or real customer access.
+Built-in local identity is implemented and validated. This document authorizes that identity boundary
+only; it does not authorize live SMS, billing, hosted AI, provider calls, external notifications, or a
+production worker. Those capabilities retain their own roadmap and go-live gates.
 
 ## Current Boundary
 
-Current supported auth mode: deterministic demo session.
+Current supported auth modes: explicit demo and built-in local.
 
-- `getOrCreateCurrentOrg` resolves the local demo organization and user through `getDemoSession`.
-- The demo organization remains `demoMode: true`.
-- The local app membership model is already canonical: `Organization`, `AppUser`, and `Membership`.
-- `requireApiRole` enforces the local `OWNER > ADMIN > MEMBER` role hierarchy for API mutations that already accept local demo actions.
-- The consolidated `/settings` team/membership summary is read-only and must not invite users, create users, change roles, suspend members, delete memberships, call Clerk, send email, send notifications, call providers, create billing records, send SMS, or enable live messaging.
+- `DEMO_MODE=true` resolves the deterministic demo principal through `getDemoSession`; it is never a
+  fallback after local authentication fails.
+- `DEMO_MODE=false` plus `AUTH_PROVIDER=local` resolves a keyed opaque cookie through
+  `resolveLocalSession`, then rechecks the enabled user, auth generation, ACTIVE membership, selected
+  organization, and current database role.
+- `AUTH_PROVIDER=oidc` is a reserved optional adapter and fails closed. Clerk is not required for the
+  standalone platform, and Clerk secrets and publishable keys remain absent from supported profiles.
+- Built-in local auth runs only under `next build && next start`; development Flight diagnostics are not
+  permitted to handle real session cookies.
 
 ## Route RBAC Matrix
 
-The executable current route matrix lives in `lib/auth/api-rbac-matrix.ts` and is covered by `tests/unit/auth/api-rbac-matrix.test.ts`.
+The executable route matrix lives in `lib/auth/api-rbac-matrix.ts` and is checked against every mutating
+API method by `tests/unit/auth/api-rbac-matrix.test.ts`.
 
-- Admin-gated local mutations include contacts, imports, templates, campaign create/update/preflight/schedule/cancel, compliance settings, provider number and credential metadata, local usage records, local demo inbound, gated live-test SMS, campaign-copy fake AI, and conversation assignment.
-- Member-gated local mutations include conversation messages, internal notes, conversation resolve/reopen, reply suggestions, conversation summaries, and lead qualification.
-- Twilio inbound and status webhooks are the only mutating route exceptions; they remain signed-webhook routes and must validate the Twilio signature before tenant-local persistence.
-- The matrix is planning and validation evidence only. It does not authorize production auth, new roles, invitations, role changes, live messaging, billing, notifications, provider calls, or real customer access.
+- Role-gated mutations use `requireApiRole` with database-derived `OWNER > ADMIN > MEMBER` authority.
+- Public-auth exceptions are limited to setup, login, logout, invite acceptance, and reset completion.
+- Tenant roles cannot issue a user-global password reset; that route is an explicit operator boundary and
+  recovery uses `npm run admin:reset-link`.
+- Twilio inbound/status callbacks are signed-webhook exceptions and validate signatures before trusted
+  tenant persistence.
+- Every internal cookie-authenticated mutation passes its concrete `Request` through the shared authentication boundary,
+  which enforces exact same-origin evidence before mutation. Specialized public
+  auth handlers enforce the same origin policy before parsing credentials or bearer payloads.
 
-## Production Auth Requirements
+Active membership status must be enforced before tenant data access. M2 additionally makes PostgreSQL
+itself reject missing/foreign tenant context under a non-owner application role; route RBAC is not a
+substitute for that database boundary.
 
-Before production auth can be enabled, the app must add all of these controls behind tests and the protected local gate:
+## Production Local-Auth Requirements
 
-- Verify the provider session server-side before tenant resolution.
-- Map verified provider user IDs and organization IDs to local `AppUser` and `Organization` rows.
-- Fail closed when the requester has no active local membership in the selected organization.
-- Active membership status must be enforced before tenant data access.
-- Every mutating API route must resolve the current organization and pass role authorization before reading a request body.
-- Reads must remain tenant-scoped by the resolved organization.
-- Owner-only and admin-only actions must be documented in a route RBAC matrix before implementation.
-- Production user provisioning, invitations, role changes, suspensions, and membership deletion require explicit owner-only APIs and tests before any UI exposes them.
-- Clerk secrets and publishable keys must remain absent from production-like demo deployments.
-- No Clerk calls, invitations, role changes, suspensions, email, notifications, provider calls, billing records, live SMS, or live feature enablement are allowed by this plan.
+- Use distinct, randomly generated `AUTH_SESSION_SECRET` and `AUTH_THROTTLE_SECRET` values. Rotating the
+  session key intentionally signs every browser out.
+- Put the app behind a trusted ingress that strips and overwrites forwarding evidence, keep its direct port
+  private, and set `TRUST_PROXY=true` only for that topology.
+- Bootstrap the first owner with a one-time server secret, then remove/rotate it. Use zero-argument operator
+  commands for additional recovery owners and user-global password reset links.
+- Use secure cookies at TLS ingress, keep every auth response non-cacheable, and preserve the database-backed
+  network/identity throttles.
+- Run `npm run validate`, all PostgreSQL tests, and `npm run test:e2e:local-auth:production` before release.
 
-## Demo Deployment Gate
+## Optional External-Identity Seam
 
-The current production-like demo deployment class uses the local demo session only. `npm run production:gate` blocks Clerk auth configuration in production-like demo environments with `CLERK_AUTH_CONFIG_PRESENT` unless a future controlled live-auth deployment explicitly expands the gate.
+The older `lib/auth/session.ts` `resolveProductionCurrentOrg` seam behind
+`PRODUCTION_AUTH_ENABLED` remains compatibility/planning code; it is not the current local-auth resolver
+and does not enable an external provider. `CLERK_AUTH_CONFIG_PRESENT` continues to block accidental Clerk
+configuration in the demo-safe production gate. A future OIDC adapter must map a server-verified subject to
+the same ACTIVE local membership/RBAC model and cannot weaken the built-in path.
 
-This plan is checked by `npm run production-auth:check`, and that check is part of `npm run validate`.
-
-## Gated Session Seam (TICKET009)
-
-The deterministic demo session remains the default and only enabled auth mode; the seam below is built but
-OFF and introduces no Clerk calls or secrets.
-
-- `lib/auth/session.ts` adds `resolveProductionCurrentOrg(subject)` behind `PRODUCTION_AUTH_ENABLED`
-  (default `false`). It maps a server-verified subject to its ACTIVE local `Membership` and returns the
-  org/role, or `null` (fail closed) when there is no verified subject or no active membership — it never
-  downgrades to the demo session.
-- `clerkConfigIsPresent()` only reports whether Clerk env is set; no key is read into a provider call here.
-- Covered by `tests/unit/auth/session.test.ts` (fail-closed paths + role derivation + `requireApiRole`
-  denial). The demo default is unchanged: `getOrCreateCurrentOrg` still resolves the demo org via
-  `getDemoSession` with `demoMode: true`.
-
-Enabling production auth stays human-gated: bind a server-verified Clerk subject to
-`resolveProductionCurrentOrg`, add 401/403 deny responses at the request boundary, and explicitly expand
-`npm run production:gate` (which still blocks `CLERK_AUTH_CONFIG_PRESENT`). No Clerk secrets are added by
-this seam.
+This contract is checked by `npm run production-auth:check`, which is part of `npm run validate`.

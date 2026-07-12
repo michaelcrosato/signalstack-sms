@@ -61,7 +61,7 @@ describe("contact JSON mutation routes", () => {
     const response = await postContact(
       new Request("http://localhost/api/contacts", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: "{"
       })
     );
@@ -85,7 +85,7 @@ describe("contact JSON mutation routes", () => {
     const response = await postContact(
       new Request("http://localhost/api/contacts", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: JSON.stringify({ phone: "+15555550100" })
       })
     );
@@ -104,6 +104,8 @@ describe("contact JSON mutation routes", () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Origin: "http://localhost",
+          Host: "localhost",
           "x-signalstack-lookup-token": operatorToken
         },
         body: JSON.stringify({ phone: "+15555550100" })
@@ -121,7 +123,7 @@ describe("contact JSON mutation routes", () => {
     const response = await patchContact(
       new Request("http://localhost/api/contacts/contact_demo", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: "{"
       }),
       { params: Promise.resolve({ contactId: "contact_demo" }) }
@@ -139,7 +141,7 @@ describe("contact JSON mutation routes", () => {
     const response = await mergeContact(
       new Request("http://localhost/api/contacts/contact_demo/merge", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: "{"
       }),
       { params: Promise.resolve({ contactId: "contact_demo" }) }
@@ -157,7 +159,7 @@ describe("contact JSON mutation routes", () => {
     const response = await importContactsRoute(
       new Request("http://localhost/api/contacts/imports", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: "{"
       })
     );
@@ -171,3 +173,7 @@ describe("contact JSON mutation routes", () => {
     expect(mocks.importContacts).not.toHaveBeenCalled();
   });
 });
+
+function sameOriginJsonHeaders() {
+  return { "Content-Type": "application/json", Origin: "http://localhost", Host: "localhost" };
+}

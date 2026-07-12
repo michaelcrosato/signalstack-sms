@@ -112,6 +112,31 @@ describe("liveAiProvider.generateReplyDraft", () => {
       liveAiProvider.generateReplyDraft({ messages: [{ direction: "INBOUND", body: "hi" }] })
     ).rejects.toThrow(/status 500/);
   });
+
+  it("passes an abort signal so a hung upstream cannot pin the request forever", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ content: [{ text: "ok. Reply STOP to opt out." }] })
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubEnv("AI_API_KEY", "test-key");
+
+    await liveAiProvider.generateReplyDraft({ messages: [{ direction: "INBOUND", body: "hi" }] });
+
+    const [, init] = fetchMock.mock.calls[0] as [string, { signal?: unknown }];
+    expect(init.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it("maps an aborted (timed-out) request to a clear timeout error", async () => {
+    const abortError = new Error("The operation was aborted.");
+    abortError.name = "AbortError";
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(abortError));
+    vi.stubEnv("AI_API_KEY", "test-key");
+
+    await expect(
+      liveAiProvider.generateReplyDraft({ messages: [{ direction: "INBOUND", body: "hi" }] })
+    ).rejects.toThrow(/timed out/);
+  });
 });
 
 describe("qualifyLead seam", () => {

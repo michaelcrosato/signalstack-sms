@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "SignalStack SMS",
-  description: "Demo-safe SMB texting SaaS scaffold"
+  description: "Self-hosted SMS operations and integration platform"
 };
 
 export default function RootLayout({

@@ -6,7 +6,7 @@ import {
   operatorSurfaceGroups,
 } from "@/lib/operations/operator-surfaces";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 const operationSummary = getOperatorSurfaceSummary();
 

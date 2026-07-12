@@ -37,7 +37,7 @@ describe("template JSON mutation routes", () => {
     const response = await POST(
       new Request("http://localhost/api/templates", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: "{"
       })
     );
@@ -54,7 +54,7 @@ describe("template JSON mutation routes", () => {
     const response = await PATCH(
       new Request("http://localhost/api/templates/template_demo", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: "{"
       }),
       { params: Promise.resolve({ templateId: "template_demo" }) }
@@ -68,3 +68,7 @@ describe("template JSON mutation routes", () => {
     expect(mocks.updateTemplate).not.toHaveBeenCalled();
   });
 });
+
+function sameOriginJsonHeaders() {
+  return { "Content-Type": "application/json", Origin: "http://localhost", Host: "localhost" };
+}

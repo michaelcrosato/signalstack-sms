@@ -8,7 +8,8 @@ import {
   type Contact,
   type QueueJob
 } from "@prisma/client";
-import { prisma } from "@/lib/db/prisma";
+import { claimDueScheduledCampaignQueueJobs, type ScheduledCampaignQueueJobClaim } from "@/lib/db/queue-dispatch";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 import { environmentIsProductionLike } from "@/lib/deployment/production-gate";
 import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
 import { renderTemplate } from "@/lib/messaging/render-template";
@@ -18,6 +19,7 @@ import { scheduledCampaignJobSchema } from "@/lib/queue/jobs";
 import { outboundCampaignMessageIdempotencyKey } from "@/lib/queue/idempotency";
 import { QUEUE_JOB_PROCESSING_LEASE_MS } from "@/lib/queue/claim-lease";
 import { recordMetric, smsPipelineMetrics } from "@/lib/observability/metrics";
+import { logger } from "@/lib/observability/logger";
 
 export type WorkerSafetyInput = {
   liveMessagingEnabled?: unknown;
@@ -40,6 +42,11 @@ export type WorkerRuntimeOptions = {
 
 export type WorkerRunResult = Awaited<ReturnType<typeof processDueScheduledCampaignJobs>>;
 
+export type ScheduledCampaignQueueJobReference = Readonly<{
+  queueJobId: string;
+  expectedOrgId: string;
+}>;
+
 export type SingleQueueJobProcessResult = {
   processed: 0 | 1;
   skipped: 0 | 1;
@@ -48,6 +55,7 @@ export type SingleQueueJobProcessResult = {
     | "provider-blocked"
     | "production-worker-blocked"
     | "missing-job"
+    | "org-mismatch"
     | "already-claimed"
     | "not-due"
     | "invalid-payload"
@@ -198,68 +206,76 @@ export function scheduledCampaignSendIsAllowed(
   return preflightCampaignRecipients(contacts).allowed;
 }
 
-async function claimScheduledCampaignQueueJob(queueJobId: string, now: Date) {
-  const candidate = await prisma.queueJob.findFirst({
-    where: {
-      id: queueJobId,
-      type: QueueJobType.SCHEDULED_CAMPAIGN,
-      status: { in: [QueueJobStatus.QUEUED, QueueJobStatus.PROCESSING] }
+async function claimScheduledCampaignQueueJob(
+  reference: ScheduledCampaignQueueJobReference,
+  now: Date
+) {
+  return withTenantTransaction({ orgId: reference.expectedOrgId }, async (tx) => {
+    const candidate = await tx.queueJob.findFirst({
+      where: {
+        id: reference.queueJobId,
+        orgId: reference.expectedOrgId,
+        type: QueueJobType.SCHEDULED_CAMPAIGN,
+        status: { in: [QueueJobStatus.QUEUED, QueueJobStatus.PROCESSING] }
+      }
+    });
+
+    if (!candidate) {
+      return { claimed: false, reason: "missing-job" } as const;
     }
-  });
-
-  if (!candidate) {
-    return { claimed: false, reason: "missing-job" } as const;
-  }
-
-  if (candidate.runAt.getTime() > now.getTime()) {
-    return { claimed: false, reason: "not-due" } as const;
-  }
-
-  const processingToken = randomUUID();
-  const processingExpiresAt = new Date(now.getTime() + QUEUE_JOB_PROCESSING_LEASE_MS);
-  const claim = await prisma.queueJob.updateMany({
-    where: {
-      id: candidate.id,
-      orgId: candidate.orgId,
-      type: QueueJobType.SCHEDULED_CAMPAIGN,
-      runAt: { lte: now },
-      OR: [
-        { status: QueueJobStatus.QUEUED },
-        {
-          status: QueueJobStatus.PROCESSING,
-          OR: [
-            { processingToken: null },
-            { processingExpiresAt: null },
-            { processingExpiresAt: { lte: now } }
-          ]
-        }
-      ]
-    },
-    data: {
-      status: QueueJobStatus.PROCESSING,
-      processingToken,
-      processingExpiresAt
+    if (candidate.orgId !== reference.expectedOrgId) {
+      return { claimed: false, reason: "org-mismatch" } as const;
     }
+    if (candidate.runAt.getTime() > now.getTime()) {
+      return { claimed: false, reason: "not-due" } as const;
+    }
+
+    const processingToken = randomUUID();
+    const processingExpiresAt = new Date(now.getTime() + QUEUE_JOB_PROCESSING_LEASE_MS);
+    const claim = await tx.queueJob.updateMany({
+      where: {
+        id: candidate.id,
+        orgId: reference.expectedOrgId,
+        type: QueueJobType.SCHEDULED_CAMPAIGN,
+        runAt: { lte: now },
+        OR: [
+          { status: QueueJobStatus.QUEUED },
+          {
+            status: QueueJobStatus.PROCESSING,
+            OR: [
+              { processingToken: null },
+              { processingExpiresAt: null },
+              { processingExpiresAt: { lte: now } }
+            ]
+          }
+        ]
+      },
+      data: {
+        status: QueueJobStatus.PROCESSING,
+        processingToken,
+        processingExpiresAt
+      }
+    });
+
+    if (claim.count !== 1) {
+      return { claimed: false, reason: "already-claimed" } as const;
+    }
+
+    return {
+      claimed: true,
+      job: {
+        ...candidate,
+        status: QueueJobStatus.PROCESSING,
+        processingToken,
+        processingExpiresAt
+      } as ClaimedQueueJob
+    } as const;
   });
-
-  if (claim.count !== 1) {
-    return { claimed: false, reason: "already-claimed" } as const;
-  }
-
-  return {
-    claimed: true,
-    job: {
-      ...candidate,
-      status: QueueJobStatus.PROCESSING,
-      processingToken,
-      processingExpiresAt
-    } as ClaimedQueueJob
-  } as const;
 }
 
 async function renewClaimedQueueJob(job: ClaimedQueueJob, now = new Date()) {
   const processingExpiresAt = new Date(now.getTime() + QUEUE_JOB_PROCESSING_LEASE_MS);
-  const renewed = await prisma.queueJob.updateMany({
+  const renewed = await withTenantTransaction({ orgId: job.orgId }, (tx) => tx.queueJob.updateMany({
     where: {
       id: job.id,
       orgId: job.orgId,
@@ -268,7 +284,7 @@ async function renewClaimedQueueJob(job: ClaimedQueueJob, now = new Date()) {
       processingToken: job.processingToken
     },
     data: { processingExpiresAt }
-  });
+  }));
 
   if (renewed.count !== 1) {
     throw new Error("Queue job processing claim was lost.");
@@ -278,7 +294,7 @@ async function renewClaimedQueueJob(job: ClaimedQueueJob, now = new Date()) {
 }
 
 async function transitionClaimedQueueJob(job: ClaimedQueueJob, status: QueueJobStatus) {
-  const transitioned = await prisma.queueJob.updateMany({
+  const transitioned = await withTenantTransaction({ orgId: job.orgId }, (tx) => tx.queueJob.updateMany({
     where: {
       id: job.id,
       orgId: job.orgId,
@@ -291,7 +307,7 @@ async function transitionClaimedQueueJob(job: ClaimedQueueJob, status: QueueJobS
       processingToken: null,
       processingExpiresAt: null
     }
-  });
+  }));
 
   if (transitioned.count !== 1) {
     throw new Error("Queue job processing claim was lost before transition.");
@@ -310,7 +326,7 @@ async function transitionClaimedQueueJobWithCampaign(
     requireCampaignTransition: boolean;
   }
 ) {
-  await prisma.$transaction(async (tx) => {
+  await withTenantTransaction({ orgId: job.orgId }, async (tx) => {
     const transitioned = await tx.queueJob.updateMany({
       where: {
         id: job.id,
@@ -368,8 +384,66 @@ async function failClaimedQueueJob(
     } else {
       await transitionClaimedQueueJob(job, QueueJobStatus.FAILED);
     }
-  } catch {
-    return;
+  } catch (error) {
+    // The job is already lease-expiring, so a failed FAILED-transition will be reclaimed later.
+    // Log it rather than losing the only signal that the terminal transition itself failed.
+    logger.error("queue_job_fail_transition_error", {
+      jobId: job.id,
+      orgId: job.orgId,
+      errorType: error instanceof Error ? error.name : "unknown"
+    });
+  }
+}
+
+async function loadDispatchedQueueJob(claim: ScheduledCampaignQueueJobClaim): Promise<ClaimedQueueJob | null> {
+  return withTenantTransaction({ orgId: claim.expectedOrgId }, async (tx) => {
+    const job = await tx.queueJob.findFirst({
+      where: {
+        id: claim.queueJobId,
+        orgId: claim.expectedOrgId,
+        type: QueueJobType.SCHEDULED_CAMPAIGN,
+        status: QueueJobStatus.PROCESSING,
+        processingToken: claim.processingToken
+      }
+    });
+    if (
+      !job ||
+      job.orgId !== claim.expectedOrgId ||
+      job.processingToken !== claim.processingToken ||
+      !job.processingExpiresAt
+    ) {
+      return null;
+    }
+    return job as ClaimedQueueJob;
+  });
+}
+
+async function processClaimedQueueJobSafely(job: ClaimedQueueJob): Promise<SingleQueueJobProcessResult> {
+  try {
+    return await processClaimedScheduledCampaignQueueJob(job);
+  } catch (error) {
+    // Surface the underlying failure: this catch marks the job FAILED and pauses its campaign, and
+    // without a log the operator has no signal (the metric is a no-op unless observability is on).
+    logger.error("queue_job_processing_failed", {
+      jobId: job.id,
+      orgId: job.orgId,
+      campaignId: job.campaignId ?? undefined,
+      errorType: error instanceof Error ? error.name : "unknown",
+      message: error instanceof Error ? error.message : String(error)
+    });
+    await failClaimedQueueJob(job);
+    recordMetric(smsPipelineMetrics.queueThroughput, {
+      action: "process",
+      status: "failure",
+      reason: "processing-failed",
+      backend: "database"
+    });
+    return {
+      processed: 0,
+      skipped: 1,
+      blocked: false,
+      reason: "processing-failed"
+    };
   }
 }
 
@@ -387,41 +461,20 @@ export async function processDueScheduledCampaignJobs(
     };
   }
 
-  const depth = typeof prisma.queueJob.count === "function"
-    ? await prisma.queueJob.count({
-        where: {
-          type: QueueJobType.SCHEDULED_CAMPAIGN,
-          status: { in: [QueueJobStatus.QUEUED, QueueJobStatus.PROCESSING] }
-        }
-      })
-    : 0;
-  recordMetric(smsPipelineMetrics.queueDepth, { depth, backend: "database" });
-
-  const jobs = await prisma.queueJob.findMany({
-    where: {
-      type: QueueJobType.SCHEDULED_CAMPAIGN,
-      runAt: { lte: now },
-      OR: [
-        { status: QueueJobStatus.QUEUED },
-        {
-          status: QueueJobStatus.PROCESSING,
-          OR: [
-            { processingToken: null },
-            { processingExpiresAt: null },
-            { processingExpiresAt: { lte: now } }
-          ]
-        }
-      ]
-    },
-    orderBy: { runAt: "asc" },
-    take: options.maxJobsPerPoll ?? DEFAULT_WORKER_MAX_JOBS_PER_POLL
-  });
+  const claims = await claimDueScheduledCampaignQueueJobs(
+    now,
+    options.maxJobsPerPoll ?? DEFAULT_WORKER_MAX_JOBS_PER_POLL
+  );
+  recordMetric(smsPipelineMetrics.queueDepth, { depth: claims.length, backend: "database" });
 
   let processed = 0;
   let skipped = 0;
 
-  for (const job of jobs) {
-    const result = await processScheduledCampaignQueueJobById(job.id, now);
+  for (const claim of claims) {
+    const job = await loadDispatchedQueueJob(claim);
+    const result = job
+      ? await processClaimedQueueJobSafely(job)
+      : { processed: 0 as const, skipped: 1 as const, blocked: false, reason: "already-claimed" as const };
     processed += result.processed;
     skipped += result.skipped;
   }
@@ -433,13 +486,16 @@ export async function processDueScheduledCampaignJobs(
   };
 }
 
-export async function processScheduledCampaignQueueJobById(queueJobId: string, now = new Date()) {
+export async function processScheduledCampaignQueueJobById(
+  reference: ScheduledCampaignQueueJobReference,
+  now = new Date()
+) {
   const readiness = currentWorkerReadiness();
   if (!readiness.allowed) {
     return { processed: 0, skipped: 0, blocked: true, reason: readiness.reason };
   }
 
-  const claim = await claimScheduledCampaignQueueJob(queueJobId, now);
+  const claim = await claimScheduledCampaignQueueJob(reference, now);
 
   if (!claim.claimed) {
     return {
@@ -450,23 +506,7 @@ export async function processScheduledCampaignQueueJobById(queueJobId: string, n
     } satisfies SingleQueueJobProcessResult;
   }
 
-  try {
-    return await processClaimedScheduledCampaignQueueJob(claim.job);
-  } catch {
-    await failClaimedQueueJob(claim.job);
-    recordMetric(smsPipelineMetrics.queueThroughput, {
-      action: "process",
-      status: "failure",
-      reason: "processing-failed",
-      backend: "database"
-    });
-    return {
-      processed: 0,
-      skipped: 1,
-      blocked: false,
-      reason: "processing-failed"
-    } satisfies SingleQueueJobProcessResult;
-  }
+  return processClaimedQueueJobSafely(claim.job);
 }
 
 async function processClaimedScheduledCampaignQueueJob(job: ClaimedQueueJob): Promise<SingleQueueJobProcessResult> {
@@ -477,7 +517,7 @@ async function processClaimedScheduledCampaignQueueJob(job: ClaimedQueueJob): Pr
     return { processed: 0, skipped: 1, blocked: false, reason: "invalid-payload" };
   }
 
-  const campaign = await prisma.campaign.findFirst({
+  const campaign = await withTenantTransaction({ orgId: job.orgId }, (tx) => tx.campaign.findFirst({
     where: { id: payload.data.campaignId, orgId: job.orgId },
     include: {
       recipients: {
@@ -485,7 +525,7 @@ async function processClaimedScheduledCampaignQueueJob(job: ClaimedQueueJob): Pr
         include: { contact: true }
       }
     }
-  });
+  }));
   if (!campaign || campaign.status !== CampaignStatus.SCHEDULED) {
     await transitionClaimedQueueJob(job, QueueJobStatus.FAILED);
     recordMetric(smsPipelineMetrics.queueThroughput, { action: "process", status: "failure", reason: "invalid-campaign", backend: "database" });
@@ -511,13 +551,6 @@ async function processClaimedScheduledCampaignQueueJob(job: ClaimedQueueJob): Pr
     .map((recipient) => ({ recipient, preflight: preflightByContactId.get(recipient.contactId) }))
     .filter(({ preflight }) => !preflight?.allowed);
 
-  if (sendableRecipients.length > 0) {
-    await prisma.campaignRecipient.updateMany({
-      where: { orgId: job.orgId, id: { in: sendableRecipients.map((recipient) => recipient.id) } },
-      data: { status: CampaignRecipientStatus.PENDING, blockReason: null }
-    });
-  }
-
   const blockedRecipientsByReason = new Map<string, string[]>();
   for (const { recipient, preflight } of blockedRecipients) {
     const reason = preflight?.reasons.join(",") || "SEND_TIME_PREFLIGHT_BLOCKED";
@@ -527,15 +560,24 @@ async function processClaimedScheduledCampaignQueueJob(job: ClaimedQueueJob): Pr
     blockedRecipientsByReason.get(reason)!.push(recipient.id);
   }
 
-  for (const [reason, recipientIds] of blockedRecipientsByReason) {
-    await prisma.campaignRecipient.updateMany({
-      where: { orgId: job.orgId, id: { in: recipientIds } },
-      data: {
-        status: CampaignRecipientStatus.BLOCKED,
-        blockReason: reason
-      }
-    });
-  }
+  await withTenantTransaction({ orgId: job.orgId }, async (tx) => {
+    if (sendableRecipients.length > 0) {
+      await tx.campaignRecipient.updateMany({
+        where: { orgId: job.orgId, id: { in: sendableRecipients.map((recipient) => recipient.id) } },
+        data: { status: CampaignRecipientStatus.PENDING, blockReason: null }
+      });
+    }
+
+    for (const [reason, recipientIds] of blockedRecipientsByReason) {
+      await tx.campaignRecipient.updateMany({
+        where: { orgId: job.orgId, id: { in: recipientIds } },
+        data: {
+          status: CampaignRecipientStatus.BLOCKED,
+          blockReason: reason
+        }
+      });
+    }
+  });
 
   if (sendableRecipients.length === 0) {
     await failClaimedQueueJob(job, { requireCampaignTransition: true });
@@ -555,7 +597,7 @@ async function processClaimedScheduledCampaignQueueJob(job: ClaimedQueueJob): Pr
       idempotencyKey
     });
 
-    await prisma.message.upsert({
+    await withTenantTransaction({ orgId: job.orgId }, (tx) => tx.message.upsert({
       where: { orgId_idempotencyKey: { orgId: job.orgId, idempotencyKey } },
       update: {},
       create: {
@@ -568,7 +610,7 @@ async function processClaimedScheduledCampaignQueueJob(job: ClaimedQueueJob): Pr
         providerStatus: result.status,
         idempotencyKey
       }
-    });
+    }));
   }
 
   await transitionClaimedQueueJobWithCampaign(job, {
@@ -582,6 +624,11 @@ async function processClaimedScheduledCampaignQueueJob(job: ClaimedQueueJob): Pr
   return { processed: 1, skipped: 0, blocked: false };
 }
 
+// The continuous worker runs indefinitely, so its returned history is a bounded ring buffer: retaining
+// every poll result would leak memory in a long-lived `worker:watch` process. Per-iteration results are
+// still delivered live via `onResult`; the returned array holds only the most recent window.
+const CONTINUOUS_WORKER_RESULT_HISTORY_LIMIT = 1_000;
+
 export async function runContinuousScheduledCampaignWorker(input: ContinuousWorkerInput) {
   const results: WorkerRunResult[] = [];
   let iteration = 0;
@@ -590,6 +637,9 @@ export async function runContinuousScheduledCampaignWorker(input: ContinuousWork
     iteration += 1;
     const result = await processDueScheduledCampaignJobs(new Date(), { maxJobsPerPoll: input.maxJobsPerPoll });
     results.push(result);
+    if (results.length > CONTINUOUS_WORKER_RESULT_HISTORY_LIMIT) {
+      results.shift();
+    }
     input.onResult?.(result, iteration);
 
     if (result.blocked || (input.maxIterations && iteration >= input.maxIterations)) {

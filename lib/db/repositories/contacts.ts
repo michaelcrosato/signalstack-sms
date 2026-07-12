@@ -1,5 +1,5 @@
 import { ContactImportStatus, ConsentStatus, type Contact, type Prisma } from "@prisma/client";
-import { prisma } from "@/lib/db/prisma";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 import { orgWhere } from "@/lib/db/tenant";
 import { hasAnyConsentEvidence, hasCompleteConsentEvidence } from "@/lib/compliance/consent-evidence";
 import type { ContactCreateInput, ContactUpdateInput } from "@/lib/validation/contacts";
@@ -13,33 +13,41 @@ const contactInclude = {
 
 const CONTACT_IMPORT_PREFETCH_BATCH_SIZE = 10_000;
 
-export async function listContacts(orgId: string, tx: Prisma.TransactionClient = prisma) {
-  return tx.contact.findMany({
+function runTenantContactOperation<T>(
+  orgId: string,
+  tx: Prisma.TransactionClient | undefined,
+  operation: (client: Prisma.TransactionClient) => Promise<T>
+): Promise<T> {
+  return tx ? operation(tx) : withTenantTransaction({ orgId }, operation);
+}
+
+export async function listContacts(orgId: string, tx?: Prisma.TransactionClient) {
+  return runTenantContactOperation(orgId, tx, (client) => client.contact.findMany({
     where: { orgId, archivedAt: null },
     orderBy: { updatedAt: "desc" },
     include: contactInclude
-  });
+  }));
 }
 
-export async function listArchivedContacts(orgId: string, tx: Prisma.TransactionClient = prisma) {
-  return tx.contact.findMany({
+export async function listArchivedContacts(orgId: string, tx?: Prisma.TransactionClient) {
+  return runTenantContactOperation(orgId, tx, (client) => client.contact.findMany({
     where: { orgId, archivedAt: { not: null } },
     orderBy: { archivedAt: "desc" },
     include: contactInclude
-  });
+  }));
 }
 
-export async function getContact(orgId: string, contactId: string, tx: Prisma.TransactionClient = prisma) {
-  return tx.contact.findFirst({
+export async function getContact(orgId: string, contactId: string, tx?: Prisma.TransactionClient) {
+  return runTenantContactOperation(orgId, tx, (client) => client.contact.findFirst({
     where: orgWhere(orgId, { id: contactId }),
     include: contactInclude
-  });
+  }));
 }
 
 export async function upsertContact(
   orgId: string,
   input: ContactCreateInput,
-  tx: Prisma.TransactionClient = prisma
+  tx?: Prisma.TransactionClient
 ) {
   const execute = async (t: Prisma.TransactionClient) => {
     const existing = await t.contact.findUnique({
@@ -71,14 +79,11 @@ export async function upsertContact(
     return t.contact.findUniqueOrThrow({ where: { id: contact.id }, include: contactInclude });
   };
 
-  if (tx === prisma) {
-    return prisma.$transaction(async (t) => execute(t));
-  }
-  return execute(tx);
+  return runTenantContactOperation(orgId, tx, execute);
 }
 
 export async function updateContact(orgId: string, contactId: string, input: ContactUpdateInput) {
-  return prisma.$transaction(async (tx) => {
+  return withTenantTransaction({ orgId }, async (tx) => {
     const existing = await tx.contact.findFirst({ where: orgWhere(orgId, { id: contactId }) });
     if (!existing) {
       return null;
@@ -95,9 +100,7 @@ export async function updateContact(orgId: string, contactId: string, input: Con
       }
     });
 
-    if (input.tagNames || input.listNames) {
-      await syncContactLabels(tx, orgId, contact.id, input.tagNames ?? [], input.listNames ?? []);
-    }
+    await syncContactLabels(tx, orgId, contact.id, input.tagNames, input.listNames);
 
     return tx.contact.findUniqueOrThrow({ where: { id: contact.id }, include: contactInclude });
   });
@@ -112,7 +115,7 @@ export async function mergeContacts(orgId: string, targetContactId: string, sour
     return null;
   }
 
-  return prisma.$transaction(async (tx) => {
+  return withTenantTransaction({ orgId }, async (tx) => {
     const [target, source] = await Promise.all([
       tx.contact.findFirst({ where: orgWhere(orgId, { id: targetContactId }), include: contactInclude }),
       tx.contact.findFirst({ where: orgWhere(orgId, { id: sourceContactId }), include: contactInclude })
@@ -191,7 +194,7 @@ export async function importContacts(
   parsed: ParsedContactImport,
   filename?: string
 ) {
-  return prisma.$transaction(async (tx) => {
+  return withTenantTransaction({ orgId }, async (tx) => {
     const importRecord = await tx.contactImport.create({
       data: {
         orgId,
@@ -284,46 +287,52 @@ function contactWriteData(input: Partial<ContactCreateInput>) {
   };
 }
 
+// Each collection is synced only when its argument is provided. An `undefined` collection is left
+// untouched, so a partial update (e.g. PATCH with only `tagNames`) cannot clear the other collection.
+// Callers that intend to clear a collection must pass an explicit empty array.
 async function syncContactLabels(
   tx: Prisma.TransactionClient,
   orgId: string,
   contactId: string,
-  tagNames: string[],
-  listNames: string[]
+  tagNames: string[] | undefined,
+  listNames: string[] | undefined
 ) {
-  await tx.contactTag.deleteMany({ where: { orgId, contactId } });
-  await tx.contactListMember.deleteMany({ where: { orgId, contactId } });
-
-  const uniqueTagNames = uniqueNames(tagNames);
-  if (uniqueTagNames.length > 0) {
-    await tx.tag.createMany({
-      data: uniqueTagNames.map((name) => ({ orgId, name })),
-      skipDuplicates: true
-    });
-    const tags = await tx.tag.findMany({
-      where: { orgId, name: { in: uniqueTagNames } },
-      select: { id: true }
-    });
-    await tx.contactTag.createMany({
-      data: tags.map((tag) => ({ orgId, contactId, tagId: tag.id })),
-      skipDuplicates: true
-    });
+  if (tagNames !== undefined) {
+    await tx.contactTag.deleteMany({ where: { orgId, contactId } });
+    const uniqueTagNames = uniqueNames(tagNames);
+    if (uniqueTagNames.length > 0) {
+      await tx.tag.createMany({
+        data: uniqueTagNames.map((name) => ({ orgId, name })),
+        skipDuplicates: true
+      });
+      const tags = await tx.tag.findMany({
+        where: { orgId, name: { in: uniqueTagNames } },
+        select: { id: true }
+      });
+      await tx.contactTag.createMany({
+        data: tags.map((tag) => ({ orgId, contactId, tagId: tag.id })),
+        skipDuplicates: true
+      });
+    }
   }
 
-  const uniqueListNames = uniqueNames(listNames);
-  if (uniqueListNames.length > 0) {
-    await tx.contactList.createMany({
-      data: uniqueListNames.map((name) => ({ orgId, name })),
-      skipDuplicates: true
-    });
-    const lists = await tx.contactList.findMany({
-      where: { orgId, name: { in: uniqueListNames } },
-      select: { id: true }
-    });
-    await tx.contactListMember.createMany({
-      data: lists.map((list) => ({ orgId, contactId, listId: list.id })),
-      skipDuplicates: true
-    });
+  if (listNames !== undefined) {
+    await tx.contactListMember.deleteMany({ where: { orgId, contactId } });
+    const uniqueListNames = uniqueNames(listNames);
+    if (uniqueListNames.length > 0) {
+      await tx.contactList.createMany({
+        data: uniqueListNames.map((name) => ({ orgId, name })),
+        skipDuplicates: true
+      });
+      const lists = await tx.contactList.findMany({
+        where: { orgId, name: { in: uniqueListNames } },
+        select: { id: true }
+      });
+      await tx.contactListMember.createMany({
+        data: lists.map((list) => ({ orgId, contactId, listId: list.id })),
+        skipDuplicates: true
+      });
+    }
   }
 }
 

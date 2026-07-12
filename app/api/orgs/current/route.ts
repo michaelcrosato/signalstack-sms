@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { getOrganizationSummary } from "@/lib/db/repositories/orgs";
 
 export async function GET() {
-  const currentOrg = await getOrCreateCurrentOrg();
+  const authentication = await authenticateApiRequest();
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
   const org = await getOrganizationSummary(currentOrg.orgId);
 
   if (!org) {

@@ -1,19 +1,27 @@
 import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth/api-authorization";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { getUsageSummary, recordUsageEvent } from "@/lib/billing/metering";
 import { usageEventCreateSchema } from "@/lib/validation/billing";
 
 export async function GET() {
-  const currentOrg = await getOrCreateCurrentOrg();
+  const authentication = await authenticateApiRequest();
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
   const usage = await getUsageSummary(currentOrg.orgId);
 
   return NextResponse.json({ usage });
 }
 
 export async function POST(request: Request) {
-  const currentOrg = await getOrCreateCurrentOrg();
+  const authentication = await authenticateApiRequest(request);
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
   const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
   if (roleResponse) {
     return roleResponse;

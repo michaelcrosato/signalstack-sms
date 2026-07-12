@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ConsentStatus } from "@prisma/client";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { evaluateSegmentContacts, type SegmentFilter } from "@/lib/db/repositories/segments";
 import { withOptionalTenantRls } from "@/lib/db/rls";
 import { escapeCsvCell } from "@/lib/csv/escape";
@@ -14,7 +14,11 @@ const segmentFilterSchema = z.object({
 });
 
 export async function GET(request: Request) {
-  const currentOrg = await getOrCreateCurrentOrg();
+  const authentication = await authenticateApiRequest();
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
   const { searchParams } = new URL(request.url);
 
   let filter: SegmentFilter = {};
@@ -33,14 +37,27 @@ export async function GET(request: Request) {
     }
   } else {
     const tagNames = searchParams.get("tagNames")?.split(",").map((t) => t.trim()).filter(Boolean);
-    const consentStatuses = searchParams.get("consentStatuses")?.split(",").map((s) => s.trim().toUpperCase()).filter(Boolean);
+    const consentStatuses = searchParams
+      .get("consentStatuses")
+      ?.split(",")
+      .map((s) => s.trim().toUpperCase())
+      .filter(Boolean);
     const minLeadScore = searchParams.get("minLeadScore");
     const maxLeadScore = searchParams.get("maxLeadScore");
 
-    if (tagNames && tagNames.length > 0) filter.tagNames = tagNames;
-    if (consentStatuses && consentStatuses.length > 0) filter.consentStatuses = consentStatuses as ConsentStatus[];
-    if (minLeadScore) filter.minLeadScore = parseInt(minLeadScore, 10);
-    if (maxLeadScore) filter.maxLeadScore = parseInt(maxLeadScore, 10);
+    // Validate the query-param path through the same schema as the JSON path so an unknown consent
+    // status or non-numeric score returns 400 rather than reaching Prisma as an invalid enum (500).
+    const candidate: Record<string, unknown> = {};
+    if (tagNames && tagNames.length > 0) candidate.tagNames = tagNames;
+    if (consentStatuses && consentStatuses.length > 0) candidate.consentStatuses = consentStatuses;
+    if (minLeadScore !== null) candidate.minLeadScore = Number(minLeadScore);
+    if (maxLeadScore !== null) candidate.maxLeadScore = Number(maxLeadScore);
+
+    const result = segmentFilterSchema.safeParse(candidate);
+    if (!result.success) {
+      return new Response("Invalid filter parameters.", { status: 400 });
+    }
+    filter = result.data;
   }
 
   const contacts = await withOptionalTenantRls(currentOrg.orgId, async (tx) => {

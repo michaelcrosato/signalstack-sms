@@ -75,7 +75,7 @@ Gate scripts and `docs/AXIOMS.md` are integrity-pinned (`scripts/gate-integrity-
 ## Token efficiency
 
 - Start with `scripts/agent/status.sh`, not wholesale file loads.
-- Respect `.aiignore` (node_modules, `.next`, `codex-runs/`, lockfile, build caches).
+- Respect `.aiignore` (node_modules, `.next`, lockfile, build caches).
 - Read big files with targeted `rg`: `tests/unit/auth/api-route-authorization.test.ts`, `tests/unit/queue/live-worker-controls.test.ts`, `contracts/CONTRACT-TESTING.md`, `docs/CANONICAL_IMPLEMENTATION_PLAN.md`.
 - Keep `SUMMARY.codex.md`/`BLOCKERS.codex.md` current-only; history is in `git log`.
 

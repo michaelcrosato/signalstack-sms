@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/db/prisma";
 import { getTemplate } from "@/lib/db/repositories/templates";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 
 const productTemplateMetricRowItems = [
   { key: "total", label: "Saved Templates" },
@@ -26,38 +26,40 @@ export const productTemplateDetailMetricRows = Object.freeze(
 );
 
 export async function getProductTemplates(orgId: string) {
-  const templates = await prisma.messageTemplate.findMany({
-    where: { orgId },
-    include: { _count: { select: { campaigns: true } } },
-    orderBy: { updatedAt: "desc" }
+  return withTenantTransaction({ orgId }, async (tx) => {
+    const templates = await tx.messageTemplate.findMany({
+      where: { orgId },
+      include: { _count: { select: { campaigns: true } } },
+      orderBy: { updatedAt: "desc" }
+    });
+
+    const variableNames = [...new Set(templates.flatMap((template) => normalizeVariables(template.variables)))].sort();
+    const campaignUsage = templates.reduce((total, template) => total + template._count.campaigns, 0);
+    const summary = {
+      total: templates.length,
+      variables: variableNames.length,
+      campaignUsage,
+      liveSends: "blocked" as const
+    };
+
+    return {
+      templates: templates.map((template) => ({
+        id: template.id,
+        name: template.name,
+        body: template.body,
+        variables: normalizeVariables(template.variables),
+        campaignUsage: template._count.campaigns,
+        updatedAt: template.updatedAt
+      })),
+      summary,
+      metrics: productTemplateMetricRows.map((row) => ({
+        key: row.key,
+        label: row.label,
+        value: summary[row.key]
+      })),
+      variableNames
+    };
   });
-
-  const variableNames = [...new Set(templates.flatMap((template) => normalizeVariables(template.variables)))].sort();
-  const campaignUsage = templates.reduce((total, template) => total + template._count.campaigns, 0);
-  const summary = {
-    total: templates.length,
-    variables: variableNames.length,
-    campaignUsage,
-    liveSends: "blocked" as const
-  };
-
-  return {
-    templates: templates.map((template) => ({
-      id: template.id,
-      name: template.name,
-      body: template.body,
-      variables: normalizeVariables(template.variables),
-      campaignUsage: template._count.campaigns,
-      updatedAt: template.updatedAt
-    })),
-    summary,
-    metrics: productTemplateMetricRows.map((row) => ({
-      key: row.key,
-      label: row.label,
-      value: summary[row.key]
-    })),
-    variableNames
-  };
 }
 
 export async function getProductTemplateDetail(orgId: string, templateId: string) {

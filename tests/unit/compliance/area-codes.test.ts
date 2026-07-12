@@ -39,6 +39,14 @@ describe("resolveTimezoneFromPhone", () => {
     expect(resolveTimezoneFromPhone("9995551234")).toBe("America/New_York");
   });
 
+  it("uses the supplied fallback timezone for unmapped area codes and invalid formats", () => {
+    // Unmapped area code → caller's fallback (e.g. the org-configured quiet-hours zone), not ET.
+    expect(resolveTimezoneFromPhone("+19995551234", "America/Los_Angeles")).toBe("America/Los_Angeles");
+    expect(resolveTimezoneFromPhone("", "America/Los_Angeles")).toBe("America/Los_Angeles");
+    // A mapped area code still wins over the fallback.
+    expect(resolveTimezoneFromPhone("+13125551234", "America/Los_Angeles")).toBe("America/Chicago");
+  });
+
   it("defaults to America/New_York for invalid formats", () => {
     // Too short
     expect(resolveTimezoneFromPhone("212555")).toBe("America/New_York");

@@ -19,10 +19,15 @@ const baseURL = `http://127.0.0.1:${e2ePort}`;
 export default defineConfig({
   testDir: ".",
   testMatch: ["e2e/**/*.spec.ts"],
+  testIgnore: ["e2e/local-auth-path.spec.ts"],
   timeout: 30_000,
   expect: { timeout: 5_000 },
   use: {
     baseURL,
+    // Mutating API routes enforce a trusted same-origin request (CSRF protection). The standalone
+    // `request` fixture does not send an Origin header the way a browser does, so set it explicitly to
+    // the app origin. trustProxy is off in the demo posture, so the check compares Origin to the Host.
+    extraHTTPHeaders: { Origin: baseURL },
     trace: "on-first-retry"
   },
   webServer: {

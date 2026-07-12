@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest";
 import {
   apiRbacMutatingMethods,
   apiRouteRbacMatrix,
+  apiRouteRbacOperatorBoundaryExceptions,
+  apiRouteRbacPublicAuthExceptions,
   apiRouteRbacRoleMatrix,
   apiRouteRbacSignedWebhookExceptions,
   type ApiRbacMutatingMethod
@@ -82,10 +84,84 @@ describe("API RBAC matrix", () => {
     }
   });
 
+  it("limits public authentication mutations to the intended local auth flows", () => {
+    expect(
+      apiRouteRbacPublicAuthExceptions.map(({ flow, method, path }) => ({ flow, method, path }))
+    ).toEqual([
+      {
+        flow: "login",
+        method: "POST",
+        path: "app/api/auth/login/route.ts"
+      },
+      {
+        flow: "logout",
+        method: "POST",
+        path: "app/api/auth/logout/route.ts"
+      },
+      {
+        flow: "reset-complete",
+        method: "POST",
+        path: "app/api/auth/password-resets/complete/route.ts"
+      },
+      {
+        flow: "setup",
+        method: "POST",
+        path: "app/api/auth/setup/route.ts"
+      },
+      {
+        flow: "invite-accept",
+        method: "POST",
+        path: "app/api/auth/team/invites/accept/route.ts"
+      }
+    ]);
+
+    for (const entry of apiRouteRbacPublicAuthExceptions) {
+      const source = readFileSync(path.join(repoRoot, entry.path), "utf8");
+      if (entry.flow === "invite-accept") {
+        expect(source).toContain("acceptTeamInvite");
+        expect(source).toContain("createAuthThrottleService");
+        expect(source).toContain("requestHasTrustedOrigin");
+      } else if (entry.flow === "reset-complete") {
+        expect(source).toContain("completePasswordReset");
+        expect(source).toContain("createAuthThrottleService");
+        expect(source).toContain("requestHasTrustedOrigin");
+        expect(source).toContain("clearLocalSessionCookie");
+      } else {
+        expect(source).toContain(`handleLocalAuth${capitalize(entry.flow)}`);
+      }
+      expect(source).not.toContain("requireApiRole");
+    }
+  });
+
+  it("keeps user-global reset issuance outside tenant role authority", () => {
+    expect(apiRouteRbacOperatorBoundaryExceptions).toEqual([
+      expect.objectContaining({
+        auth: "operator-boundary",
+        method: "POST",
+        operatorCommand: "admin:reset-link",
+        path: "app/api/auth/password-resets/route.ts"
+      })
+    ]);
+    const source = readFileSync(
+      path.join(repoRoot, apiRouteRbacOperatorBoundaryExceptions[0]!.path),
+      "utf8"
+    );
+    expect(source).toContain("authenticateApiRequest(request)");
+    expect(source).toContain("PASSWORD_RESET_OPERATOR_REQUIRED");
+    expect(source).not.toContain("requireApiRole");
+    expect(source).not.toContain("issueOperatorPasswordReset");
+  });
+
   it("freezes matrix metadata before validation uses it", () => {
     expect(Object.isFrozen(apiRouteRbacMatrix)).toBe(true);
     expect(apiRouteRbacMatrix.every((entry) => Object.isFrozen(entry))).toBe(true);
     expect(Object.isFrozen(apiRouteRbacRoleMatrix)).toBe(true);
     expect(Object.isFrozen(apiRouteRbacSignedWebhookExceptions)).toBe(true);
+    expect(Object.isFrozen(apiRouteRbacPublicAuthExceptions)).toBe(true);
+    expect(Object.isFrozen(apiRouteRbacOperatorBoundaryExceptions)).toBe(true);
   });
 });
+
+function capitalize(value: string) {
+  return `${value[0]?.toUpperCase() ?? ""}${value.slice(1)}`;
+}

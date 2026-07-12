@@ -1,5 +1,5 @@
 import { UsageEventType } from "@prisma/client";
-import { prisma } from "@/lib/db/prisma";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 import { recordUsageEvent } from "@/lib/billing/metering";
 
 export async function recordFakeAiUsage(orgId: string, endpoint: string) {
@@ -42,11 +42,11 @@ export function aiDraftCapExceeded(
 
 // Tenant-scoped count of AI_REQUEST usage events since `since` (24h window backs the live-draft cap).
 export async function countAiRequestsSince(orgId: string, since: Date): Promise<number> {
-  return prisma.usageEvent.count({
+  return withTenantTransaction({ orgId }, (tx) => tx.usageEvent.count({
     where: {
       orgId,
       type: UsageEventType.AI_REQUEST,
       createdAt: { gte: since }
     }
-  });
+  }));
 }

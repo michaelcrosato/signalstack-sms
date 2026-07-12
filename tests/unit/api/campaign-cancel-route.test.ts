@@ -29,7 +29,7 @@ describe("campaign cancel route", () => {
   it("returns role denials before canceling queued local work", async () => {
     mocks.requireApiRole.mockReturnValue(new Response(JSON.stringify({ error: "Forbidden." }), { status: 403 }));
 
-    const response = await POST(new Request("http://localhost/api/campaigns/campaign_demo/cancel", { method: "POST" }), {
+    const response = await POST(cancelRequest("campaign_demo"), {
       params: Promise.resolve({ campaignId: "campaign_demo" })
     });
 
@@ -41,7 +41,7 @@ describe("campaign cancel route", () => {
   it("returns not found when no tenant-scoped campaign can be canceled", async () => {
     mocks.cancelCampaign.mockResolvedValue(null);
 
-    const response = await POST(new Request("http://localhost/api/campaigns/missing_campaign/cancel", { method: "POST" }), {
+    const response = await POST(cancelRequest("missing_campaign"), {
       params: Promise.resolve({ campaignId: "missing_campaign" })
     });
 
@@ -53,7 +53,7 @@ describe("campaign cancel route", () => {
   it("returns conflict when an existing campaign is not scheduled", async () => {
     mocks.cancelCampaign.mockRejectedValue(new Error("Only scheduled campaigns can be canceled."));
 
-    const response = await POST(new Request("http://localhost/api/campaigns/campaign_draft/cancel", { method: "POST" }), {
+    const response = await POST(cancelRequest("campaign_draft"), {
       params: Promise.resolve({ campaignId: "campaign_draft" })
     });
 
@@ -69,7 +69,7 @@ describe("campaign cancel route", () => {
     mocks.cancelCampaign.mockRejectedValue(new Error(message));
 
     const response = await POST(
-      new Request("http://localhost/api/campaigns/campaign_demo/cancel", { method: "POST" }),
+      cancelRequest("campaign_demo"),
       { params: Promise.resolve({ campaignId: "campaign_demo" }) }
     );
 
@@ -81,7 +81,7 @@ describe("campaign cancel route", () => {
     mocks.cancelCampaign.mockRejectedValue(new Error("database password leaked"));
 
     const response = await POST(
-      new Request("http://localhost/api/campaigns/campaign_demo/cancel", { method: "POST" }),
+      cancelRequest("campaign_demo"),
       { params: Promise.resolve({ campaignId: "campaign_demo" }) }
     );
 
@@ -99,7 +99,7 @@ describe("campaign cancel route", () => {
     };
     mocks.cancelCampaign.mockResolvedValue(campaign);
 
-    const response = await POST(new Request("http://localhost/api/campaigns/campaign_demo/cancel", { method: "POST" }), {
+    const response = await POST(cancelRequest("campaign_demo"), {
       params: Promise.resolve({ campaignId: "campaign_demo" })
     });
 
@@ -113,3 +113,10 @@ describe("campaign cancel route", () => {
     expect(mocks.cancelCampaign).toHaveBeenCalledWith("org_demo", "campaign_demo");
   });
 });
+
+function cancelRequest(campaignId: string) {
+  return new Request(`http://localhost/api/campaigns/${campaignId}/cancel`, {
+    method: "POST",
+    headers: { Origin: "http://localhost", Host: "localhost" }
+  });
+}

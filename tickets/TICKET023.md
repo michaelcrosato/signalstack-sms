@@ -1,8 +1,8 @@
 # TICKET023 — Human-gated production identity, tenant routing, RLS, and gate integrity
 
-- **Status:** Todo
+- **Status:** Partially complete (2026-07-12) — identity, RLS, and composite tenant-integrity items landed with milestones M1/M2 (built-in local auth replaced the Clerk plan; forced RLS + composite tenant foreign keys + fail-closed tenant context are database-enforced and tested). Remaining scope: trusted provider-account/number webhook tenant routing (M4/M6), webhook retry policy review, live-test/lookup operator-token provisioning, and the human-reviewed integrity-manifest anchoring.
 - **Priority:** P1
-- **Blocked by:** Human-approved production identity, database-role, webhook-routing, and protected-gate decisions
+- **Blocked by:** Human-approved webhook-routing, operator-secret, and protected-gate decisions
 
 ## Goal
 

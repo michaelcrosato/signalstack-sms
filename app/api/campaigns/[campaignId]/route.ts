@@ -1,7 +1,7 @@
 import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth/api-authorization";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { getCampaign, updateCampaign } from "@/lib/db/repositories/campaigns";
 import { campaignUpdateSchema } from "@/lib/validation/campaigns";
 
@@ -10,7 +10,12 @@ type CampaignParams = {
 };
 
 export async function GET(_request: Request, { params }: CampaignParams) {
-  const [{ campaignId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
+  const authentication = await authenticateApiRequest();
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
+  const { campaignId } = await params;
   const campaign = await getCampaign(currentOrg.orgId, campaignId);
 
   if (!campaign) {
@@ -21,7 +26,12 @@ export async function GET(_request: Request, { params }: CampaignParams) {
 }
 
 export async function PATCH(request: Request, { params }: CampaignParams) {
-  const [{ campaignId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
+  const authentication = await authenticateApiRequest(request);
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
+  const { campaignId } = await params;
   const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
   if (roleResponse) {
     return roleResponse;

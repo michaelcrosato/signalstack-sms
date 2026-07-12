@@ -150,7 +150,12 @@ export const US_AREA_CODE_TIMEZONES: Record<string, string> = {
   "971": "America/Los_Angeles"
 };
 
-export function resolveTimezoneFromPhone(phone: string): string {
+// The US area-code map is not exhaustive (many valid NANP codes are unmapped). When no mapping is found
+// the caller-supplied `fallbackTimeZone` is used so quiet-hours enforcement can fall back to the
+// organization's configured timezone instead of a hardcoded Eastern default that would evaluate an
+// unmapped contact three hours off in the Pacific timezone. The default preserves prior behavior for
+// callers that pass no fallback.
+export function resolveTimezoneFromPhone(phone: string, fallbackTimeZone = "America/New_York"): string {
   // Strip any non-digit chars except leading +
   const sanitized = phone.replace(/[^\d+]/g, "");
   // Match US E.164: +1 followed by 10 digits
@@ -171,6 +176,5 @@ export function resolveTimezoneFromPhone(phone: string): string {
       return tz;
     }
   }
-  // Default to America/New_York
-  return "America/New_York";
+  return fallbackTimeZone;
 }

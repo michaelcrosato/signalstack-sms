@@ -1,7 +1,7 @@
 import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth/api-authorization";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { createConversationInboundMessage, listConversationMessages } from "@/lib/db/repositories/inbox";
 import { conversationMessageCreateSchema } from "@/lib/validation/inbox";
 
@@ -10,7 +10,12 @@ type ConversationParams = {
 };
 
 export async function GET(_request: Request, { params }: ConversationParams) {
-  const [{ conversationId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
+  const authentication = await authenticateApiRequest();
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
+  const { conversationId } = await params;
   const messages = await listConversationMessages(currentOrg.orgId, conversationId);
 
   if (!messages) {
@@ -21,7 +26,12 @@ export async function GET(_request: Request, { params }: ConversationParams) {
 }
 
 export async function POST(request: Request, { params }: ConversationParams) {
-  const [{ conversationId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
+  const authentication = await authenticateApiRequest(request);
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
+  const { conversationId } = await params;
   const roleResponse = requireApiRole(currentOrg, MembershipRole.MEMBER);
   if (roleResponse) {
     return roleResponse;

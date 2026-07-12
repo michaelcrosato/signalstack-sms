@@ -46,7 +46,7 @@ describe("redisConnectionFromUrl", () => {
     });
   });
 
-  it("parses a rediss:// (SSL) URL", () => {
+  it("parses a rediss:// (SSL) URL and enables TLS", () => {
     const result = redisConnectionFromUrl("rediss://aws-redis-host.com:6379/0");
     expect(result).toEqual({
       host: "aws-redis-host.com",
@@ -54,7 +54,20 @@ describe("redisConnectionFromUrl", () => {
       username: undefined,
       password: undefined,
       db: 0,
+      tls: {},
     });
+  });
+
+  it("percent-decodes credentials containing reserved characters", () => {
+    const result = redisConnectionFromUrl("redis://user%40name:p%40ss%3Aword@redis.example.com:6379/0");
+    expect(result).toMatchObject({
+      username: "user@name",
+      password: "p@ss:word",
+    });
+  });
+
+  it("does not include a tls option for a plaintext redis URL", () => {
+    expect(redisConnectionFromUrl("redis://localhost:6379")).not.toHaveProperty("tls");
   });
 
   it("throws an error for invalid URLs", () => {

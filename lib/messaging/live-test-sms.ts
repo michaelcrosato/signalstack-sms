@@ -1,6 +1,6 @@
 import { createHash, createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import type { LiveReadinessAuditEvent, Message, Prisma } from "@prisma/client";
-import { prisma } from "@/lib/db/prisma";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 import { isTerminalDeliveryFailureProviderStatus } from "@/lib/messaging/delivery-status";
 
 export const liveTestSmsConfirmation = "SEND LIVE TEST";
@@ -218,14 +218,19 @@ export async function sendLiveTestSms(input: LiveTestSmsSendInput): Promise<Live
       idempotencyKey
     }
   };
-  const existingMessage = await prisma.message.findUnique({ where: messageWhere });
-  if (existingMessage) {
-    return getStoredLiveTestSmsResult({
-      orgId: input.orgId,
-      actorUserId: input.actorUserId,
-      message: existingMessage,
-      requestFingerprint
-    });
+  const existingResult = await withTenantTransaction({ orgId: input.orgId }, async (tx) => {
+    const existingMessage = await tx.message.findUnique({ where: messageWhere });
+    return existingMessage
+      ? getStoredLiveTestSmsResult(tx, {
+          orgId: input.orgId,
+          actorUserId: input.actorUserId,
+          message: existingMessage,
+          requestFingerprint
+        })
+      : null;
+  });
+  if (existingResult) {
+    return existingResult;
   }
 
   const blockers = [...status.blockers];
@@ -264,8 +269,8 @@ export async function sendLiveTestSms(input: LiveTestSmsSendInput): Promise<Live
   const messageId = randomUUID();
   let reservedMessage: Pick<Message, "id">;
   try {
-    await prisma.$transaction([
-      prisma.message.create({
+    reservedMessage = await withTenantTransaction({ orgId: input.orgId }, async (tx) => {
+      const message = await tx.message.create({
         data: {
           id: messageId,
           orgId: input.orgId,
@@ -275,8 +280,8 @@ export async function sendLiveTestSms(input: LiveTestSmsSendInput): Promise<Live
           idempotencyKey
         },
         select: { id: true }
-      }),
-      prisma.liveReadinessAuditEvent.create({
+      });
+      await tx.liveReadinessAuditEvent.create({
         data: {
           orgId: input.orgId,
           actorUserId: input.actorUserId,
@@ -291,24 +296,29 @@ export async function sendLiveTestSms(input: LiveTestSmsSendInput): Promise<Live
             bodyLength: body.length
           }
         }
-      })
-    ]);
-    reservedMessage = { id: messageId };
+      });
+      return message;
+    });
   } catch (error) {
     if (!isUniqueConstraintError(error)) {
       throw error;
     }
 
-    const racedMessage = await prisma.message.findUnique({ where: messageWhere });
-    if (!racedMessage) {
+    const racedResult = await withTenantTransaction({ orgId: input.orgId }, async (tx) => {
+      const racedMessage = await tx.message.findUnique({ where: messageWhere });
+      return racedMessage
+        ? getStoredLiveTestSmsResult(tx, {
+            orgId: input.orgId,
+            actorUserId: input.actorUserId,
+            message: racedMessage,
+            requestFingerprint
+          })
+        : null;
+    });
+    if (!racedResult) {
       throw error;
     }
-    return getStoredLiveTestSmsResult({
-      orgId: input.orgId,
-      actorUserId: input.actorUserId,
-      message: racedMessage,
-      requestFingerprint
-    });
+    return racedResult;
   }
 
   let providerResult: Awaited<ReturnType<typeof sendTwilioSms>>;
@@ -370,8 +380,8 @@ export async function sendLiveTestSms(input: LiveTestSmsSendInput): Promise<Live
   }
 
   try {
-    await prisma.$transaction([
-      prisma.message.update({
+    await withTenantTransaction({ orgId: input.orgId }, async (tx) => {
+      await tx.message.update({
         where: { id: reservedMessage.id, orgId: input.orgId },
         data: {
           providerMessageId: providerResult.sid,
@@ -379,8 +389,8 @@ export async function sendLiveTestSms(input: LiveTestSmsSendInput): Promise<Live
           providerErrorCode: null,
           failedAt: null
         }
-      }),
-      prisma.liveReadinessAuditEvent.create({
+      });
+      await tx.liveReadinessAuditEvent.create({
         data: {
           orgId: input.orgId,
           actorUserId: input.actorUserId,
@@ -395,8 +405,8 @@ export async function sendLiveTestSms(input: LiveTestSmsSendInput): Promise<Live
             providerStatus: providerResult.status
           }
         }
-      })
-    ]);
+      });
+    });
   } catch {
     return pendingResult({ duplicate: false, to, from });
   }
@@ -459,7 +469,7 @@ async function markLiveTestSmsFailed(input: {
   providerStatus: string;
   providerErrorCode: string;
 }) {
-  await prisma.message.update({
+  await withTenantTransaction({ orgId: input.orgId }, (tx) => tx.message.update({
     where: { id: input.messageId, orgId: input.orgId },
     data: {
       ...(input.providerMessageId ? { providerMessageId: input.providerMessageId } : {}),
@@ -467,7 +477,7 @@ async function markLiveTestSmsFailed(input: {
       providerErrorCode: input.providerErrorCode,
       failedAt: new Date()
     }
-  });
+  }));
 }
 
 function pendingResult(input: { duplicate: boolean; to: string; from: string }): LiveTestSmsSendResult {
@@ -502,13 +512,13 @@ function failedResult(input: {
   };
 }
 
-async function getStoredLiveTestSmsResult(input: {
+async function getStoredLiveTestSmsResult(tx: Prisma.TransactionClient, input: {
   orgId: string;
   actorUserId: string;
   message: StoredLiveTestSmsMessage;
   requestFingerprint: string;
 }): Promise<LiveTestSmsSendResult> {
-  const reservationAudit = await prisma.liveReadinessAuditEvent.findFirst({
+  const reservationAudit = await tx.liveReadinessAuditEvent.findFirst({
     where: {
       orgId: input.orgId,
       action: "LIVE_TEST_SMS_RESERVED",

@@ -444,7 +444,9 @@ test("product analytics page renders local overview detail", async ({ page }) =>
   await page.goto("/dashboard/analytics");
 
   await expect(page.getByRole("heading", { name: "Analytics workspace" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Dashboard" })).toHaveAttribute("href", "/dashboard");
+  // The persistent app header (rendered first by the dashboard layout) also carries a Dashboard nav
+  // link, so scope to the analytics page's own back-link — the last Dashboard link in DOM order.
+  await expect(page.getByRole("link", { name: "Dashboard" }).last()).toHaveAttribute("href", "/dashboard");
 
   const metrics = page.getByLabel("Analytics metrics");
   await expect(metrics.getByText("Consent Coverage")).toBeVisible();

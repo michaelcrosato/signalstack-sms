@@ -20,7 +20,6 @@ package-lock.json
 .env*.local
 
 # Agent run logs / loop artifacts (history lives in `git log`)
-codex-runs/
 docs/loop-artifacts/
 LOOP_LOG.md
 docs/LOOP_LOG.md

@@ -20,9 +20,123 @@ export type ApiRouteSignedWebhookEntry = Readonly<{
   scope: string;
 }>;
 
-export type ApiRouteRbacMatrixEntry = ApiRouteRoleGateEntry | ApiRouteSignedWebhookEntry;
+export type ApiRoutePublicAuthEntry = Readonly<{
+  auth: "public-auth";
+  method: "POST";
+  path:
+    | `app/api/auth/${"setup" | "login" | "logout"}/route.ts`
+    | "app/api/auth/password-resets/complete/route.ts"
+    | "app/api/auth/team/invites/accept/route.ts";
+  flow: "setup" | "login" | "logout" | "reset-complete" | "invite-accept";
+  scope: string;
+}>;
+
+export type ApiRouteOperatorBoundaryEntry = Readonly<{
+  auth: "operator-boundary";
+  method: "POST";
+  path: "app/api/auth/password-resets/route.ts";
+  operatorCommand: "admin:reset-link";
+  scope: string;
+}>;
+
+export type ApiRouteRbacMatrixEntry =
+  | ApiRouteRoleGateEntry
+  | ApiRouteSignedWebhookEntry
+  | ApiRoutePublicAuthEntry
+  | ApiRouteOperatorBoundaryEntry;
 
 const apiRouteRbacMatrixItems = [
+  {
+    auth: "public-auth",
+    method: "POST",
+    path: "app/api/auth/login/route.ts",
+    flow: "login",
+    scope: "authenticate a local credential and create a session"
+  },
+  {
+    auth: "public-auth",
+    method: "POST",
+    path: "app/api/auth/logout/route.ts",
+    flow: "logout",
+    scope: "revoke a presented local session and clear session cookies"
+  },
+  {
+    auth: "public-auth",
+    method: "POST",
+    path: "app/api/auth/password-resets/complete/route.ts",
+    flow: "reset-complete",
+    scope: "consume a one-time local password reset and revoke every session"
+  },
+  {
+    auth: "public-auth",
+    method: "POST",
+    path: "app/api/auth/setup/route.ts",
+    flow: "setup",
+    scope: "perform first-owner bootstrap using the operator secret"
+  },
+  {
+    auth: "public-auth",
+    method: "POST",
+    path: "app/api/auth/team/invites/accept/route.ts",
+    flow: "invite-accept",
+    scope: "accept one email-bound local invitation and establish or switch a session"
+  },
+  {
+    auth: "operator-boundary",
+    method: "POST",
+    path: "app/api/auth/password-resets/route.ts",
+    operatorCommand: "admin:reset-link",
+    scope: "deny tenant reset issuance; user-global recovery is platform-operator-only"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/auth/sessions/revoke-all/route.ts",
+    requiredRole: MembershipRole.MEMBER,
+    scope: "revoke every opaque local session for the authenticated user"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/auth/organizations/route.ts",
+    requiredRole: MembershipRole.OWNER,
+    scope: "create a local organization from a current-owner trust boundary"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/auth/organizations/select/route.ts",
+    requiredRole: MembershipRole.MEMBER,
+    scope: "switch an opaque local session to another active organization membership"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/auth/team/invites/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "create an email-bound local team invitation"
+  },
+  {
+    auth: "role",
+    method: "DELETE",
+    path: "app/api/auth/team/invites/[inviteId]/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "revoke a pending same-tenant team invitation"
+  },
+  {
+    auth: "role",
+    method: "PATCH",
+    path: "app/api/auth/team/members/[userId]/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "change a same-tenant member role or suspension state"
+  },
+  {
+    auth: "role",
+    method: "DELETE",
+    path: "app/api/auth/team/members/[userId]/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "revoke a same-tenant organization membership"
+  },
   {
     auth: "role",
     method: "POST",
@@ -249,7 +363,7 @@ const apiRouteRbacMatrixItems = [
   }
 ] satisfies ApiRouteRbacMatrixEntry[];
 
-export const apiRouteRbacMatrix = Object.freeze(
+export const apiRouteRbacMatrix: readonly ApiRouteRbacMatrixEntry[] = Object.freeze(
   apiRouteRbacMatrixItems.map((entry) => Object.freeze({ ...entry }))
 );
 
@@ -261,8 +375,26 @@ function isSignedWebhookEntry(entry: ApiRouteRbacMatrixEntry): entry is ApiRoute
   return entry.auth === "signed-webhook";
 }
 
+function isPublicAuthEntry(entry: ApiRouteRbacMatrixEntry): entry is ApiRoutePublicAuthEntry {
+  return entry.auth === "public-auth";
+}
+
+function isOperatorBoundaryEntry(
+  entry: ApiRouteRbacMatrixEntry
+): entry is ApiRouteOperatorBoundaryEntry {
+  return entry.auth === "operator-boundary";
+}
+
 export const apiRouteRbacRoleMatrix = Object.freeze(apiRouteRbacMatrix.filter(isRoleGateEntry));
 
 export const apiRouteRbacSignedWebhookExceptions = Object.freeze(
   apiRouteRbacMatrix.filter(isSignedWebhookEntry)
+);
+
+export const apiRouteRbacPublicAuthExceptions = Object.freeze(
+  apiRouteRbacMatrix.filter(isPublicAuthEntry)
+);
+
+export const apiRouteRbacOperatorBoundaryExceptions = Object.freeze(
+  apiRouteRbacMatrix.filter(isOperatorBoundaryEntry)
 );

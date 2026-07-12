@@ -1,7 +1,7 @@
 import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth/api-authorization";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { cancelCampaign } from "@/lib/db/repositories/campaigns";
 
 type CampaignParams = {
@@ -14,8 +14,13 @@ const campaignCancelConflictMessages = new Set([
   "Campaign cancellation conflicted with another transition."
 ]);
 
-export async function POST(_request: Request, { params }: CampaignParams) {
-  const [{ campaignId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
+export async function POST(request: Request, { params }: CampaignParams) {
+  const authentication = await authenticateApiRequest(request);
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
+  const { campaignId } = await params;
   const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
   if (roleResponse) {
     return roleResponse;

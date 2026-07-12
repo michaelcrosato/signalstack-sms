@@ -1,7 +1,7 @@
 import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth/api-authorization";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { getTemplate, updateTemplate } from "@/lib/db/repositories/templates";
 import { extractTemplateVariables } from "@/lib/messaging/render-template";
 import { templateCreateSchema } from "@/lib/validation/campaigns";
@@ -11,7 +11,12 @@ type TemplateParams = {
 };
 
 export async function GET(_request: Request, { params }: TemplateParams) {
-  const [{ templateId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
+  const authentication = await authenticateApiRequest();
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
+  const { templateId } = await params;
   const template = await getTemplate(currentOrg.orgId, templateId);
 
   if (!template) {
@@ -22,7 +27,12 @@ export async function GET(_request: Request, { params }: TemplateParams) {
 }
 
 export async function PATCH(request: Request, { params }: TemplateParams) {
-  const [{ templateId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
+  const authentication = await authenticateApiRequest(request);
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
+  const { templateId } = await params;
   const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
   if (roleResponse) {
     return roleResponse;

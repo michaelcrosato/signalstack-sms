@@ -9,6 +9,7 @@ import {
   UsageEventType
 } from "@prisma/client";
 import { prisma } from "../lib/db/prisma";
+import { normalizeEmail } from "../lib/auth/crypto";
 import { logger } from "../lib/observability/logger";
 
 async function main() {
@@ -16,11 +17,13 @@ async function main() {
     where: { clerkUserId: "demo_user_signalstack" },
     update: {
       email: "owner@signalstack.example",
+      normalizedEmail: normalizeEmail("owner@signalstack.example"),
       displayName: "Demo Owner"
     },
     create: {
       clerkUserId: "demo_user_signalstack",
       email: "owner@signalstack.example",
+      normalizedEmail: normalizeEmail("owner@signalstack.example"),
       displayName: "Demo Owner"
     }
   });
@@ -29,11 +32,13 @@ async function main() {
     where: { clerkUserId: "demo_user_manager_signalstack" },
     update: {
       email: "manager@signalstack.example",
+      normalizedEmail: normalizeEmail("manager@signalstack.example"),
       displayName: "Demo Manager"
     },
     create: {
       clerkUserId: "demo_user_manager_signalstack",
       email: "manager@signalstack.example",
+      normalizedEmail: normalizeEmail("manager@signalstack.example"),
       displayName: "Demo Manager"
     }
   });
@@ -42,11 +47,13 @@ async function main() {
     where: { clerkUserId: "demo_user_sales_signalstack" },
     update: {
       email: "sales@signalstack.example",
+      normalizedEmail: normalizeEmail("sales@signalstack.example"),
       displayName: "Demo Sales"
     },
     create: {
       clerkUserId: "demo_user_sales_signalstack",
       email: "sales@signalstack.example",
+      normalizedEmail: normalizeEmail("sales@signalstack.example"),
       displayName: "Demo Sales"
     }
   });

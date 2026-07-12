@@ -79,7 +79,7 @@ vi.mock("@/lib/messaging/provider/settings", () => ({
 function malformedJsonRequest(path: string, method = "POST") {
   return new Request(`http://localhost${path}`, {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers: sameOriginJsonHeaders(),
     body: "{"
   });
 }
@@ -172,7 +172,7 @@ describe("settings and operations JSON mutation routes", () => {
     const response = await updateComplianceRoute(
       new Request("http://localhost/api/settings/compliance", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: JSON.stringify({
           businessName: "SignalStack Demo",
           messagingUseCase: "Customer updates",
@@ -261,7 +261,7 @@ describe("settings and operations JSON mutation routes", () => {
     const response = await upsertNumberRoute(
       new Request("http://localhost/api/settings/numbers", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: JSON.stringify({
           phoneNumber: "+15555550199",
           label: "Demo line",
@@ -294,7 +294,7 @@ describe("settings and operations JSON mutation routes", () => {
     const response = await upsertNumberRoute(
       new Request("http://localhost/api/settings/numbers", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: JSON.stringify({ phoneNumber: "+15555550199", isDefault: true })
       })
     );
@@ -311,7 +311,7 @@ describe("settings and operations JSON mutation routes", () => {
     const response = await upsertNumberRoute(
       new Request("http://localhost/api/settings/numbers", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: JSON.stringify({ phoneNumber: "+15555550199", isDefault: true })
       })
     );
@@ -376,7 +376,7 @@ describe("settings and operations JSON mutation routes", () => {
     const response = await updateProviderRoute(
       new Request("http://localhost/api/settings/provider", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: sameOriginJsonHeaders(),
         body: JSON.stringify({
           provider: "twilio",
           twilio: {
@@ -425,7 +425,7 @@ describe("settings and operations JSON mutation routes", () => {
     const denial = Response.json({ error: "Forbidden" }, { status: 403 });
     mocks.requireApiRole.mockReturnValue(denial);
 
-    const response = await deleteProviderRoute();
+    const response = await deleteProviderRoute(providerDeleteRequest());
 
     expect(response.status).toBe(403);
     expect(mocks.deleteProviderCredentialMetadata).not.toHaveBeenCalled();
@@ -450,7 +450,7 @@ describe("settings and operations JSON mutation routes", () => {
       twilio: { configured: false }
     });
 
-    const response = await deleteProviderRoute();
+    const response = await deleteProviderRoute(providerDeleteRequest());
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
@@ -484,3 +484,14 @@ describe("settings and operations JSON mutation routes", () => {
     expect(mocks.sendLiveTestSms).not.toHaveBeenCalled();
   });
 });
+
+function providerDeleteRequest() {
+  return new Request("http://localhost/api/settings/provider", {
+    method: "DELETE",
+    headers: { Origin: "http://localhost", Host: "localhost" }
+  });
+}
+
+function sameOriginJsonHeaders() {
+  return { "Content-Type": "application/json", Origin: "http://localhost", Host: "localhost" };
+}

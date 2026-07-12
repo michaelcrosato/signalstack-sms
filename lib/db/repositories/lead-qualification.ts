@@ -1,5 +1,6 @@
-import { prisma } from "@/lib/db/prisma";
+import type { Prisma } from "@prisma/client";
 import { orgWhere } from "@/lib/db/tenant";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 
 export type PersistedLeadQualification = {
   score: number;
@@ -13,24 +14,28 @@ export async function persistContactLeadQualification(
   orgId: string,
   conversationId: string,
   result: PersistedLeadQualification,
-  db: typeof prisma = prisma
+  tx?: Prisma.TransactionClient
 ): Promise<boolean> {
-  const conversation = await db.conversation.findFirst({
-    where: orgWhere(orgId, { id: conversationId }),
-    select: { contactId: true }
-  });
-  if (!conversation || !conversation.contactId) {
-    return false;
-  }
-
-  await db.contact.updateMany({
-    where: { id: conversation.contactId, orgId },
-    data: {
-      leadScore: result.score,
-      leadStage: result.stage,
-      leadQualifiedAt: new Date()
+  const execute = async (client: Prisma.TransactionClient): Promise<boolean> => {
+    const conversation = await client.conversation.findFirst({
+      where: orgWhere(orgId, { id: conversationId }),
+      select: { contactId: true }
+    });
+    if (!conversation || !conversation.contactId) {
+      return false;
     }
-  });
 
-  return true;
+    await client.contact.updateMany({
+      where: { id: conversation.contactId, orgId },
+      data: {
+        leadScore: result.score,
+        leadStage: result.stage,
+        leadQualifiedAt: new Date()
+      }
+    });
+
+    return true;
+  };
+
+  return tx ? execute(tx) : withTenantTransaction({ orgId }, execute);
 }

@@ -59,50 +59,69 @@ describe("API rate limiting", () => {
     });
   });
 
-  it("securely resolves caller IP by priority", () => {
-    // Priority 1: request.ip
-    expect(
-      getApiRateLimitClientKey({
-        headers: new Headers({
-          "cf-connecting-ip": "1.1.1.1",
-          "x-real-ip": "2.2.2.2",
-          "x-forwarded-for": "3.3.3.3, 4.4.4.4"
-        }),
-        ip: "5.5.5.5"
-      })
-    ).toBe("5.5.5.5");
+  const trustedProxy = { TRUST_PROXY: "true" };
 
-    // Priority 2: cf-connecting-ip
+  it("always trusts a platform-provided socket address regardless of TRUST_PROXY", () => {
     expect(
-      getApiRateLimitClientKey({
-        headers: new Headers({
-          "cf-connecting-ip": "1.1.1.1",
-          "x-real-ip": "2.2.2.2",
-          "x-forwarded-for": "3.3.3.3, 4.4.4.4"
-        })
-      })
+      getApiRateLimitClientKey(
+        {
+          headers: new Headers({
+            "cf-connecting-ip": "1.1.1.1",
+            "x-real-ip": "2.2.2.2",
+            "x-forwarded-for": "3.3.3.3, 4.4.4.4"
+          }),
+          ip: "5.5.5.5"
+        },
+        {}
+      )
+    ).toBe("5.5.5.5");
+  });
+
+  it("resolves forwarded IP headers by priority only when behind a trusted proxy", () => {
+    // Priority: cf-connecting-ip
+    expect(
+      getApiRateLimitClientKey(
+        {
+          headers: new Headers({
+            "cf-connecting-ip": "1.1.1.1",
+            "x-real-ip": "2.2.2.2",
+            "x-forwarded-for": "3.3.3.3, 4.4.4.4"
+          })
+        },
+        trustedProxy
+      )
     ).toBe("1.1.1.1");
 
-    // Priority 3: x-real-ip
+    // Priority: x-real-ip
     expect(
-      getApiRateLimitClientKey({
-        headers: new Headers({
-          "x-real-ip": "2.2.2.2",
-          "x-forwarded-for": "3.3.3.3, 4.4.4.4"
-        })
-      })
+      getApiRateLimitClientKey(
+        { headers: new Headers({ "x-real-ip": "2.2.2.2", "x-forwarded-for": "3.3.3.3, 4.4.4.4" }) },
+        trustedProxy
+      )
     ).toBe("2.2.2.2");
 
-    // Priority 4: rightmost x-forwarded-for
+    // Priority: rightmost x-forwarded-for (the hop our trusted ingress observed)
     expect(
-      getApiRateLimitClientKey({
-        headers: new Headers({
-          "x-forwarded-for": "3.3.3.3, 4.4.4.4"
-        })
-      })
+      getApiRateLimitClientKey({ headers: new Headers({ "x-forwarded-for": "3.3.3.3, 4.4.4.4" }) }, trustedProxy)
     ).toBe("4.4.4.4");
+  });
 
-    // Priority 5: fallback
-    expect(getApiRateLimitClientKey(new Headers())).toBe("local-demo-client");
+  it("ignores spoofable forwarded headers without TRUST_PROXY (no per-request bucket bypass)", () => {
+    // Every attacker-supplied header collapses to the shared bucket, so rotating fake IPs cannot mint
+    // a fresh limiter bucket per request.
+    expect(
+      getApiRateLimitClientKey(
+        { headers: new Headers({ "cf-connecting-ip": "1.1.1.1", "x-forwarded-for": "9.9.9.9" }) },
+        {}
+      )
+    ).toBe("local-demo-client");
+    expect(
+      getApiRateLimitClientKey({ headers: new Headers({ "cf-connecting-ip": "2.2.2.2" }) }, {})
+    ).toBe("local-demo-client");
+  });
+
+  it("falls back to the shared key when no address is available", () => {
+    expect(getApiRateLimitClientKey(new Headers(), trustedProxy)).toBe("local-demo-client");
+    expect(getApiRateLimitClientKey(new Headers(), {})).toBe("local-demo-client");
   });
 });

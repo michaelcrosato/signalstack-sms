@@ -11,6 +11,47 @@ Milestone 0 validation runs:
 - Playwright smoke
 - Next build
 
+## M2 Tenant-Boundary Gates
+
+PostgreSQL tenant enforcement is mandatory evidence, not an optional RLS mode:
+
+- `npm run test:tenant-db` runs the eight-file / 33-test M2 gate against a disposable owner-capable
+  PostgreSQL database. It creates non-owner NOINHERIT runtime roles and tenant A/B fixtures, then covers
+  all 27 protected tables for scoped reads/writes, missing context, cross-tenant forgery, relation
+  constraints/triggers, rollback, semantic runtime-policy fingerprints, exact command-specific control
+  denial, worker dispatch, and multi-connection pool reuse.
+- The tenant gate includes a fresh install of all 40 migrations under a non-superuser/non-BYPASSRLS
+  table owner using `signalstack_owner`. That proof exercises the historical triggers and dispatch
+  function and verifies the dispatch function's fixed search path and revoked `PUBLIC` EXECUTE ACL.
+- The complete `RUN_DB_TESTS=true` database-directory run is 37 files / 186 tests, and the focused auth
+  database run is nine files / 38 tests. Fresh migration deployment leaves no Prisma schema diff.
+  CI/premerge supply PostgreSQL and keep the tenant gate inside the protected validation path.
+- `npm run tenant:boundary:check` statically inventories direct Prisma imports under `app`, `lib`, and
+  `workers`. The accepted M2 posture is zero unauthorized/stale entries and zero
+  `tenant-migration-debt` imports; new tenant paths must use the transaction-context seam.
+- `npm run test:e2e:local-auth:production` uses distinct loopback `MIGRATION_DATABASE_URL` and
+  `DATABASE_URL` credentials. The owner connection manages fixtures, while the production build/server
+  receives only the non-owner web login and proves the authenticated browser path through forced RLS.
+
+Focused database command:
+
+```powershell
+$env:DATABASE_URL='<disposable PostgreSQL owner URL>'
+npm run test:tenant-db
+```
+
+Full database command:
+
+```powershell
+$env:RUN_DB_TESTS='true'
+$env:DATABASE_URL='<disposable PostgreSQL owner URL>'
+npx vitest run tests/unit/db
+```
+
+Latest default unit-suite evidence is 150 passing / 13 skipped files and 1,078 passing / 61 skipped tests
+(`npm test`; 1,139 tests total). The production local-auth build/browser proof is 1/1 under the distinct
+non-owner web login.
+
 Additional deterministic checks:
 
 - Smoke coverage verifies the exported demo-safe runtime defaults are runtime-frozen before the root launch page, health endpoint, compliance check, and local environment views consume them, so caller-side mutation cannot drift demo mode, live messaging, live billing, dummy provider, or fake AI defaults.

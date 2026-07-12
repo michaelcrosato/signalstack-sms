@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { Prisma, WebhookEvent } from "@prisma/client";
-import { prisma } from "@/lib/db/prisma";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 import { twilioStatusTransition, twilioStatusUpdateGuard } from "@/lib/messaging/twilio-webhooks";
 
 export const WEBHOOK_EVENT_CLAIM_LEASE_MS = 5 * 60 * 1000;
@@ -34,22 +34,24 @@ async function claimExistingWebhookEvent(
     } as const;
   }
 
-  const claimed = await prisma.webhookEvent.updateMany({
-    where: {
-      id: event.id,
-      orgId: input.orgId,
-      processedAt: null,
-      OR: [
-        { claimToken: null },
-        { claimExpiresAt: null },
-        { claimExpiresAt: { lte: claim.now } }
-      ]
-    },
-    data: {
-      claimToken: claim.token,
-      claimExpiresAt: claim.expiresAt
-    }
-  });
+  const claimed = await withTenantTransaction({ orgId: input.orgId }, (tx) =>
+    tx.webhookEvent.updateMany({
+      where: {
+        id: event.id,
+        orgId: input.orgId,
+        processedAt: null,
+        OR: [
+          { claimToken: null },
+          { claimExpiresAt: null },
+          { claimExpiresAt: { lte: claim.now } }
+        ]
+      },
+      data: {
+        claimToken: claim.token,
+        claimExpiresAt: claim.expiresAt
+      }
+    })
+  );
 
   if (claimed.count !== 1) {
     return {
@@ -93,24 +95,28 @@ export async function recordWebhookEvent(
   const claimExpiresAt = new Date(now.getTime() + WEBHOOK_EVENT_CLAIM_LEASE_MS);
   const claim = { token: claimToken, expiresAt: claimExpiresAt, now };
   const where = { orgId_idempotencyKey: { orgId: input.orgId, idempotencyKey: input.idempotencyKey } };
-  const existing = await prisma.webhookEvent.findUnique({ where });
+  const existing = await withTenantTransaction({ orgId: input.orgId }, (tx) =>
+    tx.webhookEvent.findUnique({ where })
+  );
   if (existing) {
     return claimExistingWebhookEvent(existing, input, claim);
   }
 
   try {
-    const event = await prisma.webhookEvent.create({
-      data: {
-        orgId: input.orgId,
-        provider: input.provider,
-        eventType: input.eventType,
-        idempotencyKey: input.idempotencyKey,
-        rawPayload: input.rawPayload as Prisma.InputJsonObject,
-        processedAt: null,
-        claimToken,
-        claimExpiresAt
-      }
-    });
+    const event = await withTenantTransaction({ orgId: input.orgId }, (tx) =>
+      tx.webhookEvent.create({
+        data: {
+          orgId: input.orgId,
+          provider: input.provider,
+          eventType: input.eventType,
+          idempotencyKey: input.idempotencyKey,
+          rawPayload: input.rawPayload as Prisma.InputJsonObject,
+          processedAt: null,
+          claimToken,
+          claimExpiresAt
+        }
+      })
+    );
 
     return {
       event,
@@ -126,7 +132,9 @@ export async function recordWebhookEvent(
       throw error;
     }
 
-    const duplicate = await prisma.webhookEvent.findUnique({ where });
+    const duplicate = await withTenantTransaction({ orgId: input.orgId }, (tx) =>
+      tx.webhookEvent.findUnique({ where })
+    );
     if (!duplicate) {
       throw error;
     }
@@ -141,7 +149,7 @@ export async function markWebhookEventProcessed(
   claimToken: string,
   processedAt = new Date()
 ) {
-  return prisma.webhookEvent.updateMany({
+  return withTenantTransaction({ orgId }, (tx) => tx.webhookEvent.updateMany({
     where: {
       id: eventId,
       orgId,
@@ -153,11 +161,11 @@ export async function markWebhookEventProcessed(
       claimToken: null,
       claimExpiresAt: null
     }
-  });
+  }));
 }
 
 export async function releaseWebhookEventClaim(orgId: string, eventId: string, claimToken: string) {
-  return prisma.webhookEvent.updateMany({
+  return withTenantTransaction({ orgId }, (tx) => tx.webhookEvent.updateMany({
     where: {
       id: eventId,
       orgId,
@@ -168,7 +176,7 @@ export async function releaseWebhookEventClaim(orgId: string, eventId: string, c
       claimToken: null,
       claimExpiresAt: null
     }
-  });
+  }));
 }
 
 export async function updateMessageFromTwilioStatus(input: {
@@ -178,30 +186,32 @@ export async function updateMessageFromTwilioStatus(input: {
   errorCode?: string;
   now?: Date;
 }) {
-  const message = await prisma.message.findFirst({
-    where: {
-      orgId: input.orgId,
-      providerMessageId: input.providerMessageId
-    },
-    select: { createdAt: true }
+  return withTenantTransaction({ orgId: input.orgId }, async (tx) => {
+    const message = await tx.message.findFirst({
+      where: {
+        orgId: input.orgId,
+        providerMessageId: input.providerMessageId
+      },
+      select: { createdAt: true }
+    });
+
+    if (!message) {
+      return { matched: false, updated: false, createdAt: null };
+    }
+
+    const update = await tx.message.updateMany({
+      where: {
+        orgId: input.orgId,
+        providerMessageId: input.providerMessageId,
+        ...twilioStatusUpdateGuard(input.status)
+      },
+      data: twilioStatusTransition(input)
+    });
+
+    if (update.count === 0) {
+      return { matched: true, updated: false, createdAt: message.createdAt };
+    }
+
+    return { matched: true, updated: true, createdAt: message.createdAt };
   });
-
-  if (!message) {
-    return { matched: false, updated: false, createdAt: null };
-  }
-
-  const update = await prisma.message.updateMany({
-    where: {
-      orgId: input.orgId,
-      providerMessageId: input.providerMessageId,
-      ...twilioStatusUpdateGuard(input.status)
-    },
-    data: twilioStatusTransition(input)
-  });
-
-  if (update.count === 0) {
-    return { matched: true, updated: false, createdAt: message.createdAt };
-  }
-
-  return { matched: true, updated: true, createdAt: message.createdAt };
 }

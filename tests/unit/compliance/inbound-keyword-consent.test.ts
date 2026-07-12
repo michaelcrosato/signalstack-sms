@@ -7,7 +7,14 @@ const mocks = vi.hoisted(() => ({
   contactUpdateMany: vi.fn(),
   conversationUpdate: vi.fn(),
   messageUpsert: vi.fn(),
-  providerSend: vi.fn()
+  providerSend: vi.fn(),
+  transaction: vi.fn()
+}));
+
+vi.mock("@/lib/db/prisma", () => ({
+  prisma: {
+    $transaction: mocks.transaction
+  }
 }));
 
 vi.mock("@/lib/messaging/provider/dummy-provider", () => ({
@@ -25,12 +32,26 @@ function fakeTransaction() {
   } as unknown as Prisma.TransactionClient;
 }
 
+let transactionActive = false;
+
 describe("inbound opt-in consent evidence", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    transactionActive = false;
+    mocks.transaction.mockImplementation(async (callback) => {
+      transactionActive = true;
+      try {
+        return await callback(fakeTransaction());
+      } finally {
+        transactionActive = false;
+      }
+    });
     mocks.contactUpdateMany.mockResolvedValue({ count: 1 });
     mocks.contactUpdate.mockResolvedValue({});
-    mocks.providerSend.mockResolvedValue({ providerMessageId: "dummy_opt_in", status: "queued" });
+    mocks.providerSend.mockImplementation(async () => {
+      expect(transactionActive).toBe(false);
+      return { providerMessageId: "dummy_opt_in", status: "queued" };
+    });
     mocks.messageUpsert.mockResolvedValue({ createdAt: new Date("2026-07-10T12:00:00.000Z") });
   });
 
@@ -38,7 +59,6 @@ describe("inbound opt-in consent evidence", () => {
     const consentCapturedAt = new Date("2026-01-01T12:00:00.000Z");
 
     await processInboundKeywordsAndAutoReply(
-      fakeTransaction(),
       "org_1",
       {
         id: "contact_1",
@@ -69,7 +89,6 @@ describe("inbound opt-in consent evidence", () => {
 
   it("captures a complete evidence set when no prior evidence exists", async () => {
     await processInboundKeywordsAndAutoReply(
-      fakeTransaction(),
       "org_1",
       {
         id: "contact_1",
@@ -104,7 +123,6 @@ describe("inbound opt-in consent evidence", () => {
 
   it("fails closed instead of mixing a new opt-in with partial historical evidence", async () => {
     await processInboundKeywordsAndAutoReply(
-      fakeTransaction(),
       "org_1",
       {
         id: "contact_1",
@@ -129,7 +147,6 @@ describe("inbound opt-in consent evidence", () => {
     mocks.contactUpdateMany.mockResolvedValue({ count: 0 });
 
     await processInboundKeywordsAndAutoReply(
-      fakeTransaction(),
       "org_1",
       {
         id: "contact_1",
@@ -151,7 +168,6 @@ describe("inbound opt-in consent evidence", () => {
 
   it("applies keyword consent without creating a dummy reply when auto-replies are disabled", async () => {
     await processInboundKeywordsAndAutoReply(
-      fakeTransaction(),
       "org_1",
       {
         id: "contact_1",

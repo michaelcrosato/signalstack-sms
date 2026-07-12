@@ -1,7 +1,7 @@
 import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth/api-authorization";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { resolveAiMessages } from "@/lib/ai/conversation-context";
 import { resolveAiProvider } from "@/lib/ai/provider";
 import {
@@ -12,11 +12,16 @@ import {
 } from "@/lib/ai/usage";
 import { persistContactLeadQualification } from "@/lib/db/repositories/lead-qualification";
 import { conversationAiRequestSchema } from "@/lib/validation/ai";
+import { aiRouteErrorResponse } from "@/lib/ai/ai-route-error";
 
 const CAP_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 export async function POST(request: Request) {
-  const currentOrg = await getOrCreateCurrentOrg();
+  const authentication = await authenticateApiRequest(request);
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
   const roleResponse = requireApiRole(currentOrg, MembershipRole.MEMBER);
   if (roleResponse) {
     return roleResponse;
@@ -61,6 +66,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json(result);
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "AI provider blocked." }, { status: 403 });
+    return aiRouteErrorResponse("lead-qualification", error);
   }
 }

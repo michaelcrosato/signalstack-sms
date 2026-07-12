@@ -1,9 +1,12 @@
 # SignalStack SMS
 
-Demo-safe, multi-tenant SMB **SMS/MMS marketing + shared inbox + lead-qualification** SaaS
-(Next.js App Router · TypeScript · Prisma/Postgres · BullMQ/Redis). All real-world impact — live
-SMS, billing, AI, and production auth/workers/deploy — is **off by default** behind executable hard
-gates. The only intentional live path is the multi-gated `/demo` live-test SMS form.
+Self-hostable, multi-tenant **SMS/MMS messaging + campaigns + shared inbox + integration API** platform
+(Next.js App Router · TypeScript · Prisma/Postgres · optional BullMQ/Redis). The current release remains
+demo-safe: live SMS, billing, hosted AI, and production worker execution are off by default behind
+executable gates while the standalone production roadmap is implemented.
+
+The product target, minimal-dependency architecture, milestone graph, acceptance matrix, and current
+evidence are in [`docs/STANDALONE_ROADMAP.md`](docs/STANDALONE_ROADMAP.md).
 
 ## Quick start
 
@@ -19,6 +22,18 @@ npm run dev                            # http://localhost:3000
 ```
 
 Product workspace is at `/dashboard`; the gated live-test console is at `/demo`.
+
+In the default `DEMO_MODE=true` posture the dev server signs every visitor in as the demo
+organization's owner — no login required. Built-in local authentication (`/login`, `/setup`, `/team`,
+`/organizations`, `/account`, `/reset`) activates with `DEMO_MODE=false` + `AUTH_PROVIDER=local` and
+requires a **production build** (`npm run build && npm start`) plus `AUTH_SESSION_SECRET`,
+`AUTH_THROTTLE_SECRET`, and the database posture described in
+[`docs/PRODUCTION_AUTH_RBAC.md`](docs/PRODUCTION_AUTH_RBAC.md). Bootstrap the first owner with
+`npm run admin:create` (see [`docs/LOCAL_OPERATOR_RUNBOOK.md`](docs/LOCAL_OPERATOR_RUNBOOK.md)).
+
+> **Note:** a plain `npm start` in the demo posture fails closed by design — production builds
+> refuse `DEMO_MODE=true` (and a missing RLS boundary) unless `ALLOW_PRODUCTION_DEMO=true`
+> explicitly acknowledges an intentionally public demo. Use `npm run dev` for local demo work.
 
 ## Run / build / test
 
@@ -45,22 +60,30 @@ before `npm run test:e2e:smoke` or `npm run validate` (Linux Playwright support 
 
 `bootstrap.sh` copies `.env.example` → `.env`. Demo-safe defaults: `DEMO_MODE=true`,
 `LIVE_MESSAGING_ENABLED=false`, `LIVE_BILLING_ENABLED=false`, `MESSAGING_PROVIDER=dummy`,
-`AI_PROVIDER=fake`. Clerk/Twilio/Stripe keys are blank placeholders — keep real secrets out of git
-(`npm run secrets:scan` enforces this).
+`AI_PROVIDER=fake`. Twilio/Stripe keys are blank placeholders — keep real secrets out of git
+(`npm run secrets:scan` enforces this). Production posture additionally requires
+`DATABASE_RLS_ENFORCED=true`, distinct auth secrets, `TRUST_PROXY=true` behind a header-overwriting
+ingress, and rejects `DEMO_MODE=true` without `ALLOW_PRODUCTION_DEMO=true`
+(see `lib/env/runtime-config.ts` for the executable contract).
 
 ## Product surface
 
 - `/dashboard` — contacts, campaigns, inbox, templates, analytics, compliance.
-- `/settings` — go-live readiness + 10 read-only operations surfaces.
+- `/settings` — go-live readiness + read-only operations surfaces.
 - `/demo` — gated live-test SMS console.
+- `/login`, `/setup`, `/team`, `/organizations`, `/account`, `/reset`, `/invite` — built-in local
+  identity (active outside demo mode).
 
 ## Docs
 
 - [`GOAL.md`](GOAL.md) — purpose, current state, definition of done.
-- [`ROADMAP.md`](ROADMAP.md) — phased plan mapped to [`tickets/`](tickets/).
+- [`docs/STANDALONE_ROADMAP.md`](docs/STANDALONE_ROADMAP.md) — governing product roadmap, milestone graph, acceptance evidence.
+- [`ROADMAP.md`](ROADMAP.md) — operational milestone view mapped to [`tickets/`](tickets/).
 - [`AGENTS.md`](AGENTS.md) + [`docs/ai/REPO_MAP.md`](docs/ai/REPO_MAP.md) — autonomous-agent instructions and where code lives.
-- [`plan/`](plan/) — research-informed transformation plan (specs, roadmap, execution prompt).
-- [`docs/CANONICAL_IMPLEMENTATION_PLAN.md`](docs/CANONICAL_IMPLEMENTATION_PLAN.md) — governing implementation contract.
+- [`docs/KNOWN_LIMITATIONS.md`](docs/KNOWN_LIMITATIONS.md) — honest register of remaining gaps and risks.
+- [`contracts/`](contracts/) — executable behavior contracts (`npm run contracts:check` enforces).
+- [`plan/`](plan/) — specs backlog (`plan/specs/SPEC-*.md`).
+- [`docs/CANONICAL_IMPLEMENTATION_PLAN.md`](docs/CANONICAL_IMPLEMENTATION_PLAN.md) — historical bootstrap-era contract.
 
 ## Windows Development Quickstart & Troubleshooting
 

@@ -1,8 +1,161 @@
 # API Contract
 
+Every internal cookie-authenticated `POST`, `PUT`, `PATCH`, and `DELETE` passes its concrete `Request`
+through the shared authentication boundary. After session authentication and before role checks, body
+parsing, or mutation, that boundary requires an exact Origin/Host match (using only proxy-overwritten
+forwarding evidence when trusted). Auth public mutations enforce the same policy in their specialized
+handlers; signed provider webhooks remain signature-authenticated exceptions.
+
 Owner: backend-data and frontend-ui.
 
 ## Implemented Endpoints
+
+### `/setup`, `/login`, and `/logout`
+
+Provide the self-hosted first-owner, built-in credential, and browser session-exit workflows. They use
+the local auth endpoints below, never render server secrets, accept only local redirect destinations,
+and do not substitute deterministic demo identity when local auth is selected.
+
+### `POST /api/auth/setup`
+
+Creates the first local owner, organization, active membership, and opaque session only when local auth
+is selected, a server-only bootstrap token is configured and matched, and no local credential exists.
+The response contains sanitized user/organization data, sets an HttpOnly session cookie, and is never
+cacheable. Invalid, denied, closed, or unavailable setup attempts return stable secret-free errors.
+
+### `POST /api/auth/login`
+
+Authenticates a local email/password using a generic denial response, selects an active organization
+membership, rotates the presented session, and sets a fresh opaque HttpOnly session cookie. It returns
+only sanitized current-user, organization, role, and expiry metadata and is never cacheable.
+
+### `POST /api/auth/logout`
+
+Idempotently revokes the presented local session when one can be resolved and clears both supported
+session-cookie forms. Missing or invalid session evidence does not make logout fail. The response is
+secret-free and never cacheable.
+
+### `GET /api/auth/session`
+
+Resolves the opaque local session against current database user, organization, active membership,
+revocation, auth-version, idle-expiry, and absolute-expiry state. Valid sessions return sanitized
+identity and expiry metadata; every invalid state returns `401` without demo fallback. The response is
+never cacheable.
+
+### `POST /api/auth/sessions/revoke-all`
+
+Revokes every opaque session for the authenticated user across organizations after MEMBER and same-
+origin checks, increments the user's authentication generation, and clears both supported cookie names.
+The route never accepts a user ID or bearer in its body and returns only a revoked-row count.
+
+### `POST /api/auth/password-resets`
+
+Authenticates the cookie session and then returns non-cacheable `403
+PASSWORD_RESET_OPERATOR_REQUIRED` without parsing request JSON. No tenant role can issue a bearer that
+changes a user-global credential. The supported issuance boundary is the zero-argument
+`npm run admin:reset-link` operator command.
+
+### `POST /api/auth/password-resets/complete`
+
+Completes a built-in reset as a narrowly declared public-auth mutation. Local-mode and exact same-origin
+checks precede a PostgreSQL `LOGIN_NETWORK` throttle, which is consumed before body parsing using trusted
+proxy evidence only when configured and otherwise the documented `0.0.0.0` fallback. The strict body
+contains only reset `token` and policy-valid `password`. One atomic claim of the platform-operator/global token shape replaces or creates the
+credential, clears failures/lock, increments auth version, revokes all sessions, consumes the token once,
+and writes null-actor secret-free audit evidence across the user's current memberships. Success returns only `{ "completed": true }`, clears both session
+cookie names, and is non-cacheable. Malformed, expired, replayed, revoked, foreign, and mismatched reset
+evidence use the same `400`; throttle denial uses `429` plus bounded `Retry-After`; throttle/storage/runtime
+failure uses sanitized `503`. No response echoes token, password, email, hash, or account evidence.
+
+### `GET /api/auth/organizations`
+
+Lists only ACTIVE organization memberships for the enabled user resolved from the built-in local
+session. Each item contains only organization `id`, `name`, `slug`, `timezone`, `demoMode`, and the
+authenticated user's role. The endpoint never accepts a user identifier and all responses are
+non-cacheable.
+
+### `POST /api/auth/organizations`
+
+Creates one non-demo organization, ACTIVE OWNER membership for the authenticated user, and secret-free
+audit event in one transaction. Authentication and the current-session OWNER role gate run before
+same-origin validation and body parsing. The strict body accepts only `name`, `slug`, and `timezone`;
+caller-supplied user, role, or tenant relations are rejected. A successful response is `201`; duplicate
+slugs return a sanitized `409`. The endpoint is available only with built-in local auth and every
+response is non-cacheable.
+
+### `POST /api/auth/organizations/select`
+
+Switches the current opaque database session to an organization where its enabled user has an ACTIVE
+membership. Authentication and the current-session MEMBER role gate run before same-origin validation
+and body parsing. The strict body accepts only `organizationId`; user, role, and token fields are
+rejected. The bearer is read only from the environment-appropriate HttpOnly session cookie, remains
+opaque, and is not rotated because only the session row's selected organization changes. Cross-user,
+suspended, disabled, malformed, and missing target states use sanitized errors. Every response is
+non-cacheable.
+
+### `GET /api/auth/team`
+
+Returns sanitized same-tenant ACTIVE/SUSPENDED members and pending invitations after built-in local
+authentication and an ADMIN role check. Member output contains identity, role, status, disabled flag, and
+membership timestamps; invite output contains identity, intended role, issuer, and expiry metadata. No
+credential hash, token hash, or raw bearer is returned. Every response is non-cacheable.
+
+### `POST /api/auth/team/invites`
+
+Creates one expiring, email-bound invitation after authentication, ADMIN authorization, local-mode, and
+same-origin checks run before parsing. ADMIN can invite MEMBER/ADMIN; only OWNER can invite OWNER. Success
+returns the sanitized invite plus a one-time `/invite#token=...` `acceptPath`. Only the hash is stored, and
+the raw token is absent from later reads, logs, audit metadata, and errors. Duplicate pending invites or
+existing memberships return sanitized conflicts. The issuer must retain current grant authority through
+redemption; role change, suspension, or removal revokes their pending links. Copyable bearer possession is
+not treated as mailbox verification. Every response is non-cacheable.
+
+### `DELETE /api/auth/team/invites/:inviteId`
+
+Revokes a pending same-tenant invitation after authentication, ADMIN authorization, local-mode, and
+same-origin checks. OWNER invitations can be managed only by OWNER. Consumed, expired, revoked, foreign,
+or unknown identifiers use sanitized unavailable errors. Every response is non-cacheable.
+
+### `POST /api/auth/team/invites/accept`
+
+Consumes an email-bound invitation exactly once. This public-auth exception requires local mode, exact
+same origin, and a PostgreSQL `LOGIN_NETWORK` throttle before parsing. An enabled matching user may accept
+through the environment-appropriate existing session cookie; that same session is switched to the new
+organization without returning its bearer. An existing identity without an active session may instead
+submit strict `{ token, email, password }`; invite availability is checked before password derivation,
+`LOGIN_EMAIL` throttling and the normal credential lock policy apply, and acceptance/session creation are
+bound to the verified auth generation. A new identity submits strict `{ token, displayName, password }`
+and receives a new credential/membership/session. Any pre-existing membership in the invited organization
+fails closed, including SUSPENDED rows, so an old invite cannot reactivate or upgrade it. Success returns
+only sanitized membership state, account-created state, and a local redirect. Expiry, replay, revocation,
+mismatch, throttling, and storage failures are secret-free and non-cacheable.
+
+### `PATCH /api/auth/team/members/:userId`
+
+Accepts exactly one strict variant: `{ "role": "MEMBER|ADMIN|OWNER" }` or
+`{ "suspended": boolean }`. Authentication and ADMIN authorization precede local-mode, same-origin, and
+body parsing. ADMIN manages MEMBER/ADMIN; OWNER is required for OWNER. All queries are same-tenant, and
+concurrent demotion/suspension attempts preserve at least one enabled ACTIVE OWNER. Every response is
+non-cacheable.
+
+### `DELETE /api/auth/team/members/:userId`
+
+Revokes a same-tenant membership and its selected-organization sessions after authentication, ADMIN
+authorization, local-mode, and same-origin checks. The user and append-only audit evidence remain. OWNER
+bounds and concurrent final-active-owner protection apply. Every response is non-cacheable.
+
+### `/organizations`
+
+Renders authenticated workspace listing, non-demo organization creation, and current-session selection
+through the organization endpoints above. Identity and role always come from the verified session; the
+browser never receives or supplies the opaque bearer.
+
+### `/team`, `/invite`, `/reset`, and `/account`
+
+Render built-in team/session administration plus invitation and reset redemption. Raw invite links appear
+once in tenant-administrator responses; reset links appear once only in operator CLI output. Both use URL
+fragments, are removed from the browser address before submission, and are never stored or rendered again
+after successful use.
 
 ### `GET /api/health`
 
@@ -10,7 +163,8 @@ Returns service health and demo-safe defaults.
 
 ### `GET /api/orgs/current`
 
-Returns the demo-safe current user and organization summary.
+Returns the current verified user and selected organization summary. Explicit demo mode uses the
+deterministic demo principal; local mode requires a valid opaque session and active membership.
 
 Response shape:
 
@@ -25,7 +179,7 @@ Response shape:
     "id": "string",
     "name": "string",
     "slug": "string",
-    "demoMode": true,
+    "demoMode": false,
     "timezone": "America/Los_Angeles",
     "_count": {
       "memberships": 1,
