@@ -1,7 +1,7 @@
 # TICKET021 — Controlled Clerk authentication enablement and RBAC enforcement
 
-- **Status:** Todo
-- **Priority:** P1
+- **Status:** Superseded (2026-07-12) — the standalone self-hosted identity milestone (M1, `plan/specs/SPEC-030-self-hosted-identity.md`, `contracts/CONTRACT-AUTH.md`) replaced Clerk-based production auth with built-in local credentials, keyed opaque sessions, and an executable RBAC matrix. Clerk remains an explicitly rejected external dependency (`CLERK_AUTH_CONFIG_PRESENT` production blocker). Do not implement this ticket.
+- **Priority:** P1 (historical)
 
 ## Goal
 Implement route-level and API-level RBAC enforcement utilizing Clerk auth in production-like environments, while preserving the deterministic local demo session defaults by default.
