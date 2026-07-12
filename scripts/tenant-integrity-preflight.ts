@@ -289,8 +289,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     .then((exitCode) => {
       process.exitCode = exitCode;
     })
-    .catch(() => {
-      console.error("TENANT_INTEGRITY_PREFLIGHT_FAILED");
+    .catch((error: unknown) => {
+      // Print the failure class without echoing query results or connection strings.
+      const reason = error instanceof Error ? `${error.name}: ${error.message.split("\n")[0]}` : "unknown error";
+      console.error(`TENANT_INTEGRITY_PREFLIGHT_FAILED (${reason})`);
       process.exitCode = 1;
     });
 }

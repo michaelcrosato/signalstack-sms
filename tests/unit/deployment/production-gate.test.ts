@@ -9,12 +9,53 @@ describe("production deployment gate", () => {
     expect(environmentIsProductionLike({ DEPLOYMENT_ENV: "prod" })).toBe(true);
   });
 
-  it("allows demo-safe production-like defaults", () => {
+  it("blocks production-like demo mode without an explicit public-demo acknowledgment", () => {
     expect(
       evaluateProductionDeploymentGate({
         NODE_ENV: "production",
         LIVE_MESSAGING_ENABLED: "false",
         LIVE_BILLING_ENABLED: "false",
+        MESSAGING_PROVIDER: "dummy",
+        AI_PROVIDER: "fake"
+      })
+    ).toEqual({
+      productionLike: true,
+      allowed: false,
+      blockers: ["DEMO_MODE_WITHOUT_PRODUCTION_DEMO_ACK"]
+    });
+
+    expect(
+      evaluateProductionDeploymentGate({
+        NODE_ENV: "production",
+        DEMO_MODE: "true",
+        MESSAGING_PROVIDER: "dummy",
+        AI_PROVIDER: "fake"
+      }).blockers
+    ).toContain("DEMO_MODE_WITHOUT_PRODUCTION_DEMO_ACK");
+  });
+
+  it("allows production-like demo defaults once the public demo is explicitly acknowledged", () => {
+    expect(
+      evaluateProductionDeploymentGate({
+        NODE_ENV: "production",
+        ALLOW_PRODUCTION_DEMO: "true",
+        LIVE_MESSAGING_ENABLED: "false",
+        LIVE_BILLING_ENABLED: "false",
+        MESSAGING_PROVIDER: "dummy",
+        AI_PROVIDER: "fake"
+      })
+    ).toEqual({
+      productionLike: true,
+      allowed: true,
+      blockers: []
+    });
+  });
+
+  it("allows production-like deployments that disable demo mode", () => {
+    expect(
+      evaluateProductionDeploymentGate({
+        NODE_ENV: "production",
+        DEMO_MODE: "false",
         MESSAGING_PROVIDER: "dummy",
         AI_PROVIDER: "fake"
       })
@@ -29,6 +70,7 @@ describe("production deployment gate", () => {
     expect(
       evaluateProductionDeploymentGate({
         NODE_ENV: "production",
+        DEMO_MODE: "false",
         LIVE_MESSAGING_ENABLED: "true",
         LIVE_TEST_SMS_ENABLED: "true",
         LIVE_BILLING_ENABLED: "true",
@@ -54,6 +96,7 @@ describe("production deployment gate", () => {
     expect(
       evaluateProductionDeploymentGate({
         NODE_ENV: "production",
+        DEMO_MODE: "false",
         ALLOW_PRODUCTION_EXTERNALS: "true",
         LIVE_MESSAGING_ENABLED: "true",
         MESSAGING_PROVIDER: "twilio"
@@ -63,5 +106,16 @@ describe("production deployment gate", () => {
       allowed: true,
       blockers: []
     });
+
+    // The externals override must not waive the demo-mode acknowledgment: auth absence is a
+    // separate decision from live-provider enablement.
+    expect(
+      evaluateProductionDeploymentGate({
+        NODE_ENV: "production",
+        ALLOW_PRODUCTION_EXTERNALS: "true",
+        LIVE_MESSAGING_ENABLED: "true",
+        MESSAGING_PROVIDER: "twilio"
+      }).blockers
+    ).toEqual(["DEMO_MODE_WITHOUT_PRODUCTION_DEMO_ACK"]);
   });
 });

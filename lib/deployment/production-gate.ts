@@ -26,6 +26,12 @@ export function evaluateProductionDeploymentGate(
   const blockers: string[] = [];
   const overrideEnabled = env.ALLOW_PRODUCTION_EXTERNALS === "true";
 
+  // DEMO_MODE defaults to true when unset, and demo mode disables authentication entirely,
+  // so a production-like deployment must either disable it or explicitly acknowledge a public demo.
+  if (productionLike && env.DEMO_MODE !== "false" && env.ALLOW_PRODUCTION_DEMO !== "true") {
+    blockers.push("DEMO_MODE_WITHOUT_PRODUCTION_DEMO_ACK");
+  }
+
   if (productionLike && !overrideEnabled) {
     if (env.LIVE_MESSAGING_ENABLED === "true") {
       blockers.push("LIVE_MESSAGING_ENABLED_TRUE");

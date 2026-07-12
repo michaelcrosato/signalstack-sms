@@ -322,6 +322,46 @@ describe("runtime configuration", () => {
     );
   });
 
+  it("rejects production demo mode unless a public demo is explicitly acknowledged", () => {
+    // DEMO_MODE defaults to true, so an operator who configures production but forgets to
+    // disable demo mode must fail closed instead of serving anonymous owner sessions.
+    const forgotten = captureConfigError({ APP_ENV: "production", DATABASE_RLS_ENFORCED: "true" });
+    expect(forgotten.issues).toContainEqual(
+      expect.objectContaining({
+        path: "DEMO_MODE",
+        message: expect.stringContaining("DEMO_MODE=false")
+      })
+    );
+
+    const explicit = captureConfigError({
+      APP_ENV: "production",
+      DATABASE_RLS_ENFORCED: "true",
+      DEMO_MODE: "true"
+    });
+    expect(explicit.issues).toContainEqual(expect.objectContaining({ path: "DEMO_MODE" }));
+
+    expect(() =>
+      parseRuntimeConfig({
+        APP_ENV: "production",
+        DATABASE_RLS_ENFORCED: "true",
+        DEMO_MODE: "true",
+        ALLOW_PRODUCTION_DEMO: "true"
+      })
+    ).not.toThrow();
+
+    expect(() =>
+      parseRuntimeConfig({
+        APP_ENV: "production",
+        DATABASE_RLS_ENFORCED: "true",
+        DEMO_MODE: "false",
+        AUTH_PROVIDER: "local",
+        AUTH_SESSION_SECRET: sessionSecret,
+        AUTH_THROTTLE_SECRET: throttleSecret,
+        TRUST_PROXY: "true"
+      })
+    ).not.toThrow();
+  });
+
   it("validates encrypted backup and off-site readiness without returning keys or URLs", () => {
     const missingKey = captureConfigError({ BACKUP_ENABLED: "true" });
     expect(missingKey.issues).toContainEqual(expect.objectContaining({ path: "BACKUP_ENCRYPTION_KEY" }));

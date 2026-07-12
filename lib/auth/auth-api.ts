@@ -20,6 +20,7 @@ import {
 import { requestHasTrustedOrigin } from "@/lib/auth/request-origin";
 import { withAuthDatabaseContext } from "@/lib/db/tenant-context";
 import { getRuntimeConfig, type RuntimeConfig } from "@/lib/env/runtime-config";
+import { logger } from "@/lib/observability/logger";
 import { authLoginSchema, authSetupSchema } from "@/lib/validation/auth";
 
 const MINUTE_MS = 60_000;
@@ -74,7 +75,8 @@ export async function handleLocalAuthSetup(request: Request): Promise<NextRespon
       secure: cookieIsSecure(config)
     });
     return response;
-  } catch {
+  } catch (error) {
+    logger.error("local_auth_setup_failed", { errorType: error instanceof Error ? error.name : "unknown" });
     return authenticationServiceUnavailableResponse();
   }
 }
@@ -159,7 +161,8 @@ export async function handleLocalAuthLogin(request: Request): Promise<NextRespon
       secure
     });
     return response;
-  } catch {
+  } catch (error) {
+    logger.error("local_auth_login_failed", { errorType: error instanceof Error ? error.name : "unknown" });
     return authenticationServiceUnavailableResponse();
   }
 }
@@ -181,7 +184,8 @@ export async function handleLocalAuthLogout(request: Request): Promise<NextRespo
     const response = noStoreEmptyResponse(204);
     clearLocalSessionCookie(response, { secure });
     return response;
-  } catch {
+  } catch (error) {
+    logger.error("local_auth_logout_failed", { errorType: error instanceof Error ? error.name : "unknown" });
     const response = authenticationServiceUnavailableResponse();
     clearLocalSessionCookie(response, { secure });
     return response;
@@ -207,7 +211,8 @@ export async function handleLocalAuthSession(request: Request): Promise<NextResp
     }
 
     return noStoreJson({ session: publicSession(session) }, 200);
-  } catch {
+  } catch (error) {
+    logger.error("local_auth_session_failed", { errorType: error instanceof Error ? error.name : "unknown" });
     return authenticationServiceUnavailableResponse();
   }
 }

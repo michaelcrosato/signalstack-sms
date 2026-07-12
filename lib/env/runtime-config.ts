@@ -224,6 +224,7 @@ const runtimeEnvironmentSchema = z
     APP_ENV: z.enum(["local", "development", "test", "production", "prod"]).optional(),
     RUNTIME_PROCESS: z.enum(["web", "worker", "all"]).default("web"),
     DEMO_MODE: booleanFromEnv(true),
+    ALLOW_PRODUCTION_DEMO: booleanFromEnv(false),
 
     NEXT_PUBLIC_APP_URL: z.preprocess(
       blankToUndefined,
@@ -291,6 +292,13 @@ const runtimeEnvironmentSchema = z
         context,
         "DATABASE_RLS_ENFORCED",
         "Production requires the fail-closed non-owner database tenant boundary."
+      );
+    }
+    if (production && config.DEMO_MODE && !config.ALLOW_PRODUCTION_DEMO) {
+      addIssue(
+        context,
+        "DEMO_MODE",
+        "Production requires DEMO_MODE=false: demo mode grants every anonymous visitor an owner session. Set ALLOW_PRODUCTION_DEMO=true only for an intentionally public demo deployment."
       );
     }
     if (
