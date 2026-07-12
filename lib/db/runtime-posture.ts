@@ -60,10 +60,6 @@ export function inspectRuntimeDatabasePostureForClient(client: PrismaClient): Pr
   return inspectRuntimeDatabasePosture(client);
 }
 
-export function resetRuntimeDatabasePostureForTests(): void {
-  posturePromise = undefined;
-}
-
 export function runtimePostureIsRequired(
   env: Record<string, string | undefined> = process.env
 ): boolean {

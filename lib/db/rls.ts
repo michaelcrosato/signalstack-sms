@@ -10,11 +10,6 @@ export async function withTenantRls<T>(
   return withTenantTransaction({ orgId }, fn);
 }
 
-export function rlsIsEnabled(env: Record<string, string | undefined> = process.env): boolean {
-  void env;
-  return true;
-}
-
 export async function withOptionalTenantRls<T>(
   orgId: string,
   fn: (tx: Prisma.TransactionClient) => Promise<T>,

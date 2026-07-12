@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { prisma } from "@/lib/db/prisma";
-import { withTenantRls, withOptionalTenantRls, rlsIsEnabled } from "@/lib/db/rls";
+import { withTenantRls, withOptionalTenantRls } from "@/lib/db/rls";
 import {
   currentTenantDatabaseContext,
   withAuthDatabaseContext,
@@ -26,18 +26,6 @@ vi.mock("@/lib/db/prisma", () => {
 describe("rls.ts", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  describe("rlsIsEnabled", () => {
-    it("returns true when DATABASE_RLS_ENFORCED is 'true'", () => {
-      expect(rlsIsEnabled({ DATABASE_RLS_ENFORCED: "true" })).toBe(true);
-    });
-
-    it("cannot be disabled by a runtime flag", () => {
-      expect(rlsIsEnabled({ DATABASE_RLS_ENFORCED: "false" })).toBe(true);
-      expect(rlsIsEnabled({})).toBe(true);
-      expect(rlsIsEnabled({ DATABASE_RLS_ENFORCED: undefined })).toBe(true);
-    });
   });
 
   describe("withTenantRls", () => {

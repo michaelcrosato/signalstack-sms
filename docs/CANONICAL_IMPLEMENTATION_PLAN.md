@@ -171,7 +171,6 @@ signalstack-sms/
 ├─ eslint.config.mjs
 ├─ postcss.config.mjs
 ├─ tailwind.config.ts
-├─ components.json
 ├─ playwright.config.ts
 ├─ vitest.config.ts
 ├─ prisma.config.ts

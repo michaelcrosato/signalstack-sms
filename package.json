@@ -53,7 +53,6 @@
     "secrets:scan": "tsx scripts/secrets-scan.ts",
     "validate": "tsx scripts/validate.ts",
     "agent:brief": "tsx scripts/agent-brief.ts",
-    "agent:status": "tsx scripts/agent-status.ts",
     "agent:bootstrap": "bash scripts/agent/bootstrap.sh",
     "agent:doctor": "bash scripts/agent/doctor.sh",
     "agent:check": "bash scripts/agent/check.sh",
@@ -61,7 +60,6 @@
     "agent:lint": "bash scripts/agent/lint.sh",
     "agent:typecheck": "bash scripts/agent/typecheck.sh",
     "agent:format": "bash scripts/agent/format.sh",
-    "agent:handoff": "tsx scripts/agent-handoff.ts",
     "agent:repair": "npm run validate",
     "afk:preflight": "bash scripts/agent/afk-preflight.sh",
     "ci": "npm run validate",
@@ -79,6 +77,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@next/eslint-plugin-next": "^15.5.19",
     "@playwright/test": "^1.60.0",
     "@tailwindcss/forms": "^0.5.11",
     "@types/node": "^22.19.19",
