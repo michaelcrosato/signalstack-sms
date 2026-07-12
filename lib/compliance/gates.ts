@@ -82,7 +82,10 @@ export function evaluateMessagingHardGate(input: MessagingHardGateInput): Messag
     let resolvedState = input.quietHours.state;
 
     if (input.contact?.phone) {
-      resolvedTimeZone = resolveTimezoneFromPhone(input.contact.phone);
+      // Fall back to the org-configured quiet-hours timezone (not a hardcoded Eastern default) when the
+      // contact's area code is not in the map, so an unmapped number is evaluated in the operator's
+      // intended zone rather than up to three hours off.
+      resolvedTimeZone = resolveTimezoneFromPhone(input.contact.phone, input.quietHours.timeZone);
     }
     if (input.contact?.state) {
       resolvedState = input.contact.state;

@@ -78,31 +78,43 @@ export function getApiRateLimitPolicy(env: RateLimitEnvironment = process.env): 
   };
 }
 
-export function getApiRateLimitClientKey(request: { headers: Headers; ip?: string } | Headers) {
+export function getApiRateLimitClientKey(
+  request: { headers: Headers; ip?: string } | Headers,
+  env: RateLimitEnvironment = process.env
+) {
   const headers = request instanceof Headers ? request : request.headers;
   const ip = request instanceof Headers ? undefined : request.ip;
 
+  // A platform-provided socket address is not client-controllable — always the strongest key.
   if (ip) {
     return ip;
   }
 
-  const connectingIp = headers.get("cf-connecting-ip")?.trim();
-  if (connectingIp) {
-    return connectingIp;
-  }
+  // Forwarded IP headers (cf-connecting-ip, x-real-ip, x-forwarded-for) are trivially spoofable by the
+  // client unless a trusted ingress overwrites them. Only honor them when TRUST_PROXY says an ingress
+  // does. Otherwise an attacker rotates a fake header per request to get a fresh bucket each time,
+  // neutralizing the limiter. Without a trusted proxy we fall back to a single shared bucket rather
+  // than trust attacker-controlled input. Per-client API limiting therefore requires TRUST_PROXY=true
+  // behind a header-overwriting ingress (see docs/PRODUCTION_DEPLOYMENT.md).
+  if (parseBoolean(env.TRUST_PROXY, false)) {
+    const connectingIp = headers.get("cf-connecting-ip")?.trim();
+    if (connectingIp) {
+      return connectingIp;
+    }
 
-  const realIp = headers.get("x-real-ip")?.trim();
-  if (realIp) {
-    return realIp;
-  }
+    const realIp = headers.get("x-real-ip")?.trim();
+    if (realIp) {
+      return realIp;
+    }
 
-  const forwardedForHeader = headers.get("x-forwarded-for");
-  if (forwardedForHeader) {
-    // The rightmost IP is the one directly connecting to our proxy, which is the most trustworthy in the chain.
-    const ips = forwardedForHeader.split(",");
-    const rightmostIp = ips[ips.length - 1]?.trim();
-    if (rightmostIp) {
-      return rightmostIp;
+    const forwardedForHeader = headers.get("x-forwarded-for");
+    if (forwardedForHeader) {
+      // The rightmost hop is the address our trusted ingress observed connecting to it.
+      const ips = forwardedForHeader.split(",");
+      const rightmostIp = ips[ips.length - 1]?.trim();
+      if (rightmostIp) {
+        return rightmostIp;
+      }
     }
   }
 
