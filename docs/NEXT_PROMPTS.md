@@ -15,7 +15,9 @@ This is the compact handoff for the next automated loop. History lives in `git l
 
 ## Current State
 
-- Latest validated run: Run 819 surfaces provider error-code evidence in campaign detail delivery snapshots without provider calls.
+- Latest validated checkpoint: Run 832 completes M4 provider ownership. Eight migrations extend the current substrate to 51 migrations / 39
+  protected tables with encrypted credential envelopes, verified account/number/service ownership, safe
+  ADMIN lifecycle, a complete deterministic provider factory, and trusted callback routing without sends.
 - Run 818 adds seeded delivered, pending, and failed local outbound delivery evidence so fresh demos show realistic delivery-review states without live providers.
 - Run 817 adds failed and pending summary counts to the product analytics delivery review queue.
 - Run 816 adds visible/hidden and needs-review summary counts to the product analytics delivery review queue.
@@ -32,30 +34,41 @@ This is the compact handoff for the next automated loop. History lives in `git l
 - Run 805 adds latest outbound evidence visibility to campaign-list delivery reporting from existing local message records.
 - Run 804 adds a campaign delivery review status to product campaign list/detail reporting from existing local outbound message evidence.
 - Run 803 adds an executable API RBAC matrix at `lib/auth/api-rbac-matrix.ts` and cross-checks it against every mutating `app/api/**/route.ts` method plus the signed Twilio webhook exceptions.
-- The backend foundation is strong: tenant helpers, contacts, campaigns with missing/cross-tenant requested preflight contact IDs blocked, queue jobs with schedule-time stale queued-job cancellation, tenant-explicit local outbound worker idempotency keys, per-recipient send-time skips, local outbound provider-status preservation, BullMQ worker startup and direct construction gates, inbox with explicit inbound duplicate side-effect prevention, compliance gates, fake AI, local billing/analytics, provider metadata, Twilio webhook foundations with duplicate-race handling, readiness audit, operations inventory, and validation gates.
+- The backend foundation is strong: tenant helpers, contacts, campaigns, queue jobs, inbox, compliance gates,
+  fake AI, local billing/analytics, encrypted provider ownership, exact Twilio callback routing, readiness audit,
+  operations inventory, and validation gates. Legacy provider credential/rotation rows remain explicitly
+  unverified/display-only; canonical M4 provider-control audit evidence is `IntegrationAuditEvent`.
 - The browser product has a usable local demo path across dashboard with seeded delivered/pending/failed local outbound evidence, next-step delivery evidence review, and centralized outbound-only local delivery evidence/rate/pending/failure/review/latest-evidence signals, contacts import/detail/archive/restore/merge, campaign fake-AI copy/preflight count/schedule/detail/edit/cancel plus campaign-list recipient readiness and delivered/pending/failed/rate/review-status/latest-evidence reporting, campaign-detail aggregate recipient readiness, all-outbound delivery-rate/count/review-status/last-message/provider-status/provider-error-code metrics, visible recent-evidence row count, explicit recent-row boundary copy and newest-first recent delivery rows with provider error-code evidence, recipient send-state/human-readable block reasons, mutually exclusive outbound-only delivery detail visibility with per-row delivery states, inbox query-selected thread work, template create/detail/edit, analytics delivery review/latest-evidence status plus campaign-level delivery review summary/links with failed/pending count labels and delivery operations with outbound-only `failed`/`undelivered` breakdowns, and compliance readiness.
-- Live campaign sending, live billing, live AI, provider secrets, production workers, and the complete production package remain blocked by default. Built-in local identity is complete and deterministic identity is demo-only.
+- General provider sends, live campaigns, live billing, live AI, production workers, and the complete
+  production package remain blocked by default. Encrypted M4 provider credentials authorize explicit ADMIN
+  verification/discovery/health and signed callbacks only; they do not enable messaging.
 - Production auth/RBAC has a checked implementation contract at `docs/PRODUCTION_AUTH_RBAC.md`, an executable mutating-route RBAC matrix, `npm run production-auth:check`, keyed opaque sessions, operator recovery, and a production browser proof; Clerk remains optional and accidental configuration is blocked with `CLERK_AUTH_CONFIG_PRESENT`.
 - GitHub `ci` and `premerge` workflows now run `pwsh ./scripts/local-gate.ps1` with demo-safe defaults after install/browser setup, and unit coverage pins that they do not treat raw `npm run validate`/`premerge` calls as green.
 - The only intentional live external-impact route is the isolated `/demo` live-test SMS path, gated by explicit Twilio credentials, live flags, recipient allowlist, confirmation phrase, and a server-only operator token; public readiness is last-four/count only, and ambiguous provider outcomes stay durably pending without resend.
-- Twilio webhook handlers fail closed on malformed or unsupported form bodies before tenant lookup or local mutation, acquire expiring owner leases for valid signed events, release failed/unmatched work for explicit upstream retry, return processed duplicates as no-ops, and apply monotonic current-tenant status updates. Trusted provider-account/number tenant routing remains TICKET023.
+- Twilio webhook handlers resolve exactly one verified account plus owned destination, validate with that
+  account's active credential, recheck tenant/generation state before persistence, and retain expiring owner
+  leases, duplicate no-ops, explicit retry release, and monotonic status updates. Non-owner PostgreSQL routing
+  plus HTTP route fixtures cover crossed/unknown/rotated/revoked evidence without a literal server E2E claim.
 - Queue cancellation and worker claims are owner-token, lease, and transaction guarded with Postgres tests for both race winners; BullMQ mirror IDs use durable generations and recoverable processor outcomes retry instead of disappearing.
 - `docs/PR_REVIEW_2026-07-10.md` is the disposition ledger for every original PR #60–#153; do not reopen superseded or declined proposals without new evidence.
 - Auth scanner, API RBAC matrix, BullMQ direct startup gating, and live-worker hardening coverage are already very broad. Do not spend another loop on minor syntactic variants unless a concrete uncovered parser/control-flow gap is proven with targeted search.
 
 ## Next Work
 
-M0–M3 in `docs/STANDALONE_ROADMAP.md` are DONE. M2 evidence is a fresh 40-migration/no-diff install under
+M0–M4 in `docs/STANDALONE_ROADMAP.md` are DONE. M2 evidence is a fresh 40-migration/no-diff install under
 a non-superuser/non-BYPASSRLS table owner, owner capability barred from runtimes, 27-table fail-closed RLS
 with semantic policy fingerprints, composite tenant integrity, exact command-specific control policies,
 atomic database-timed dispatch with no public ACL, short tenant/control/dispatch contexts, zero migration-
 debt imports, the mandatory eight-file / 33-test tenant matrix, 37 PostgreSQL files / 186 tests, nine auth
-database files / 38 tests, and production local-auth build/browser proof 1/1 under a non-owner login. M3
-extends the current substrate to 43 migrations / 36 protected tables; its 12-file / 49-test mandatory tenant
+database files / 38 tests, and production local-auth build/browser proof 1/1 under a non-owner login. M3's
+checkpoint is 43 migrations / 36 protected tables; its 12-file / 49-test mandatory tenant
 gate, 30-file / 111-test public API suite, generated OpenAPI/examples, and literal non-owner Next HTTP +
 receiver-socket proof cover scoped keys, dummy/local resources, signed events, failure/replay, and secret/key
-rotation without a carrier call. The active queue is M4 provider ownership/secrets, then M5–M11; do not claim
-live transport or later milestones early.
+rotation without a carrier call. M4 extends the current substrate to 51 migrations / 39 protected tables;
+its eight migrations, account-hash/AAD-bound AES-256-GCM envelopes, safe ADMIN/provider fixtures, and
+two-account non-owner PostgreSQL routing plus HTTP route fixtures close provider identity and ownership. The
+mandatory tenant runner is 14 files / 57 tests. The active queue is M5 durable direct messaging, then
+M6–M11; do not claim live transport or later milestones early.
 
 Rules: run the protected gate (`pwsh scripts/local-gate.ps1`, now fully green incl `e2e:smoke` after
 `npm run afk:preflight`) before treating work as green; commit only when green. Keep all live

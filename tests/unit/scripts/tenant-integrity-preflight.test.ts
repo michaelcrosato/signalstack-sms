@@ -22,6 +22,10 @@ const expectedChecks = [
   "message.campaign",
   "internal-note.conversation",
   "provider-credential-rotation.credential",
+  "provider-credential-secret.account",
+  "provider-messaging-service.account",
+  "provider-phone-number.account",
+  "provider-phone-number.messaging-service",
   "api-idempotency-record.credential",
   "integration-audit-event.credential",
   "integration-audit-event.subject",
@@ -42,7 +46,7 @@ describe("tenant integrity preflight", () => {
   it("maintains a unique, count-only inventory of strict relations and current membership refs", () => {
     expect(tenantIntegrityChecks.map(({ id }) => id)).toEqual(expectedChecks);
     expect(new Set(expectedChecks).size).toBe(expectedChecks.length);
-    expect(tenantIntegrityChecks.filter(({ category }) => category === "strict-relation")).toHaveLength(24);
+    expect(tenantIntegrityChecks.filter(({ category }) => category === "strict-relation")).toHaveLength(28);
     expect(tenantIntegrityChecks.filter(({ category }) => category === "current-membership")).toHaveLength(3);
     expect(tenantIntegrityChecks.filter(({ category }) => category === "job-envelope")).toHaveLength(1);
     expect(tenantIntegrityReadOnlyStatement).toBe("SET TRANSACTION READ ONLY");

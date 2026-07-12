@@ -482,31 +482,129 @@ Records a local usage event. This endpoint must not call Stripe or create live b
 
 ### `POST /api/webhooks/twilio/inbound`
 
-Accepts Twilio `application/x-www-form-urlencoded` inbound message webhooks. The request must pass `X-Twilio-Signature` validation with `TWILIO_AUTH_TOKEN`; unsigned requests are rejected. Valid payloads are stored as raw org-scoped webhook events by idempotency key and create local inbound inbox messages only after acquiring an expiring owner lease. Successful and already processed events return `204`; an unprocessed event owned by another request returns `409` with an advisory `Retry-After`. Upstream retry behavior must be configured explicitly. The handler disables sentiment analysis and keyword auto-replies, and does not send SMS or invoke AI.
+Accepts Twilio `application/x-www-form-urlencoded` inbound message webhooks. M4 resolves one candidate from
+strict `AccountSid` plus owned `To` number/service evidence, decrypts that account's active credential,
+validates `X-Twilio-Signature`, then locks/rechecks account/ownership/credential generation inside the
+resolved tenant before persistence. It never uses browser/API identity, demo fallback, or the installation-
+global `TWILIO_AUTH_TOKEN` as tenant authority. Valid payloads retain the existing idempotent owner-lease
+path. The handler disables sentiment analysis and keyword auto-replies and never sends SMS or invokes AI.
 
 ### `POST /api/webhooks/twilio/status`
 
-Accepts Twilio `application/x-www-form-urlencoded` delivery status webhooks. The request must pass `X-Twilio-Signature` validation with `TWILIO_AUTH_TOKEN`; unsigned requests are rejected. Valid payloads are stored as raw org-scoped webhook events by idempotency key and mutate local delivery state only after acquiring an expiring owner lease. Successful and already processed events return `204`; an unprocessed event owned by another request returns `409` with an advisory `Retry-After`. Upstream retry behavior must be configured explicitly. The handler does not call any provider.
+Accepts Twilio `application/x-www-form-urlencoded` delivery status webhooks. M4 resolves one candidate from
+strict `AccountSid` plus the owned outbound `From` number/service, validates with that account's active
+credential, and rechecks the locked tenant state before storing the event or mutating delivery evidence.
+Valid payloads retain the existing idempotent owner-lease and monotonic-status path. The handler does not
+call any provider.
+
+For both Twilio routes, malformed forms return `400`. Wrong signature/credential/destination, crossed or
+unknown account/resource, detected ambiguity, disabled/revoked state, and rotation races share `403` with
+`{ "error": "Provider callback rejected.", "code": "INVALID_PROVIDER_CALLBACK" }` and no tenant mutation.
+Routing/crypto storage unavailability returns secret-free `503 WEBHOOK_ROUTING_UNAVAILABLE`. All denials are
+`Cache-Control: no-store` and reveal no account, tenant, number, service, or credential existence.
 
 ### `GET /api/settings/provider`
 
-Returns secret-safe messaging provider readiness for the current organization: selected provider, demo mode, live messaging flag, live messaging blockers, compliance readiness, and Twilio credential presence booleans. This endpoint must not return credential values, mutate provider state, or enable live SMS.
+Returns secret-safe aggregate provider readiness for the current organization: selected provider, demo/live
+flags, compliance blockers, and safe verified/revoked/account/number/service/health summaries. It must not
+return credential/envelope/routing values, call a provider, mutate state, or enable live SMS.
 
 ### `PATCH /api/settings/provider`
 
-Stores local, secret-safe Twilio credential readiness metadata from `{ "provider": "twilio", "twilio": { "accountSid": "...", "authToken": "...", "fromNumber": "+15555550199" } }`. The handler may persist redacted account/from-number fields and a one-way token fingerprint only. It must not return or persist raw auth tokens, call Twilio, validate live ownership, enable live messaging, or send SMS.
+Retired metadata-only compatibility mutation. It requires ADMIN/same-origin authorization and returns
+no-store `410 PROVIDER_METADATA_ENDPOINT_RETIRED` before reading a request body. Callers must use the
+verified provider-account endpoints. It does not mutate provider state, enable messaging, or send.
 
 ### `DELETE /api/settings/provider`
 
-Clears local Twilio credential readiness metadata for the current organization. The handler must not call Twilio, revoke provider credentials, disable provider accounts, enable live messaging, or send SMS. It records a local readiness audit event.
+M4 compatibility mutation that locally revokes the selected default provider account/credential authority.
+It retains encrypted-version and audit history, does not claim provider-side revocation, and never sends.
+
+### `GET /api/settings/provider/accounts`
+
+Lists safe same-tenant provider-account DTOs after ADMIN authorization. It does not return plaintext,
+envelope, lookup-hash, or raw provider-error fields and performs no provider call.
+
+### `POST /api/settings/provider/accounts`
+
+Requires ADMIN/same-origin before parsing, verifies one Twilio account through a bounded explicit provider
+read, and atomically persists account identity plus an encrypted credential version. Any verification,
+ownership, encryption, or persistence failure creates no partial account/credential/ownership rows.
+
+### `GET /api/settings/provider/accounts/:accountId`
+
+Returns one safe same-tenant provider-account DTO after ADMIN authorization. It exposes no envelope,
+routing, credential, or raw provider-error fields and performs no provider call.
+
+### `PATCH /api/settings/provider/accounts/:accountId`
+
+Requires ADMIN/same-origin before parsing and selects the verified active account as the organization's
+local default. It does not enable messaging or perform a provider-side mutation.
+
+### `DELETE /api/settings/provider/accounts/:accountId`
+
+Requires ADMIN/same-origin and locally revokes account and credential authority while retaining encrypted
+version and immutable audit evidence. It does not claim or perform provider-side credential revocation.
+
+### `POST /api/settings/provider/accounts/:accountId/rotate`
+
+Verifies a replacement credential before locking/rechecking generation and atomically activating the next
+encrypted version. A concurrent rotation/revocation returns `409`; the prior version becomes unusable but
+is retained.
+
+### `POST /api/settings/provider/accounts/:accountId/verify`
+
+Explicit bounded account re-verification under the active credential. It records only safe verification
+status/time/error class and never enables sending.
+
+### `POST /api/settings/provider/accounts/:accountId/health`
+
+Explicit bounded read-only provider health check. It records only safe status/time/error-class evidence and
+does not silently revoke credentials or mutate provider resources.
+
+### `POST /api/settings/provider/accounts/:accountId/discover`
+
+Returns bounded, strictly parsed number and messaging-service candidates under the active verified account
+without persisting ownership. Candidates contain safe IDs/last-four, canonical E.164, capabilities, provider
+status, and a short-lived account/credential-generation binding only.
+The opaque `pvcandidate_v1_` IDs are distinct from persistent `pvlookup_v1_` ownership/routing hashes; the
+latter never enter the response.
+
+### `POST /api/settings/provider/accounts/:accountId/import`
+
+Imports selected fresh discovery candidates after locking/rechecking account, credential generation, and
+global ownership. It never purchases, releases, ports, configures, or otherwise changes provider resources.
+
+### `GET /api/settings/provider/accounts/:accountId/numbers`
+
+Returns safe verified/disabled owned-number state for one same-tenant provider account.
+
+### `GET /api/settings/provider/accounts/:accountId/messaging-services`
+
+Returns safe verified/disabled messaging-service state for one same-tenant provider account.
+
+### `PATCH /api/settings/provider/accounts/:accountId/messaging-services/:serviceId`
+
+Requires ADMIN/same-origin before parsing and performs exactly one local lifecycle action: make the verified
+service the account default or disable it. The URL account must own the service. No provider-side resource is
+changed and no message is sent.
+
+### `PATCH /api/settings/numbers/:numberId`
+
+Requires ADMIN/same-origin before parsing and performs exactly one local lifecycle action: make the verified
+owned number its account default or disable it. No provider-side resource is changed and no message is sent.
 
 ### `GET /api/settings/provider/rotations`
 
-Returns recent tenant-scoped provider credential metadata history for the current organization. Optional query parameters are `action=CONFIGURED|REFRESHED|ROTATED|DELETED` and bounded `limit`. Entries include provider, action, redacted account/from-number values, last-four hints, configured booleans, actor ID, and timestamp. The response must not include raw auth tokens, token fingerprints, provider credential values, provider verification results, or trigger provider calls/live messaging.
+Returns bounded, safe, unverified/display-only legacy `ProviderCredentialRotation` metadata. It is not M4
+provider ownership, credential authority, or canonical provider-control audit evidence. Entries exclude raw
+tokens, fingerprints, envelope/routing values, and provider errors and trigger no provider call.
 
 ### `GET /api/settings/provider/rotations/export`
 
-Returns a CSV export of recent tenant-scoped provider credential metadata history for the current organization using the same allowlisted `action` and bounded `limit` filters as the JSON rotation endpoint. The export includes redacted local credential metadata only. It must not include raw auth tokens, token fingerprints, provider verification results, provider-side state, or trigger provider calls, live messaging, billing records, notifications, or mutations.
+Returns a CSV of the same bounded legacy display-only history. It excludes plaintext/envelope/routing
+values, raw provider errors, fingerprints, and provider-side secrets and triggers no mutation or external
+call. Canonical M4 provider-control evidence remains in append-only `IntegrationAuditEvent` rows.
 
 ### `/settings`
 
@@ -514,7 +612,11 @@ Renders the consolidated go-live readiness view for the current organization. It
 
 ### `/settings/provider`
 
-Renders provider details for the current organization. It may submit local Twilio credential metadata to `PATCH /api/settings/provider`, clear local metadata through `DELETE /api/settings/provider`, filter local rotation history, and link to its bounded CSV export. It must render and export redacted values only and must not expose raw auth tokens or token fingerprints, claim provider verification, call providers, revoke provider-side credentials, offer live-send controls, or enable live messaging.
+Renders the M4 ADMIN provider control plane: safe account/readiness/health state, unprefilled credential
+verification/rotation controls, verified discovery/import for numbers/services, local revoke/disable/default
+controls, and bounded legacy display-history export. Canonical M4 audit remains in append-only
+`IntegrationAuditEvent`. Plaintext inputs reset after submission and are never server-rendered or
+returned. The page offers no send, number purchase/release/port, provider-side mutation, or live-enable control.
 
 ### `/dashboard/campaigns/:campaignId`
 
@@ -602,7 +704,9 @@ Returns tenant-scoped provider phone-number metadata for the current organizatio
 
 ### `POST /api/settings/numbers`
 
-Creates or updates tenant-scoped provider phone-number metadata from `{ "phoneNumber": "+15555550123", "provider": "dummy", "capabilities": ["sms"], "isDefault": true }`. At most one number per organization may be the default. This endpoint is local metadata only; it must not provision numbers, validate live ownership, store secrets, enable live messaging, or send SMS.
+Creates or updates dummy/local provider-number metadata only. Caller-asserted `twilio` ownership is rejected
+unless this method delegates to the verified account discovery/import boundary. At most one eligible sender
+per configured scope may be default. It never provisions, purchases, releases, ports, enables, or sends.
 
 ### `GET /api/settings/readiness-audit`
 

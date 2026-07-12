@@ -10,7 +10,7 @@ import {
 const mocks = vi.hoisted(() => ({
   messageFindFirst: vi.fn(),
   messageUpdateMany: vi.fn(),
-  webhookEventCreate: vi.fn(),
+  webhookEventCreateMany: vi.fn(),
   webhookEventFindUnique: vi.fn(),
   webhookEventUpdateMany: vi.fn()
 }));
@@ -22,7 +22,7 @@ vi.mock("@/lib/db/prisma", () => ({
       updateMany: mocks.messageUpdateMany
     },
     webhookEvent: {
-      create: mocks.webhookEventCreate,
+      createMany: mocks.webhookEventCreateMany,
       findUnique: mocks.webhookEventFindUnique,
       updateMany: mocks.webhookEventUpdateMany
     }
@@ -75,7 +75,7 @@ describe("recordWebhookEvent", () => {
         }
       }
     });
-    expect(mocks.webhookEventCreate).not.toHaveBeenCalled();
+    expect(mocks.webhookEventCreateMany).not.toHaveBeenCalled();
     expect(mocks.webhookEventUpdateMany).not.toHaveBeenCalled();
   });
 
@@ -104,7 +104,7 @@ describe("recordWebhookEvent", () => {
       retryAfterSeconds: null
     });
 
-    expect(mocks.webhookEventCreate).not.toHaveBeenCalled();
+    expect(mocks.webhookEventCreateMany).not.toHaveBeenCalled();
     expect(mocks.webhookEventUpdateMany).toHaveBeenCalledWith({
       where: {
         id: "event_unprocessed",
@@ -144,7 +144,7 @@ describe("recordWebhookEvent", () => {
       retryAfterSeconds: 240
     });
 
-    expect(mocks.webhookEventCreate).not.toHaveBeenCalled();
+    expect(mocks.webhookEventCreateMany).not.toHaveBeenCalled();
   });
 
   it("recovers an expired claim with a new owner token", async () => {
@@ -178,8 +178,8 @@ describe("recordWebhookEvent", () => {
       id: "event_created",
       ...webhookInput
     };
-    mocks.webhookEventFindUnique.mockResolvedValue(null);
-    mocks.webhookEventCreate.mockResolvedValue(createdEvent);
+    mocks.webhookEventFindUnique.mockResolvedValueOnce(null).mockResolvedValueOnce(createdEvent);
+    mocks.webhookEventCreateMany.mockResolvedValue({ count: 1 });
 
     await expect(recordWebhookEvent(webhookInput, claimOptions)).resolves.toEqual({
       event: createdEvent,
@@ -191,8 +191,8 @@ describe("recordWebhookEvent", () => {
       retryAfterSeconds: null
     });
 
-    expect(mocks.webhookEventCreate).toHaveBeenCalledWith({
-      data: {
+    expect(mocks.webhookEventCreateMany).toHaveBeenCalledWith({
+      data: [{
         orgId: "org_demo",
         provider: "twilio",
         eventType: "status",
@@ -204,7 +204,8 @@ describe("recordWebhookEvent", () => {
         processedAt: null,
         claimToken: "claim_owner",
         claimExpiresAt
-      }
+      }],
+      skipDuplicates: true
     });
   });
 
@@ -217,7 +218,7 @@ describe("recordWebhookEvent", () => {
       claimExpiresAt: new Date("2026-01-02T00:04:00.000Z")
     };
     mocks.webhookEventFindUnique.mockResolvedValueOnce(null).mockResolvedValueOnce(duplicateEvent);
-    mocks.webhookEventCreate.mockRejectedValue(Object.assign(new Error("Unique constraint failed"), { code: "P2002" }));
+    mocks.webhookEventCreateMany.mockResolvedValue({ count: 0 });
     mocks.webhookEventUpdateMany.mockResolvedValue({ count: 0 });
 
     await expect(recordWebhookEvent(webhookInput, claimOptions)).resolves.toEqual({
@@ -230,24 +231,25 @@ describe("recordWebhookEvent", () => {
       retryAfterSeconds: 240
     });
 
-    expect(mocks.webhookEventCreate).toHaveBeenCalledTimes(1);
+    expect(mocks.webhookEventCreateMany).toHaveBeenCalledTimes(1);
     expect(mocks.webhookEventFindUnique).toHaveBeenCalledTimes(2);
   });
 
   it("rethrows non-unique persistence errors", async () => {
     const persistenceError = Object.assign(new Error("database unavailable"), { code: "P1001" });
     mocks.webhookEventFindUnique.mockResolvedValue(null);
-    mocks.webhookEventCreate.mockRejectedValue(persistenceError);
+    mocks.webhookEventCreateMany.mockRejectedValue(persistenceError);
 
     await expect(recordWebhookEvent(webhookInput, claimOptions)).rejects.toBe(persistenceError);
   });
 
-  it("rethrows unique constraint errors if a concurrent duplicate is ultimately not found", async () => {
-    const uniqueConstraintError = Object.assign(new Error("Unique constraint failed"), { code: "P2002" });
+  it("fails closed if a conflict-safe insert produces no readable tenant row", async () => {
     mocks.webhookEventFindUnique.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
-    mocks.webhookEventCreate.mockRejectedValue(uniqueConstraintError);
+    mocks.webhookEventCreateMany.mockResolvedValue({ count: 0 });
 
-    await expect(recordWebhookEvent(webhookInput, claimOptions)).rejects.toBe(uniqueConstraintError);
+    await expect(recordWebhookEvent(webhookInput, claimOptions)).rejects.toThrow(
+      "Webhook event insert did not produce a readable tenant row."
+    );
     expect(mocks.webhookEventFindUnique).toHaveBeenCalledTimes(2);
   });
 });

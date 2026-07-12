@@ -17,7 +17,7 @@ its own software while requiring no application SaaS beyond an unavoidable carri
 | M1 | Built-in identity, onboarding, team administration | done |
 | M2 | Database-enforced tenant integrity | done |
 | M3 | Public API identity and customer webhooks | done |
-| M4 | Provider secrets, accounts, and owned-number routing | partial foundation |
+| M4 | Provider secrets, accounts, and owned-number routing | done |
 | M5 | Durable direct-message outbox and Twilio transport | partial foundation |
 | M6 | Trusted inbound messaging and shared inbox | partial foundation |
 | M7 | Production campaigns and audience management | partial foundation |
@@ -29,15 +29,16 @@ its own software while requiring no application SaaS beyond an unavoidable carri
 M1 through M3 establish identity, tenant, and integration trust and are complete. M2 closed with a
 least-privileged 40-migration install,
 database-enforced tenant relations, forced RLS with semantic policy attestation, and exact runtime/control/
-dispatch capabilities. M3 extends that boundary to the current 43 migrations/36 protected tables and adds
-scoped `/api/v1` identity plus durable signed customer events without live carrier impact. Live provider
-work starts only after provider ownership, secrets, tenant routing, and durable-before-external semantics
-exist.
+dispatch capabilities. M3 extended that boundary to its 43-migration/36-protected-table checkpoint and added
+scoped `/api/v1` identity plus durable signed customer events without live carrier impact. M4 now extends the
+current substrate to 51 migrations/39 protected tables with encrypted provider credentials, verified
+account/number/service ownership, safe ADMIN lifecycle, and trusted callback routing. General live provider
+mutation still waits for M5's durable-before-external semantics.
 
 ## Immediate execution queue
 
-1. Build the M4 encrypted provider ownership control plane while preserving the completed M3 contract.
-2. Continue through M5–M11 without narrowing the completion definition.
+1. Build the M5 durable direct-message outbox and Twilio transport without weakening the completed M4 trust boundary.
+2. Continue through M6–M11 without narrowing the completion definition.
 
 ## Rules
 

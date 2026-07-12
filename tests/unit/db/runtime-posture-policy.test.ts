@@ -24,33 +24,36 @@ describe("runtime policy posture", () => {
     expect(() => assertRuntimePolicyShapes(reviewedPolicies())).not.toThrow();
   });
 
-  it("requires an owner-bound dispatch function executable only by the worker capability", () => {
-    const reviewed = (functionName: string) => ({
+  it("requires owner-bound dispatch and provider-routing functions with exact capabilities", () => {
+    const reviewed = (functionName: string, capability: "worker" | "web") => ({
       functionName,
       securityDefiner: true,
       settings: ["search_path=pg_catalog, public"],
       publicExecute: false,
-      workerExecute: true,
+      workerExecute: capability === "worker",
       runtimeExecute: false,
       controlExecute: false,
-      webExecute: false,
+      webExecute: capability === "web",
       ownerMember: true
     });
     const rows = [
-      reviewed("claim_due_queue_jobs"),
-      reviewed("claim_due_customer_webhook_deliveries")
+      reviewed("claim_due_queue_jobs", "worker"),
+      reviewed("claim_due_customer_webhook_deliveries", "worker"),
+      reviewed("resolve_verified_provider_destination", "web")
     ];
     expect(() => assertDispatchCapabilityShape(rows)).not.toThrow();
     expect(() =>
       assertDispatchCapabilityShape([
         { ...rows[0]!, publicExecute: true },
-        rows[1]!
+        rows[1]!,
+        rows[2]!
       ])
     ).toThrow("capability shape is invalid");
     expect(() =>
       assertDispatchCapabilityShape([
         { ...rows[0]!, settings: ["search_path=public"] },
-        rows[1]!
+        rows[1]!,
+        rows[2]!
       ])
     ).toThrow("capability shape is invalid");
     expect(() => assertDispatchCapabilityShape([rows[0]!, rows[0]!])).toThrow(

@@ -1,15 +1,19 @@
 import { NextResponse } from "next/server";
-import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import {
   markWebhookEventProcessed,
   recordWebhookEvent,
   releaseWebhookEventClaim,
   updateMessageFromTwilioStatus
 } from "@/lib/db/repositories/webhooks";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
+import {
+  assertProviderCallbackBindingActive,
+  authenticateTwilioProviderCallback,
+  createProviderCallbackFailureResponse
+} from "@/lib/integrations/provider-accounts/webhook-routing";
 import {
   normalizeTwilioStatus,
-  readTwilioFormPayload,
-  validateTwilioSignature
+  readTwilioFormPayload
 } from "@/lib/messaging/twilio-webhooks";
 import { isTerminalDeliveryFailureProviderStatus } from "@/lib/messaging/delivery-status";
 import { twilioWebhookPayloadSchema } from "@/lib/validation/webhooks";
@@ -21,14 +25,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid Twilio form payload." }, { status: 400 });
   }
 
-  const signatureValid = validateTwilioSignature({
-    authToken: process.env.TWILIO_AUTH_TOKEN,
-    signature: request.headers.get("x-twilio-signature"),
-    url: request.url,
-    params: rawPayload
-  });
-  if (!signatureValid) {
-    return NextResponse.json({ error: "Invalid Twilio signature." }, { status: 403 });
+  let binding;
+  try {
+    binding = await authenticateTwilioProviderCallback({
+      kind: "status",
+      signature: request.headers.get("x-twilio-signature"),
+      url: request.url,
+      params: rawPayload
+    });
+  } catch (error) {
+    return createProviderCallbackFailureResponse(error);
   }
 
   const payload = twilioWebhookPayloadSchema.parse(rawPayload);
@@ -37,75 +43,77 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid Twilio status payload." }, { status: 400 });
   }
 
-  const authentication = await authenticateApiRequest({ boundary: "signed-webhook" });
-  if (!authentication.ok) {
-    return authentication.response;
-  }
-  const current = authentication.currentOrg;
-  const recorded = await recordWebhookEvent({
-    orgId: current.orgId,
-    provider: "twilio",
-    eventType: "status",
-    idempotencyKey: status.idempotencyKey,
-    rawPayload
-  });
+  return withTenantTransaction({ orgId: binding.orgId }, async (tx) => {
+    try {
+      await assertProviderCallbackBindingActive(tx, binding);
+    } catch (error) {
+      return createProviderCallbackFailureResponse(error);
+    }
+    const recorded = await recordWebhookEvent({
+      orgId: binding.orgId,
+      provider: "twilio",
+      eventType: "status",
+      idempotencyKey: status.idempotencyKey,
+      rawPayload
+    });
 
-  if (!recorded.claimed) {
-    if (recorded.outcome === "in_progress") {
-      return new NextResponse(null, {
-        status: 409,
-        headers: { "Retry-After": String(recorded.retryAfterSeconds) }
+    if (!recorded.claimed) {
+      if (recorded.outcome === "in_progress") {
+        return new NextResponse(null, {
+          status: 409,
+          headers: { "Retry-After": String(recorded.retryAfterSeconds) }
+        });
+      }
+
+      return new NextResponse(null, { status: 204 });
+    }
+
+    try {
+      const statusUpdate = await updateMessageFromTwilioStatus({
+        orgId: binding.orgId,
+        providerMessageId: status.providerMessageId,
+        status: status.status,
+        errorCode: status.errorCode
       });
+
+      if (!statusUpdate.matched) {
+        await releaseWebhookEventClaim(binding.orgId, recorded.event.id, recorded.claimToken);
+        return new NextResponse(null, {
+          status: 409,
+          headers: { "Retry-After": "5" }
+        });
+      }
+
+      if (statusUpdate.updated) {
+        const nextStatus = status.status.toLowerCase();
+        if (nextStatus === "delivered") {
+          recordMetric(smsPipelineMetrics.deliveryRate, { status: "success" });
+          if (statusUpdate.createdAt) {
+            const latencyMs = Date.now() - statusUpdate.createdAt.getTime();
+            recordMetric(smsPipelineMetrics.sendToDeliveredLatencyMs, { latencyMs });
+          }
+        } else if (isTerminalDeliveryFailureProviderStatus(nextStatus)) {
+          recordMetric(smsPipelineMetrics.deliveryRate, { status: "failure" });
+          if (status.errorCode) {
+            recordMetric(smsPipelineMetrics.failureByErrorCode, { errorCode: status.errorCode });
+          }
+        }
+      }
+
+      const completed = await markWebhookEventProcessed(
+        binding.orgId,
+        recorded.event.id,
+        recorded.claimToken
+      );
+      if (completed.count !== 1) {
+        throw new Error("Webhook event claim was lost before status processing completed.");
+      }
+    } catch (error) {
+      await releaseWebhookEventClaim(binding.orgId, recorded.event.id, recorded.claimToken);
+      throw error;
     }
 
     return new NextResponse(null, { status: 204 });
-  }
-
-  try {
-    const statusUpdate = await updateMessageFromTwilioStatus({
-      orgId: current.orgId,
-      providerMessageId: status.providerMessageId,
-      status: status.status,
-      errorCode: status.errorCode
-    });
-
-    if (!statusUpdate.matched) {
-      await releaseWebhookEventClaim(current.orgId, recorded.event.id, recorded.claimToken);
-      return new NextResponse(null, {
-        status: 409,
-        headers: { "Retry-After": "5" }
-      });
-    }
-
-    if (statusUpdate.updated) {
-      const nextStatus = status.status.toLowerCase();
-      if (nextStatus === "delivered") {
-        recordMetric(smsPipelineMetrics.deliveryRate, { status: "success" });
-        if (statusUpdate.createdAt) {
-          const latencyMs = Date.now() - statusUpdate.createdAt.getTime();
-          recordMetric(smsPipelineMetrics.sendToDeliveredLatencyMs, { latencyMs });
-        }
-      } else if (isTerminalDeliveryFailureProviderStatus(nextStatus)) {
-        recordMetric(smsPipelineMetrics.deliveryRate, { status: "failure" });
-        if (status.errorCode) {
-          recordMetric(smsPipelineMetrics.failureByErrorCode, { errorCode: status.errorCode });
-        }
-      }
-    }
-
-    const completed = await markWebhookEventProcessed(
-      current.orgId,
-      recorded.event.id,
-      recorded.claimToken
-    );
-    if (completed.count !== 1) {
-      throw new Error("Webhook event claim was lost before status processing completed.");
-    }
-  } catch (error) {
-    await releaseWebhookEventClaim(current.orgId, recorded.event.id, recorded.claimToken);
-    throw error;
-  }
-
-  return new NextResponse(null, { status: 204 });
+  });
 }
 

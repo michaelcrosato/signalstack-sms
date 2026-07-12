@@ -95,13 +95,13 @@ Area status values: `complete`, `partial`, `missing`, `blocked-by-live-proof`.
 | --- | --- | --- |
 | Self-hosted install | partial | Production compose boots ingress, web, migration, worker, and Postgres from a clean host; no secret or host build artifact enters the image. |
 | Identity and onboarding | complete | Built-in credential/session, owner bootstrap, operator recovery, organization/team lifecycle, authorization, PostgreSQL races, and production browser proof are green. |
-| Tenant database boundary | complete | The current 43-migration substrate extends the M2 boundary to 36 protected tables, including the M3 credential, idempotency, audit, event, delivery, and attempt rows plus disable/attempt reconciliation; least-privileged install, forced fail-closed RLS, exact control/dispatch capabilities, and the mandatory two-tenant matrix are green. |
+| Tenant database boundary | complete | The current 51-migration substrate extends the M2/M3 boundary to 39 protected tables, adding M4 provider account, encrypted credential-secret, messaging-service, and verified-number ownership while retaining least-privileged install, forced fail-closed RLS, exact control/dispatch/routing capabilities, and the mandatory two-tenant matrix. |
 | Public integration API | complete | Scoped one-time API keys, bearer-only `/api/v1`, encrypted idempotent replay, bounded cursors/rates/errors, OpenAPI, cross-runtime examples, rotation/revocation, audit, and a real-PostgreSQL exit path are implemented. Message submission remains explicit dummy/local work and makes no carrier call. |
 | Customer event webhooks | complete | Allowlisted subscriptions, encrypted one-time HMAC secrets, atomic event fanout, durable delivery/attempt history, safe transport, bounded retry/backoff, replay, disablement, secret rotation, receiver examples, and database/worker recovery proof are implemented. |
-| Provider control plane | partial | Encrypted credentials, verified account/number ownership, provider factory, rotation, health/readiness, tenant routing, and secret-leak tests. |
+| Provider control plane | complete | AES-256-GCM credentials, verified account/number/service ownership, safe ADMIN lifecycle and discovery/import, deterministic dummy and fixture-only Twilio provider surfaces, rotation/revocation/health, exact signed callback tenant routing, and secret-leak tests are implemented without enabling live sends. |
 | Individual outbound messaging | partial | The M3 status endpoint and idempotent dummy/local acceptance are complete; durable carrier message/attempt reservation, real Twilio transport, callback correlation, ambiguity reconciliation, and crash-injection proof remain. |
 | Campaign sending | partial | Live provider path, final compliance gate, bounded provider throughput, per-recipient attempts, retries/DLQ/replay, pause/kill switch, and restart/soak tests. |
-| Inbound and delivery status | partial | Customer lifecycle events are available; account + destination-number tenant resolution, provider-specific tenant credentials/signatures, media, complete STOP/START/HELP behavior, callback reconciliation, and unknown/ambiguous rejection remain. |
+| Inbound and delivery status | partial | M4 completes account + owned-destination tenant resolution, per-account credential signatures, and unknown/ambiguous rejection; media, complete STOP/START/HELP behavior, live inbox replies, and full callback reconciliation remain. |
 | Contacts and audiences | partial | Public tags/lists/list-membership/saved-segment CRUD and bounded evaluation are complete; imports with file/mapping UI, browser administration, audience estimates/snapshots, suppression, dedupe, export, and campaign targeting remain. |
 | Shared inbox | partial | Public thread/message reads, dummy/local replies, and customer conversation events are complete; real inbound/live replies, unread/SLA state, search/filter, safe realtime refresh, media, delivery state, and agent workflow E2E remain. |
 | Templates and campaigns | partial | Template archive/versioning, preview integration, MMS assets, saved audiences, test sends, recurring/cancel/pause behavior, history, and reporting. |
@@ -110,7 +110,7 @@ Area status values: `complete`, `partial`, `missing`, `blocked-by-live-proof`.
 | Analytics and operations | partial | Time ranges, delivery/provider/queue SLIs, protected metrics, worker heartbeat, alerts, audit search/export, and customer-facing reports. |
 | Privacy and lifecycle | missing | Retention policies, export/delete workflows, legal-hold boundaries, media cleanup, webhook-payload minimization, and tested scheduled cleanup. |
 | Backup, restore, upgrades | missing | Encrypted scheduled backup, off-host option, RPO/RTO, restore command and drill, pre-migration snapshot, expand/contract migration policy, and rollback rehearsal. |
-| Release assurance | partial | M3 adds mandatory PostgreSQL integration and public API/customer-webhook contract proof; production container/provider E2E, security-release scans, SBOM, restore drill, and live canary checklist remain. |
+| Release assurance | partial | M3 adds mandatory PostgreSQL integration and public API/customer-webhook contract proof; M4 adds non-owner provider ownership/routing, encrypted-envelope, ADMIN-route, and provider-fixture proof. Production carrier/container E2E, security-release scans, SBOM, restore drill, and live canary checklist remain. |
 
 ## Dependency-Ordered Implementation Roadmap
 
@@ -353,8 +353,8 @@ M0 -------------------------------> M10
 M1..M10 ---------------------------> M11
 ```
 
-M3 public integration work and M4 provider control-plane work may proceed in parallel after tenant
-integrity. M10 packaging begins early but cannot be declared complete until the production worker,
+M3 public integration and M4 provider control-plane work are complete after tenant integrity. M10 packaging
+begins early but cannot be declared complete until the production worker,
 secrets, health, retention, and recovery models are stable.
 
 ## Verification Ledger
@@ -367,9 +367,9 @@ This table is updated only from current evidence.
 | M1 | done | Built-in credentials and keyed sessions, bootstrap/operator recovery, organization/team lifecycle, fail-closed authorization, production browser proof, and final security audit pass. |
 | M2 | done | Fresh 40-migration/no-diff install under a non-superuser/non-BYPASSRLS table owner; owner capability excluded from runtimes; composite FKs/preflight/triggers; NOINHERIT web/worker provisioning; 27-table fail-closed RLS with semantic fingerprints; exact command-specific control policies; atomic database-timed security-definer dispatch with no public ACL; zero migration-debt imports; eight-file/33-test tenant matrix, 37-file/186-test DB run, nine-file/38-test auth DB run, and non-owner production browser proof. |
 | M3 | done | One-time scoped API credentials with immediate rotation/revocation; bearer-only `/api/v1` resources with stable envelopes, request IDs, HMAC cursors, PostgreSQL rate limits, encrypted durable idempotency, and generated OpenAPI; atomic customer-event fanout with encrypted signing secrets, SSRF-resistant delivery, bounded retries, disablement, reserved attempt evidence, history, and replay; curl/TypeScript/Python/provider-callback/receiver examples; 43-migration/36-protected-table posture; 12-file/49-test tenant gate; 30-file/111-test public API suite; and a literal Next HTTP + receiver-socket exit test using separate NOINHERIT web/worker logins to cover organization A/B denial, method boundaries, concurrent exact dummy replay/status, signed receipt, forced failure, replay after secret rotation, and API-key rotation/revocation. No live provider call is part of M3. |
-| M4 | partial foundation | Provider metadata exists; encrypted secrets and trusted tenant routing pending. |
+| M4 | done | Eight M4 migrations extend the current substrate to 51 migrations/39 protected tables; provider Auth Tokens persist only as account-hash/AAD-bound AES-256-GCM envelopes; verified account/number/service ownership and generation-safe rotation/import/revocation are enforced; safe ADMIN account routes and UI expose no secret/envelope/routing fields; the frozen provider factory keeps dummy deterministic and Twilio verification/discovery/health/create/fetch/signature behavior fixture-bound; and signed two-account routing is proven through non-owner PostgreSQL resolution plus HTTP route fixtures for correct, crossed, unknown, rotated, and revoked evidence. The mandatory tenant runner is 14 files/57 tests. M4 sends no message and purchases, releases, ports, or configures no provider resource. |
 | M5 | partial foundation | Dummy sends and isolated live test exist; general durable live outbox pending. |
-| M6 | partial foundation | Webhook parsing/leases exist; tenant routing/live inbox path pending. |
+| M6 | partial foundation | Webhook parsing, leases, and M4 trusted tenant routing exist; the complete production inbound/status and live inbox path remains pending. |
 | M7 | partial foundation | Durable campaign queue exists; live provider worker/audiences pending. |
 | M8 | partial foundation | Core opt-out/quiet-hour/evidence gates exist; complete audit/registration/lifecycle pending. |
 | M9 | partial foundation | Product UI plus setup/team/account flows exist; integration/provider/quota/audit/lifecycle administration remains. |

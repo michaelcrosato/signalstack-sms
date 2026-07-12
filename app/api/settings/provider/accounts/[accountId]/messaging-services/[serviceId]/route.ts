@@ -1,0 +1,41 @@
+import { MembershipRole } from "@prisma/client";
+import { requireApiRole } from "@/lib/auth/api-authorization";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
+import { updateProviderMessagingServiceLifecycle } from "@/lib/integrations/provider-accounts/service";
+import { providerResourceLifecycleSchema } from "@/lib/validation/provider";
+import {
+  noStoreResponse,
+  parseProviderJson,
+  providerJson,
+  providerRouteError,
+  routeParam
+} from "../../../_shared";
+
+type ServiceRouteContext = Readonly<{
+  params: Promise<{ accountId: string; serviceId: string }>;
+}>;
+
+export async function PATCH(request: Request, context: ServiceRouteContext) {
+  const authentication = await authenticateApiRequest(request);
+  if (!authentication.ok) return authentication.response;
+  const { currentOrg } = authentication;
+  const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+  if (roleResponse) return noStoreResponse(roleResponse);
+
+  const parsed = await parseProviderJson(request, providerResourceLifecycleSchema);
+  if (!parsed.ok) return parsed.response;
+  const { accountId, serviceId } = await context.params;
+
+  try {
+    const messagingService = await updateProviderMessagingServiceLifecycle({
+      orgId: currentOrg.orgId,
+      providerAccountId: routeParam(accountId),
+      messagingServiceId: routeParam(serviceId),
+      ...parsed.data,
+      actor: { userId: currentOrg.userId }
+    });
+    return providerJson({ messagingService });
+  } catch (error) {
+    return providerRouteError(error);
+  }
+}

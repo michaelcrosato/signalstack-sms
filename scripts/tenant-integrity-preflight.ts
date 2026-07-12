@@ -132,6 +132,40 @@ export const tenantIntegrityChecks: readonly TenantIntegrityCheck[] = Object.fre
      WHERE child."providerCredentialId" IS NOT NULL AND child."orgId" <> parent."orgId"`
   ),
   strictRelation(
+    "provider-credential-secret.account",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "ProviderCredentialSecret" child
+     JOIN "ProviderAccount" parent ON parent."id" = child."providerAccountId"
+     WHERE child."orgId" <> parent."orgId"`
+  ),
+  strictRelation(
+    "provider-messaging-service.account",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "ProviderMessagingService" child
+     JOIN "ProviderAccount" parent ON parent."id" = child."providerAccountId"
+     WHERE child."orgId" <> parent."orgId" OR child."provider" <> parent."provider"`
+  ),
+  strictRelation(
+    "provider-phone-number.account",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "ProviderPhoneNumber" child
+     JOIN "ProviderAccount" parent ON parent."id" = child."providerAccountId"
+     WHERE child."providerAccountId" IS NOT NULL
+       AND (child."orgId" <> parent."orgId" OR child."provider" <> parent."provider")`
+  ),
+  strictRelation(
+    "provider-phone-number.messaging-service",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "ProviderPhoneNumber" child
+     JOIN "ProviderMessagingService" parent ON parent."id" = child."providerMessagingServiceId"
+     WHERE child."providerMessagingServiceId" IS NOT NULL
+       AND (
+         child."orgId" <> parent."orgId"
+         OR child."providerAccountId" <> parent."providerAccountId"
+         OR child."provider" <> parent."provider"
+       )`
+  ),
+  strictRelation(
     "api-idempotency-record.credential",
     `SELECT COUNT(*)::bigint AS "count"
      FROM "ApiIdempotencyRecord" child
@@ -164,8 +198,26 @@ export const tenantIntegrityChecks: readonly TenantIntegrityCheck[] = Object.fre
            SELECT 1 FROM "CustomerWebhookDelivery" parent
            WHERE parent."orgId" = child."orgId" AND parent."id" = child."subjectId"
          ))
+         OR (child."subjectType" = 'provider_account' AND NOT EXISTS (
+           SELECT 1 FROM "ProviderAccount" parent
+           WHERE parent."orgId" = child."orgId" AND parent."id" = child."subjectId"
+         ))
+         OR (child."subjectType" = 'provider_credential_secret' AND NOT EXISTS (
+           SELECT 1 FROM "ProviderCredentialSecret" parent
+           WHERE parent."orgId" = child."orgId" AND parent."id" = child."subjectId"
+         ))
+         OR (child."subjectType" = 'provider_messaging_service' AND NOT EXISTS (
+           SELECT 1 FROM "ProviderMessagingService" parent
+           WHERE parent."orgId" = child."orgId" AND parent."id" = child."subjectId"
+         ))
+         OR (child."subjectType" = 'provider_phone_number' AND NOT EXISTS (
+           SELECT 1 FROM "ProviderPhoneNumber" parent
+           WHERE parent."orgId" = child."orgId" AND parent."id" = child."subjectId"
+         ))
          OR child."subjectType" NOT IN (
-           'organization', 'api_credential', 'customer_webhook_endpoint', 'customer_webhook_delivery'
+           'organization', 'api_credential', 'customer_webhook_endpoint', 'customer_webhook_delivery',
+           'provider_account', 'provider_credential_secret', 'provider_messaging_service',
+           'provider_phone_number'
          )
        )`
   ),

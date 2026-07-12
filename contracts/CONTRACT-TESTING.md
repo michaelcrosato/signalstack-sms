@@ -32,12 +32,33 @@ with demo-safe defaults rather than treating direct validation calls as green.
   `tests/unit/operations/operator-surfaces.test.ts`.
 - **Webhooks** fail closed on malformed/unsigned payloads before tenant lookup or local mutations; duplicate
   events are idempotent.
+- **M4 credential envelopes**: AES-256-GCM round trips only under the exact tenant/provider/account/external-
+  ID/credential-secret-version binding. Ciphertext, IV, tag, fingerprint, key/envelope version, master key, and AAD
+  tampering fail generically; secret-output scans cover responses, HTML, logs, audit, CSV, fixtures, and
+  errors.
+- **M4 provider control plane**: ADMIN/same-origin denial precedes body/secret reads; verification,
+  rotation, revocation, health, discovery, and import use bounded injected transports and safe DTOs. Twilio
+  fixtures cover exact AC/MG/E.164/capability parsing, malformed/provider/timeout paths, and no partial writes.
+- **M4 provider factory**: dummy implements the complete interface deterministically and performs no
+  environment read/network effect. Twilio verification/discovery/health/create/fetch/normalization/retry/
+  signature surfaces are fixture-tested, but no M4 route/worker invokes message creation or provider resource
+  mutation.
+- **M4 ownership and routing**: mandatory PostgreSQL tests install the migration under least privilege,
+  exercise forced RLS/same-tenant/global account-number-service uniqueness and concurrent import/rotation/
+  revoke races, and leave no Prisma diff. Two organizations with separate accounts/numbers/services prove
+  correct signed inbound/status routing; wrong credential, crossed/unknown destination, injected ambiguity,
+  disabled/revoked state, and generation races share generic denial with zero event/domain/audit persistence.
+- **M4 exit proof** uses non-owner web/worker roles plus deterministic HTTP/provider fixtures. It must pass
+  without a real credential, carrier message, provider purchase/release/port/configuration, paid lookup, or
+  external network call.
 - **Demo path**: `npm run test:e2e:demo` (investor) and `npm run test:e2e:product-demo` (product) run against a
   seeded database, separate from the default gate.
 
 ## Fixtures & Playwright
 
-- Webhook + CSV fixtures live in `tests/fixtures/`.
+- Webhook, provider-control, and CSV fixtures live in `tests/fixtures/`. Provider fixtures contain only
+  impossible test identifiers/tokens and deterministic responses; secret scanning rejects production-shaped
+  credential material.
 - Playwright serves a local-only server on `127.0.0.1`, default test port separate from `npm run dev`.
   `PLAYWRIGHT_PORT` overrides the port; existing-server reuse is explicit via `PLAYWRIGHT_REUSE_EXISTING_SERVER=true`.
 

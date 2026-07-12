@@ -6,6 +6,8 @@ import { POST as statusWebhookRoute } from "@/app/api/webhooks/twilio/status/rou
 const originalTwilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
 
 const mocks = vi.hoisted(() => ({
+  assertProviderCallbackBindingActive: vi.fn(),
+  authenticateTwilioProviderCallback: vi.fn(),
   createDemoInboundMessage: vi.fn(),
   getOrCreateCurrentOrg: vi.fn(),
   markWebhookEventProcessed: vi.fn(),
@@ -13,6 +15,22 @@ const mocks = vi.hoisted(() => ({
   recordWebhookEvent: vi.fn(),
   releaseWebhookEventClaim: vi.fn(),
   updateMessageFromTwilioStatus: vi.fn()
+}));
+
+vi.mock("@/lib/integrations/provider-accounts/webhook-routing", () => ({
+  assertProviderCallbackBindingActive: mocks.assertProviderCallbackBindingActive,
+  authenticateTwilioProviderCallback: mocks.authenticateTwilioProviderCallback,
+  createProviderCallbackFailureResponse: (error: { code?: string }) =>
+    Response.json(
+      error?.code === "WEBHOOK_ROUTING_UNAVAILABLE"
+        ? { error: "Provider callback routing is unavailable.", code: "WEBHOOK_ROUTING_UNAVAILABLE" }
+        : { error: "Provider callback rejected.", code: "INVALID_PROVIDER_CALLBACK" },
+      { status: error?.code === "WEBHOOK_ROUTING_UNAVAILABLE" ? 503 : 403 }
+    )
+}));
+
+vi.mock("@/lib/db/tenant-context", () => ({
+  withTenantTransaction: (_context: unknown, fn: (tx: object) => unknown) => fn({})
 }));
 
 vi.mock("@/lib/auth/current-org", () => ({
@@ -72,6 +90,18 @@ describe("Twilio webhook routes", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.TWILIO_AUTH_TOKEN = "test_token";
+    mocks.authenticateTwilioProviderCallback.mockResolvedValue({
+      orgId: "org_demo",
+      provider: "twilio",
+      providerAccountId: "provider_account_demo",
+      providerPhoneNumberId: "provider_number_demo",
+      providerCredentialSecretId: "provider_secret_demo",
+      credentialVersion: 1,
+      credentialFingerprint: "pvfp_demo",
+      externalAccountId: "AC00000000000000000000000000000000",
+      phoneNumber: "+15555550199"
+    });
+    mocks.assertProviderCallbackBindingActive.mockResolvedValue(undefined);
     mocks.getOrCreateCurrentOrg.mockResolvedValue({ orgId: "org_demo", userId: "user_demo", role: "OWNER" });
     mocks.createDemoInboundMessage.mockResolvedValue({ message: { id: "message_demo" } });
     mocks.recordWebhookEvent.mockResolvedValue({
@@ -112,6 +142,9 @@ describe("Twilio webhook routes", () => {
   });
 
   it("rejects invalid inbound signatures before tenant lookup or local mutations", async () => {
+    mocks.authenticateTwilioProviderCallback.mockRejectedValueOnce({
+      code: "INVALID_PROVIDER_CALLBACK"
+    });
     const response = await inboundWebhookRoute(
       twilioFormRequest(
         "/api/webhooks/twilio/inbound",
@@ -121,7 +154,10 @@ describe("Twilio webhook routes", () => {
     );
 
     expect(response.status).toBe(403);
-    await expect(response.json()).resolves.toEqual({ error: "Invalid Twilio signature." });
+    await expect(response.json()).resolves.toEqual({
+      error: "Provider callback rejected.",
+      code: "INVALID_PROVIDER_CALLBACK"
+    });
     expect(mocks.getOrCreateCurrentOrg).not.toHaveBeenCalled();
     expect(mocks.recordWebhookEvent).not.toHaveBeenCalled();
     expect(mocks.createDemoInboundMessage).not.toHaveBeenCalled();

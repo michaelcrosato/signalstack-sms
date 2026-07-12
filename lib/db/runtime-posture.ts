@@ -257,6 +257,10 @@ async function inspectRuntimeDatabasePosture(client: PrismaClient): Promise<void
           functions.proname = 'claim_due_customer_webhook_deliveries'
           AND functions.proargtypes = '23 23 2950'::oidvector
         )
+        OR (
+          functions.proname = 'resolve_verified_provider_destination'
+          AND functions.proargtypes = '25 25 25'::oidvector
+        )
       )
   `;
   assertDispatchCapabilityShape(dispatchFunctions);
@@ -339,31 +343,34 @@ function canonicalPolicyExpression(value: string | null): string | null {
 }
 
 export function assertDispatchCapabilityShape(rows: readonly DispatchCapabilityRow[]): void {
-  const expectedFunctions = new Set([
-    "claim_due_queue_jobs",
-    "claim_due_customer_webhook_deliveries"
+  const expectedFunctions = new Map<string, "worker" | "web">([
+    ["claim_due_queue_jobs", "worker"],
+    ["claim_due_customer_webhook_deliveries", "worker"],
+    ["resolve_verified_provider_destination", "web"]
   ]);
   if (rows.length !== expectedFunctions.size) {
-    throw new Error("Worker dispatch database capability shape is invalid.");
+    throw new Error("Database capability shape is invalid.");
   }
   for (const functionShape of rows) {
+    const expectedCapability = expectedFunctions.get(functionShape.functionName);
     if (
-      !expectedFunctions.delete(functionShape.functionName) ||
+      !expectedCapability ||
       !functionShape.securityDefiner ||
       functionShape.settings?.length !== 1 ||
       functionShape.settings[0] !== "search_path=pg_catalog, public" ||
       functionShape.publicExecute ||
-      !functionShape.workerExecute ||
+      functionShape.workerExecute !== (expectedCapability === "worker") ||
       functionShape.runtimeExecute ||
       functionShape.controlExecute ||
-      functionShape.webExecute ||
+      functionShape.webExecute !== (expectedCapability === "web") ||
       !functionShape.ownerMember
     ) {
-      throw new Error("Worker dispatch database capability shape is invalid.");
+      throw new Error("Database capability shape is invalid.");
     }
+    expectedFunctions.delete(functionShape.functionName);
   }
   if (expectedFunctions.size !== 0) {
-    throw new Error("Worker dispatch database capability shape is invalid.");
+    throw new Error("Database capability shape is invalid.");
   }
 }
 

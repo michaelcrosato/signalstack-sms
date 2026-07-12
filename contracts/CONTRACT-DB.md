@@ -11,9 +11,9 @@ Every tenant-scoped model must include `orgId` unless explicitly documented here
 PostgreSQL independently enforces the tenant rule; repository predicates are defense in depth, not the
 authorization boundary:
 
-- The M2 baseline contained 22 ordinary tenant tables. M3 adds nine public-integration tables, so the
-  canonical manifest contains 31 ordinary tenant tables plus five identity/control tables
-  (`Organization`, `Membership`, `AppUser`, `AuthSession`, and `AuthToken`). All 36 enable and force RLS,
+- The M2 baseline contained 22 ordinary tenant tables. M3 adds nine public-integration tables and M4 adds
+  three provider-control tables, so the canonical manifest contains 34 ordinary tenant tables plus five
+  identity/control tables (`Organization`, `Membership`, `AppUser`, `AuthSession`, and `AuthToken`). All 39 enable and force RLS,
   deny missing context, and expose no `PUBLIC` read/write privilege. Runtime posture verifies the exact
   tenant policy name, command, role, permissiveness, `USING`, and `WITH CHECK` expression for every table;
   a catalog with the right policy count but weakened semantics is rejected.
@@ -62,12 +62,13 @@ authorization boundary:
 - The direct-Prisma inventory permits reviewed control-plane/context seams only. M2 closes with zero
   `tenant-migration-debt` imports; new tenant paths must use the transaction boundary and join its tests.
 
-Mandatory proof covers tenant A and B across all 36 protected tables, missing context, cross-tenant
+Mandatory proof covers tenant A and B across all 39 protected tables, missing context, cross-tenant
 read/write/relation forgery, rollback, command-specific control policy denial, runtime policy semantic
 fingerprints, worker dispatch, multi-connection pool reuse, and the literal non-owner external-network
-lifecycle. `npm run test:tenant-db` is the current twelve-file / 49-test gate; the complete database-directory
+lifecycle. `npm run test:tenant-db` is the current 14-file / 57-test gate (13 files / 56 tests in the tenant
+batch plus one literal-network public-API file / one test); the complete database-directory
 run remains mandatory without freezing a stale aggregate count here. The least-privilege test creates a fresh
-database, applies all 43 migrations through a
+database, applies all 51 migrations through a
 non-superuser/non-BYPASSRLS table owner, exercises historical triggers and dispatch, and proves the
 dispatch function has no `PUBLIC` EXECUTE ACL. Production local-auth browser proof uses separate
 owner/runtime credentials and serves the app under the non-owner login.
@@ -162,29 +163,61 @@ Compliance profile completion is required by the centralized messaging hard gate
 - `UsageEvent`: tenant-scoped local usage record with `type`, `quantity`, optional JSON metadata, and timestamp.
 - `BillingAccount`: one org-scoped billing metadata record with local status and live-billing flag.
 - `WebhookEvent`: org-scoped raw provider webhook record with provider, event type, tenant-unique `(orgId, idempotencyKey)`, raw payload, received timestamp, processed timestamp, and nullable claim owner/expiry fields. A null processed timestamp is retryable only after an atomic tenant-scoped lease claim; only the matching owner may complete or release the claim, and an expired lease is recoverable.
-- `ProviderPhoneNumber`: org-scoped phone-number metadata with `phoneNumber`, provider name, local status, capabilities, and default-number marker.
-- `ProviderCredential`: org-scoped provider credential metadata with provider name, redacted Twilio account/from-number fields, auth-token fingerprint, configured flag, and source.
-- `ProviderCredentialRotation`: org-scoped local history of provider credential metadata configuration, rotation, and deletion events.
+- `ProviderAccount` (M4): org-scoped provider identity with exact `externalAccountId`, globally unique keyed
+  account lookup hash, safe display metadata, verification/health/generation state, and revocation evidence.
+- `ProviderCredentialSecret` (M4): org/account-scoped versioned AES-256-GCM Auth Token envelope with one
+  active version per account and retirement/revocation evidence.
+- `ProviderPhoneNumber`: org/account-scoped number. Dummy/local rows remain metadata; M4 live rows require
+  verified discovery/import, global `(provider, phoneNumber)` ownership, provider capability evidence, and
+  disable/default state.
+- `ProviderMessagingService` (M4): org/account-scoped verified service with globally unique keyed external
+  identifier, capabilities, and disable/default state.
+- `ProviderCredentialRotation`: preserved unverified/display-only legacy history for pre-M4 metadata
+  configuration, rotation, and deletion; it is not M4 ownership or authorization evidence.
+- `IntegrationAuditEvent`: canonical append-only M4 provider-control evidence for configuration,
+  verification, rotation, revocation, health, discovery, import, default, and disable actions.
 - `LiveReadinessAuditEvent`: org-scoped audit event for go-live readiness configuration changes.
 - `UsageEventType`: `CONTACT_IMPORTED`, `MESSAGE_INBOUND`, `CAMPAIGN_SCHEDULED`, `AI_REQUEST`.
 - `BillingAccountStatus`: `DEMO`, `TRIALING`, `ACTIVE`, `PAST_DUE`, `CANCELLED`.
 
 Billing records are local metadata only. Stripe/customer/subscription IDs are nullable placeholders and must not be created by MVP endpoints.
 
-## Post-MVP Provider Number Foundation
+## M4 Provider Accounts, Credentials, and Ownership
 
-`ProviderPhoneNumber` records are configuration metadata only. At most one row per organization may
-be marked as the default, enforced by a database partial unique index. Creating or updating one must
-not provision a provider number, validate ownership with Twilio, store credentials, enable live
-messaging, or send SMS.
+Provider records are ordinary tenant rows and must join the canonical manifest, forced RLS/runtime posture,
+least-privilege grants, same-tenant composite relations, static Prisma inventory, and mandatory two-tenant
+matrix. Pre-tenant callback routing is a separate exact SELECT-only capability keyed by account and
+destination hashes; it exposes no broad provider-table reads or mutation.
 
-## Post-MVP Provider Credential Metadata Foundation
+Global invariants are:
 
-`ProviderCredential` records are local readiness metadata only. They may store redacted identifiers and a one-way fingerprint of a submitted token, but must not store raw auth tokens, return secrets to API clients, verify credentials with Twilio, enable live messaging, or send SMS.
+- unique `(provider, accountIdentifierHash)` account ownership;
+- unique active live `(provider, phoneNumber)` ownership;
+- unique `(provider, messagingServiceIdentifierHash)` service ownership;
+- one active credential version per account;
+- same-tenant account/credential/number/service foreign keys plus organization-bound, secret-free audit
+  subjects; and
+- no default sender/service pointing to an unverified, disabled, or foreign-account resource.
 
-## Post-MVP Provider Credential Rotation History
+A PII-free migration preflight emits only invariant labels/counts and aborts on legacy collisions. Existing
+metadata-only credentials and caller-configured Twilio numbers remain explicitly unverified; migration cannot
+promote them to owned/verified state because no recoverable secret or provider proof exists.
 
-`ProviderCredentialRotation` records are local, tenant-scoped history entries for provider credential metadata changes. They may store redacted account/from-number values, last-four hints, credential presence booleans, action labels, and actor IDs. They must not store raw auth tokens, return one-way token fingerprints through API responses, call Twilio, validate credentials, revoke provider-side credentials, enable live messaging, or send SMS.
+Credential envelopes store version, algorithm, key version, canonical IV/ciphertext/tag, and a safe keyed
+fingerprint. AES-256-GCM AAD binds the tenant, provider, account, exact `externalAccountId`, account lookup
+hash, credential-secret row/version, and fingerprint. The Twilio Auth Token and master key never enter
+plaintext database columns. Account SID is a non-secret identifier stored only as tenant-scoped
+`externalAccountId`; APIs/logs/audit/exports expose only redacted/last-four metadata. Ciphertext/tag/binding/
+version tampering fails closed.
+
+Credential rotation verifies outside the transaction, then locks and rechecks account generation before
+creating/activating the next version and retiring the previous one. Revocation clears active authority and
+disables readiness without hard deletion. Provider-control history is append-only and secret-free.
+
+Verified discovery returns no persistent ownership. Import locks and rechecks the active verified account,
+credential generation, and selected fresh discovery evidence before installing globally unique ownership.
+Concurrent crossed/stale/duplicate imports roll back completely. Import never purchases, releases, ports, or
+changes the provider-side resource.
 
 ## Post-MVP Live Readiness Audit Foundation
 

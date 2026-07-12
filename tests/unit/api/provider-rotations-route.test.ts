@@ -71,6 +71,7 @@ describe("provider credential rotation API routes", () => {
     );
 
     expect(response.status).toBe(200);
+    expect(response.headers.get("cache-control")).toBe("no-store, max-age=0");
     await expect(response.json()).resolves.toEqual({ rotations });
     expect(mocks.listProviderCredentialRotations).toHaveBeenCalledWith("org_demo", "twilio", 25, "ROTATED");
     expect(mocks.serializeProviderCredentialRotationsCsv).not.toHaveBeenCalled();
@@ -117,9 +118,27 @@ describe("provider credential rotation API routes", () => {
     );
 
     expect(response.status).toBe(200);
+    expect(response.headers.get("cache-control")).toBe("no-store, max-age=0");
     await expect(response.text()).resolves.toBe("id,action\nrotation_demo,DELETED\n");
     expect(response.headers.get("Content-Type")).toBe("text/csv; charset=utf-8");
     expect(mocks.listProviderCredentialRotations).toHaveBeenCalledWith("org_demo", "twilio", 25, "DELETED");
     expect(mocks.serializeProviderCredentialRotationsCsv).toHaveBeenCalledWith(rotations);
+  });
+
+  it("denies legacy provider history to non-admin members before reading rows", async () => {
+    mocks.getOrCreateCurrentOrg.mockResolvedValue({
+      orgId: "org_demo",
+      userId: "user_member",
+      role: "MEMBER",
+      demoMode: true
+    });
+
+    const response = await listProviderRotationsRoute(
+      new Request("http://localhost/api/settings/provider/rotations")
+    );
+
+    expect(response.status).toBe(403);
+    expect(response.headers.get("cache-control")).toBe("no-store, max-age=0");
+    expect(mocks.listProviderCredentialRotations).not.toHaveBeenCalled();
   });
 });

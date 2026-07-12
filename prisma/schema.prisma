@@ -100,6 +100,18 @@ enum ProviderPhoneNumberStatus {
   DEMO
   CONFIGURED
   DISABLED
+  VERIFIED
+}
+
+enum ProviderAccountStatus {
+  VERIFIED
+  DEGRADED
+  REVOKED
+}
+
+enum ProviderMessagingServiceStatus {
+  VERIFIED
+  DISABLED
 }
 
 enum CustomerWebhookEndpointStatus {
@@ -140,6 +152,9 @@ model Organization {
   usageEvents                     UsageEvent[]
   billingAccount                  BillingAccount?
   webhookEvents                   WebhookEvent[]
+  providerAccounts                ProviderAccount[]
+  providerCredentialSecrets       ProviderCredentialSecret[]
+  providerMessagingServices       ProviderMessagingService[]
   providerPhoneNumbers            ProviderPhoneNumber[]
   providerCredentials             ProviderCredential[]
   providerCredentialRotations     ProviderCredentialRotation[]
@@ -616,24 +631,119 @@ model BillingAccount {
   @@index([status])
 }
 
-model ProviderPhoneNumber {
-  id           String                    @id @default(cuid())
-  orgId        String
-  phoneNumber  String
-  label        String?
-  provider     String                    @default("dummy")
-  status       ProviderPhoneNumberStatus @default(DEMO)
-  capabilities Json
-  /// At most one true row per org; enforced by a partial unique index in migration SQL.
-  isDefault    Boolean                   @default(false)
-  createdAt    DateTime                  @default(now())
-  updatedAt    DateTime                  @updatedAt
-  org          Organization              @relation(fields: [orgId], references: [id], onDelete: Cascade)
+model ProviderAccount {
+  id                     String                     @id @default(cuid())
+  orgId                  String
+  provider               String
+  externalAccountId      String
+  externalAccountIdHash  String                     @unique
+  externalAccountIdLast4 String
+  status                 ProviderAccountStatus
+  isDefault              Boolean                    @default(false)
+  accountStatus          String?
+  accountType            String?
+  verifiedAt             DateTime
+  lastCheckedAt          DateTime
+  revokedAt              DateTime?
+  createdAt              DateTime                   @default(now())
+  updatedAt              DateTime                   @updatedAt
+  org                    Organization               @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  credentialSecrets      ProviderCredentialSecret[]
+  messagingServices      ProviderMessagingService[]
+  phoneNumbers           ProviderPhoneNumber[]
 
+  @@unique([orgId, id])
+  @@unique([orgId, id, provider])
+  @@unique([provider, externalAccountId])
+  @@index([orgId])
+  @@index([orgId, provider, status])
+}
+
+model ProviderCredentialSecret {
+  id                String          @id @default(cuid())
+  orgId             String
+  providerAccountId String
+  version           Int
+  envelopeVersion   Int             @default(1)
+  algorithm         String          @default("aes-256-gcm")
+  keyVersion        Int
+  iv                String
+  ciphertext        String
+  authTag           String
+  fingerprint       String
+  activeFrom        DateTime        @default(now())
+  retiredAt         DateTime?
+  createdAt         DateTime        @default(now())
+  org               Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  providerAccount   ProviderAccount @relation(fields: [orgId, providerAccountId], references: [orgId, id], onDelete: Restrict)
+
+  @@unique([orgId, id])
+  @@unique([providerAccountId, version])
+  @@index([orgId])
+  @@index([orgId, providerAccountId])
+  @@index([providerAccountId, retiredAt])
+}
+
+model ProviderMessagingService {
+  id                     String                         @id @default(cuid())
+  orgId                  String
+  providerAccountId      String
+  provider               String
+  externalServiceId      String
+  externalServiceIdHash  String                         @unique
+  externalServiceIdLast4 String
+  status                 ProviderMessagingServiceStatus
+  isDefault              Boolean                        @default(false)
+  capabilities           Json
+  verifiedAt             DateTime
+  lastCheckedAt          DateTime
+  disabledAt             DateTime?
+  createdAt              DateTime                       @default(now())
+  updatedAt              DateTime                       @updatedAt
+  org                    Organization                   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  providerAccount        ProviderAccount                @relation(fields: [orgId, providerAccountId, provider], references: [orgId, id, provider], onDelete: Restrict)
+  phoneNumbers           ProviderPhoneNumber[]
+
+  @@unique([orgId, id])
+  @@unique([orgId, providerAccountId, provider, id])
+  @@unique([provider, externalServiceId])
+  @@index([orgId])
+  @@index([orgId, providerAccountId, status])
+}
+
+model ProviderPhoneNumber {
+  id                         String                    @id @default(cuid())
+  orgId                      String
+  phoneNumber                String
+  phoneNumberHash            String?
+  label                      String?
+  provider                   String                    @default("dummy")
+  providerAccountId          String?
+  providerMessagingServiceId String?
+  externalNumberId           String?
+  externalNumberIdLast4      String?
+  status                     ProviderPhoneNumberStatus @default(DEMO)
+  capabilities               Json
+  /// At most one true row per org; enforced by a partial unique index in migration SQL.
+  isDefault                  Boolean                   @default(false)
+  verifiedAt                 DateTime?
+  lastCheckedAt              DateTime?
+  disabledAt                 DateTime?
+  createdAt                  DateTime                  @default(now())
+  updatedAt                  DateTime                  @updatedAt
+  org                        Organization              @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  providerAccount            ProviderAccount?          @relation(fields: [orgId, providerAccountId, provider], references: [orgId, id, provider], onDelete: Restrict)
+  providerMessagingService   ProviderMessagingService? @relation(fields: [orgId, providerAccountId, provider, providerMessagingServiceId], references: [orgId, providerAccountId, provider, id], onDelete: Restrict)
+
+  @@unique([orgId, id])
   @@unique([orgId, phoneNumber])
+  @@unique([provider, externalNumberId])
   @@index([orgId])
   @@index([orgId, isDefault])
   @@index([orgId, provider])
+  @@index([orgId, providerAccountId])
+  @@index([orgId, providerMessagingServiceId])
+  @@index([orgId, status])
 }
 
 model ProviderCredential {

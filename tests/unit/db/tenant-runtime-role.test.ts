@@ -3,6 +3,8 @@ import {
   AuthTokenType,
   MembershipRole,
   PrismaClient,
+  ProviderAccountStatus,
+  ProviderMessagingServiceStatus,
   QueueJobType,
   UsageEventType,
   type Prisma
@@ -641,12 +643,103 @@ async function seedOwnerFixtures(): Promise<OwnerFixture> {
     const billingB = await tx.billingAccount.create({ data: { orgId: orgB.id } });
     remember("BillingAccount", billingA.id, billingB.id);
 
+    const providerVerifiedAt = new Date();
+    const externalAccountA = `AC${suiteToken}A`;
+    const externalAccountB = `AC${suiteToken}B`;
+    const providerAccountA = await tx.providerAccount.create({
+      data: {
+        orgId: orgA.id,
+        provider: fixtureLabel,
+        externalAccountId: externalAccountA,
+        externalAccountIdHash: providerLookupHash(`${fixtureLabel}:account:${externalAccountA}`),
+        externalAccountIdLast4: externalAccountA.slice(-4),
+        status: ProviderAccountStatus.VERIFIED,
+        verifiedAt: providerVerifiedAt,
+        lastCheckedAt: providerVerifiedAt
+      }
+    });
+    const providerAccountB = await tx.providerAccount.create({
+      data: {
+        orgId: orgB.id,
+        provider: fixtureLabel,
+        externalAccountId: externalAccountB,
+        externalAccountIdHash: providerLookupHash(`${fixtureLabel}:account:${externalAccountB}`),
+        externalAccountIdLast4: externalAccountB.slice(-4),
+        status: ProviderAccountStatus.VERIFIED,
+        verifiedAt: providerVerifiedAt,
+        lastCheckedAt: providerVerifiedAt
+      }
+    });
+    remember("ProviderAccount", providerAccountA.id, providerAccountB.id);
+
+    const providerSecretA = await tx.providerCredentialSecret.create({
+      data: {
+        orgId: orgA.id,
+        providerAccountId: providerAccountA.id,
+        version: 1,
+        keyVersion: 1,
+        iv: tokenHash("provider-iv-a"),
+        ciphertext: tokenHash("provider-ciphertext-a"),
+        authTag: tokenHash("provider-tag-a"),
+        fingerprint: providerFingerprint("provider-fingerprint-a")
+      }
+    });
+    const providerSecretB = await tx.providerCredentialSecret.create({
+      data: {
+        orgId: orgB.id,
+        providerAccountId: providerAccountB.id,
+        version: 1,
+        keyVersion: 1,
+        iv: tokenHash("provider-iv-b"),
+        ciphertext: tokenHash("provider-ciphertext-b"),
+        authTag: tokenHash("provider-tag-b"),
+        fingerprint: providerFingerprint("provider-fingerprint-b")
+      }
+    });
+    remember("ProviderCredentialSecret", providerSecretA.id, providerSecretB.id);
+
+    const externalServiceA = `MG${suiteToken}A`;
+    const externalServiceB = `MG${suiteToken}B`;
+    const providerServiceA = await tx.providerMessagingService.create({
+      data: {
+        orgId: orgA.id,
+        providerAccountId: providerAccountA.id,
+        provider: fixtureLabel,
+        externalServiceId: externalServiceA,
+        externalServiceIdHash: providerLookupHash(
+          `${fixtureLabel}:service:${externalServiceA}`
+        ),
+        externalServiceIdLast4: externalServiceA.slice(-4),
+        status: ProviderMessagingServiceStatus.VERIFIED,
+        capabilities: ["sms"],
+        verifiedAt: providerVerifiedAt,
+        lastCheckedAt: providerVerifiedAt
+      }
+    });
+    const providerServiceB = await tx.providerMessagingService.create({
+      data: {
+        orgId: orgB.id,
+        providerAccountId: providerAccountB.id,
+        provider: fixtureLabel,
+        externalServiceId: externalServiceB,
+        externalServiceIdHash: providerLookupHash(
+          `${fixtureLabel}:service:${externalServiceB}`
+        ),
+        externalServiceIdLast4: externalServiceB.slice(-4),
+        status: ProviderMessagingServiceStatus.VERIFIED,
+        capabilities: ["sms"],
+        verifiedAt: providerVerifiedAt,
+        lastCheckedAt: providerVerifiedAt
+      }
+    });
+    remember("ProviderMessagingService", providerServiceA.id, providerServiceB.id);
+
     const providerPhoneA = await tx.providerPhoneNumber.create({
       data: {
         orgId: orgA.id,
         phoneNumber: `+1666${phoneTail}`,
         provider: fixtureLabel,
-        capabilities: { sms: true }
+        capabilities: ["sms"]
       }
     });
     const providerPhoneB = await tx.providerPhoneNumber.create({
@@ -654,7 +747,7 @@ async function seedOwnerFixtures(): Promise<OwnerFixture> {
         orgId: orgB.id,
         phoneNumber: `+1666${phoneTail}`,
         provider: fixtureLabel,
-        capabilities: { sms: true }
+        capabilities: ["sms"]
       }
     });
     remember("ProviderPhoneNumber", providerPhoneA.id, providerPhoneB.id);
@@ -1141,6 +1234,14 @@ function tokenHash(label: string): string {
   return createHash("sha256")
     .update(`${suiteToken}:${label}`, "utf8")
     .digest("base64url");
+}
+
+function providerLookupHash(value: string): string {
+  return `pvlookup_v1_${createHash("sha256").update(value, "utf8").digest("base64url")}`;
+}
+
+function providerFingerprint(value: string): string {
+  return `pvfp_${createHash("sha256").update(value, "utf8").digest("base64url").slice(0, 22)}`;
 }
 
 function numericTail(value: string): string {

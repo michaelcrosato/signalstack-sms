@@ -21,6 +21,9 @@ export const ordinaryTenantTables = Object.freeze([
   "ComplianceProfile",
   "UsageEvent",
   "BillingAccount",
+  "ProviderAccount",
+  "ProviderCredentialSecret",
+  "ProviderMessagingService",
   "ProviderPhoneNumber",
   "ProviderCredential",
   "ProviderCredentialRotation",
@@ -59,6 +62,10 @@ export const appendOnlyTenantTables = Object.freeze([
 
 /** Durable M3 control/event rows are revoked or disabled, never hard-deleted by application code. */
 export const nonDeletableTenantTables = Object.freeze([
+  "ProviderAccount",
+  "ProviderCredentialSecret",
+  "ProviderMessagingService",
+  "ProviderPhoneNumber",
   "ApiCredential",
   "IntegrationAuditEvent",
   "CustomerWebhookEndpoint",

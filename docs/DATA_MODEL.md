@@ -47,7 +47,7 @@ The M2 checkpoint established the database tenant boundary that every later mode
 
 ## Standalone M3 — Public Integration Substrate
 
-The current 43-migration schema extends the M2 boundary to 31 ordinary tenant tables plus the five
+The M3 checkpoint's 43-migration schema extends the M2 boundary to 31 ordinary tenant tables plus the five
 identity/control tables, for 36 protected tables. The nine added tenant models are covered by forced RLS,
 same-tenant composite relations, runtime posture attestation, least-privileged grants, and the mandatory
 PostgreSQL tenant matrix:
@@ -78,6 +78,32 @@ PostgreSQL tenant matrix:
 `claim_due_customer_webhook_deliveries` is the worker-only bounded, database-timed claim seam. It uses
 transactional row locking, lease/generation evidence, a fixed search path, and no `PUBLIC` execution grant;
 network delivery occurs outside the transaction and finalization is conditional on the live owner token.
+
+## Standalone M4 — Provider Ownership and Trusted Routing
+
+Eight migrations (`20260712010000` through `20260712017000`) extend the current schema to 51 migrations,
+34 ordinary tenant tables, and five identity/control tables: 39 protected tables total.
+
+- `ProviderAccount` stores one tenant-scoped provider identity, exact non-secret external account ID,
+  globally unique keyed account hash, safe display/last-four metadata, verification/health/generation state,
+  local default selection, and revocation evidence.
+- `ProviderCredentialSecret` stores versioned AES-256-GCM envelope fields, a safe fingerprint, and activation/
+  retirement/revocation evidence. AAD binds `orgId`, provider, exact external account ID and its canonical
+  keyed hash, local provider-account ID, credential-secret ID/version, envelope/key versions, and fingerprint.
+- `ProviderPhoneNumber` may remain legacy dummy/unverified metadata or become verified owned evidence only
+  through fresh account-bound discovery/import. Verified live rows have canonical E.164, account ownership,
+  strict capabilities, verification/import state, and local default/disable lifecycle.
+- `ProviderMessagingService` stores verified, account-bound service identity, a globally unique keyed
+  external identifier, strict capabilities, and local default/disable lifecycle.
+- `IntegrationAuditEvent` is the canonical append-only M4 provider-control audit for configure, verify,
+  rotate, revoke, health, discovery, import, default, and disable. Legacy `ProviderCredential` and
+  `ProviderCredentialRotation` rows remain unverified/display-only and never authorize M4 ownership.
+
+The web-only `resolve_verified_provider_destination` capability resolves an exact keyed account plus owned
+destination without granting broad provider-table reads. Unknown, crossed, ambiguous, disabled, revoked, or
+stale-generation evidence fails before tenant persistence. The mandatory PostgreSQL proof uses a non-owner
+two-account fixture; HTTP route fixtures separately prove handler behavior without claiming a literal
+callback-server E2E. M4 never sends a message or purchases, releases, ports, or configures provider resources.
 
 ## Milestone 2 Contacts
 
@@ -135,17 +161,23 @@ Provider delivery state is stored on `Message` rows:
 - `deliveredAt`: set when a provider status reaches `delivered`.
 - `failedAt`: set when a provider status reaches the shared terminal-failure vocabulary: `failed`, `undelivered`, or `canceled`.
 
-## Post-MVP Provider Number Foundation
+## Legacy Provider Number Foundation
 
-`ProviderPhoneNumber` stores org-scoped phone-number metadata for demo and future provider setup screens. It tracks phone number, provider, local status, capabilities, and default selection. These rows are not credentials and do not prove live provider ownership.
+Pre-M4 `ProviderPhoneNumber` rows store org-scoped local metadata and remain explicitly unverified. M4 does
+not promote them during migration; only verified account-bound discovery/import creates live ownership
+evidence. Number rows are never credentials and local lifecycle changes do not mutate provider resources.
 
-## Post-MVP Provider Credential Metadata Foundation
+## Legacy Provider Credential Metadata Foundation
 
-`ProviderCredential` stores org-scoped local provider readiness metadata. For Twilio it records redacted account SID/from-number fields, credential presence booleans through derived settings, a one-way auth-token fingerprint, and source metadata. It intentionally does not store raw auth tokens or validate credentials with Twilio.
+`ProviderCredential` stores pre-M4 org-scoped readiness metadata only. It may contain redacted account/from-
+number fields and old configured booleans, but it is unverified/display-only and never supplies M4 authority.
+Recoverable M4 credentials exist only in bound `ProviderCredentialSecret` envelopes.
 
-## Post-MVP Provider Credential Rotation History
+## Legacy Provider Credential Rotation History
 
-`ProviderCredentialRotation` stores org-scoped local history for provider credential metadata configuration, rotation, and deletion events. It records provider name, action, optional credential row ID, redacted account/from-number values, last-four hints, configured booleans, optional actor, and timestamp. API responses never expose raw auth tokens or token fingerprints, and these records do not trigger provider calls or live messaging.
+`ProviderCredentialRotation` preserves org-scoped pre-M4 display history for metadata configuration, rotation,
+and deletion. It is not canonical M4 audit or ownership evidence. API/export responses remain redacted and
+these rows do not trigger provider calls or live messaging.
 
 ## Post-MVP Live Readiness Audit Foundation
 

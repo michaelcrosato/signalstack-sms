@@ -339,6 +339,76 @@ const apiRouteRbacMatrixItems = [
   {
     auth: "role",
     method: "POST",
+    path: "app/api/settings/provider/accounts/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "verify and connect one encrypted provider account"
+  },
+  {
+    auth: "role",
+    method: "PATCH",
+    path: "app/api/settings/provider/accounts/[accountId]/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "make one verified provider account the organization default"
+  },
+  {
+    auth: "role",
+    method: "DELETE",
+    path: "app/api/settings/provider/accounts/[accountId]/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "revoke one provider account and its active local authority"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/settings/provider/accounts/[accountId]/rotate/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "verify and rotate one provider account credential"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/settings/provider/accounts/[accountId]/verify/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "reverify one provider account without sending"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/settings/provider/accounts/[accountId]/health/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "check one provider account through a bounded read-only provider call"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/settings/provider/accounts/[accountId]/discover/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "discover safe provider number and messaging-service candidates"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/settings/provider/accounts/[accountId]/import/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "import fresh verified provider resource candidates without provider mutation"
+  },
+  {
+    auth: "role",
+    method: "PATCH",
+    path: "app/api/settings/provider/accounts/[accountId]/messaging-services/[serviceId]/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "default or disable one verified provider messaging service"
+  },
+  {
+    auth: "role",
+    method: "PATCH",
+    path: "app/api/settings/numbers/[numberId]/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "default or disable one verified provider phone number"
+  },
+  {
+    auth: "role",
+    method: "POST",
     path: "app/api/settings/api-keys/route.ts",
     requiredRole: MembershipRole.ADMIN,
     scope: "issue one tenant API credential and reveal its bearer secret once"

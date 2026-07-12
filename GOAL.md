@@ -18,9 +18,11 @@ The detailed product contract, milestone graph, acceptance matrix, and verificat
 
 - Strong demo-safe foundations: tenant-scoped repositories, contacts/imports, templates, campaigns,
   durable database queue jobs, optional BullMQ mirroring, shared inbox, compliance gates, dummy provider,
-  fake/local AI, Twilio webhook parsing, provider metadata, observability seams, and product UI.
+  fake/local AI, trusted Twilio callback routing, encrypted provider ownership, observability seams, and
+  product UI.
 - The seeded browser product path works at `/dashboard`; mandatory PostgreSQL coverage now includes the
-  43-migration/36-protected-table tenant substrate plus the public API exit path. The M2 checkpoint remains
+  current 51-migration/39-protected-table tenant substrate plus the public API and provider-routing exit
+  paths. The M2 checkpoint remains
   recorded as 37 PostgreSQL files / 186 passing tests, including its eight-file / 33-test tenant gate and
   nine-file / 38-test auth database run. Playwright smoke, a production local-auth browser proof under a
   non-owner login, and the production build are green.
@@ -31,15 +33,19 @@ The detailed product contract, milestone graph, acceptance matrix, and verificat
   attestation, separate non-owner web/worker capabilities, exact control policies, short
   tenant/control/dispatch transactions, and mandatory two-tenant missing-context/forgery/pool proof are
   enforced.
-- M3 public integrations are complete: the current 43-migration/36-protected-table substrate provides
+- M3 public integrations are complete: its 43-migration/36-protected-table checkpoint provides
   one-time scoped API credentials, bearer-only `/api/v1` resources, encrypted durable idempotency,
   generated OpenAPI and cross-runtime examples, plus signed customer-event delivery with bounded retry,
   disablement, replay, and secret rotation. Its real-route PostgreSQL exit path remains dummy/local and
   makes no carrier call.
-- The repository is not yet a production SMS platform. Twilio callbacks still route to the demo tenant;
-  provider secrets are not stored for real sends; the campaign
-  worker is dummy-only and production-blocked; there is no production container bundle or backup/restore
-  proof.
+- M4 provider ownership is complete: eight migrations add account-hash/AAD-bound AES-256-GCM credential
+  envelopes, verified account/number/service ownership, safe ADMIN lifecycle and discovery/import, a
+  complete deterministic provider factory, and exact signed callback routing. Non-owner PostgreSQL routing
+  plus HTTP route fixtures cover two accounts and crossed/unknown/rotated/revoked evidence without sending
+  or changing provider resources. Legacy provider credential/rotation rows remain unverified/display-only.
+- The repository is not yet a production SMS platform. The durable carrier message outbox and general
+  Twilio send path are not implemented; the campaign worker is dummy-only and production-blocked; there is
+  no production container bundle or backup/restore proof.
 - Live SMS, billing, and hosted AI remain off by default. The isolated operator-gated live-test SMS path
   is not evidence of production campaign readiness.
 

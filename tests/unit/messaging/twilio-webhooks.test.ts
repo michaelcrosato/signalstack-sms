@@ -49,6 +49,55 @@ describe("Twilio webhook helpers", () => {
     });
   });
 
+  it("rejects multipart and duplicate URL-encoded fields before signature validation", async () => {
+    const multipart = new FormData();
+    multipart.append("Body", "HELP");
+    const multipartRequest = new Request("https://example.com/api/webhooks/twilio/inbound", {
+      method: "POST",
+      body: multipart
+    });
+    const duplicateRequest = new Request("https://example.com/api/webhooks/twilio/inbound", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "Body=HELP&Body=STOP"
+    });
+
+    await expect(readTwilioFormPayload(multipartRequest)).resolves.toBeNull();
+    await expect(readTwilioFormPayload(duplicateRequest)).resolves.toBeNull();
+  });
+
+  it("rejects oversized and malformed URL-encoded bodies", async () => {
+    const oversized = new Request("https://example.com/api/webhooks/twilio/inbound", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": String(64 * 1024 + 1)
+      },
+      body: "Body=HELP"
+    });
+    const malformed = new Request("https://example.com/api/webhooks/twilio/inbound", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "Body=%FF"
+    });
+
+    await expect(readTwilioFormPayload(oversized)).resolves.toBeNull();
+    await expect(readTwilioFormPayload(malformed)).resolves.toBeNull();
+  });
+
+  it("uses a null-prototype record for untrusted provider field names", async () => {
+    const request = new Request("https://example.com/api/webhooks/twilio/inbound", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "__proto__=untrusted&Body=HELP"
+    });
+
+    const parsed = await readTwilioFormPayload(request);
+    expect(parsed).not.toBeNull();
+    expect(Object.getPrototypeOf(parsed!)).toBeNull();
+    expect(Object.hasOwn(parsed!, "__proto__")).toBe(true);
+  });
+
   it("rejects non-string form fields before signature validation", () => {
     const formData = new FormData();
     formData.append("From", "+15555550100");

@@ -57,6 +57,10 @@ const twilioTerminalStatuses = new Set<string>([
   ...terminalDeliveryFailureProviderStatuses
 ]);
 const twilioEarlyStatuses = twilioProgressiveStatusGroups.slice(0, 2).flat();
+const MAX_TWILIO_FORM_BYTES = 64 * 1024;
+const MAX_TWILIO_FORM_FIELDS = 256;
+const MAX_TWILIO_FORM_KEY_BYTES = 256;
+const MAX_TWILIO_FORM_VALUE_BYTES = 16 * 1024;
 
 function normalizeRequiredProviderValue(value: string | undefined) {
   const normalized = value?.trim();
@@ -79,9 +83,15 @@ function normalizeOptionalProviderValue(value: string | undefined) {
 }
 
 export function formDataToRecord(formData: FormData): Record<string, string> | null {
-  const payload: Record<string, string> = {};
+  const payload: Record<string, string> = Object.create(null) as Record<string, string>;
+  let fieldCount = 0;
   for (const [key, value] of formData.entries()) {
-    if (typeof value !== "string") {
+    fieldCount += 1;
+    if (
+      fieldCount > MAX_TWILIO_FORM_FIELDS ||
+      typeof value !== "string" ||
+      !validFormEntry(key, value)
+    ) {
       return null;
     }
     if (Object.hasOwn(payload, key)) {
@@ -93,11 +103,91 @@ export function formDataToRecord(formData: FormData): Record<string, string> | n
 }
 
 export async function readTwilioFormPayload(request: Request): Promise<Record<string, string> | null> {
+  const contentType = request.headers.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase();
+  if (contentType !== "application/x-www-form-urlencoded") {
+    return null;
+  }
+  const contentLength = request.headers.get("content-length");
+  if (
+    contentLength &&
+    (!/^\d+$/.test(contentLength) || Number(contentLength) > MAX_TWILIO_FORM_BYTES)
+  ) {
+    return null;
+  }
+
   try {
-    return formDataToRecord(await request.formData());
+    const body = await readBoundedRequestBody(request, MAX_TWILIO_FORM_BYTES);
+    if (body === null) return null;
+    return parseUrlEncodedForm(body);
   } catch {
     return null;
   }
+}
+
+function parseUrlEncodedForm(body: Uint8Array): Record<string, string> | null {
+  const source = new TextDecoder("utf-8", { fatal: true }).decode(body);
+  const pairs = source.length === 0 ? [] : source.split("&");
+  if (pairs.length > MAX_TWILIO_FORM_FIELDS) return null;
+  const payload: Record<string, string> = Object.create(null) as Record<string, string>;
+  for (const pair of pairs) {
+    const separator = pair.indexOf("=");
+    const encodedKey = separator === -1 ? pair : pair.slice(0, separator);
+    const encodedValue = separator === -1 ? "" : pair.slice(separator + 1);
+    const key = decodeFormComponent(encodedKey);
+    const value = decodeFormComponent(encodedValue);
+    if (key === null || value === null || !validFormEntry(key, value) || Object.hasOwn(payload, key)) {
+      return null;
+    }
+    payload[key] = value;
+  }
+  return payload;
+}
+
+function decodeFormComponent(value: string): string | null {
+  try {
+    return decodeURIComponent(value.replaceAll("+", " "));
+  } catch {
+    return null;
+  }
+}
+
+function validFormEntry(key: string, value: string): boolean {
+  return (
+    Buffer.byteLength(key, "utf8") > 0 &&
+    Buffer.byteLength(key, "utf8") <= MAX_TWILIO_FORM_KEY_BYTES &&
+    Buffer.byteLength(value, "utf8") <= MAX_TWILIO_FORM_VALUE_BYTES
+  );
+}
+
+async function readBoundedRequestBody(
+  request: Request,
+  maximumBytes: number
+): Promise<Uint8Array | null> {
+  const reader = request.body?.getReader();
+  if (!reader) return new Uint8Array();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const chunk = await reader.read();
+      if (chunk.done) break;
+      total += chunk.value.byteLength;
+      if (total > maximumBytes) {
+        await reader.cancel().catch(() => undefined);
+        return null;
+      }
+      chunks.push(chunk.value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const body = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    body.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return body;
 }
 
 export function validateTwilioSignature(input: {

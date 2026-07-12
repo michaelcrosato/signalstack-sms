@@ -73,14 +73,16 @@ describe("API RBAC matrix", () => {
     }
   });
 
-  it("keeps signed webhook exceptions backed by Twilio signature validation", () => {
+  it("keeps signed webhook exceptions backed by account routing and locked generation validation", () => {
     for (const entry of apiRouteRbacSignedWebhookExceptions) {
       const fullPath = path.join(repoRoot, entry.path);
       expect(existsSync(fullPath)).toBe(true);
       const source = readFileSync(fullPath, "utf8");
       expect(entry.provider).toBe("twilio");
       expect(source).toContain("readTwilioFormPayload");
-      expect(source).toContain("validateTwilioSignature");
+      expect(source).toContain("authenticateTwilioProviderCallback");
+      expect(source).toContain("assertProviderCallbackBindingActive");
+      expect(source).not.toContain("process.env.TWILIO_AUTH_TOKEN");
       expect(source).not.toContain("requireApiRole");
     }
   });

@@ -5,10 +5,6 @@ import { twilioStatusTransition, twilioStatusUpdateGuard } from "@/lib/messaging
 
 export const WEBHOOK_EVENT_CLAIM_LEASE_MS = 5 * 60 * 1000;
 
-function isUniqueConstraintConflict(error: unknown) {
-  return typeof error === "object" && error !== null && "code" in error && error.code === "P2002";
-}
-
 function retryAfterSeconds(event: WebhookEvent, now: Date) {
   if (!(event.claimExpiresAt instanceof Date)) {
     return Math.ceil(WEBHOOK_EVENT_CLAIM_LEASE_MS / 1000);
@@ -102,22 +98,28 @@ export async function recordWebhookEvent(
     return claimExistingWebhookEvent(existing, input, claim);
   }
 
-  try {
-    const event = await withTenantTransaction({ orgId: input.orgId }, (tx) =>
-      tx.webhookEvent.create({
-        data: {
-          orgId: input.orgId,
-          provider: input.provider,
-          eventType: input.eventType,
-          idempotencyKey: input.idempotencyKey,
-          rawPayload: input.rawPayload as Prisma.InputJsonObject,
-          processedAt: null,
-          claimToken,
-          claimExpiresAt
-        }
-      })
-    );
-
+  const insert = await withTenantTransaction({ orgId: input.orgId }, (tx) =>
+    tx.webhookEvent.createMany({
+      data: [{
+        orgId: input.orgId,
+        provider: input.provider,
+        eventType: input.eventType,
+        idempotencyKey: input.idempotencyKey,
+        rawPayload: input.rawPayload as Prisma.InputJsonObject,
+        processedAt: null,
+        claimToken,
+        claimExpiresAt
+      }],
+      skipDuplicates: true
+    })
+  );
+  const event = await withTenantTransaction({ orgId: input.orgId }, (tx) =>
+    tx.webhookEvent.findUnique({ where })
+  );
+  if (!event) {
+    throw new Error("Webhook event insert did not produce a readable tenant row.");
+  }
+  if (insert.count === 1) {
     return {
       event,
       outcome: "claimed",
@@ -127,20 +129,8 @@ export async function recordWebhookEvent(
       claimExpiresAt,
       retryAfterSeconds: null
     } as const;
-  } catch (error) {
-    if (!isUniqueConstraintConflict(error)) {
-      throw error;
-    }
-
-    const duplicate = await withTenantTransaction({ orgId: input.orgId }, (tx) =>
-      tx.webhookEvent.findUnique({ where })
-    );
-    if (!duplicate) {
-      throw error;
-    }
-
-    return claimExistingWebhookEvent(duplicate, input, claim);
   }
+  return claimExistingWebhookEvent(event, input, claim);
 }
 
 export async function markWebhookEventProcessed(

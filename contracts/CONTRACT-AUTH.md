@@ -48,6 +48,28 @@ Cookie-authenticated ADMIN users bootstrap credentials through `GET|POST /api/se
 they are not `/api/v1` bearer requests. Create/rotate return one raw key once, list returns safe metadata only,
 and revoke is terminal/idempotent. Every mutation appends secret-free tenant audit evidence.
 
+## Provider control-plane authorization (M4)
+
+Provider account, credential, health, discovery, import, default, disable, rotation, and revocation
+mutations require a verified browser session in the current organization, at least ADMIN, and the shared
+same-origin check before any request-body or secret field is read. Public API keys, demo identity outside
+explicit demo mode, provider signatures, and customer-webhook signatures never authorize this control plane.
+
+An operator-entered provider secret may exist only in an unprefilled active form/request and bounded server
+operation memory. It is never server-rendered, cached, returned, logged, audited, exported, stored in
+plaintext, or retained by the browser form after completion. Safe reads expose only allowlisted DTO fields;
+Prisma credential/envelope rows are never serialized directly.
+
+Twilio Account SID is a provider identifier rather than the authentication secret. The exact value may be
+stored only as tenant-scoped `ProviderAccount.externalAccountId` and used in encrypted-secret AAD/routing;
+browser reads, logs, audit, exports, and errors expose only redacted/last-four metadata.
+
+Provider callbacks are not users and do not enter this ADMIN boundary. M4 callback routing uses exact
+account + owned-destination candidate evidence only to select one encrypted credential, validates the
+provider signature, then enters the resolved tenant and rechecks locked account/ownership/generation state.
+Wrong/unknown/ambiguous/revoked evidence shares generic denial and never falls back to the current browser,
+demo organization, API bearer, or installation-global environment token.
+
 ## Password credentials
 
 - Email identity is stored and looked up by a trimmed lowercase `normalizedEmail` unique key.

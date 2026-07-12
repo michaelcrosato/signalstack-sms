@@ -1,9 +1,9 @@
 # Codex Summary
 
-Run number: 831
+Run number: 832
 
-- **PR review consolidation is green.** Every original open PR from #60 through #153 has a recorded patch-level disposition in `docs/PR_REVIEW_2026-07-10.md`; selected original commits are retained and valid ideas with unsafe/stale implementations were repaired.
-- **Validation:** contracts, secrets, compliance, production/auth/worker/observability/operator/platform/context/security/AI gates, lint, typecheck, Prisma validate/generate, **115 Vitest files / 778 passing / 2 skipped**, Playwright Chromium smoke, and the production build pass against migrated/seeded Postgres.
-- **Durability/security repairs:** tenant-scoped nested campaign data, atomic consent evidence, recoverable queue and webhook owner leases, Postgres-tested cancel/claim serialization, atomic queue/campaign terminal transitions, generation-safe BullMQ replay, monotonic delivery state, redacted/idempotent operator-gated live test SMS, operator-gated paid lookup, and shared safe CSV serialization.
-- **Production remains intentionally blocked.** TICKET023 owns verified identity/membership, production RLS role tests, trusted webhook tenant routing, composite tenant foreign keys, provider retry configuration, secret/cost provisioning, and human-reviewed integrity-gate changes.
+- **M4 provider ownership is complete.** Eight migrations extend the current substrate to 51 migrations / 39 protected tables with account-hash/AAD-bound AES-256-GCM credentials, verified account/number/service ownership, safe ADMIN lifecycle, deterministic provider fixtures, and exact signed callback routing without sends or provider-resource mutation.
+- **M4 evidence:** the mandatory tenant runner is 14 files / 57 tests (13 files / 56 tests plus the one-file / one-test literal-network M3 exit); provider routing uses non-owner two-account PostgreSQL proof plus HTTP route fixtures and does not claim a literal callback-server E2E.
+- **Validation snapshot:** full Vitest is **219 files / 1,490 tests: 1,405 passing / 85 skipped**. M4 retains dummy-safe defaults, fixture-only provider tests, secret-safe DTO/audit boundaries, and no carrier call in tests or CI.
+- **Production remains intentionally blocked.** M5 owns the durable direct-message outbox and general Twilio transport; live campaigns/workers, provider retry policy, real secret provisioning/rotation, paid-lookup caps, production packaging, and human-reviewed integrity-gate changes remain gated.
 - History is in `git log`; start with `npm run agent:brief`.

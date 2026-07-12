@@ -13,7 +13,7 @@ describe("getProviderSettings", () => {
   it("should return false for configured if no credentials provided", () => {
     const result = getProviderSettings(baseInput);
     expect(result.twilio.configured).toBe(false);
-    expect(result.twilio.source).toBe("environment");
+    expect(result.twilio.source).toBe("unconfigured");
     expect(result.liveMessagingAllowed).toBe(false);
   });
 
@@ -32,7 +32,7 @@ describe("getProviderSettings", () => {
     expect(result.twilio.source).toBe("environment");
   });
 
-  it("should detect twilio configured via metadata", () => {
+  it("should keep legacy Twilio metadata display-only and unverified", () => {
     const input: ProviderSettingsInput = {
       ...baseInput,
       providerCredential: {
@@ -49,8 +49,9 @@ describe("getProviderSettings", () => {
     };
 
     const result = getProviderSettings(input);
-    expect(result.twilio.configured).toBe(true);
-    expect(result.twilio.source).toBe("local_metadata");
+    expect(result.twilio.configured).toBe(false);
+    expect(result.twilio.source).toBe("legacy_metadata_unverified");
+    expect(result.twilio.legacyMetadataPresent).toBe(true);
   });
 
   it("should add blocker if twilio provider selected but not configured", () => {
@@ -91,7 +92,7 @@ describe("getProviderSettings", () => {
     expect(result.compliance.a2pRegistrationStatus).toBe(A2pRegistrationStatus.NOT_STARTED);
   });
 
-  it("should compute liveMessagingAllowed correctly based on hard gates and twilio config", () => {
+  it("should keep general Twilio transport unavailable until M5", () => {
     const input: ProviderSettingsInput = {
       ...baseInput,
       // Fully complete compliance profile
@@ -116,9 +117,8 @@ describe("getProviderSettings", () => {
     };
 
     const result = getProviderSettings(input);
-    // Should be allowed because hard gates pass (not demo mode, live enabled, etc.) and twilio is configured
-    expect(result.liveMessagingAllowed).toBe(true);
-    expect(result.blockers).toHaveLength(0);
+    expect(result.liveMessagingAllowed).toBe(false);
+    expect(result.blockers).toEqual(["TWILIO_GENERAL_TRANSPORT_UNAVAILABLE"]);
   });
 
   it("should not allow live messaging if twilio is not configured but hard gates pass", () => {

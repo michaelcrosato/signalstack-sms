@@ -14,6 +14,8 @@ const files = [
   "tests/unit/db/worker-runtime-dispatch.test.ts",
   "tests/unit/db/tenant-relation-integrity.test.ts",
   "tests/unit/db/public-integration-substrate.test.ts",
+  "tests/unit/db/provider-ownership-substrate.test.ts",
+  "tests/unit/db/provider-webhook-routing-exit-path.test.ts",
   "tests/unit/db/public-api-runtime.test.ts",
   "tests/unit/db/public-api-exit-path.test.ts",
   "tests/unit/db/rls-isolation.test.ts",

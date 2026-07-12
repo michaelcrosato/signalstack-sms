@@ -19,27 +19,30 @@ export function ProviderCredentialForm() {
     const form = event.currentTarget;
     const formData = new FormData(form);
 
-    const response = await fetch("/api/settings/provider", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        provider: "twilio",
-        twilio: {
-          accountSid: String(formData.get("accountSid") ?? ""),
+    try {
+      const response = await fetch("/api/settings/provider/accounts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          provider: "twilio",
+          externalAccountId: String(formData.get("accountSid") ?? ""),
           authToken: String(formData.get("authToken") ?? ""),
-          fromNumber: String(formData.get("fromNumber") ?? ""),
-        },
-      }),
-    });
+          isDefault: true,
+        }),
+      });
 
-    if (!response.ok) {
-      setState({ kind: "error", message: "Metadata was not saved." });
-      return;
+      if (!response.ok) {
+        setState({ kind: "error", message: "Account verification failed." });
+        return;
+      }
+
+      setState({ kind: "success", message: "Account verified and encrypted." });
+      startTransition(() => router.refresh());
+    } catch {
+      setState({ kind: "error", message: "Account verification failed." });
+    } finally {
+      form.reset();
     }
-
-    form.reset();
-    setState({ kind: "success", message: "Metadata saved locally." });
-    startTransition(() => router.refresh());
   }
 
   async function handleDelete() {
@@ -56,11 +59,11 @@ export function ProviderCredentialForm() {
     });
 
     if (!response.ok) {
-      setState({ kind: "error", message: "Metadata was not cleared." });
+      setState({ kind: "error", message: "Default account was not revoked." });
       return;
     }
 
-    setState({ kind: "success", message: "Metadata cleared locally." });
+    setState({ kind: "success", message: "Default account revoked locally." });
     setClearConfirmed(false);
     startTransition(() => router.refresh());
   }
@@ -69,11 +72,11 @@ export function ProviderCredentialForm() {
     <section className="rounded border border-slate-200 bg-white p-5">
       <div className="flex flex-col gap-1">
         <h2 className="text-lg font-semibold text-slate-950">
-          Credential Metadata
+          Connect Twilio Account
         </h2>
         <p className="text-sm text-slate-600">
-          Local readiness record only. Raw tokens are not shown after
-          submission.
+          Credentials are verified with Twilio, encrypted locally, and never
+          returned after submission. This does not enable message sending.
         </p>
       </div>
 
@@ -86,10 +89,10 @@ export function ProviderCredentialForm() {
             placeholder="AC1234567890"
             autoComplete="off"
             required
-            minLength={8}
-            maxLength={80}
-            pattern="AC[A-Za-z0-9]{6,78}"
-            title="Use a Twilio-style Account SID beginning with AC."
+            minLength={34}
+            maxLength={34}
+            pattern="AC[A-Fa-f0-9]{32}"
+            title="Use an Account SID containing AC followed by 32 hexadecimal characters."
           />
         </label>
 
@@ -101,25 +104,10 @@ export function ProviderCredentialForm() {
             type="password"
             autoComplete="off"
             required
-            minLength={8}
-            maxLength={160}
-            title="Use local metadata only. The raw token is fingerprinted and not shown after submission."
-          />
-        </label>
-
-        <label className="grid gap-2 text-sm font-medium text-slate-700">
-          From number
-          <input
-            className="rounded border border-slate-300 px-3 py-2 text-slate-950"
-            name="fromNumber"
-            type="tel"
-            placeholder="+15555550199"
-            autoComplete="off"
-            required
-            minLength={5}
+            minLength={32}
             maxLength={32}
-            pattern="\+[1-9][0-9]{4,31}"
-            title="Use E.164 format, for example +15555550199."
+            pattern="[A-Fa-f0-9]{32}"
+            title="The raw token is encrypted and is never shown after submission."
           />
         </label>
 
@@ -130,8 +118,8 @@ export function ProviderCredentialForm() {
             checked={clearConfirmed}
             onChange={(event) => setClearConfirmed(event.currentTarget.checked)}
           />
-          Clear only local readiness metadata; no provider-side credential is
-          revoked.
+          Revoke the selected default account locally. This does not change
+          the provider-side Twilio account.
         </label>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -140,7 +128,7 @@ export function ProviderCredentialForm() {
             type="submit"
             disabled={isPending}
           >
-            Save Metadata
+            Verify and Encrypt
           </button>
           <button
             className="rounded border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-60"
@@ -148,7 +136,7 @@ export function ProviderCredentialForm() {
             disabled={isPending || !clearConfirmed}
             onClick={handleDelete}
           >
-            Clear Metadata
+            Revoke Default Account
           </button>
           {state.message ? (
             <p

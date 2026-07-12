@@ -35,7 +35,10 @@ MESSAGING_PROVIDER=dummy
 AI_PROVIDER=fake
 ```
 
-Provider credential metadata may exist in the database for readiness screens, but it must remain redacted local metadata only. Raw provider secrets must not be stored in the database or exposed through API responses.
+M4 provider Auth Tokens may persist only as account-hash/AAD-bound AES-256-GCM ciphertext under the
+separately provisioned `SECRETS_MASTER_KEY`; plaintext is never stored or exposed. Legacy
+`ProviderCredential`/`ProviderCredentialRotation` rows remain unverified/display-only. M4 verification and
+ownership do not enable a live send.
 
 ## Future Live Enablement Requirements
 
@@ -43,10 +46,12 @@ A future live-send milestone must add and validate all of these before any live 
 
 - Explicit org-level live messaging enablement separate from environment flags.
 - Complete compliance profile with approved A2P status.
-- Provider credential storage through a real secret manager, not raw database fields.
+- Production provisioning and rotation of `SECRETS_MASTER_KEY`, with access restricted to approved M4/M5
+  operation boundaries and no plaintext database fields.
 - The implemented built-in auth/RBAC boundary plus completed M2 database tenant enforcement, as documented
   in `docs/PRODUCTION_AUTH_RBAC.md`; an external OIDC adapter is optional, not a go-live dependency.
-- Provider number ownership/readiness verification.
+- M5 durable message/attempt reservation and the final centralized hard gate immediately before provider
+  mutation; M4 provider number ownership/readiness verification is already complete.
 - A dedicated production worker policy gate as documented in `docs/PRODUCTION_WORKER_POLICY.md`.
 - Send-rate limits and queue backpressure appropriate for provider limits.
 - Billing live-enable gate and test coverage proving Stripe calls cannot happen in demo/CI.

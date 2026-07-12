@@ -88,6 +88,28 @@ and do not prove live provider transport.
 
 Twilio inbound and status webhooks validate `X-Twilio-Signature`, preserve raw provider payloads, and are idempotent before any mutation.
 
+## M4 trusted provider callback routing
+
+Provider callbacks never use a browser session, API key, deterministic demo organization, or the
+installation-global `TWILIO_AUTH_TOKEN` as tenant authority. Routing order is fixed:
+
+1. Parse one bounded URL-encoded string-only form and reject duplicate/file fields.
+2. Normalize exact Twilio `AccountSid` plus the event-specific owned destination (`To` for inbound, `From`
+   for outbound status, with optional same-account `MessagingServiceSid`).
+3. Use domain-separated keyed hashes for one bounded SELECT-only pre-tenant candidate lookup.
+4. Require exactly one ACTIVE/VERIFIED account, imported number/service, and active encrypted credential
+   version; decrypt only that credential and validate the signature over the exact external URL and all form
+   parameters.
+5. Enter the resolved tenant transaction, lock and recheck account/ownership/credential generation, then
+   record the raw event and acquire the existing processing lease.
+
+Wrong signature/credential/destination, crossed or unknown account/resource, detected ambiguity,
+disabled/revoked state, and a rotate/revoke race all return the same no-store `403` body
+`{ "error": "Provider callback rejected.", "code": "INVALID_PROVIDER_CALLBACK" }`. Routing/crypto storage
+unavailability returns secret-free `503 WEBHOOK_ROUTING_UNAVAILABLE`. Every denial occurs before
+`WebhookEvent`, contact, conversation, message, tenant-attributed metric, or audit insertion and reveals no
+account/tenant/resource existence.
+
 Implemented foundations:
 
 - `POST /api/webhooks/twilio/inbound`
@@ -99,8 +121,9 @@ Rules:
 - Malformed or unsupported form bodies return `400` before signature validation, current-org lookup, webhook-event storage, or local message/delivery mutation.
 - Non-string form parts are rejected before signature validation; Twilio webhook helpers must not coerce file/blob parts into filenames or trusted payload fields.
 - Duplicate form field names are rejected before signature validation; Twilio webhook helpers must not collapse repeated fields into an ambiguous last-value payload.
-- Signature validation uses the exact request URL, all received parameters including unknown provider fields, and `TWILIO_AUTH_TOKEN`.
-- Missing or invalid signatures return `403`.
+- Signature validation uses the exact request URL, all received parameters including unknown provider
+  fields, and only the resolved account credential version. The environment token is not routing authority.
+- Missing or invalid signatures and every unusable routing candidate share the generic M4 `403`.
 - Missing required normalized fields return `400`.
 - A valid event whose request acquires the processing lease returns `204` after local completion. An already processed duplicate also returns `204`. An unprocessed duplicate with a live lease returns `409` with an advisory `Retry-After` and performs no downstream mutation. Automatic retry is an upstream webhook-configuration concern and must not be assumed from the response header alone.
 - Raw payloads are stored in `WebhookEvent.rawPayload` without dropping unknown provider fields.
