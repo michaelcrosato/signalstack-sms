@@ -131,6 +131,96 @@ export const tenantIntegrityChecks: readonly TenantIntegrityCheck[] = Object.fre
      JOIN "ProviderCredential" parent ON parent."id" = child."providerCredentialId"
      WHERE child."providerCredentialId" IS NOT NULL AND child."orgId" <> parent."orgId"`
   ),
+  strictRelation(
+    "api-idempotency-record.credential",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "ApiIdempotencyRecord" child
+     JOIN "ApiCredential" parent ON parent."id" = child."credentialId"
+     WHERE child."orgId" <> parent."orgId"`
+  ),
+  strictRelation(
+    "integration-audit-event.credential",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "IntegrationAuditEvent" child
+     JOIN "ApiCredential" parent ON parent."id" = child."apiCredentialId"
+     WHERE child."apiCredentialId" IS NOT NULL AND child."orgId" <> parent."orgId"`
+  ),
+  strictRelation(
+    "integration-audit-event.subject",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "IntegrationAuditEvent" child
+     WHERE child."subjectId" IS NOT NULL
+       AND (
+         (child."subjectType" = 'organization' AND child."subjectId" <> child."orgId")
+         OR (child."subjectType" = 'api_credential' AND NOT EXISTS (
+           SELECT 1 FROM "ApiCredential" parent
+           WHERE parent."orgId" = child."orgId" AND parent."id" = child."subjectId"
+         ))
+         OR (child."subjectType" = 'customer_webhook_endpoint' AND NOT EXISTS (
+           SELECT 1 FROM "CustomerWebhookEndpoint" parent
+           WHERE parent."orgId" = child."orgId" AND parent."id" = child."subjectId"
+         ))
+         OR (child."subjectType" = 'customer_webhook_delivery' AND NOT EXISTS (
+           SELECT 1 FROM "CustomerWebhookDelivery" parent
+           WHERE parent."orgId" = child."orgId" AND parent."id" = child."subjectId"
+         ))
+         OR child."subjectType" NOT IN (
+           'organization', 'api_credential', 'customer_webhook_endpoint', 'customer_webhook_delivery'
+         )
+       )`
+  ),
+  strictRelation(
+    "customer-webhook-subscription.endpoint",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "CustomerWebhookSubscription" child
+     JOIN "CustomerWebhookEndpoint" parent ON parent."id" = child."endpointId"
+     WHERE child."orgId" <> parent."orgId"`
+  ),
+  strictRelation(
+    "customer-webhook-signing-secret.subscription",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "CustomerWebhookSigningSecret" child
+     JOIN "CustomerWebhookSubscription" parent ON parent."id" = child."subscriptionId"
+     WHERE child."orgId" <> parent."orgId"`
+  ),
+  strictRelation(
+    "customer-webhook-delivery.subscription",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "CustomerWebhookDelivery" child
+     JOIN "CustomerWebhookSubscription" parent ON parent."id" = child."subscriptionId"
+     WHERE child."orgId" <> parent."orgId" OR child."endpointId" <> parent."endpointId"`
+  ),
+  strictRelation(
+    "customer-webhook-delivery.event",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "CustomerWebhookDelivery" child
+     JOIN "CustomerWebhookEvent" parent ON parent."id" = child."eventId"
+     WHERE child."orgId" <> parent."orgId"`
+  ),
+  strictRelation(
+    "customer-webhook-delivery.signing-secret",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "CustomerWebhookDelivery" child
+     JOIN "CustomerWebhookSigningSecret" parent ON parent."id" = child."signingSecretId"
+     WHERE child."orgId" <> parent."orgId" OR child."subscriptionId" <> parent."subscriptionId"`
+  ),
+  strictRelation(
+    "customer-webhook-delivery.replay",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "CustomerWebhookDelivery" child
+     JOIN "CustomerWebhookDelivery" parent ON parent."id" = child."replayOfDeliveryId"
+     WHERE child."replayOfDeliveryId" IS NOT NULL
+       AND (child."orgId" <> parent."orgId"
+         OR child."endpointId" <> parent."endpointId"
+         OR child."eventId" <> parent."eventId")`
+  ),
+  strictRelation(
+    "customer-webhook-delivery-attempt.delivery",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "CustomerWebhookDeliveryAttempt" child
+     JOIN "CustomerWebhookDelivery" parent ON parent."id" = child."deliveryId"
+     WHERE child."orgId" <> parent."orgId" OR child."generation" <> parent."generation"`
+  ),
   currentMembership(
     "conversation.active-assignee",
     `SELECT COUNT(*)::bigint AS "count"

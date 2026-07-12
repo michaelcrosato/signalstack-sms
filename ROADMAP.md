@@ -16,7 +16,7 @@ its own software while requiring no application SaaS beyond an unavoidable carri
 | M0 | Truth, build-context safety, executable acceptance | done |
 | M1 | Built-in identity, onboarding, team administration | done |
 | M2 | Database-enforced tenant integrity | done |
-| M3 | Public API identity and customer webhooks | not started |
+| M3 | Public API identity and customer webhooks | done |
 | M4 | Provider secrets, accounts, and owned-number routing | partial foundation |
 | M5 | Durable direct-message outbox and Twilio transport | partial foundation |
 | M6 | Trusted inbound messaging and shared inbox | partial foundation |
@@ -26,15 +26,17 @@ its own software while requiring no application SaaS beyond an unavoidable carri
 | M10 | Self-contained production package and operations | not started |
 | M11 | Full release proof | not started |
 
-M1 and M2 establish trust and are complete. M2 closes with a least-privileged 40-migration install,
+M1 through M3 establish identity, tenant, and integration trust and are complete. M2 closed with a
+least-privileged 40-migration install,
 database-enforced tenant relations, forced RLS with semantic policy attestation, and exact runtime/control/
-dispatch capabilities. M3 and M4 may now proceed in parallel. Live provider work starts only after
-provider ownership, secrets, tenant routing, and durable-before-external semantics exist.
+dispatch capabilities. M3 extends that boundary to the current 43 migrations/36 protected tables and adds
+scoped `/api/v1` identity plus durable signed customer events without live carrier impact. Live provider
+work starts only after provider ownership, secrets, tenant routing, and durable-before-external semantics
+exist.
 
 ## Immediate execution queue
 
-1. Build M3 API credentials + `/api/v1` + customer webhook outbox and M4 encrypted provider ownership
-   control plane.
+1. Build the M4 encrypted provider ownership control plane while preserving the completed M3 contract.
 2. Continue through M5–M11 without narrowing the completion definition.
 
 ## Rules

@@ -21,18 +21,19 @@ Tenant rule: every tenant-scoped table must include `orgId` unless explicitly do
 
 ## Standalone M2 — Database-Enforced Tenant Integrity
 
-The database tenant boundary is complete for the current schema:
+The M2 checkpoint established the database tenant boundary that every later model must preserve:
 
-- `lib/db/tenant-manifest.ts` lists 22 ordinary tenant tables and five identity/control tables, for 27
-  protected tables total. Every protected table has forced, fail-closed RLS, and runtime posture compares
-  command/role/predicate fingerprints rather than accepting policy names or counts alone.
+- At the M2 checkpoint, `lib/db/tenant-manifest.ts` listed 22 ordinary tenant tables and five
+  identity/control tables, for 27 protected tables total. Every protected table had forced, fail-closed
+  RLS, and runtime posture compared command/role/predicate fingerprints rather than accepting policy names
+  or counts alone.
 - Same-tenant composite keys and foreign keys cover live relations. The upgrade preflight aborts on
   invalid legacy rows while emitting only invariant labels/counts, never tenant IDs or PII.
 - Historical issuer, author, actor, and typed audit-subject references are validated by insert/update
   triggers when deleting the referenced row must not erase history.
 - `LocalCredential` and `AuthThrottle` remain installation-global. User-global password-reset
   `AuthToken` rows retain their explicit null-organization shape and use bounded control context.
-- All 40 migrations support a distinct table-owning credential that is non-superuser and non-BYPASSRLS
+- All 40 M2 migrations support a distinct table-owning credential that is non-superuser and non-BYPASSRLS
   through the explicit NOLOGIN `signalstack_owner` capability. Web and worker logins are NOINHERIT,
   non-owner roles; provisioning removes the owner capability and runtime posture rejects it.
 - Control-plane purposes do not grant broad access. Command-specific tenant-root/global-user policies
@@ -43,6 +44,40 @@ The database tenant boundary is complete for the current schema:
 - The static direct-Prisma inventory has no tenant migration-debt entries. New tenant-owned models must
   add `orgId`, join the manifest/RLS policy set, use the transaction context, and extend the mandatory
   two-tenant matrix in the same change.
+
+## Standalone M3 — Public Integration Substrate
+
+The current 43-migration schema extends the M2 boundary to 31 ordinary tenant tables plus the five
+identity/control tables, for 36 protected tables. The nine added tenant models are covered by forced RLS,
+same-tenant composite relations, runtime posture attestation, least-privileged grants, and the mandatory
+PostgreSQL tenant matrix:
+
+- `ApiCredential` stores a visible unique prefix, server-keyed secret digest, scopes, expiry/revocation,
+  last-use metadata, and a database-owned fixed rate window. Raw API keys are one-time responses and are
+  never persisted in plaintext.
+- `ApiIdempotencyRecord` binds a credential and HMAC-protected idempotency key to one method, canonical
+  route, and request digest. The completed response snapshot is authenticated-encrypted before the JSON
+  column is written, permitting an exact status/body/request-ID replay without storing a one-time secret
+  in plaintext.
+- `IntegrationAuditEvent` is append-only tenant evidence for API-key and public-integration lifecycle
+  actions. Optional credential references are same-tenant and restricted rather than cascading history.
+- `CustomerWebhookEndpoint` and `CustomerWebhookSubscription` store one immutable canonical HTTPS target,
+  endpoint state/failure evidence, and an allowlisted event-type selection.
+- `CustomerWebhookSigningSecret` stores versioned AES-256-GCM envelope fields and a safe fingerprint. Raw
+  `whsec_` material is revealed only on creation/rotation; deliveries retain the precise secret version
+  to which they were pinned.
+- `CustomerWebhookEvent` is an immutable, deduplicated domain-event outbox row containing canonical raw
+  payload text plus its digest. `CustomerWebhookDelivery` records endpoint/subscription/event/secret pins,
+  bounded scheduling, generation/lease ownership, terminal evidence, and replay ancestry.
+- `CustomerWebhookDeliveryAttempt` is reserved durably before network I/O, then completed once with its
+  outcome. Its delivery/generation/attempt identity and timing are immutable, completed evidence cannot be
+  rewritten, and an expired disabled-endpoint reservation is reconciled as ambiguous instead of erasing
+  possible external impact. It retains acknowledgement/error classification and status code without storing
+  response bodies.
+
+`claim_due_customer_webhook_deliveries` is the worker-only bounded, database-timed claim seam. It uses
+transactional row locking, lease/generation evidence, a fixed search path, and no `PUBLIC` execution grant;
+network delivery occurs outside the transaction and finalization is conditional on the live owner token.
 
 ## Milestone 2 Contacts
 

@@ -393,9 +393,24 @@ const runtimeEnvironmentSchema = z
       if (!isTwilioSenderConfigured(config)) {
         addIssue(context, "TWILIO_FROM_NUMBER", "Live Twilio messaging requires a from number or messaging service.");
       }
-      if (!isEncryptionKey(config.SECRETS_MASTER_KEY)) {
+      if (!production && !isEncryptionKey(config.SECRETS_MASTER_KEY)) {
         addIssue(context, "SECRETS_MASTER_KEY", "Live Twilio messaging requires a valid 256-bit secrets master key.");
       }
+    }
+
+    if (production && !isEncryptionKey(config.SECRETS_MASTER_KEY)) {
+      addIssue(
+        context,
+        "SECRETS_MASTER_KEY",
+        "Production public integrations require a valid 256-bit secrets master key."
+      );
+    }
+    if (production && !isApiKeyPepper(config.API_KEY_PEPPER)) {
+      addIssue(
+        context,
+        "API_KEY_PEPPER",
+        "Production public API credentials require a dedicated 32-2048 character pepper."
+      );
     }
 
     if (config.BACKUP_ENABLED && !isEncryptionKey(config.BACKUP_ENCRYPTION_KEY)) {
@@ -498,7 +513,7 @@ function buildSafeRuntimeConfig(config: ParsedRuntimeEnvironment): RuntimeConfig
     }),
     secrets: Object.freeze({
       masterKeyConfigured,
-      apiKeyPepperConfigured: isMinimumSecret(config.API_KEY_PEPPER),
+      apiKeyPepperConfigured: isApiKeyPepper(config.API_KEY_PEPPER),
       backupEncryptionKeyConfigured
     }),
     retention: Object.freeze({
@@ -541,6 +556,16 @@ function hasProtocol(value: string, allowedProtocols: readonly string[]): boolea
 
 function isMinimumSecret(value: string | undefined, minimumLength = 32): boolean {
   return Boolean(value && value.length >= minimumLength);
+}
+
+function isApiKeyPepper(value: string | undefined): boolean {
+  return Boolean(
+    value &&
+      value.length >= 32 &&
+      value.length <= 2_048 &&
+      Buffer.byteLength(value, "utf8") <= 4_096 &&
+      !hasControlCharacter(value)
+  );
 }
 
 function isAuthThrottleSecret(value: string | undefined): boolean {

@@ -13,6 +13,41 @@ Owner: platform-security.
   serializes request Cookie headers into browser-readable HTML; operators and browser proofs must use
   `next build && next start`. Demo mode remains available for `next dev` without real session bearers.
 
+## Public API bearer credentials (M3 complete)
+
+Public integration identity is separate from browser identity. Every protected `/api/v1` route accepts only
+one exact `Authorization: Bearer ss_api_<12-base64url-prefix>_<43-base64url-secret>` header. Cookies, local
+sessions, demo identity, OIDC/Clerk tokens, query-string credentials, provider signatures, and customer
+webhook signatures are not fallbacks. `GET /api/v1/openapi.json` is the sole unauthenticated metadata route.
+
+The raw 256-bit API secret is returned only by its logical creation or rotation operation; an exact
+idempotent retry may reproduce that operation's authenticated-encrypted response snapshot. PostgreSQL stores only a visible
+non-secret prefix and a domain-separated HMAC-SHA-256 digest keyed by the independently provisioned
+`API_KEY_PEPPER`. Importing public API modules does not read secrets; the configured pepper is read and
+validated only at an operation boundary. Raw keys, hashes, and client addresses never enter logs, audit
+metadata, list responses, browser state, or error text. Last-use network evidence, when retained, is also a
+domain-separated keyed digest.
+
+A narrow pre-tenant control lookup may select a credential only when the transaction-local API-key hash
+exactly matches the stored digest. It exposes no mutation authority. The resolved organization then enters
+the normal tenant transaction, locks and rechecks the credential, rejects revocation/expiry/rotation, consumes
+the PostgreSQL one-minute rate window, updates safe last-use metadata, and evaluates exact scopes before body
+parsing. Missing or malformed bearer evidence returns `AUTHENTICATION_REQUIRED`. Unknown, expired, revoked,
+rotated-away, or otherwise unusable credentials intentionally share `INVALID_API_KEY`; callers cannot use the
+API as a credential-lifecycle oracle. Scope failure is `INSUFFICIENT_SCOPE`, exhaustion is
+`RATE_LIMIT_EXCEEDED`, and control/rate storage failure is `SERVICE_UNAVAILABLE` without an unmetered fallback.
+
+The exact non-wildcard scope catalog is defined in `lib/public-api/scopes.ts` and SPEC-031. `messages:send`
+and `campaigns:send` remain separate from ordinary write scopes so future live-impact transport cannot be
+gained through metadata authority. A bearer with `credentials:read|write` can inspect, rotate, or revoke only
+itself. It cannot enumerate, create, rotate, or revoke another credential; tenant-wide administration remains
+behind the browser ADMIN boundary.
+
+Cookie-authenticated ADMIN users bootstrap credentials through `GET|POST /api/settings/api-keys` and
+`POST|DELETE /api/settings/api-keys/:credentialId`. Browser mutations retain the shared same-origin boundary;
+they are not `/api/v1` bearer requests. Create/rotate return one raw key once, list returns safe metadata only,
+and revoke is terminal/idempotent. Every mutation appends secret-free tenant audit evidence.
+
 ## Password credentials
 
 - Email identity is stored and looked up by a trimmed lowercase `normalizedEmail` unique key.

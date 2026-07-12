@@ -45,14 +45,17 @@ This is the compact handoff for the next automated loop. History lives in `git l
 
 ## Next Work
 
-M0–M2 in `docs/STANDALONE_ROADMAP.md` are DONE. M2 evidence is a fresh 40-migration/no-diff install under
+M0–M3 in `docs/STANDALONE_ROADMAP.md` are DONE. M2 evidence is a fresh 40-migration/no-diff install under
 a non-superuser/non-BYPASSRLS table owner, owner capability barred from runtimes, 27-table fail-closed RLS
 with semantic policy fingerprints, composite tenant integrity, exact command-specific control policies,
 atomic database-timed dispatch with no public ACL, short tenant/control/dispatch contexts, zero migration-
 debt imports, the mandatory eight-file / 33-test tenant matrix, 37 PostgreSQL files / 186 tests, nine auth
-database files / 38 tests, and production local-auth build/browser proof 1/1 under a non-owner login. The
-active queue is M3 public integrations and M4 provider ownership/secrets in parallel; do not claim M5–M11
-early.
+database files / 38 tests, and production local-auth build/browser proof 1/1 under a non-owner login. M3
+extends the current substrate to 43 migrations / 36 protected tables; its 12-file / 49-test mandatory tenant
+gate, 30-file / 111-test public API suite, generated OpenAPI/examples, and literal non-owner Next HTTP +
+receiver-socket proof cover scoped keys, dummy/local resources, signed events, failure/replay, and secret/key
+rotation without a carrier call. The active queue is M4 provider ownership/secrets, then M5–M11; do not claim
+live transport or later milestones early.
 
 Rules: run the protected gate (`pwsh scripts/local-gate.ps1`, now fully green incl `e2e:smoke` after
 `npm run afk:preflight`) before treating work as green; commit only when green. Keep all live

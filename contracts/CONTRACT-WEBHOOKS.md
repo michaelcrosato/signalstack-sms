@@ -2,6 +2,90 @@
 
 Owner: integrations-ai.
 
+## Outbound customer event webhooks (M3 complete)
+
+Customer webhooks notify company software after tenant domain changes. They are not provider callbacks and
+never authenticate an inbound SignalStack mutation. This is the implemented frozen M3 protocol: endpoint
+administration, durable worker recovery, replay, cross-runtime examples, and the non-owner external-network
+receiver proof are complete. Detailed acceptance is in `plan/specs/SPEC-031-public-integrations.md`.
+
+### Subscription and event catalog
+
+Subscriptions select only exact values from this additive allowlist:
+
+- `contact.created`, `contact.updated`, `contact.archived`
+- `message.accepted`, `message.sent`, `message.delivered`, `message.failed`, `message.received`,
+  `message.status.updated`
+- `campaign.scheduled`, `campaign.started`, `campaign.completed`, `campaign.failed`, `campaign.canceled`
+- `conversation.created`, `conversation.updated`
+- `webhook.endpoint.disabled`
+
+`message.status.updated` covers every durable normalized status transition; a specific lifecycle event may be
+created for the same transition. Receivers deduplicate by event ID, not aggregate ID.
+
+An immutable event and one delivery for each matching active subscription are inserted in the same tenant
+transaction as the domain mutation. A rollback leaves neither. The canonical JSON body is bounded and has
+exactly the public event ID, allowlisted `type`, `apiVersion`, UTC `occurredAt`, and minimized `data` snapshot.
+It excludes raw provider payloads, secrets, hashes, and unrelated tenant data. Delivery is at least once;
+receivers persist the event ID before applying effects.
+
+### Endpoint and secret boundary
+
+Production endpoints are canonical public `https://` URLs without userinfo, query strings, or fragments. Every attempt
+resolves DNS again, rejects the entire answer set if any address is private/local/reserved, pins one vetted
+public address while retaining hostname SNI/certificate validation, requires TLS 1.2+, and follows no
+redirect. DNS, request, response, request-body, response-body, and header sizes are bounded. Unsafe DNS or
+URL state disables the endpoint rather than making a request. Endpoint URLs are immutable; replacing a
+destination requires creating a new endpoint so queued deliveries cannot be silently rerouted.
+
+Creation and rotation return one `whsec_` plus the 43-character base64url encoding of 32 random bytes only
+in that logical idempotent operation; an exact retry within the 24-hour idempotency window reproduces the
+same encrypted response snapshot, while every later GET/list response exposes only its fingerprint. The secret is
+authenticated-encrypted under the separately supplied `SECRETS_MASTER_KEY`, bound to its tenant,
+subscription, secret ID, and version; only a safe fingerprint is listable. Raw signing secrets never enter
+logs, audit metadata, event/delivery rows, URLs, list responses, or browser state.
+
+### Signed delivery protocol
+
+Each request is an HTTPS JSON `POST` with `User-Agent: SignalStack-Customer-Webhooks/1` and these headers:
+
+- `X-SignalStack-Event-Id`
+- `X-SignalStack-Event-Type`
+- `X-SignalStack-Delivery-Id`
+- `X-SignalStack-Timestamp` containing Unix seconds
+- `X-SignalStack-Secret-Version` containing the pinned positive integer signing-secret version
+- `X-SignalStack-Signature` containing exactly `v1=<64 lowercase hex characters>`
+
+The signature is HMAC-SHA-256 with the 32 decoded `whsec_` bytes over the exact bytes
+`"signalstack/customer-webhook-signature/v1\0" + timestamp + "." + raw_body`. Receivers verify the raw
+body before parsing, use constant-time digest comparison, reject ambiguous/duplicate headers, enforce an
+approximately five-minute timestamp window, and then deduplicate the event. Re-serialized JSON does not
+verify.
+
+### Acknowledgement, retry, disablement, replay, and rotation
+
+- Any `2xx` acknowledges delivery; the response body is ignored and drained only to a bounded size.
+- Network/timeouts and HTTP `408`, `409`, `425`, `429`, and `5xx` retry. A valid `Retry-After` is honored only
+  up to the six-hour ceiling. Redirects are never followed; other `3xx`/`4xx` are permanent failures.
+- `410 Gone` and newly unsafe endpoint resolution disable immediately. Ten consecutive terminal delivery
+  failures also disable; a successful delivery resets the count. Disabled endpoints receive no new fanout,
+  and the retained state may produce `webhook.endpoint.disabled` for other active subscriptions.
+- Default delivery permits at most eight attempts with exponential delays after failed attempts of 30
+  seconds, 2 minutes, 8 minutes, 32 minutes, 2 hours 8 minutes, and then at most 6 hours per remaining retry.
+- Each attempt is append-only and includes generation/attempt number, request timestamp, outcome, status or
+  safe error class, and bounded start/finish evidence. Expired worker leases make work claimable without
+  erasing or duplicating the event.
+- Replay is allowed only for terminal failed delivery. It creates a linked new delivery/generation for the
+  same immutable event, retains every prior attempt, uses the active secret, and follows the normal retry
+  policy. The public replay request itself is scoped and idempotent.
+- Rotation retires the previous secret for new events/replays. Already-created deliveries remain bound to
+  their original secret for deterministic retries, so receivers retain the prior verifier for 24 hours (more
+  than the default retry horizon). Disabling the endpoint stops those attempts immediately.
+
+Receiver verification examples for TypeScript and Python, the curl/TypeScript/Python public clients, and
+delivery/replay/rotation/concurrency tests are current M3 implementation evidence. They remain dummy/local
+and do not prove live provider transport.
+
 Twilio inbound and status webhooks validate `X-Twilio-Signature`, preserve raw provider payloads, and are idempotent before any mutation.
 
 Implemented foundations:

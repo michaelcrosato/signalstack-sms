@@ -40,6 +40,7 @@ describe("API authentication boundary coverage", () => {
       const relativePath = repoPath(path.relative(process.cwd(), filePath));
       if (
         relativePath.startsWith("app/api/auth/") ||
+        relativePath.startsWith("app/api/v1/") ||
         relativePath === "app/api/health/route.ts" ||
         relativePath.startsWith("app/api/webhooks/")
       ) {
@@ -60,6 +61,7 @@ describe("API authentication boundary coverage", () => {
       const relativePath = repoPath(path.relative(process.cwd(), filePath));
       if (
         relativePath.startsWith("app/api/auth/") ||
+        relativePath.startsWith("app/api/v1/") ||
         relativePath === "app/api/health/route.ts" ||
         relativePath.startsWith("app/api/webhooks/")
       ) {

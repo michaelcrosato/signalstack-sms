@@ -15,6 +15,8 @@ import {
   withTenantTransaction
 } from "@/lib/db/tenant-context";
 import {
+  appendOnlyTenantTables,
+  nonDeletableTenantTables,
   ordinaryTenantTables,
   protectedTenantTables
 } from "@/lib/db/tenant-manifest";
@@ -30,6 +32,8 @@ type FixtureSide = "a" | "b";
 type FixtureIds = Record<ProtectedTenantTable, Record<FixtureSide, string>>;
 type TenantRow = Readonly<{ id: string; orgId?: string }>;
 type ProtectedRows = Record<ProtectedTenantTable, readonly TenantRow[]>;
+const appendOnlyTenantTableSet = new Set<OrdinaryTenantTable>(appendOnlyTenantTables);
+const nonDeletableTenantTableSet = new Set<OrdinaryTenantTable>(nonDeletableTenantTables);
 
 type OwnerFixture = Readonly<{
   ids: FixtureIds;
@@ -118,7 +122,8 @@ describe.runIf(run)("non-owner tenant runtime role", () => {
       orgId: null,
       userId: null,
       sessionHash: null,
-      tokenHash: null
+      tokenHash: null,
+      apiKeyHash: null
     });
     for (const table of protectedTenantTables) {
       expect(snapshot.rows[table], `${table} must fail closed without context`).toEqual([]);
@@ -186,14 +191,20 @@ describe.runIf(run)("non-owner tenant runtime role", () => {
         >;
         for (const table of ordinaryTenantTables) {
           const id = fixtureId(seeded, table, "b");
+          if (appendOnlyTenantTableSet.has(table)) {
+            result[table] = { updated: 0, deleted: 0 };
+            continue;
+          }
           const updated = await tx.$executeRawUnsafe(
             `UPDATE ${quoteIdentifier(table)} SET "orgId" = "orgId" WHERE "id" = $1`,
             id
           );
-          const deleted = await tx.$executeRawUnsafe(
-            `DELETE FROM ${quoteIdentifier(table)} WHERE "id" = $1`,
-            id
-          );
+          const deleted = nonDeletableTenantTableSet.has(table)
+            ? 0
+            : await tx.$executeRawUnsafe(
+                `DELETE FROM ${quoteIdentifier(table)} WHERE "id" = $1`,
+                id
+              );
           result[table] = { updated, deleted };
         }
         return result;
@@ -213,6 +224,40 @@ describe.runIf(run)("non-owner tenant runtime role", () => {
       expect(bRows[table]).toEqual([
         { id: fixtureId(seeded, table, "b"), orgId: seeded.orgBId }
       ]);
+    }
+  });
+
+  it("denies updates to append-only rows and hard deletes of durable M3 rows", async () => {
+    const client = requireClient(runtime);
+    const seeded = requireFixture(fixture);
+
+    for (const table of appendOnlyTenantTables) {
+      const id = fixtureId(seeded, table, "a");
+      await expect(
+        withTenantTransaction(
+          { orgId: seeded.orgAId, userId: seeded.userAId },
+          (tx) =>
+            tx.$executeRawUnsafe(
+              `UPDATE ${quoteIdentifier(table)} SET "orgId" = "orgId" WHERE "id" = $1`,
+              id
+            ),
+          { client, attest: false }
+        )
+      ).rejects.toThrow();
+    }
+    for (const table of nonDeletableTenantTables) {
+      const id = fixtureId(seeded, table, "a");
+      await expect(
+        withTenantTransaction(
+          { orgId: seeded.orgAId, userId: seeded.userAId },
+          (tx) =>
+            tx.$executeRawUnsafe(
+              `DELETE FROM ${quoteIdentifier(table)} WHERE "id" = $1`,
+              id
+            ),
+          { client, attest: false }
+        )
+      ).rejects.toThrow();
     }
   });
 
@@ -682,6 +727,217 @@ async function seedOwnerFixtures(): Promise<OwnerFixture> {
     });
     remember("WebhookEvent", webhookA.id, webhookB.id);
 
+    const apiCredentialA = await tx.apiCredential.create({
+      data: {
+        orgId: orgA.id,
+        name: fixtureLabel,
+        prefix: `${fixtureLabel}-a`,
+        secretHash: tokenHash("api-key-a"),
+        scopes: ["contacts:read"]
+      }
+    });
+    const apiCredentialB = await tx.apiCredential.create({
+      data: {
+        orgId: orgB.id,
+        name: fixtureLabel,
+        prefix: `${fixtureLabel}-b`,
+        secretHash: tokenHash("api-key-b"),
+        scopes: ["contacts:read"]
+      }
+    });
+    remember("ApiCredential", apiCredentialA.id, apiCredentialB.id);
+
+    const idempotencyA = await tx.apiIdempotencyRecord.create({
+      data: {
+        orgId: orgA.id,
+        credentialId: apiCredentialA.id,
+        key: fixtureLabel,
+        method: "POST",
+        canonicalRoute: "/api/v1/contacts",
+        requestHash: tokenHash("request-a"),
+        responseStatus: 201,
+        responseBody: {},
+        responseHeaders: {},
+        expiresAt: future
+      }
+    });
+    const idempotencyB = await tx.apiIdempotencyRecord.create({
+      data: {
+        orgId: orgB.id,
+        credentialId: apiCredentialB.id,
+        key: fixtureLabel,
+        method: "POST",
+        canonicalRoute: "/api/v1/contacts",
+        requestHash: tokenHash("request-b"),
+        responseStatus: 201,
+        responseBody: {},
+        responseHeaders: {},
+        expiresAt: future
+      }
+    });
+    remember("ApiIdempotencyRecord", idempotencyA.id, idempotencyB.id);
+
+    const integrationAuditA = await tx.integrationAuditEvent.create({
+      data: {
+        orgId: orgA.id,
+        actorUserId: userA.id,
+        apiCredentialId: apiCredentialA.id,
+        action: "RUNTIME_MATRIX_CREATED",
+        subjectType: "api_credential",
+        subjectId: apiCredentialA.id
+      }
+    });
+    const integrationAuditB = await tx.integrationAuditEvent.create({
+      data: {
+        orgId: orgB.id,
+        actorUserId: userB.id,
+        apiCredentialId: apiCredentialB.id,
+        action: "RUNTIME_MATRIX_CREATED",
+        subjectType: "api_credential",
+        subjectId: apiCredentialB.id
+      }
+    });
+    remember("IntegrationAuditEvent", integrationAuditA.id, integrationAuditB.id);
+
+    const customerEndpointA = await tx.customerWebhookEndpoint.create({
+      data: {
+        orgId: orgA.id,
+        name: fixtureLabel,
+        canonicalUrl: `https://a-${suiteToken}.example.test/events`
+      }
+    });
+    const customerEndpointB = await tx.customerWebhookEndpoint.create({
+      data: {
+        orgId: orgB.id,
+        name: fixtureLabel,
+        canonicalUrl: `https://b-${suiteToken}.example.test/events`
+      }
+    });
+    remember("CustomerWebhookEndpoint", customerEndpointA.id, customerEndpointB.id);
+
+    const customerSubscriptionA = await tx.customerWebhookSubscription.create({
+      data: {
+        orgId: orgA.id,
+        endpointId: customerEndpointA.id,
+        eventTypes: ["contact.created"]
+      }
+    });
+    const customerSubscriptionB = await tx.customerWebhookSubscription.create({
+      data: {
+        orgId: orgB.id,
+        endpointId: customerEndpointB.id,
+        eventTypes: ["contact.created"]
+      }
+    });
+    remember(
+      "CustomerWebhookSubscription",
+      customerSubscriptionA.id,
+      customerSubscriptionB.id
+    );
+
+    const signingSecretA = await tx.customerWebhookSigningSecret.create({
+      data: {
+        orgId: orgA.id,
+        subscriptionId: customerSubscriptionA.id,
+        version: 1,
+        ciphertext: tokenHash("ciphertext-a"),
+        iv: tokenHash("iv-a"),
+        authTag: tokenHash("tag-a"),
+        keyVersion: 1,
+        fingerprint: tokenHash("fingerprint-a")
+      }
+    });
+    const signingSecretB = await tx.customerWebhookSigningSecret.create({
+      data: {
+        orgId: orgB.id,
+        subscriptionId: customerSubscriptionB.id,
+        version: 1,
+        ciphertext: tokenHash("ciphertext-b"),
+        iv: tokenHash("iv-b"),
+        authTag: tokenHash("tag-b"),
+        keyVersion: 1,
+        fingerprint: tokenHash("fingerprint-b")
+      }
+    });
+    remember("CustomerWebhookSigningSecret", signingSecretA.id, signingSecretB.id);
+
+    const customerEventA = await tx.customerWebhookEvent.create({
+      data: {
+        orgId: orgA.id,
+        deduplicationKey: fixtureLabel,
+        type: "contact.created",
+        aggregateType: "contact",
+        aggregateId: contactA.id,
+        payloadText: "{}",
+        payloadHash: tokenHash("payload-a"),
+        occurredAt: new Date()
+      }
+    });
+    const customerEventB = await tx.customerWebhookEvent.create({
+      data: {
+        orgId: orgB.id,
+        deduplicationKey: fixtureLabel,
+        type: "contact.created",
+        aggregateType: "contact",
+        aggregateId: contactB.id,
+        payloadText: "{}",
+        payloadHash: tokenHash("payload-b"),
+        occurredAt: new Date()
+      }
+    });
+    remember("CustomerWebhookEvent", customerEventA.id, customerEventB.id);
+
+    const customerDeliveryA = await tx.customerWebhookDelivery.create({
+      data: {
+        orgId: orgA.id,
+        endpointId: customerEndpointA.id,
+        subscriptionId: customerSubscriptionA.id,
+        eventId: customerEventA.id,
+        signingSecretId: signingSecretA.id
+      }
+    });
+    const customerDeliveryB = await tx.customerWebhookDelivery.create({
+      data: {
+        orgId: orgB.id,
+        endpointId: customerEndpointB.id,
+        subscriptionId: customerSubscriptionB.id,
+        eventId: customerEventB.id,
+        signingSecretId: signingSecretB.id
+      }
+    });
+    remember("CustomerWebhookDelivery", customerDeliveryA.id, customerDeliveryB.id);
+
+    const attemptStartedAt = new Date();
+    const customerAttemptA = await tx.customerWebhookDeliveryAttempt.create({
+      data: {
+        orgId: orgA.id,
+        deliveryId: customerDeliveryA.id,
+        generation: customerDeliveryA.generation,
+        attemptNumber: 1,
+        requestTimestamp: attemptStartedAt,
+        outcome: "ACKNOWLEDGED",
+        startedAt: attemptStartedAt,
+        finishedAt: attemptStartedAt
+      }
+    });
+    const customerAttemptB = await tx.customerWebhookDeliveryAttempt.create({
+      data: {
+        orgId: orgB.id,
+        deliveryId: customerDeliveryB.id,
+        generation: customerDeliveryB.generation,
+        attemptNumber: 1,
+        requestTimestamp: attemptStartedAt,
+        outcome: "ACKNOWLEDGED",
+        startedAt: attemptStartedAt,
+        finishedAt: attemptStartedAt
+      }
+    });
+    remember(
+      "CustomerWebhookDeliveryAttempt",
+      customerAttemptA.id,
+      customerAttemptB.id
+    );
+
     const sessionA = await tx.authSession.create({
       data: {
         tokenHash: tokenHash("session-a"),
@@ -771,20 +1027,28 @@ async function readMissingContextSnapshot(client: PrismaClient) {
         userId: string | null;
         sessionHash: string | null;
         tokenHash: string | null;
+        apiKeyHash: string | null;
       }>
     >`
       SELECT
         NULLIF(current_setting('app.current_org_id', true), '') AS "orgId",
         NULLIF(current_setting('app.current_user_id', true), '') AS "userId",
         NULLIF(current_setting('app.current_session_hash', true), '') AS "sessionHash",
-        NULLIF(current_setting('app.current_token_hash', true), '') AS "tokenHash"
+        NULLIF(current_setting('app.current_token_hash', true), '') AS "tokenHash",
+        NULLIF(current_setting('app.current_api_key_hash', true), '') AS "apiKeyHash"
     `;
     const rows = {} as ProtectedRows;
     for (const table of protectedTenantTables) {
       rows[table] = await selectTableRows(tx, table);
     }
     return {
-      settings: settings ?? { orgId: null, userId: null, sessionHash: null, tokenHash: null },
+      settings: settings ?? {
+        orgId: null,
+        userId: null,
+        sessionHash: null,
+        tokenHash: null,
+        apiKeyHash: null
+      },
       rows
     };
   });
@@ -818,7 +1082,8 @@ function assertMissingContext(snapshot: Awaited<ReturnType<typeof readMissingCon
     orgId: null,
     userId: null,
     sessionHash: null,
-    tokenHash: null
+    tokenHash: null,
+    apiKeyHash: null
   });
   for (const table of protectedTenantTables) {
     expect(snapshot.rows[table], `${table} leaked after transaction completion`).toEqual([]);

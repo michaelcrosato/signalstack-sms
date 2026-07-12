@@ -21,6 +21,7 @@ export type AuthDatabaseContext = Readonly<{
   userId?: string;
   sessionHash?: string;
   tokenHash?: string;
+  apiKeyHash?: string;
   loginEmail?: string;
   purpose?: AuthDatabasePurpose;
 }>;
@@ -31,6 +32,7 @@ export type AuthDatabasePurpose =
   | "session"
   | "invite"
   | "password_reset"
+  | "api_key"
   | "organization_create"
   | "operator";
 
@@ -177,6 +179,7 @@ async function setDatabaseContext(
       set_config('app.current_user_id', ${context.userId ?? ""}, true),
       set_config('app.current_session_hash', ${context.sessionHash ?? ""}, true),
       set_config('app.current_token_hash', ${context.tokenHash ?? ""}, true),
+      set_config('app.current_api_key_hash', ${context.apiKeyHash ?? ""}, true),
       set_config('app.current_login_email', ${context.loginEmail ?? ""}, true),
       set_config('app.control_purpose', ${context.purpose ?? ""}, true)
   `;
@@ -210,6 +213,7 @@ function normalizeAuthContext(context: AuthDatabaseContext): AuthDatabaseContext
     userId: normalizeOptionalEvidence(context.userId, "userId", 191),
     sessionHash: normalizeOptionalEvidence(context.sessionHash, "sessionHash", 512),
     tokenHash: normalizeOptionalEvidence(context.tokenHash, "tokenHash", 512),
+    apiKeyHash: normalizeOptionalEvidence(context.apiKeyHash, "apiKeyHash", 512),
     loginEmail: normalizeOptionalEvidence(context.loginEmail, "loginEmail", 320),
     purpose: normalizePurpose(context.purpose)
   };
@@ -229,6 +233,7 @@ function normalizePurpose(value: AuthDatabasePurpose | undefined): AuthDatabaseP
     "session",
     "invite",
     "password_reset",
+    "api_key",
     "organization_create",
     "operator"
   ];

@@ -3,6 +3,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   apiRbacMutatingMethods,
+  apiRouteRbacApiKeyBoundaries,
   apiRouteRbacMatrix,
   apiRouteRbacOperatorBoundaryExceptions,
   apiRouteRbacPublicAuthExceptions,
@@ -84,6 +85,21 @@ describe("API RBAC matrix", () => {
     }
   });
 
+  it("keeps API-key boundaries backed by pre-body scope authorization and durable idempotency", () => {
+    for (const entry of apiRouteRbacApiKeyBoundaries) {
+      const fullPath = path.join(repoRoot, entry.path);
+      expect(existsSync(fullPath)).toBe(true);
+      const source = readFileSync(fullPath, "utf8");
+      expect(source).toContain("authorizePublicApiRequest(request");
+      for (const scope of entry.requiredScopes) {
+        expect(source).toContain(`"${scope}"`);
+      }
+      expect(
+        source.includes("runPublicApiIdempotentMutation(") || source.includes("executeIdempotentMutation(")
+      ).toBe(true);
+    }
+  });
+
   it("limits public authentication mutations to the intended local auth flows", () => {
     expect(
       apiRouteRbacPublicAuthExceptions.map(({ flow, method, path }) => ({ flow, method, path }))
@@ -159,6 +175,7 @@ describe("API RBAC matrix", () => {
     expect(Object.isFrozen(apiRouteRbacSignedWebhookExceptions)).toBe(true);
     expect(Object.isFrozen(apiRouteRbacPublicAuthExceptions)).toBe(true);
     expect(Object.isFrozen(apiRouteRbacOperatorBoundaryExceptions)).toBe(true);
+    expect(Object.isFrozen(apiRouteRbacApiKeyBoundaries)).toBe(true);
   });
 });
 

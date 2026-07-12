@@ -132,9 +132,21 @@ describe("runtime configuration", () => {
         AUTH_SESSION_SECRET: sessionSecret,
         AUTH_THROTTLE_SECRET: throttleSecret,
         TRUST_PROXY: "true",
-        DATABASE_RLS_ENFORCED: "true"
+        DATABASE_RLS_ENFORCED: "true",
+        SECRETS_MASTER_KEY: encryptionKey,
+        API_KEY_PEPPER: apiKeyPepper
       })
     ).not.toThrow();
+  });
+
+  it("requires standalone public-integration cryptographic readiness in production", () => {
+    const error = captureConfigError({ APP_ENV: "production" });
+    expect(error.issues).toContainEqual(
+      expect.objectContaining({ path: "SECRETS_MASTER_KEY", message: expect.stringContaining("public integrations") })
+    );
+    expect(error.issues).toContainEqual(
+      expect.objectContaining({ path: "API_KEY_PEPPER", message: expect.stringContaining("public API") })
+    );
   });
 
   it("validates the exact throttle-secret value at 32 to 256 characters without mutating it", () => {

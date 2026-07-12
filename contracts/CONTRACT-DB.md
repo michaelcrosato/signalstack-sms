@@ -11,8 +11,9 @@ Every tenant-scoped model must include `orgId` unless explicitly documented here
 PostgreSQL independently enforces the tenant rule; repository predicates are defense in depth, not the
 authorization boundary:
 
-- The canonical manifest contains 22 ordinary tenant tables plus five identity/control tables
-  (`Organization`, `Membership`, `AppUser`, `AuthSession`, and `AuthToken`). All 27 enable and force RLS,
+- The M2 baseline contained 22 ordinary tenant tables. M3 adds nine public-integration tables, so the
+  canonical manifest contains 31 ordinary tenant tables plus five identity/control tables
+  (`Organization`, `Membership`, `AppUser`, `AuthSession`, and `AuthToken`). All 36 enable and force RLS,
   deny missing context, and expose no `PUBLIC` read/write privilege. Runtime posture verifies the exact
   tenant policy name, command, role, permissiveness, `USING`, and `WITH CHECK` expression for every table;
   a catalog with the right policy count but weakened semantics is rejected.
@@ -43,14 +44,30 @@ authorization boundary:
   uses `clock_timestamp()` for eligibility/lease state, bounds caller time to 60 seconds of the database,
   rejects null or out-of-range limits/leases/tokens, fixes its search path, and exposes no `PUBLIC` or
   ordinary table access.
+- API credentials are tenant rows containing a visible prefix, one-way keyed secret hash, allowlisted
+  scopes, expiry/revocation/use metadata, and database-authoritative fixed-window counters. Pre-tenant
+  lookup is SELECT-only through an exact `app.current_api_key_hash` control policy; all mutation occurs
+  after entering the credential organization through the ordinary tenant role.
+- The M3 ordinary-table inventory is `ApiCredential`, `ApiIdempotencyRecord`,
+  `IntegrationAuditEvent`, `CustomerWebhookEndpoint`, `CustomerWebhookSubscription`,
+  `CustomerWebhookSigningSecret`, `CustomerWebhookEvent`, `CustomerWebhookDelivery`, and
+  `CustomerWebhookDeliveryAttempt`.
+- API replay records are unique per `(orgId, credentialId, key)` and pin request/response hashes and
+  expiry. Integration audit rows are append-only. Customer webhook endpoints, subscriptions, encrypted
+  signing-secret versions, canonical event payloads, delivery leases/replay lineage, and durably reserved,
+  one-way-completed attempts use composite same-tenant references. The only active secret per subscription is enforced by
+  a partial unique index. Global delivery discovery is available only through the bounded,
+  database-timed `claim_due_customer_webhook_deliveries` security-definer function, with EXECUTE granted
+  only to `signalstack_worker` and no worker table privileges.
 - The direct-Prisma inventory permits reviewed control-plane/context seams only. M2 closes with zero
   `tenant-migration-debt` imports; new tenant paths must use the transaction boundary and join its tests.
 
-Mandatory proof covers tenant A and B across all 27 protected tables, missing context, cross-tenant
+Mandatory proof covers tenant A and B across all 36 protected tables, missing context, cross-tenant
 read/write/relation forgery, rollback, command-specific control policy denial, runtime policy semantic
-fingerprints, worker dispatch, and multi-connection pool reuse. `npm run test:tenant-db` is the eight-file
-/ 33-test gate; the full database run is 37 files / 186 tests, and the focused auth database run is nine
-files / 38 tests. The least-privilege test creates a fresh database, applies all 40 migrations through a
+fingerprints, worker dispatch, multi-connection pool reuse, and the literal non-owner external-network
+lifecycle. `npm run test:tenant-db` is the current twelve-file / 49-test gate; the complete database-directory
+run remains mandatory without freezing a stale aggregate count here. The least-privilege test creates a fresh
+database, applies all 43 migrations through a
 non-superuser/non-BYPASSRLS table owner, exercises historical triggers and dispatch, and proves the
 dispatch function has no `PUBLIC` EXECUTE ACL. Production local-auth browser proof uses separate
 owner/runtime credentials and serves the app under the non-owner login.

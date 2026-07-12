@@ -7,25 +7,31 @@ Milestone 0 validation runs:
 - ESLint
 - TypeScript
 - Prisma validation and client generation
+- Generated OpenAPI and cross-runtime integration-example drift checks
 - Vitest smoke
 - Playwright smoke
 - Next build
 
-## M2 Tenant-Boundary Gates
+## Tenant-Boundary Gates
 
 PostgreSQL tenant enforcement is mandatory evidence, not an optional RLS mode:
 
-- `npm run test:tenant-db` runs the eight-file / 33-test M2 gate against a disposable owner-capable
-  PostgreSQL database. It creates non-owner NOINHERIT runtime roles and tenant A/B fixtures, then covers
-  all 27 protected tables for scoped reads/writes, missing context, cross-tenant forgery, relation
-  constraints/triggers, rollback, semantic runtime-policy fingerprints, exact command-specific control
-  denial, worker dispatch, and multi-connection pool reuse.
-- The tenant gate includes a fresh install of all 40 migrations under a non-superuser/non-BYPASSRLS
+- The completed M2 checkpoint was the eight-file / 33-test gate over 40 migrations and 27 protected tables.
+  The current `npm run test:tenant-db` is a twelve-file / 49-test superset covering all 43 migrations and 36
+  protected tables, including API-key control resolution/rate concurrency, encrypted public idempotency,
+  customer-event/delivery rows, worker dispatch, and the real-route M3 exit path. It creates non-owner
+  NOINHERIT runtime roles and tenant A/B fixtures, then covers scoped reads/writes, missing context,
+  cross-tenant forgery, relation constraints/triggers, rollback, semantic runtime-policy fingerprints,
+  exact command-specific control denial, both dispatch functions, and multi-connection pool reuse.
+- The M2 tenant gate proved a fresh install of 40 migrations under a non-superuser/non-BYPASSRLS
   table owner using `signalstack_owner`. That proof exercises the historical triggers and dispatch
-  function and verifies the dispatch function's fixed search path and revoked `PUBLIC` EXECUTE ACL.
-- The complete `RUN_DB_TESTS=true` database-directory run is 37 files / 186 tests, and the focused auth
-  database run is nine files / 38 tests. Fresh migration deployment leaves no Prisma schema diff.
-  CI/premerge supply PostgreSQL and keep the tenant gate inside the protected validation path.
+  function and verifies its fixed search path and revoked `PUBLIC` EXECUTE ACL. The current superset proves
+  a fresh 43-migration install and the bounded worker-only customer-webhook claim function under the same
+  least-privilege posture, with no Prisma schema diff.
+- The M2 checkpoint's complete `RUN_DB_TESTS=true` database-directory run was 37 files / 186 tests, and its
+  focused auth database run was nine files / 38 tests. Current DB coverage is intentionally reported by the
+  commands below rather than freezing a stale aggregate count. CI/premerge supply PostgreSQL and keep the
+  tenant gate inside the protected validation path.
 - `npm run tenant:boundary:check` statically inventories direct Prisma imports under `app`, `lib`, and
   `workers`. The accepted M2 posture is zero unauthorized/stale entries and zero
   `tenant-migration-debt` imports; new tenant paths must use the transaction-context seam.
@@ -48,9 +54,43 @@ $env:DATABASE_URL='<disposable PostgreSQL owner URL>'
 npx vitest run tests/unit/db
 ```
 
-Latest default unit-suite evidence is 150 passing / 13 skipped files and 1,078 passing / 61 skipped tests
-(`npm test`; 1,139 tests total). The production local-auth build/browser proof is 1/1 under the distinct
-non-owner web login.
+The current default unit suite runs through `npm test` inside `npm run validate`; the production local-auth
+build/browser proof remains 1/1 under the distinct non-owner web login. Historical exact counts are kept
+only with the milestone checkpoint they describe.
+
+## M3 Public Integration Gates
+
+- `npm run openapi:check` regenerates the frozen `/api/v1` OpenAPI document in memory and fails on artifact,
+  route, scope, envelope, or protocol drift. `GET /api/v1/openapi.json` is the only unauthenticated public
+  metadata route.
+- `npm run examples:check` derives the customer-webhook golden vector from the production signer, verifies
+  exact raw-body HMAC and secret-version selection in TypeScript and Python, rejects duplicated signatures,
+  body tampering, and stale timestamps, checks a localhost-only Twilio callback fixture against the inbound
+  verifier, and inventories the curl/TypeScript/Python public clients. Examples are localhost-safe,
+  dummy/local, and make no provider call.
+- Focused public API tests cover bearer-only authentication before body parsing, scopes, frozen envelopes and
+  errors, cursor integrity, bounded JSON, strict DTOs, full resource routes, API-key lifecycle, PostgreSQL
+  rate concurrency, and encrypted exact idempotent replay. Customer-webhook suites cover the event catalog,
+  minimized payloads, signing encryption/HMAC, endpoint safety, acknowledgement/retry classification,
+  transport bounds, leases/generations, crash recovery, disablement, replay, and rotation. The current focused
+  public API suite is 30 files / 111 tests.
+- Method-boundary coverage pins explicit `GET`/`POST`/`PUT`/`PATCH`/`DELETE`/`HEAD`/`OPTIONS` exports across
+  all `/api/v1` Route Handlers. Unsupported protected methods authenticate and consume the durable rate
+  window before canonical `405`; missing/invalid bearer remains `401`; the OpenAPI metadata exception gets
+  unauthenticated `405`; and `Allow`, no-store, request-ID, and rate headers remain exact.
+- `tests/unit/db/public-api-exit-path.test.ts` uses real route handlers and a non-owner runtime role across two
+  tenants. It proves one idempotent contact mutation/event, foreign-resource denial, exact dummy-message
+  replay and status, signed raw lifecycle receipt, a terminal failed delivery, replay under the newly rotated
+  webhook secret, rejection by the old verifier, and immediate API-key rotation/revocation denial.
+- `tests/unit/db/public-api-network-exit-path.test.ts` is the literal external-application proof. It creates
+  a fresh disposable 43-migration database and NOINHERIT web/worker logins, starts a real Next App Router HTTP
+  child on the forced-RLS web role plus an independent local receiver socket, and runs claims/finalization on
+  the worker role. Organization A/B keys prove foreign `GET`/`PATCH` both return `404` without mutation;
+  root/nested unknown paths and unauthenticated/authenticated `HEAD`/`OPTIONS` prove canonical auth/method
+  headers. The same run drives six-way concurrent contact/message retries through `fetch`, reads dummy status,
+  verifies exact signed raw bodies/headers, forces a receiver `500`, rotates and replays under secret version
+  2 while rejecting the old secret, then proves API-key rotation/revocation denial. It is mandatory in
+  `npm run test:tenant-db`, removes its database/process/socket/roles in teardown, and makes no provider request.
 
 Additional deterministic checks:
 

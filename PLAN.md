@@ -20,14 +20,15 @@ are optional adapters or accelerators, never core requirements.
 - Local/demo product workflows and defensive backend foundations are substantial and validated.
 - Built-in local identity, onboarding, team lifecycle, operator recovery, and production-session browser
   proof are complete; deterministic identity remains only in explicit demo mode.
-- Database-enforced tenant integrity is complete. Remaining production trust gaps include demo-tenant
-  webhook routing, metadata-only provider credentials, a dummy-only campaign worker, and no public
-  integration identity/event-delivery platform.
+- Database-enforced tenant integrity and the public integration identity/event-delivery platform are
+  complete. The current substrate is 43 migrations/36 protected tables; `/api/v1` message acceptance is
+  deliberately dummy/local. Remaining production trust gaps include demo-tenant provider callback routing,
+  metadata-only provider credentials, and a dummy-only campaign worker.
 - Deployment is not a standalone package: current Compose contains backing services only; no hardened
   app/worker/ingress/migration/backup stack or restore proof exists.
 - Live external impact remains disabled while implementation proceeds.
 
-## Active move: M3 public integrations and M4 provider ownership
+## Active move: M4 provider ownership
 
 ### Completed: M0 — Roadmap and package safety
 
@@ -65,10 +66,25 @@ are optional adapters or accelerators, never core requirements.
   files / 38 tests. A fresh least-privilege install proves all migrations, historical triggers, dispatch,
   and revoked public function access; production local-auth browser proof runs under a non-owner login.
 
+### Completed: M3 — Public API identity and customer webhooks
+
+- One-time scoped API credentials, safe ADMIN lifecycle routes, bearer-only `/api/v1` identity, immediate
+  rotation/revocation, and audit evidence.
+- Stable envelopes, request IDs, errors, HMAC cursors, database-owned per-key rate windows, and encrypted
+  exact idempotency replay across all mutations.
+- Organization, contact, tag, list, segment, template, dummy/local message, campaign, conversation, and
+  delivery-status resources with generated OpenAPI plus curl, TypeScript, and Python examples.
+- Atomic allowlisted event fanout, one-time encrypted webhook signing secrets, SSRF-resistant delivery,
+  bounded retry/disable/replay/rotation, and provider-callback/receiver verification examples.
+- Current tenant posture of 43 migrations/36 protected tables and a literal external-network proof on a
+  fresh database with NOINHERIT web/worker logins and forced RLS. It boots a real Next server plus receiver
+  socket, proves organization A/B HTTP denial and method/unknown-path behavior, then covers concurrent exact
+  replay/status, signed receipt, forced failure, secret rotation/replay, and API-key rotation/revocation
+  without a carrier call. Separate PostgreSQL/direct-handler suites retain the broader runtime-role matrix.
+
 ## Following dependency queue
 
-1. M3 scoped API keys, `/api/v1`, OpenAPI, and durable signed customer webhooks, in parallel with M4
-   encrypted provider credentials and trusted account/number tenant routing.
+1. M4 encrypted provider credentials and trusted account/number tenant routing.
 2. M5 direct-message outbox and Twilio transport with ambiguity reconciliation.
 3. M6 inbound/status/shared-inbox production path.
 4. M7 campaign worker, audiences, throttling, DLQ/replay, and kill switches.

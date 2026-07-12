@@ -13,6 +13,13 @@ const contactInclude = {
 
 const CONTACT_IMPORT_PREFETCH_BATCH_SIZE = 10_000;
 
+export class ContactConsentEvidenceError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ContactConsentEvidenceError";
+  }
+}
+
 function runTenantContactOperation<T>(
   orgId: string,
   tx: Prisma.TransactionClient | undefined,
@@ -82,8 +89,39 @@ export async function upsertContact(
   return runTenantContactOperation(orgId, tx, execute);
 }
 
-export async function updateContact(orgId: string, contactId: string, input: ContactUpdateInput) {
-  return withTenantTransaction({ orgId }, async (tx) => {
+export async function createContact(
+  orgId: string,
+  input: ContactCreateInput,
+  tx?: Prisma.TransactionClient
+) {
+  const execute = async (client: Prisma.TransactionClient) => {
+    verifyConsentEvidenceCompleteness(null, input);
+    const contact = await client.contact.create({
+      data: {
+        orgId,
+        phone: input.phone,
+        ...contactWriteData(input)
+      }
+    });
+
+    if (contact.consentStatus === ConsentStatus.PENDING_DOUBLE_OPT_IN) {
+      await sendDoubleOptInRequest(client, orgId, contact.id, contact.phone);
+    }
+
+    await syncContactLabels(client, orgId, contact.id, input.tagNames, input.listNames);
+    return client.contact.findUniqueOrThrow({ where: { id: contact.id }, include: contactInclude });
+  };
+
+  return runTenantContactOperation(orgId, tx, execute);
+}
+
+export async function updateContact(
+  orgId: string,
+  contactId: string,
+  input: ContactUpdateInput,
+  existingTx?: Prisma.TransactionClient
+) {
+  return runTenantContactOperation(orgId, existingTx, async (tx) => {
     const existing = await tx.contact.findFirst({ where: orgWhere(orgId, { id: contactId }) });
     if (!existing) {
       return null;
@@ -100,16 +138,20 @@ export async function updateContact(orgId: string, contactId: string, input: Con
       }
     });
 
-    if (input.tagNames || input.listNames) {
-      await syncContactLabels(tx, orgId, contact.id, input.tagNames ?? [], input.listNames ?? []);
+    if (input.tagNames !== undefined || input.listNames !== undefined) {
+      await syncContactLabels(tx, orgId, contact.id, input.tagNames, input.listNames);
     }
 
     return tx.contact.findUniqueOrThrow({ where: { id: contact.id }, include: contactInclude });
   });
 }
 
-export async function archiveContact(orgId: string, contactId: string) {
-  return updateContact(orgId, contactId, { archived: true });
+export async function archiveContact(
+  orgId: string,
+  contactId: string,
+  tx?: Prisma.TransactionClient
+) {
+  return updateContact(orgId, contactId, { archived: true }, tx);
 }
 
 export async function mergeContacts(orgId: string, targetContactId: string, sourceContactId: string) {
@@ -293,42 +335,45 @@ async function syncContactLabels(
   tx: Prisma.TransactionClient,
   orgId: string,
   contactId: string,
-  tagNames: string[],
-  listNames: string[]
+  tagNames: string[] | undefined,
+  listNames: string[] | undefined
 ) {
-  await tx.contactTag.deleteMany({ where: { orgId, contactId } });
-  await tx.contactListMember.deleteMany({ where: { orgId, contactId } });
-
-  const uniqueTagNames = uniqueNames(tagNames);
-  if (uniqueTagNames.length > 0) {
-    await tx.tag.createMany({
-      data: uniqueTagNames.map((name) => ({ orgId, name })),
-      skipDuplicates: true
-    });
-    const tags = await tx.tag.findMany({
-      where: { orgId, name: { in: uniqueTagNames } },
-      select: { id: true }
-    });
-    await tx.contactTag.createMany({
-      data: tags.map((tag) => ({ orgId, contactId, tagId: tag.id })),
-      skipDuplicates: true
-    });
+  if (tagNames !== undefined) {
+    await tx.contactTag.deleteMany({ where: { orgId, contactId } });
+    const uniqueTagNames = uniqueNames(tagNames);
+    if (uniqueTagNames.length > 0) {
+      await tx.tag.createMany({
+        data: uniqueTagNames.map((name) => ({ orgId, name })),
+        skipDuplicates: true
+      });
+      const tags = await tx.tag.findMany({
+        where: { orgId, name: { in: uniqueTagNames } },
+        select: { id: true }
+      });
+      await tx.contactTag.createMany({
+        data: tags.map((tag) => ({ orgId, contactId, tagId: tag.id })),
+        skipDuplicates: true
+      });
+    }
   }
 
-  const uniqueListNames = uniqueNames(listNames);
-  if (uniqueListNames.length > 0) {
-    await tx.contactList.createMany({
-      data: uniqueListNames.map((name) => ({ orgId, name })),
-      skipDuplicates: true
-    });
-    const lists = await tx.contactList.findMany({
-      where: { orgId, name: { in: uniqueListNames } },
-      select: { id: true }
-    });
-    await tx.contactListMember.createMany({
-      data: lists.map((list) => ({ orgId, contactId, listId: list.id })),
-      skipDuplicates: true
-    });
+  if (listNames !== undefined) {
+    await tx.contactListMember.deleteMany({ where: { orgId, contactId } });
+    const uniqueListNames = uniqueNames(listNames);
+    if (uniqueListNames.length > 0) {
+      await tx.contactList.createMany({
+        data: uniqueListNames.map((name) => ({ orgId, name })),
+        skipDuplicates: true
+      });
+      const lists = await tx.contactList.findMany({
+        where: { orgId, name: { in: uniqueListNames } },
+        select: { id: true }
+      });
+      await tx.contactListMember.createMany({
+        data: lists.map((list) => ({ orgId, contactId, listId: list.id })),
+        skipDuplicates: true
+      });
+    }
   }
 }
 
@@ -456,18 +501,24 @@ function verifyConsentEvidenceImmutability(
       input.consentCapturedAt === null ||
       existing.consentCapturedAt.getTime() !== input.consentCapturedAt.getTime()
     ) {
-      throw new Error("Consent evidence (consentCapturedAt) is write-once and cannot be changed");
+      throw new ContactConsentEvidenceError(
+        "Consent evidence (consentCapturedAt) is write-once and cannot be changed"
+      );
     }
   }
   if (existing.consentMethod && input.consentMethod !== undefined && existing.consentMethod !== input.consentMethod) {
-    throw new Error("Consent evidence (consentMethod) is write-once and cannot be changed");
+    throw new ContactConsentEvidenceError(
+      "Consent evidence (consentMethod) is write-once and cannot be changed"
+    );
   }
   if (
     existing.consentDisclosure &&
     input.consentDisclosure !== undefined &&
     existing.consentDisclosure !== input.consentDisclosure
   ) {
-    throw new Error("Consent evidence (consentDisclosure) is write-once and cannot be changed");
+    throw new ContactConsentEvidenceError(
+      "Consent evidence (consentDisclosure) is write-once and cannot be changed"
+    );
   }
 }
 
@@ -492,7 +543,9 @@ function verifyConsentEvidenceCompleteness(
   };
 
   if (hasAnyConsentEvidence(resultingEvidence) && !hasCompleteConsentEvidence(resultingEvidence)) {
-    throw new Error("Consent evidence requires capturedAt, method, and disclosure together");
+    throw new ContactConsentEvidenceError(
+      "Consent evidence requires capturedAt, method, and disclosure together"
+    );
   }
 }
 

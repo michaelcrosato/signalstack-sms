@@ -27,6 +27,83 @@ Standalone identity foundation:
 - `/reset`: consumes a one-time reset fragment, changes the password, and invalidates every prior session.
 - `/account`: displays server-derived identity and offers current/all-session revocation.
 
+Standalone M3 public integration platform (implemented; milestone complete):
+
+- `GET /api/v1/openapi.json`: returns the public OpenAPI document and is the sole unauthenticated `/api/v1`
+  metadata exception.
+- `GET /api/v1/organization`: returns the bearer credential's current organization (`organization:read`).
+- `GET /api/v1/contacts` and `GET /api/v1/contacts/:contactId`: read cursor-paginated/single contacts
+  (`contacts:read`).
+- `POST /api/v1/contacts`, `PATCH /api/v1/contacts/:contactId`, and
+  `DELETE /api/v1/contacts/:contactId`: create, update/restore, or soft-archive idempotently (`contacts:write`).
+- `GET /api/v1/tags` and `GET /api/v1/tags/:tagId`: read tags (`tags:read`).
+- `POST /api/v1/tags`, `PATCH /api/v1/tags/:tagId`, and `DELETE /api/v1/tags/:tagId`: mutate tags
+  idempotently (`tags:write`).
+- `GET /api/v1/lists`, `GET /api/v1/lists/:listId`, and `GET /api/v1/lists/:listId/contacts`: read lists
+  and bounded membership (`lists:read`, plus `contacts:read` for members).
+- `POST /api/v1/lists`, `PATCH /api/v1/lists/:listId`, `DELETE /api/v1/lists/:listId`,
+  `POST /api/v1/lists/:listId/contacts`, and `DELETE /api/v1/lists/:listId/contacts/:contactId`: mutate list
+  metadata/membership idempotently (`lists:write`).
+- `GET /api/v1/segments`, `GET /api/v1/segments/:segmentId`, and
+  `GET /api/v1/segments/:segmentId/contacts`: read/evaluate saved segments (`segments:read`, plus
+  `contacts:read` for results).
+- `POST /api/v1/segments`, `PATCH /api/v1/segments/:segmentId`, and
+  `DELETE /api/v1/segments/:segmentId`: mutate saved segments idempotently (`segments:write`).
+- `GET /api/v1/templates` and `GET /api/v1/templates/:templateId`: read templates (`templates:read`).
+- `POST /api/v1/templates`, `PATCH /api/v1/templates/:templateId`, and
+  `DELETE /api/v1/templates/:templateId`: mutate templates idempotently (`templates:write`).
+- `GET /api/v1/messages` and `GET /api/v1/messages/:messageId`: read messages (`messages:read`).
+- `POST /api/v1/messages`: submits one idempotent dummy message in M3 (`messages:send`); this does not enable
+  live carrier transport.
+- `GET /api/v1/messages/:messageId/status`: reads normalized delivery state (`deliveries:read`).
+- `GET /api/v1/campaigns` and `GET /api/v1/campaigns/:campaignId`: read campaigns (`campaigns:read`).
+- `POST /api/v1/campaigns` and `PATCH /api/v1/campaigns/:campaignId`: create/update drafts idempotently
+  (`campaigns:write`).
+- `POST /api/v1/campaigns/:campaignId/schedule` and `POST /api/v1/campaigns/:campaignId/cancel`: schedule or
+  cancel external-impact work idempotently (`campaigns:send`).
+- `GET /api/v1/conversations`, `GET /api/v1/conversations/:conversationId`, and
+  `GET /api/v1/conversations/:conversationId/messages`: read inbox threads (`conversations:read`, plus
+  `messages:read` for messages).
+- `POST /api/v1/conversations/:conversationId/messages`: submits an idempotent reply
+  (`conversations:write` plus `messages:send`).
+- `GET /api/v1/api-keys/current`: reads safe metadata for the calling credential only (`credentials:read`).
+- `POST /api/v1/api-keys/current/rotate` and `DELETE /api/v1/api-keys/current`: rotate/reveal once or revoke
+  only the calling credential (`credentials:write`).
+- `GET /api/v1/webhook-event-types`, `GET /api/v1/webhook-endpoints`, and
+  `GET /api/v1/webhook-endpoints/:endpointId`: read the allowlist and secret-free endpoint/subscription state
+  (`webhooks:read`).
+- `POST /api/v1/webhook-endpoints`, `PATCH /api/v1/webhook-endpoints/:endpointId`,
+  `DELETE /api/v1/webhook-endpoints/:endpointId`, and
+  `POST /api/v1/webhook-endpoints/:endpointId/rotate-secret`: administer safe endpoint/subscription state,
+  allowlisted events, and one-time signing secrets (`webhooks:write`).
+- `GET /api/v1/webhook-endpoints/:endpointId/deliveries`: reads bounded delivery and attempt evidence
+  (`deliveries:read`).
+- `POST /api/v1/webhook-deliveries/:deliveryId/replay`: replays a terminal failed delivery while retaining
+  all history (`webhooks:replay`).
+- `GET /api/settings/api-keys`: cookie-authenticated ADMIN listing of safe same-tenant credential metadata.
+- `POST /api/settings/api-keys`: cookie-authenticated ADMIN creation returning the raw bearer exactly once.
+- `POST /api/settings/api-keys/:credentialId`: cookie-authenticated ADMIN rotation returning the replacement
+  bearer exactly once and invalidating the prior secret.
+- `DELETE /api/settings/api-keys/:credentialId`: cookie-authenticated ADMIN terminal/idempotent revocation.
+
+All protected `/api/v1` entries above are bearer-only, use the frozen `{ok,data|error,meta.requestId}`
+envelope, HMAC-bound cursor, PostgreSQL per-key rate headers, and `Idempotency-Key` on every mutation. The exact
+scope/error/event catalogs and delivery protocol are in SPEC-031. The generated artifact at
+`public/openapi/v1.json` is served by the metadata route and checked for drift by `npm run openapi:check`.
+Every `/api/v1` Route Handler exports the complete HTTP method set: unsupported protected methods still
+authenticate and durably consume the key's rate window before returning the canonical `405`/`Allow`
+response, while the OpenAPI metadata exception returns its unauthenticated canonical `405`.
+The [integration examples](../examples/README.md) cover curl, dependency-free TypeScript and Python public
+clients, a local provider callback, and raw-body customer-webhook verification. `npm run examples:check`
+checks those examples against the production signing protocol without contacting a provider.
+
+The literal network proof starts a real Next HTTP server on a NOINHERIT web login, processes customer events
+through a distinct NOINHERIT worker login and independent receiver socket, and enforces RLS on a fresh
+disposable database. It covers organization A/B foreign read/write denial, root/nested unknown routes,
+authenticated and unauthenticated `HEAD`/`OPTIONS`, exact concurrent contact/message replay, dummy/local
+status, signed lifecycle receipt, forced failed delivery, replay under a rotated webhook secret, and API-key
+rotation/revocation. No `/api/v1` route in M3 enables live carrier transport.
+
 Milestone 0:
 
 - `GET /api/health`: returns service health and demo-safe defaults.

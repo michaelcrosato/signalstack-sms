@@ -14,15 +14,16 @@ hosted monitoring, and hosted object storage must not be core requirements.
 The detailed product contract, milestone graph, acceptance matrix, and verification ledger are in
 `docs/STANDALONE_ROADMAP.md`.
 
-## Current state (2026-07-10)
+## Current state (2026-07-12)
 
 - Strong demo-safe foundations: tenant-scoped repositories, contacts/imports, templates, campaigns,
   durable database queue jobs, optional BullMQ mirroring, shared inbox, compliance gates, dummy provider,
   fake/local AI, Twilio webhook parsing, provider metadata, observability seams, and product UI.
-- The seeded browser product path works at `/dashboard`; current database evidence is 37 PostgreSQL
-  files / 186 passing tests, including the mandatory eight-file / 33-test tenant gate and nine-file /
-  38-test auth database run. Playwright smoke, a production local-auth browser proof under a non-owner
-  login, and the production build are green.
+- The seeded browser product path works at `/dashboard`; mandatory PostgreSQL coverage now includes the
+  43-migration/36-protected-table tenant substrate plus the public API exit path. The M2 checkpoint remains
+  recorded as 37 PostgreSQL files / 186 passing tests, including its eight-file / 33-test tenant gate and
+  nine-file / 38-test auth database run. Playwright smoke, a production local-auth browser proof under a
+  non-owner login, and the production build are green.
 - M1 built-in identity is complete: local credentials, keyed opaque sessions, onboarding/team lifecycle,
   operator recovery, and fail-closed authorization replace deterministic identity outside explicit demo.
 - M2 database-enforced tenant integrity is complete: all 40 migrations install under a non-superuser,
@@ -30,10 +31,15 @@ The detailed product contract, milestone graph, acceptance matrix, and verificat
   attestation, separate non-owner web/worker capabilities, exact control policies, short
   tenant/control/dispatch transactions, and mandatory two-tenant missing-context/forgery/pool proof are
   enforced.
+- M3 public integrations are complete: the current 43-migration/36-protected-table substrate provides
+  one-time scoped API credentials, bearer-only `/api/v1` resources, encrypted durable idempotency,
+  generated OpenAPI and cross-runtime examples, plus signed customer-event delivery with bounded retry,
+  disablement, replay, and secret rotation. Its real-route PostgreSQL exit path remains dummy/local and
+  makes no carrier call.
 - The repository is not yet a production SMS platform. Twilio callbacks still route to the demo tenant;
   provider secrets are not stored for real sends; the campaign
-  worker is dummy-only and production-blocked; there is no public API-key surface, outbound customer
-  webhook delivery, production container bundle, or backup/restore proof.
+  worker is dummy-only and production-blocked; there is no production container bundle or backup/restore
+  proof.
 - Live SMS, billing, and hosted AI remain off by default. The isolated operator-gated live-test SMS path
   is not evidence of production campaign readiness.
 

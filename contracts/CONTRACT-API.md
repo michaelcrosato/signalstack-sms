@@ -8,6 +8,116 @@ handlers; signed provider webhooks remain signature-authenticated exceptions.
 
 Owner: backend-data and frontend-ui.
 
+## Frozen `/api/v1` Public Integration Protocol (M3 Complete)
+
+This section is the implemented compatibility contract for M3. The route inventory, OpenAPI document,
+external-network test application/receiver, and customer-webhook worker are complete under the dummy/local
+transport boundary. The detailed acceptance contract and evidence are in
+`plan/specs/SPEC-031-public-integrations.md`.
+
+Every `/api/v1` resource and mutation route authenticates only one exact
+`Authorization: Bearer ss_api_<prefix>_<secret>` credential. Browser cookies, demo principals, provider
+signatures, query-string keys, and alternate schemes are ignored. `GET /api/v1/openapi.json` is the one
+unauthenticated metadata exception.
+
+### Envelope, request ID, errors, pagination, idempotency, and rate limits
+
+- Success is `{ "ok": true, "data": ..., "meta": { "requestId": "uuid", ... } }`.
+- Failure is `{ "ok": false, "error": { "code": "...", "message": "...", "details": ...? },
+  "meta": { "requestId": "uuid" } }`.
+- Every response is `Cache-Control: no-store`; `X-Request-Id` exactly matches `meta.requestId`. A single valid
+  client UUID may be retained; malformed or duplicated evidence is replaced.
+- Stable public codes are `AUTHENTICATION_REQUIRED`, `INVALID_API_KEY`, `INSUFFICIENT_SCOPE`,
+  `INVALID_REQUEST`, `INVALID_JSON`, `INVALID_CURSOR`, `IDEMPOTENCY_KEY_REQUIRED`,
+  `IDEMPOTENCY_KEY_INVALID`, `IDEMPOTENCY_CONFLICT`, `PAYLOAD_TOO_LARGE`, `UNSUPPORTED_MEDIA_TYPE`,
+  `VALIDATION_ERROR`, `OPERATION_NOT_ALLOWED`, `NOT_FOUND`, `METHOD_NOT_ALLOWED`, `CONFLICT`,
+  `RATE_LIMIT_EXCEEDED`, `INTERNAL_ERROR`, `UPSTREAM_ERROR`, and `SERVICE_UNAVAILABLE` with the status mapping
+  in SPEC-031. Unknown, expired, revoked, and rotated-away key states all use `INVALID_API_KEY`.
+- Collections use a default limit of 50 and maximum 100, newest-first `(createdAt, id)` ordering, and a
+  maximum-1,024-character HMAC-authenticated v1 cursor bound to the tenant and canonical resource. An invalid,
+  tampered, foreign-tenant, or foreign-resource cursor returns `INVALID_CURSOR` without fallback.
+- Every public `POST`, `PUT`, `PATCH`, and `DELETE` requires one `[A-Za-z0-9._:-]{8,128}`
+  `Idempotency-Key`. The key, method, route, and canonical JSON body are bound inside the same PostgreSQL
+  transaction as the domain mutation and encrypted completed response. Exact retries within 24 hours return
+  the original status, body, and request ID with `Idempotency-Replayed: true`; changed bindings return
+  `409 IDEMPOTENCY_CONFLICT`.
+- PostgreSQL consumes the resolved key's one-minute window before scope evaluation or body parsing.
+  Authenticated responses include `RateLimit-Limit`, `RateLimit-Remaining`, and Unix-seconds
+  `RateLimit-Reset`; exhausted requests also include `Retry-After` and return `RATE_LIMIT_EXCEEDED`. Database
+  failure returns `SERVICE_UNAVAILABLE`, never an in-memory or unmetered fallback.
+
+### Scope catalog
+
+The exact non-wildcard catalog is `organization:read`; `contacts:read|write`; `tags:read|write`;
+`lists:read|write`; `segments:read|write`; `templates:read|write`; `messages:read|write|send`;
+`campaigns:read|write|send`; `conversations:read|write`; `deliveries:read`; `credentials:read|write`; and
+`webhooks:read|write|replay`. `messages:send` and `campaigns:send` are separate external-impact grants. A public
+credential can read, rotate, or revoke only itself; tenant-wide creation and administration remain behind the
+cookie-session ADMIN boundary.
+
+### Frozen route table
+
+The exact M3 routes and minimum scopes are:
+
+- `GET /api/v1/openapi.json` — public metadata exception.
+- `GET /api/v1/organization` — `organization:read`.
+- `GET /api/v1/contacts`, `GET /api/v1/contacts/:contactId` — `contacts:read`.
+- `POST /api/v1/contacts`, `PATCH /api/v1/contacts/:contactId`,
+  `DELETE /api/v1/contacts/:contactId` — `contacts:write`.
+- `GET /api/v1/tags`, `GET /api/v1/tags/:tagId` — `tags:read`.
+- `POST /api/v1/tags`, `PATCH /api/v1/tags/:tagId`, `DELETE /api/v1/tags/:tagId` — `tags:write`.
+- `GET /api/v1/lists`, `GET /api/v1/lists/:listId` — `lists:read`.
+- `POST /api/v1/lists`, `PATCH /api/v1/lists/:listId`, `DELETE /api/v1/lists/:listId` — `lists:write`.
+- `GET /api/v1/lists/:listId/contacts` — `lists:read` plus `contacts:read`.
+- `POST /api/v1/lists/:listId/contacts`, `DELETE /api/v1/lists/:listId/contacts/:contactId` — `lists:write`.
+- `GET /api/v1/segments`, `GET /api/v1/segments/:segmentId` — `segments:read`.
+- `POST /api/v1/segments`, `PATCH /api/v1/segments/:segmentId`,
+  `DELETE /api/v1/segments/:segmentId` — `segments:write`.
+- `GET /api/v1/segments/:segmentId/contacts` — `segments:read` plus `contacts:read`.
+- `GET /api/v1/templates`, `GET /api/v1/templates/:templateId` — `templates:read`.
+- `POST /api/v1/templates`, `PATCH /api/v1/templates/:templateId`,
+  `DELETE /api/v1/templates/:templateId` — `templates:write`.
+- `GET /api/v1/messages`, `GET /api/v1/messages/:messageId` — `messages:read`.
+- `POST /api/v1/messages` — `messages:send`; M3 remains dummy-only.
+- `GET /api/v1/messages/:messageId/status` — `deliveries:read`.
+- `GET /api/v1/campaigns`, `GET /api/v1/campaigns/:campaignId` — `campaigns:read`.
+- `POST /api/v1/campaigns`, `PATCH /api/v1/campaigns/:campaignId` — `campaigns:write`.
+- `POST /api/v1/campaigns/:campaignId/schedule`, `POST /api/v1/campaigns/:campaignId/cancel` —
+  `campaigns:send`.
+- `GET /api/v1/conversations`, `GET /api/v1/conversations/:conversationId` — `conversations:read`.
+- `GET /api/v1/conversations/:conversationId/messages` — `conversations:read` plus `messages:read`.
+- `POST /api/v1/conversations/:conversationId/messages` — `conversations:write` plus `messages:send`.
+- `GET /api/v1/api-keys/current` — `credentials:read`; safe metadata for the calling key only.
+- `POST /api/v1/api-keys/current/rotate`, `DELETE /api/v1/api-keys/current` — `credentials:write`; the calling
+  key only.
+- `GET /api/v1/webhook-event-types`, `GET /api/v1/webhook-endpoints`, and
+  `GET /api/v1/webhook-endpoints/:endpointId` — `webhooks:read`.
+- `POST /api/v1/webhook-endpoints`, `PATCH /api/v1/webhook-endpoints/:endpointId`,
+  `DELETE /api/v1/webhook-endpoints/:endpointId`, and
+  `POST /api/v1/webhook-endpoints/:endpointId/rotate-secret` — `webhooks:write`.
+- `GET /api/v1/webhook-endpoints/:endpointId/deliveries` — `deliveries:read`.
+- `POST /api/v1/webhook-deliveries/:deliveryId/replay` — `webhooks:replay`.
+
+### `GET /api/settings/api-keys`
+
+Lists safe API credential metadata for the current organization after cookie-session ADMIN authorization.
+It never returns a raw key, stored hash, last-use network hash, or another tenant's row and is non-cacheable.
+
+### `POST /api/settings/api-keys`
+
+Creates one tenant API credential after cookie-session ADMIN and same-origin checks. It validates exact
+catalog scopes, expiry, and the per-minute limit, then returns the raw bearer exactly once with safe metadata.
+
+### `POST /api/settings/api-keys/:credentialId`
+
+Rotates one same-tenant, unrevoked credential after ADMIN and same-origin checks. The previous bearer becomes
+invalid atomically; the replacement is returned once and is never available from later reads.
+
+### `DELETE /api/settings/api-keys/:credentialId`
+
+Idempotently revokes one same-tenant credential after ADMIN and same-origin checks. It retains secret-free
+metadata and audit evidence and never hard-deletes the credential.
+
 ## Implemented Endpoints
 
 ### `/setup`, `/login`, and `/logout`

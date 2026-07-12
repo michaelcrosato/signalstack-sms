@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  assertApiKeyControlPolicyShape,
   assertDispatchCapabilityShape,
   assertRuntimePolicyShapes
 } from "@/lib/db/runtime-posture";
@@ -24,7 +25,8 @@ describe("runtime policy posture", () => {
   });
 
   it("requires an owner-bound dispatch function executable only by the worker capability", () => {
-    const reviewed = {
+    const reviewed = (functionName: string) => ({
+      functionName,
       securityDefiner: true,
       settings: ["search_path=pg_catalog, public"],
       publicExecute: false,
@@ -33,13 +35,51 @@ describe("runtime policy posture", () => {
       controlExecute: false,
       webExecute: false,
       ownerMember: true
-    };
-    expect(() => assertDispatchCapabilityShape([reviewed])).not.toThrow();
+    });
+    const rows = [
+      reviewed("claim_due_queue_jobs"),
+      reviewed("claim_due_customer_webhook_deliveries")
+    ];
+    expect(() => assertDispatchCapabilityShape(rows)).not.toThrow();
     expect(() =>
-      assertDispatchCapabilityShape([{ ...reviewed, publicExecute: true }])
+      assertDispatchCapabilityShape([
+        { ...rows[0]!, publicExecute: true },
+        rows[1]!
+      ])
     ).toThrow("capability shape is invalid");
     expect(() =>
-      assertDispatchCapabilityShape([{ ...reviewed, settings: ["search_path=public"] }])
+      assertDispatchCapabilityShape([
+        { ...rows[0]!, settings: ["search_path=public"] },
+        rows[1]!
+      ])
+    ).toThrow("capability shape is invalid");
+    expect(() => assertDispatchCapabilityShape([rows[0]!, rows[0]!])).toThrow(
+      "capability shape is invalid"
+    );
+  });
+
+  it("requires an exact-hash SELECT-only API-key control policy", () => {
+    const reviewed = {
+      policyName: "api_key_control_select_scope",
+      command: "SELECT",
+      permissive: "PERMISSIVE",
+      roles: ["signalstack_control"],
+      usingExpression:
+        `((current_setting('app.control_purpose'::text, true) = 'api_key'::text) AND ` +
+        `("secretHash" = NULLIF(current_setting('app.current_api_key_hash'::text, true), ''::text)))`,
+      checkExpression: null,
+      controlSelect: true,
+      controlInsert: false,
+      controlUpdate: false,
+      controlDelete: false,
+      publicPrivilege: false
+    };
+    expect(() => assertApiKeyControlPolicyShape([reviewed])).not.toThrow();
+    expect(() =>
+      assertApiKeyControlPolicyShape([{ ...reviewed, usingExpression: "true" }])
+    ).toThrow("capability shape is invalid");
+    expect(() =>
+      assertApiKeyControlPolicyShape([{ ...reviewed, controlUpdate: true }])
     ).toThrow("capability shape is invalid");
   });
 

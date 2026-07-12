@@ -19,6 +19,8 @@ const foreignEmail = `foreign-${suffix}@example.test`;
 const demoSlug = `control-demo-${suffix}`;
 const foreignSlug = `control-foreign-${suffix}`;
 const createdSlug = `control-created-${suffix}`;
+const demoApiKeyHash = `api-key-demo-${suffix}`;
+const foreignApiKeyHash = `api-key-foreign-${suffix}`;
 
 describe.runIf(run)("control role policy hardening", () => {
   let demoOrgId = "";
@@ -77,6 +79,24 @@ describe.runIf(run)("control role policy hardening", () => {
     ]);
     void demoMembership;
     foreignMembershipId = foreignMembership.id;
+    await prisma.apiCredential.createMany({
+      data: [
+        {
+          orgId: demoOrgId,
+          name: "Demo API key",
+          prefix: `demo_${suffix}`,
+          secretHash: demoApiKeyHash,
+          scopes: ["organization:read"]
+        },
+        {
+          orgId: foreignOrgId,
+          name: "Foreign API key",
+          prefix: `foreign_${suffix}`,
+          secretHash: foreignApiKeyHash,
+          scopes: ["organization:read"]
+        }
+      ]
+    });
   });
 
   afterAll(async () => {
@@ -125,6 +145,36 @@ describe.runIf(run)("control role policy hardening", () => {
       }
     );
     expect(snapshot).toEqual({ setting: demoOrgId, organizations: [{ id: demoOrgId }] });
+  });
+
+  it("resolves only the exact API-key hash through a SELECT-only control policy", async () => {
+    const exact = await withAuthDatabaseContext(
+      { apiKeyHash: demoApiKeyHash, purpose: "api_key" },
+      (tx) => tx.apiCredential.findMany({ select: { orgId: true, secretHash: true } })
+    );
+    expect(exact).toEqual([{ orgId: demoOrgId, secretHash: demoApiKeyHash }]);
+
+    const wrongPurpose = await withAuthDatabaseContext(
+      { apiKeyHash: demoApiKeyHash, purpose: "session" },
+      (tx) => tx.apiCredential.findMany({ select: { id: true } })
+    );
+    expect(wrongPurpose).toEqual([]);
+
+    const absentHash = await withAuthDatabaseContext(
+      { purpose: "api_key" },
+      (tx) => tx.apiCredential.findMany({ select: { id: true } })
+    );
+    expect(absentHash).toEqual([]);
+
+    await expect(
+      withAuthDatabaseContext(
+        { apiKeyHash: demoApiKeyHash, purpose: "api_key" },
+        (tx) => tx.apiCredential.update({
+          where: { secretHash: demoApiKeyHash },
+          data: { lastUsedAt: new Date() }
+        })
+      )
+    ).rejects.toThrow();
   });
 
   it("binds bootstrap visibility and mutation to the exact demo subject and slug", async () => {
@@ -317,6 +367,7 @@ async function setControlContext(
       set_config('app.current_user_id', ${context.userId ?? ""}, true),
       set_config('app.current_session_hash', ${context.sessionHash ?? ""}, true),
       set_config('app.current_token_hash', ${context.tokenHash ?? ""}, true),
+      set_config('app.current_api_key_hash', ${context.apiKeyHash ?? ""}, true),
       set_config('app.current_login_email', ${context.loginEmail ?? ""}, true),
       set_config('app.control_purpose', ${context.purpose ?? ""}, true)
   `;

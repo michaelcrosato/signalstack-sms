@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
@@ -102,90 +102,112 @@ enum ProviderPhoneNumberStatus {
   DISABLED
 }
 
+enum CustomerWebhookEndpointStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum CustomerWebhookDeliveryStatus {
+  PENDING
+  PROCESSING
+  DELIVERED
+  FAILED
+  CANCELED
+}
+
 model Organization {
-  id            String         @id @default(cuid())
-  name          String
-  slug          String         @unique
-  clerkOrgId    String?        @unique
-  demoMode      Boolean        @default(true)
-  timezone      String         @default("America/Los_Angeles")
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  memberships   Membership[]
-  contacts      Contact[]
-  tags          Tag[]
-  contactLists  ContactList[]
-  segments      Segment[]
-  contactImports ContactImport[]
-  templates     MessageTemplate[]
-  campaigns     Campaign[]
-  queueJobs     QueueJob[]
-  conversations Conversation[]
-  messages      Message[]
-  internalNotes InternalNote[]
-  complianceProfile ComplianceProfile?
-  usageEvents   UsageEvent[]
-  billingAccount BillingAccount?
-  webhookEvents WebhookEvent[]
-  providerPhoneNumbers ProviderPhoneNumber[]
-  providerCredentials ProviderCredential[]
-  providerCredentialRotations ProviderCredentialRotation[]
-  liveReadinessAuditEvents LiveReadinessAuditEvent[]
-  authSessions  AuthSession[]
-  authTokens    AuthToken[]
+  id                              String                           @id @default(cuid())
+  name                            String
+  slug                            String                           @unique
+  clerkOrgId                      String?                          @unique
+  demoMode                        Boolean                          @default(true)
+  timezone                        String                           @default("America/Los_Angeles")
+  createdAt                       DateTime                         @default(now())
+  updatedAt                       DateTime                         @updatedAt
+  memberships                     Membership[]
+  contacts                        Contact[]
+  tags                            Tag[]
+  contactLists                    ContactList[]
+  segments                        Segment[]
+  contactImports                  ContactImport[]
+  templates                       MessageTemplate[]
+  campaigns                       Campaign[]
+  queueJobs                       QueueJob[]
+  conversations                   Conversation[]
+  messages                        Message[]
+  internalNotes                   InternalNote[]
+  complianceProfile               ComplianceProfile?
+  usageEvents                     UsageEvent[]
+  billingAccount                  BillingAccount?
+  webhookEvents                   WebhookEvent[]
+  providerPhoneNumbers            ProviderPhoneNumber[]
+  providerCredentials             ProviderCredential[]
+  providerCredentialRotations     ProviderCredentialRotation[]
+  liveReadinessAuditEvents        LiveReadinessAuditEvent[]
+  authSessions                    AuthSession[]
+  authTokens                      AuthToken[]
+  apiCredentials                  ApiCredential[]
+  apiIdempotencyRecords           ApiIdempotencyRecord[]
+  integrationAuditEvents          IntegrationAuditEvent[]
+  customerWebhookEndpoints        CustomerWebhookEndpoint[]
+  customerWebhookSubscriptions    CustomerWebhookSubscription[]
+  customerWebhookSigningSecrets   CustomerWebhookSigningSecret[]
+  customerWebhookEvents           CustomerWebhookEvent[]
+  customerWebhookDeliveries       CustomerWebhookDelivery[]
+  customerWebhookDeliveryAttempts CustomerWebhookDeliveryAttempt[]
 }
 
 model AppUser {
-  id              String       @id @default(cuid())
+  id                    String           @id @default(cuid())
   /// Legacy optional external identity subject. Built-in users do not require Clerk.
-  clerkUserId     String?      @unique
-  email           String       @unique
-  normalizedEmail String       @unique
-  displayName     String?
-  emailVerifiedAt DateTime?
-  disabledAt      DateTime?
-  authVersion     Int          @default(1)
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  memberships     Membership[]
-  assignedConversations Conversation[] @relation("ConversationAssignee")
-  internalNotes InternalNote[]
-  localCredential LocalCredential?
-  authSessions AuthSession[]
-  authTokens AuthToken[] @relation("AuthTokenSubject")
-  issuedAuthTokens AuthToken[] @relation("AuthTokenIssuer")
+  clerkUserId           String?          @unique
+  email                 String           @unique
+  normalizedEmail       String           @unique
+  displayName           String?
+  emailVerifiedAt       DateTime?
+  disabledAt            DateTime?
+  authVersion           Int              @default(1)
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  memberships           Membership[]
+  assignedConversations Conversation[]   @relation("ConversationAssignee")
+  internalNotes         InternalNote[]
+  localCredential       LocalCredential?
+  authSessions          AuthSession[]
+  authTokens            AuthToken[]      @relation("AuthTokenSubject")
+  issuedAuthTokens      AuthToken[]      @relation("AuthTokenIssuer")
 
   @@index([disabledAt])
 }
 
 model LocalCredential {
-  id                String   @id @default(cuid())
-  userId            String   @unique
+  id                String    @id @default(cuid())
+  userId            String    @unique
   passwordHash      String
-  passwordChangedAt DateTime @default(now())
-  failedAttempts    Int      @default(0)
+  passwordChangedAt DateTime  @default(now())
+  failedAttempts    Int       @default(0)
   lockedUntil       DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  user              AppUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  user              AppUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([lockedUntil])
 }
 
 model AuthSession {
-  id                String        @id @default(cuid())
-  tokenHash         String        @unique
+  id                String       @id @default(cuid())
+  tokenHash         String       @unique
   userId            String
   orgId             String
   authVersion       Int
-  createdAt         DateTime      @default(now())
-  lastSeenAt        DateTime      @default(now())
+  createdAt         DateTime     @default(now())
+  lastSeenAt        DateTime     @default(now())
   idleExpiresAt     DateTime
   absoluteExpiresAt DateTime
   revokedAt         DateTime?
-  user              AppUser       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  org               Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  membership        Membership    @relation("AuthSessionMembership", fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
+  user              AppUser      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org               Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  membership        Membership   @relation("AuthSessionMembership", fields: [orgId, userId], references: [orgId, userId], onDelete: Cascade)
 
   @@index([orgId, userId])
   @@index([userId, revokedAt])
@@ -233,17 +255,17 @@ model AuthThrottle {
 }
 
 model Membership {
-  id        String         @id @default(cuid())
-  orgId     String
-  userId    String
-  role      MembershipRole @default(MEMBER)
-  status    MembershipStatus @default(ACTIVE)
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-  org       Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  user      AppUser        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  authSessions AuthSession[] @relation("AuthSessionMembership")
-  assignedConversations Conversation[] @relation("ConversationAssigneeMembership")
+  id                    String           @id @default(cuid())
+  orgId                 String
+  userId                String
+  role                  MembershipRole   @default(MEMBER)
+  status                MembershipStatus @default(ACTIVE)
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  org                   Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user                  AppUser          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  authSessions          AuthSession[]    @relation("AuthSessionMembership")
+  assignedConversations Conversation[]   @relation("ConversationAssigneeMembership")
 
   @@unique([orgId, userId])
   @@index([orgId])
@@ -251,37 +273,37 @@ model Membership {
 }
 
 model Contact {
-  id            String        @id @default(cuid())
-  orgId         String
-  phone         String
-  email         String?
-  firstName     String?
-  lastName      String?
-  displayName   String?
-  consentStatus ConsentStatus @default(UNKNOWN)
-  optInSource   String?
-  optInAt       DateTime?
-  optedOutAt    DateTime?
+  id                 String              @id @default(cuid())
+  orgId              String
+  phone              String
+  email              String?
+  firstName          String?
+  lastName           String?
+  displayName        String?
+  consentStatus      ConsentStatus       @default(UNKNOWN)
+  optInSource        String?
+  optInAt            DateTime?
+  optedOutAt         DateTime?
   /// Part of the all-or-none, write-once consent evidence bundle enforced by database migrations.
-  consentCapturedAt DateTime?
+  consentCapturedAt  DateTime?
   /// Part of the all-or-none, write-once consent evidence bundle enforced by database migrations.
-  consentMethod String?
+  consentMethod      String?
   /// Part of the all-or-none, write-once consent evidence bundle enforced by database migrations.
-  consentDisclosure String?
-  source        String?
-  notes         String?
-  leadScore     Int?
-  leadStage     String?
-  leadQualifiedAt DateTime?
-  archivedAt    DateTime?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  org           Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  tagLinks      ContactTag[]
-  listLinks     ContactListMember[]
+  consentDisclosure  String?
+  source             String?
+  notes              String?
+  leadScore          Int?
+  leadStage          String?
+  leadQualifiedAt    DateTime?
+  archivedAt         DateTime?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  org                Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  tagLinks           ContactTag[]
+  listLinks          ContactListMember[]
   campaignRecipients CampaignRecipient[]
-  conversations Conversation[]
-  messages      Message[]
+  conversations      Conversation[]
+  messages           Message[]
 
   @@unique([orgId, id])
   @@unique([orgId, phone])
@@ -367,15 +389,15 @@ model Segment {
 }
 
 model MessageTemplate {
-  id          String       @id @default(cuid())
-  orgId       String
-  name        String
-  body        String
-  variables   Json
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  campaigns   Campaign[]
+  id        String       @id @default(cuid())
+  orgId     String
+  name      String
+  body      String
+  variables Json
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  campaigns Campaign[]
 
   @@unique([orgId, id])
   @@unique([orgId, name])
@@ -399,18 +421,18 @@ model ContactImport {
 }
 
 model Campaign {
-  id          String         @id @default(cuid())
+  id          String              @id @default(cuid())
   orgId       String
   templateId  String?
   name        String
-  status      CampaignStatus @default(DRAFT)
+  status      CampaignStatus      @default(DRAFT)
   body        String
   scheduledAt DateTime?
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  org         Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  org         Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
   /// PostgreSQL migration SQL uses column-specific SET NULL so orgId remains non-null.
-  template    MessageTemplate? @relation(fields: [orgId, templateId], references: [orgId, id], onDelete: SetNull)
+  template    MessageTemplate?    @relation(fields: [orgId, templateId], references: [orgId, id], onDelete: SetNull)
   recipients  CampaignRecipient[]
   queueJobs   QueueJob[]
   messages    Message[]
@@ -441,26 +463,26 @@ model CampaignRecipient {
 }
 
 model Conversation {
-  id               String             @id @default(cuid())
-  orgId            String
-  contactId        String?
-  assignedToUserId String?
-  status           ConversationStatus @default(OPEN)
-  lastMessageAt    DateTime?
-  assignedAt       DateTime?
-  resolvedAt       DateTime?
-  sentiment        String?
-  category         String?
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  org              Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  id                 String             @id @default(cuid())
+  orgId              String
+  contactId          String?
+  assignedToUserId   String?
+  status             ConversationStatus @default(OPEN)
+  lastMessageAt      DateTime?
+  assignedAt         DateTime?
+  resolvedAt         DateTime?
+  sentiment          String?
+  category           String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  org                Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)
   /// PostgreSQL migration SQL uses column-specific SET NULL so orgId remains non-null.
-  contact          Contact?           @relation(fields: [orgId, contactId], references: [orgId, id], onDelete: SetNull)
-  assignedTo       AppUser?           @relation("ConversationAssignee", fields: [assignedToUserId], references: [id], onDelete: SetNull)
+  contact            Contact?           @relation(fields: [orgId, contactId], references: [orgId, id], onDelete: SetNull)
+  assignedTo         AppUser?           @relation("ConversationAssignee", fields: [assignedToUserId], references: [id], onDelete: SetNull)
   /// PostgreSQL migration SQL uses column-specific SET NULL so orgId remains non-null.
-  assignedMembership Membership?      @relation("ConversationAssigneeMembership", fields: [orgId, assignedToUserId], references: [orgId, userId], onDelete: SetNull)
-  messages         Message[]
-  internalNotes    InternalNote[]
+  assignedMembership Membership?        @relation("ConversationAssigneeMembership", fields: [orgId, assignedToUserId], references: [orgId, userId], onDelete: SetNull)
+  messages           Message[]
+  internalNotes      InternalNote[]
 
   @@unique([orgId, id])
   @@index([orgId])
@@ -472,22 +494,22 @@ model Conversation {
 }
 
 model QueueJob {
-  id             String         @id @default(cuid())
-  orgId          String
-  campaignId     String?
-  type           QueueJobType
-  status         QueueJobStatus @default(QUEUED)
-  idempotencyKey String
-  payload        Json
-  runAt          DateTime
-  processingToken String?
+  id                  String         @id @default(cuid())
+  orgId               String
+  campaignId          String?
+  type                QueueJobType
+  status              QueueJobStatus @default(QUEUED)
+  idempotencyKey      String
+  payload             Json
+  runAt               DateTime
+  processingToken     String?
   processingExpiresAt DateTime?
   /// Monotonic durable generation used to distinguish reopened BullMQ mirror jobs.
-  generation     Int            @default(1)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  org            Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  campaign       Campaign?      @relation(fields: [orgId, campaignId], references: [orgId, id], onDelete: Cascade)
+  generation          Int            @default(1)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  org                 Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  campaign            Campaign?      @relation(fields: [orgId, campaignId], references: [orgId, id], onDelete: Cascade)
 
   @@unique([orgId, idempotencyKey])
   @@index([orgId])
@@ -498,27 +520,27 @@ model QueueJob {
 }
 
 model Message {
-  id                  String        @id @default(cuid())
-  orgId               String
-  contactId           String?
-  conversationId      String?
-  campaignId          String?
-  direction           String
-  body                String
-  providerMessageId   String?
-  providerStatus      String?
-  providerErrorCode   String?
-  deliveredAt         DateTime?
-  failedAt            DateTime?
-  idempotencyKey      String
-  createdAt           DateTime      @default(now())
-  org                 Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  id                String        @id @default(cuid())
+  orgId             String
+  contactId         String?
+  conversationId    String?
+  campaignId        String?
+  direction         String
+  body              String
+  providerMessageId String?
+  providerStatus    String?
+  providerErrorCode String?
+  deliveredAt       DateTime?
+  failedAt          DateTime?
+  idempotencyKey    String
+  createdAt         DateTime      @default(now())
+  org               Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
   /// PostgreSQL migration SQL uses column-specific SET NULL so orgId remains non-null.
-  contact             Contact?      @relation(fields: [orgId, contactId], references: [orgId, id], onDelete: SetNull)
+  contact           Contact?      @relation(fields: [orgId, contactId], references: [orgId, id], onDelete: SetNull)
   /// PostgreSQL migration SQL uses column-specific SET NULL so orgId remains non-null.
-  conversation        Conversation? @relation(fields: [orgId, conversationId], references: [orgId, id], onDelete: SetNull)
+  conversation      Conversation? @relation(fields: [orgId, conversationId], references: [orgId, id], onDelete: SetNull)
   /// PostgreSQL migration SQL uses column-specific SET NULL so orgId remains non-null.
-  campaign            Campaign?     @relation(fields: [orgId, campaignId], references: [orgId, id], onDelete: SetNull)
+  campaign          Campaign?     @relation(fields: [orgId, campaignId], references: [orgId, id], onDelete: SetNull)
 
   @@unique([orgId, idempotencyKey])
   @@unique([orgId, providerMessageId])
@@ -550,17 +572,17 @@ model InternalNote {
 }
 
 model ComplianceProfile {
-  id                 String                @id @default(cuid())
-  orgId              String                @unique
-  businessName       String?
-  messagingUseCase   String?
-  optInDescription   String?
-  privacyPolicyUrl   String?
-  termsOfServiceUrl  String?
+  id                    String                @id @default(cuid())
+  orgId                 String                @unique
+  businessName          String?
+  messagingUseCase      String?
+  optInDescription      String?
+  privacyPolicyUrl      String?
+  termsOfServiceUrl     String?
   a2pRegistrationStatus A2pRegistrationStatus @default(NOT_STARTED)
-  createdAt          DateTime              @default(now())
-  updatedAt          DateTime              @updatedAt
-  org                Organization          @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  org                   Organization          @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
   @@index([orgId])
 }
@@ -580,15 +602,15 @@ model UsageEvent {
 }
 
 model BillingAccount {
-  id                  String               @id @default(cuid())
-  orgId               String               @unique
-  status              BillingAccountStatus @default(DEMO)
-  liveBillingEnabled  Boolean              @default(false)
-  stripeCustomerId    String?
+  id                   String               @id @default(cuid())
+  orgId                String               @unique
+  status               BillingAccountStatus @default(DEMO)
+  liveBillingEnabled   Boolean              @default(false)
+  stripeCustomerId     String?
   stripeSubscriptionId String?
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  org                 Organization         @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  org                  Organization         @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
   @@index([orgId])
   @@index([status])
@@ -615,19 +637,19 @@ model ProviderPhoneNumber {
 }
 
 model ProviderCredential {
-  id                    String       @id @default(cuid())
-  orgId                 String
-  provider              String
-  accountSidRedacted    String?
-  accountSidLast4       String?
-  authTokenFingerprint  String?
-  authTokenConfigured   Boolean      @default(false)
-  fromNumberRedacted    String?
-  fromNumberLast4       String?
-  source                String       @default("local_metadata")
-  createdAt             DateTime     @default(now())
-  updatedAt             DateTime     @updatedAt
-  org                   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  id                   String       @id @default(cuid())
+  orgId                String
+  provider             String
+  accountSidRedacted   String?
+  accountSidLast4      String?
+  authTokenFingerprint String?
+  authTokenConfigured  Boolean      @default(false)
+  fromNumberRedacted   String?
+  fromNumberLast4      String?
+  source               String       @default("local_metadata")
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  org                  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
   @@unique([orgId, provider])
   @@index([orgId])
@@ -635,23 +657,23 @@ model ProviderCredential {
 }
 
 model ProviderCredentialRotation {
-  id                       String       @id @default(cuid())
-  orgId                    String
-  provider                 String
-  providerCredentialId     String?
-  action                   String
-  actorUserId              String?
-  accountSidRedacted       String?
-  accountSidLast4          String?
-  fromNumberRedacted       String?
-  fromNumberLast4          String?
-  authTokenConfigured      Boolean      @default(false)
-  previousAccountSidLast4  String?
-  previousFromNumberLast4  String?
-  previousAuthTokenConfigured Boolean   @default(false)
-  source                   String       @default("local_metadata")
-  createdAt                DateTime     @default(now())
-  org                      Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  id                          String       @id @default(cuid())
+  orgId                       String
+  provider                    String
+  providerCredentialId        String?
+  action                      String
+  actorUserId                 String?
+  accountSidRedacted          String?
+  accountSidLast4             String?
+  fromNumberRedacted          String?
+  fromNumberLast4             String?
+  authTokenConfigured         Boolean      @default(false)
+  previousAccountSidLast4     String?
+  previousFromNumberLast4     String?
+  previousAuthTokenConfigured Boolean      @default(false)
+  source                      String       @default("local_metadata")
+  createdAt                   DateTime     @default(now())
+  org                         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
   @@index([orgId])
   @@index([orgId, provider])
@@ -661,15 +683,15 @@ model ProviderCredentialRotation {
 }
 
 model LiveReadinessAuditEvent {
-  id           String       @id @default(cuid())
-  orgId        String
-  actorUserId  String?
-  action       String
-  subjectType  String
-  subjectId    String?
-  metadata     Json?
-  createdAt    DateTime     @default(now())
-  org          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  id          String       @id @default(cuid())
+  orgId       String
+  actorUserId String?
+  action      String
+  subjectType String
+  subjectId   String?
+  metadata    Json?
+  createdAt   DateTime     @default(now())
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
   @@index([orgId])
   @@index([orgId, actorUserId])
@@ -696,4 +718,226 @@ model WebhookEvent {
   @@index([orgId, provider, eventType])
   @@index([orgId, processedAt, claimExpiresAt])
   @@index([receivedAt])
+}
+
+model ApiCredential {
+  id                  String                  @id @default(cuid())
+  orgId               String
+  name                String
+  prefix              String                  @unique
+  secretHash          String                  @unique
+  scopes              String[]
+  rateLimitPerMinute  Int                     @default(60)
+  rateWindowStartedAt DateTime?
+  rateRequestCount    Int                     @default(0)
+  expiresAt           DateTime?
+  lastUsedAt          DateTime?
+  lastUsedIpHash      String?
+  revokedAt           DateTime?
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
+  org                 Organization            @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  idempotencyRecords  ApiIdempotencyRecord[]
+  auditEvents         IntegrationAuditEvent[]
+
+  @@unique([orgId, id])
+  @@index([orgId])
+  @@index([orgId, revokedAt, expiresAt])
+}
+
+model ApiIdempotencyRecord {
+  id              String        @id @default(cuid())
+  orgId           String
+  credentialId    String
+  key             String
+  method          String
+  canonicalRoute  String
+  requestHash     String
+  responseStatus  Int
+  responseBody    Json
+  responseHeaders Json
+  expiresAt       DateTime
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  org             Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  credential      ApiCredential @relation(fields: [orgId, credentialId], references: [orgId, id], onDelete: Restrict)
+
+  @@unique([orgId, id])
+  @@unique([orgId, credentialId, key])
+  @@index([orgId])
+  @@index([orgId, expiresAt])
+  @@index([credentialId])
+}
+
+model IntegrationAuditEvent {
+  id              String         @id @default(cuid())
+  orgId           String
+  actorUserId     String?
+  apiCredentialId String?
+  action          String
+  subjectType     String
+  subjectId       String?
+  metadata        Json?
+  createdAt       DateTime       @default(now())
+  org             Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  apiCredential   ApiCredential? @relation(fields: [orgId, apiCredentialId], references: [orgId, id], onDelete: Restrict)
+
+  @@unique([orgId, id])
+  @@index([orgId])
+  @@index([orgId, apiCredentialId])
+  @@index([orgId, actorUserId])
+  @@index([orgId, action, createdAt])
+  @@index([orgId, subjectType, subjectId])
+}
+
+model CustomerWebhookEndpoint {
+  id                  String                        @id @default(cuid())
+  orgId               String
+  name                String
+  canonicalUrl        String
+  status              CustomerWebhookEndpointStatus @default(ACTIVE)
+  consecutiveFailures Int                           @default(0)
+  lastFailureAt       DateTime?
+  lastSuccessAt       DateTime?
+  disabledAt          DateTime?
+  createdAt           DateTime                      @default(now())
+  updatedAt           DateTime                      @updatedAt
+  org                 Organization                  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  subscriptions       CustomerWebhookSubscription[]
+
+  @@unique([orgId, id])
+  @@unique([orgId, canonicalUrl])
+  @@index([orgId])
+  @@index([orgId, status])
+}
+
+model CustomerWebhookSubscription {
+  id             String                         @id @default(cuid())
+  orgId          String
+  endpointId     String
+  eventTypes     String[]
+  createdAt      DateTime                       @default(now())
+  updatedAt      DateTime                       @updatedAt
+  org            Organization                   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  endpoint       CustomerWebhookEndpoint        @relation(fields: [orgId, endpointId], references: [orgId, id], onDelete: Restrict)
+  signingSecrets CustomerWebhookSigningSecret[]
+  deliveries     CustomerWebhookDelivery[]
+
+  @@unique([orgId, id])
+  @@unique([orgId, endpointId])
+  @@unique([orgId, endpointId, id])
+  @@index([orgId])
+  @@index([endpointId])
+}
+
+model CustomerWebhookSigningSecret {
+  id              String                      @id @default(cuid())
+  orgId           String
+  subscriptionId  String
+  version         Int
+  envelopeVersion Int                         @default(1)
+  algorithm       String                      @default("aes-256-gcm")
+  ciphertext      String
+  iv              String
+  authTag         String
+  keyVersion      Int
+  fingerprint     String
+  activeFrom      DateTime                    @default(now())
+  retiredAt       DateTime?
+  createdAt       DateTime                    @default(now())
+  org             Organization                @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  subscription    CustomerWebhookSubscription @relation(fields: [orgId, subscriptionId], references: [orgId, id], onDelete: Restrict)
+  deliveries      CustomerWebhookDelivery[]
+
+  @@unique([orgId, id])
+  @@unique([orgId, subscriptionId, id])
+  @@unique([orgId, subscriptionId, version])
+  @@index([orgId])
+  @@index([subscriptionId])
+}
+
+model CustomerWebhookEvent {
+  id               String                    @id @default(cuid())
+  orgId            String
+  deduplicationKey String
+  type             String
+  schemaVersion    Int                       @default(1)
+  aggregateType    String
+  aggregateId      String?
+  payloadText      String
+  payloadHash      String
+  occurredAt       DateTime
+  createdAt        DateTime                  @default(now())
+  org              Organization              @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  deliveries       CustomerWebhookDelivery[]
+
+  @@unique([orgId, id])
+  @@unique([orgId, deduplicationKey])
+  @@index([orgId])
+  @@index([orgId, type, occurredAt])
+  @@index([orgId, aggregateType, aggregateId])
+}
+
+model CustomerWebhookDelivery {
+  id                  String                           @id @default(cuid())
+  orgId               String
+  endpointId          String
+  subscriptionId      String
+  eventId             String
+  signingSecretId     String
+  status              CustomerWebhookDeliveryStatus    @default(PENDING)
+  attemptCount        Int                              @default(0)
+  maxAttempts         Int                              @default(8)
+  nextAttemptAt       DateTime                         @default(now())
+  processingToken     String?
+  processingExpiresAt DateTime?
+  generation          Int                              @default(1)
+  replayOfDeliveryId  String?
+  deliveredAt         DateTime?
+  failedAt            DateTime?
+  lastStatusCode      Int?
+  lastErrorCode       String?
+  createdAt           DateTime                         @default(now())
+  updatedAt           DateTime                         @updatedAt
+  org                 Organization                     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  subscription        CustomerWebhookSubscription      @relation(fields: [orgId, endpointId, subscriptionId], references: [orgId, endpointId, id], onDelete: Restrict)
+  event               CustomerWebhookEvent             @relation(fields: [orgId, eventId], references: [orgId, id], onDelete: Restrict)
+  signingSecret       CustomerWebhookSigningSecret     @relation(fields: [orgId, subscriptionId, signingSecretId], references: [orgId, subscriptionId, id], onDelete: Restrict)
+  replayOf            CustomerWebhookDelivery?         @relation("CustomerWebhookDeliveryReplay", fields: [orgId, endpointId, eventId, replayOfDeliveryId], references: [orgId, endpointId, eventId, id], onDelete: Restrict)
+  replays             CustomerWebhookDelivery[]        @relation("CustomerWebhookDeliveryReplay")
+  attempts            CustomerWebhookDeliveryAttempt[]
+
+  @@unique([orgId, id])
+  @@unique([orgId, id, generation])
+  @@unique([orgId, endpointId, eventId, id])
+  @@unique([orgId, endpointId, eventId, generation])
+  @@index([orgId])
+  @@index([orgId, status, nextAttemptAt, processingExpiresAt])
+  @@index([orgId, replayOfDeliveryId])
+  @@index([eventId])
+  @@index([signingSecretId])
+  @@index([subscriptionId])
+}
+
+model CustomerWebhookDeliveryAttempt {
+  id               String                  @id @default(cuid())
+  orgId            String
+  deliveryId       String
+  generation       Int
+  attemptNumber    Int
+  requestTimestamp DateTime
+  statusCode       Int?
+  outcome          String?
+  errorCode        String?
+  startedAt        DateTime
+  finishedAt       DateTime?
+  createdAt        DateTime                @default(now())
+  org              Organization            @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  delivery         CustomerWebhookDelivery @relation(fields: [orgId, deliveryId, generation], references: [orgId, id, generation], onDelete: Restrict)
+
+  @@unique([orgId, id])
+  @@unique([orgId, deliveryId, generation, attemptNumber])
+  @@index([orgId])
+  @@index([orgId, deliveryId, createdAt])
+  @@index([deliveryId])
 }
