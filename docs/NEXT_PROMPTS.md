@@ -9,9 +9,8 @@ This is the compact handoff for the next automated loop. History lives in `git l
 3. `npm run agent:brief`
 4. `PLAN.md`
 5. `docs/CURRENT_STATE_MATRIX.md`
-6. `planning/CONSENSUS-2026-05-21.md`
-7. `contracts/**` with targeted reads
-8. `docs/LOCAL_GATE.md`
+6. `contracts/**` with targeted reads
+7. `docs/LOCAL_GATE.md`
 
 ## Current State
 

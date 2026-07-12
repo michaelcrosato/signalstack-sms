@@ -52,7 +52,6 @@ Current handoffs: `SUMMARY.codex.md`, `BLOCKERS.codex.md`, `docs/NEXT_PROMPTS.md
 
 ## Skip / read-with-care
 
-- **Skip** (in `.aiignore`): `node_modules/`, `.next/`, `codex-runs/` (50 stale agent logs), `package-lock.json`, `*.tsbuildinfo`, `test-results/`, `docs/loop-artifacts/`.
-- **Targeted `rg` only** (huge): `tests/unit/auth/api-route-authorization.test.ts` (~512KB), `tests/unit/queue/live-worker-controls.test.ts` (~464KB), `contracts/CONTRACT-TESTING.md` (~119KB), `docs/CANONICAL_IMPLEMENTATION_PLAN.md` (~2.7k lines).
-- `planning/*-2026-05-21.md` are dated snapshots; read `planning/CONSENSUS-2026-05-21.md` for the summary.
+- **Skip** (in `.aiignore`): `node_modules/`, `.next/`, `package-lock.json`, `*.tsbuildinfo`, `test-results/`, `docs/loop-artifacts/`.
+- **Targeted `rg` only** (large): `docs/CANONICAL_IMPLEMENTATION_PLAN.md` (~2.7k lines), `tests/unit/auth/api-route-authorization.test.ts` (~2.2k lines).
 - Run history is in `git log` (there is no LOOP_LOG file).

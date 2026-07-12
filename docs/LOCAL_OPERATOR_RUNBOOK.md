@@ -121,16 +121,12 @@ for that identity across organizations. Failures print only a stable sanitized c
 ## Autonomous Codex Loop
 
 ```powershell
-.\codex-skynet-max.ps1 -FullYolo -KeepAwake
+pwsh scripts/agent/afk-12h.ps1
 ```
 
-The loop is endless by default. Use `-FuseMinutes <minutes>` only for a capped run. Failed commands or protected gates are not green handoffs.
-
-For a strict one-shot launch check:
-
-```powershell
-.\codex-skynet-max.ps1 -PreflightOnly
-```
+The AFK wrapper delegates to the integrity-pinned `scripts/run-codex-yolo-loop.ps1`; run
+`npm run afk:preflight` first for a one-shot launch check. Failed commands or protected gates are not
+green handoffs. See `docs/AFK_RUNBOOK.md` for session policy.
 
 Run the seeded investor path after changes to pages, APIs, seed data, provider metadata, exports, campaigns, inbox, AI, analytics, billing, or middleware:
 

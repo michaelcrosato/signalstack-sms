@@ -153,9 +153,6 @@ signalstack-sms/
 ├─ README.md
 ├─ PLAN.md
 ├─ AGENTS.md
-├─ CONTRACTS.md
-├─ SUMMARY.bootstrap.md
-├─ BLOCKERS.bootstrap.md
 ├─ .env.example
 ├─ .gitignore
 ├─ package.json
@@ -304,23 +301,6 @@ signalstack-sms/
 │  ├─ NEXT_PROMPTS.md
 │  ├─ DECISIONS.md
 │  └─ SCHEMA_CHANGELOG.md
-├─ prompts/
-│  ├─ README.md
-│  ├─ shared/
-│  │  ├─ LOOP.md
-│  │  ├─ MERGE.md
-│  │  └─ SPRINT-ROLLOVER.md
-│  ├─ codex/
-│  │  └─ LOOP.md
-│  ├─ claude/
-│  │  └─ LOOP.md
-│  ├─ gemini/
-│  │  └─ LOOP.md
-│  ├─ grok/
-│  │  └─ LOOP.md
-│  └─ manager/
-│     ├─ INTEGRATION.md
-│     └─ DISPATCH.md
 ├─ lib/
 │  ├─ auth/
 │  │  ├─ clerk.ts
@@ -2529,7 +2509,6 @@ COMPLETE MILESTONE 0 ONLY:
    - e2e/
    - docs/
    - contracts/
-   - prompts/
    - .github/workflows/
    - .cursor/rules/
 3. Create required source-of-truth docs:
