@@ -80,6 +80,7 @@ ingress, and rejects `DEMO_MODE=true` without `ALLOW_PRODUCTION_DEMO=true`
 - [`docs/STANDALONE_ROADMAP.md`](docs/STANDALONE_ROADMAP.md) — governing product roadmap, milestone graph, acceptance evidence.
 - [`ROADMAP.md`](ROADMAP.md) — operational milestone view mapped to [`tickets/`](tickets/).
 - [`AGENTS.md`](AGENTS.md) + [`docs/ai/REPO_MAP.md`](docs/ai/REPO_MAP.md) — autonomous-agent instructions and where code lives.
+- [`docs/KNOWN_LIMITATIONS.md`](docs/KNOWN_LIMITATIONS.md) — honest register of remaining gaps and risks.
 - [`contracts/`](contracts/) — executable behavior contracts (`npm run contracts:check` enforces).
 - [`plan/`](plan/) — specs backlog (`plan/specs/SPEC-*.md`).
 - [`docs/CANONICAL_IMPLEMENTATION_PLAN.md`](docs/CANONICAL_IMPLEMENTATION_PLAN.md) — historical bootstrap-era contract.

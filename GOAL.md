@@ -67,6 +67,12 @@ ledger in `docs/STANDALONE_ROADMAP.md` to be backed by current tests or deployme
 - Default provider is `dummy`; carrier calls require explicit, evidence-backed activation.
 - Protected axioms and integrity-gate files remain human-owned.
 
+## Known limitations
+
+Gaps that survive the current state — deployment-dependent latent bugs, human-gated webhook/live paths,
+and minor correctness rough edges — are recorded honestly in
+[`docs/KNOWN_LIMITATIONS.md`](docs/KNOWN_LIMITATIONS.md). None block the demo-safe product.
+
 ## Agent guidance
 
 - Read `docs/STANDALONE_ROADMAP.md`, this file, `docs/CURRENT_STATE_MATRIX.md`, and
