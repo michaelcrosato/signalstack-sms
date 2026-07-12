@@ -54,11 +54,17 @@ export async function recordUsageEvent(orgId: string, input: UsageEventCreateInp
 
 export async function getUsageSummary(orgId: string) {
   return withTenantTransaction({ orgId }, async (tx) => {
-    const [billingAccount, events] = await Promise.all([
+    const [billingAccount, groupedTotals, recentEvents] = await Promise.all([
       tx.billingAccount.upsert({
         where: { orgId },
         update: { liveBillingEnabled: false },
         create: { orgId, status: BillingAccountStatus.DEMO, liveBillingEnabled: false }
+      }),
+      // Aggregate every event so totals stay correct past the recent-events display window.
+      tx.usageEvent.groupBy({
+        by: ["type"],
+        where: { orgId },
+        _sum: { quantity: true }
       }),
       tx.usageEvent.findMany({
         where: { orgId },
@@ -67,11 +73,16 @@ export async function getUsageSummary(orgId: string) {
       })
     ]);
 
+    const totals = emptyUsageTotals();
+    for (const group of groupedTotals) {
+      totals[group.type] = group._sum.quantity ?? 0;
+    }
+
     return {
       billingAccount,
       liveBillingBlocked: liveBillingIsBlocked(),
-      totals: aggregateUsageEvents(events),
-      recentEvents: events
+      totals,
+      recentEvents
     };
   });
 }

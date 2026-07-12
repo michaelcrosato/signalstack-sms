@@ -25,7 +25,19 @@ export async function POST(request: Request) {
   }
 
   const parsed = await parseContactImport(payload.data.csv);
-  const contactImport = await importContacts(currentOrg.orgId, parsed, payload.data.filename);
+
+  let contactImport;
+  try {
+    contactImport = await importContacts(currentOrg.orgId, parsed, payload.data.filename);
+  } catch (error) {
+    // Consent evidence is write-once: an import that would rewrite existing evidence is rejected
+    // whole (fail-closed) rather than partially applied. Surface it as a clean 422, not a 500.
+    const message = error instanceof Error ? error.message : "Contact import failed.";
+    if (message.includes("Consent evidence")) {
+      return NextResponse.json({ error: message }, { status: 422 });
+    }
+    throw error;
+  }
 
   return NextResponse.json({
     import: contactImport,

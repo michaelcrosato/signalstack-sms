@@ -100,9 +100,7 @@ export async function updateContact(orgId: string, contactId: string, input: Con
       }
     });
 
-    if (input.tagNames || input.listNames) {
-      await syncContactLabels(tx, orgId, contact.id, input.tagNames ?? [], input.listNames ?? []);
-    }
+    await syncContactLabels(tx, orgId, contact.id, input.tagNames, input.listNames);
 
     return tx.contact.findUniqueOrThrow({ where: { id: contact.id }, include: contactInclude });
   });
@@ -289,46 +287,52 @@ function contactWriteData(input: Partial<ContactCreateInput>) {
   };
 }
 
+// Each collection is synced only when its argument is provided. An `undefined` collection is left
+// untouched, so a partial update (e.g. PATCH with only `tagNames`) cannot clear the other collection.
+// Callers that intend to clear a collection must pass an explicit empty array.
 async function syncContactLabels(
   tx: Prisma.TransactionClient,
   orgId: string,
   contactId: string,
-  tagNames: string[],
-  listNames: string[]
+  tagNames: string[] | undefined,
+  listNames: string[] | undefined
 ) {
-  await tx.contactTag.deleteMany({ where: { orgId, contactId } });
-  await tx.contactListMember.deleteMany({ where: { orgId, contactId } });
-
-  const uniqueTagNames = uniqueNames(tagNames);
-  if (uniqueTagNames.length > 0) {
-    await tx.tag.createMany({
-      data: uniqueTagNames.map((name) => ({ orgId, name })),
-      skipDuplicates: true
-    });
-    const tags = await tx.tag.findMany({
-      where: { orgId, name: { in: uniqueTagNames } },
-      select: { id: true }
-    });
-    await tx.contactTag.createMany({
-      data: tags.map((tag) => ({ orgId, contactId, tagId: tag.id })),
-      skipDuplicates: true
-    });
+  if (tagNames !== undefined) {
+    await tx.contactTag.deleteMany({ where: { orgId, contactId } });
+    const uniqueTagNames = uniqueNames(tagNames);
+    if (uniqueTagNames.length > 0) {
+      await tx.tag.createMany({
+        data: uniqueTagNames.map((name) => ({ orgId, name })),
+        skipDuplicates: true
+      });
+      const tags = await tx.tag.findMany({
+        where: { orgId, name: { in: uniqueTagNames } },
+        select: { id: true }
+      });
+      await tx.contactTag.createMany({
+        data: tags.map((tag) => ({ orgId, contactId, tagId: tag.id })),
+        skipDuplicates: true
+      });
+    }
   }
 
-  const uniqueListNames = uniqueNames(listNames);
-  if (uniqueListNames.length > 0) {
-    await tx.contactList.createMany({
-      data: uniqueListNames.map((name) => ({ orgId, name })),
-      skipDuplicates: true
-    });
-    const lists = await tx.contactList.findMany({
-      where: { orgId, name: { in: uniqueListNames } },
-      select: { id: true }
-    });
-    await tx.contactListMember.createMany({
-      data: lists.map((list) => ({ orgId, contactId, listId: list.id })),
-      skipDuplicates: true
-    });
+  if (listNames !== undefined) {
+    await tx.contactListMember.deleteMany({ where: { orgId, contactId } });
+    const uniqueListNames = uniqueNames(listNames);
+    if (uniqueListNames.length > 0) {
+      await tx.contactList.createMany({
+        data: uniqueListNames.map((name) => ({ orgId, name })),
+        skipDuplicates: true
+      });
+      const lists = await tx.contactList.findMany({
+        where: { orgId, name: { in: uniqueListNames } },
+        select: { id: true }
+      });
+      await tx.contactListMember.createMany({
+        data: lists.map((list) => ({ orgId, contactId, listId: list.id })),
+        skipDuplicates: true
+      });
+    }
   }
 }
 

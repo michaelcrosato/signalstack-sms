@@ -195,11 +195,16 @@ Rollback is the hosting platform's previous build plus database migration discip
 These values must remain available to force the product back into a no-external-impact posture:
 
 ```bash
-DEMO_MODE=true
 LIVE_MESSAGING_ENABLED=false
 LIVE_BILLING_ENABLED=false
 MESSAGING_PROVIDER=dummy
 AI_PROVIDER=fake
 ```
+
+Do **not** flip `DEMO_MODE=true` on a production deployment as an incident switch: demo mode disables
+authentication and would grant every anonymous visitor an owner session. Production posture rejects
+`DEMO_MODE=true` (config parse failure plus the `DEMO_MODE_WITHOUT_PRODUCTION_DEMO_ACK` deployment
+blocker) unless `ALLOW_PRODUCTION_DEMO=true` explicitly acknowledges an intentionally public,
+throwaway demo deployment.
 
 If the app is deployed with any production-like environment marker, `npm run production:gate` must still pass before the deployment is considered valid.

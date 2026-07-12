@@ -7,26 +7,26 @@ Stack: Next.js App Router + TypeScript (strict) + Prisma/Postgres + BullMQ/Redis
 
 | What | Where |
 | --- | --- |
-| Web app (App Router) | `app/` — `page.tsx` (marketing), `dashboard/**` (product), `settings/**` (operations), `demo/**` (gated live-test SMS) |
+| Web app (App Router) | `app/` — `page.tsx` (marketing), `dashboard/**` (product), `settings/**` (operations), `demo/**` (gated live-test SMS), `login|setup|team|organizations|account|reset|invite|logout/**` (built-in local identity) |
 | API route handlers | `app/api/**/route.ts` (Zod-validated; RBAC via `lib/auth`) |
 | Request middleware | `middleware.ts` |
 | Queue workers (local/demo only) | `workers/index.ts` (DB), `workers/bullmq.ts` (BullMQ) |
 
-## Core logic — `lib/` (78 files)
+## Core logic — `lib/` (~116 files)
 
 | Domain | Path | Notes |
 | --- | --- | --- |
-| DB | `lib/db/` | `prisma.ts`, `tenant.ts` (orgId guard), `repositories/**` (tenant-scoped) |
+| DB | `lib/db/` | `prisma.ts`, `tenant.ts` (orgId guard), `tenant-context.ts` (fail-closed tenant transactions), `runtime-posture.ts` (role/RLS attestation), `repositories/**` (tenant-scoped) |
 | Validation | `lib/validation/` | Zod schemas per domain (boundary contracts) |
 | Messaging | `lib/messaging/` | `provider/**` adapter (dummy/twilio), `render-template`, `send-preflight`, `twilio-webhooks`, `delivery-*` |
 | Queue | `lib/queue/` | `worker`, `bullmq*`, `jobs`, `idempotency`, `live-worker-controls` (frozen hard-gate metadata) |
 | Compliance | `lib/compliance/` | `gates`, `opt-out`, `readiness-audit-export` |
-| Auth/RBAC | `lib/auth/` | `api-authorization`, `api-rbac-matrix`, `current-org`, `demo-session`, `roles` |
+| Auth/RBAC | `lib/auth/` | built-in local identity: `crypto` (scrypt/HMAC), `local-credentials`, `local-session`, `session-cookie`, `auth-api`, `auth-throttle`, `team-service`, `organization-service`, `password-reset-service`, `operator-*`; boundaries: `api-authentication`, `page-authentication`, `api-rbac-matrix`, `current-org`, `roles`; demo: `demo-session`; legacy inert seam: `session.ts` |
 | AI (fake) | `lib/ai/` | `fake-ai-provider`, `conversation-context`, `usage` |
 | Billing/Analytics/CSV | `lib/billing/`, `lib/analytics/`, `lib/csv/` | local usage metering, overview, contact import |
 | Product projections | `lib/product/` | UI-facing frozen view models + `*-defaults` for `app/dashboard/**` |
 | Operations (read-only) | `lib/operations/` | inventory backing `app/settings/**` |
-| Deployment/Env/Rate-limit | `lib/deployment/`, `lib/env/`, `lib/rate-limit/` | `production-gate`, demo-safe `defaults`, in-memory limiter |
+| Deployment/Env/Rate-limit | `lib/deployment/`, `lib/env/`, `lib/rate-limit/` | `production-gate`, demo-safe `defaults`, `runtime-config` (parsed/validated posture contract), in-memory limiter |
 
 ## Data model
 

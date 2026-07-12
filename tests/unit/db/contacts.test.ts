@@ -6,7 +6,8 @@ import {
   listArchivedContacts,
   getContact,
   archiveContact,
-  mergeContacts
+  mergeContacts,
+  updateContact
 } from "@/lib/db/repositories/contacts";
 import { prisma } from "@/lib/db/prisma";
 
@@ -136,6 +137,67 @@ describe("contacts repository", () => {
         data: expect.objectContaining({ archivedAt: expect.any(Date) })
       });
       expect(result).toBeDefined();
+    });
+  });
+
+  describe("updateContact label sync", () => {
+    function setupUpdateTransaction() {
+      const contactTag = { deleteMany: vi.fn(), createMany: vi.fn() };
+      const contactListMember = { deleteMany: vi.fn(), createMany: vi.fn() };
+      mocks.transaction.mockImplementation(async (callback) =>
+        callback({
+          contact: {
+            findFirst: mocks.findFirst,
+            update: mocks.update,
+            findUniqueOrThrow: mocks.findUniqueOrThrow
+          },
+          contactTag,
+          contactListMember,
+          tag: { createMany: vi.fn(), findMany: vi.fn().mockResolvedValue([]) },
+          contactList: { createMany: vi.fn(), findMany: vi.fn().mockResolvedValue([]) }
+        })
+      );
+      mocks.findFirst.mockResolvedValue(defaultContact);
+      mocks.update.mockResolvedValue(defaultContact);
+      mocks.findUniqueOrThrow.mockResolvedValue(defaultContact);
+      return { contactTag, contactListMember };
+    }
+
+    it("does not clear list memberships when only tagNames is provided", async () => {
+      const { contactTag, contactListMember } = setupUpdateTransaction();
+
+      await updateContact(orgId, contactId, { tagNames: ["vip"] });
+
+      expect(contactTag.deleteMany).toHaveBeenCalledOnce();
+      // Lists were not part of the patch, so they must be left untouched.
+      expect(contactListMember.deleteMany).not.toHaveBeenCalled();
+    });
+
+    it("does not clear tags when only listNames is provided", async () => {
+      const { contactTag, contactListMember } = setupUpdateTransaction();
+
+      await updateContact(orgId, contactId, { listNames: ["newsletter"] });
+
+      expect(contactListMember.deleteMany).toHaveBeenCalledOnce();
+      expect(contactTag.deleteMany).not.toHaveBeenCalled();
+    });
+
+    it("leaves both collections untouched when neither is provided", async () => {
+      const { contactTag, contactListMember } = setupUpdateTransaction();
+
+      await updateContact(orgId, contactId, { displayName: "Renamed" });
+
+      expect(contactTag.deleteMany).not.toHaveBeenCalled();
+      expect(contactListMember.deleteMany).not.toHaveBeenCalled();
+    });
+
+    it("clears a collection when an explicit empty array is provided", async () => {
+      const { contactTag } = setupUpdateTransaction();
+
+      await updateContact(orgId, contactId, { tagNames: [] });
+
+      expect(contactTag.deleteMany).toHaveBeenCalledOnce();
+      expect(contactTag.createMany).not.toHaveBeenCalled();
     });
   });
 
