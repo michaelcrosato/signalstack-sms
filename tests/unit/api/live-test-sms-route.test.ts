@@ -27,7 +27,7 @@ const operatorToken = "test-operator-token-32-characters-minimum";
 function liveTestRequest() {
   return new Request("http://localhost/api/demo/live-test-sms", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", Origin: "http://localhost", Host: "localhost" },
     body: JSON.stringify({
       requestId,
       to: "+15879873814",

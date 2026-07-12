@@ -3,6 +3,11 @@ import { spawnSync } from "node:child_process";
 
 const scripts = [
   "contracts:check",
+  "standalone:check",
+  "tenant:boundary:check",
+  "tenant:integrity:preflight",
+  "docker:context:check",
+  "runtime:check",
   "secrets:scan",
   "compliance:check",
   "production:gate",
@@ -19,9 +24,10 @@ const scripts = [
   "db:validate",
   "db:generate",
   "test",
+  ...(process.env.RUN_DB_TESTS === "true" ? ["test:tenant-db"] : []),
   "test:e2e:smoke",
   "build"
-] as const;
+];
 
 function npmCliPath() {
   const npmExecPath = process.env.npm_execpath;

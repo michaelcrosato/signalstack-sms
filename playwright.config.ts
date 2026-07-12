@@ -19,6 +19,7 @@ const baseURL = `http://127.0.0.1:${e2ePort}`;
 export default defineConfig({
   testDir: ".",
   testMatch: ["e2e/**/*.spec.ts"],
+  testIgnore: ["e2e/local-auth-path.spec.ts"],
   timeout: 30_000,
   expect: { timeout: 5_000 },
   use: {

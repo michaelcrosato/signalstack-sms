@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { createDemoInboundMessage } from "@/lib/db/repositories/inbox";
 import {
   markWebhookEventProcessed,
@@ -35,7 +35,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid Twilio inbound payload." }, { status: 400 });
   }
 
-  const current = await getOrCreateCurrentOrg();
+  const authentication = await authenticateApiRequest({ boundary: "signed-webhook" });
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const current = authentication.currentOrg;
   const recorded = await recordWebhookEvent({
     orgId: current.orgId,
     provider: "twilio",

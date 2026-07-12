@@ -1,0 +1,54 @@
+# Version-control and local agent state
+.git
+.git/**
+.agents
+.agent-cleaner
+
+# Local environment files and secrets; the placeholder template is safe to retain.
+.env
+.env.*
+!.env.example
+
+# Dependency and framework build output
+node_modules
+node_modules/**
+**/node_modules
+**/node_modules/**
+.next
+.next/**
+dist
+dist/**
+out
+out/**
+
+# Test, coverage, and automation artifacts
+coverage
+coverage/**
+playwright-report
+playwright-report/**
+test-results
+test-results/**
+codex-runs
+codex-runs/**
+
+# Runtime data must never be copied into an application image.
+backups
+backups/**
+media
+media/**
+uploads
+uploads/**
+runtime-data
+runtime-data/**
+data
+data/**
+
+# Logs and local compiler caches
+*.log
+**/*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tsbuildinfo
+**/*.tsbuildinfo

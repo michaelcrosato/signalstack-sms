@@ -39,6 +39,15 @@ vi.mock("@/lib/db/prisma", () => ({
 describe("Campaigns Repository", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.transaction.mockImplementation(async (callback) => callback({
+      campaign: {
+        findMany: mocks.campaignFindMany,
+        findFirst: mocks.campaignFindFirst
+      },
+      message: {
+        findMany: mocks.messageFindMany
+      }
+    }));
   });
 
   describe("listCampaigns", () => {

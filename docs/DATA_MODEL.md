@@ -7,7 +7,8 @@
 SignalStack is multi-tenant from the first product milestone:
 
 - `Organization` represents a customer workspace.
-- `AppUser` represents the local app user record mapped from Clerk later.
+- `AppUser` represents the built-in local identity; an optional future OIDC adapter may map a verified
+  external subject to the same record and membership model.
 - `Membership` connects users to organizations with a role and status.
 
 Demo mode uses:
@@ -17,6 +18,31 @@ Demo mode uses:
 - Role: `OWNER`
 
 Tenant rule: every tenant-scoped table must include `orgId` unless explicitly documented in `contracts/CONTRACT-DB.md`.
+
+## Standalone M2 — Database-Enforced Tenant Integrity
+
+The database tenant boundary is complete for the current schema:
+
+- `lib/db/tenant-manifest.ts` lists 22 ordinary tenant tables and five identity/control tables, for 27
+  protected tables total. Every protected table has forced, fail-closed RLS, and runtime posture compares
+  command/role/predicate fingerprints rather than accepting policy names or counts alone.
+- Same-tenant composite keys and foreign keys cover live relations. The upgrade preflight aborts on
+  invalid legacy rows while emitting only invariant labels/counts, never tenant IDs or PII.
+- Historical issuer, author, actor, and typed audit-subject references are validated by insert/update
+  triggers when deleting the referenced row must not erase history.
+- `LocalCredential` and `AuthThrottle` remain installation-global. User-global password-reset
+  `AuthToken` rows retain their explicit null-organization shape and use bounded control context.
+- All 40 migrations support a distinct table-owning credential that is non-superuser and non-BYPASSRLS
+  through the explicit NOLOGIN `signalstack_owner` capability. Web and worker logins are NOINHERIT,
+  non-owner roles; provisioning removes the owner capability and runtime posture rejects it.
+- Control-plane purposes do not grant broad access. Command-specific tenant-root/global-user policies
+  require exact org/user/email/token/slug evidence and give the control role no DELETE on those tables.
+- Queue discovery is exposed only through an atomically installed, bounded security-definer claim
+  function. It derives eligibility and lease time from the database, rejects null/out-of-range arguments,
+  has no public execution ACL, and returns `(id, orgId)` for matching tenant processing.
+- The static direct-Prisma inventory has no tenant migration-debt entries. New tenant-owned models must
+  add `orgId`, join the manifest/RLS policy set, use the transaction context, and extend the mandatory
+  two-tenant matrix in the same change.
 
 ## Milestone 2 Contacts
 

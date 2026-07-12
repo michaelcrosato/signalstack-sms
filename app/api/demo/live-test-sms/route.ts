@@ -1,18 +1,27 @@
 import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth/api-authorization";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { getLiveTestSmsStatus, sendLiveTestSms } from "@/lib/messaging/live-test-sms";
 import { liveTestSmsSchema } from "@/lib/validation/live-test-sms";
 
 export async function GET() {
+  const authentication = await authenticateApiRequest();
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+
   return NextResponse.json({
     liveTestSms: getLiveTestSmsStatus()
   });
 }
 
 export async function POST(request: Request) {
-  const currentOrg = await getOrCreateCurrentOrg();
+  const authentication = await authenticateApiRequest(request);
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
   const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
   if (roleResponse) {
     return roleResponse;

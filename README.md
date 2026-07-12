@@ -1,9 +1,12 @@
 # SignalStack SMS
 
-Demo-safe, multi-tenant SMB **SMS/MMS marketing + shared inbox + lead-qualification** SaaS
-(Next.js App Router · TypeScript · Prisma/Postgres · BullMQ/Redis). All real-world impact — live
-SMS, billing, AI, and production auth/workers/deploy — is **off by default** behind executable hard
-gates. The only intentional live path is the multi-gated `/demo` live-test SMS form.
+Self-hostable, multi-tenant **SMS/MMS messaging + campaigns + shared inbox + integration API** platform
+(Next.js App Router · TypeScript · Prisma/Postgres · optional BullMQ/Redis). The current release remains
+demo-safe: live SMS, billing, hosted AI, and production worker execution are off by default behind
+executable gates while the standalone production roadmap is implemented.
+
+The product target, minimal-dependency architecture, milestone graph, acceptance matrix, and current
+evidence are in [`docs/STANDALONE_ROADMAP.md`](docs/STANDALONE_ROADMAP.md).
 
 ## Quick start
 

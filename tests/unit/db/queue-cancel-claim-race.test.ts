@@ -46,7 +46,7 @@ describe("queue cancellation and worker claim database race", () => {
         status: CampaignStatus.SCHEDULED,
         scheduledAt,
         recipients: {
-          create: { orgId, contactId: contact.id }
+          create: { contactId: contact.id }
         }
       }
     });
@@ -158,7 +158,7 @@ describe("queue cancellation and worker claim database race", () => {
         status: CampaignStatus.SCHEDULED,
         scheduledAt,
         recipients: {
-          create: { orgId, contactId: contact.id }
+          create: { contactId: contact.id }
         }
       }
     });

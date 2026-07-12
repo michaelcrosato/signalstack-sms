@@ -88,16 +88,36 @@ function reservationAudit(overrides: Record<string, unknown> = {}) {
   };
 }
 
+let activeTransactions = 0;
+
 describe("live test SMS gates", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.unstubAllGlobals();
     mocks.messageFindUnique.mockResolvedValue(null);
-    mocks.messageCreate.mockResolvedValue({ id: "message_live_test" });
+    mocks.messageCreate.mockImplementation(async ({ data }) => ({ id: data.id }));
     mocks.messageUpdate.mockResolvedValue({ id: "message_live_test" });
     mocks.readinessAuditFindFirst.mockResolvedValue(null);
     mocks.readinessAuditCreate.mockResolvedValue({ id: "audit_live_test" });
-    mocks.transaction.mockImplementation((operations: Array<Promise<unknown>>) => Promise.all(operations));
+    activeTransactions = 0;
+    mocks.transaction.mockImplementation(async (callback) => {
+      activeTransactions += 1;
+      try {
+        return await callback({
+          message: {
+            findUnique: mocks.messageFindUnique,
+            create: mocks.messageCreate,
+            update: mocks.messageUpdate
+          },
+          liveReadinessAuditEvent: {
+            findFirst: mocks.readinessAuditFindFirst,
+            create: mocks.readinessAuditCreate
+          }
+        });
+      } finally {
+        activeTransactions -= 1;
+      }
+    });
   });
 
   it("normalizes North American demo phone formats to E.164", () => {
@@ -226,15 +246,18 @@ describe("live test SMS gates", () => {
 
   it("reserves before Twilio and records the normalized accepted outcome", async () => {
     const timeoutSpy = vi.spyOn(AbortSignal, "timeout");
-    const fetchMock = vi.fn(async () => ({
-      ok: true,
-      status: 201,
-      statusText: "Created",
-      json: async () => ({
-        sid: "SM_live_test",
-        status: " ACCEPTED "
-      })
-    }));
+    const fetchMock = vi.fn(async () => {
+      expect(activeTransactions).toBe(0);
+      return {
+        ok: true,
+        status: 201,
+        statusText: "Created",
+        json: async () => ({
+          sid: "SM_live_test",
+          status: " ACCEPTED "
+        })
+      };
+    });
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(
@@ -288,7 +311,6 @@ describe("live test SMS gates", () => {
     expect(JSON.stringify(reservationMetadata)).not.toContain("Hello from the gated local test path");
     expect(JSON.stringify(mocks.messageCreate.mock.calls)).not.toContain(operatorToken);
     expect(JSON.stringify(mocks.readinessAuditCreate.mock.calls)).not.toContain(operatorToken);
-    expect(mocks.transaction.mock.calls[0][0]).toHaveLength(2);
     expect(mocks.messageCreate.mock.invocationCallOrder[0]).toBeLessThan(fetchMock.mock.invocationCallOrder[0]);
     expect(mocks.transaction.mock.invocationCallOrder[0]).toBeLessThan(fetchMock.mock.invocationCallOrder[0]);
     expect(mocks.messageUpdate).toHaveBeenCalledWith({
@@ -314,7 +336,7 @@ describe("live test SMS gates", () => {
         })
       })
     });
-    expect(mocks.transaction).toHaveBeenCalledTimes(2);
+    expect(mocks.transaction).toHaveBeenCalledTimes(3);
     timeoutSpy.mockRestore();
   });
 
@@ -540,7 +562,7 @@ describe("live test SMS gates", () => {
     });
     expect(JSON.stringify(result)).not.toContain("private detail");
     expect(mocks.messageUpdate).not.toHaveBeenCalled();
-    expect(mocks.transaction).toHaveBeenCalledTimes(1);
+    expect(mocks.transaction).toHaveBeenCalledTimes(2);
   });
 
   it("keeps the reservation pending when an accepted provider result cannot be persisted", async () => {
@@ -564,7 +586,7 @@ describe("live test SMS gates", () => {
       fromLast4: "0199",
       blockers: []
     });
-    expect(mocks.transaction).toHaveBeenCalledTimes(2);
+    expect(mocks.transaction).toHaveBeenCalledTimes(3);
   });
 
   it("persists an immediate terminal provider status as a definitive failure", async () => {
@@ -633,7 +655,7 @@ describe("live test SMS gates", () => {
       }
     });
     expect(JSON.stringify(mocks.messageUpdate.mock.calls)).not.toContain("raw provider detail");
-    expect(mocks.transaction).toHaveBeenCalledTimes(1);
+    expect(mocks.transaction).toHaveBeenCalledTimes(3);
     expect(mocks.readinessAuditCreate).toHaveBeenCalledTimes(1);
     expect(mocks.readinessAuditCreate).toHaveBeenCalledWith({
       data: expect.objectContaining({ action: "LIVE_TEST_SMS_RESERVED", subjectId: reservedMessageId })

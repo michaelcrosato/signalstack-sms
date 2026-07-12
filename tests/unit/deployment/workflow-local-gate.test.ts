@@ -32,4 +32,19 @@ describe("GitHub validation workflows", () => {
       );
     }
   });
+
+  it("runs production local-auth proof through a provisioned non-owner database login", () => {
+    for (const workflowPath of workflowPaths) {
+      const workflow = readWorkflow(workflowPath);
+
+      expect(workflow).toContain(
+        "MIGRATION_DATABASE_URL: postgresql://signalstack:signalstack@localhost:5432/signalstack_sms_local_auth_e2e?schema=public"
+      );
+      expect(workflow).toContain(
+        "DATABASE_URL: postgresql://signalstack_web_e2e:signalstack-runtime-e2e-password@localhost:5432/signalstack_sms_local_auth_e2e?schema=public"
+      );
+      expect(workflow).toContain('DATABASE_RLS_ENFORCED: "true"');
+      expect(workflow).toContain("run: npm run db:provision:web");
+    }
+  });
 });

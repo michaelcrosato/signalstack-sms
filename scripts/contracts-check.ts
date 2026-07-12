@@ -11,7 +11,8 @@ const required = [
   "contracts/CONTRACT-BILLING.md",
   "contracts/CONTRACT-TESTING.md",
   "contracts/CONTRACT-COMPLIANCE.md",
-  "contracts/CONTRACT-QUEUE.md"
+  "contracts/CONTRACT-QUEUE.md",
+  "contracts/CONTRACT-AUTH.md"
 ];
 
 const appApiRoot = path.join("app", "api");
@@ -251,7 +252,8 @@ export function runContractsCheck() {
     "ProviderCredential",
     "ProviderCredentialRotation",
     "LiveReadinessAuditEvent",
-    "WebhookEvent"
+    "WebhookEvent",
+    "AuthSession"
   ];
 
   const modelsMissingOrgId = tenantScopedModels.filter((model) => {

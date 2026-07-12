@@ -1,5 +1,5 @@
 import type { Prisma } from "@prisma/client";
-import { prisma } from "@/lib/db/prisma";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 import type { ReadinessAuditQuery } from "@/lib/validation/readiness-audit";
 
 export type ReadinessAuditInput = {
@@ -11,7 +11,7 @@ export type ReadinessAuditInput = {
 };
 
 export async function recordLiveReadinessAuditEvent(orgId: string, input: ReadinessAuditInput) {
-  return prisma.liveReadinessAuditEvent.create({
+  return withTenantTransaction({ orgId }, (tx) => tx.liveReadinessAuditEvent.create({
     data: {
       orgId,
       actorUserId: input.actorUserId,
@@ -20,11 +20,11 @@ export async function recordLiveReadinessAuditEvent(orgId: string, input: Readin
       subjectId: input.subjectId,
       metadata: input.metadata
     }
-  });
+  }));
 }
 
 export async function listLiveReadinessAuditEvents(orgId: string, take = 50, filters: Pick<ReadinessAuditQuery, "action" | "subjectType"> = {}) {
-  return prisma.liveReadinessAuditEvent.findMany({
+  return withTenantTransaction({ orgId }, (tx) => tx.liveReadinessAuditEvent.findMany({
     where: {
       orgId,
       ...(filters.action ? { action: filters.action } : {}),
@@ -32,5 +32,5 @@ export async function listLiveReadinessAuditEvents(orgId: string, take = 50, fil
     },
     orderBy: { createdAt: "desc" },
     take
-  });
+  }));
 }

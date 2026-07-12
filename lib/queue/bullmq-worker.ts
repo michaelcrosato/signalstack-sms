@@ -8,6 +8,7 @@ import { recordMetric, smsPipelineMetrics } from "@/lib/observability/metrics";
 
 const terminalBullMqQueueJobReasons = new Set([
   "missing-job",
+  "org-mismatch",
   "invalid-payload",
   "invalid-campaign",
   "stale-schedule",
@@ -66,7 +67,10 @@ export function createScheduledCampaignBullMqWorker(env: Record<string, string |
     scheduledCampaignBullMqQueueName,
     async (job) => {
       const payload = scheduledCampaignBullMqJobDataSchema.parse(job.data);
-      const result = await processScheduledCampaignQueueJobById(payload.queueJobId);
+      const result = await processScheduledCampaignQueueJobById({
+        queueJobId: payload.queueJobId,
+        expectedOrgId: payload.orgId
+      });
       if (result.processed === 1 || (result.reason && terminalBullMqQueueJobReasons.has(result.reason))) {
         return result;
       }

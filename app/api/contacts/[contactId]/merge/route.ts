@@ -1,7 +1,7 @@
 import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth/api-authorization";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { mergeContacts } from "@/lib/db/repositories/contacts";
 import { contactMergeSchema } from "@/lib/validation/contacts";
 
@@ -10,7 +10,12 @@ type ContactMergeParams = {
 };
 
 export async function POST(request: Request, { params }: ContactMergeParams) {
-  const [{ contactId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
+  const authentication = await authenticateApiRequest(request);
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
+  const { contactId } = await params;
   const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
   if (roleResponse) {
     return roleResponse;

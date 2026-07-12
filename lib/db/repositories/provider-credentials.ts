@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import type { ProviderCredential } from "@prisma/client";
-import { prisma } from "@/lib/db/prisma";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 import type { ProviderCredentialRotationAction, ProviderSettingsUpdateInput } from "@/lib/validation/provider";
 import type { ReadinessAuditInput } from "@/lib/db/repositories/readiness-audit";
 
@@ -15,14 +15,14 @@ export function fingerprintSecret(value: string) {
 }
 
 export async function getProviderCredential(orgId: string, provider: string) {
-  return prisma.providerCredential.findUnique({
+  return withTenantTransaction({ orgId }, (tx) => tx.providerCredential.findUnique({
     where: {
       orgId_provider: {
         orgId,
         provider
       }
     }
-  });
+  }));
 }
 
 export function getCredentialHistoryAction(previous: ProviderCredential | null | undefined, next: ProviderCredential) {
@@ -45,29 +45,31 @@ export async function listProviderCredentialRotations(
   take = 20,
   action?: ProviderCredentialRotationAction
 ) {
-  const rotations = await prisma.providerCredentialRotation.findMany({
-    where: { orgId, provider, ...(action ? { action } : {}) },
-    orderBy: { createdAt: "desc" },
-    take
-  });
+  return withTenantTransaction({ orgId }, async (tx) => {
+    const rotations = await tx.providerCredentialRotation.findMany({
+      where: { orgId, provider, ...(action ? { action } : {}) },
+      orderBy: { createdAt: "desc" },
+      take
+    });
 
-  return rotations.map((rotation) => ({
-    id: rotation.id,
-    provider: rotation.provider,
-    action: rotation.action,
-    providerCredentialId: rotation.providerCredentialId,
-    actorUserId: rotation.actorUserId,
-    accountSidRedacted: rotation.accountSidRedacted,
-    accountSidLast4: rotation.accountSidLast4,
-    fromNumberRedacted: rotation.fromNumberRedacted,
-    fromNumberLast4: rotation.fromNumberLast4,
-    authTokenConfigured: rotation.authTokenConfigured,
-    previousAccountSidLast4: rotation.previousAccountSidLast4,
-    previousFromNumberLast4: rotation.previousFromNumberLast4,
-    previousAuthTokenConfigured: rotation.previousAuthTokenConfigured,
-    source: rotation.source,
-    createdAt: rotation.createdAt
-  }));
+    return rotations.map((rotation) => ({
+      id: rotation.id,
+      provider: rotation.provider,
+      action: rotation.action,
+      providerCredentialId: rotation.providerCredentialId,
+      actorUserId: rotation.actorUserId,
+      accountSidRedacted: rotation.accountSidRedacted,
+      accountSidLast4: rotation.accountSidLast4,
+      fromNumberRedacted: rotation.fromNumberRedacted,
+      fromNumberLast4: rotation.fromNumberLast4,
+      authTokenConfigured: rotation.authTokenConfigured,
+      previousAccountSidLast4: rotation.previousAccountSidLast4,
+      previousFromNumberLast4: rotation.previousFromNumberLast4,
+      previousAuthTokenConfigured: rotation.previousAuthTokenConfigured,
+      source: rotation.source,
+      createdAt: rotation.createdAt
+    }));
+  });
 }
 
 export async function upsertProviderCredentialMetadata(
@@ -75,7 +77,7 @@ export async function upsertProviderCredentialMetadata(
   input: ProviderSettingsUpdateInput,
   audit?: Pick<ReadinessAuditInput, "actorUserId">
 ) {
-  return prisma.$transaction(async (tx) => {
+  return withTenantTransaction({ orgId, userId: audit?.actorUserId }, async (tx) => {
     const previousCredential = await tx.providerCredential.findUnique({
       where: {
         orgId_provider: {
@@ -160,7 +162,7 @@ export async function deleteProviderCredentialMetadata(
   provider: string,
   audit?: Pick<ReadinessAuditInput, "actorUserId">
 ) {
-  return prisma.$transaction(async (tx) => {
+  return withTenantTransaction({ orgId, userId: audit?.actorUserId }, async (tx) => {
     const credential = await tx.providerCredential.findUnique({
       where: {
         orgId_provider: {
@@ -190,16 +192,10 @@ export async function deleteProviderCredentialMetadata(
         }
       });
 
-      await tx.providerCredential.delete({
-        where: {
-          orgId_provider: {
-            orgId,
-            provider
-          }
-        }
-      });
     }
 
+    // Record the historical subject while it is still available for same-tenant validation. The
+    // transaction keeps the event and deletion atomic, and the event intentionally survives deletion.
     await tx.liveReadinessAuditEvent.create({
       data: {
         orgId,
@@ -213,6 +209,17 @@ export async function deleteProviderCredentialMetadata(
         }
       }
     });
+
+    if (credential) {
+      await tx.providerCredential.delete({
+        where: {
+          orgId_provider: {
+            orgId,
+            provider
+          }
+        }
+      });
+    }
 
     return { deleted: Boolean(credential) };
   });

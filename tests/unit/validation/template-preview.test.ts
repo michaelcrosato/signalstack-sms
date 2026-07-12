@@ -85,7 +85,7 @@ describe("Message Template Variable Substitution Validator & Preview Seam", () =
 
     const request = new Request("http://localhost/api/templates/preview", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: sameOriginJsonHeaders(),
       body: JSON.stringify({
         templateId: template.id,
         variables: { firstName: "Eve" }
@@ -112,7 +112,7 @@ describe("Message Template Variable Substitution Validator & Preview Seam", () =
 
     const request = new Request("http://localhost/api/templates/preview", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: sameOriginJsonHeaders(),
       body: JSON.stringify({
         templateId: "non_existent_id",
         variables: {}
@@ -139,7 +139,7 @@ describe("Message Template Variable Substitution Validator & Preview Seam", () =
     const response = await previewTemplateRoute(
       new Request("http://localhost/api/templates/preview", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+          headers: sameOriginJsonHeaders(),
         body: JSON.stringify(body)
       })
     );
@@ -147,3 +147,7 @@ describe("Message Template Variable Substitution Validator & Preview Seam", () =
     expect(response.status).toBe(400);
   });
 });
+
+function sameOriginJsonHeaders() {
+  return { "Content-Type": "application/json", Origin: "http://localhost", Host: "localhost" };
+}

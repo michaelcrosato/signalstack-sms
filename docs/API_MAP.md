@@ -1,12 +1,39 @@
 # API Map
 
+Standalone identity foundation:
+
+- `/setup`: renders the guarded first-owner bootstrap flow without exposing the server token.
+- `/login`: renders built-in credential sign-in with allowlisted local redirects.
+- `/logout`: revokes the current browser session and clears both supported cookie names.
+- `POST /api/auth/setup`: atomically creates the first local owner/organization and opaque session after server-only bootstrap authorization.
+- `POST /api/auth/login`: authenticates built-in credentials with generic denial behavior and rotates into an opaque local session.
+- `POST /api/auth/logout`: idempotently revokes the presented local session and clears supported session cookies.
+- `GET /api/auth/session`: returns sanitized current-session identity, organization, role, and expiry state or `401` without demo fallback.
+- `POST /api/auth/sessions/revoke-all`: revokes every local session for the authenticated user, rotates the auth generation, and clears both cookie names.
+- `POST /api/auth/password-resets`: authenticates the session and then denies tenant issuance with `PASSWORD_RESET_OPERATOR_REQUIRED`; user-global reset links are created only by `npm run admin:reset-link`.
+- `POST /api/auth/password-resets/complete`: public same-origin local completion consumes `LOGIN_NETWORK` before its strict body, atomically rotates the credential/auth version and revokes every session, then clears both cookie forms; all invalid token states share one secret-free denial.
+- `GET /api/auth/organizations`: lists only sanitized ACTIVE organization memberships for the enabled local-session user.
+- `POST /api/auth/organizations`: transactionally creates a non-demo organization, fixed ACTIVE OWNER membership, and secret-free audit event after authentication, current-organization OWNER authorization, and same-origin validation.
+- `POST /api/auth/organizations/select`: switches the opaque database session to another ACTIVE membership using only the environment-appropriate HttpOnly cookie; it never accepts or returns the bearer.
+- `GET /api/auth/team`: returns same-tenant ACTIVE/SUSPENDED member summaries and pending invite metadata after local-session ADMIN authorization.
+- `POST /api/auth/team/invites`: creates an email-bound, hashed, expiring invite and returns its raw bearer only once inside `/invite#token=...`; OWNER is required for OWNER invitations.
+- `DELETE /api/auth/team/invites/:inviteId`: revokes a pending same-tenant invite with ADMIN/OWNER bounds and no bearer disclosure.
+- `POST /api/auth/team/invites/accept`: rate-limits and atomically consumes a public email-bound invite, creating a new identity/session, verifying an existing membership-less identity with its current password and auth generation, or switching the matching authenticated user's session; pre-existing invited-org membership fails closed.
+- `PATCH /api/auth/team/members/:userId`: changes exactly one role or suspension state while enforcing tenant, OWNER, disabled-user, and concurrent final-owner invariants.
+- `DELETE /api/auth/team/members/:userId`: revokes a same-tenant membership and its organization sessions while retaining the user and secret-free audit evidence.
+- `/organizations`: renders authenticated workspace listing, creation, and current-session switching without exposing or accepting bearer identity material.
+- `/team`: renders same-tenant member, invite, role, suspension, and revocation controls; it cannot issue user-global reset links.
+- `/invite`: consumes a one-time invitation fragment for the matching session or a new local account.
+- `/reset`: consumes a one-time reset fragment, changes the password, and invalidates every prior session.
+- `/account`: displays server-derived identity and offers current/all-session revocation.
+
 Milestone 0:
 
 - `GET /api/health`: returns service health and demo-safe defaults.
 
 Milestone 1:
 
-- `GET /api/orgs/current`: returns deterministic current user and organization summary.
+- `GET /api/orgs/current`: returns the verified current user and selected organization; deterministic identity is limited to explicit demo mode.
 
 Milestone 2:
 

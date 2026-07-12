@@ -1,7 +1,7 @@
 import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth/api-authorization";
-import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
+import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { archiveContact, getContact, updateContact } from "@/lib/db/repositories/contacts";
 import { contactUpdateSchema } from "@/lib/validation/contacts";
 
@@ -10,7 +10,12 @@ type ContactParams = {
 };
 
 export async function GET(_request: Request, { params }: ContactParams) {
-  const [{ contactId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
+  const authentication = await authenticateApiRequest();
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
+  const { contactId } = await params;
   const contact = await getContact(currentOrg.orgId, contactId);
 
   if (!contact) {
@@ -21,7 +26,12 @@ export async function GET(_request: Request, { params }: ContactParams) {
 }
 
 export async function PATCH(request: Request, { params }: ContactParams) {
-  const [{ contactId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
+  const authentication = await authenticateApiRequest(request);
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
+  const { contactId } = await params;
   const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
   if (roleResponse) {
     return roleResponse;
@@ -42,8 +52,13 @@ export async function PATCH(request: Request, { params }: ContactParams) {
   return NextResponse.json({ contact });
 }
 
-export async function DELETE(_request: Request, { params }: ContactParams) {
-  const [{ contactId }, currentOrg] = await Promise.all([params, getOrCreateCurrentOrg()]);
+export async function DELETE(request: Request, { params }: ContactParams) {
+  const authentication = await authenticateApiRequest(request);
+  if (!authentication.ok) {
+    return authentication.response;
+  }
+  const { currentOrg } = authentication;
+  const { contactId } = await params;
   const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
   if (roleResponse) {
     return roleResponse;

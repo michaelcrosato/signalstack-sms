@@ -2,7 +2,7 @@ import { SettingsLink } from "@/components/settings/SettingsLink";
 import { QueueJobStatus } from "@prisma/client";
 import type { ReactNode } from "react";
 import { getOrCreateCurrentOrg } from "@/lib/auth/current-org";
-import { prisma } from "@/lib/db/prisma";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 import { getQueueOperationLinks } from "@/lib/operations/operator-surfaces";
 import { getQueueOperationsStatus } from "@/lib/operations/queue-operations";
 import { getSystemStatus } from "@/lib/operations/system-status";
@@ -13,24 +13,27 @@ export const dynamic = "force-dynamic";
 export default async function QueueOperationsPage() {
   const currentOrg = await getOrCreateCurrentOrg();
   const now = new Date();
-  const [queueJobs, campaignCount] = await Promise.all([
-    prisma.queueJob.findMany({
-      where: { orgId: currentOrg.orgId },
-      include: {
-        campaign: {
-          select: {
-            id: true,
-            name: true,
-            status: true,
-            scheduledAt: true,
+  const [queueJobs, campaignCount] = await withTenantTransaction(
+    { orgId: currentOrg.orgId, userId: currentOrg.userId },
+    (tx) => Promise.all([
+      tx.queueJob.findMany({
+        where: { orgId: currentOrg.orgId },
+        include: {
+          campaign: {
+            select: {
+              id: true,
+              name: true,
+              status: true,
+              scheduledAt: true,
+            },
           },
         },
-      },
-      orderBy: [{ runAt: "asc" }, { createdAt: "desc" }],
-      take: 30,
-    }),
-    prisma.campaign.count({ where: { orgId: currentOrg.orgId } }),
-  ]);
+        orderBy: [{ runAt: "asc" }, { createdAt: "desc" }],
+        take: 30,
+      }),
+      tx.campaign.count({ where: { orgId: currentOrg.orgId } }),
+    ])
+  );
   const status = getSystemStatus(process.env);
   const queuedJobs = queueJobs.filter(
     (job) => job.status === QueueJobStatus.QUEUED,
@@ -224,7 +227,7 @@ export default async function QueueOperationsPage() {
 }
 
 function countJobs(
-  jobs: Awaited<ReturnType<typeof prisma.queueJob.findMany>>,
+  jobs: ReadonlyArray<{ status: QueueJobStatus }>,
   status: QueueJobStatus,
 ) {
   return jobs.filter((job) => job.status === status).length;

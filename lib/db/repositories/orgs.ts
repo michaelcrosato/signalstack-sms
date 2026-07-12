@@ -1,7 +1,7 @@
-import { prisma } from "@/lib/db/prisma";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 
 export async function getOrganizationSummary(orgId: string) {
-  return prisma.organization.findUnique({
+  return withTenantTransaction({ orgId }, (tx) => tx.organization.findUnique({
     where: { id: orgId },
     select: {
       id: true,
@@ -19,6 +19,6 @@ export async function getOrganizationSummary(orgId: string) {
         }
       }
     }
-  });
+  }));
 }
 

@@ -1,11 +1,11 @@
-import { ConsentStatus, ConversationStatus, type Prisma } from "@prisma/client";
+import { ConsentStatus, ConversationStatus, type Message, type Prisma } from "@prisma/client";
 import {
   hasAnyConsentEvidence,
   hasCompleteConsentEvidence
 } from "@/lib/compliance/consent-evidence";
 import { classifyInboundKeyword, type InboundKeywordAction } from "@/lib/compliance/opt-out";
-import { prisma } from "@/lib/db/prisma";
 import { orgWhere } from "@/lib/db/tenant";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
 import { resolveAiProvider } from "@/lib/ai/provider";
 import { logger } from "@/lib/observability/logger";
@@ -44,33 +44,43 @@ async function findExistingInboundMessage(
 }
 
 export async function listConversations(orgId: string) {
-  return prisma.conversation.findMany({
+  return withTenantTransaction({ orgId }, (tx) => tx.conversation.findMany({
     where: { orgId },
     orderBy: [{ status: "asc" }, { lastMessageAt: "desc" }, { updatedAt: "desc" }],
     include: conversationInclude
-  });
+  }));
 }
 
 export async function getConversation(orgId: string, conversationId: string) {
-  return prisma.conversation.findFirst({
+  return withTenantTransaction({ orgId }, (tx) => tx.conversation.findFirst({
     where: orgWhere(orgId, { id: conversationId }),
     include: conversationInclude
-  });
+  }));
 }
 
 export async function listConversationMessages(orgId: string, conversationId: string) {
-  const conversation = await prisma.conversation.findFirst({ where: orgWhere(orgId, { id: conversationId }) });
-  if (!conversation) {
-    return null;
-  }
+  return withTenantTransaction({ orgId }, async (tx) => {
+    const conversation = await tx.conversation.findFirst({ where: orgWhere(orgId, { id: conversationId }) });
+    if (!conversation) {
+      return null;
+    }
 
-  return prisma.message.findMany({
-    where: { orgId, conversationId },
-    orderBy: { createdAt: "asc" }
+    return tx.message.findMany({
+      where: { orgId, conversationId },
+      orderBy: { createdAt: "asc" }
+    });
   });
 }
 
-export async function processInboundKeywordsAndAutoReply(
+type KeywordAutoReplyIntent = Readonly<{
+  contactId: string;
+  conversationId: string;
+  phone: string;
+  body: string;
+  idempotencyKey: string;
+}>;
+
+async function applyInboundKeyword(
   tx: Prisma.TransactionClient,
   orgId: string,
   contact: {
@@ -85,7 +95,7 @@ export async function processInboundKeywordsAndAutoReply(
   keywordAction: InboundKeywordAction,
   inboundIdempotencyKey: string,
   options: { sendAutoReply?: boolean } = {}
-) {
+): Promise<KeywordAutoReplyIntent | null> {
   if (keywordAction === "OPT_OUT") {
     await tx.contact.update({
       where: { id: contact.id },
@@ -96,39 +106,12 @@ export async function processInboundKeywordsAndAutoReply(
     });
 
     if (options.sendAutoReply === false) {
-      return;
+      return null;
     }
 
     const body = "You have successfully opted out. You will no longer receive messages. Reply START to opt back in.";
     const idempotencyKey = `opt-out-confirm:${inboundIdempotencyKey}`;
-
-    const providerResult = await dummyProvider.send({
-      to: contact.phone,
-      from: "demo-signalstack",
-      body,
-      orgId,
-      idempotencyKey
-    });
-
-    const message = await tx.message.upsert({
-      where: { orgId_idempotencyKey: { orgId, idempotencyKey } },
-      update: {},
-      create: {
-        orgId,
-        contactId: contact.id,
-        conversationId,
-        direction: "OUTBOUND",
-        body,
-        providerMessageId: providerResult.providerMessageId,
-        providerStatus: providerResult.status,
-        idempotencyKey
-      }
-    });
-
-    await tx.conversation.update({
-      where: { id: conversationId },
-      data: { lastMessageAt: message.createdAt }
-    });
+    return { contactId: contact.id, conversationId, phone: contact.phone, body, idempotencyKey };
   } else if (keywordAction === "OPT_IN") {
     if (
       contact.consentStatus === ConsentStatus.PENDING_DOUBLE_OPT_IN ||
@@ -137,7 +120,7 @@ export async function processInboundKeywordsAndAutoReply(
     ) {
       const existingEvidenceIsComplete = hasCompleteConsentEvidence(contact);
       if (!existingEvidenceIsComplete && hasAnyConsentEvidence(contact)) {
-        return;
+        return null;
       }
 
       const consentEvidence = existingEvidenceIsComplete
@@ -167,44 +150,67 @@ export async function processInboundKeywordsAndAutoReply(
         }
       });
       if (updateResult.count !== 1) {
-        return;
+        return null;
       }
 
       if (options.sendAutoReply === false) {
-        return;
+        return null;
       }
 
       const body = "Thank you! You have successfully confirmed your subscription and opted in.";
       const idempotencyKey = `opt-in-confirm:${inboundIdempotencyKey}`;
-
-      const providerResult = await dummyProvider.send({
-        to: contact.phone,
-        from: "demo-signalstack",
-        body,
-        orgId,
-        idempotencyKey
-      });
-
-      const message = await tx.message.upsert({
-        where: { orgId_idempotencyKey: { orgId, idempotencyKey } },
-        update: {},
-        create: {
-          orgId,
-          contactId: contact.id,
-          conversationId,
-          direction: "OUTBOUND",
-          body,
-          providerMessageId: providerResult.providerMessageId,
-          providerStatus: providerResult.status,
-          idempotencyKey
-        }
-      });
-
-      await tx.conversation.update({
-        where: { id: conversationId },
-        data: { lastMessageAt: message.createdAt }
-      });
+      return { contactId: contact.id, conversationId, phone: contact.phone, body, idempotencyKey };
     }
+  }
+
+  return null;
+}
+
+async function deliverKeywordAutoReply(orgId: string, intent: KeywordAutoReplyIntent): Promise<void> {
+  const providerResult = await dummyProvider.send({
+    to: intent.phone,
+    from: "demo-signalstack",
+    body: intent.body,
+    orgId,
+    idempotencyKey: intent.idempotencyKey
+  });
+
+  await withTenantTransaction({ orgId }, async (tx) => {
+    const message = await tx.message.upsert({
+      where: { orgId_idempotencyKey: { orgId, idempotencyKey: intent.idempotencyKey } },
+      update: {},
+      create: {
+        orgId,
+        contactId: intent.contactId,
+        conversationId: intent.conversationId,
+        direction: "OUTBOUND",
+        body: intent.body,
+        providerMessageId: providerResult.providerMessageId,
+        providerStatus: providerResult.status,
+        idempotencyKey: intent.idempotencyKey
+      }
+    });
+
+    await tx.conversation.update({
+      where: { id: intent.conversationId },
+      data: { lastMessageAt: message.createdAt }
+    });
+  });
+}
+
+export async function processInboundKeywordsAndAutoReply(
+  orgId: string,
+  contact: Parameters<typeof applyInboundKeyword>[2],
+  conversationId: string,
+  keywordAction: InboundKeywordAction,
+  inboundIdempotencyKey: string,
+  options: { sendAutoReply?: boolean } = {}
+): Promise<void> {
+  const intent = await withTenantTransaction({ orgId }, (tx) =>
+    applyInboundKeyword(tx, orgId, contact, conversationId, keywordAction, inboundIdempotencyKey, options)
+  );
+  if (intent) {
+    await deliverKeywordAutoReply(orgId, intent);
   }
 }
 
@@ -213,7 +219,7 @@ export async function createDemoInboundMessage(
   input: InboundMessageInput,
   options: { analyzeSentiment?: boolean; sendKeywordAutoReply?: boolean } = {}
 ) {
-  const transactionResult = await prisma.$transaction(async (tx) => {
+  const transactionResult = await withTenantTransaction({ orgId }, async (tx) => {
     const explicitIdempotencyKey =
       input.idempotencyKey ?? (input.providerMessageId ? `demo-inbound:${orgId}:${input.providerMessageId}` : null);
     if (explicitIdempotencyKey) {
@@ -221,7 +227,8 @@ export async function createDemoInboundMessage(
       if (existing) {
         return {
           value: { ...existing, keywordAction: classifyInboundKeyword(existing.message.body) },
-          shouldAnalyze: false
+          shouldAnalyze: false,
+          autoReply: null
         };
       }
     }
@@ -280,7 +287,7 @@ export async function createDemoInboundMessage(
       }
     });
 
-    await processInboundKeywordsAndAutoReply(
+    const autoReply = await applyInboundKeyword(
       tx,
       orgId,
       contact,
@@ -301,9 +308,14 @@ export async function createDemoInboundMessage(
         message,
         keywordAction
       },
-      shouldAnalyze: true
+      shouldAnalyze: true,
+      autoReply
     };
   });
+
+  if (transactionResult.autoReply) {
+    await deliverKeywordAutoReply(orgId, transactionResult.autoReply);
+  }
 
   if (
     options.analyzeSentiment !== false &&
@@ -317,10 +329,10 @@ export async function createDemoInboundMessage(
 
 export async function triggerConversationSentimentAnalysis(orgId: string, conversationId: string) {
   try {
-    const messages = await prisma.message.findMany({
+    const messages = await withTenantTransaction({ orgId }, (tx) => tx.message.findMany({
       where: { orgId, conversationId },
       orderBy: { createdAt: "asc" }
-    });
+    }));
     if (messages.length === 0) return;
 
     const aiMessages = messages.map((message) => ({
@@ -331,13 +343,13 @@ export async function triggerConversationSentimentAnalysis(orgId: string, conver
     const provider = resolveAiProvider();
     const result = await provider.analyzeConversationSentiment({ messages: aiMessages });
 
-    await prisma.conversation.updateMany({
+    await withTenantTransaction({ orgId }, (tx) => tx.conversation.updateMany({
       where: { id: conversationId, orgId },
       data: {
         sentiment: result.sentiment,
         category: result.category
       }
-    });
+    }));
   } catch (error) {
     logger.error("conversation_sentiment_analysis_failed", {
       orgId,
@@ -352,10 +364,10 @@ export async function createConversationInboundMessage(
   conversationId: string,
   input: ConversationMessageCreateInput
 ) {
-  const transactionResult = await prisma.$transaction(async (tx) => {
+  const transactionResult = await withTenantTransaction({ orgId }, async (tx) => {
     const conversation = await tx.conversation.findFirst({ where: orgWhere(orgId, { id: conversationId }) });
     if (!conversation) {
-      return { value: null, shouldAnalyze: false };
+      return { value: null, shouldAnalyze: false, autoReply: null };
     }
 
     if (input.idempotencyKey) {
@@ -363,7 +375,8 @@ export async function createConversationInboundMessage(
       if (existing) {
         return {
           value: { message: existing.message, keywordAction: classifyInboundKeyword(existing.message.body) },
-          shouldAnalyze: false
+          shouldAnalyze: false,
+          autoReply: null
         };
       }
     }
@@ -393,19 +406,23 @@ export async function createConversationInboundMessage(
     const contact = conversation.contactId
       ? await tx.contact.findFirst({ where: orgWhere(orgId, { id: conversation.contactId }) })
       : null;
-    if (contact) {
-      await processInboundKeywordsAndAutoReply(
+    const autoReply = contact
+      ? await applyInboundKeyword(
         tx,
         orgId,
         contact,
         conversationId,
         keywordAction,
         idempotencyKey
-      );
-    }
+      )
+      : null;
 
-    return { value: { message, keywordAction }, shouldAnalyze: true };
+    return { value: { message, keywordAction }, shouldAnalyze: true, autoReply };
   });
+
+  if (transactionResult.autoReply) {
+    await deliverKeywordAutoReply(orgId, transactionResult.autoReply);
+  }
 
   if (transactionResult.shouldAnalyze) {
     await triggerConversationSentimentAnalysis(orgId, conversationId);
@@ -416,7 +433,16 @@ export async function createConversationInboundMessage(
 export type OutboundReplyResult =
   | null
   | { blocked: true; reasons: string[] }
-  | { blocked: false; message: Awaited<ReturnType<typeof prisma.message.upsert>>; deduped: boolean };
+  | { blocked: false; message: Message; deduped: boolean };
+
+type OutboundReplyPreparation =
+  | { ready: false; result: OutboundReplyResult }
+  | {
+      ready: true;
+      contactId: string;
+      phone: string;
+      idempotencyKey: string;
+    };
 
 // Demo-safe outbound reply: records a local OUTBOUND message via the dummy provider only — never a live
 // send. Replying to an inbound conversation does not require OPTED_IN, but opt-out/STOP and archived
@@ -426,10 +452,10 @@ export async function createConversationOutboundReply(
   conversationId: string,
   input: ConversationReplyCreateInput
 ): Promise<OutboundReplyResult> {
-  return prisma.$transaction(async (tx) => {
+  const preparation = await withTenantTransaction({ orgId }, async (tx): Promise<OutboundReplyPreparation> => {
     const conversation = await tx.conversation.findFirst({ where: orgWhere(orgId, { id: conversationId }) });
     if (!conversation) {
-      return null;
+      return { ready: false, result: null };
     }
 
     if (input.idempotencyKey) {
@@ -437,7 +463,7 @@ export async function createConversationOutboundReply(
         where: { orgId_idempotencyKey: { orgId, idempotencyKey: input.idempotencyKey } }
       });
       if (existing) {
-        return { blocked: false, message: existing, deduped: true };
+        return { ready: false, result: { blocked: false, message: existing, deduped: true } };
       }
     }
 
@@ -457,30 +483,45 @@ export async function createConversationOutboundReply(
       }
     }
     if (reasons.length > 0 || !contact) {
-      return { blocked: true, reasons };
+      return { ready: false, result: { blocked: true, reasons } };
     }
 
     const idempotencyKey = input.idempotencyKey ?? `inbox-reply:${orgId}:${conversationId}:${Date.now()}`;
-    const providerResult = await dummyProvider.send({
-      to: contact.phone,
-      from: "demo-signalstack",
-      body: input.body,
-      orgId,
-      idempotencyKey
+    return { ready: true, contactId: contact.id, phone: contact.phone, idempotencyKey };
+  });
+
+  if (!preparation.ready) {
+    return preparation.result;
+  }
+
+  const providerResult = await dummyProvider.send({
+    to: preparation.phone,
+    from: "demo-signalstack",
+    body: input.body,
+    orgId,
+    idempotencyKey: preparation.idempotencyKey
+  });
+
+  return withTenantTransaction({ orgId }, async (tx) => {
+    const existing = await tx.message.findUnique({
+      where: { orgId_idempotencyKey: { orgId, idempotencyKey: preparation.idempotencyKey } }
     });
+    if (existing) {
+      return { blocked: false, message: existing, deduped: true };
+    }
 
     const message = await tx.message.upsert({
-      where: { orgId_idempotencyKey: { orgId, idempotencyKey } },
+      where: { orgId_idempotencyKey: { orgId, idempotencyKey: preparation.idempotencyKey } },
       update: {},
       create: {
         orgId,
-        contactId: conversation.contactId,
+        contactId: preparation.contactId,
         conversationId,
         direction: "OUTBOUND",
         body: input.body,
         providerMessageId: providerResult.providerMessageId,
         providerStatus: providerResult.status,
-        idempotencyKey
+        idempotencyKey: preparation.idempotencyKey
       }
     });
 
@@ -498,7 +539,7 @@ export async function assignConversation(
   conversationId: string,
   input: ConversationAssignInput
 ) {
-  return prisma.$transaction(async (tx) => {
+  return withTenantTransaction({ orgId }, async (tx) => {
     const conversation = await tx.conversation.findFirst({ where: orgWhere(orgId, { id: conversationId }) });
     if (!conversation) {
       return null;
@@ -530,7 +571,7 @@ export async function addConversationNote(
   authorUserId: string,
   input: ConversationNoteCreateInput
 ) {
-  return prisma.$transaction(async (tx) => {
+  return withTenantTransaction({ orgId, userId: authorUserId }, async (tx) => {
     const conversation = await tx.conversation.findFirst({ where: orgWhere(orgId, { id: conversationId }) });
     if (!conversation) {
       return null;
@@ -549,15 +590,17 @@ export async function addConversationNote(
 }
 
 export async function listConversationNotes(orgId: string, conversationId: string) {
-  const conversation = await prisma.conversation.findFirst({ where: orgWhere(orgId, { id: conversationId }) });
-  if (!conversation) {
-    return null;
-  }
+  return withTenantTransaction({ orgId }, async (tx) => {
+    const conversation = await tx.conversation.findFirst({ where: orgWhere(orgId, { id: conversationId }) });
+    if (!conversation) {
+      return null;
+    }
 
-  return prisma.internalNote.findMany({
-    where: { orgId, conversationId },
-    orderBy: { createdAt: "asc" },
-    include: { author: true }
+    return tx.internalNote.findMany({
+      where: { orgId, conversationId },
+      orderBy: { createdAt: "asc" },
+      include: { author: true }
+    });
   });
 }
 
@@ -566,17 +609,19 @@ export async function setConversationResolved(
   conversationId: string,
   input: ConversationResolveInput
 ) {
-  const conversation = await prisma.conversation.findFirst({ where: orgWhere(orgId, { id: conversationId }) });
-  if (!conversation) {
-    return null;
-  }
+  return withTenantTransaction({ orgId }, async (tx) => {
+    const conversation = await tx.conversation.findFirst({ where: orgWhere(orgId, { id: conversationId }) });
+    if (!conversation) {
+      return null;
+    }
 
-  return prisma.conversation.update({
-    where: { id: conversationId },
-    data: {
-      status: input.resolved ? ConversationStatus.RESOLVED : ConversationStatus.OPEN,
-      resolvedAt: input.resolved ? new Date() : null
-    },
-    include: conversationInclude
+    return tx.conversation.update({
+      where: { id: conversationId },
+      data: {
+        status: input.resolved ? ConversationStatus.RESOLVED : ConversationStatus.OPEN,
+        resolvedAt: input.resolved ? new Date() : null
+      },
+      include: conversationInclude
+    });
   });
 }

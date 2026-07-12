@@ -1,5 +1,5 @@
 import { CampaignStatus, QueueJobStatus, QueueJobType, type Prisma, type QueueJob } from "@prisma/client";
-import { prisma } from "@/lib/db/prisma";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 import { recordMetric, smsPipelineMetrics } from "@/lib/observability/metrics";
 import { orgWhere } from "@/lib/db/tenant";
 import { preflightCampaignRecipients } from "@/lib/messaging/send-preflight";
@@ -63,52 +63,54 @@ const campaignDetailDeliveryMessageSelect = {
 } satisfies Prisma.MessageSelect;
 
 export async function listCampaigns(orgId: string) {
-  return prisma.campaign.findMany({
+  return withTenantTransaction({ orgId }, (tx) => tx.campaign.findMany({
     where: { orgId },
     orderBy: { updatedAt: "desc" },
     include: campaignListInclude(orgId)
-  });
+  }));
 }
 
 export async function listCampaignsWithDelivery(orgId: string) {
-  return prisma.campaign.findMany({
+  return withTenantTransaction({ orgId }, (tx) => tx.campaign.findMany({
     where: { orgId },
     orderBy: { updatedAt: "desc" },
     include: campaignListDeliveryInclude(orgId)
-  });
+  }));
 }
 
 export async function getCampaign(orgId: string, campaignId: string) {
-  return prisma.campaign.findFirst({
+  return withTenantTransaction({ orgId }, (tx) => tx.campaign.findFirst({
     where: orgWhere(orgId, { id: campaignId }),
     include: campaignListInclude(orgId)
-  });
+  }));
 }
 
 export async function getCampaignWithMessages(orgId: string, campaignId: string) {
-  const campaign = await prisma.campaign.findFirst({
-    where: orgWhere(orgId, { id: campaignId }),
-    include: campaignDetailInclude(orgId)
+  return withTenantTransaction({ orgId }, async (tx) => {
+    const campaign = await tx.campaign.findFirst({
+      where: orgWhere(orgId, { id: campaignId }),
+      include: campaignDetailInclude(orgId)
+    });
+
+    if (!campaign) {
+      return null;
+    }
+
+    const deliveryMessages = await tx.message.findMany({
+      where: orgWhere(orgId, { campaignId, direction: "OUTBOUND" }),
+      orderBy: { createdAt: "asc" },
+      select: campaignDetailDeliveryMessageSelect
+    });
+
+    return {
+      ...campaign,
+      deliveryMessages
+    };
   });
-
-  if (!campaign) {
-    return null;
-  }
-
-  const deliveryMessages = await prisma.message.findMany({
-    where: orgWhere(orgId, { campaignId, direction: "OUTBOUND" }),
-    orderBy: { createdAt: "asc" },
-    select: campaignDetailDeliveryMessageSelect
-  });
-
-  return {
-    ...campaign,
-    deliveryMessages
-  };
 }
 
 export async function createCampaign(orgId: string, input: CampaignCreateInput) {
-  return prisma.$transaction(async (tx) => {
+  return withTenantTransaction({ orgId }, async (tx) => {
     await assertCampaignTemplateBelongsToOrg(tx, orgId, input.templateId);
 
     const campaign = await tx.campaign.create({
@@ -129,7 +131,7 @@ export async function createCampaign(orgId: string, input: CampaignCreateInput) 
 }
 
 export async function updateCampaign(orgId: string, campaignId: string, input: CampaignUpdateInput) {
-  return prisma.$transaction(async (tx) => {
+  return withTenantTransaction({ orgId }, async (tx) => {
     const existing = await tx.campaign.findFirst({ where: orgWhere(orgId, { id: campaignId }) });
     if (!existing) {
       return null;
@@ -160,35 +162,37 @@ export async function updateCampaign(orgId: string, campaignId: string, input: C
 }
 
 export async function preflightCampaign(orgId: string, campaignId: string, contactIds?: string[]) {
-  const campaign = await prisma.campaign.findFirst({
-    where: orgWhere(orgId, { id: campaignId }),
-    include: { recipients: { where: { orgId } } }
-  });
+  return withTenantTransaction({ orgId }, async (tx) => {
+    const campaign = await tx.campaign.findFirst({
+      where: orgWhere(orgId, { id: campaignId }),
+      include: { recipients: { where: { orgId } } }
+    });
 
-  if (!campaign) {
-    return null;
-  }
-
-  const selectedContactIds = contactIds ?? campaign.recipients.map((recipient) => recipient.contactId);
-  const contacts = await prisma.contact.findMany({
-    where: {
-      orgId,
-      id: { in: selectedContactIds }
-    },
-    select: {
-      id: true,
-      phone: true,
-      consentStatus: true,
-      optedOutAt: true,
-      archivedAt: true
+    if (!campaign) {
+      return null;
     }
-  });
 
-  return preflightCampaignRecipients(contacts, selectedContactIds);
+    const selectedContactIds = contactIds ?? campaign.recipients.map((recipient) => recipient.contactId);
+    const contacts = await tx.contact.findMany({
+      where: {
+        orgId,
+        id: { in: selectedContactIds }
+      },
+      select: {
+        id: true,
+        phone: true,
+        consentStatus: true,
+        optedOutAt: true,
+        archivedAt: true
+      }
+    });
+
+    return preflightCampaignRecipients(contacts, selectedContactIds);
+  });
 }
 
 export async function scheduleCampaign(orgId: string, campaignId: string, scheduledAt: Date) {
-  return prisma.$transaction(async (tx) => {
+  return withTenantTransaction({ orgId }, async (tx) => {
     const campaign = await tx.campaign.findFirst({
       where: orgWhere(orgId, { id: campaignId }),
       include: { recipients: { where: { orgId } } }
@@ -302,7 +306,7 @@ export async function scheduleCampaign(orgId: string, campaignId: string, schedu
 }
 
 export async function cancelCampaign(orgId: string, campaignId: string) {
-  return prisma.$transaction(async (tx) => {
+  return withTenantTransaction({ orgId }, async (tx) => {
     const campaign = await tx.campaign.findFirst({ where: orgWhere(orgId, { id: campaignId }) });
     if (!campaign) {
       return null;
