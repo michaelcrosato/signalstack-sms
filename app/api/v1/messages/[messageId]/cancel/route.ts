@@ -45,7 +45,7 @@ export async function POST(request: Request, context: RouteContext) {
           return publicApiErrorSnapshot(
             "OPERATION_NOT_ALLOWED",
             authorization.requestId,
-            409,
+            422,
             "The message can no longer be cancelled."
           );
         }
