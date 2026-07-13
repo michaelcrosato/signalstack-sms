@@ -1,6 +1,7 @@
 import { Queue, type JobsOptions } from "bullmq";
 import type { QueueJob } from "@prisma/client";
 import { getRedisQueueConfig, redisConnectionFromUrl } from "@/lib/queue/redis";
+import { positiveIntFromEnv } from "@/lib/queue/parse-env";
 import {
   scheduledCampaignBullMqJobDataSchema,
   scheduledCampaignJobSchema,
@@ -35,12 +36,8 @@ export function buildScheduledCampaignBullMqJob(input: {
   const env = input.env ?? process.env;
   const bullMqJobId = `${input.queueJobId}-${input.queueJobGeneration}`;
 
-  const removeOnCompleteAge = env.BULLMQ_REMOVE_ON_COMPLETE_AGE_SEC
-    ? Number.parseInt(env.BULLMQ_REMOVE_ON_COMPLETE_AGE_SEC, 10)
-    : 24 * 3600; // 24 hours
-  const removeOnFailAge = env.BULLMQ_REMOVE_ON_FAIL_AGE_SEC
-    ? Number.parseInt(env.BULLMQ_REMOVE_ON_FAIL_AGE_SEC, 10)
-    : 7 * 24 * 3600; // 7 days
+  const removeOnCompleteAge = positiveIntFromEnv(env.BULLMQ_REMOVE_ON_COMPLETE_AGE_SEC, 24 * 3600); // 24 hours
+  const removeOnFailAge = positiveIntFromEnv(env.BULLMQ_REMOVE_ON_FAIL_AGE_SEC, 7 * 24 * 3600); // 7 days
 
   return {
     name: scheduledCampaignBullMqJobName,
