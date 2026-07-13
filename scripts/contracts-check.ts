@@ -171,6 +171,9 @@ export function extractExportedRouteMethods(source: string) {
       for (const exportedName of exportedNames) {
         const aliasMatch = /^\s*([A-Za-z_$][\w$]*)\s+as\s+([A-Za-z_$][\w$]*)\s*$/.exec(exportedName);
         if (aliasMatch !== null && aliasMatch[2] === method) {
+          if (aliasMatch[1] === "methodNotAllowed" || aliasMatch[1] === "notFound") {
+            continue;
+          }
           return true;
         }
 
@@ -244,6 +247,7 @@ export function runContractsCheck() {
     "Conversation",
     "QueueJob",
     "Message",
+    "MessageAttempt",
     "InternalNote",
     "ComplianceProfile",
     "UsageEvent",

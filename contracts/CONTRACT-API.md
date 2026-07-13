@@ -8,6 +8,167 @@ handlers; signed provider webhooks remain signature-authenticated exceptions.
 
 Owner: backend-data and frontend-ui.
 
+## Frozen `/api/v1` Public Integration Protocol (M3 Complete)
+
+This section is the implemented compatibility contract for M3. The route inventory, OpenAPI document,
+external-network test application/receiver, and customer-webhook worker are complete under the dummy/local
+transport boundary. The detailed acceptance contract and evidence are in
+`plan/specs/SPEC-031-public-integrations.md`.
+
+Every `/api/v1` resource and mutation route authenticates only one exact
+`Authorization: Bearer ss_api_<prefix>_<secret>` credential. Browser cookies, demo principals, provider
+signatures, query-string keys, and alternate schemes are ignored. `GET /api/v1/openapi.json` is the one
+unauthenticated metadata exception.
+
+### Envelope, request ID, errors, pagination, idempotency, and rate limits
+
+- Success is `{ "ok": true, "data": ..., "meta": { "requestId": "uuid", ... } }`.
+- Failure is `{ "ok": false, "error": { "code": "...", "message": "...", "details": ...? },
+  "meta": { "requestId": "uuid" } }`.
+- Every response is `Cache-Control: no-store`; `X-Request-Id` exactly matches `meta.requestId`. A single valid
+  client UUID may be retained; malformed or duplicated evidence is replaced.
+- Stable public codes are `AUTHENTICATION_REQUIRED`, `INVALID_API_KEY`, `INSUFFICIENT_SCOPE`,
+  `INVALID_REQUEST`, `INVALID_JSON`, `INVALID_CURSOR`, `IDEMPOTENCY_KEY_REQUIRED`,
+  `IDEMPOTENCY_KEY_INVALID`, `IDEMPOTENCY_CONFLICT`, `PAYLOAD_TOO_LARGE`, `UNSUPPORTED_MEDIA_TYPE`,
+  `VALIDATION_ERROR`, `OPERATION_NOT_ALLOWED`, `NOT_FOUND`, `METHOD_NOT_ALLOWED`, `CONFLICT`,
+  `RATE_LIMIT_EXCEEDED`, `INTERNAL_ERROR`, `UPSTREAM_ERROR`, and `SERVICE_UNAVAILABLE` with the status mapping
+  in SPEC-031. Unknown, expired, revoked, and rotated-away key states all use `INVALID_API_KEY`.
+- Collections use a default limit of 50 and maximum 100, newest-first `(createdAt, id)` ordering, and a
+  maximum-1,024-character HMAC-authenticated v1 cursor bound to the tenant and canonical resource. An invalid,
+  tampered, foreign-tenant, or foreign-resource cursor returns `INVALID_CURSOR` without fallback.
+- Every public `POST`, `PUT`, `PATCH`, and `DELETE` requires one `[A-Za-z0-9._:-]{8,128}`
+  `Idempotency-Key`. The key, method, route, and canonical JSON body are bound inside the same PostgreSQL
+  transaction as the domain mutation and encrypted completed response. Exact retries within 24 hours return
+  the original status, body, and request ID with `Idempotency-Replayed: true`; changed bindings return
+  `409 IDEMPOTENCY_CONFLICT`.
+- PostgreSQL consumes the resolved key's one-minute window before scope evaluation or body parsing.
+  Authenticated responses include `RateLimit-Limit`, `RateLimit-Remaining`, and Unix-seconds
+  `RateLimit-Reset`; exhausted requests also include `Retry-After` and return `RATE_LIMIT_EXCEEDED`. Database
+  failure returns `SERVICE_UNAVAILABLE`, never an in-memory or unmetered fallback.
+
+### Scope catalog
+
+The exact non-wildcard catalog is `organization:read`; `contacts:read|write`; `tags:read|write`;
+`lists:read|write`; `segments:read|write`; `templates:read|write`; `messages:read|write|send`;
+`campaigns:read|write|send`; `conversations:read|write`; `deliveries:read`; `credentials:read|write`; and
+`webhooks:read|write|replay`. `messages:send` and `campaigns:send` are separate external-impact grants. A public
+credential can read, rotate, or revoke only itself; tenant-wide creation and administration remain behind the
+cookie-session ADMIN boundary.
+
+### Frozen route table
+
+The M3 route table remains compatible; M5 adds only direct-message cancellation. Minimum scopes are:
+
+- `GET /api/v1/openapi.json` — public metadata exception.
+- `GET /api/v1/organization` — `organization:read`.
+- `GET /api/v1/contacts`, `GET /api/v1/contacts/:contactId` — `contacts:read`.
+- `POST /api/v1/contacts`, `PATCH /api/v1/contacts/:contactId`,
+  `DELETE /api/v1/contacts/:contactId` — `contacts:write`.
+- `GET /api/v1/tags`, `GET /api/v1/tags/:tagId` — `tags:read`.
+- `POST /api/v1/tags`, `PATCH /api/v1/tags/:tagId`, `DELETE /api/v1/tags/:tagId` — `tags:write`.
+- `GET /api/v1/lists`, `GET /api/v1/lists/:listId` — `lists:read`.
+- `POST /api/v1/lists`, `PATCH /api/v1/lists/:listId`, `DELETE /api/v1/lists/:listId` — `lists:write`.
+- `GET /api/v1/lists/:listId/contacts` — `lists:read` plus `contacts:read`.
+- `POST /api/v1/lists/:listId/contacts`, `DELETE /api/v1/lists/:listId/contacts/:contactId` — `lists:write`.
+- `GET /api/v1/segments`, `GET /api/v1/segments/:segmentId` — `segments:read`.
+- `POST /api/v1/segments`, `PATCH /api/v1/segments/:segmentId`,
+  `DELETE /api/v1/segments/:segmentId` — `segments:write`.
+- `GET /api/v1/segments/:segmentId/contacts` — `segments:read` plus `contacts:read`.
+- `GET /api/v1/templates`, `GET /api/v1/templates/:templateId` — `templates:read`.
+- `POST /api/v1/templates`, `PATCH /api/v1/templates/:templateId`,
+  `DELETE /api/v1/templates/:templateId` — `templates:write`.
+- `GET /api/v1/messages`, `GET /api/v1/messages/:messageId` — `messages:read`.
+- `POST /api/v1/messages` — `messages:send`; M5 reserves the durable direct-message outbox while preserving
+  deterministic dummy behavior in demo/local mode.
+- `GET /api/v1/messages/:messageId/status` — `deliveries:read`.
+- `POST /api/v1/messages/:messageId/cancel` — `messages:send`.
+- `GET /api/v1/campaigns`, `GET /api/v1/campaigns/:campaignId` — `campaigns:read`.
+- `POST /api/v1/campaigns`, `PATCH /api/v1/campaigns/:campaignId` — `campaigns:write`.
+- `POST /api/v1/campaigns/:campaignId/schedule`, `POST /api/v1/campaigns/:campaignId/cancel` —
+  `campaigns:send`.
+- `GET /api/v1/conversations`, `GET /api/v1/conversations/:conversationId` — `conversations:read`.
+- `GET /api/v1/conversations/:conversationId/messages` — `conversations:read` plus `messages:read`.
+- `POST /api/v1/conversations/:conversationId/messages` — `conversations:write` plus `messages:send`.
+- `GET /api/v1/api-keys/current` — `credentials:read`; safe metadata for the calling key only.
+- `POST /api/v1/api-keys/current/rotate`, `DELETE /api/v1/api-keys/current` — `credentials:write`; the calling
+  key only.
+- `GET /api/v1/webhook-event-types`, `GET /api/v1/webhook-endpoints`, and
+  `GET /api/v1/webhook-endpoints/:endpointId` — `webhooks:read`.
+- `POST /api/v1/webhook-endpoints`, `PATCH /api/v1/webhook-endpoints/:endpointId`,
+  `DELETE /api/v1/webhook-endpoints/:endpointId`, and
+  `POST /api/v1/webhook-endpoints/:endpointId/rotate-secret` — `webhooks:write`.
+- `GET /api/v1/webhook-endpoints/:endpointId/deliveries` — `deliveries:read`.
+- `POST /api/v1/webhook-deliveries/:deliveryId/replay` — `webhooks:replay`.
+
+### M5 direct-message acceptance and DTOs
+
+`POST /api/v1/messages` accepts `contactId`, optional same-contact `conversationId`, a required trimmed body
+of 1–1,600 characters, and zero to ten unique HTTPS media URLs. SMS is body-only; media requires the selected
+verified owned number to advertise MMS capability. The server snapshots the normalized destination and
+content so a later contact edit cannot silently retarget accepted work.
+
+After bearer authentication, exact `messages:send` scope, rate consumption, JSON validation, and recipient
+preflight, the route executes the centralized reservation inside the public idempotency transaction. It
+atomically creates the stable `Message`, attempt one, permanent keyed payload binding, conversation
+projection, and `message.accepted` customer-event outbox before returning `202` with `Location`. It never
+calls Twilio. Missing/cross-tenant contact or conversation is `404`; current recipient-policy denial is
+`422 OPERATION_NOT_ALLOWED` without a message. An exact public replay returns the original `202`, body,
+request ID, and location; changed binding is `409 IDEMPOTENCY_CONFLICT`.
+
+Public API idempotency retains the M3 `(orgId, apiCredentialId, Idempotency-Key)` scope and encrypted 24-hour
+response snapshot. The message's permanent opaque credential-bound key and keyed canonical fingerprint
+survive response expiry. The same identity may return an existing message only when route, direction,
+contact, conversation, destination, body, media, and transport all match; any changed binding conflicts.
+
+`POST /api/v1/conversations/:conversationId/messages` uses the same reservation and `202` contract after
+exact `conversations:write` plus `messages:send` authorization. The URL conversation is part of the permanent
+fingerprint and must belong to the selected contact. Neither public route permits caller-selected provider
+credentials, exact provider account IDs, sender numbers, callback URLs, transport overrides, provider IDs,
+application/attempt status, or retry controls.
+
+`GET /api/v1/messages`, `GET /api/v1/messages/:messageId`, and
+`GET /api/v1/messages/:messageId/status` expose distinct `applicationStatus`, compatibility `status`,
+explicit lower-case `transport: dummy|twilio`, `attemptCount`, latest safe attempt status, `requiresReview`,
+normalized provider status/error code, and delivery timestamps. `applicationStatus` is one of `ACCEPTED`, `SCHEDULED`,
+`PROCESSING`, `SENT`, `DELIVERED`, `FAILED`, `CANCELLED`, or `AMBIGUOUS`; latest attempt status is one of
+`QUEUED`, `PROCESSING`, `SUCCEEDED`, `FAILED`, `CANCELLED`, `AMBIGUOUS`, or `RESOLVED_NOT_SENT`. The legacy
+`status` field remains a documented compatibility projection and never determines claimability. Legacy
+`mode: dummy|provider` is derived from explicit transport, never provider-status text. Ambiguity is
+first-class and is not reported as ordinary pending.
+
+Public DTOs never expose the message body through the status-only resource, accepted destination/sender,
+media-fetch credentials, exact provider account identity, credential generation, owner/lease tokens,
+callback correlation/HMAC, request fingerprint, raw provider response, internal error/disposition,
+attestation reason, or other-tenant evidence.
+
+### `POST /api/v1/messages/:messageId/cancel`
+
+Requires bearer `messages:send` authorization and the normal public `Idempotency-Key`. It conditionally
+cancels the same-tenant message/current attempt only before `providerCallStartedAt`. Success returns the
+cancelled message resource; an exact replay returns the same response. Cross-tenant/unknown messages are
+`404`. Any post-frontier, already-sent, delivered, failed, ambiguous, or otherwise incompatible state is
+`409 CONFLICT`. Cancellation never calls a provider, deletes attempt evidence, or creates a retry.
+
+### `GET /api/settings/api-keys`
+
+Lists safe API credential metadata for the current organization after cookie-session ADMIN authorization.
+It never returns a raw key, stored hash, last-use network hash, or another tenant's row and is non-cacheable.
+
+### `POST /api/settings/api-keys`
+
+Creates one tenant API credential after cookie-session ADMIN and same-origin checks. It validates exact
+catalog scopes, expiry, and the per-minute limit, then returns the raw bearer exactly once with safe metadata.
+
+### `POST /api/settings/api-keys/:credentialId`
+
+Rotates one same-tenant, unrevoked credential after ADMIN and same-origin checks. The previous bearer becomes
+invalid atomically; the replacement is returned once and is never available from later reads.
+
+### `DELETE /api/settings/api-keys/:credentialId`
+
+Idempotently revokes one same-tenant credential after ADMIN and same-origin checks. It retains secret-free
+metadata and audit evidence and never hard-deletes the credential.
+
 ## Implemented Endpoints
 
 ### `/setup`, `/login`, and `/logout`
@@ -304,7 +465,18 @@ Creates a demo-safe inbound message on an existing conversation. Explicit `idemp
 
 ### `POST /api/inbox/conversations/:conversationId/reply`
 
-Records a demo-safe **outbound** reply on the conversation through the dummy provider — never a live send. Requires `MEMBER`. Opted-out, archived, or missing contacts are blocked with `422` and `{ "reasons": [...] }`, creating no message row. An explicit `idempotencyKey` duplicate returns the existing local message with `deduped: true` and does not insert again.
+Requires same-origin cookie authentication and `MEMBER`. The strict body is `{ "body": "...",
+"idempotencyKey": "client-uuid" }`; the browser creates one UUID before submission, retains it across
+network retries, and clears it only after a conclusive response. The permanent identity is
+`(orgId, conversationId, client UUID)` and is bound to direction, contact, destination, body, media, and
+transport. An exact replay returns the original message with `deduped: true`; changed reuse is `409` and
+never returns an unrelated inbound row.
+
+The route uses the same M5 reservation service as public direct messaging and never calls Twilio. A new
+reservation retains browser compatibility with `201`, an exact replay returns `200`, and both include the
+same stable message resource and `Location`. Opted-out, archived, or missing contacts are blocked with `422`
+and safe reasons without creating a message. Demo/dummy mode remains deterministic and network-free; live
+transport is performed later only by the authorized direct worker and final gate.
 
 ### `POST /api/inbox/conversations/:conversationId/assign`
 
@@ -360,7 +532,11 @@ Returns deterministic fake lead qualification score, stage, and reasons from sup
 
 ### `GET /api/analytics/overview`
 
-Returns tenant-scoped counts for contacts, total and scheduled campaigns, conversations, local outbound message delivery breakdowns including delivered, pending, failed outbound counts, the newest outbound local message timestamp, and local usage totals. Delivered outbound counts exclude rows with terminal failure evidence so stale delivery timestamps do not inflate delivery rates.
+Returns tenant-scoped counts for contacts, total and scheduled campaigns, conversations, outbound message
+delivery breakdowns including delivered, pending, ambiguous, failed, and cancelled application outcomes, the
+newest outbound evidence timestamp, and local usage totals. Ambiguous is never counted as ordinary pending.
+Delivered counts exclude rows with terminal failure evidence so stale delivery timestamps do not inflate
+delivery rates.
 
 ### `GET /api/billing/usage`
 
@@ -372,31 +548,171 @@ Records a local usage event. This endpoint must not call Stripe or create live b
 
 ### `POST /api/webhooks/twilio/inbound`
 
-Accepts Twilio `application/x-www-form-urlencoded` inbound message webhooks. The request must pass `X-Twilio-Signature` validation with `TWILIO_AUTH_TOKEN`; unsigned requests are rejected. Valid payloads are stored as raw org-scoped webhook events by idempotency key and create local inbound inbox messages only after acquiring an expiring owner lease. Successful and already processed events return `204`; an unprocessed event owned by another request returns `409` with an advisory `Retry-After`. Upstream retry behavior must be configured explicitly. The handler disables sentiment analysis and keyword auto-replies, and does not send SMS or invoke AI.
+Accepts Twilio `application/x-www-form-urlencoded` inbound message webhooks. M4 resolves one candidate from
+strict `AccountSid` plus owned `To` number/service evidence, decrypts that account's active credential,
+validates `X-Twilio-Signature`, then locks/rechecks account/ownership/credential generation inside the
+resolved tenant before persistence. It never uses browser/API identity, demo fallback, or the installation-
+global `TWILIO_AUTH_TOKEN` as tenant authority. Valid payloads retain the existing idempotent owner-lease
+path. The handler disables sentiment analysis and keyword auto-replies and never sends SMS or invokes AI.
 
 ### `POST /api/webhooks/twilio/status`
 
-Accepts Twilio `application/x-www-form-urlencoded` delivery status webhooks. The request must pass `X-Twilio-Signature` validation with `TWILIO_AUTH_TOKEN`; unsigned requests are rejected. Valid payloads are stored as raw org-scoped webhook events by idempotency key and mutate local delivery state only after acquiring an expiring owner lease. Successful and already processed events return `204`; an unprocessed event owned by another request returns `409` with an advisory `Retry-After`. Upstream retry behavior must be configured explicitly. The handler does not call any provider.
+Accepts Twilio `application/x-www-form-urlencoded` delivery status webhooks. M4 resolves one candidate from
+strict `AccountSid` plus the owned outbound `From` number/service, validates with that account's active
+credential, and rechecks the locked tenant state before storing the event or mutating delivery evidence.
+M5 additionally requires the callback URL's attempt correlation plus domain-separated HMAC, then binds the
+exact attempt/account/sender/destination/provider SID before mutation. A valid correlation may attach a SID
+when create-result persistence was lost; conflicting evidence fails closed. Valid payloads retain the
+idempotent owner-lease and monotonic-status path and atomically update attempt, message projection, and
+deduplicated customer events. The handler does not call any provider.
+
+For both Twilio routes, malformed forms return `400`. Wrong signature/credential/destination, crossed or
+unknown account/resource, detected ambiguity, disabled/revoked state, and rotation races share `403` with
+`{ "error": "Provider callback rejected.", "code": "INVALID_PROVIDER_CALLBACK" }` and no tenant mutation.
+Routing/crypto storage unavailability returns secret-free `503 WEBHOOK_ROUTING_UNAVAILABLE`. All denials are
+`Cache-Control: no-store` and reveal no account, tenant, number, service, or credential existence.
+
+### `GET /api/settings/delivery-attempts`
+
+Requires cookie-session ADMIN authorization and returns a bounded, tenant-scoped review list. Allowlisted
+filters may select application/attempt state and `requiresReview`; pagination/order must be deterministic.
+Rows expose only stable message/attempt IDs, redacted destination/sender last-four, application/attempt/
+provider status, safe provider error code, attempt number, timestamps, and review eligibility. They never
+include message body/media, exact account/sender/destination, credentials, fingerprints, owner tokens,
+callback correlation/HMAC, raw provider response, or internal attestation text.
+
+### `GET /api/settings/delivery-attempts/:attemptId`
+
+Returns one safe same-tenant ADMIN review DTO under the same redaction boundary. Unknown and cross-tenant
+identifiers share `404`; the read performs no provider call or mutation.
+
+### `POST /api/settings/delivery-attempts/:attemptId/reconcile`
+
+Requires cookie-session ADMIN, exact same origin, no request body, and `Cache-Control: no-store`. It performs
+provider fetch only when the ambiguous attempt has a known SID and current exact stored account credential.
+Fetched account/SID/destination/sender evidence must match the durable attempt. It may conditionally converge
+to `SENT`, `DELIVERED`, or `FAILED`; fetch failure/mismatch preserves ambiguity. It never calls create,
+creates a retry, or accepts caller-supplied provider identity. Success or a conclusive no-change appends a
+secret-free `MESSAGE_ATTEMPT_RECONCILED` integration audit event.
+
+### `POST /api/settings/delivery-attempts/:attemptId/attest-not-sent`
+
+Requires cookie-session ADMIN, exact same origin, and strict `{ "confirmation": "ATTEST NOT SENT",
+"reason": "..." }` with a trimmed bounded reason. It conditionally marks only an ambiguous no-provider-
+proof attempt `RESOLVED_NOT_SENT`; stale, non-ambiguous, SID-bearing/proven-impact, already-resolved, or
+concurrent requests return `409`. It makes no provider call and appends secret-free
+`MESSAGE_ATTEMPT_ATTESTED_NOT_SENT` audit evidence without outwardly returning the reason.
+
+### `POST /api/settings/delivery-attempts/:attemptId/retry`
+
+Requires cookie-session ADMIN, exact same origin, and strict `{ "confirmation": "RETRY MESSAGE" }`. Only a
+current `RESOLVED_NOT_SENT` attempt without an existing successor may create the next attempt number once.
+The route returns the successor and appends `MESSAGE_ATTEMPT_RETRY_CREATED` audit evidence; it does not call
+a provider. Stale, concurrent, non-attested, or already-retried requests return `409`. The successor is an
+ordinary queued attempt and must pass the complete worker gate later.
 
 ### `GET /api/settings/provider`
 
-Returns secret-safe messaging provider readiness for the current organization: selected provider, demo mode, live messaging flag, live messaging blockers, compliance readiness, and Twilio credential presence booleans. This endpoint must not return credential values, mutate provider state, or enable live SMS.
+Returns secret-safe aggregate provider readiness for the current organization: selected provider, demo/live
+flags, compliance blockers, and safe verified/revoked/account/number/service/health summaries. It must not
+return credential/envelope/routing values, call a provider, mutate state, or enable live SMS.
 
 ### `PATCH /api/settings/provider`
 
-Stores local, secret-safe Twilio credential readiness metadata from `{ "provider": "twilio", "twilio": { "accountSid": "...", "authToken": "...", "fromNumber": "+15555550199" } }`. The handler may persist redacted account/from-number fields and a one-way token fingerprint only. It must not return or persist raw auth tokens, call Twilio, validate live ownership, enable live messaging, or send SMS.
+Retired metadata-only compatibility mutation. It requires ADMIN/same-origin authorization and returns
+no-store `410 PROVIDER_METADATA_ENDPOINT_RETIRED` before reading a request body. Callers must use the
+verified provider-account endpoints. It does not mutate provider state, enable messaging, or send.
 
 ### `DELETE /api/settings/provider`
 
-Clears local Twilio credential readiness metadata for the current organization. The handler must not call Twilio, revoke provider credentials, disable provider accounts, enable live messaging, or send SMS. It records a local readiness audit event.
+M4 compatibility mutation that locally revokes the selected default provider account/credential authority.
+It retains encrypted-version and audit history, does not claim provider-side revocation, and never sends.
+
+### `GET /api/settings/provider/accounts`
+
+Lists safe same-tenant provider-account DTOs after ADMIN authorization. It does not return plaintext,
+envelope, lookup-hash, or raw provider-error fields and performs no provider call.
+
+### `POST /api/settings/provider/accounts`
+
+Requires ADMIN/same-origin before parsing, verifies one Twilio account through a bounded explicit provider
+read, and atomically persists account identity plus an encrypted credential version. Any verification,
+ownership, encryption, or persistence failure creates no partial account/credential/ownership rows.
+
+### `GET /api/settings/provider/accounts/:accountId`
+
+Returns one safe same-tenant provider-account DTO after ADMIN authorization. It exposes no envelope,
+routing, credential, or raw provider-error fields and performs no provider call.
+
+### `PATCH /api/settings/provider/accounts/:accountId`
+
+Requires ADMIN/same-origin before parsing and selects the verified active account as the organization's
+local default. It does not enable messaging or perform a provider-side mutation.
+
+### `DELETE /api/settings/provider/accounts/:accountId`
+
+Requires ADMIN/same-origin and locally revokes account and credential authority while retaining encrypted
+version and immutable audit evidence. It does not claim or perform provider-side credential revocation.
+
+### `POST /api/settings/provider/accounts/:accountId/rotate`
+
+Verifies a replacement credential before locking/rechecking generation and atomically activating the next
+encrypted version. A concurrent rotation/revocation returns `409`; the prior version becomes unusable but
+is retained.
+
+### `POST /api/settings/provider/accounts/:accountId/verify`
+
+Explicit bounded account re-verification under the active credential. It records only safe verification
+status/time/error class and never enables sending.
+
+### `POST /api/settings/provider/accounts/:accountId/health`
+
+Explicit bounded read-only provider health check. It records only safe status/time/error-class evidence and
+does not silently revoke credentials or mutate provider resources.
+
+### `POST /api/settings/provider/accounts/:accountId/discover`
+
+Returns bounded, strictly parsed number and messaging-service candidates under the active verified account
+without persisting ownership. Candidates contain safe IDs/last-four, canonical E.164, capabilities, provider
+status, and a short-lived account/credential-generation binding only.
+The opaque `pvcandidate_v1_` IDs are distinct from persistent `pvlookup_v1_` ownership/routing hashes; the
+latter never enter the response.
+
+### `POST /api/settings/provider/accounts/:accountId/import`
+
+Imports selected fresh discovery candidates after locking/rechecking account, credential generation, and
+global ownership. It never purchases, releases, ports, configures, or otherwise changes provider resources.
+
+### `GET /api/settings/provider/accounts/:accountId/numbers`
+
+Returns safe verified/disabled owned-number state for one same-tenant provider account.
+
+### `GET /api/settings/provider/accounts/:accountId/messaging-services`
+
+Returns safe verified/disabled messaging-service state for one same-tenant provider account.
+
+### `PATCH /api/settings/provider/accounts/:accountId/messaging-services/:serviceId`
+
+Requires ADMIN/same-origin before parsing and performs exactly one local lifecycle action: make the verified
+service the account default or disable it. The URL account must own the service. No provider-side resource is
+changed and no message is sent.
+
+### `PATCH /api/settings/numbers/:numberId`
+
+Requires ADMIN/same-origin before parsing and performs exactly one local lifecycle action: make the verified
+owned number its account default or disable it. No provider-side resource is changed and no message is sent.
 
 ### `GET /api/settings/provider/rotations`
 
-Returns recent tenant-scoped provider credential metadata history for the current organization. Optional query parameters are `action=CONFIGURED|REFRESHED|ROTATED|DELETED` and bounded `limit`. Entries include provider, action, redacted account/from-number values, last-four hints, configured booleans, actor ID, and timestamp. The response must not include raw auth tokens, token fingerprints, provider credential values, provider verification results, or trigger provider calls/live messaging.
+Returns bounded, safe, unverified/display-only legacy `ProviderCredentialRotation` metadata. It is not M4
+provider ownership, credential authority, or canonical provider-control audit evidence. Entries exclude raw
+tokens, fingerprints, envelope/routing values, and provider errors and trigger no provider call.
 
 ### `GET /api/settings/provider/rotations/export`
 
-Returns a CSV export of recent tenant-scoped provider credential metadata history for the current organization using the same allowlisted `action` and bounded `limit` filters as the JSON rotation endpoint. The export includes redacted local credential metadata only. It must not include raw auth tokens, token fingerprints, provider verification results, provider-side state, or trigger provider calls, live messaging, billing records, notifications, or mutations.
+Returns a CSV of the same bounded legacy display-only history. It excludes plaintext/envelope/routing
+values, raw provider errors, fingerprints, and provider-side secrets and triggers no mutation or external
+call. Canonical M4 provider-control evidence remains in append-only `IntegrationAuditEvent` rows.
 
 ### `/settings`
 
@@ -404,7 +720,11 @@ Renders the consolidated go-live readiness view for the current organization. It
 
 ### `/settings/provider`
 
-Renders provider details for the current organization. It may submit local Twilio credential metadata to `PATCH /api/settings/provider`, clear local metadata through `DELETE /api/settings/provider`, filter local rotation history, and link to its bounded CSV export. It must render and export redacted values only and must not expose raw auth tokens or token fingerprints, claim provider verification, call providers, revoke provider-side credentials, offer live-send controls, or enable live messaging.
+Renders the M4 ADMIN provider control plane: safe account/readiness/health state, unprefilled credential
+verification/rotation controls, verified discovery/import for numbers/services, local revoke/disable/default
+controls, and bounded legacy display-history export. Canonical M4 audit remains in append-only
+`IntegrationAuditEvent`. Plaintext inputs reset after submission and are never server-rendered or
+returned. The page offers no send, number purchase/release/port, provider-side mutation, or live-enable control.
 
 ### `/dashboard/campaigns/:campaignId`
 
@@ -429,6 +749,16 @@ Renders a read-only local operator checklist based on `docs/LOCAL_OPERATOR_RUNBO
 ### `/settings/queue`
 
 Renders a read-only queue operations view for the current organization. It may display scheduled-campaign queue job status counts, due versus future queued jobs, payload validity, idempotency keys, worker poll settings, queue backend metadata, Redis presence, and related campaign names. The page must not enqueue jobs, run workers, mutate queue rows, update campaign status, call Redis, call messaging providers, create billing records, send notifications, expose secrets, send SMS, or enable live messaging.
+
+### `/settings/delivery-attempts`
+
+Renders the cookie-authenticated ADMIN M5 direct-message attempt review surface. It may list safe tenant-
+scoped attempt/application/provider state, redacted destination/sender last-four, timestamps, and review
+eligibility and may submit the explicit reconcile, `NOT_SENT` attestation, and retry actions above. Rendering
+performs no provider call or mutation. It never shows body/media, exact destination/sender/account identity,
+credential/envelope/fingerprint material, owner tokens, callback correlation/HMAC, raw provider responses,
+or attestation reason. Reconcile is fetch-only; attestation and retry require their exact confirmations; no
+browser action directly calls provider create or bypasses the worker gate.
 
 ### `/settings/validation`
 
@@ -464,7 +794,14 @@ Renders the product-facing campaign workspace for the current organization. It m
 
 ### `/dashboard/inbox`
 
-Renders the product-facing inbox workspace for the current organization. It may display tenant-scoped conversations, select a visible local thread with `conversationId` query state, fall back to the first visible thread when the query does not match the current tenant inbox, create local inbound demo messages, add internal notes, assign conversations, resolve or reopen threads through existing inbox endpoints, and request deterministic fake-AI conversation summary plus lead qualification from existing local AI endpoints. It must not send outbound SMS, call providers, create billing records, call live AI, expose secrets, notify contacts, or enable live messaging.
+Renders the product-facing inbox workspace for the current organization. It may display tenant-scoped
+conversations, select a visible local thread with `conversationId` query state, fall back to the first
+visible thread, create local inbound demo messages, add notes, assign/resolve/reopen threads, request
+deterministic fake-AI insights, and reserve an outbound reply through the M5 route. Message cards distinguish
+accepted, processing, sent, delivered, failed, cancelled, and ambiguous state; ambiguous is never ordinary
+pending. The client retains its reply UUID across uncertain network outcomes. The page/route does not call a
+provider, reconcile, attest, retry, create billing records, call live AI, expose secrets, or enable live
+messaging; any live create occurs later in the separately authorized direct worker.
 
 ### `/dashboard/templates`
 
@@ -476,7 +813,12 @@ Renders the product-facing template detail workflow for a tenant-scoped message 
 
 ### `/dashboard/analytics`
 
-Renders the product-facing analytics workspace for the current organization. It may display tenant-scoped contact, campaign, scheduled-campaign, conversation, local outbound message delivery counts, latest outbound evidence timestamp, a campaign-level delivery review summary including failed and pending campaign counts, bounded delivery review rows linking to existing campaign detail pages, and local usage totals from existing local analytics and campaign records. It must not execute reports, create exports, mutate records, retry deliveries, run workers, call providers, call Stripe, create billing artifacts, send SMS, call live AI, expose secrets, or enable live messaging.
+Renders the product-facing analytics workspace for the current organization. It may display tenant-scoped
+contact, campaign, scheduled-campaign, conversation, and outbound delivery counts, latest evidence, campaign
+review summaries, and local usage. M5 application ambiguity is a separate count/review priority and cannot
+be collapsed into pending; direct-message review links route ADMIN users to the dedicated attempt surface.
+It must not execute reports, create exports, mutate records, retry deliveries, run workers, call providers,
+call Stripe, create billing artifacts, send SMS, call live AI, expose secrets, or enable live messaging.
 
 ### `/dashboard/compliance`
 
@@ -492,7 +834,9 @@ Returns tenant-scoped provider phone-number metadata for the current organizatio
 
 ### `POST /api/settings/numbers`
 
-Creates or updates tenant-scoped provider phone-number metadata from `{ "phoneNumber": "+15555550123", "provider": "dummy", "capabilities": ["sms"], "isDefault": true }`. At most one number per organization may be the default. This endpoint is local metadata only; it must not provision numbers, validate live ownership, store secrets, enable live messaging, or send SMS.
+Creates or updates dummy/local provider-number metadata only. Caller-asserted `twilio` ownership is rejected
+unless this method delegates to the verified account discovery/import boundary. At most one eligible sender
+per configured scope may be default. It never provisions, purchases, releases, ports, enables, or sends.
 
 ### `GET /api/settings/readiness-audit`
 

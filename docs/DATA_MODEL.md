@@ -21,18 +21,19 @@ Tenant rule: every tenant-scoped table must include `orgId` unless explicitly do
 
 ## Standalone M2 — Database-Enforced Tenant Integrity
 
-The database tenant boundary is complete for the current schema:
+The M2 checkpoint established the database tenant boundary that every later model must preserve:
 
-- `lib/db/tenant-manifest.ts` lists 22 ordinary tenant tables and five identity/control tables, for 27
-  protected tables total. Every protected table has forced, fail-closed RLS, and runtime posture compares
-  command/role/predicate fingerprints rather than accepting policy names or counts alone.
+- At the M2 checkpoint, `lib/db/tenant-manifest.ts` listed 22 ordinary tenant tables and five
+  identity/control tables, for 27 protected tables total. Every protected table had forced, fail-closed
+  RLS, and runtime posture compared command/role/predicate fingerprints rather than accepting policy names
+  or counts alone.
 - Same-tenant composite keys and foreign keys cover live relations. The upgrade preflight aborts on
   invalid legacy rows while emitting only invariant labels/counts, never tenant IDs or PII.
 - Historical issuer, author, actor, and typed audit-subject references are validated by insert/update
   triggers when deleting the referenced row must not erase history.
 - `LocalCredential` and `AuthThrottle` remain installation-global. User-global password-reset
   `AuthToken` rows retain their explicit null-organization shape and use bounded control context.
-- All 40 migrations support a distinct table-owning credential that is non-superuser and non-BYPASSRLS
+- All 40 M2 migrations support a distinct table-owning credential that is non-superuser and non-BYPASSRLS
   through the explicit NOLOGIN `signalstack_owner` capability. Web and worker logins are NOINHERIT,
   non-owner roles; provisioning removes the owner capability and runtime posture rejects it.
 - Control-plane purposes do not grant broad access. Command-specific tenant-root/global-user policies
@@ -43,6 +44,74 @@ The database tenant boundary is complete for the current schema:
 - The static direct-Prisma inventory has no tenant migration-debt entries. New tenant-owned models must
   add `orgId`, join the manifest/RLS policy set, use the transaction context, and extend the mandatory
   two-tenant matrix in the same change.
+
+## Standalone M3 — Public Integration Substrate
+
+The M3 checkpoint's 43-migration schema extends the M2 boundary to 31 ordinary tenant tables plus the five
+identity/control tables, for 36 protected tables. The nine added tenant models are covered by forced RLS,
+same-tenant composite relations, runtime posture attestation, least-privileged grants, and the mandatory
+PostgreSQL tenant matrix:
+
+- `ApiCredential` stores a visible unique prefix, server-keyed secret digest, scopes, expiry/revocation,
+  last-use metadata, and a database-owned fixed rate window. Raw API keys are one-time responses and are
+  never persisted in plaintext.
+- `ApiIdempotencyRecord` binds a credential and HMAC-protected idempotency key to one method, canonical
+  route, and request digest. The completed response snapshot is authenticated-encrypted before the JSON
+  column is written, permitting an exact status/body/request-ID replay without storing a one-time secret
+  in plaintext.
+- `IntegrationAuditEvent` is append-only tenant evidence for API-key and public-integration lifecycle
+  actions. Optional credential references are same-tenant and restricted rather than cascading history.
+- `CustomerWebhookEndpoint` and `CustomerWebhookSubscription` store one immutable canonical HTTPS target,
+  endpoint state/failure evidence, and an allowlisted event-type selection.
+- `CustomerWebhookSigningSecret` stores versioned AES-256-GCM envelope fields and a safe fingerprint. Raw
+  `whsec_` material is revealed only on creation/rotation; deliveries retain the precise secret version
+  to which they were pinned.
+- `CustomerWebhookEvent` is an immutable, deduplicated domain-event outbox row containing canonical raw
+  payload text plus its digest. `CustomerWebhookDelivery` records endpoint/subscription/event/secret pins,
+  bounded scheduling, generation/lease ownership, terminal evidence, and replay ancestry.
+- `CustomerWebhookDeliveryAttempt` is reserved durably before network I/O, then completed once with its
+  outcome. Its delivery/generation/attempt identity and timing are immutable, completed evidence cannot be
+  rewritten, and an expired disabled-endpoint reservation is reconciled as ambiguous instead of erasing
+  possible external impact. It retains acknowledgement/error classification and status code without storing
+  response bodies.
+
+`claim_due_customer_webhook_deliveries` is the worker-only bounded, database-timed claim seam. It uses
+transactional row locking, lease/generation evidence, a fixed search path, and no `PUBLIC` execution grant;
+network delivery occurs outside the transaction and finalization is conditional on the live owner token.
+
+## Standalone M4 — Provider Ownership and Trusted Routing
+
+Eight migrations (`20260712010000` through `20260712017000`) extend the current schema to 51 migrations,
+34 ordinary tenant tables, and five identity/control tables: 39 protected tables total.
+
+M5 adds four forward migrations (`20260712018000` through `20260712021000`) and one ordinary protected
+table, bringing the current schema to 55 migrations, 35 ordinary tenant tables, and 40 protected tables.
+`Message.applicationStatus` is the customer lifecycle while `MessageAttempt.status` is independent outbox
+state. Accepted payload/correlation/provider-call-frontier identity is immutable; a bounded worker-only
+database capability reclaims pre-frontier work and converts expired post-frontier ownership to ambiguity.
+Attempts retain provider authority, destination/body/media snapshot, callback correlation, provider
+evidence, reconciliation evidence, and retry lineage without storing plaintext credentials.
+
+- `ProviderAccount` stores one tenant-scoped provider identity, exact non-secret external account ID,
+  globally unique keyed account hash, safe display/last-four metadata, verification/health/generation state,
+  local default selection, and revocation evidence.
+- `ProviderCredentialSecret` stores versioned AES-256-GCM envelope fields, a safe fingerprint, and activation/
+  retirement/revocation evidence. AAD binds `orgId`, provider, exact external account ID and its canonical
+  keyed hash, local provider-account ID, credential-secret ID/version, envelope/key versions, and fingerprint.
+- `ProviderPhoneNumber` may remain legacy dummy/unverified metadata or become verified owned evidence only
+  through fresh account-bound discovery/import. Verified live rows have canonical E.164, account ownership,
+  strict capabilities, verification/import state, and local default/disable lifecycle.
+- `ProviderMessagingService` stores verified, account-bound service identity, a globally unique keyed
+  external identifier, strict capabilities, and local default/disable lifecycle.
+- `IntegrationAuditEvent` is the canonical append-only M4 provider-control audit for configure, verify,
+  rotate, revoke, health, discovery, import, default, and disable. Legacy `ProviderCredential` and
+  `ProviderCredentialRotation` rows remain unverified/display-only and never authorize M4 ownership.
+
+The web-only `resolve_verified_provider_destination` capability resolves an exact keyed account plus owned
+destination without granting broad provider-table reads. Unknown, crossed, ambiguous, disabled, revoked, or
+stale-generation evidence fails before tenant persistence. The mandatory PostgreSQL proof uses a non-owner
+two-account fixture; HTTP route fixtures separately prove handler behavior without claiming a literal
+callback-server E2E. M4 never sends a message or purchases, releases, ports, or configures provider resources.
 
 ## Milestone 2 Contacts
 
@@ -100,17 +169,23 @@ Provider delivery state is stored on `Message` rows:
 - `deliveredAt`: set when a provider status reaches `delivered`.
 - `failedAt`: set when a provider status reaches the shared terminal-failure vocabulary: `failed`, `undelivered`, or `canceled`.
 
-## Post-MVP Provider Number Foundation
+## Legacy Provider Number Foundation
 
-`ProviderPhoneNumber` stores org-scoped phone-number metadata for demo and future provider setup screens. It tracks phone number, provider, local status, capabilities, and default selection. These rows are not credentials and do not prove live provider ownership.
+Pre-M4 `ProviderPhoneNumber` rows store org-scoped local metadata and remain explicitly unverified. M4 does
+not promote them during migration; only verified account-bound discovery/import creates live ownership
+evidence. Number rows are never credentials and local lifecycle changes do not mutate provider resources.
 
-## Post-MVP Provider Credential Metadata Foundation
+## Legacy Provider Credential Metadata Foundation
 
-`ProviderCredential` stores org-scoped local provider readiness metadata. For Twilio it records redacted account SID/from-number fields, credential presence booleans through derived settings, a one-way auth-token fingerprint, and source metadata. It intentionally does not store raw auth tokens or validate credentials with Twilio.
+`ProviderCredential` stores pre-M4 org-scoped readiness metadata only. It may contain redacted account/from-
+number fields and old configured booleans, but it is unverified/display-only and never supplies M4 authority.
+Recoverable M4 credentials exist only in bound `ProviderCredentialSecret` envelopes.
 
-## Post-MVP Provider Credential Rotation History
+## Legacy Provider Credential Rotation History
 
-`ProviderCredentialRotation` stores org-scoped local history for provider credential metadata configuration, rotation, and deletion events. It records provider name, action, optional credential row ID, redacted account/from-number values, last-four hints, configured booleans, optional actor, and timestamp. API responses never expose raw auth tokens or token fingerprints, and these records do not trigger provider calls or live messaging.
+`ProviderCredentialRotation` preserves org-scoped pre-M4 display history for metadata configuration, rotation,
+and deletion. It is not canonical M4 audit or ownership evidence. API/export responses remain redacted and
+these rows do not trigger provider calls or live messaging.
 
 ## Post-MVP Live Readiness Audit Foundation
 

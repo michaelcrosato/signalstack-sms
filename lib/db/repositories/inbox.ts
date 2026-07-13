@@ -1,4 +1,10 @@
-import { ConsentStatus, ConversationStatus, type Message, type Prisma } from "@prisma/client";
+import {
+  ConsentStatus,
+  ConversationStatus,
+  type MessageApplicationStatus,
+  type MessageTransport,
+  type Prisma
+} from "@prisma/client";
 import {
   hasAnyConsentEvidence,
   hasCompleteConsentEvidence
@@ -6,6 +12,10 @@ import {
 import { classifyInboundKeyword, type InboundKeywordAction } from "@/lib/compliance/opt-out";
 import { orgWhere } from "@/lib/db/tenant";
 import { withTenantTransaction } from "@/lib/db/tenant-context";
+import {
+  reserveDirectMessage,
+  resolveDirectMessageTransport
+} from "@/lib/messaging/direct-message-reservation";
 import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
 import { resolveAiProvider } from "@/lib/ai/provider";
 import { logger } from "@/lib/observability/logger";
@@ -433,104 +443,70 @@ export async function createConversationInboundMessage(
 export type OutboundReplyResult =
   | null
   | { blocked: true; reasons: string[] }
-  | { blocked: false; message: Message; deduped: boolean };
+  | { blocked: false; conflict: true }
+  | { blocked: false; message: OutboundReplyMessage; deduped: boolean };
 
-type OutboundReplyPreparation =
-  | { ready: false; result: OutboundReplyResult }
-  | {
-      ready: true;
-      contactId: string;
-      phone: string;
-      idempotencyKey: string;
-    };
+type OutboundReplyMessage = Readonly<{
+  id: string;
+  contactId: string | null;
+  conversationId: string | null;
+  direction: string;
+  body: string;
+  applicationStatus: MessageApplicationStatus;
+  transport: MessageTransport;
+  providerStatus: string | null;
+  providerErrorCode: string | null;
+  deliveredAt: Date | null;
+  failedAt: Date | null;
+  createdAt: Date;
+}>;
 
-// Demo-safe outbound reply: records a local OUTBOUND message via the dummy provider only — never a live
-// send. Replying to an inbound conversation does not require OPTED_IN, but opt-out/STOP and archived
-// contacts are blocked (no message row created), honoring the consent boundary the live hard gate enforces.
+// Browser replies share the durable direct-message reservation used by the public API. Acceptance never
+// calls Twilio; dummy finalization remains deterministic and transaction-local.
 export async function createConversationOutboundReply(
   orgId: string,
   conversationId: string,
   input: ConversationReplyCreateInput
 ): Promise<OutboundReplyResult> {
-  const preparation = await withTenantTransaction({ orgId }, async (tx): Promise<OutboundReplyPreparation> => {
-    const conversation = await tx.conversation.findFirst({ where: orgWhere(orgId, { id: conversationId }) });
-    if (!conversation) {
-      return { ready: false, result: null };
-    }
-
-    if (input.idempotencyKey) {
-      const existing = await tx.message.findUnique({
-        where: { orgId_idempotencyKey: { orgId, idempotencyKey: input.idempotencyKey } }
-      });
-      if (existing) {
-        return { ready: false, result: { blocked: false, message: existing, deduped: true } };
-      }
-    }
-
-    const contact = conversation.contactId
-      ? await tx.contact.findFirst({ where: orgWhere(orgId, { id: conversation.contactId }) })
-      : null;
-
-    const reasons: string[] = [];
-    if (!contact) {
-      reasons.push("CONTACT_MISSING");
-    } else {
-      if (contact.archivedAt) {
-        reasons.push("CONTACT_ARCHIVED");
-      }
-      if (contact.optedOutAt || contact.consentStatus === ConsentStatus.OPTED_OUT) {
-        reasons.push("CONTACT_OPTED_OUT");
-      }
-    }
-    if (reasons.length > 0 || !contact) {
-      return { ready: false, result: { blocked: true, reasons } };
-    }
-
-    const idempotencyKey = input.idempotencyKey ?? `inbox-reply:${orgId}:${conversationId}:${Date.now()}`;
-    return { ready: true, contactId: contact.id, phone: contact.phone, idempotencyKey };
-  });
-
-  if (!preparation.ready) {
-    return preparation.result;
+  const transport = resolveDirectMessageTransport();
+  if (!transport) {
+    return { blocked: true, reasons: ["TRANSPORT_NOT_AVAILABLE"] };
   }
-
-  const providerResult = await dummyProvider.send({
-    to: preparation.phone,
-    from: "demo-signalstack",
-    body: input.body,
-    orgId,
-    idempotencyKey: preparation.idempotencyKey
-  });
-
   return withTenantTransaction({ orgId }, async (tx) => {
-    const existing = await tx.message.findUnique({
-      where: { orgId_idempotencyKey: { orgId, idempotencyKey: preparation.idempotencyKey } }
+    const result = await reserveDirectMessage(tx, {
+      orgId,
+      route: "browser_inbox_reply",
+      identity: { kind: "browser_inbox", requestId: input.idempotencyKey },
+      transport,
+      conversationId,
+      body: input.body,
+      mediaUrls: []
     });
-    if (existing) {
-      return { blocked: false, message: existing, deduped: true };
-    }
+    if (!result.ok && result.kind === "not_found") return null;
+    if (!result.ok && result.kind === "conflict") return { blocked: false, conflict: true };
+    if (!result.ok) return { blocked: true, reasons: [...result.reasons] };
+    return {
+      blocked: false,
+      message: safeOutboundReplyMessage(result.message),
+      deduped: result.deduped
+    };
+  });
+}
 
-    const message = await tx.message.upsert({
-      where: { orgId_idempotencyKey: { orgId, idempotencyKey: preparation.idempotencyKey } },
-      update: {},
-      create: {
-        orgId,
-        contactId: preparation.contactId,
-        conversationId,
-        direction: "OUTBOUND",
-        body: input.body,
-        providerMessageId: providerResult.providerMessageId,
-        providerStatus: providerResult.status,
-        idempotencyKey: preparation.idempotencyKey
-      }
-    });
-
-    await tx.conversation.update({
-      where: { id: conversationId },
-      data: { lastMessageAt: message.createdAt }
-    });
-
-    return { blocked: false, message, deduped: false };
+function safeOutboundReplyMessage(message: Readonly<OutboundReplyMessage>): OutboundReplyMessage {
+  return Object.freeze({
+    id: message.id,
+    contactId: message.contactId,
+    conversationId: message.conversationId,
+    direction: message.direction,
+    body: message.body,
+    applicationStatus: message.applicationStatus,
+    transport: message.transport,
+    providerStatus: message.providerStatus,
+    providerErrorCode: message.providerErrorCode,
+    deliveredAt: message.deliveredAt,
+    failedAt: message.failedAt,
+    createdAt: message.createdAt
   });
 }
 

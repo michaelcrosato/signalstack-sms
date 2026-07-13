@@ -1,4 +1,5 @@
 import { MembershipRole } from "@prisma/client";
+import type { ApiScope } from "@/lib/public-api/scopes";
 
 export const apiRbacMutatingMethods = Object.freeze(["POST", "PATCH", "PUT", "DELETE"] as const);
 
@@ -39,11 +40,20 @@ export type ApiRouteOperatorBoundaryEntry = Readonly<{
   scope: string;
 }>;
 
+export type ApiRouteApiKeyEntry = Readonly<{
+  auth: "api-key";
+  method: ApiRbacMutatingMethod;
+  path: `app/api/v1/${string}/route.ts`;
+  requiredScopes: readonly ApiScope[];
+  scope: string;
+}>;
+
 export type ApiRouteRbacMatrixEntry =
   | ApiRouteRoleGateEntry
   | ApiRouteSignedWebhookEntry
   | ApiRoutePublicAuthEntry
-  | ApiRouteOperatorBoundaryEntry;
+  | ApiRouteOperatorBoundaryEntry
+  | ApiRouteApiKeyEntry;
 
 const apiRouteRbacMatrixItems = [
   {
@@ -308,6 +318,27 @@ const apiRouteRbacMatrixItems = [
   {
     auth: "role",
     method: "POST",
+    path: "app/api/settings/delivery-attempts/[attemptId]/reconcile/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "fetch provider evidence for one ambiguous delivery attempt"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/settings/delivery-attempts/[attemptId]/attest-not-sent/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "attest one ambiguous no-proof delivery attempt not sent"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/settings/delivery-attempts/[attemptId]/retry/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "create one successor for an attested delivery attempt"
+  },
+  {
+    auth: "role",
+    method: "POST",
     path: "app/api/settings/numbers/route.ts",
     requiredRole: MembershipRole.ADMIN,
     scope: "upsert local provider number metadata"
@@ -325,6 +356,97 @@ const apiRouteRbacMatrixItems = [
     path: "app/api/settings/provider/route.ts",
     requiredRole: MembershipRole.ADMIN,
     scope: "delete local provider credential metadata"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/settings/provider/accounts/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "verify and connect one encrypted provider account"
+  },
+  {
+    auth: "role",
+    method: "PATCH",
+    path: "app/api/settings/provider/accounts/[accountId]/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "make one verified provider account the organization default"
+  },
+  {
+    auth: "role",
+    method: "DELETE",
+    path: "app/api/settings/provider/accounts/[accountId]/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "revoke one provider account and its active local authority"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/settings/provider/accounts/[accountId]/rotate/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "verify and rotate one provider account credential"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/settings/provider/accounts/[accountId]/verify/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "reverify one provider account without sending"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/settings/provider/accounts/[accountId]/health/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "check one provider account through a bounded read-only provider call"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/settings/provider/accounts/[accountId]/discover/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "discover safe provider number and messaging-service candidates"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/settings/provider/accounts/[accountId]/import/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "import fresh verified provider resource candidates without provider mutation"
+  },
+  {
+    auth: "role",
+    method: "PATCH",
+    path: "app/api/settings/provider/accounts/[accountId]/messaging-services/[serviceId]/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "default or disable one verified provider messaging service"
+  },
+  {
+    auth: "role",
+    method: "PATCH",
+    path: "app/api/settings/numbers/[numberId]/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "default or disable one verified provider phone number"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/settings/api-keys/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "issue one tenant API credential and reveal its bearer secret once"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/settings/api-keys/[credentialId]/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "rotate one tenant API credential without changing its authority"
+  },
+  {
+    auth: "role",
+    method: "DELETE",
+    path: "app/api/settings/api-keys/[credentialId]/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "revoke one tenant API credential"
   },
   {
     auth: "role",
@@ -360,6 +482,223 @@ const apiRouteRbacMatrixItems = [
     path: "app/api/webhooks/twilio/status/route.ts",
     provider: "twilio",
     scope: "ingest signed Twilio status webhook"
+  },
+  {
+    auth: "api-key",
+    method: "POST",
+    path: "app/api/v1/webhook-endpoints/route.ts",
+    requiredScopes: ["webhooks:write"],
+    scope: "create a signed customer webhook endpoint with an idempotent public write"
+  },
+  {
+    auth: "api-key",
+    method: "PATCH",
+    path: "app/api/v1/webhook-endpoints/[endpointId]/route.ts",
+    requiredScopes: ["webhooks:write"],
+    scope: "update a same-tenant customer webhook endpoint"
+  },
+  {
+    auth: "api-key",
+    method: "DELETE",
+    path: "app/api/v1/webhook-endpoints/[endpointId]/route.ts",
+    requiredScopes: ["webhooks:write"],
+    scope: "disable a same-tenant customer webhook endpoint"
+  },
+  {
+    auth: "api-key",
+    method: "POST",
+    path: "app/api/v1/webhook-endpoints/[endpointId]/rotate-secret/route.ts",
+    requiredScopes: ["webhooks:write"],
+    scope: "rotate a customer webhook signing secret without rerouting queued deliveries"
+  },
+  {
+    auth: "api-key",
+    method: "POST",
+    path: "app/api/v1/webhook-deliveries/[deliveryId]/replay/route.ts",
+    requiredScopes: ["webhooks:replay"],
+    scope: "replay one failed same-tenant customer webhook delivery"
+  },
+  {
+    auth: "api-key",
+    method: "POST",
+    path: "app/api/v1/api-keys/current/rotate/route.ts",
+    requiredScopes: ["credentials:write"],
+    scope: "rotate the authenticated API credential without elevating its authority"
+  },
+  {
+    auth: "api-key",
+    method: "DELETE",
+    path: "app/api/v1/api-keys/current/route.ts",
+    requiredScopes: ["credentials:write"],
+    scope: "revoke the authenticated API credential"
+  },
+  {
+    auth: "api-key",
+    method: "POST",
+    path: "app/api/v1/contacts/route.ts",
+    requiredScopes: ["contacts:write"],
+    scope: "create a same-tenant contact through an idempotent public write"
+  },
+  {
+    auth: "api-key",
+    method: "PATCH",
+    path: "app/api/v1/contacts/[contactId]/route.ts",
+    requiredScopes: ["contacts:write"],
+    scope: "update a same-tenant contact through an idempotent public write"
+  },
+  {
+    auth: "api-key",
+    method: "DELETE",
+    path: "app/api/v1/contacts/[contactId]/route.ts",
+    requiredScopes: ["contacts:write"],
+    scope: "archive a same-tenant contact through an idempotent public write"
+  },
+  {
+    auth: "api-key",
+    method: "POST",
+    path: "app/api/v1/messages/route.ts",
+    requiredScopes: ["messages:send"],
+    scope: "accept one durable consent-safe direct message and its first attempt atomically"
+  },
+  {
+    auth: "api-key",
+    method: "POST",
+    path: "app/api/v1/messages/[messageId]/cancel/route.ts",
+    requiredScopes: ["messages:send"],
+    scope: "conditionally cancel one direct message before its provider-call frontier"
+  },
+  {
+    auth: "api-key",
+    method: "POST",
+    path: "app/api/v1/tags/route.ts",
+    requiredScopes: ["tags:write"],
+    scope: "create a same-tenant contact tag"
+  },
+  {
+    auth: "api-key",
+    method: "PATCH",
+    path: "app/api/v1/tags/[tagId]/route.ts",
+    requiredScopes: ["tags:write"],
+    scope: "update a same-tenant contact tag"
+  },
+  {
+    auth: "api-key",
+    method: "DELETE",
+    path: "app/api/v1/tags/[tagId]/route.ts",
+    requiredScopes: ["tags:write"],
+    scope: "delete a same-tenant contact tag"
+  },
+  {
+    auth: "api-key",
+    method: "POST",
+    path: "app/api/v1/lists/route.ts",
+    requiredScopes: ["lists:write"],
+    scope: "create a same-tenant contact list"
+  },
+  {
+    auth: "api-key",
+    method: "PATCH",
+    path: "app/api/v1/lists/[listId]/route.ts",
+    requiredScopes: ["lists:write"],
+    scope: "update a same-tenant contact list"
+  },
+  {
+    auth: "api-key",
+    method: "DELETE",
+    path: "app/api/v1/lists/[listId]/route.ts",
+    requiredScopes: ["lists:write"],
+    scope: "delete a same-tenant contact list"
+  },
+  {
+    auth: "api-key",
+    method: "POST",
+    path: "app/api/v1/lists/[listId]/contacts/route.ts",
+    requiredScopes: ["lists:write"],
+    scope: "add same-tenant contacts to one contact list"
+  },
+  {
+    auth: "api-key",
+    method: "DELETE",
+    path: "app/api/v1/lists/[listId]/contacts/[contactId]/route.ts",
+    requiredScopes: ["lists:write"],
+    scope: "remove one same-tenant contact-list membership"
+  },
+  {
+    auth: "api-key",
+    method: "POST",
+    path: "app/api/v1/segments/route.ts",
+    requiredScopes: ["segments:write"],
+    scope: "create a same-tenant saved segment"
+  },
+  {
+    auth: "api-key",
+    method: "PATCH",
+    path: "app/api/v1/segments/[segmentId]/route.ts",
+    requiredScopes: ["segments:write"],
+    scope: "update a same-tenant saved segment"
+  },
+  {
+    auth: "api-key",
+    method: "DELETE",
+    path: "app/api/v1/segments/[segmentId]/route.ts",
+    requiredScopes: ["segments:write"],
+    scope: "delete a same-tenant saved segment"
+  },
+  {
+    auth: "api-key",
+    method: "POST",
+    path: "app/api/v1/templates/route.ts",
+    requiredScopes: ["templates:write"],
+    scope: "create a same-tenant message template"
+  },
+  {
+    auth: "api-key",
+    method: "PATCH",
+    path: "app/api/v1/templates/[templateId]/route.ts",
+    requiredScopes: ["templates:write"],
+    scope: "update a same-tenant message template"
+  },
+  {
+    auth: "api-key",
+    method: "DELETE",
+    path: "app/api/v1/templates/[templateId]/route.ts",
+    requiredScopes: ["templates:write"],
+    scope: "delete a same-tenant message template"
+  },
+  {
+    auth: "api-key",
+    method: "POST",
+    path: "app/api/v1/campaigns/route.ts",
+    requiredScopes: ["campaigns:write"],
+    scope: "create a same-tenant draft campaign"
+  },
+  {
+    auth: "api-key",
+    method: "PATCH",
+    path: "app/api/v1/campaigns/[campaignId]/route.ts",
+    requiredScopes: ["campaigns:write"],
+    scope: "update a same-tenant draft campaign"
+  },
+  {
+    auth: "api-key",
+    method: "POST",
+    path: "app/api/v1/campaigns/[campaignId]/schedule/route.ts",
+    requiredScopes: ["campaigns:send"],
+    scope: "schedule one preflight-approved same-tenant campaign"
+  },
+  {
+    auth: "api-key",
+    method: "POST",
+    path: "app/api/v1/campaigns/[campaignId]/cancel/route.ts",
+    requiredScopes: ["campaigns:send"],
+    scope: "cancel queued work for one same-tenant campaign"
+  },
+  {
+    auth: "api-key",
+    method: "POST",
+    path: "app/api/v1/conversations/[conversationId]/messages/route.ts",
+    requiredScopes: ["conversations:write", "messages:send"],
+    scope: "accept one consent-safe dummy reply in a same-tenant conversation"
   }
 ] satisfies ApiRouteRbacMatrixEntry[];
 
@@ -385,6 +724,10 @@ function isOperatorBoundaryEntry(
   return entry.auth === "operator-boundary";
 }
 
+function isApiKeyEntry(entry: ApiRouteRbacMatrixEntry): entry is ApiRouteApiKeyEntry {
+  return entry.auth === "api-key";
+}
+
 export const apiRouteRbacRoleMatrix = Object.freeze(apiRouteRbacMatrix.filter(isRoleGateEntry));
 
 export const apiRouteRbacSignedWebhookExceptions = Object.freeze(
@@ -397,4 +740,8 @@ export const apiRouteRbacPublicAuthExceptions = Object.freeze(
 
 export const apiRouteRbacOperatorBoundaryExceptions = Object.freeze(
   apiRouteRbacMatrix.filter(isOperatorBoundaryEntry)
+);
+
+export const apiRouteRbacApiKeyBoundaries = Object.freeze(
+  apiRouteRbacMatrix.filter(isApiKeyEntry)
 );

@@ -158,13 +158,76 @@ describe.runIf(run)("least-privilege migration owner", () => {
         `;
       });
       expect(claimed).toEqual([{ id: job.id, orgId: org.id }]);
+
+      const endpoint = await owner.customerWebhookEndpoint.create({
+        data: {
+          orgId: org.id,
+          name: "Least-owner webhook",
+          canonicalUrl: `https://least-owner-${suffix}.example.test/events`
+        }
+      });
+      const subscription = await owner.customerWebhookSubscription.create({
+        data: { orgId: org.id, endpointId: endpoint.id, eventTypes: ["contact.created"] }
+      });
+      const signingSecret = await owner.customerWebhookSigningSecret.create({
+        data: {
+          orgId: org.id,
+          subscriptionId: subscription.id,
+          version: 1,
+          ciphertext: `ciphertext-${suffix}`,
+          iv: `iv-${suffix}`,
+          authTag: `tag-${suffix}`,
+          keyVersion: 1,
+          fingerprint: `fingerprint-${suffix}`
+        }
+      });
+      const event = await owner.customerWebhookEvent.create({
+        data: {
+          orgId: org.id,
+          deduplicationKey: `least-owner-${suffix}`,
+          type: "contact.created",
+          aggregateType: "contact",
+          payloadText: "{}",
+          payloadHash: `payload-${suffix}`,
+          occurredAt: scheduledAt
+        }
+      });
+      const delivery = await owner.customerWebhookDelivery.create({
+        data: {
+          orgId: org.id,
+          endpointId: endpoint.id,
+          subscriptionId: subscription.id,
+          eventId: event.id,
+          signingSecretId: signingSecret.id,
+          nextAttemptAt: scheduledAt
+        }
+      });
+      const webhookClaimToken = randomUUID();
+      const claimedWebhooks = await owner.$transaction(async (tx) => {
+        await tx.$executeRawUnsafe("SET LOCAL ROLE signalstack_worker");
+        return tx.$queryRaw<Array<{ deliveryId: string; orgId: string }>>`
+          SELECT claim."deliveryId", claim."orgId"
+          FROM public.claim_due_customer_webhook_deliveries(
+            1,
+            300000,
+            ${webhookClaimToken}::uuid
+          ) claim
+        `;
+      });
+      expect(claimedWebhooks).toEqual([{ deliveryId: delivery.id, orgId: org.id }]);
       expect(await owner.organization.count()).toBe(1);
 
       const publicExecute = await owner.$queryRaw<Array<{ grants: bigint }>>`
         SELECT count(*) AS grants
         FROM information_schema.routine_privileges
         WHERE routine_schema = 'public'
-          AND routine_name = 'claim_due_queue_jobs'
+          AND routine_name IN (
+            'claim_due_queue_jobs',
+            'claim_due_customer_webhook_deliveries',
+            'claim_due_message_attempts',
+            'recover_expired_message_attempts',
+            'resolve_verified_provider_destination'
+          )
           AND grantee = 'PUBLIC'
           AND privilege_type = 'EXECUTE'
       `;

@@ -273,7 +273,8 @@ export const operatorSurfaceGroups = freezeOperatorSurfaceGroups([
       { href: "/settings/health", label: "Health Operations", note: "health contract and blockers" },
       { href: "/settings/security", label: "Security Operations", note: "safety gates and secret boundaries" },
       { href: "/settings/validation", label: "Validation Operations", note: "local gate and repair signals" },
-      { href: "/settings/queue", label: "Queue Operations", note: "scheduled job metadata" }
+      { href: "/settings/queue", label: "Queue Operations", note: "scheduled job metadata" },
+      { href: "/settings/delivery-attempts", label: "Delivery Attempt Review", note: "redacted direct-send ambiguity controls" }
     ]
   },
   {

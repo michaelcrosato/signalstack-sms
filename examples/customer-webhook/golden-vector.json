@@ -1,0 +1,21 @@
+{
+  "purpose": "Public, deterministic, test-only cross-language customer-webhook vector.",
+  "secret": "whsec_AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+  "secretVersion": 3,
+  "timestamp": "1710000000",
+  "nowSeconds": 1710000120,
+  "toleranceSeconds": 300,
+  "eventId": "evt_example_01",
+  "eventType": "message.delivered",
+  "deliveryId": "delivery_example_01",
+  "rawBodyBase64": "eyJhcGlWZXJzaW9uIjoiMjAyNi0wNy0xMCIsImlkIjoiZXZ0X2V4YW1wbGVfMDEiLCJ0eXBlIjoibWVzc2FnZS5kZWxpdmVyZWQiLCJvY2N1cnJlZEF0IjoiMjAyNi0wNy0xMVQwNTozMDowMC4wMDBaIiwiZGF0YSI6eyJtZXNzYWdlSWQiOiJtc2dfZXhhbXBsZV8wMSIsInN0YXR1cyI6ImRlbGl2ZXJlZCJ9fQo=",
+  "headers": {
+    "Content-Type": "application/json",
+    "X-SignalStack-Event-Id": "evt_example_01",
+    "X-SignalStack-Event-Type": "message.delivered",
+    "X-SignalStack-Delivery-Id": "delivery_example_01",
+    "X-SignalStack-Timestamp": "1710000000",
+    "X-SignalStack-Secret-Version": "3",
+    "X-SignalStack-Signature": "v1=08c52fac9ab6a9c4e6e40a68aced90ee536a46b5e421979812ebbfc040884570"
+  }
+}

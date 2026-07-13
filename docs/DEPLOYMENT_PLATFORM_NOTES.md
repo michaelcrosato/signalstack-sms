@@ -49,7 +49,10 @@ Do not configure these in the current deployment class:
 - Stripe secret or webhook-secret environment secrets
 - third-party telemetry export credentials
 
-Provider credential readiness metadata may be entered in `/settings/provider`, but raw provider secrets must not be stored in environment variables, database rows, logs, exports, or screenshots under the current gate.
+M4 credentials entered through `/settings/provider` persist only as account-hash/AAD-bound AES-256-GCM
+ciphertext. Plaintext must not enter database columns, browser-delivered configuration, logs, exports, or
+screenshots. The separate master key and real credentials remain human-provisioned, and M4 ownership does
+not authorize live sends; legacy provider credential/rotation rows remain unverified/display-only.
 
 ## Build And Release Commands
 

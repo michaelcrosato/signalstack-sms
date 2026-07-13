@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db/prisma";
+import { withTenantTransaction } from "@/lib/db/tenant-context";
 import {
   markWebhookEventProcessed,
   recordWebhookEvent,
@@ -30,8 +31,12 @@ describe("webhook event claim lease database invariant", () => {
     };
 
     const attempts = await Promise.all([
-      recordWebhookEvent(input, { claimToken: "owner_a", now }),
-      recordWebhookEvent(input, { claimToken: "owner_b", now })
+      withTenantTransaction({ orgId }, () =>
+        recordWebhookEvent(input, { claimToken: "owner_a", now })
+      ),
+      withTenantTransaction({ orgId }, () =>
+        recordWebhookEvent(input, { claimToken: "owner_b", now })
+      )
     ]);
     const winner = attempts.find((attempt) => attempt.claimed);
     const loser = attempts.find((attempt) => !attempt.claimed);

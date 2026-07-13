@@ -9,6 +9,7 @@ import {
 } from "@/lib/db/repositories/provider-credentials";
 import { listProviderPhoneNumbers } from "@/lib/db/repositories/provider-numbers";
 import { listLiveReadinessAuditEvents } from "@/lib/db/repositories/readiness-audit";
+import { listProviderAccounts } from "@/lib/integrations/provider-accounts/service";
 import { getProviderSettings } from "@/lib/messaging/provider/settings";
 import { getSettingsNavigationLinks } from "@/lib/operations/operator-surfaces";
 import {
@@ -47,6 +48,7 @@ export default async function SettingsPage({
     auditEvents,
     providerCredential,
     credentialRotations,
+    providerAccounts,
   ] = await Promise.all([
     getComplianceProfile(currentOrg.orgId),
     listProviderPhoneNumbers(currentOrg.orgId),
@@ -55,12 +57,15 @@ export default async function SettingsPage({
     }),
     getProviderCredential(currentOrg.orgId, "twilio"),
     listProviderCredentialRotations(currentOrg.orgId, "twilio", 5),
+    listProviderAccounts(currentOrg.orgId),
   ]);
   const providerSettings = getProviderSettings({
     demoMode: currentOrg.demoMode,
     liveMessagingEnabled: process.env.LIVE_MESSAGING_ENABLED === "true",
     messagingProvider: process.env.MESSAGING_PROVIDER ?? "dummy",
     complianceProfile,
+    providerAccounts,
+    providerPhoneNumbers: numbers,
     providerCredential,
     env: process.env,
   });
@@ -423,14 +428,15 @@ export default async function SettingsPage({
       <Panel title="Delivery Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/health"
+          href="/settings/delivery-attempts"
         >
-          Delivery Operations
+          Delivery Attempt Review
         </Link>
         <p className="text-sm leading-6 text-slate-700">
-          Review existing message delivery metadata and provider status counts
-          without sending SMS, retrying delivery, replaying webhooks, mutating
-          messages, billing, sending notifications, or enabling live messaging.
+          Review redacted direct-message attempt evidence. ADMIN-only explicit
+          controls can fetch known provider evidence, record a no-send
+          attestation, or create one queued successor that still passes the
+          complete worker gate.
         </p>
       </Panel>
 

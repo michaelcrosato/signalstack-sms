@@ -34,7 +34,12 @@ Forbidden for the current deployment class:
 - Stripe secret or webhook-secret environment secrets
 - Clerk secret or publishable-key environment configuration
 
-Provider credential metadata may be entered through `/settings/provider`, but it remains local readiness metadata only. Raw provider auth tokens must not be stored, logged, returned by APIs, committed to the repo, or placed in production environment variables under the current gate.
+`/settings/provider` now stores verified provider Auth Tokens only as account-hash/AAD-bound AES-256-GCM
+ciphertext. Plaintext must never be stored, logged, returned, exported, committed, or placed in browser-
+delivered configuration. Provisioning/rotation of the separate `SECRETS_MASTER_KEY` and any real credential
+remains human-controlled; M4 ownership alone does not authorize M5 sends. The exact
+`production-live-direct` worker additionally requires M5 live/runtime/organization/compliance/consent/
+quiet-hour/frontier gates. Legacy provider credential/rotation rows remain unverified/display-only.
 
 ## Pre-Deploy Checks
 
@@ -160,7 +165,8 @@ Verify these routes in the deployed app:
 - `/api/health` reports demo-safe defaults.
 - `/demo` renders the investor demo console.
 - `/settings` shows live messaging blocked.
-- `/settings/provider` shows redacted provider metadata only.
+- `/settings/provider` shows only safe M4 account/ownership/health state, unprefilled credential controls,
+  and legacy redacted history; it never renders plaintext, envelope, routing-hash, or raw provider-error data.
 
 Verify these behaviors:
 

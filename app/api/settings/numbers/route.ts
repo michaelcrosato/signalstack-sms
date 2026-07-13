@@ -3,7 +3,10 @@ import { NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth/api-authorization";
 import { authenticateApiRequest } from "@/lib/auth/api-authentication";
 import { listProviderPhoneNumbers, upsertProviderPhoneNumber } from "@/lib/db/repositories/provider-numbers";
+import { toSafeProviderPhoneNumber } from "@/lib/integrations/provider-accounts/safe-dtos";
 import { providerPhoneNumberSchema } from "@/lib/validation/provider";
+
+const noStoreHeaders = Object.freeze({ "Cache-Control": "no-store, max-age=0", Pragma: "no-cache" });
 
 function isUniqueConstraintConflict(error: unknown) {
   return typeof error === "object" && error !== null && "code" in error && error.code === "P2002";
@@ -15,9 +18,17 @@ export async function GET() {
     return authentication.response;
   }
   const { currentOrg } = authentication;
+  const roleResponse = requireApiRole(currentOrg, MembershipRole.ADMIN);
+  if (roleResponse) {
+    for (const [name, value] of Object.entries(noStoreHeaders)) roleResponse.headers.set(name, value);
+    return roleResponse;
+  }
   const numbers = await listProviderPhoneNumbers(currentOrg.orgId);
 
-  return NextResponse.json({ numbers });
+  return NextResponse.json(
+    { numbers: numbers.map(toSafeProviderPhoneNumber) },
+    { headers: noStoreHeaders }
+  );
 }
 
 export async function POST(request: Request) {
@@ -43,15 +54,21 @@ export async function POST(request: Request) {
       actorUserId: currentOrg.userId
     });
 
-    return NextResponse.json({ number }, { status: 201 });
+    return NextResponse.json(
+      { number: toSafeProviderPhoneNumber(number) },
+      { status: 201, headers: noStoreHeaders }
+    );
   } catch (error) {
     if (!isUniqueConstraintConflict(error)) {
-      return NextResponse.json({ error: "Provider number metadata update failed." }, { status: 500 });
+      return NextResponse.json(
+        { error: "Provider number metadata update failed." },
+        { status: 500, headers: noStoreHeaders }
+      );
     }
 
     return NextResponse.json(
       { error: "Provider number metadata conflicted with another update." },
-      { status: 409 }
+      { status: 409, headers: noStoreHeaders }
     );
   }
 }

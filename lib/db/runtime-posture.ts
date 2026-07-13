@@ -35,6 +35,7 @@ type RuntimePolicyRow = Readonly<{
 }>;
 
 type DispatchCapabilityRow = Readonly<{
+  functionName: string;
   securityDefiner: boolean;
   settings: string[] | null;
   publicExecute: boolean;
@@ -43,6 +44,20 @@ type DispatchCapabilityRow = Readonly<{
   controlExecute: boolean;
   webExecute: boolean;
   ownerMember: boolean;
+}>;
+
+type ApiKeyControlPolicyRow = Readonly<{
+  policyName: string;
+  command: string;
+  permissive: string;
+  roles: string[];
+  usingExpression: string | null;
+  checkExpression: string | null;
+  controlSelect: boolean;
+  controlInsert: boolean;
+  controlUpdate: boolean;
+  controlDelete: boolean;
+  publicPrivilege: boolean;
 }>;
 
 let posturePromise: Promise<void> | undefined;
@@ -179,8 +194,36 @@ async function inspectRuntimeDatabasePosture(client: PrismaClient): Promise<void
   `;
   assertRuntimePolicyShapes(policies);
 
+  const apiKeyControlPolicies = await client.$queryRaw<ApiKeyControlPolicyRow[]>`
+    SELECT
+      policies.policyname AS "policyName",
+      policies.cmd AS "command",
+      policies.permissive AS "permissive",
+      policies.roles AS "roles",
+      policies.qual AS "usingExpression",
+      policies.with_check AS "checkExpression",
+      has_table_privilege('signalstack_control', 'public."ApiCredential"', 'SELECT') AS "controlSelect",
+      has_table_privilege('signalstack_control', 'public."ApiCredential"', 'INSERT') AS "controlInsert",
+      has_table_privilege('signalstack_control', 'public."ApiCredential"', 'UPDATE') AS "controlUpdate",
+      has_table_privilege('signalstack_control', 'public."ApiCredential"', 'DELETE') AS "controlDelete",
+      EXISTS (
+        SELECT 1
+        FROM information_schema.table_privileges privileges
+        WHERE privileges.table_schema = current_schema()
+          AND privileges.table_name = 'ApiCredential'
+          AND privileges.grantee = 'PUBLIC'
+          AND privileges.privilege_type IN ('SELECT', 'INSERT', 'UPDATE', 'DELETE')
+      ) AS "publicPrivilege"
+    FROM pg_policies policies
+    WHERE policies.schemaname = current_schema()
+      AND policies.tablename = 'ApiCredential'
+      AND 'signalstack_control' = ANY(policies.roles)
+  `;
+  assertApiKeyControlPolicyShape(apiKeyControlPolicies);
+
   const dispatchFunctions = await client.$queryRaw<DispatchCapabilityRow[]>`
     SELECT
+      functions.proname AS "functionName",
       functions.prosecdef AS "securityDefiner",
       functions.proconfig AS "settings",
       EXISTS (
@@ -201,8 +244,28 @@ async function inspectRuntimeDatabasePosture(client: PrismaClient): Promise<void
     FROM pg_proc functions
     JOIN pg_namespace namespaces ON namespaces.oid = functions.pronamespace
     WHERE namespaces.nspname = current_schema()
-      AND functions.proname = 'claim_due_queue_jobs'
-      AND functions.proargtypes = '23 1184 23 2950'::oidvector
+      AND (
+        (
+          functions.proname = 'claim_due_queue_jobs'
+          AND functions.proargtypes = '23 1184 23 2950'::oidvector
+        )
+        OR (
+          functions.proname = 'claim_due_customer_webhook_deliveries'
+          AND functions.proargtypes = '23 23 2950'::oidvector
+        )
+        OR (
+          functions.proname = 'claim_due_message_attempts'
+          AND functions.proargtypes = '23 23 2950'::oidvector
+        )
+        OR (
+          functions.proname = 'recover_expired_message_attempts'
+          AND functions.proargtypes = '23'::oidvector
+        )
+        OR (
+          functions.proname = 'resolve_verified_provider_destination'
+          AND functions.proargtypes = '25 25 25'::oidvector
+        )
+      )
   `;
   assertDispatchCapabilityShape(dispatchFunctions);
 }
@@ -284,20 +347,63 @@ function canonicalPolicyExpression(value: string | null): string | null {
 }
 
 export function assertDispatchCapabilityShape(rows: readonly DispatchCapabilityRow[]): void {
-  const functionShape = rows[0];
+  const expectedFunctions = new Map<string, "worker" | "web">([
+    ["claim_due_queue_jobs", "worker"],
+    ["claim_due_customer_webhook_deliveries", "worker"],
+    ["claim_due_message_attempts", "worker"],
+    ["recover_expired_message_attempts", "worker"],
+    ["resolve_verified_provider_destination", "web"]
+  ]);
+  if (rows.length !== expectedFunctions.size) {
+    throw new Error("Database capability shape is invalid.");
+  }
+  for (const functionShape of rows) {
+    const expectedCapability = expectedFunctions.get(functionShape.functionName);
+    if (
+      !expectedCapability ||
+      !functionShape.securityDefiner ||
+      functionShape.settings?.length !== 1 ||
+      functionShape.settings[0] !== "search_path=pg_catalog, public" ||
+      functionShape.publicExecute ||
+      functionShape.workerExecute !== (expectedCapability === "worker") ||
+      functionShape.runtimeExecute ||
+      functionShape.controlExecute ||
+      functionShape.webExecute !== (expectedCapability === "web") ||
+      !functionShape.ownerMember
+    ) {
+      throw new Error("Database capability shape is invalid.");
+    }
+    expectedFunctions.delete(functionShape.functionName);
+  }
+  if (expectedFunctions.size !== 0) {
+    throw new Error("Database capability shape is invalid.");
+  }
+}
+
+/** The pre-tenant API-key lookup is SELECT-only and requires one exact transaction-local hash. */
+export function assertApiKeyControlPolicyShape(
+  rows: readonly ApiKeyControlPolicyRow[]
+): void {
+  const row = rows[0];
+  const expectedUsing =
+    `((current_setting('app.control_purpose'::text,true)='api_key'::text)` +
+    `and(secrethash=nullif(current_setting('app.current_api_key_hash'::text,true),''::text)))`;
   if (
     rows.length !== 1 ||
-    !functionShape ||
-    !functionShape.securityDefiner ||
-    functionShape.settings?.length !== 1 ||
-    functionShape.settings[0] !== "search_path=pg_catalog, public" ||
-    functionShape.publicExecute ||
-    !functionShape.workerExecute ||
-    functionShape.runtimeExecute ||
-    functionShape.controlExecute ||
-    functionShape.webExecute ||
-    !functionShape.ownerMember
+    !row ||
+    row.policyName !== "api_key_control_select_scope" ||
+    row.command !== "SELECT" ||
+    row.permissive !== "PERMISSIVE" ||
+    row.roles.length !== 1 ||
+    row.roles[0] !== "signalstack_control" ||
+    canonicalPolicyExpression(row.usingExpression) !== expectedUsing ||
+    row.checkExpression !== null ||
+    !row.controlSelect ||
+    row.controlInsert ||
+    row.controlUpdate ||
+    row.controlDelete ||
+    row.publicPrivilege
   ) {
-    throw new Error("Worker dispatch database capability shape is invalid.");
+    throw new Error("API-key control database capability shape is invalid.");
   }
 }

@@ -3,6 +3,8 @@ import { spawnSync } from "node:child_process";
 
 const scripts = [
   "contracts:check",
+  "openapi:check",
+  "examples:check",
   "standalone:check",
   "tenant:boundary:check",
   "tenant:integrity:preflight",

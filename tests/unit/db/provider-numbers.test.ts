@@ -86,15 +86,15 @@ describe("upsertProviderPhoneNumber", () => {
     expect(result).toEqual(mockNumber);
   });
 
-  it("should not call updateMany if isDefault is false, and handle real provider", async () => {
-    const mockNumber = { id: "num_1", provider: "twilio", isDefault: false, status: ProviderPhoneNumberStatus.CONFIGURED };
+  it("does not clear the current default for a non-default dummy number", async () => {
+    const mockNumber = { id: "num_1", provider: "dummy", isDefault: false, status: ProviderPhoneNumberStatus.DEMO };
     hoistedMocks.tx.providerPhoneNumber.upsert.mockResolvedValue(mockNumber);
     hoistedMocks.tx.liveReadinessAuditEvent.create.mockResolvedValue({ id: "audit_1" });
 
     const input = {
       phoneNumber: "+456",
-      label: "Prod",
-      provider: "twilio" as const,
+      label: "Secondary demo",
+      provider: "dummy" as const,
       capabilities: ["sms"] as ("sms" | "mms")[],
       isDefault: false
     };
@@ -105,8 +105,8 @@ describe("upsertProviderPhoneNumber", () => {
 
     expect(hoistedMocks.tx.providerPhoneNumber.upsert).toHaveBeenCalledWith({
       where: { orgId_phoneNumber: { orgId: "org_demo", phoneNumber: "+456" } },
-      update: expect.objectContaining({ status: ProviderPhoneNumberStatus.CONFIGURED }),
-      create: expect.objectContaining({ status: ProviderPhoneNumberStatus.CONFIGURED })
+      update: expect.objectContaining({ status: ProviderPhoneNumberStatus.DEMO }),
+      create: expect.objectContaining({ status: ProviderPhoneNumberStatus.DEMO })
     });
 
     expect(result).toEqual(mockNumber);

@@ -3,22 +3,34 @@ import { POST as recordUsageRoute } from "@/app/api/billing/usage/route";
 import { POST as preflightCampaignRoute } from "@/app/api/campaigns/[campaignId]/preflight/route";
 import { POST as liveTestSmsRoute } from "@/app/api/demo/live-test-sms/route";
 import { PATCH as updateComplianceRoute } from "@/app/api/settings/compliance/route";
-import { POST as upsertNumberRoute } from "@/app/api/settings/numbers/route";
-import { DELETE as deleteProviderRoute, PATCH as updateProviderRoute } from "@/app/api/settings/provider/route";
+import {
+  GET as listNumbersRoute,
+  POST as upsertNumberRoute
+} from "@/app/api/settings/numbers/route";
+import {
+  DELETE as deleteProviderRoute,
+  GET as readProviderRoute,
+  PATCH as updateProviderRoute
+} from "@/app/api/settings/provider/route";
 
 const mocks = vi.hoisted(() => ({
   complianceProfileIsComplete: vi.fn(),
   evaluateMessagingHardGate: vi.fn(),
   getOrCreateComplianceProfile: vi.fn(),
+  getComplianceProfile: vi.fn(),
   getOrCreateCurrentOrg: vi.fn(),
   getProviderCredential: vi.fn(),
   getProviderSettings: vi.fn(),
   getUsageSummary: vi.fn(),
+  listOwnedProviderPhoneNumbers: vi.fn(),
+  listProviderPhoneNumbers: vi.fn(),
+  listProviderAccounts: vi.fn(),
   preflightCampaign: vi.fn(),
   recordLiveReadinessAuditEvent: vi.fn(),
   recordUsageEvent: vi.fn(),
   requireApiRole: vi.fn(),
   sendLiveTestSms: vi.fn(),
+  revokeProviderAccount: vi.fn(),
   deleteProviderCredentialMetadata: vi.fn(),
   updateComplianceProfile: vi.fn(),
   upsertProviderCredentialMetadata: vi.fn(),
@@ -48,6 +60,7 @@ vi.mock("@/lib/db/repositories/campaigns", () => ({
 }));
 
 vi.mock("@/lib/db/repositories/compliance", () => ({
+  getComplianceProfile: mocks.getComplianceProfile,
   getOrCreateComplianceProfile: mocks.getOrCreateComplianceProfile,
   updateComplianceProfile: mocks.updateComplianceProfile
 }));
@@ -59,8 +72,14 @@ vi.mock("@/lib/db/repositories/provider-credentials", () => ({
 }));
 
 vi.mock("@/lib/db/repositories/provider-numbers", () => ({
-  listProviderPhoneNumbers: vi.fn(),
+  listProviderPhoneNumbers: mocks.listProviderPhoneNumbers,
   upsertProviderPhoneNumber: mocks.upsertProviderPhoneNumber
+}));
+
+vi.mock("@/lib/integrations/provider-accounts/service", () => ({
+  listOwnedProviderPhoneNumbers: mocks.listOwnedProviderPhoneNumbers,
+  listProviderAccounts: mocks.listProviderAccounts,
+  revokeProviderAccount: mocks.revokeProviderAccount
 }));
 
 vi.mock("@/lib/db/repositories/readiness-audit", () => ({
@@ -94,6 +113,8 @@ describe("settings and operations JSON mutation routes", () => {
       demoMode: true
     });
     mocks.requireApiRole.mockReturnValue(null);
+    mocks.listProviderAccounts.mockResolvedValue([]);
+    mocks.listOwnedProviderPhoneNumbers.mockResolvedValue([]);
     mocks.complianceProfileIsComplete.mockReturnValue(false);
     mocks.evaluateMessagingHardGate.mockReturnValue({
       allowed: false,
@@ -246,15 +267,26 @@ describe("settings and operations JSON mutation routes", () => {
   });
 
   it("upserts only local provider number metadata for valid admin requests", async () => {
+    const timestamp = new Date("2026-07-12T00:00:00.000Z");
     const number = {
       id: "number_demo",
       orgId: "org_demo",
       phoneNumber: "+15555550199",
+      phoneNumberHash: null,
       label: "Demo line",
       provider: "dummy",
+      providerAccountId: null,
+      providerMessagingServiceId: null,
+      externalNumberId: null,
+      externalNumberIdLast4: null,
       status: "DEMO",
       capabilities: ["sms"],
-      isDefault: true
+      isDefault: true,
+      verifiedAt: null,
+      lastCheckedAt: null,
+      disabledAt: null,
+      createdAt: timestamp,
+      updatedAt: timestamp
     };
     mocks.upsertProviderPhoneNumber.mockResolvedValue(number);
 
@@ -271,7 +303,25 @@ describe("settings and operations JSON mutation routes", () => {
     );
 
     expect(response.status).toBe(201);
-    await expect(response.json()).resolves.toEqual({ number });
+    await expect(response.json()).resolves.toEqual({
+      number: {
+        id: "number_demo",
+        providerAccountId: null,
+        providerMessagingServiceId: null,
+        provider: "dummy",
+        phoneNumber: "+15555550199",
+        externalNumberIdLast4: null,
+        label: "Demo line",
+        status: "DEMO",
+        capabilities: ["sms"],
+        isDefault: true,
+        verifiedAt: null,
+        lastCheckedAt: null,
+        disabledAt: null,
+        createdAt: timestamp.toISOString(),
+        updatedAt: timestamp.toISOString()
+      }
+    });
     expect(mocks.upsertProviderPhoneNumber).toHaveBeenCalledWith(
       "org_demo",
       {
@@ -322,12 +372,13 @@ describe("settings and operations JSON mutation routes", () => {
     });
   });
 
-  it("rejects malformed provider settings JSON without persisting credential metadata", async () => {
+  it("retires the metadata compatibility endpoint before parsing request bodies", async () => {
     const response = await updateProviderRoute(malformedJsonRequest("/api/settings/provider", "PATCH"));
 
-    expect(response.status).toBe(400);
-    await expect(response.json()).resolves.toMatchObject({
-      error: "Invalid provider settings payload."
+    expect(response.status).toBe(410);
+    await expect(response.json()).resolves.toEqual({
+      error: "Use the verified provider accounts endpoint.",
+      code: "PROVIDER_METADATA_ENDPOINT_RETIRED"
     });
     expect(mocks.upsertProviderCredentialMetadata).not.toHaveBeenCalled();
     expect(mocks.getProviderSettings).not.toHaveBeenCalled();
@@ -345,34 +396,7 @@ describe("settings and operations JSON mutation routes", () => {
     expect(mocks.getProviderSettings).not.toHaveBeenCalled();
   });
 
-  it("stores only local provider credential metadata before rendering secret-safe settings", async () => {
-    const credential = {
-      id: "credential_demo",
-      orgId: "org_demo",
-      provider: "twilio",
-      accountSidRedacted: "AC****************3456",
-      fromNumberRedacted: "+1******0199",
-      authTokenFingerprint: "fingerprint_demo",
-      configured: true,
-      source: "local-metadata"
-    };
-    mocks.upsertProviderCredentialMetadata.mockResolvedValue(credential);
-    mocks.getOrCreateComplianceProfile.mockResolvedValue({
-      id: "compliance_demo",
-      orgId: "org_demo",
-      businessName: "SignalStack Demo",
-      messagingUseCase: "Demo updates",
-      optInDescription: "Website form",
-      privacyPolicyUrl: "https://example.com/privacy",
-      termsOfServiceUrl: "https://example.com/terms",
-      a2pRegistrationStatus: "PENDING"
-    });
-    mocks.getProviderSettings.mockReturnValue({
-      selectedProvider: "dummy",
-      liveMessagingAllowed: false,
-      twilio: { configured: true }
-    });
-
+  it("does not persist secrets submitted to the retired metadata endpoint", async () => {
     const response = await updateProviderRoute(
       new Request("http://localhost/api/settings/provider", {
         method: "PATCH",
@@ -388,34 +412,13 @@ describe("settings and operations JSON mutation routes", () => {
       })
     );
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(410);
     await expect(response.json()).resolves.toEqual({
-      providerSettings: {
-        selectedProvider: "dummy",
-        liveMessagingAllowed: false,
-        twilio: { configured: true }
-      }
+      error: "Use the verified provider accounts endpoint.",
+      code: "PROVIDER_METADATA_ENDPOINT_RETIRED"
     });
-    expect(mocks.upsertProviderCredentialMetadata).toHaveBeenCalledWith(
-      "org_demo",
-      {
-        provider: "twilio",
-        twilio: {
-          accountSid: "AC123456789",
-          authToken: "auth-token-demo",
-          fromNumber: "+15555550199"
-        }
-      },
-      { actorUserId: "user_demo" }
-    );
-    expect(mocks.getProviderSettings).toHaveBeenCalledWith(
-      expect.objectContaining({
-        demoMode: true,
-        liveMessagingEnabled: false,
-        messagingProvider: "dummy",
-        providerCredential: credential
-      })
-    );
+    expect(mocks.upsertProviderCredentialMetadata).not.toHaveBeenCalled();
+    expect(mocks.getProviderSettings).not.toHaveBeenCalled();
     expect(mocks.upsertProviderPhoneNumber).not.toHaveBeenCalled();
     expect(mocks.deleteProviderCredentialMetadata).not.toHaveBeenCalled();
     expect(mocks.sendLiveTestSms).not.toHaveBeenCalled();
@@ -433,44 +436,27 @@ describe("settings and operations JSON mutation routes", () => {
     expect(mocks.getProviderSettings).not.toHaveBeenCalled();
   });
 
-  it("clears only local provider metadata before rendering secret-safe settings", async () => {
-    mocks.getOrCreateComplianceProfile.mockResolvedValue({
-      id: "compliance_demo",
-      orgId: "org_demo",
-      businessName: "SignalStack Demo",
-      messagingUseCase: "Demo updates",
-      optInDescription: "Website form",
-      privacyPolicyUrl: "https://example.com/privacy",
-      termsOfServiceUrl: "https://example.com/terms",
-      a2pRegistrationStatus: "PENDING"
-    });
-    mocks.getProviderSettings.mockReturnValue({
-      selectedProvider: "dummy",
-      liveMessagingAllowed: false,
-      twilio: { configured: false }
-    });
+  it("revokes the default verified account without deleting lifecycle evidence", async () => {
+    const account = {
+      id: "provider_account_demo",
+      isDefault: true,
+      revokedAt: null
+    };
+    const revoked = { ...account, isDefault: false, revokedAt: "2026-07-12T00:00:00.000Z" };
+    mocks.listProviderAccounts.mockResolvedValue([account]);
+    mocks.revokeProviderAccount.mockResolvedValue(revoked);
 
     const response = await deleteProviderRoute(providerDeleteRequest());
 
     expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toEqual({
-      providerSettings: {
-        selectedProvider: "dummy",
-        liveMessagingAllowed: false,
-        twilio: { configured: false }
-      }
+    await expect(response.json()).resolves.toEqual({ account: revoked });
+    expect(mocks.revokeProviderAccount).toHaveBeenCalledWith({
+      orgId: "org_demo",
+      providerAccountId: "provider_account_demo",
+      actor: { userId: "user_demo" }
     });
-    expect(mocks.deleteProviderCredentialMetadata).toHaveBeenCalledWith("org_demo", "twilio", {
-      actorUserId: "user_demo"
-    });
-    expect(mocks.getProviderSettings).toHaveBeenCalledWith(
-      expect.objectContaining({
-        demoMode: true,
-        liveMessagingEnabled: false,
-        messagingProvider: "dummy",
-        providerCredential: null
-      })
-    );
+    expect(mocks.deleteProviderCredentialMetadata).not.toHaveBeenCalled();
+    expect(mocks.getProviderSettings).not.toHaveBeenCalled();
     expect(mocks.upsertProviderCredentialMetadata).not.toHaveBeenCalled();
   });
 
@@ -482,6 +468,69 @@ describe("settings and operations JSON mutation routes", () => {
       error: "Invalid live test SMS payload."
     });
     expect(mocks.sendLiveTestSms).not.toHaveBeenCalled();
+  });
+
+  it("returns only ADMIN-safe provider number DTOs without routing hashes", async () => {
+    const timestamp = new Date("2026-07-12T00:00:00.000Z");
+    mocks.listProviderPhoneNumbers.mockResolvedValue([
+      {
+        id: "number_live",
+        orgId: "org_demo",
+        phoneNumber: "+15555550199",
+        phoneNumberHash: `pvlookup_v1_${"A".repeat(43)}`,
+        label: "Support",
+        provider: "twilio",
+        providerAccountId: "provider_account_1",
+        providerMessagingServiceId: null,
+        externalNumberId: `PN${"f".repeat(32)}`,
+        externalNumberIdLast4: "ffff",
+        status: "VERIFIED",
+        capabilities: ["sms", "mms"],
+        isDefault: true,
+        verifiedAt: timestamp,
+        lastCheckedAt: timestamp,
+        disabledAt: null,
+        createdAt: timestamp,
+        updatedAt: timestamp
+      }
+    ]);
+
+    const response = await listNumbersRoute();
+    const serialized = JSON.stringify(await response.json());
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("cache-control")).toBe("no-store, max-age=0");
+    expect(serialized).not.toContain("pvlookup_v1_");
+    expect(serialized).not.toContain(`PN${"f".repeat(32)}`);
+    expect(serialized).not.toContain("org_demo");
+    expect(serialized).toContain('"externalNumberIdLast4":"ffff"');
+  });
+
+  it("denies provider-number inventory before reading raw rows", async () => {
+    mocks.requireApiRole.mockReturnValue(Response.json({ error: "Forbidden" }, { status: 403 }));
+
+    const response = await listNumbersRoute();
+
+    expect(response.status).toBe(403);
+    expect(mocks.listProviderPhoneNumbers).not.toHaveBeenCalled();
+  });
+
+  it("reads aggregate provider state without creating compliance metadata", async () => {
+    mocks.getComplianceProfile.mockResolvedValue(null);
+    mocks.getProviderCredential.mockResolvedValue(null);
+    mocks.getProviderSettings.mockReturnValue({ provider: "dummy" });
+
+    const response = await readProviderRoute();
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("cache-control")).toBe("no-store, max-age=0");
+    await expect(response.json()).resolves.toEqual({
+      providerSettings: { provider: "dummy" },
+      accounts: [],
+      numbers: []
+    });
+    expect(mocks.getComplianceProfile).toHaveBeenCalledWith("org_demo");
+    expect(mocks.getOrCreateComplianceProfile).not.toHaveBeenCalled();
   });
 });
 

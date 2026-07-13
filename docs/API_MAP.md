@@ -27,6 +27,85 @@ Standalone identity foundation:
 - `/reset`: consumes a one-time reset fragment, changes the password, and invalidates every prior session.
 - `/account`: displays server-derived identity and offers current/all-session revocation.
 
+Standalone M3 public integration platform (implemented; milestone complete):
+
+- `GET /api/v1/openapi.json`: returns the public OpenAPI document and is the sole unauthenticated `/api/v1`
+  metadata exception.
+- `GET /api/v1/organization`: returns the bearer credential's current organization (`organization:read`).
+- `GET /api/v1/contacts` and `GET /api/v1/contacts/:contactId`: read cursor-paginated/single contacts
+  (`contacts:read`).
+- `POST /api/v1/contacts`, `PATCH /api/v1/contacts/:contactId`, and
+  `DELETE /api/v1/contacts/:contactId`: create, update/restore, or soft-archive idempotently (`contacts:write`).
+- `GET /api/v1/tags` and `GET /api/v1/tags/:tagId`: read tags (`tags:read`).
+- `POST /api/v1/tags`, `PATCH /api/v1/tags/:tagId`, and `DELETE /api/v1/tags/:tagId`: mutate tags
+  idempotently (`tags:write`).
+- `GET /api/v1/lists`, `GET /api/v1/lists/:listId`, and `GET /api/v1/lists/:listId/contacts`: read lists
+  and bounded membership (`lists:read`, plus `contacts:read` for members).
+- `POST /api/v1/lists`, `PATCH /api/v1/lists/:listId`, `DELETE /api/v1/lists/:listId`,
+  `POST /api/v1/lists/:listId/contacts`, and `DELETE /api/v1/lists/:listId/contacts/:contactId`: mutate list
+  metadata/membership idempotently (`lists:write`).
+- `GET /api/v1/segments`, `GET /api/v1/segments/:segmentId`, and
+  `GET /api/v1/segments/:segmentId/contacts`: read/evaluate saved segments (`segments:read`, plus
+  `contacts:read` for results).
+- `POST /api/v1/segments`, `PATCH /api/v1/segments/:segmentId`, and
+  `DELETE /api/v1/segments/:segmentId`: mutate saved segments idempotently (`segments:write`).
+- `GET /api/v1/templates` and `GET /api/v1/templates/:templateId`: read templates (`templates:read`).
+- `POST /api/v1/templates`, `PATCH /api/v1/templates/:templateId`, and
+  `DELETE /api/v1/templates/:templateId`: mutate templates idempotently (`templates:write`).
+- `GET /api/v1/messages` and `GET /api/v1/messages/:messageId`: read messages (`messages:read`).
+- `POST /api/v1/messages`: durably reserves one idempotent direct message and first attempt
+  (`messages:send`); demo mode finalizes the deterministic dummy attempt without a carrier call.
+- `GET /api/v1/messages/:messageId/status`: reads normalized delivery state (`deliveries:read`).
+- `POST /api/v1/messages/:messageId/cancel`: conditionally cancels a direct message before its durable
+  provider-call frontier (`messages:send`).
+- `GET /api/v1/campaigns` and `GET /api/v1/campaigns/:campaignId`: read campaigns (`campaigns:read`).
+- `POST /api/v1/campaigns` and `PATCH /api/v1/campaigns/:campaignId`: create/update drafts idempotently
+  (`campaigns:write`).
+- `POST /api/v1/campaigns/:campaignId/schedule` and `POST /api/v1/campaigns/:campaignId/cancel`: schedule or
+  cancel external-impact work idempotently (`campaigns:send`).
+- `GET /api/v1/conversations`, `GET /api/v1/conversations/:conversationId`, and
+  `GET /api/v1/conversations/:conversationId/messages`: read inbox threads (`conversations:read`, plus
+  `messages:read` for messages).
+- `POST /api/v1/conversations/:conversationId/messages`: submits an idempotent reply
+  (`conversations:write` plus `messages:send`).
+- `GET /api/v1/api-keys/current`: reads safe metadata for the calling credential only (`credentials:read`).
+- `POST /api/v1/api-keys/current/rotate` and `DELETE /api/v1/api-keys/current`: rotate/reveal once or revoke
+  only the calling credential (`credentials:write`).
+- `GET /api/v1/webhook-event-types`, `GET /api/v1/webhook-endpoints`, and
+  `GET /api/v1/webhook-endpoints/:endpointId`: read the allowlist and secret-free endpoint/subscription state
+  (`webhooks:read`).
+- `POST /api/v1/webhook-endpoints`, `PATCH /api/v1/webhook-endpoints/:endpointId`,
+  `DELETE /api/v1/webhook-endpoints/:endpointId`, and
+  `POST /api/v1/webhook-endpoints/:endpointId/rotate-secret`: administer safe endpoint/subscription state,
+  allowlisted events, and one-time signing secrets (`webhooks:write`).
+- `GET /api/v1/webhook-endpoints/:endpointId/deliveries`: reads bounded delivery and attempt evidence
+  (`deliveries:read`).
+- `POST /api/v1/webhook-deliveries/:deliveryId/replay`: replays a terminal failed delivery while retaining
+  all history (`webhooks:replay`).
+- `GET /api/settings/api-keys`: cookie-authenticated ADMIN listing of safe same-tenant credential metadata.
+- `POST /api/settings/api-keys`: cookie-authenticated ADMIN creation returning the raw bearer exactly once.
+- `POST /api/settings/api-keys/:credentialId`: cookie-authenticated ADMIN rotation returning the replacement
+  bearer exactly once and invalidating the prior secret.
+- `DELETE /api/settings/api-keys/:credentialId`: cookie-authenticated ADMIN terminal/idempotent revocation.
+
+All protected `/api/v1` entries above are bearer-only, use the frozen `{ok,data|error,meta.requestId}`
+envelope, HMAC-bound cursor, PostgreSQL per-key rate headers, and `Idempotency-Key` on every mutation. The exact
+scope/error/event catalogs and delivery protocol are in SPEC-031. The generated artifact at
+`public/openapi/v1.json` is served by the metadata route and checked for drift by `npm run openapi:check`.
+Every `/api/v1` Route Handler exports the complete HTTP method set: unsupported protected methods still
+authenticate and durably consume the key's rate window before returning the canonical `405`/`Allow`
+response, while the OpenAPI metadata exception returns its unauthenticated canonical `405`.
+The [integration examples](../examples/README.md) cover curl, dependency-free TypeScript and Python public
+clients, a local provider callback, and raw-body customer-webhook verification. `npm run examples:check`
+checks those examples against the production signing protocol without contacting a provider.
+
+The literal network proof starts a real Next HTTP server on a NOINHERIT web login, processes customer events
+through a distinct NOINHERIT worker login and independent receiver socket, and enforces RLS on a fresh
+disposable database. It covers organization A/B foreign read/write denial, root/nested unknown routes,
+authenticated and unauthenticated `HEAD`/`OPTIONS`, exact concurrent contact/message replay, dummy/local
+status, signed lifecycle receipt, forced failed delivery, replay under a rotated webhook secret, and API-key
+rotation/revocation. No `/api/v1` route in M3 enables live carrier transport.
+
 Milestone 0:
 
 - `GET /api/health`: returns service health and demo-safe defaults.
@@ -102,10 +181,10 @@ Milestone 9:
 
 Post-MVP webhook foundation:
 
-- `POST /api/webhooks/twilio/inbound`: validates a Twilio form webhook signature, stores raw inbound payloads idempotently, and creates a local inbound inbox message under an expiring owner lease without AI or automatic replies. Active-lease conflicts return `409` with advisory `Retry-After`; processed duplicates return `204`.
-- `POST /api/webhooks/twilio/status`: validates a Twilio form webhook signature and stores raw delivery-status payloads idempotently, applying local state under an expiring owner lease without provider callbacks. Active-lease conflicts return `409` with advisory `Retry-After`; processed duplicates return `204`.
+- `POST /api/webhooks/twilio/inbound`: resolves one verified account plus owned destination, validates the exact Twilio form signature with that account's decrypted active credential, rechecks the binding inside the resolved tenant, and then retains the idempotent inbound owner-lease path without AI or automatic replies. Invalid, crossed, ambiguous, disabled, revoked, or stale routing evidence fails generically before tenant mutation.
+- `POST /api/webhooks/twilio/status`: resolves one verified account plus owned outbound sender, validates with that account's active credential, rechecks the tenant binding, and then retains the idempotent owner-lease and monotonic delivery-status path without a provider call. Invalid, crossed, ambiguous, disabled, revoked, or stale routing evidence fails generically before tenant mutation.
 
-Post-MVP provider settings foundation:
+Standalone M4 provider control plane:
 
 - `/`: renders a static local launch dashboard with demo-safe defaults and links to existing local-only admin/demo views without database access, mutations, provider calls, billing artifacts, notifications, live messaging, or secrets.
 - `/dashboard`: renders a product-facing dashboard with tenant-scoped product metrics, outbound-only local message delivery rate/pending/failure/review/latest-evidence signals, local usage totals, and navigation links without mutations, delivery retries, provider calls, SMS, billing artifacts, live AI, secrets, or live messaging enablement.
@@ -124,19 +203,39 @@ Post-MVP provider settings foundation:
 - `/settings/security`: renders the read-only security boundary, production override posture, rate-limit policy, and validation references without exposing secrets or enabling live features.
 - `/settings/validation`: renders the read-only local validation inventory and repair signals without executing commands or inspecting logs.
 - `/settings/queue`: renders read-only scheduled-job timing, payload validity, worker settings, and queue-backend metadata without enqueueing jobs, running workers, or calling Redis/providers.
-- `GET /api/settings/provider`: returns secret-safe provider readiness, live messaging blockers, and Twilio credential presence booleans.
-- `PATCH /api/settings/provider`: stores local redacted Twilio credential readiness metadata without raw token persistence, provider calls, or live sends.
-- `DELETE /api/settings/provider`: clears local Twilio credential readiness metadata without provider calls or live-send side effects.
-- `GET /api/settings/provider/rotations`: lists recent local provider credential metadata history with optional allowlisted action filtering and bounded limits, without raw tokens, token fingerprints, provider calls, or live sends.
-- `GET /api/settings/provider/rotations/export`: exports filtered local provider credential metadata history as CSV without raw tokens, token fingerprints, provider calls, billing records, notifications, live sends, or mutations.
-- `/settings/provider`: renders provider details, local credential-metadata controls, redacted readiness, rotation history, and the bounded CSV export without provider calls or live-send controls.
+- `/settings/delivery-attempts`: renders the ADMIN-only, tenant-scoped direct-message attempt review surface with redacted last-four hints and explicit fetch-only reconcile, `NOT_SENT` attestation, and separate queued-retry controls.
+- `GET /api/settings/delivery-attempts`: lists a bounded deterministic page of same-tenant safe delivery-attempt review DTOs with allowlisted lifecycle/review filters and no-store headers.
+- `GET /api/settings/delivery-attempts/:attemptId`: returns one safe same-tenant delivery-attempt review DTO; unknown and cross-tenant identifiers share `404`.
+- `POST /api/settings/delivery-attempts/:attemptId/reconcile`: requires ADMIN and exact same origin, accepts no body, and conditionally converges a known-SID ambiguous attempt through one exact provider fetch without creating a message or retry.
+- `POST /api/settings/delivery-attempts/:attemptId/attest-not-sent`: requires ADMIN, exact same origin, `ATTEST NOT SENT`, and a bounded internal reason before conditionally resolving one ambiguous no-SID attempt.
+- `POST /api/settings/delivery-attempts/:attemptId/retry`: requires ADMIN, exact same origin, and `RETRY MESSAGE` before atomically creating at most one ordinary queued successor for a current `RESOLVED_NOT_SENT` attempt; it makes no provider call.
+- `GET /api/settings/provider`: returns secret-safe aggregate readiness, live-messaging blockers, and verified/revoked account, owned-number, messaging-service, and health summaries without a provider call.
+- `PATCH /api/settings/provider`: authenticates an ADMIN and returns no-store `410 PROVIDER_METADATA_ENDPOINT_RETIRED` before reading a body; verified account endpoints replace metadata-only writes.
+- `DELETE /api/settings/provider`: locally revokes the selected default verified account and credential authority while retaining encrypted-version and audit history; it does not revoke anything at Twilio or send.
+- `GET /api/settings/provider/accounts`: lists safe same-tenant account DTOs without credentials, envelopes, routing hashes, or provider calls.
+- `POST /api/settings/provider/accounts`: verifies one submitted Twilio account through a bounded explicit ADMIN operation and atomically stores its AES-256-GCM credential envelope and account evidence.
+- `GET /api/settings/provider/accounts/:accountId`: returns one safe same-tenant account DTO.
+- `PATCH /api/settings/provider/accounts/:accountId`: selects one verified active account as the organization's local default.
+- `DELETE /api/settings/provider/accounts/:accountId`: locally revokes account and credential authority without provider-side revocation.
+- `POST /api/settings/provider/accounts/:accountId/rotate`: verifies a replacement credential and atomically activates the next encrypted version.
+- `POST /api/settings/provider/accounts/:accountId/verify`: explicitly re-verifies the account through its active credential and records only safe evidence.
+- `POST /api/settings/provider/accounts/:accountId/health`: performs an explicit bounded provider health read and records only safe status evidence.
+- `POST /api/settings/provider/accounts/:accountId/discover`: returns bounded, short-lived, generation-bound number and messaging-service candidates without persisting ownership.
+- `POST /api/settings/provider/accounts/:accountId/import`: imports selected fresh candidates as verified local ownership without purchasing, releasing, porting, or configuring provider resources.
+- `GET /api/settings/provider/accounts/:accountId/numbers`: lists safe verified/disabled owned-number state for the account.
+- `GET /api/settings/provider/accounts/:accountId/messaging-services`: lists safe verified/disabled messaging-service state for the account.
+- `PATCH /api/settings/provider/accounts/:accountId/messaging-services/:serviceId`: locally makes one verified service the account default or disables it; no provider resource is changed.
+- `PATCH /api/settings/numbers/:numberId`: locally makes one verified owned number its account default or disables it; no provider resource is changed.
+- `GET /api/settings/provider/rotations`: lists bounded, redacted, unverified/display-only legacy `ProviderCredentialRotation` metadata without secrets or provider calls; canonical M4 provider-control audit evidence lives in `IntegrationAuditEvent`.
+- `GET /api/settings/provider/rotations/export`: exports the same bounded legacy display-only metadata without provider calls or mutations; it is not verified ownership or credential-authority evidence.
+- `/settings/provider`: renders the M4 ADMIN provider control plane with unprefilled verification/rotation inputs, safe readiness/health, verified discovery/import, local revoke/disable/default controls, and legacy display-history export. Canonical M4 audit remains in `IntegrationAuditEvent`; the page offers no send or provider-resource mutation control.
 - `/settings/compliance`: renders compliance-profile completeness, A2P status, live-message blockers, and local readiness-audit export links without mutations or provider calls.
 - `/settings/readiness-audit`: renders tenant-scoped go-live readiness events, allowlisted filters, and bounded CSV export links without mutating audit events.
 - `/settings/exports`: renders the allowlisted local administrative exports and their no-secret/no-mutation boundary.
 - `/settings/runbook`: renders the read-only local operator checklist and command references without executing commands.
 - Legacy per-area settings paths are not application routes. Their remaining readiness signals are consolidated into `/settings`; product work belongs under `/dashboard/contacts`, `/dashboard/campaigns`, `/dashboard/inbox`, `/dashboard/templates`, `/dashboard/analytics`, and `/dashboard/compliance`, while the seeded demo checkpoint is `/demo`.
 
-Post-MVP provider number foundation:
+Legacy provider number metadata foundation:
 
 - `GET /api/settings/numbers`: lists local provider phone-number metadata.
 - `POST /api/settings/numbers`: creates or updates local provider phone-number metadata without provisioning, provider calls, or live sends.

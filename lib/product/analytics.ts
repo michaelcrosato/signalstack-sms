@@ -33,6 +33,7 @@ const productAnalyticsDeliveryRowItems = [
   { key: "delivered", label: "Delivered" },
   { key: "pending", label: "Pending" },
   { key: "failed", label: "Failed" },
+  { key: "ambiguous", label: "Ambiguous" },
   { key: "deliveryRate", label: "Delivery rate" },
   { key: "reviewStatus", label: "Review status" },
   { key: "lastDeliveryEvidence", label: "Last delivery evidence" }
@@ -71,18 +72,22 @@ export async function getProductAnalytics(orgId: string) {
     fakeAiUsagePercent,
     deliveryRatePercent,
     lastDeliveryEvidence: overview.messages.lastOutboundAt ?? "none",
-    deliveryReviewStatus: getLocalDeliveryReviewStatus({
-      outboundMessages: overview.messages.outbound,
-      delivered: overview.messages.delivered,
-      pending: overview.messages.pending,
-      failed: overview.messages.failed
-    })
+    deliveryReviewStatus:
+      overview.messages.ambiguous > 0
+        ? `${overview.messages.ambiguous} ambiguous; ADMIN review required`
+        : getLocalDeliveryReviewStatus({
+            outboundMessages: overview.messages.outbound,
+            delivered: overview.messages.delivered,
+            pending: overview.messages.pending,
+            failed: overview.messages.failed
+          })
   };
   const deliveryValues: Record<ProductAnalyticsDeliveryRowKey, string> = {
     outbound: overview.messages.outbound.toString(),
     delivered: overview.messages.delivered.toString(),
     pending: overview.messages.pending.toString(),
     failed: overview.messages.failed.toString(),
+    ambiguous: overview.messages.ambiguous.toString(),
     deliveryRate: `${derived.deliveryRatePercent}%`,
     reviewStatus: derived.deliveryReviewStatus,
     lastDeliveryEvidence: derived.lastDeliveryEvidence

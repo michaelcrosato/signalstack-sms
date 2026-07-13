@@ -7,26 +7,27 @@ Stack: Next.js App Router + TypeScript (strict) + Prisma/Postgres + BullMQ/Redis
 
 | What | Where |
 | --- | --- |
-| Web app (App Router) | `app/` — `page.tsx` (marketing), `dashboard/**` (product), `settings/**` (operations), `demo/**` (gated live-test SMS), `login|setup|team|organizations|account|reset|invite|logout/**` (built-in local identity) |
+| Web app (App Router) | `app/` — `page.tsx` (marketing), `dashboard/**` (product), `settings/**` (operations), `demo/**` (gated live-test SMS) |
 | API route handlers | `app/api/**/route.ts` (Zod-validated; RBAC via `lib/auth`) |
 | Request middleware | `middleware.ts` |
 | Queue workers (local/demo only) | `workers/index.ts` (DB), `workers/bullmq.ts` (BullMQ) |
 
-## Core logic — `lib/` (~116 files)
+## Core logic — `lib/`
 
 | Domain | Path | Notes |
 | --- | --- | --- |
-| DB | `lib/db/` | `prisma.ts`, `tenant.ts` (orgId guard), `tenant-context.ts` (fail-closed tenant transactions), `runtime-posture.ts` (role/RLS attestation), `repositories/**` (tenant-scoped) |
+| DB | `lib/db/` | `prisma.ts`, `tenant.ts` (orgId guard), `repositories/**` (tenant-scoped) |
 | Validation | `lib/validation/` | Zod schemas per domain (boundary contracts) |
-| Messaging | `lib/messaging/` | `provider/**` adapter (dummy/twilio), `render-template`, `send-preflight`, `twilio-webhooks`, `delivery-*` |
+| Messaging | `lib/messaging/` | `provider/**` adapter (dummy/twilio), direct-message outbox/callback/review, `render-template`, `send-preflight`, `twilio-webhooks`, `delivery-*` |
+| Provider accounts | `lib/integrations/provider-accounts/` | AES-GCM credential envelopes, safe DTOs, ADMIN lifecycle service, trusted callback authentication |
 | Queue | `lib/queue/` | `worker`, `bullmq*`, `jobs`, `idempotency`, `live-worker-controls` (frozen hard-gate metadata) |
 | Compliance | `lib/compliance/` | `gates`, `opt-out`, `readiness-audit-export` |
-| Auth/RBAC | `lib/auth/` | built-in local identity: `crypto` (scrypt/HMAC), `local-credentials`, `local-session`, `session-cookie`, `auth-api`, `auth-throttle`, `team-service`, `organization-service`, `password-reset-service`, `operator-*`; boundaries: `api-authentication`, `page-authentication`, `api-rbac-matrix`, `current-org`, `roles`; demo: `demo-session`; legacy inert seam: `session.ts` |
+| Auth/RBAC | `lib/auth/` | `api-authorization`, `api-rbac-matrix`, `current-org`, `demo-session`, `roles` |
 | AI (fake) | `lib/ai/` | `fake-ai-provider`, `conversation-context`, `usage` |
 | Billing/Analytics/CSV | `lib/billing/`, `lib/analytics/`, `lib/csv/` | local usage metering, overview, contact import |
 | Product projections | `lib/product/` | UI-facing frozen view models + `*-defaults` for `app/dashboard/**` |
 | Operations (read-only) | `lib/operations/` | inventory backing `app/settings/**` |
-| Deployment/Env/Rate-limit | `lib/deployment/`, `lib/env/`, `lib/rate-limit/` | `production-gate`, demo-safe `defaults`, `runtime-config` (parsed/validated posture contract), in-memory limiter |
+| Deployment/Env/Rate-limit | `lib/deployment/`, `lib/env/`, `lib/rate-limit/` | `production-gate`, demo-safe `defaults`, in-memory limiter |
 
 ## Data model
 
@@ -52,6 +53,7 @@ Current handoffs: `SUMMARY.codex.md`, `BLOCKERS.codex.md`, `docs/NEXT_PROMPTS.md
 
 ## Skip / read-with-care
 
-- **Skip** (in `.aiignore`): `node_modules/`, `.next/`, `package-lock.json`, `*.tsbuildinfo`, `test-results/`, `docs/loop-artifacts/`.
-- **Targeted `rg` only** (large): `docs/CANONICAL_IMPLEMENTATION_PLAN.md` (~2.7k lines), `tests/unit/auth/api-route-authorization.test.ts` (~2.2k lines).
+- **Skip** (in `.aiignore`): `node_modules/`, `.next/`, `codex-runs/` (50 stale agent logs), `package-lock.json`, `*.tsbuildinfo`, `test-results/`, `docs/loop-artifacts/`.
+- **Targeted `rg` only** (huge): `tests/unit/auth/api-route-authorization.test.ts` (~512KB), `tests/unit/queue/live-worker-controls.test.ts` (~464KB), `contracts/CONTRACT-TESTING.md` (~119KB), `docs/CANONICAL_IMPLEMENTATION_PLAN.md` (~2.7k lines).
+- `planning/*-2026-05-21.md` are dated snapshots; read `planning/CONSENSUS-2026-05-21.md` for the summary.
 - Run history is in `git log` (there is no LOOP_LOG file).

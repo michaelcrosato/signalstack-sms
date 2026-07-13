@@ -1,29 +1,30 @@
 # Current State Matrix
 
-Last updated: 2026-07-10. Governing roadmap: `docs/STANDALONE_ROADMAP.md`.
+Last updated: 2026-07-12. Governing roadmap: `docs/STANDALONE_ROADMAP.md`.
 
 This file is intentionally compact. Historical detail belongs in Git and the standalone verification
 ledger; the rows below describe current implementation truth only.
 
 SignalStack is a strong demo-safe product foundation, not yet a standalone production SMS platform.
-Built-in local identity and database-enforced tenant isolation are complete and validated; provider
-routing, durable external sends, public integrations, packaging, and recovery remain incomplete.
+Built-in local identity, database-enforced tenant isolation, the public API/customer-webhook platform,
+provider ownership/routing, and M5 durable direct messaging are complete and validated. Trusted inbound,
+campaign execution, packaging, and recovery remain incomplete.
 
 | Area | Backend/API State | Browser State | Main Gap | Next Action |
 | --- | --- | --- | --- | --- |
-| Standalone platform | Strong demo-safe domain/queue foundation plus complete built-in identity and database tenant boundary. | Seeded product and real local-auth workflows are usable. | Integrations, carrier execution, packaging, and recovery are incomplete. | Execute M3/M4, then M5–M11 in `docs/STANDALONE_ROADMAP.md`. |
+| Standalone platform | Strong demo-safe foundation plus complete built-in identity, database tenant boundary, public integrations, provider ownership, and durable direct-message transport. | Seeded product, real local-auth, provider control, message-state visibility, and ADMIN ambiguity review are usable. | Trusted inbound, campaigns, packaging, and recovery are incomplete. | Execute M6–M11 in `docs/STANDALONE_ROADMAP.md`. |
 
 | Area | Implemented now | Missing for standalone completion | Roadmap |
 | --- | --- | --- | --- |
 | Identity/team | Built-in scrypt credentials; keyed opaque sessions; owner bootstrap; operator create/reset CLIs; login/logout/reset; organization selection; invite/reinvite/role/suspend/revoke; fail-closed page/API auth; explicit demo-only fallback. | Optional OIDC and verified invite delivery remain adapters, not standalone requirements. | M1 done |
-| Tenant database boundary | Fresh 40-migration/no-diff install under a non-superuser/non-BYPASSRLS table owner using `signalstack_owner`; owner capability barred from runtimes; same-tenant composite FKs and historical-reference triggers; PII-free aborting preflight; 27-table forced RLS with semantic fingerprints; NOINHERIT web/worker logins; exact command-specific control policies; atomic database-timed dispatch with no public ACL; zero tenant migration-debt imports; mandatory two-tenant matrix. | No M2 gap. New tenant models and repository paths must join the manifest, contexts, fingerprints, and mandatory matrix. | M2 done |
-| Public integrations | Internal browser JSON routes and provider callback routes. | Scoped API keys, `/api/v1`, OpenAPI, pagination/errors, SDK examples, outbound signed webhook outbox/retry/replay. | M3 |
-| Provider control plane | Dummy provider; redacted Twilio metadata/rotation history; local number metadata; isolated env-backed live test. | Encrypted recoverable secrets, account/number verification, globally unique ownership, provider factory, trusted tenant routing, health. | M4 |
-| Direct outbound | Dummy inbox reply and isolated reserved live-test send. | General durable message/attempt outbox, public send API, real Twilio adapter, callback correlation, reconciliation, ambiguity UI. | M5 |
-| Inbound/status | Twilio form parsing/signatures, durable webhook leases, idempotency, monotonic status updates. | Resolve account + destination to one tenant, tenant credential validation, live replies, media, full keyword behavior, customer events. | M6 |
+| Tenant database boundary | M2 completed a 40-migration/27-protected-table checkpoint; M3 reached 43/36 and M4 reached 51/39. The current 55-migration schema protects 40 tables after M5 adds the immutable `MessageAttempt` outbox, worker-only bounded dispatch/recovery, forced RLS, same-tenant provider/retry/reconciler relations, and payload/frontier triggers. | No current tenant-boundary gap. Every later tenant model and repository path must continue to join the manifest, contexts, fingerprints, and mandatory PostgreSQL matrix. | M2 boundary maintained through M5 |
+| Public integrations | One-time scoped keys; bearer-only `/api/v1`; stable envelopes/errors/request IDs; HMAC cursors; PostgreSQL rates; encrypted replay; generated OpenAPI and curl/TypeScript/Python examples; atomic signed customer events. Direct message/reply acceptance now reserves permanent M5 lifecycle evidence and returns explicit application/transport/attempt/review state; acceptance itself never calls a carrier. | No current M3/M5 integration gap. Future changes must preserve the versioned compatibility and durable-before-provider contracts. | M3/M5 done |
+| Provider control plane | Account-hash/AAD-bound AES-256-GCM credentials; verified account/number/service ownership; safe ADMIN lifecycle/discovery; deterministic dummy and bounded Twilio create/fetch/signature adapter; exact callback routing; canonical audit evidence. Legacy provider metadata remains unverified/display-only. | Dynamic messaging-service sender pools and campaign throughput belong to M7. | M4 maintained through M5 |
+| Direct outbound | Public direct/conversation and inbox replies share transactional permanent reservation, `MessageAttempt` outbox, final-gated stored-credential Twilio SMS/MMS, bounded definitive retry, correlated callbacks, provider fetch, first-class ambiguity, cancellation, and safe ADMIN attest/retry. Dummy remains deterministic and the default. | Real carrier canary and full release proof belong to M11; campaign execution is separate M7 scope. | M5 done |
+| Inbound/status | Exact account + owned-destination routing, per-account signature validation, durable webhook leases, correlated outbound status callbacks, monotonic application/attempt updates, lost-SID binding, and fetch reconciliation. | Trusted inbound media, complete STOP/START/HELP behavior, unread/search/filter/SLA, and full shared-inbox production workflow remain. | M5 outbound status done / M6 inbound |
 | Campaigns/queue | Draft/preflight/schedule/cancel, durable DB jobs, owner leases, race-tested terminal transitions, optional BullMQ mirror, dummy worker. | Production live worker, final hard gate, provider throttling/backpressure, per-recipient attempts, retry/DLQ/replay, kill switch, saved audiences. | M7 |
-| Contacts/audiences | Contact lifecycle, tags/lists in schema, CSV parse/import, archive/restore/merge, ad-hoc segment query/export. | First-class tag/list/saved-segment APIs/UI, file mapping, suppression workflows, audience snapshots/estimates and campaign targeting. | M7/M9 |
-| Inbox | Demo inbound/reply, notes, assignment, resolve/reopen, sentiment/summary/lead signals. | Trusted production inbound/live replies, real team administration, unread/search/filter/SLA, media, safe refresh and customer events. | M6/M9 |
+| Contacts/audiences | Public contact/tag/list/list-membership/saved-segment CRUD and bounded segment evaluation; CSV parse/import; archive/restore/merge; ad-hoc segment query/export. | Browser administration, file mapping, suppression workflows, audience snapshots/estimates, and campaign targeting remain. | M7/M9 |
+| Inbox | Demo inbound, public conversation/message reads, notes, assignment, resolve/reopen, sentiment/summary/lead signals, and M5 outbox-backed dummy/live reply acceptance with stable client retry IDs and delivery-state visibility. | Trusted production inbound, unread/search/filter/SLA, media, and safe realtime refresh remain. | M5 done / M6/M9 |
 | Templates/MMS | Template CRUD and plaintext preview engine; campaign copy assistance. | Archive/versioning, preview integration, media model/storage, MMS provider path, test-send and richer campaign history. | M7/M9 |
 | Compliance | Central gates, consent state/evidence constraint, double opt-in seam, quiet-hours logic, STOP/START classification, readiness profile. | Complete evidence-bearing registration/business fields, append-only consent/audit events, authoritative timezone/policy, suppression, retention and provider proof. | M8 |
 | AI | Deterministic fake provider and optional gated Anthropic seam. | No hosted dependency is required; finish UX/governance only as optional value. | M9 |
@@ -32,9 +33,9 @@ routing, durable external sends, public integrations, packaging, and recovery re
 | Privacy/lifecycle | Redaction helpers, secret scan, write-once consent bundle. | Message/media/webhook retention, export/delete/legal hold, cleanup jobs, complete secret scanning and audit immutability. | M8/M10 |
 | Packaging | Safe Docker context, web Dockerfile, Compose for Postgres and optional Redis, demo runbooks. | Non-root standalone image, ingress/web/migration/worker/backup stack, internal networks/secrets/health/resource controls. | M0 done / M10 |
 | Backup/upgrade | Prisma forward migrations and app-image rollback note. | Scheduled encrypted backups, off-host option, RPO/RTO, restore drill, pre-migration snapshot, expand/contract upgrades and rollback rehearsal. | M10 |
-| Verification | Unit suite: 150 files pass / 13 skip, 1,078 tests pass / 61 skip; database suite: 37 files / 186 pass; mandatory tenant gate: eight files / 33 pass; focused auth database run: nine files / 38 pass; fresh 40-migration/no-diff proof; smoke browser, production local-auth build/browser 1/1 under a non-owner login, and adversarial M1 audit. | Mandatory public API/provider/container/restore E2E and release evidence remain. | M11 |
+| Verification | M1/M2 checkpoints and M3's 43/36 public-integration proof remain. Current gates cover 55 migrations/40 protected tables; the mandatory tenant runner is 16 files/65 tests. M5 adds real-PostgreSQL permanent replay, frontier/recovery/crash, correlated callback replay/order/cross-tenant, fetch reconciliation, ADMIN attestation, and concurrent single-successor proof plus fixture-only provider tests with no carrier call. | Real carrier canary, production-container, backup/restore, upgrade, and final release evidence remain. | M5 done; M11 pending |
 
 ## Immediate implementation order
 
-1. Build M3 public integration identity/events and M4 provider ownership/secrets in parallel.
-2. Continue through M5–M11 without treating demo-only behavior as completion proof.
+1. Build M6 trusted inbound/shared-inbox completion without weakening M5's provider/correlation boundary.
+2. Continue through M7–M11 without treating fixture/dummy behavior as carrier-production proof.

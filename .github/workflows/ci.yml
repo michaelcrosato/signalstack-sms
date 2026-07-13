@@ -106,7 +106,11 @@ jobs:
           bootstrap_token="$(openssl rand -hex 32)"
           owner_password="$(openssl rand -hex 32)"
           member_password="$(openssl rand -hex 32)"
-          for value in "$session_secret" "$throttle_secret" "$bootstrap_token" "$owner_password" "$member_password"; do
+          # M3 public integrations make these production-required; the local-auth proof runs a production
+          # build, so it must supply a valid 256-bit master key and an API-key pepper.
+          secrets_master_key="$(openssl rand -base64 32)"
+          api_key_pepper="$(openssl rand -hex 32)"
+          for value in "$session_secret" "$throttle_secret" "$bootstrap_token" "$owner_password" "$member_password" "$secrets_master_key" "$api_key_pepper"; do
             echo "::add-mask::$value"
           done
           {
@@ -115,6 +119,8 @@ jobs:
             echo "BOOTSTRAP_TOKEN=$bootstrap_token"
             echo "LOCAL_AUTH_E2E_OWNER_PASSWORD=$owner_password"
             echo "LOCAL_AUTH_E2E_MEMBER_PASSWORD=$member_password"
+            echo "SECRETS_MASTER_KEY=$secrets_master_key"
+            echo "API_KEY_PEPPER=$api_key_pepper"
           } >> "$GITHUB_ENV"
       - run: npm run db:deploy
       - run: npm run db:provision:web

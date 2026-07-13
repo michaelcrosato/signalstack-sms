@@ -40,6 +40,7 @@ describe("API authentication boundary coverage", () => {
       const relativePath = repoPath(path.relative(process.cwd(), filePath));
       if (
         relativePath.startsWith("app/api/auth/") ||
+        relativePath.startsWith("app/api/v1/") ||
         relativePath === "app/api/health/route.ts" ||
         relativePath.startsWith("app/api/webhooks/")
       ) {
@@ -60,6 +61,7 @@ describe("API authentication boundary coverage", () => {
       const relativePath = repoPath(path.relative(process.cwd(), filePath));
       if (
         relativePath.startsWith("app/api/auth/") ||
+        relativePath.startsWith("app/api/v1/") ||
         relativePath === "app/api/health/route.ts" ||
         relativePath.startsWith("app/api/webhooks/")
       ) {
@@ -85,7 +87,7 @@ describe("API authentication boundary coverage", () => {
     expect(missingOriginBoundary).toEqual([]);
   });
 
-  it("keeps Twilio callbacks on the signed-webhook boundary", () => {
+  it("keeps Twilio callbacks on exact provider-account routing and generation recheck", () => {
     const webhookRoutes = [
       "app/api/webhooks/twilio/inbound/route.ts",
       "app/api/webhooks/twilio/status/route.ts"
@@ -93,9 +95,9 @@ describe("API authentication boundary coverage", () => {
 
     const incorrectlyClassified = webhookRoutes.filter((relativePath) => {
       const source = readFileSync(path.join(process.cwd(), relativePath), "utf8");
-      return !/authenticateApiRequest\s*\(\s*\{\s*boundary:\s*"signed-webhook"\s*\}\s*\)/.test(
-        source
-      );
+      return !source.includes("authenticateTwilioProviderCallback") ||
+        !source.includes("assertProviderCallbackBindingActive") ||
+        source.includes('boundary: "signed-webhook"');
     });
 
     expect(incorrectlyClassified).toEqual([]);

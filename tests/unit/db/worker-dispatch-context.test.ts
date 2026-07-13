@@ -47,9 +47,10 @@ describe("worker dispatch database context", () => {
     expect(statement).toContain("app.current_user_id");
     expect(statement).toContain("app.current_session_hash");
     expect(statement).toContain("app.current_token_hash");
+    expect(statement).toContain("app.current_api_key_hash");
     expect(statement).toContain("app.current_login_email");
     expect(statement).toContain("app.control_purpose");
-    expect(values).toEqual(["", "", "", "", "", "", ""]);
+    expect(values).toEqual(["", "", "", "", "", "", "", ""]);
     expect(mocks.executeRawUnsafe.mock.invocationCallOrder[0]).toBeLessThan(
       mocks.transactionQueryRaw.mock.invocationCallOrder[0]
     );

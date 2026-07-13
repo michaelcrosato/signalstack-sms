@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  apiRouteRbacApiKeyBoundaries,
   apiRouteRbacOperatorBoundaryExceptions,
   apiRouteRbacPublicAuthExceptions,
   apiRouteRbacSignedWebhookExceptions
@@ -10,6 +11,7 @@ import {
 const mutatingMethods = ["POST", "PATCH", "PUT", "DELETE"] as const;
 const defaultRequestParameterName = "request";
 const roleGateExceptionRoutes = new Set([
+  ...apiRouteRbacApiKeyBoundaries.map((entry) => entry.path),
   ...apiRouteRbacOperatorBoundaryExceptions.map((entry) => entry.path),
   ...apiRouteRbacPublicAuthExceptions.map((entry) => entry.path),
   ...apiRouteRbacSignedWebhookExceptions.map((entry) => entry.path)
@@ -34,8 +36,26 @@ function exportedMutatingMethods(source: string) {
   return mutatingMethods.filter((method) =>
     new RegExp(
       `export\\s+(?:(?:async\\s+)?function\\s+${method}\\b|const\\s+${method}\\b(?:\\s*:[\\s\\S]*?)?\\s*=\\s*(?:async\\s+)?(?:function\\b)?)`
-    ).test(maskedSource) || exportedHandlerLocalName(source, method) !== null
+    ).test(maskedSource) ||
+    (exportedHandlerLocalName(source, method) !== null &&
+      !exportedHandlerIsCanonicalPublicBoundary(source, method))
   );
+}
+
+function exportedHandlerIsCanonicalPublicBoundary(
+  source: string,
+  method: (typeof mutatingMethods)[number]
+) {
+  const localHandlerName = exportedHandlerLocalName(source, method);
+  if (localHandlerName === null || localHandlerName === method) {
+    return false;
+  }
+
+  const maskedSource = maskNonCodeTokens(source);
+  return new RegExp(
+    `\\bconst\\s+${escapeRegExp(localHandlerName)}\\s*=\\s*` +
+      `(?:createPublicApiMethodNotAllowedHandler|createPublicMetadataMethodNotAllowedHandler|createPublicApiNotFoundHandler)\\s*\\(`
+  ).test(maskedSource);
 }
 
 function exportedHandlerLocalName(source: string, method: (typeof mutatingMethods)[number]) {

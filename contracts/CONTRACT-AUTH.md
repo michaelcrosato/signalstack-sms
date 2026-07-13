@@ -13,6 +13,82 @@ Owner: platform-security.
   serializes request Cookie headers into browser-readable HTML; operators and browser proofs must use
   `next build && next start`. Demo mode remains available for `next dev` without real session bearers.
 
+## Public API bearer credentials (M3 complete)
+
+Public integration identity is separate from browser identity. Every protected `/api/v1` route accepts only
+one exact `Authorization: Bearer ss_api_<12-base64url-prefix>_<43-base64url-secret>` header. Cookies, local
+sessions, demo identity, OIDC/Clerk tokens, query-string credentials, provider signatures, and customer
+webhook signatures are not fallbacks. `GET /api/v1/openapi.json` is the sole unauthenticated metadata route.
+
+The raw 256-bit API secret is returned only by its logical creation or rotation operation; an exact
+idempotent retry may reproduce that operation's authenticated-encrypted response snapshot. PostgreSQL stores only a visible
+non-secret prefix and a domain-separated HMAC-SHA-256 digest keyed by the independently provisioned
+`API_KEY_PEPPER`. Importing public API modules does not read secrets; the configured pepper is read and
+validated only at an operation boundary. Raw keys, hashes, and client addresses never enter logs, audit
+metadata, list responses, browser state, or error text. Last-use network evidence, when retained, is also a
+domain-separated keyed digest.
+
+A narrow pre-tenant control lookup may select a credential only when the transaction-local API-key hash
+exactly matches the stored digest. It exposes no mutation authority. The resolved organization then enters
+the normal tenant transaction, locks and rechecks the credential, rejects revocation/expiry/rotation, consumes
+the PostgreSQL one-minute rate window, updates safe last-use metadata, and evaluates exact scopes before body
+parsing. Missing or malformed bearer evidence returns `AUTHENTICATION_REQUIRED`. Unknown, expired, revoked,
+rotated-away, or otherwise unusable credentials intentionally share `INVALID_API_KEY`; callers cannot use the
+API as a credential-lifecycle oracle. Scope failure is `INSUFFICIENT_SCOPE`, exhaustion is
+`RATE_LIMIT_EXCEEDED`, and control/rate storage failure is `SERVICE_UNAVAILABLE` without an unmetered fallback.
+
+The exact non-wildcard scope catalog is defined in `lib/public-api/scopes.ts` and SPEC-031. `messages:send`
+and `campaigns:send` remain separate from ordinary write scopes so future live-impact transport cannot be
+gained through metadata authority. A bearer with `credentials:read|write` can inspect, rotate, or revoke only
+itself. It cannot enumerate, create, rotate, or revoke another credential; tenant-wide administration remains
+behind the browser ADMIN boundary.
+
+Cookie-authenticated ADMIN users bootstrap credentials through `GET|POST /api/settings/api-keys` and
+`POST|DELETE /api/settings/api-keys/:credentialId`. Browser mutations retain the shared same-origin boundary;
+they are not `/api/v1` bearer requests. Create/rotate return one raw key once, list returns safe metadata only,
+and revoke is terminal/idempotent. Every mutation appends secret-free tenant audit evidence.
+
+## Provider control-plane authorization (M4)
+
+Provider account, credential, health, discovery, import, default, disable, rotation, and revocation
+mutations require a verified browser session in the current organization, at least ADMIN, and the shared
+same-origin check before any request-body or secret field is read. Public API keys, demo identity outside
+explicit demo mode, provider signatures, and customer-webhook signatures never authorize this control plane.
+
+An operator-entered provider secret may exist only in an unprefilled active form/request and bounded server
+operation memory. It is never server-rendered, cached, returned, logged, audited, exported, stored in
+plaintext, or retained by the browser form after completion. Safe reads expose only allowlisted DTO fields;
+Prisma credential/envelope rows are never serialized directly.
+
+Twilio Account SID is a provider identifier rather than the authentication secret. The exact value may be
+stored only as tenant-scoped `ProviderAccount.externalAccountId` and used in encrypted-secret AAD/routing;
+browser reads, logs, audit, exports, and errors expose only redacted/last-four metadata.
+
+Provider callbacks are not users and do not enter this ADMIN boundary. M4 callback routing uses exact
+account + owned-destination candidate evidence only to select one encrypted credential, validates the
+provider signature, then enters the resolved tenant and rechecks locked account/ownership/generation state.
+Wrong/unknown/ambiguous/revoked evidence shares generic denial and never falls back to the current browser,
+demo organization, API bearer, or installation-global environment token.
+
+## Direct-message authorization (M5)
+
+Public direct acceptance and cancellation require the exact `messages:send` API-key scope; public
+conversation reply additionally requires `conversations:write`. These grants authorize durable tenant
+reservation/cancellation only. Public HTTP routes never possess worker authority and never call a provider.
+API idempotency remains bound to the authenticated credential, while the permanent domain fingerprint
+prevents changed payload reuse after the response snapshot expires.
+
+Browser inbox reply requires a verified current-organization session, at least MEMBER, and exact same origin
+before parsing its UUID/body. This route may reserve one durable reply but cannot reconcile, attest, retry,
+or call a provider. ADMIN delivery-attempt list/get/reconcile/attest/retry routes require a verified same-
+tenant session; every mutation requires exact same origin before body parsing. Reconcile is provider fetch
+only, and attestation/retry cannot bypass worker authorization or the final messaging gate.
+
+The direct worker is a separate database capability, not a user/API credential. Only the exact authorized
+`production-live-direct` deployment class and worker role may claim due attempt identities and reach the
+provider-call frontier. Browser sessions, API keys, provider/customer-webhook signatures, demo identity,
+installation-global live-test credentials, and the campaign worker class never substitute for that role.
+
 ## Password credentials
 
 - Email identity is stored and looked up by a trimmed lowercase `normalizedEmail` unique key.

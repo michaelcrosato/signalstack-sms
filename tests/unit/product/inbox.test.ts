@@ -1,4 +1,9 @@
-import { ConsentStatus, ConversationStatus } from "@prisma/client";
+import {
+  ConsentStatus,
+  ConversationStatus,
+  MessageApplicationStatus,
+  MessageTransport
+} from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { listConversations, listConversationMessages } from "@/lib/db/repositories/inbox";
 import { productInboxWorkspaceDefaults } from "@/lib/product/inbox-workspace-defaults";
@@ -53,7 +58,10 @@ vi.mock("@/lib/db/repositories/inbox", () => ({
       id: "message_1",
       direction: "INBOUND",
       body: "Can you send pricing?",
+      applicationStatus: MessageApplicationStatus.DELIVERED,
+      transport: MessageTransport.TWILIO,
       providerStatus: null,
+      providerErrorCode: null,
       createdAt: new Date("2026-01-03T10:00:00.000Z")
     }
   ])
@@ -97,7 +105,11 @@ describe("getProductInbox", () => {
         id: "message_1",
         direction: "INBOUND",
         body: "Can you send pricing?",
+        applicationStatus: MessageApplicationStatus.DELIVERED,
+        transport: "twilio",
         providerStatus: null,
+        providerErrorCode: null,
+        requiresReview: false,
         createdAt: "2026-01-03T10:00:00.000Z"
       }
     ]);
