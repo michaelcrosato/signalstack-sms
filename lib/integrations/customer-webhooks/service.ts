@@ -96,15 +96,21 @@ export async function validateCustomerWebhookEndpointDestination(
 ): Promise<string> {
   const canonicalUrl = canonicalizeCustomerWebhookEndpointUrl(value);
   const hostname = new URL(canonicalUrl).hostname;
-  const answers = await Promise.race([
-    resolver(hostname),
-    new Promise<never>((_, reject) => {
-      const timer = setTimeout(() => reject(new Error("Customer webhook endpoint DNS validation timed out.")), 3_000);
-      timer.unref?.();
-    })
-  ]);
-  assertSafeCustomerWebhookDnsAnswers(hostname, answers);
-  return canonicalUrl;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const answers = await Promise.race([
+      resolver(hostname),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("Customer webhook endpoint DNS validation timed out.")), 3_000);
+        timer.unref?.();
+      })
+    ]);
+    assertSafeCustomerWebhookDnsAnswers(hostname, answers);
+    return canonicalUrl;
+  } finally {
+    // Clear the timeout when the resolver wins, so no dangling timer survives the race.
+    if (timer) clearTimeout(timer);
+  }
 }
 
 export async function listCustomerWebhookEndpoints(

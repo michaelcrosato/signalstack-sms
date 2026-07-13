@@ -473,6 +473,8 @@ function assertTwilioUrl(url: URL): void {
 async function readBoundedJson(response: Response, operation: ProviderOperation): Promise<unknown | null> {
   const contentLength = response.headers.get("content-length");
   if (contentLength && /^\d+$/.test(contentLength) && Number(contentLength) > MAX_RESPONSE_BYTES) {
+    // Release the unread body so the connection can be reused, matching the other exit paths.
+    await response.body?.cancel().catch(() => undefined);
     throw providerRequestError({
       safeCode: "TWILIO_RESPONSE_TOO_LARGE",
       operation,
