@@ -95,7 +95,11 @@ export async function getProductInbox(orgId: string, selectedConversationId?: st
             id: message.id,
             direction: message.direction,
             body: message.body,
+            applicationStatus: message.applicationStatus,
+            transport: message.transport.toLowerCase(),
             providerStatus: message.providerStatus,
+            providerErrorCode: message.providerErrorCode,
+            requiresReview: message.applicationStatus === "AMBIGUOUS",
             createdAt: message.createdAt.toISOString()
           })),
           statusRows: productInboxThreadStatusRows.map((row) => ({

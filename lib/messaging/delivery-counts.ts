@@ -1,5 +1,5 @@
 import type { Prisma } from "@prisma/client";
-import { terminalDeliveryFailureProviderStatuses } from "@/lib/messaging/delivery-status";
+import { MessageApplicationStatus } from "@prisma/client";
 
 export function outboundMessageWhere(orgId: string): Prisma.MessageWhereInput {
   return {
@@ -11,24 +11,34 @@ export function outboundMessageWhere(orgId: string): Prisma.MessageWhereInput {
 export function outboundDeliveredMessageWhere(orgId: string): Prisma.MessageWhereInput {
   return {
     ...outboundMessageWhere(orgId),
-    deliveredAt: { not: null },
-    failedAt: null,
-    OR: [{ providerStatus: null }, { providerStatus: { notIn: [...terminalDeliveryFailureProviderStatuses] } }]
+    applicationStatus: MessageApplicationStatus.DELIVERED
   };
 }
 
 export function outboundPendingMessageWhere(orgId: string): Prisma.MessageWhereInput {
   return {
     ...outboundMessageWhere(orgId),
-    deliveredAt: null,
-    failedAt: null,
-    OR: [{ providerStatus: null }, { providerStatus: { notIn: [...terminalDeliveryFailureProviderStatuses] } }]
+    applicationStatus: {
+      in: [
+        MessageApplicationStatus.ACCEPTED,
+        MessageApplicationStatus.SCHEDULED,
+        MessageApplicationStatus.PROCESSING,
+        MessageApplicationStatus.SENT
+      ]
+    }
   };
 }
 
 export function outboundFailedMessageWhere(orgId: string): Prisma.MessageWhereInput {
   return {
     ...outboundMessageWhere(orgId),
-    OR: [{ failedAt: { not: null } }, { providerStatus: { in: [...terminalDeliveryFailureProviderStatuses] } }]
+    applicationStatus: MessageApplicationStatus.FAILED
+  };
+}
+
+export function outboundAmbiguousMessageWhere(orgId: string): Prisma.MessageWhereInput {
+  return {
+    ...outboundMessageWhere(orgId),
+    applicationStatus: MessageApplicationStatus.AMBIGUOUS
   };
 }

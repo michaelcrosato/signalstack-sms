@@ -20,8 +20,28 @@ const expectedChecks = [
   "message.contact",
   "message.conversation",
   "message.campaign",
+  "message-attempt.message",
+  "message-attempt.retry-parent",
+  "message-attempt.provider-account",
+  "message-attempt.provider-credential",
+  "message-attempt.provider-phone",
+  "message-attempt.reconciler-membership",
   "internal-note.conversation",
   "provider-credential-rotation.credential",
+  "provider-credential-secret.account",
+  "provider-messaging-service.account",
+  "provider-phone-number.account",
+  "provider-phone-number.messaging-service",
+  "api-idempotency-record.credential",
+  "integration-audit-event.credential",
+  "integration-audit-event.subject",
+  "customer-webhook-subscription.endpoint",
+  "customer-webhook-signing-secret.subscription",
+  "customer-webhook-delivery.subscription",
+  "customer-webhook-delivery.event",
+  "customer-webhook-delivery.signing-secret",
+  "customer-webhook-delivery.replay",
+  "customer-webhook-delivery-attempt.delivery",
   "conversation.active-assignee",
   "auth-session.active-membership",
   "auth-token.pending-invite-issuer",
@@ -32,7 +52,7 @@ describe("tenant integrity preflight", () => {
   it("maintains a unique, count-only inventory of strict relations and current membership refs", () => {
     expect(tenantIntegrityChecks.map(({ id }) => id)).toEqual(expectedChecks);
     expect(new Set(expectedChecks).size).toBe(expectedChecks.length);
-    expect(tenantIntegrityChecks.filter(({ category }) => category === "strict-relation")).toHaveLength(14);
+    expect(tenantIntegrityChecks.filter(({ category }) => category === "strict-relation")).toHaveLength(34);
     expect(tenantIntegrityChecks.filter(({ category }) => category === "current-membership")).toHaveLength(3);
     expect(tenantIntegrityChecks.filter(({ category }) => category === "job-envelope")).toHaveLength(1);
     expect(tenantIntegrityReadOnlyStatement).toBe("SET TRANSACTION READ ONLY");

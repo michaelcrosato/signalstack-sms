@@ -7,25 +7,33 @@ Milestone 0 validation runs:
 - ESLint
 - TypeScript
 - Prisma validation and client generation
+- Generated OpenAPI and cross-runtime integration-example drift checks
 - Vitest smoke
 - Playwright smoke
 - Next build
 
-## M2 Tenant-Boundary Gates
+## Tenant-Boundary Gates
 
 PostgreSQL tenant enforcement is mandatory evidence, not an optional RLS mode:
 
-- `npm run test:tenant-db` runs the eight-file / 33-test M2 gate against a disposable owner-capable
-  PostgreSQL database. It creates non-owner NOINHERIT runtime roles and tenant A/B fixtures, then covers
-  all 27 protected tables for scoped reads/writes, missing context, cross-tenant forgery, relation
-  constraints/triggers, rollback, semantic runtime-policy fingerprints, exact command-specific control
-  denial, worker dispatch, and multi-connection pool reuse.
-- The tenant gate includes a fresh install of all 40 migrations under a non-superuser/non-BYPASSRLS
+- The completed M2 checkpoint was the eight-file / 33-test gate over 40 migrations and 27 protected tables.
+  The current `npm run test:tenant-db` is a 16-file / 65-test superset: 15 files / 64 tests in the tenant
+  batch plus the one-file / one-test literal-network M3 exit. It covers all 55 migrations and 40 protected
+  tables, including API-key control resolution/rate concurrency, encrypted public idempotency,
+  customer-event/delivery rows, M4 provider ownership/routing, worker dispatch, and the M3 exit path. It creates non-owner
+  NOINHERIT runtime roles and tenant A/B fixtures, then covers scoped reads/writes, missing context,
+  cross-tenant forgery, relation constraints/triggers, rollback, semantic runtime-policy fingerprints,
+  exact command-specific control denial, both dispatch functions, and multi-connection pool reuse.
+- The M2 tenant gate proved a fresh install of 40 migrations under a non-superuser/non-BYPASSRLS
   table owner using `signalstack_owner`. That proof exercises the historical triggers and dispatch
-  function and verifies the dispatch function's fixed search path and revoked `PUBLIC` EXECUTE ACL.
-- The complete `RUN_DB_TESTS=true` database-directory run is 37 files / 186 tests, and the focused auth
-  database run is nine files / 38 tests. Fresh migration deployment leaves no Prisma schema diff.
-  CI/premerge supply PostgreSQL and keep the tenant gate inside the protected validation path.
+  function and verifies its fixed search path and revoked `PUBLIC` EXECUTE ACL. The current superset proves
+  a fresh 55-migration install, the bounded worker-only customer-webhook/direct-message claim and recovery
+  functions, and the exact web-only provider-routing capability under the same
+  least-privilege posture, with no Prisma schema diff.
+- The M2 checkpoint's complete `RUN_DB_TESTS=true` database-directory run was 37 files / 186 tests, and its
+  focused auth database run was nine files / 38 tests. Current DB coverage is intentionally reported by the
+  commands below rather than freezing a stale aggregate count. CI/premerge supply PostgreSQL and keep the
+  tenant gate inside the protected validation path.
 - `npm run tenant:boundary:check` statically inventories direct Prisma imports under `app`, `lib`, and
   `workers`. The accepted M2 posture is zero unauthorized/stale entries and zero
   `tenant-migration-debt` imports; new tenant paths must use the transaction-context seam.
@@ -48,14 +56,64 @@ $env:DATABASE_URL='<disposable PostgreSQL owner URL>'
 npx vitest run tests/unit/db
 ```
 
-Latest default unit-suite evidence is 150 passing / 13 skipped files and 1,078 passing / 61 skipped tests
-(`npm test`; 1,139 tests total). The production local-auth build/browser proof is 1/1 under the distinct
-non-owner web login.
+The current default unit suite runs through `npm test` inside `npm run validate`; the production local-auth
+build/browser proof remains 1/1 under the distinct non-owner web login. Historical exact counts are kept
+only with the milestone checkpoint they describe.
+
+## M3 Public Integration Gates
+
+- `npm run openapi:check` regenerates the frozen `/api/v1` OpenAPI document in memory and fails on artifact,
+  route, scope, envelope, or protocol drift. `GET /api/v1/openapi.json` is the only unauthenticated public
+  metadata route.
+- `npm run examples:check` derives the customer-webhook golden vector from the production signer, verifies
+  exact raw-body HMAC and secret-version selection in TypeScript and Python, rejects duplicated signatures,
+  body tampering, and stale timestamps, checks a localhost-only Twilio callback fixture against the inbound
+  verifier, and inventories the curl/TypeScript/Python public clients. Examples are localhost-safe,
+  dummy/local, and make no provider call.
+- Focused public API tests cover bearer-only authentication before body parsing, scopes, frozen envelopes and
+  errors, cursor integrity, bounded JSON, strict DTOs, full resource routes, API-key lifecycle, PostgreSQL
+  rate concurrency, and encrypted exact idempotent replay. Customer-webhook suites cover the event catalog,
+  minimized payloads, signing encryption/HMAC, endpoint safety, acknowledgement/retry classification,
+  transport bounds, leases/generations, crash recovery, disablement, replay, and rotation. The current focused
+  public API suite is 30 files / 111 tests.
+- Method-boundary coverage pins explicit `GET`/`POST`/`PUT`/`PATCH`/`DELETE`/`HEAD`/`OPTIONS` exports across
+  all `/api/v1` Route Handlers. Unsupported protected methods authenticate and consume the durable rate
+  window before canonical `405`; missing/invalid bearer remains `401`; the OpenAPI metadata exception gets
+  unauthenticated `405`; and `Allow`, no-store, request-ID, and rate headers remain exact.
+- `tests/unit/db/public-api-exit-path.test.ts` uses real route handlers and a non-owner runtime role across two
+  tenants. It proves one idempotent contact mutation/event, foreign-resource denial, exact dummy-message
+  replay and status, signed raw lifecycle receipt, a terminal failed delivery, replay under the newly rotated
+  webhook secret, rejection by the old verifier, and immediate API-key rotation/revocation denial.
+- `tests/unit/db/public-api-network-exit-path.test.ts` is the literal external-application proof. It creates
+  a fresh disposable 55-migration database and NOINHERIT web/worker logins, starts a real Next App Router HTTP
+  child on the forced-RLS web role plus an independent local receiver socket, and runs claims/finalization on
+  the worker role. Organization A/B keys prove foreign `GET`/`PATCH` both return `404` without mutation;
+  root/nested unknown paths and unauthenticated/authenticated `HEAD`/`OPTIONS` prove canonical auth/method
+  headers. The same run drives six-way concurrent contact/message retries through `fetch`, reads dummy status,
+  verifies exact signed raw bodies/headers, forces a receiver `500`, rotates and replays under secret version
+  2 while rejecting the old secret, then proves API-key rotation/revocation denial. It is mandatory in
+  `npm run test:tenant-db`, removes its database/process/socket/roles in teardown, and makes no provider request.
+- M4 provider-control coverage spans bound AES-256-GCM envelope tamper/secret-output tests, safe DTOs,
+  verification/rotation/revocation/health/discovery/import services, ADMIN-before-body routes, deterministic
+  dummy and bounded Twilio fixtures, migration invariants, and two-account signed routing. The routing exit
+  proof uses a non-owner PostgreSQL web role; HTTP route fixtures separately exercise inbound/status handler
+  behavior, so M4 does not claim a literal callback-server E2E.
+- M5 direct-message coverage spans permanent reservation after API replay expiry, changed-binding conflict,
+  one message/attempt/accepted event, immutable payload/frontier state, worker-only claim/recovery, exact
+  final organization/compliance/contact/current-credential/sender gates, bounded definitive retry, and
+  possible-impact ambiguity with no blind successor. Real PostgreSQL tests cover provider-impact process
+  termination, duplicate/out-of-order/cross-tenant correlated callbacks, known-SID provider fetch without
+  create, audited ADMIN no-send attestation, and a concurrent single-winner retry. Fixtures cover bounded
+  Twilio SMS/MMS requests and errors; defaults, validation, and tests have no carrier credentials or call.
 
 Additional deterministic checks:
 
 - Smoke coverage verifies the exported demo-safe runtime defaults are runtime-frozen before the root launch page, health endpoint, compliance check, and local environment views consume them, so caller-side mutation cannot drift demo mode, live messaging, live billing, dummy provider, or fake AI defaults.
-- Provider settings update route tests verify role denials return before request-body parsing, and successful admin requests persist only local credential metadata before rendering secret-safe provider settings without provider number writes, credential deletion, or live-test SMS helpers.
+- The retired provider settings `PATCH` test verifies ADMIN denial precedes work and authorized calls return
+  no-store `410 PROVIDER_METADATA_ENDPOINT_RETIRED` without reading a body. M4 account-route tests cover safe
+  listing, verified connect/rotate/revoke/health/discovery/import/default/disable, generic secret-free error
+  mapping, and ADMIN-before-body ordering. Legacy metadata/rotation rows remain unverified/display-only;
+  canonical provider-control operations append `IntegrationAuditEvent` evidence.
 - Static mutating API authorization coverage verifies default-initialized destructuring of `globalThis` `Request` constructor aliases, including `const { Request: RequestCtor = Request } = globalThis`, `const { [requestConstructorName]: RequestCtor = Request } = globalThis`, `({ Request: RequestCtor = Request } = globalThis)`, `({ [requestConstructorName]: RequestCtor = Request } = globalThis)`, `const { Request: RequestCtor = Request } = (globalThis as typeof globalThis)`, `const { [requestConstructorName]: RequestCtor = Request } = (globalThis satisfies typeof globalThis)`, `({ Request: RequestCtor = Request } = (globalThis as typeof globalThis))`, `({ [requestConstructorName]: RequestCtor = Request } = (globalThis satisfies typeof globalThis))`, and defaulted destructuring through local `globalThis` root aliases such as `const root = globalThis; const { Request: RequestCtor = Request } = root`, `root = (globalThis as typeof globalThis); ({ Request: RequestCtor = Request } = root)`, `root = (globalThis as typeof globalThis); ({ [requestConstructorName]: RequestCtor = Request } = root)`, and `root = (globalThis satisfies typeof globalThis); ({ [requestConstructorName]: RequestCtor = Request } = root)`, is treated as `Request.prototype` body-reader access before each handler's own top-level `requireApiRole` call.
 - Static mutating API authorization coverage verifies assigned type-asserted and `satisfies` computed destructuring of `globalThis` `Object`/`Reflect` aliases, including `({ [objectName]: ObjectBuiltin, [reflectName]: ReflectBuiltin } = (globalThis as typeof globalThis))` and `({ [objectName]: ObjectBuiltin, [reflectName]: ReflectBuiltin } = (globalThis satisfies typeof globalThis))`, is treated as descriptor/prototype body-reader access before each handler's own top-level `requireApiRole` call.
 - Static mutating API authorization coverage verifies default-initialized destructuring of `globalThis` `Object`/`Reflect` aliases, including `const { Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = globalThis`, `const { [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = globalThis`, `({ Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = globalThis)`, `({ [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = globalThis)`, `const { Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = (globalThis as typeof globalThis)`, `const { [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = (globalThis satisfies typeof globalThis)`, `({ Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = (globalThis as typeof globalThis))`, `({ [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = (globalThis satisfies typeof globalThis))`, and defaulted destructuring through local `globalThis` root aliases such as `const root = globalThis; const { Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = root`, `root = (globalThis as typeof globalThis); ({ Object: ObjectBuiltin = Object, Reflect: ReflectBuiltin = Reflect } = root)`, `root = (globalThis as typeof globalThis); ({ [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = root)`, and `root = (globalThis satisfies typeof globalThis); ({ [objectName]: ObjectBuiltin = Object, [reflectName]: ReflectBuiltin = Reflect } = root)`, is treated as descriptor/prototype body-reader access before each handler's own top-level `requireApiRole` call.
@@ -143,7 +201,13 @@ Additional deterministic checks:
 - Phone lookup coverage verifies local normalization remains the default, paid Twilio Lookup requires exact live enablement plus cost acknowledgement, credentials, and a constant-time server-token match from the dedicated request header before fetch, operator secrets are not forwarded to Twilio, provider phone numbers normalize to the exact requested number, timeouts stay bounded and abort requests, explicitly requested provider/configuration failures fail closed, and CSV imports never call live lookup even when all live configuration is present.
 - Production deployment gate tests verify that production-like environments cannot enable external-impact settings without an explicit future override.
 - API rate limiting helpers are unit-tested with deterministic clocks and isolated stores. Local validation keeps the middleware defaults generous enough for smoke and demo paths.
-- Campaign create/update route tests verify malformed JSON returns `400` before local campaign create/update repository mutations run. Contact create/update/merge/import route tests verify malformed JSON returns `400` before local contact upsert/update/merge, CSV parsing, or import repository mutations run. Inbox/demo inbound route tests verify malformed JSON returns `400` before local inbound message, conversation message, assignment, note, or resolve repository mutations run. Fake AI route tests verify malformed JSON returns `400` before conversation lookup, fake provider execution, or local `AI_REQUEST` usage metering can run. Billing usage, campaign preflight, compliance settings, provider number metadata, provider settings, and live-test SMS route tests verify malformed JSON returns `400` before local usage records, local preflight repository work, compliance updates, readiness audit writes, provider metadata writes, provider settings rendering, or gated live-test send helpers can run. Readiness audit route tests verify unsupported JSON/CSV export query filters return `400` before local audit event reads or CSV serialization, and supported bounded filters read only local audit metadata. Provider credential rotation route tests verify unsupported JSON/CSV export query filters return `400` before local rotation-history reads or CSV serialization, and supported bounded filters read only local redacted credential metadata. Compliance settings route tests verify role denials return before request-body parsing, and successful admin requests update only local compliance metadata and local readiness audit records before evaluating the local messaging hard gate without provider metadata writes or live-test SMS helpers. Provider number metadata route tests verify role denials return before request-body parsing, and successful admin requests upsert only local provider number metadata without provider settings rendering, provider credential persistence, or live-test send helpers. Provider settings delete route tests verify role denials return before local credential metadata is cleared, and successful deletion clears only local metadata before rendering secret-safe provider settings. Campaign schedule route tests verify role denials return before request-body parsing, malformed or schema-invalid schedule payloads return `400` before local queue scheduling or BullMQ enqueue helpers can run, missing campaigns return `404` without BullMQ enqueue, and valid payloads persist a local queue job before optional BullMQ enqueue. CI validates both active integration pushes (`develop`) and release pushes (`main`), as well as every pull request.
+- Malformed-JSON coverage keeps campaign, contact/import, inbox, fake-AI, billing, preflight, compliance,
+  legacy provider-number metadata, and live-test helpers from mutating before validation. Readiness-audit and
+  legacy provider-rotation filters are bounded and reject before reads/CSV serialization. M4 provider-
+  account and verified resource routes separately require ADMIN/same-origin before parsing or service work;
+  compatibility `DELETE /api/settings/provider` revokes only the selected default account's local authority.
+  Campaign schedule coverage retains the persisted-before-optional-BullMQ ordering. CI validates active
+  integration/release pushes and every pull request.
 - Live-worker control tests verify exact frozen control-entry evidence remains descriptor-based and does not read accessor-backed or invoke data-backed inherited `Object.prototype` `Symbol.toPrimitive`, `toString`, or `valueOf` metadata while evaluating the still-reserved `production-live-campaign` authorization path.
 - Live-worker control tests verify exact frozen authorization-wrapper evidence remains descriptor-based and does not read accessor-backed or invoke data-backed inherited `Object.prototype` `Symbol.toPrimitive`, `toString`, or `valueOf` metadata while evaluating the still-reserved `production-live-campaign` authorization path.
 - Live-worker control tests verify exact frozen live-worker evidence remains descriptor-based and does not invoke data-backed inherited `Object.prototype` `Symbol.toPrimitive`, `toString`, or `valueOf` metadata while evaluating the still-reserved `production-live-campaign` authorization path.
@@ -165,5 +229,10 @@ Additional deterministic checks:
 - Contact consent-evidence integration coverage verifies the database permits first capture and identical rewrites, rejects clearing or replacement, and allows exactly one of two concurrent first-capture writers to commit.
 - Template create/update route unit coverage verifies malformed JSON returns `400` before local template upsert/update repository mutations run.
 - Twilio webhook helper coverage verifies unsupported request body formats return a controlled invalid form payload result before signature validation, while URL-encoded form payloads preserve unknown provider fields for signature validation and raw local storage.
-- Twilio webhook repository and route coverage verifies malformed forms and invalid signatures return before tenant lookup or local mutations, concurrent unprocessed duplicates cannot steal a live owner lease and receive `409` plus advisory `Retry-After`, processed duplicates return `204`, downstream failures release only the owner's claim, stale leases recover, inbound routes disable AI/automatic replies, and status updates are scoped by the current tenant plus provider message ID. A Postgres-backed concurrency test verifies exactly one simultaneous claim winner.
+- Twilio webhook repository and route coverage verifies malformed forms return before routing, invalid or
+  crossed account/destination/signature evidence fails generically before tenant mutation, authenticated
+  bindings are rechecked for current credential generation and revocation, concurrent duplicates cannot
+  steal a live owner lease, processed duplicates return `204`, failed work releases only the owner's claim,
+  stale leases recover, inbound routes disable AI/automatic replies, and status updates stay inside the
+  resolved tenant plus provider message ID. PostgreSQL tests cover exact two-account routing and one claim winner.
 - Delivery-status, webhook-route, delivery-count, and Prometheus exporter coverage verifies `failed`, `undelivered`, and `canceled` share one terminal-failure vocabulary. Prometheus coverage also creates another tenant's failure evidence and verifies the current-organization scrape excludes it and excludes the unattributable process-global signature-failure counter.

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useMemo, useRef, useState } from "react";
 import { productInboxWorkspaceDefaults } from "@/lib/product/inbox-workspace-defaults";
 
 type InboxConversationRow = {
@@ -21,7 +21,11 @@ type InboxMessage = {
   id: string;
   direction: string;
   body: string;
+  applicationStatus: string;
+  transport: string;
   providerStatus: string | null;
+  providerErrorCode: string | null;
+  requiresReview: boolean;
   createdAt: string;
 };
 
@@ -75,6 +79,7 @@ export function InboxWorkspace({
   const [aiPending, setAiPending] = useState(false);
   const [aiInsights, setAiInsights] = useState<AiInsights | null>(null);
   const [localThreadStatus, setLocalThreadStatus] = useState(selectedConversation?.status ?? "OPEN");
+  const replyRequestId = useRef<string | null>(null);
   const threadStatus = localThreadStatus;
   const orderedMessages = useMemo(() => selectedConversation?.messages ?? [], [selectedConversation]);
 
@@ -121,20 +126,46 @@ export function InboxWorkspace({
     );
   }
 
+  async function submitReply(conversationId: string) {
+    setPending(true);
+    setStatus(null);
+    setError(null);
+    const requestId = replyRequestId.current ?? crypto.randomUUID();
+    replyRequestId.current = requestId;
+    try {
+      const response = await fetch(`/api/inbox/conversations/${conversationId}/reply`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body: replyBody, idempotencyKey: requestId })
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (response.status < 500) {
+        replyRequestId.current = null;
+      }
+      if (!response.ok) {
+        setError(typeof payload.error === "string" ? payload.error : "Inbox reply failed.");
+        return;
+      }
+      setStatus(
+        payload.deduped
+          ? "Duplicate reply ignored (idempotent). No provider send ran."
+          : "Outbound reply accepted through the durable message outbox."
+      );
+      setReplyBody("");
+      router.refresh();
+    } catch {
+      setError("The reply outcome is uncertain. Retry to safely inspect the same request.");
+    } finally {
+      setPending(false);
+    }
+  }
+
   function sendReply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!selectedConversation) {
       return;
     }
-
-    void submitJson(
-      `/api/inbox/conversations/${selectedConversation.id}/reply`,
-      { body: replyBody },
-      (payload) =>
-        payload.deduped
-          ? "Duplicate reply ignored (idempotent). No provider send ran."
-          : "Local outbound reply recorded via the dummy provider. No live SMS was sent."
-    );
+    void submitReply(selectedConversation.id);
   }
 
   function addNote(event: FormEvent<HTMLFormElement>) {
@@ -340,10 +371,31 @@ export function InboxWorkspace({
                 key={message.id}
               >
                 <div className="flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  <span>{message.direction}</span>
+                  <span className="flex flex-wrap items-center gap-2">
+                    <span>{message.direction}</span>
+                    <span
+                      className={
+                        message.requiresReview
+                          ? "rounded bg-amber-100 px-2 py-1 text-amber-900"
+                          : "rounded bg-slate-200 px-2 py-1 text-slate-700"
+                      }
+                    >
+                      {message.applicationStatus}
+                    </span>
+                  </span>
                   <span>{new Date(message.createdAt).toLocaleString("en-US")}</span>
                 </div>
                 <p className="mt-2 text-sm text-slate-800">{message.body}</p>
+                <p className="mt-2 text-xs text-slate-500">
+                  Transport {message.transport}
+                  {message.providerStatus ? ` · Provider ${message.providerStatus}` : ""}
+                  {message.providerErrorCode ? ` · ${message.providerErrorCode}` : ""}
+                </p>
+                {message.requiresReview ? (
+                  <p className="mt-2 text-xs font-semibold text-amber-900">
+                    Delivery outcome needs ADMIN review before any retry.
+                  </p>
+                ) : null}
               </article>
             ))}
           </div>
@@ -398,14 +450,14 @@ export function InboxWorkspace({
         <form className="grid gap-3 rounded border border-slate-200 bg-white p-5" onSubmit={sendReply}>
           <h2 className="text-xl font-semibold">Send reply</h2>
           <p className="text-sm text-slate-600">
-            Records a local OUTBOUND message via the dummy provider. Opted-out or archived contacts are blocked; no live SMS is sent.
+            Accepts one durable outbound message. Opted-out or archived contacts are blocked; carrier work runs only through the gated worker.
           </p>
           <label className="grid gap-2 text-sm font-medium text-slate-700">
             Reply message
             <textarea
               className="min-h-28 rounded border border-slate-300 px-3 py-2 text-sm text-slate-950"
               onChange={(event) => setReplyBody(event.target.value)}
-              placeholder="Type a reply to record via the demo-safe dummy provider"
+              placeholder="Type a reply to reserve in the durable outbox"
               value={replyBody}
             />
           </label>

@@ -2,7 +2,12 @@ import { createHash, randomUUID } from "node:crypto";
 import {
   AuthTokenType,
   MembershipRole,
+  MessageApplicationStatus,
+  MessageAttemptStatus,
+  MessageTransport,
   PrismaClient,
+  ProviderAccountStatus,
+  ProviderMessagingServiceStatus,
   QueueJobType,
   UsageEventType,
   type Prisma
@@ -15,6 +20,8 @@ import {
   withTenantTransaction
 } from "@/lib/db/tenant-context";
 import {
+  appendOnlyTenantTables,
+  nonDeletableTenantTables,
   ordinaryTenantTables,
   protectedTenantTables
 } from "@/lib/db/tenant-manifest";
@@ -30,6 +37,8 @@ type FixtureSide = "a" | "b";
 type FixtureIds = Record<ProtectedTenantTable, Record<FixtureSide, string>>;
 type TenantRow = Readonly<{ id: string; orgId?: string }>;
 type ProtectedRows = Record<ProtectedTenantTable, readonly TenantRow[]>;
+const appendOnlyTenantTableSet = new Set<OrdinaryTenantTable>(appendOnlyTenantTables);
+const nonDeletableTenantTableSet = new Set<OrdinaryTenantTable>(nonDeletableTenantTables);
 
 type OwnerFixture = Readonly<{
   ids: FixtureIds;
@@ -118,7 +127,8 @@ describe.runIf(run)("non-owner tenant runtime role", () => {
       orgId: null,
       userId: null,
       sessionHash: null,
-      tokenHash: null
+      tokenHash: null,
+      apiKeyHash: null
     });
     for (const table of protectedTenantTables) {
       expect(snapshot.rows[table], `${table} must fail closed without context`).toEqual([]);
@@ -186,14 +196,20 @@ describe.runIf(run)("non-owner tenant runtime role", () => {
         >;
         for (const table of ordinaryTenantTables) {
           const id = fixtureId(seeded, table, "b");
+          if (appendOnlyTenantTableSet.has(table)) {
+            result[table] = { updated: 0, deleted: 0 };
+            continue;
+          }
           const updated = await tx.$executeRawUnsafe(
             `UPDATE ${quoteIdentifier(table)} SET "orgId" = "orgId" WHERE "id" = $1`,
             id
           );
-          const deleted = await tx.$executeRawUnsafe(
-            `DELETE FROM ${quoteIdentifier(table)} WHERE "id" = $1`,
-            id
-          );
+          const deleted = nonDeletableTenantTableSet.has(table)
+            ? 0
+            : await tx.$executeRawUnsafe(
+                `DELETE FROM ${quoteIdentifier(table)} WHERE "id" = $1`,
+                id
+              );
           result[table] = { updated, deleted };
         }
         return result;
@@ -213,6 +229,40 @@ describe.runIf(run)("non-owner tenant runtime role", () => {
       expect(bRows[table]).toEqual([
         { id: fixtureId(seeded, table, "b"), orgId: seeded.orgBId }
       ]);
+    }
+  });
+
+  it("denies updates to append-only rows and hard deletes of durable M3 rows", async () => {
+    const client = requireClient(runtime);
+    const seeded = requireFixture(fixture);
+
+    for (const table of appendOnlyTenantTables) {
+      const id = fixtureId(seeded, table, "a");
+      await expect(
+        withTenantTransaction(
+          { orgId: seeded.orgAId, userId: seeded.userAId },
+          (tx) =>
+            tx.$executeRawUnsafe(
+              `UPDATE ${quoteIdentifier(table)} SET "orgId" = "orgId" WHERE "id" = $1`,
+              id
+            ),
+          { client, attest: false }
+        )
+      ).rejects.toThrow();
+    }
+    for (const table of nonDeletableTenantTables) {
+      const id = fixtureId(seeded, table, "a");
+      await expect(
+        withTenantTransaction(
+          { orgId: seeded.orgAId, userId: seeded.userAId },
+          (tx) =>
+            tx.$executeRawUnsafe(
+              `DELETE FROM ${quoteIdentifier(table)} WHERE "id" = $1`,
+              id
+            ),
+          { client, attest: false }
+        )
+      ).rejects.toThrow();
     }
   });
 
@@ -536,6 +586,7 @@ async function seedOwnerFixtures(): Promise<OwnerFixture> {
     });
     remember("QueueJob", queueA.id, queueB.id);
 
+    const messageAttemptAt = new Date();
     const messageA = await tx.message.create({
       data: {
         orgId: orgA.id,
@@ -544,8 +595,16 @@ async function seedOwnerFixtures(): Promise<OwnerFixture> {
         campaignId: campaignA.id,
         direction: "OUTBOUND",
         body: "Runtime matrix",
+        applicationStatus: MessageApplicationStatus.SENT,
+        transport: MessageTransport.DUMMY,
+        destination: contactA.phone,
+        requestFingerprint: "runtime-message-fingerprint-a",
         providerMessageId: fixtureLabel,
-        idempotencyKey: fixtureLabel
+        acceptedAt: messageAttemptAt,
+        sentAt: messageAttemptAt,
+        attemptCount: 1,
+        idempotencyKey: fixtureLabel,
+        createdAt: messageAttemptAt
       }
     });
     const messageB = await tx.message.create({
@@ -556,11 +615,59 @@ async function seedOwnerFixtures(): Promise<OwnerFixture> {
         campaignId: campaignB.id,
         direction: "OUTBOUND",
         body: "Runtime matrix",
+        applicationStatus: MessageApplicationStatus.SENT,
+        transport: MessageTransport.DUMMY,
+        destination: contactB.phone,
+        requestFingerprint: "runtime-message-fingerprint-b",
         providerMessageId: fixtureLabel,
-        idempotencyKey: fixtureLabel
+        acceptedAt: messageAttemptAt,
+        sentAt: messageAttemptAt,
+        attemptCount: 1,
+        idempotencyKey: fixtureLabel,
+        createdAt: messageAttemptAt
       }
     });
     remember("Message", messageA.id, messageB.id);
+
+    const messageAttemptA = await tx.messageAttempt.create({
+      data: {
+        orgId: orgA.id,
+        messageId: messageA.id,
+        attemptNumber: 1,
+        status: MessageAttemptStatus.SUCCEEDED,
+        transport: MessageTransport.DUMMY,
+        dueAt: messageAttemptAt,
+        destination: contactA.phone,
+        body: messageA.body,
+        requestFingerprint: "runtime-message-fingerprint-a",
+        callbackCorrelationId: randomUUID(),
+        providerMessageId: fixtureLabel,
+        providerStatus: "queued",
+        disposition: "success",
+        completedAt: messageAttemptAt,
+        createdAt: messageAttemptAt
+      }
+    });
+    const messageAttemptB = await tx.messageAttempt.create({
+      data: {
+        orgId: orgB.id,
+        messageId: messageB.id,
+        attemptNumber: 1,
+        status: MessageAttemptStatus.SUCCEEDED,
+        transport: MessageTransport.DUMMY,
+        dueAt: messageAttemptAt,
+        destination: contactB.phone,
+        body: messageB.body,
+        requestFingerprint: "runtime-message-fingerprint-b",
+        callbackCorrelationId: randomUUID(),
+        providerMessageId: fixtureLabel,
+        providerStatus: "queued",
+        disposition: "success",
+        completedAt: messageAttemptAt,
+        createdAt: messageAttemptAt
+      }
+    });
+    remember("MessageAttempt", messageAttemptA.id, messageAttemptB.id);
 
     const noteA = await tx.internalNote.create({
       data: {
@@ -596,12 +703,103 @@ async function seedOwnerFixtures(): Promise<OwnerFixture> {
     const billingB = await tx.billingAccount.create({ data: { orgId: orgB.id } });
     remember("BillingAccount", billingA.id, billingB.id);
 
+    const providerVerifiedAt = new Date();
+    const externalAccountA = `AC${suiteToken}A`;
+    const externalAccountB = `AC${suiteToken}B`;
+    const providerAccountA = await tx.providerAccount.create({
+      data: {
+        orgId: orgA.id,
+        provider: fixtureLabel,
+        externalAccountId: externalAccountA,
+        externalAccountIdHash: providerLookupHash(`${fixtureLabel}:account:${externalAccountA}`),
+        externalAccountIdLast4: externalAccountA.slice(-4),
+        status: ProviderAccountStatus.VERIFIED,
+        verifiedAt: providerVerifiedAt,
+        lastCheckedAt: providerVerifiedAt
+      }
+    });
+    const providerAccountB = await tx.providerAccount.create({
+      data: {
+        orgId: orgB.id,
+        provider: fixtureLabel,
+        externalAccountId: externalAccountB,
+        externalAccountIdHash: providerLookupHash(`${fixtureLabel}:account:${externalAccountB}`),
+        externalAccountIdLast4: externalAccountB.slice(-4),
+        status: ProviderAccountStatus.VERIFIED,
+        verifiedAt: providerVerifiedAt,
+        lastCheckedAt: providerVerifiedAt
+      }
+    });
+    remember("ProviderAccount", providerAccountA.id, providerAccountB.id);
+
+    const providerSecretA = await tx.providerCredentialSecret.create({
+      data: {
+        orgId: orgA.id,
+        providerAccountId: providerAccountA.id,
+        version: 1,
+        keyVersion: 1,
+        iv: tokenHash("provider-iv-a"),
+        ciphertext: tokenHash("provider-ciphertext-a"),
+        authTag: tokenHash("provider-tag-a"),
+        fingerprint: providerFingerprint("provider-fingerprint-a")
+      }
+    });
+    const providerSecretB = await tx.providerCredentialSecret.create({
+      data: {
+        orgId: orgB.id,
+        providerAccountId: providerAccountB.id,
+        version: 1,
+        keyVersion: 1,
+        iv: tokenHash("provider-iv-b"),
+        ciphertext: tokenHash("provider-ciphertext-b"),
+        authTag: tokenHash("provider-tag-b"),
+        fingerprint: providerFingerprint("provider-fingerprint-b")
+      }
+    });
+    remember("ProviderCredentialSecret", providerSecretA.id, providerSecretB.id);
+
+    const externalServiceA = `MG${suiteToken}A`;
+    const externalServiceB = `MG${suiteToken}B`;
+    const providerServiceA = await tx.providerMessagingService.create({
+      data: {
+        orgId: orgA.id,
+        providerAccountId: providerAccountA.id,
+        provider: fixtureLabel,
+        externalServiceId: externalServiceA,
+        externalServiceIdHash: providerLookupHash(
+          `${fixtureLabel}:service:${externalServiceA}`
+        ),
+        externalServiceIdLast4: externalServiceA.slice(-4),
+        status: ProviderMessagingServiceStatus.VERIFIED,
+        capabilities: ["sms"],
+        verifiedAt: providerVerifiedAt,
+        lastCheckedAt: providerVerifiedAt
+      }
+    });
+    const providerServiceB = await tx.providerMessagingService.create({
+      data: {
+        orgId: orgB.id,
+        providerAccountId: providerAccountB.id,
+        provider: fixtureLabel,
+        externalServiceId: externalServiceB,
+        externalServiceIdHash: providerLookupHash(
+          `${fixtureLabel}:service:${externalServiceB}`
+        ),
+        externalServiceIdLast4: externalServiceB.slice(-4),
+        status: ProviderMessagingServiceStatus.VERIFIED,
+        capabilities: ["sms"],
+        verifiedAt: providerVerifiedAt,
+        lastCheckedAt: providerVerifiedAt
+      }
+    });
+    remember("ProviderMessagingService", providerServiceA.id, providerServiceB.id);
+
     const providerPhoneA = await tx.providerPhoneNumber.create({
       data: {
         orgId: orgA.id,
         phoneNumber: `+1666${phoneTail}`,
         provider: fixtureLabel,
-        capabilities: { sms: true }
+        capabilities: ["sms"]
       }
     });
     const providerPhoneB = await tx.providerPhoneNumber.create({
@@ -609,7 +807,7 @@ async function seedOwnerFixtures(): Promise<OwnerFixture> {
         orgId: orgB.id,
         phoneNumber: `+1666${phoneTail}`,
         provider: fixtureLabel,
-        capabilities: { sms: true }
+        capabilities: ["sms"]
       }
     });
     remember("ProviderPhoneNumber", providerPhoneA.id, providerPhoneB.id);
@@ -681,6 +879,217 @@ async function seedOwnerFixtures(): Promise<OwnerFixture> {
       }
     });
     remember("WebhookEvent", webhookA.id, webhookB.id);
+
+    const apiCredentialA = await tx.apiCredential.create({
+      data: {
+        orgId: orgA.id,
+        name: fixtureLabel,
+        prefix: `${fixtureLabel}-a`,
+        secretHash: tokenHash("api-key-a"),
+        scopes: ["contacts:read"]
+      }
+    });
+    const apiCredentialB = await tx.apiCredential.create({
+      data: {
+        orgId: orgB.id,
+        name: fixtureLabel,
+        prefix: `${fixtureLabel}-b`,
+        secretHash: tokenHash("api-key-b"),
+        scopes: ["contacts:read"]
+      }
+    });
+    remember("ApiCredential", apiCredentialA.id, apiCredentialB.id);
+
+    const idempotencyA = await tx.apiIdempotencyRecord.create({
+      data: {
+        orgId: orgA.id,
+        credentialId: apiCredentialA.id,
+        key: fixtureLabel,
+        method: "POST",
+        canonicalRoute: "/api/v1/contacts",
+        requestHash: tokenHash("request-a"),
+        responseStatus: 201,
+        responseBody: {},
+        responseHeaders: {},
+        expiresAt: future
+      }
+    });
+    const idempotencyB = await tx.apiIdempotencyRecord.create({
+      data: {
+        orgId: orgB.id,
+        credentialId: apiCredentialB.id,
+        key: fixtureLabel,
+        method: "POST",
+        canonicalRoute: "/api/v1/contacts",
+        requestHash: tokenHash("request-b"),
+        responseStatus: 201,
+        responseBody: {},
+        responseHeaders: {},
+        expiresAt: future
+      }
+    });
+    remember("ApiIdempotencyRecord", idempotencyA.id, idempotencyB.id);
+
+    const integrationAuditA = await tx.integrationAuditEvent.create({
+      data: {
+        orgId: orgA.id,
+        actorUserId: userA.id,
+        apiCredentialId: apiCredentialA.id,
+        action: "RUNTIME_MATRIX_CREATED",
+        subjectType: "api_credential",
+        subjectId: apiCredentialA.id
+      }
+    });
+    const integrationAuditB = await tx.integrationAuditEvent.create({
+      data: {
+        orgId: orgB.id,
+        actorUserId: userB.id,
+        apiCredentialId: apiCredentialB.id,
+        action: "RUNTIME_MATRIX_CREATED",
+        subjectType: "api_credential",
+        subjectId: apiCredentialB.id
+      }
+    });
+    remember("IntegrationAuditEvent", integrationAuditA.id, integrationAuditB.id);
+
+    const customerEndpointA = await tx.customerWebhookEndpoint.create({
+      data: {
+        orgId: orgA.id,
+        name: fixtureLabel,
+        canonicalUrl: `https://a-${suiteToken}.example.test/events`
+      }
+    });
+    const customerEndpointB = await tx.customerWebhookEndpoint.create({
+      data: {
+        orgId: orgB.id,
+        name: fixtureLabel,
+        canonicalUrl: `https://b-${suiteToken}.example.test/events`
+      }
+    });
+    remember("CustomerWebhookEndpoint", customerEndpointA.id, customerEndpointB.id);
+
+    const customerSubscriptionA = await tx.customerWebhookSubscription.create({
+      data: {
+        orgId: orgA.id,
+        endpointId: customerEndpointA.id,
+        eventTypes: ["contact.created"]
+      }
+    });
+    const customerSubscriptionB = await tx.customerWebhookSubscription.create({
+      data: {
+        orgId: orgB.id,
+        endpointId: customerEndpointB.id,
+        eventTypes: ["contact.created"]
+      }
+    });
+    remember(
+      "CustomerWebhookSubscription",
+      customerSubscriptionA.id,
+      customerSubscriptionB.id
+    );
+
+    const signingSecretA = await tx.customerWebhookSigningSecret.create({
+      data: {
+        orgId: orgA.id,
+        subscriptionId: customerSubscriptionA.id,
+        version: 1,
+        ciphertext: tokenHash("ciphertext-a"),
+        iv: tokenHash("iv-a"),
+        authTag: tokenHash("tag-a"),
+        keyVersion: 1,
+        fingerprint: tokenHash("fingerprint-a")
+      }
+    });
+    const signingSecretB = await tx.customerWebhookSigningSecret.create({
+      data: {
+        orgId: orgB.id,
+        subscriptionId: customerSubscriptionB.id,
+        version: 1,
+        ciphertext: tokenHash("ciphertext-b"),
+        iv: tokenHash("iv-b"),
+        authTag: tokenHash("tag-b"),
+        keyVersion: 1,
+        fingerprint: tokenHash("fingerprint-b")
+      }
+    });
+    remember("CustomerWebhookSigningSecret", signingSecretA.id, signingSecretB.id);
+
+    const customerEventA = await tx.customerWebhookEvent.create({
+      data: {
+        orgId: orgA.id,
+        deduplicationKey: fixtureLabel,
+        type: "contact.created",
+        aggregateType: "contact",
+        aggregateId: contactA.id,
+        payloadText: "{}",
+        payloadHash: tokenHash("payload-a"),
+        occurredAt: new Date()
+      }
+    });
+    const customerEventB = await tx.customerWebhookEvent.create({
+      data: {
+        orgId: orgB.id,
+        deduplicationKey: fixtureLabel,
+        type: "contact.created",
+        aggregateType: "contact",
+        aggregateId: contactB.id,
+        payloadText: "{}",
+        payloadHash: tokenHash("payload-b"),
+        occurredAt: new Date()
+      }
+    });
+    remember("CustomerWebhookEvent", customerEventA.id, customerEventB.id);
+
+    const customerDeliveryA = await tx.customerWebhookDelivery.create({
+      data: {
+        orgId: orgA.id,
+        endpointId: customerEndpointA.id,
+        subscriptionId: customerSubscriptionA.id,
+        eventId: customerEventA.id,
+        signingSecretId: signingSecretA.id
+      }
+    });
+    const customerDeliveryB = await tx.customerWebhookDelivery.create({
+      data: {
+        orgId: orgB.id,
+        endpointId: customerEndpointB.id,
+        subscriptionId: customerSubscriptionB.id,
+        eventId: customerEventB.id,
+        signingSecretId: signingSecretB.id
+      }
+    });
+    remember("CustomerWebhookDelivery", customerDeliveryA.id, customerDeliveryB.id);
+
+    const attemptStartedAt = new Date();
+    const customerAttemptA = await tx.customerWebhookDeliveryAttempt.create({
+      data: {
+        orgId: orgA.id,
+        deliveryId: customerDeliveryA.id,
+        generation: customerDeliveryA.generation,
+        attemptNumber: 1,
+        requestTimestamp: attemptStartedAt,
+        outcome: "ACKNOWLEDGED",
+        startedAt: attemptStartedAt,
+        finishedAt: attemptStartedAt
+      }
+    });
+    const customerAttemptB = await tx.customerWebhookDeliveryAttempt.create({
+      data: {
+        orgId: orgB.id,
+        deliveryId: customerDeliveryB.id,
+        generation: customerDeliveryB.generation,
+        attemptNumber: 1,
+        requestTimestamp: attemptStartedAt,
+        outcome: "ACKNOWLEDGED",
+        startedAt: attemptStartedAt,
+        finishedAt: attemptStartedAt
+      }
+    });
+    remember(
+      "CustomerWebhookDeliveryAttempt",
+      customerAttemptA.id,
+      customerAttemptB.id
+    );
 
     const sessionA = await tx.authSession.create({
       data: {
@@ -771,20 +1180,28 @@ async function readMissingContextSnapshot(client: PrismaClient) {
         userId: string | null;
         sessionHash: string | null;
         tokenHash: string | null;
+        apiKeyHash: string | null;
       }>
     >`
       SELECT
         NULLIF(current_setting('app.current_org_id', true), '') AS "orgId",
         NULLIF(current_setting('app.current_user_id', true), '') AS "userId",
         NULLIF(current_setting('app.current_session_hash', true), '') AS "sessionHash",
-        NULLIF(current_setting('app.current_token_hash', true), '') AS "tokenHash"
+        NULLIF(current_setting('app.current_token_hash', true), '') AS "tokenHash",
+        NULLIF(current_setting('app.current_api_key_hash', true), '') AS "apiKeyHash"
     `;
     const rows = {} as ProtectedRows;
     for (const table of protectedTenantTables) {
       rows[table] = await selectTableRows(tx, table);
     }
     return {
-      settings: settings ?? { orgId: null, userId: null, sessionHash: null, tokenHash: null },
+      settings: settings ?? {
+        orgId: null,
+        userId: null,
+        sessionHash: null,
+        tokenHash: null,
+        apiKeyHash: null
+      },
       rows
     };
   });
@@ -818,7 +1235,8 @@ function assertMissingContext(snapshot: Awaited<ReturnType<typeof readMissingCon
     orgId: null,
     userId: null,
     sessionHash: null,
-    tokenHash: null
+    tokenHash: null,
+    apiKeyHash: null
   });
   for (const table of protectedTenantTables) {
     expect(snapshot.rows[table], `${table} leaked after transaction completion`).toEqual([]);
@@ -876,6 +1294,14 @@ function tokenHash(label: string): string {
   return createHash("sha256")
     .update(`${suiteToken}:${label}`, "utf8")
     .digest("base64url");
+}
+
+function providerLookupHash(value: string): string {
+  return `pvlookup_v1_${createHash("sha256").update(value, "utf8").digest("base64url")}`;
+}
+
+function providerFingerprint(value: string): string {
+  return `pvfp_${createHash("sha256").update(value, "utf8").digest("base64url").slice(0, 22)}`;
 }
 
 function numericTail(value: string): string {

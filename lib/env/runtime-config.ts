@@ -53,7 +53,7 @@ export type RuntimeConfig = Readonly<{
   }>;
   worker: Readonly<{
     enabled: boolean;
-    deploymentClass: "local-demo" | "production-live-campaign";
+    deploymentClass: "local-demo" | "production-live-direct" | "production-live-campaign";
     concurrency: number;
     pollIntervalMs: number;
   }>;
@@ -239,7 +239,9 @@ const runtimeEnvironmentSchema = z
     DATABASE_RLS_ENFORCED: booleanFromEnv(false),
 
     WORKER_ENABLED: booleanFromEnv(false),
-    WORKER_DEPLOYMENT_CLASS: z.enum(["local-demo", "production-live-campaign"]).default("local-demo"),
+    WORKER_DEPLOYMENT_CLASS: z
+      .enum(["local-demo", "production-live-direct", "production-live-campaign"])
+      .default("local-demo"),
     WORKER_CONCURRENCY: integerFromEnv(5, 1, 100),
     WORKER_POLL_INTERVAL_MS: integerFromEnv(1_000, 100, 60_000),
 
@@ -392,18 +394,31 @@ const runtimeEnvironmentSchema = z
     }
 
     if (config.LIVE_MESSAGING_ENABLED && config.MESSAGING_PROVIDER === "twilio") {
-      if (!isTwilioAccountSid(config.TWILIO_ACCOUNT_SID)) {
-        addIssue(context, "TWILIO_ACCOUNT_SID", "Live Twilio messaging requires account credential readiness.");
-      }
-      if (!isMinimumSecret(config.TWILIO_AUTH_TOKEN, 16)) {
-        addIssue(context, "TWILIO_AUTH_TOKEN", "Live Twilio messaging requires auth-token readiness.");
-      }
-      if (!isTwilioSenderConfigured(config)) {
-        addIssue(context, "TWILIO_FROM_NUMBER", "Live Twilio messaging requires a from number or messaging service.");
-      }
       if (!isEncryptionKey(config.SECRETS_MASTER_KEY)) {
         addIssue(context, "SECRETS_MASTER_KEY", "Live Twilio messaging requires a valid 256-bit secrets master key.");
       }
+      if (!isHttpsUrl(config.NEXT_PUBLIC_APP_URL)) {
+        addIssue(
+          context,
+          "NEXT_PUBLIC_APP_URL",
+          "Live Twilio messaging requires an HTTPS public callback origin."
+        );
+      }
+    }
+
+    if (production && !isEncryptionKey(config.SECRETS_MASTER_KEY)) {
+      addIssue(
+        context,
+        "SECRETS_MASTER_KEY",
+        "Production public integrations require a valid 256-bit secrets master key."
+      );
+    }
+    if (production && !isApiKeyPepper(config.API_KEY_PEPPER)) {
+      addIssue(
+        context,
+        "API_KEY_PEPPER",
+        "Production public API credentials require a dedicated 32-2048 character pepper."
+      );
     }
 
     if (config.BACKUP_ENABLED && !isEncryptionKey(config.BACKUP_ENCRYPTION_KEY)) {
@@ -486,7 +501,9 @@ function buildSafeRuntimeConfig(config: ParsedRuntimeEnvironment): RuntimeConfig
     provider: Object.freeze({
       name: config.MESSAGING_PROVIDER,
       liveMessagingEnabled: config.LIVE_MESSAGING_ENABLED,
-      credentialsReady: twilio.accountSidConfigured && twilio.authTokenConfigured && twilio.senderConfigured,
+      // General M5 transport resolves per-tenant encrypted credentials and owned senders at dispatch.
+      // Environment Twilio fields remain safe readiness metadata for the isolated live-test exception.
+      credentialsReady: masterKeyConfigured,
       twilio
     }),
     queue: Object.freeze({
@@ -506,7 +523,7 @@ function buildSafeRuntimeConfig(config: ParsedRuntimeEnvironment): RuntimeConfig
     }),
     secrets: Object.freeze({
       masterKeyConfigured,
-      apiKeyPepperConfigured: isMinimumSecret(config.API_KEY_PEPPER),
+      apiKeyPepperConfigured: isApiKeyPepper(config.API_KEY_PEPPER),
       backupEncryptionKeyConfigured
     }),
     retention: Object.freeze({
@@ -547,8 +564,27 @@ function hasProtocol(value: string, allowedProtocols: readonly string[]): boolea
   }
 }
 
+function isHttpsUrl(value: string): boolean {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "https:" && !parsed.username && !parsed.password;
+  } catch {
+    return false;
+  }
+}
+
 function isMinimumSecret(value: string | undefined, minimumLength = 32): boolean {
   return Boolean(value && value.length >= minimumLength);
+}
+
+function isApiKeyPepper(value: string | undefined): boolean {
+  return Boolean(
+    value &&
+      value.length >= 32 &&
+      value.length <= 2_048 &&
+      Buffer.byteLength(value, "utf8") <= 4_096 &&
+      !hasControlCharacter(value)
+  );
 }
 
 function isAuthThrottleSecret(value: string | undefined): boolean {

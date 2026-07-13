@@ -14,15 +14,19 @@ hosted monitoring, and hosted object storage must not be core requirements.
 The detailed product contract, milestone graph, acceptance matrix, and verification ledger are in
 `docs/STANDALONE_ROADMAP.md`.
 
-## Current state (2026-07-10)
+## Current state (2026-07-12)
 
 - Strong demo-safe foundations: tenant-scoped repositories, contacts/imports, templates, campaigns,
   durable database queue jobs, optional BullMQ mirroring, shared inbox, compliance gates, dummy provider,
-  fake/local AI, Twilio webhook parsing, provider metadata, observability seams, and product UI.
-- The seeded browser product path works at `/dashboard`; current database evidence is 37 PostgreSQL
-  files / 186 passing tests, including the mandatory eight-file / 33-test tenant gate and nine-file /
-  38-test auth database run. Playwright smoke, a production local-auth browser proof under a non-owner
-  login, and the production build are green.
+  fake/local AI, trusted Twilio callback routing, encrypted provider ownership, observability seams, and
+  product UI.
+- The seeded browser product path works at `/dashboard`; mandatory PostgreSQL coverage now includes the
+  current 55-migration/40-protected-table tenant substrate plus the public API, provider-routing, and M5
+  durable direct-message exit
+  paths. The M2 checkpoint remains
+  recorded as 37 PostgreSQL files / 186 passing tests, including its eight-file / 33-test tenant gate and
+  nine-file / 38-test auth database run. Playwright smoke, a production local-auth browser proof under a
+  non-owner login, and the production build are green.
 - M1 built-in identity is complete: local credentials, keyed opaque sessions, onboarding/team lifecycle,
   operator recovery, and fail-closed authorization replace deterministic identity outside explicit demo.
 - M2 database-enforced tenant integrity is complete: all 40 migrations install under a non-superuser,
@@ -30,10 +34,22 @@ The detailed product contract, milestone graph, acceptance matrix, and verificat
   attestation, separate non-owner web/worker capabilities, exact control policies, short
   tenant/control/dispatch transactions, and mandatory two-tenant missing-context/forgery/pool proof are
   enforced.
-- The repository is not yet a production SMS platform. Twilio callbacks still route to the demo tenant;
-  provider secrets are not stored for real sends; the campaign
-  worker is dummy-only and production-blocked; there is no public API-key surface, outbound customer
-  webhook delivery, production container bundle, or backup/restore proof.
+- M3 public integrations are complete: its 43-migration/36-protected-table checkpoint provides
+  one-time scoped API credentials, bearer-only `/api/v1` resources, encrypted durable idempotency,
+  generated OpenAPI and cross-runtime examples, plus signed customer-event delivery with bounded retry,
+  disablement, replay, and secret rotation. Its real-route PostgreSQL exit path remains dummy/local and
+  makes no carrier call.
+- M4 provider ownership is complete: eight migrations add account-hash/AAD-bound AES-256-GCM credential
+  envelopes, verified account/number/service ownership, safe ADMIN lifecycle and discovery/import, a
+  complete deterministic provider factory, and exact signed callback routing. Non-owner PostgreSQL routing
+  plus HTTP route fixtures cover two accounts and crossed/unknown/rotated/revoked evidence without sending
+  or changing provider resources. Legacy provider credential/rotation rows remain unverified/display-only.
+- M5 durable direct messaging is complete: transactional public/inbox acceptance, immutable PostgreSQL
+  attempts, stored-credential Twilio SMS/MMS, the final live gate, bounded definitive retry, no blind
+  ambiguous resend, correlated callbacks, provider-fetch reconciliation, and safe ADMIN resolution/retry
+  are database and fixture tested.
+- The repository is not yet a production SMS platform. Trusted inbound/shared-inbox completion and the
+  live campaign worker remain pending; there is no production container bundle or backup/restore proof.
 - Live SMS, billing, and hosted AI remain off by default. The isolated operator-gated live-test SMS path
   is not evidence of production campaign readiness.
 

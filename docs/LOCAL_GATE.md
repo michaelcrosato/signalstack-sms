@@ -95,7 +95,10 @@ identity fail-close, and the continued absence of required Clerk configuration.
 
 Production worker policy validation is included in `npm run validate`. It verifies that the local/demo-only worker boundary remains documented, source-enforced, and covered by tests before any future live worker design proceeds.
 
-Production-like demo deployment operations are documented in `docs/PRODUCTION_DEPLOYMENT.md`. That runbook requires demo-safe defaults and treats provider credential metadata as local readiness data only.
+Production-like demo deployment operations are documented in `docs/PRODUCTION_DEPLOYMENT.md`. That runbook
+requires dummy-safe defaults, treats legacy provider credential/rotation rows as unverified/display-only,
+and permits M4 encrypted credentials only for explicit bounded ADMIN verification/discovery/health and
+trusted callback validation—not live sends.
 
 Demo-safe hosting platform notes are documented in `docs/DEPLOYMENT_PLATFORM_NOTES.md`. They do not authorize live messaging, billing, AI, provider calls, notifications, third-party telemetry exports, real secrets, or destructive data operations.
 

@@ -2,14 +2,18 @@ import { MembershipRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { requireApiRole } from "@/lib/auth/api-authorization";
 import { authenticateApiRequest } from "@/lib/auth/api-authentication";
-import { getOrCreateComplianceProfile } from "@/lib/db/repositories/compliance";
+import { getComplianceProfile } from "@/lib/db/repositories/compliance";
 import {
-  deleteProviderCredentialMetadata,
-  getProviderCredential,
-  upsertProviderCredentialMetadata
+  getProviderCredential
 } from "@/lib/db/repositories/provider-credentials";
+import {
+  listOwnedProviderPhoneNumbers,
+  listProviderAccounts,
+  revokeProviderAccount
+} from "@/lib/integrations/provider-accounts/service";
 import { getProviderSettings } from "@/lib/messaging/provider/settings";
-import { providerSettingsUpdateSchema } from "@/lib/validation/provider";
+
+const noStoreHeaders = Object.freeze({ "Cache-Control": "no-store, max-age=0" });
 
 export async function GET() {
   const authentication = await authenticateApiRequest();
@@ -17,9 +21,11 @@ export async function GET() {
     return authentication.response;
   }
   const { currentOrg } = authentication;
-  const [complianceProfile, providerCredential] = await Promise.all([
-    getOrCreateComplianceProfile(currentOrg.orgId),
-    getProviderCredential(currentOrg.orgId, "twilio")
+  const [complianceProfile, providerCredential, providerAccounts, providerPhoneNumbers] = await Promise.all([
+    getComplianceProfile(currentOrg.orgId),
+    getProviderCredential(currentOrg.orgId, "twilio"),
+    listProviderAccounts(currentOrg.orgId),
+    listOwnedProviderPhoneNumbers(currentOrg.orgId)
   ]);
 
   return NextResponse.json({
@@ -28,10 +34,14 @@ export async function GET() {
       liveMessagingEnabled: process.env.LIVE_MESSAGING_ENABLED === "true",
       messagingProvider: process.env.MESSAGING_PROVIDER ?? "dummy",
       complianceProfile,
+      providerAccounts,
+      providerPhoneNumbers,
       providerCredential,
       env: process.env
-    })
-  });
+    }),
+    accounts: providerAccounts,
+    numbers: providerPhoneNumbers
+  }, { headers: noStoreHeaders });
 }
 
 export async function PATCH(request: Request) {
@@ -45,28 +55,10 @@ export async function PATCH(request: Request) {
     return roleResponse;
   }
 
-  const rawPayload = await request.json().catch(() => undefined);
-  const payload = providerSettingsUpdateSchema.safeParse(rawPayload);
-
-  if (!payload.success) {
-    return NextResponse.json({ error: "Invalid provider settings payload.", issues: payload.error.flatten() }, { status: 400 });
-  }
-
-  const credential = await upsertProviderCredentialMetadata(currentOrg.orgId, payload.data, {
-    actorUserId: currentOrg.userId
-  });
-  const complianceProfile = await getOrCreateComplianceProfile(currentOrg.orgId);
-
   return NextResponse.json({
-    providerSettings: getProviderSettings({
-      demoMode: currentOrg.demoMode,
-      liveMessagingEnabled: process.env.LIVE_MESSAGING_ENABLED === "true",
-      messagingProvider: process.env.MESSAGING_PROVIDER ?? "dummy",
-      complianceProfile,
-      providerCredential: credential,
-      env: process.env
-    })
-  });
+    error: "Use the verified provider accounts endpoint.",
+    code: "PROVIDER_METADATA_ENDPOINT_RETIRED"
+  }, { status: 410, headers: noStoreHeaders });
 }
 
 export async function DELETE(request: Request) {
@@ -80,19 +72,18 @@ export async function DELETE(request: Request) {
     return roleResponse;
   }
 
-  await deleteProviderCredentialMetadata(currentOrg.orgId, "twilio", {
-    actorUserId: currentOrg.userId
+  const accounts = await listProviderAccounts(currentOrg.orgId);
+  const account = accounts.find((candidate) => candidate.isDefault && candidate.revokedAt === null);
+  if (!account) {
+    return NextResponse.json(
+      { error: "Provider account not found.", code: "PROVIDER_ACCOUNT_NOT_FOUND" },
+      { status: 404, headers: noStoreHeaders }
+    );
+  }
+  const revoked = await revokeProviderAccount({
+    orgId: currentOrg.orgId,
+    providerAccountId: account.id,
+    actor: { userId: currentOrg.userId }
   });
-  const complianceProfile = await getOrCreateComplianceProfile(currentOrg.orgId);
-
-  return NextResponse.json({
-    providerSettings: getProviderSettings({
-      demoMode: currentOrg.demoMode,
-      liveMessagingEnabled: process.env.LIVE_MESSAGING_ENABLED === "true",
-      messagingProvider: process.env.MESSAGING_PROVIDER ?? "dummy",
-      complianceProfile,
-      providerCredential: null,
-      env: process.env
-    })
-  });
+  return NextResponse.json({ account: revoked }, { headers: noStoreHeaders });
 }

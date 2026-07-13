@@ -38,6 +38,37 @@
 - Added `UsageEvent` for local usage metering.
 - Added `BillingAccount` for org-scoped billing metadata with live billing disabled by default.
 
+## Standalone M4 Provider Control Plane
+
+- `20260712010000_provider_status_enums` adds the verified provider account/resource status vocabulary.
+- `20260712011000_provider_ownership_substrate` adds `ProviderAccount`, `ProviderCredentialSecret`, and
+  `ProviderMessagingService`; binds provider numbers to accounts; installs global keyed ownership and the
+  exact web-only callback-routing capability; and joins the new rows to forced RLS/runtime grants.
+- `20260712012000_provider_reverification_lifecycle` pins credential-generation and reverification state.
+- `20260712013000_verified_provider_e164` separates verified canonical E.164 ownership from legacy metadata.
+- `20260712014000_provider_phone_default_lifecycle` adds local account-bound default/disable invariants.
+- `20260712015000_provider_credential_fingerprint` persists the safe authenticated credential fingerprint.
+- `20260712016000_provider_resource_invariants` enforces strict capabilities and one-way verified resource
+  identity transitions.
+- `20260712017000_provider_legacy_promotion_identity` preserves row identity and creation evidence during
+  the sole legacy CONFIGURED-to-VERIFIED ownership promotion.
+- The M4 checkpoint is 51 migrations and 39 protected tables. M4 provider-control actions use append-
+  only `IntegrationAuditEvent`; legacy `ProviderCredential`/`ProviderCredentialRotation` rows are preserved
+  unverified/display-only and are not promoted to provider authority.
+
+## Standalone M5 Durable Direct Messages
+
+- `20260712018000_message_attempt_outbox` adds explicit `Message` application state and the durable,
+  tenant-scoped `MessageAttempt` PostgreSQL outbox with provider authority, payload, result, reconciliation,
+  and retry-lineage evidence.
+- `20260712019000_message_attempt_invariants` makes accepted payload/correlation/frontier identity immutable,
+  guards state transitions, and extends canonical audit-subject validation.
+- `20260712020000_message_attempt_dispatch_security` installs forced RLS/runtime posture plus bounded,
+  worker-only, fixed-search-path claim and post-frontier recovery capabilities.
+- `20260712021000_message_attempt_payload_bounds` enforces canonical E.164 length and UUID callback
+  correlation at rest.
+- The current substrate is 55 migrations, 35 ordinary tenant tables, and 40 protected tables.
+
 ## Post-MVP Webhook Foundations
 
 - Added `WebhookEvent` for org-scoped raw provider webhook payloads and idempotency tracking.
@@ -46,20 +77,22 @@
 
 - Added `Message.providerStatus`, `Message.providerErrorCode`, `Message.deliveredAt`, and `Message.failedAt` for local delivery-status updates from provider callbacks.
 
-## Post-MVP Provider Number Foundation
+## Legacy Provider Number Foundation
 
 - Added `ProviderPhoneNumber` and `ProviderPhoneNumberStatus` for org-scoped local number metadata.
 
-## Post-MVP Provider Credential Metadata Foundation
+## Legacy Provider Credential Metadata Foundation
 
 - Added `ProviderCredential` for org-scoped local provider readiness metadata.
 - Twilio metadata stores redacted account/from-number values and one-way token fingerprints only.
-- Credential metadata does not store raw auth tokens, call Twilio, verify ownership, enable live messaging, or send SMS.
+- Credential metadata does not store raw auth tokens, call Twilio, verify ownership, enable live messaging,
+  or send SMS. M4 preserves these rows as unverified/display-only and does not use them as authority.
 
-## Post-MVP Provider Credential Rotation History
+## Legacy Provider Credential Rotation History
 
 - Added `ProviderCredentialRotation` for org-scoped local history of provider credential metadata configuration, rotation, refresh, and deletion events.
-- Rotation history stores redacted identifiers and configured booleans only; API responses do not expose raw tokens or token fingerprints.
+- Rotation history stores redacted identifiers and configured booleans only; API responses do not expose raw
+  tokens or token fingerprints. Canonical M4 provider-control audit evidence uses `IntegrationAuditEvent`.
 
 ## Post-MVP Live Readiness Audit Foundation
 

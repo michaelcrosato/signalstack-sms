@@ -1,23 +1,48 @@
 # Provider Adapter
 
-The default messaging provider is `dummy`. The dummy provider is deterministic and performs no external network calls.
+The default provider is `dummy`. It is deterministic, reads no provider environment credentials, and makes
+no network call. M4 completes provider identity/ownership; M5 enables direct live messaging only through
+the durable, separately authorized final-gated worker.
 
-Twilio is planned as the first live provider after compliance and live-send gates exist. [DEFAULT]
+## M4 Provider Control Plane
 
-`GET /api/settings/provider` exposes read-only provider readiness for the current organization. It reports credential presence booleans for Twilio but never returns account SID, auth token, phone number values, or other secrets. It does not enable live messaging or call providers.
+`/settings/provider` is the same-origin ADMIN control plane for verified provider accounts. It uses
+unprefilled password controls and safe DTOs for account connection, credential rotation, explicit
+verification/health, number and messaging-service discovery/import, local default/disable lifecycle, and
+local revocation. The page offers no send, purchase, release, port, or provider-side configuration action.
 
-`PATCH /api/settings/provider` records local Twilio credential readiness metadata for future go-live setup. The endpoint stores only redacted account/from-number values and a one-way auth-token fingerprint. It does not keep raw auth tokens, verify credentials with Twilio, enable live messaging, or send SMS.
+Provider Auth Tokens persist only as AES-256-GCM ciphertext under a separately provisioned
+`SECRETS_MASTER_KEY`. AAD binds the organization, provider, exact external account ID and canonical keyed
+account hash, local account ID, credential-secret ID/version, envelope/key versions, and safe fingerprint.
+Plaintext, envelope fields, routing hashes, full account IDs, fingerprints, raw provider errors, and secrets
+never enter responses, HTML, logs, audit metadata, exports, or caches.
 
-`DELETE /api/settings/provider` clears local Twilio credential readiness metadata. It records an audit event but does not call Twilio, revoke credentials, mutate provider accounts, enable live messaging, or send SMS.
+Explicit same-origin ADMIN connect, rotate, verify, health, and discovery operations may make bounded read-
+only Twilio requests. Tests and defaults use injected fixtures and never contact Twilio. Import persists only
+fresh, account/generation-bound discovery evidence and never purchases, releases, ports, configures, or
+otherwise mutates a provider resource.
 
-`GET /api/settings/provider/rotations` lists recent local provider credential metadata history. It supports allowlisted action filtering and bounded result limits. It exposes only redacted identifiers, last-four hints, configured booleans, actions, actor IDs, and timestamps. It never returns raw auth tokens or token fingerprints, never validates credentials with Twilio, and never enables live messaging.
+`GET /api/settings/provider` reports safe aggregate M4 readiness without a provider call. The old metadata
+`PATCH` is retired and returns authenticated no-store `410 PROVIDER_METADATA_ENDPOINT_RETIRED` before body
+parsing. Compatibility `DELETE` locally revokes only the selected default account's authority and history is
+retained; it does not revoke credentials at Twilio.
 
-`GET /api/settings/provider/rotations/export` exports the same local credential metadata history as CSV with the same allowlisted filters and bounded limits. It includes redacted identifiers and configured booleans only. It never returns raw auth tokens or token fingerprints, never validates credentials with Twilio, and never mutates provider state.
+The `/api/settings/provider/accounts/**` routes expose safe account lifecycle, discovery/import, and owned-
+resource reads. `PATCH /api/settings/numbers/:numberId` and the nested messaging-service `PATCH` perform one
+local default/disable action and never change provider state.
 
-`/settings/provider` includes a local-only Twilio metadata form, action filters for credential rotation history, and a rotation CSV export link. Submitted auth tokens are sent only to the local metadata API, then the page refreshes redacted readiness and rotation history. The page does not display raw tokens, expose token fingerprints, validate credentials with Twilio, revoke provider-side credentials, enable live messaging, or send SMS.
+M4 configure, verify, rotate, revoke, health, discovery, import, default, and disable operations append
+secret-free `IntegrationAuditEvent` evidence. Existing `ProviderCredential` and
+`ProviderCredentialRotation` rows and their JSON/CSV history endpoints remain unverified/display-only legacy
+metadata; they never authorize an account, number, service, credential, callback, or send.
 
-The metadata form uses browser-side hints for Twilio-style account SID and E.164 phone-number shape. Clearing metadata requires an explicit local-only confirmation and still only deletes local readiness metadata; it does not revoke or mutate provider-side credentials.
+Signed Twilio callbacks resolve exactly one keyed account plus owned destination, decrypt only that
+account's active credential for signature validation, and recheck tenant/generation state before persistence.
+Unknown, crossed, ambiguous, disabled, revoked, or stale evidence fails generically. Non-owner PostgreSQL
+routing plus HTTP route fixtures prove the boundary; M4 does not claim a literal callback-server E2E.
 
-`GET /api/settings/numbers` and `POST /api/settings/numbers` manage local provider phone-number metadata for demo and future setup UI. They do not provision provider numbers, verify ownership, store credentials, enable live messaging, or send SMS.
-
-The consolidated `/settings` readiness view renders the same local phone-number metadata as a read-only summary, while `/settings/provider` retains focused credential-readiness detail. The summary may show labels, providers, local statuses, default-number state, and capabilities, but it does not mutate number rows, call Twilio, prove provider ownership, expose credentials, enable live messaging, or send SMS.
+General Twilio SMS/MMS creation is implemented for the exact `production-live-direct` worker class. It uses
+the attempt's encrypted tenant credential and verified owned sender, supplies a signed correlated HTTPS
+callback, applies a bounded timeout, and never retries possible-impact ambiguity. Public/inbox acceptance,
+pages, tests, builds, and default workers do not call Twilio. The isolated live-test SMS continues to use its
+separate environment credentials/operator gates and does not authorize the general outbox.

@@ -199,11 +199,16 @@ The shared operator-surface inventory drives the root launch view, demo console,
 - Use `/settings/operations` to navigate the surviving operator surfaces.
 - Use `/settings/health` to review the health contract, demo-safe defaults, and runtime blockers. Rendering it does not execute a probe.
 - Use `/settings/queue` to review due/future jobs, payload validity, worker settings, and queue-backend metadata. Rendering it does not enqueue jobs, run workers, call Redis, or call providers.
-- Use `/settings/provider` to manage local redacted credential metadata and bounded rotation-history exports. It does not verify or revoke provider-side credentials or enable live messaging.
+- Use `/settings/provider` for M4 ADMIN account verification, encrypted credential rotation, explicit health,
+  discovery/import, local revoke/default/disable, and legacy bounded rotation-history exports. Explicit
+  provider reads are bounded; local revoke does not revoke at Twilio, and no control enables live messaging.
 - Use `/settings/security` to review demo-safe gates, rate-limit policy, production overrides, and secret-storage boundaries. It does not scan files or expose environment values.
 - Use `/settings/readiness-audit` to review tenant-scoped readiness events and bounded exports. It does not mutate or replay events.
 
-All operator views are demo-safe and display-focused. They must not mutate records, call providers, create billing records, send notifications, or enable live messaging.
+Operator views remain demo-safe. `/settings/provider` is the explicit M4 exception that may mutate local
+provider-control rows and perform bounded ADMIN read-only provider verification/discovery/health; it cannot
+send or mutate provider resources. Other operator views remain display-focused and must not call providers,
+create billing records, send notifications, or enable live messaging.
 
 ## Validation Operations
 

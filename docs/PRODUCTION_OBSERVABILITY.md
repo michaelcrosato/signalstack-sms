@@ -9,7 +9,8 @@ SignalStack SMS currently exposes local and platform-readable signals:
 - `/api/health` for demo-safe runtime defaults.
 - `npm run production:gate` for production-like external-impact flag checks.
 - `npm run validate` for contracts, safety checks, typecheck, lint, tests, Playwright smoke, and build.
-- `/settings` for admin-visible go-live readiness, blockers, provider metadata state, rate-limit policy, and audit history.
+- `/settings` for admin-visible go-live readiness, blockers, safe M4 provider account/ownership state,
+  rate-limit policy, and audit history.
 - `/api/settings/readiness-audit` and `/api/settings/readiness-audit/export` for tenant-scoped local readiness audit review.
 - Worker logs from `npm run worker`, `npm run worker:watch`, and `npm run worker:bullmq` when explicitly run locally.
 

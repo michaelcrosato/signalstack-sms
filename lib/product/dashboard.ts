@@ -3,6 +3,7 @@ import { aggregateUsageEvents } from "@/lib/billing/metering";
 import { withTenantTransaction } from "@/lib/db/tenant-context";
 import {
   outboundDeliveredMessageWhere,
+  outboundAmbiguousMessageWhere,
   outboundFailedMessageWhere,
   outboundMessageWhere,
   outboundPendingMessageWhere
@@ -158,6 +159,7 @@ export async function getProductDashboard(orgId: string) {
     deliveredMessages,
     pendingMessages,
     failedMessages,
+    ambiguousMessages,
     lastOutboundMessage,
     complianceProfile,
     usageEvents
@@ -175,6 +177,7 @@ export async function getProductDashboard(orgId: string) {
     prisma.message.count({ where: outboundDeliveredMessageWhere(orgId) }),
     prisma.message.count({ where: outboundPendingMessageWhere(orgId) }),
     prisma.message.count({ where: outboundFailedMessageWhere(orgId) }),
+    prisma.message.count({ where: outboundAmbiguousMessageWhere(orgId) }),
     prisma.message.findFirst({
       where: outboundMessageWhere(orgId),
       orderBy: { createdAt: "desc" },
@@ -188,12 +191,14 @@ export async function getProductDashboard(orgId: string) {
   const usage = aggregateUsageEvents(usageEvents);
   const optedInPercent = contacts > 0 ? Math.round((optedInContacts / contacts) * 100) : 0;
   const deliveryRatePercent = outboundMessages > 0 ? Math.round((deliveredMessages / outboundMessages) * 100) : 0;
-  const deliveryReviewStatus = getLocalDeliveryReviewStatus({
-    outboundMessages,
-    delivered: deliveredMessages,
-    pending: pendingMessages,
-    failed: failedMessages
-  });
+  const deliveryReviewStatus = ambiguousMessages > 0
+    ? `${ambiguousMessages} ambiguous; ADMIN review required`
+    : getLocalDeliveryReviewStatus({
+        outboundMessages,
+        delivered: deliveredMessages,
+        pending: pendingMessages,
+        failed: failedMessages
+      });
 
   const dashboard = {
     contacts: {
@@ -216,6 +221,7 @@ export async function getProductDashboard(orgId: string) {
       delivered: deliveredMessages,
       pending: pendingMessages,
       failed: failedMessages,
+      ambiguous: ambiguousMessages,
       deliveryRatePercent,
       deliveryReviewStatus,
       lastEvidenceAt: lastOutboundMessage?.createdAt.toISOString() ?? "none"

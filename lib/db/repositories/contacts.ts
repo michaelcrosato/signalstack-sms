@@ -13,6 +13,13 @@ const contactInclude = {
 
 const CONTACT_IMPORT_PREFETCH_BATCH_SIZE = 10_000;
 
+export class ContactConsentEvidenceError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ContactConsentEvidenceError";
+  }
+}
+
 function runTenantContactOperation<T>(
   orgId: string,
   tx: Prisma.TransactionClient | undefined,
@@ -82,8 +89,39 @@ export async function upsertContact(
   return runTenantContactOperation(orgId, tx, execute);
 }
 
-export async function updateContact(orgId: string, contactId: string, input: ContactUpdateInput) {
-  return withTenantTransaction({ orgId }, async (tx) => {
+export async function createContact(
+  orgId: string,
+  input: ContactCreateInput,
+  tx?: Prisma.TransactionClient
+) {
+  const execute = async (client: Prisma.TransactionClient) => {
+    verifyConsentEvidenceCompleteness(null, input);
+    const contact = await client.contact.create({
+      data: {
+        orgId,
+        phone: input.phone,
+        ...contactWriteData(input)
+      }
+    });
+
+    if (contact.consentStatus === ConsentStatus.PENDING_DOUBLE_OPT_IN) {
+      await sendDoubleOptInRequest(client, orgId, contact.id, contact.phone);
+    }
+
+    await syncContactLabels(client, orgId, contact.id, input.tagNames, input.listNames);
+    return client.contact.findUniqueOrThrow({ where: { id: contact.id }, include: contactInclude });
+  };
+
+  return runTenantContactOperation(orgId, tx, execute);
+}
+
+export async function updateContact(
+  orgId: string,
+  contactId: string,
+  input: ContactUpdateInput,
+  existingTx?: Prisma.TransactionClient
+) {
+  return runTenantContactOperation(orgId, existingTx, async (tx) => {
     const existing = await tx.contact.findFirst({ where: orgWhere(orgId, { id: contactId }) });
     if (!existing) {
       return null;
@@ -106,8 +144,12 @@ export async function updateContact(orgId: string, contactId: string, input: Con
   });
 }
 
-export async function archiveContact(orgId: string, contactId: string) {
-  return updateContact(orgId, contactId, { archived: true });
+export async function archiveContact(
+  orgId: string,
+  contactId: string,
+  tx?: Prisma.TransactionClient
+) {
+  return updateContact(orgId, contactId, { archived: true }, tx);
 }
 
 export async function mergeContacts(orgId: string, targetContactId: string, sourceContactId: string) {
@@ -460,18 +502,24 @@ function verifyConsentEvidenceImmutability(
       input.consentCapturedAt === null ||
       existing.consentCapturedAt.getTime() !== input.consentCapturedAt.getTime()
     ) {
-      throw new Error("Consent evidence (consentCapturedAt) is write-once and cannot be changed");
+      throw new ContactConsentEvidenceError(
+        "Consent evidence (consentCapturedAt) is write-once and cannot be changed"
+      );
     }
   }
   if (existing.consentMethod && input.consentMethod !== undefined && existing.consentMethod !== input.consentMethod) {
-    throw new Error("Consent evidence (consentMethod) is write-once and cannot be changed");
+    throw new ContactConsentEvidenceError(
+      "Consent evidence (consentMethod) is write-once and cannot be changed"
+    );
   }
   if (
     existing.consentDisclosure &&
     input.consentDisclosure !== undefined &&
     existing.consentDisclosure !== input.consentDisclosure
   ) {
-    throw new Error("Consent evidence (consentDisclosure) is write-once and cannot be changed");
+    throw new ContactConsentEvidenceError(
+      "Consent evidence (consentDisclosure) is write-once and cannot be changed"
+    );
   }
 }
 
@@ -496,7 +544,9 @@ function verifyConsentEvidenceCompleteness(
   };
 
   if (hasAnyConsentEvidence(resultingEvidence) && !hasCompleteConsentEvidence(resultingEvidence)) {
-    throw new Error("Consent evidence requires capturedAt, method, and disclosure together");
+    throw new ContactConsentEvidenceError(
+      "Consent evidence requires capturedAt, method, and disclosure together"
+    );
   }
 }
 

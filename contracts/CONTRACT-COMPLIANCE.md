@@ -42,14 +42,35 @@ Milestone 5 inbound rules:
 - Signed provider webhooks apply keyword consent effects without creating dummy confirmation replies and without invoking conversation sentiment analysis.
 - Inbox assignment, notes, resolve, and reopen operations are tenant-scoped.
 
-Milestone 6 hard gate rules:
+M5 direct-message hard gate rules:
 
-- The centralized messaging hard gate must block when `LIVE_MESSAGING_ENABLED` is not true.
-- The centralized messaging hard gate must block when `DEMO_MODE` is active.
-- The centralized messaging hard gate must block when the selected provider is `dummy`.
-- The centralized messaging hard gate must block when the compliance profile is incomplete or A2P status is not `APPROVED`.
-- Contact-level consent and opt-out checks remain required even if provider/configuration gates pass.
-- Local scheduled-campaign workers must recheck recipient consent, opt-out, and archive state at send time. Recipients blocked by stale consent state are skipped and marked `BLOCKED`; the job fails only when no sendable recipients remain.
+- API/inbox acceptance may perform a recipient preflight, but it does not authorize carrier impact. The
+  direct worker must reload and evaluate every mutable input immediately before its durable provider-call
+  frontier. Passing an earlier preflight, provider setup screen, or readiness summary is not send authority.
+- The centralized messaging hard gate blocks unless `LIVE_MESSAGING_ENABLED=true`, `DEMO_MODE=false`, and
+  `MESSAGING_PROVIDER=twilio`. Missing, blank, malformed, or case-drifted live configuration fails closed.
+- The complete current compliance profile and `APPROVED` A2P status are required.
+- The fresh contact must remain in the same tenant, not archived, explicitly `OPTED_IN`, not opted out or
+  pending double opt-in, and retain the complete write-once consent evidence bundle. A contact phone edit
+  cannot retarget an already accepted message; a mismatch from the snapshotted destination blocks the call.
+- The current authoritative contact timezone/state policy must permit sending at the database-backed worker
+  decision time. Quiet hours are a policy-bounded no-call outcome and cannot be bypassed by an API, retry,
+  reconciliation, or operator action.
+- The final gate also requires the attempt's exact M4 account to remain verified and unrevoked, its credential
+  generation active, its sender number verified/enabled/owned by that account and organization, and its
+  SMS/MMS capability compatible with the immutable payload. Disable, revoke, rotation, opt-out, archive, and
+  quiet-hours races are resolved by conditional database transitions before provider mutation.
+- Only the exact `production-live-direct` worker class may execute an M5 live create, and the default worker
+  profile authorizes no live direct or campaign mutation. Installation-global live-test credentials do not
+  satisfy the general direct-message gate.
+- Reconciliation is provider fetch only and never sends. ADMIN `NOT_SENT` attestation and retry cannot bypass
+  the gate; a successor attempt is checked again when its worker reaches the provider-call frontier.
+- `dummy` remains deterministic and network-free and does not pass the live gate. It may produce local outbox
+  evidence without pretending that compliance/provider readiness is production proof.
+
+Campaign send-time hard gate rules remain deferred to M7. Existing local scheduled-campaign workers continue
+to recheck recipient consent, opt-out, and archive state and remain dummy-only; M5 direct-worker authorization
+must not authorize `production-live-campaign`.
 
 Post-MVP live-readiness audit rules:
 

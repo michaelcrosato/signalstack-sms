@@ -17,15 +17,28 @@ export const ordinaryTenantTables = Object.freeze([
   "Conversation",
   "QueueJob",
   "Message",
+  "MessageAttempt",
   "InternalNote",
   "ComplianceProfile",
   "UsageEvent",
   "BillingAccount",
+  "ProviderAccount",
+  "ProviderCredentialSecret",
+  "ProviderMessagingService",
   "ProviderPhoneNumber",
   "ProviderCredential",
   "ProviderCredentialRotation",
   "LiveReadinessAuditEvent",
-  "WebhookEvent"
+  "WebhookEvent",
+  "ApiCredential",
+  "ApiIdempotencyRecord",
+  "IntegrationAuditEvent",
+  "CustomerWebhookEndpoint",
+  "CustomerWebhookSubscription",
+  "CustomerWebhookSigningSecret",
+  "CustomerWebhookEvent",
+  "CustomerWebhookDelivery",
+  "CustomerWebhookDeliveryAttempt"
 ] as const);
 
 export const specialTenantTables = Object.freeze([
@@ -39,6 +52,30 @@ export const specialTenantTables = Object.freeze([
 export const protectedTenantTables = Object.freeze([
   ...ordinaryTenantTables,
   ...specialTenantTables
+] as const);
+
+/** Tenant rows whose application capability may insert/read but never rewrite or hard-delete. */
+export const appendOnlyTenantTables = Object.freeze([
+  "IntegrationAuditEvent",
+  "CustomerWebhookEvent",
+  "CustomerWebhookDeliveryAttempt"
+] as const);
+
+/** Durable M3 control/event rows are revoked or disabled, never hard-deleted by application code. */
+export const nonDeletableTenantTables = Object.freeze([
+  "ProviderAccount",
+  "ProviderCredentialSecret",
+  "ProviderMessagingService",
+  "ProviderPhoneNumber",
+  "ApiCredential",
+  "IntegrationAuditEvent",
+  "CustomerWebhookEndpoint",
+  "CustomerWebhookSubscription",
+  "CustomerWebhookSigningSecret",
+  "CustomerWebhookEvent",
+  "CustomerWebhookDelivery",
+  "CustomerWebhookDeliveryAttempt",
+  "MessageAttempt"
 ] as const);
 
 export const globalControlTables = Object.freeze([

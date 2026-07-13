@@ -35,19 +35,25 @@ MESSAGING_PROVIDER=dummy
 AI_PROVIDER=fake
 ```
 
-Provider credential metadata may exist in the database for readiness screens, but it must remain redacted local metadata only. Raw provider secrets must not be stored in the database or exposed through API responses.
+M4 provider Auth Tokens may persist only as account-hash/AAD-bound AES-256-GCM ciphertext under the
+separately provisioned `SECRETS_MASTER_KEY`; plaintext is never stored or exposed. Legacy
+`ProviderCredential`/`ProviderCredentialRotation` rows remain unverified/display-only. M4 verification and
+ownership do not enable a live send.
 
-## Future Live Enablement Requirements
+## Remaining Live Enablement Requirements
 
-A future live-send milestone must add and validate all of these before any live external action is allowed:
+M5 implements the durable direct-message reservation, final gate, and exact direct-worker authorization.
+Complete production enablement still requires all of these controls before the whole platform is live-ready:
 
 - Explicit org-level live messaging enablement separate from environment flags.
 - Complete compliance profile with approved A2P status.
-- Provider credential storage through a real secret manager, not raw database fields.
+- Production provisioning and rotation of `SECRETS_MASTER_KEY`, with access restricted to approved M4/M5
+  operation boundaries and no plaintext database fields.
 - The implemented built-in auth/RBAC boundary plus completed M2 database tenant enforcement, as documented
   in `docs/PRODUCTION_AUTH_RBAC.md`; an external OIDC adapter is optional, not a go-live dependency.
-- Provider number ownership/readiness verification.
-- A dedicated production worker policy gate as documented in `docs/PRODUCTION_WORKER_POLICY.md`.
+- Preserve the implemented M5 durable message/attempt reservation, provider-call frontier, centralized hard
+  gate, exact `production-live-direct` worker class, and M4 provider number/credential ownership checks.
+- A production campaign worker policy gate as documented in `docs/PRODUCTION_WORKER_POLICY.md`.
 - Send-rate limits and queue backpressure appropriate for provider limits.
 - Billing live-enable gate and test coverage proving Stripe calls cannot happen in demo/CI.
 - Manual break-glass documentation for disabling live sends.

@@ -4,6 +4,7 @@ import { getAnalyticsOverview } from "@/lib/analytics/overview";
 import { aggregateUsageEvents } from "@/lib/billing/metering";
 import {
   outboundDeliveredMessageWhere,
+  outboundAmbiguousMessageWhere,
   outboundFailedMessageWhere,
   outboundMessageWhere,
   outboundPendingMessageWhere
@@ -46,15 +47,16 @@ describe("analytics usage aggregation", () => {
     mocks.campaignCount.mockImplementation(async ({ where }: CountArgs) => (where.status === "SCHEDULED" ? 3 : 7));
     mocks.conversationCount.mockImplementation(async ({ where }: CountArgs) => (where.status === "OPEN" ? 4 : 9));
     mocks.messageCount.mockImplementation(async ({ where }: CountArgs) => {
-      if (where.deliveredAt && where.failedAt === null) {
+      if (where.applicationStatus === "DELIVERED") {
         return 3;
       }
-      if (where.deliveredAt === null && where.failedAt === null) {
+      if (typeof where.applicationStatus === "object") {
         return 2;
       }
-      if (where.OR) {
+      if (where.applicationStatus === "FAILED") {
         return 1;
       }
+      if (where.applicationStatus === "AMBIGUOUS") return 0;
       if (where.direction === "INBOUND") {
         return 11;
       }
@@ -106,6 +108,7 @@ describe("analytics usage aggregation", () => {
         delivered: 3,
         pending: 2,
         failed: 1,
+        ambiguous: 0,
         lastOutboundAt: "2026-01-04T12:00:00.000Z"
       },
       usage: {
@@ -120,6 +123,7 @@ describe("analytics usage aggregation", () => {
     expect(mocks.messageCount).toHaveBeenCalledWith({ where: outboundDeliveredMessageWhere("org_analytics") });
     expect(mocks.messageCount).toHaveBeenCalledWith({ where: outboundPendingMessageWhere("org_analytics") });
     expect(mocks.messageCount).toHaveBeenCalledWith({ where: outboundFailedMessageWhere("org_analytics") });
+    expect(mocks.messageCount).toHaveBeenCalledWith({ where: outboundAmbiguousMessageWhere("org_analytics") });
     expect(mocks.messageFindFirst).toHaveBeenCalledWith({
       where: outboundMessageWhere("org_analytics"),
       orderBy: { createdAt: "desc" },

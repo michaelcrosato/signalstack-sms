@@ -20,14 +20,16 @@ are optional adapters or accelerators, never core requirements.
 - Local/demo product workflows and defensive backend foundations are substantial and validated.
 - Built-in local identity, onboarding, team lifecycle, operator recovery, and production-session browser
   proof are complete; deterministic identity remains only in explicit demo mode.
-- Database-enforced tenant integrity is complete. Remaining production trust gaps include demo-tenant
-  webhook routing, metadata-only provider credentials, a dummy-only campaign worker, and no public
-  integration identity/event-delivery platform.
+- Database-enforced tenant integrity and the public integration identity/event-delivery platform are
+  complete. M5 extends the current substrate to 55 migrations/40 protected tables with encrypted provider
+  credentials, verified account/number/service ownership, durable direct-message acceptance/attempts,
+  correlated callbacks, safe ADMIN reconciliation, and a final-gated direct worker. Campaign execution and
+  trusted inbound completion remain incomplete.
 - Deployment is not a standalone package: current Compose contains backing services only; no hardened
   app/worker/ingress/migration/backup stack or restore proof exists.
 - Live external impact remains disabled while implementation proceeds.
 
-## Active move: M3 public integrations and M4 provider ownership
+## Active move: M6 trusted inbound messaging and shared-inbox completion
 
 ### Completed: M0 — Roadmap and package safety
 
@@ -65,17 +67,61 @@ are optional adapters or accelerators, never core requirements.
   files / 38 tests. A fresh least-privilege install proves all migrations, historical triggers, dispatch,
   and revoked public function access; production local-auth browser proof runs under a non-owner login.
 
+### Completed: M3 — Public API identity and customer webhooks
+
+- One-time scoped API credentials, safe ADMIN lifecycle routes, bearer-only `/api/v1` identity, immediate
+  rotation/revocation, and audit evidence.
+- Stable envelopes, request IDs, errors, HMAC cursors, database-owned per-key rate windows, and encrypted
+  exact idempotency replay across all mutations.
+- Organization, contact, tag, list, segment, template, dummy/local message, campaign, conversation, and
+  delivery-status resources with generated OpenAPI plus curl, TypeScript, and Python examples.
+- Atomic allowlisted event fanout, one-time encrypted webhook signing secrets, SSRF-resistant delivery,
+  bounded retry/disable/replay/rotation, and provider-callback/receiver verification examples.
+- M3 checkpoint posture of 43 migrations/36 protected tables and a literal external-network proof on a
+  fresh database with NOINHERIT web/worker logins and forced RLS. It boots a real Next server plus receiver
+  socket, proves organization A/B HTTP denial and method/unknown-path behavior, then covers concurrent exact
+  replay/status, signed receipt, forced failure, secret rotation/replay, and API-key rotation/revocation
+  without a carrier call. Separate PostgreSQL/direct-handler suites retain the broader runtime-role matrix.
+
+### Completed: M4 — Provider secrets, accounts, and owned-number routing
+
+- Eight migrations extend the current substrate to 51 migrations/39 protected tables while preserving the
+  least-privileged owner/runtime split, forced RLS, same-tenant relations, and no-diff install proof.
+- Provider Auth Tokens persist only as account-hash/AAD-bound AES-256-GCM envelopes under the separately
+  provisioned master key; plaintext, envelope, routing, and raw provider-error fields never enter outward
+  surfaces. Legacy `ProviderCredential`/`ProviderCredentialRotation` rows remain unverified/display-only.
+- Verified accounts, numbers, and messaging services support bounded ADMIN verification, rotation,
+  revocation, health, discovery/import, local default/disable lifecycle, and canonical append-only
+  `IntegrationAuditEvent` evidence without sending or changing provider resources.
+- The complete deterministic dummy/provider factory and fixture-only Twilio boundary are covered. Signed
+  routing is proven through non-owner two-account PostgreSQL resolution plus HTTP route fixtures, including
+  crossed/unknown, rotated, and revoked evidence. The tenant runner is 14 files / 57 tests.
+
+### Completed: M5 — Durable individual-message outbox and Twilio transport
+
+- Four forward migrations extend the current substrate to 55 migrations/40 protected tables with separate
+  message application state and an immutable, forced-RLS `MessageAttempt` PostgreSQL outbox.
+- Public direct messages, public conversation replies, and browser inbox replies reserve one permanent
+  message/payload/attempt/event binding before `202`; exact replay survives API-cache expiry and changed
+  input conflicts without another attempt.
+- The exact `production-live-direct` worker class rechecks organization demo mode, live configuration,
+  contact consent/archive/opt-out, quiet hours, compliance/A2P, current encrypted credential generation,
+  verified owned sender, and SMS/MMS capability immediately before its durable call frontier.
+- Only definitive no-impact failures create bounded 5-second/30-second successors, with three total
+  attempts. Possible impact becomes visible ambiguity and never automatically resends.
+- Signed callback correlation, provider fetch, redacted ADMIN review, explicit no-send attestation, and a
+  separately confirmed single-winner retry converge state without exposing message bodies or credentials.
+- The mandatory PostgreSQL runner is 16 files / 65 tests (15 files / 64 tests plus the one-file / one-test
+  literal-network M3 exit), including replay, frontier, crash, callback, cross-tenant, fetch, and review races.
+
 ## Following dependency queue
 
-1. M3 scoped API keys, `/api/v1`, OpenAPI, and durable signed customer webhooks, in parallel with M4
-   encrypted provider credentials and trusted account/number tenant routing.
-2. M5 direct-message outbox and Twilio transport with ambiguity reconciliation.
-3. M6 inbound/status/shared-inbox production path.
-4. M7 campaign worker, audiences, throttling, DLQ/replay, and kill switches.
-5. M8 compliance evidence, audit, suppression, retention, and privacy lifecycle.
-6. M9 complete setup/product/admin UX and local entitlements/quotas.
-7. M10 clean-host package, health/metrics, backups, restore, and upgrades.
-8. M11 complete production/API/provider/container/recovery proof.
+1. M6 inbound/status/shared-inbox production path.
+2. M7 campaign worker, audiences, throttling, DLQ/replay, and kill switches.
+3. M8 compliance evidence, audit, suppression, retention, and privacy lifecycle.
+4. M9 complete setup/product/admin UX and local entitlements/quotas.
+5. M10 clean-host package, health/metrics, backups, restore, and upgrades.
+6. M11 complete production/API/provider/container/recovery proof.
 
 ## Validation rule
 

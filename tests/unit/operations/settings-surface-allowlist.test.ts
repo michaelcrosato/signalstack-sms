@@ -9,6 +9,7 @@ import { describe, expect, it } from "vitest";
 // operations-coverage e2e specs currently reference every page, so deletion cannot be verified locally.
 const allowedSettingsSurfaces = [
   "compliance",
+  "delivery-attempts",
   "exports",
   "health",
   "operations",

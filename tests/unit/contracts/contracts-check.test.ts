@@ -70,6 +70,24 @@ describe("contracts-check route method extraction", () => {
     ]);
   });
 
+  it("ignores deliberate 405 and authenticated fallback aliases", () => {
+    const source = `
+      export async function GET() { return Response.json({}); }
+      const methodNotAllowed = createPublicApiMethodNotAllowedHandler(["GET"]);
+      const notFound = createPublicApiNotFoundHandler();
+      export {
+        methodNotAllowed as POST,
+        methodNotAllowed as PATCH,
+        notFound as PUT,
+        notFound as DELETE,
+        methodNotAllowed as HEAD,
+        notFound as OPTIONS
+      };
+    `;
+
+    expect(extractExportedRouteMethods(source)).toEqual(["GET"]);
+  });
+
   it("ignores route method export mentions in comments and strings", () => {
     const source = `
       // export async function POST() {}

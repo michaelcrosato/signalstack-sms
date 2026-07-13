@@ -2,7 +2,11 @@
 
 Demo mode is the default. It uses the dummy messaging provider and fake AI provider and must not require Twilio, Stripe, Clerk secrets, real phone numbers, or paid AI calls.
 
-Provider phone-number rows, credential-rotation history, webhook events, delivery evidence, usage events, and readiness-audit events are local metadata only. They can make a seeded workspace realistic, but they do not provision or verify provider resources, call providers, charge payment methods, send notifications, or enable live features. Provider submissions are reduced to redacted identifiers and one-way token fingerprints; raw tokens and fingerprints are never rendered or exported.
+Seeded provider-number and legacy credential/rotation rows, webhook events, delivery evidence, usage events,
+and readiness-audit events are local metadata only. They do not prove M4 ownership or trigger provider calls.
+An explicit same-origin ADMIN may separately submit an unprefilled credential for bounded M4 verification,
+rotation, health, or discovery; the Auth Token persists only as a bound AES-256-GCM envelope and is never
+rendered or exported. No M4 action sends, purchases, releases, ports, or configures a provider resource.
 
 ## Canonical Operator Surfaces
 
@@ -27,7 +31,10 @@ The shared operator-surface inventory drives the root launch view, demo console,
 
 ## Surface Boundaries
 
-- `/settings/provider` may configure, rotate, clear, and export local redacted credential metadata. It does not verify Twilio state, revoke provider-side credentials, send messages, or enable live messaging.
+- `/settings/provider` provides M4 ADMIN account verification, encrypted credential rotation, health,
+  discovery/import, and local revoke/default/disable controls plus legacy display-only rotation export. Its
+  explicit read-only provider checks are bounded; it does not revoke provider-side credentials, mutate
+  provider resources, send messages, or enable live messaging.
 - `/settings/compliance` displays the existing compliance profile, checklist completeness, A2P metadata status, and hard-gate blockers. It does not register or verify anything with a provider.
 - `/settings/readiness-audit` and `/settings/exports` expose bounded, tenant-scoped local CSV links. Rendering either page does not execute an export or mutate records.
 - `/settings/queue` displays local job timing, payload validity, worker settings, and backend metadata. It does not enqueue jobs, run workers, call Redis, or call providers.

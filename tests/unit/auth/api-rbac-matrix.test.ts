@@ -3,6 +3,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   apiRbacMutatingMethods,
+  apiRouteRbacApiKeyBoundaries,
   apiRouteRbacMatrix,
   apiRouteRbacOperatorBoundaryExceptions,
   apiRouteRbacPublicAuthExceptions,
@@ -72,15 +73,32 @@ describe("API RBAC matrix", () => {
     }
   });
 
-  it("keeps signed webhook exceptions backed by Twilio signature validation", () => {
+  it("keeps signed webhook exceptions backed by account routing and locked generation validation", () => {
     for (const entry of apiRouteRbacSignedWebhookExceptions) {
       const fullPath = path.join(repoRoot, entry.path);
       expect(existsSync(fullPath)).toBe(true);
       const source = readFileSync(fullPath, "utf8");
       expect(entry.provider).toBe("twilio");
       expect(source).toContain("readTwilioFormPayload");
-      expect(source).toContain("validateTwilioSignature");
+      expect(source).toContain("authenticateTwilioProviderCallback");
+      expect(source).toContain("assertProviderCallbackBindingActive");
+      expect(source).not.toContain("process.env.TWILIO_AUTH_TOKEN");
       expect(source).not.toContain("requireApiRole");
+    }
+  });
+
+  it("keeps API-key boundaries backed by pre-body scope authorization and durable idempotency", () => {
+    for (const entry of apiRouteRbacApiKeyBoundaries) {
+      const fullPath = path.join(repoRoot, entry.path);
+      expect(existsSync(fullPath)).toBe(true);
+      const source = readFileSync(fullPath, "utf8");
+      expect(source).toContain("authorizePublicApiRequest(request");
+      for (const scope of entry.requiredScopes) {
+        expect(source).toContain(`"${scope}"`);
+      }
+      expect(
+        source.includes("runPublicApiIdempotentMutation(") || source.includes("executeIdempotentMutation(")
+      ).toBe(true);
     }
   });
 
@@ -159,6 +177,7 @@ describe("API RBAC matrix", () => {
     expect(Object.isFrozen(apiRouteRbacSignedWebhookExceptions)).toBe(true);
     expect(Object.isFrozen(apiRouteRbacPublicAuthExceptions)).toBe(true);
     expect(Object.isFrozen(apiRouteRbacOperatorBoundaryExceptions)).toBe(true);
+    expect(Object.isFrozen(apiRouteRbacApiKeyBoundaries)).toBe(true);
   });
 });
 

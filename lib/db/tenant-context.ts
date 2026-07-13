@@ -9,6 +9,7 @@ import {
 const TENANT_ROLE = "signalstack_runtime";
 const CONTROL_ROLE = "signalstack_control";
 const WORKER_DISPATCH_ROLE = "signalstack_worker";
+const PROVIDER_ROUTING_ROLE = "signalstack_web";
 
 export type TenantDatabaseContext = Readonly<{
   orgId: string;
@@ -21,6 +22,7 @@ export type AuthDatabaseContext = Readonly<{
   userId?: string;
   sessionHash?: string;
   tokenHash?: string;
+  apiKeyHash?: string;
   loginEmail?: string;
   purpose?: AuthDatabasePurpose;
 }>;
@@ -31,6 +33,7 @@ export type AuthDatabasePurpose =
   | "session"
   | "invite"
   | "password_reset"
+  | "api_key"
   | "organization_create"
   | "operator";
 
@@ -154,6 +157,37 @@ export async function withWorkerDispatchTransaction<T>(
   });
 }
 
+/**
+ * Invoke the exact pre-tenant provider-routing capability. The web role can execute only the
+ * reviewed hash-bound resolver and receives no direct provider-table privileges without selecting
+ * the tenant runtime role inside a later tenant transaction.
+ */
+export async function withProviderRoutingTransaction<T>(
+  fn: (tx: Prisma.TransactionClient) => Promise<T>,
+  options: Readonly<{ client?: PrismaClient; attest?: boolean }> = {}
+): Promise<T> {
+  const client = options.client ?? prisma;
+  if (
+    process.env.NODE_ENV === "test" &&
+    client === prisma &&
+    (typeof prisma.$transaction !== "function" || typeof prisma.$queryRaw !== "function")
+  ) {
+    return runWithFocusedTestClient(fn);
+  }
+  if (options.attest !== false) {
+    if (client === prisma) {
+      await assertRuntimeDatabasePosture();
+    } else {
+      await inspectRuntimeDatabasePostureForClient(client);
+    }
+  }
+  return client.$transaction(async (tx) => {
+    await selectFixedRole(tx, PROVIDER_ROUTING_ROLE);
+    await setDatabaseContext(tx, {});
+    return fn(tx);
+  });
+}
+
 export function currentTenantDatabaseContext(): TenantDatabaseContext | null {
   return tenantStorage.getStore()?.context ?? null;
 }
@@ -177,6 +211,7 @@ async function setDatabaseContext(
       set_config('app.current_user_id', ${context.userId ?? ""}, true),
       set_config('app.current_session_hash', ${context.sessionHash ?? ""}, true),
       set_config('app.current_token_hash', ${context.tokenHash ?? ""}, true),
+      set_config('app.current_api_key_hash', ${context.apiKeyHash ?? ""}, true),
       set_config('app.current_login_email', ${context.loginEmail ?? ""}, true),
       set_config('app.control_purpose', ${context.purpose ?? ""}, true)
   `;
@@ -184,7 +219,11 @@ async function setDatabaseContext(
 
 async function selectFixedRole(
   tx: Prisma.TransactionClient,
-  role: typeof TENANT_ROLE | typeof CONTROL_ROLE | typeof WORKER_DISPATCH_ROLE
+  role:
+    | typeof TENANT_ROLE
+    | typeof CONTROL_ROLE
+    | typeof WORKER_DISPATCH_ROLE
+    | typeof PROVIDER_ROUTING_ROLE
 ): Promise<void> {
   if (role === TENANT_ROLE) {
     await tx.$executeRawUnsafe("SET LOCAL ROLE signalstack_runtime");
@@ -192,6 +231,10 @@ async function selectFixedRole(
   }
   if (role === WORKER_DISPATCH_ROLE) {
     await tx.$executeRawUnsafe("SET LOCAL ROLE signalstack_worker");
+    return;
+  }
+  if (role === PROVIDER_ROUTING_ROLE) {
+    await tx.$executeRawUnsafe("SET LOCAL ROLE signalstack_web");
     return;
   }
   await tx.$executeRawUnsafe("SET LOCAL ROLE signalstack_control");
@@ -210,6 +253,7 @@ function normalizeAuthContext(context: AuthDatabaseContext): AuthDatabaseContext
     userId: normalizeOptionalEvidence(context.userId, "userId", 191),
     sessionHash: normalizeOptionalEvidence(context.sessionHash, "sessionHash", 512),
     tokenHash: normalizeOptionalEvidence(context.tokenHash, "tokenHash", 512),
+    apiKeyHash: normalizeOptionalEvidence(context.apiKeyHash, "apiKeyHash", 512),
     loginEmail: normalizeOptionalEvidence(context.loginEmail, "loginEmail", 320),
     purpose: normalizePurpose(context.purpose)
   };
@@ -229,6 +273,7 @@ function normalizePurpose(value: AuthDatabasePurpose | undefined): AuthDatabaseP
     "session",
     "invite",
     "password_reset",
+    "api_key",
     "organization_create",
     "operator"
   ];

@@ -157,7 +157,10 @@ describe("inbox JSON mutation routes", () => {
       new Request("http://localhost/api/inbox/conversations/conversation_demo/reply", {
         method: "POST",
       headers: sameOriginJsonHeaders(),
-        body: JSON.stringify({ body: "Thanks for reaching out!" })
+        body: JSON.stringify({
+          body: "Thanks for reaching out!",
+          idempotencyKey: "f8fdb7fa-8785-4c54-8bb2-30237d44f6b7"
+        })
       }),
       conversationParams
     );
@@ -180,18 +183,23 @@ describe("inbox JSON mutation routes", () => {
       new Request("http://localhost/api/inbox/conversations/conversation_demo/reply", {
         method: "POST",
       headers: sameOriginJsonHeaders(),
-        body: JSON.stringify({ body: "Thanks for reaching out!" })
+        body: JSON.stringify({
+          body: "Thanks for reaching out!",
+          idempotencyKey: "f8fdb7fa-8785-4c54-8bb2-30237d44f6b7"
+        })
       }),
       conversationParams
     );
 
     expect(response.status).toBe(201);
+    expect(response.headers.get("Location")).toBe("/api/v1/messages/message_reply");
     await expect(response.json()).resolves.toMatchObject({
       message: { id: "message_reply", direction: "OUTBOUND" },
       deduped: false
     });
     expect(mocks.createConversationOutboundReply).toHaveBeenCalledWith("org_demo", "conversation_demo", {
-      body: "Thanks for reaching out!"
+      body: "Thanks for reaching out!",
+      idempotencyKey: "f8fdb7fa-8785-4c54-8bb2-30237d44f6b7"
     });
   });
 
@@ -206,13 +214,38 @@ describe("inbox JSON mutation routes", () => {
       new Request("http://localhost/api/inbox/conversations/conversation_demo/reply", {
         method: "POST",
       headers: sameOriginJsonHeaders(),
-        body: JSON.stringify({ body: "Thanks again!", idempotencyKey: "reply-1" })
+        body: JSON.stringify({
+          body: "Thanks again!",
+          idempotencyKey: "287c6e6c-e7af-4885-9d67-b04a0914cd19"
+        })
       }),
       conversationParams
     );
 
     expect(response.status).toBe(200);
+    expect(response.headers.get("Location")).toBe("/api/v1/messages/message_reply");
     await expect(response.json()).resolves.toMatchObject({ deduped: true });
+  });
+
+  it("maps a changed permanent browser reply binding to conflict", async () => {
+    mocks.createConversationOutboundReply.mockResolvedValue({ blocked: false, conflict: true });
+
+    const response = await replyConversationRoute(
+      new Request("http://localhost/api/inbox/conversations/conversation_demo/reply", {
+        method: "POST",
+        headers: sameOriginJsonHeaders(),
+        body: JSON.stringify({
+          body: "Changed content",
+          idempotencyKey: "287c6e6c-e7af-4885-9d67-b04a0914cd19"
+        })
+      }),
+      conversationParams
+    );
+
+    expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toMatchObject({
+      error: expect.stringContaining("already used")
+    });
   });
 });
 

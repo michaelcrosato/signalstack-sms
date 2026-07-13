@@ -44,7 +44,8 @@ describe("provider settings", () => {
       }
     });
 
-    expect(settings.liveMessagingAllowed).toBe(true);
+    expect(settings.liveMessagingAllowed).toBe(false);
+    expect(settings.blockers).toContain("TWILIO_CREDENTIALS_INCOMPLETE");
     expect(settings.twilio).toEqual({
       accountSidConfigured: true,
       authTokenConfigured: true,
@@ -52,7 +53,10 @@ describe("provider settings", () => {
       configured: true,
       source: "environment",
       accountSidRedacted: null,
-      fromNumberRedacted: null
+      fromNumberRedacted: null,
+      verifiedAccountCount: 0,
+      verifiedNumberCount: 0,
+      legacyMetadataPresent: false
     });
     expect(JSON.stringify(settings)).not.toContain("secret");
   });
@@ -72,7 +76,7 @@ describe("provider settings", () => {
     expect(settings.blockers).toContain("TWILIO_CREDENTIALS_INCOMPLETE");
   });
 
-  it("uses local credential metadata for readiness without exposing raw values", () => {
+  it("keeps legacy metadata explicitly unverified without exposing fingerprints", () => {
     const settings = getProviderSettings({
       demoMode: false,
       liveMessagingEnabled: true,
@@ -95,9 +99,46 @@ describe("provider settings", () => {
       env: {}
     });
 
-    expect(settings.liveMessagingAllowed).toBe(true);
-    expect(settings.twilio.configured).toBe(true);
-    expect(settings.twilio.source).toBe("local_metadata");
+    expect(settings.liveMessagingAllowed).toBe(false);
+    expect(settings.twilio.configured).toBe(false);
+    expect(settings.twilio.source).toBe("legacy_metadata_unverified");
+    expect(settings.twilio.legacyMetadataPresent).toBe(true);
     expect(JSON.stringify(settings)).not.toContain("abc123");
+  });
+
+  it("reports verified encrypted account and owned-number readiness for M5 transport", () => {
+    const settings = getProviderSettings({
+      demoMode: false,
+      liveMessagingEnabled: true,
+      messagingProvider: "twilio",
+      complianceProfile: completeProfile,
+      providerAccounts: [
+        {
+          status: "VERIFIED",
+          revokedAt: null,
+          externalAccountIdLast4: "7890"
+        }
+      ],
+      providerPhoneNumbers: [
+        {
+          status: "VERIFIED",
+          disabledAt: null,
+          phoneNumber: "+15555550199"
+        }
+      ],
+      env: {}
+    });
+
+    expect(settings.liveMessagingAllowed).toBe(true);
+    expect(settings.twilio).toMatchObject({
+      configured: true,
+      source: "encrypted_database",
+      accountSidRedacted: "redacted_7890",
+      fromNumberRedacted: "redacted_0199",
+      verifiedAccountCount: 1,
+      verifiedNumberCount: 1,
+      legacyMetadataPresent: false
+    });
+    expect(settings.blockers).toEqual([]);
   });
 });
