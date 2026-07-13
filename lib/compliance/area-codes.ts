@@ -104,11 +104,13 @@ export const US_AREA_CODE_TIMEZONES: Record<string, string> = {
   "307": "America/Denver",
   "385": "America/Denver",
   "435": "America/Denver",
-  "480": "America/Denver",
+  // Phoenix-metro Arizona does not observe DST, so it must be America/Phoenix (fixed UTC-7), not
+  // America/Denver — otherwise quiet-hours are computed an hour late for ~8 months of the year.
+  "480": "America/Phoenix",
   "505": "America/Denver",
   "575": "America/Denver",
-  "602": "America/Denver",
-  "623": "America/Denver",
+  "602": "America/Phoenix",
+  "623": "America/Phoenix",
   "720": "America/Denver",
   "801": "America/Denver",
   "970": "America/Denver",
