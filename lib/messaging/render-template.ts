@@ -5,5 +5,10 @@ export function extractTemplateVariables(body: string) {
 }
 
 export function renderTemplate(body: string, values: Record<string, string>) {
-  return body.replace(templatePlaceholderRegExp(), (_match, key: string) => values[key] ?? "");
+  // Only substitute own properties. Placeholder names like `constructor`, `__proto__`, or `toString`
+  // resolve to inherited Object.prototype members, which would otherwise leak JS-engine internals into
+  // the outbound message. This matches the own-property guard the preview path already applies.
+  return body.replace(templatePlaceholderRegExp(), (_match, key: string) =>
+    Object.hasOwn(values, key) ? values[key] ?? "" : ""
+  );
 }
