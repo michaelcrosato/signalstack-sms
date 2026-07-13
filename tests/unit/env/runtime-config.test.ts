@@ -376,7 +376,9 @@ describe("runtime configuration", () => {
         APP_ENV: "production",
         DATABASE_RLS_ENFORCED: "true",
         DEMO_MODE: "true",
-        ALLOW_PRODUCTION_DEMO: "true"
+        ALLOW_PRODUCTION_DEMO: "true",
+        SECRETS_MASTER_KEY: encryptionKey,
+        API_KEY_PEPPER: apiKeyPepper
       })
     ).not.toThrow();
 
@@ -388,7 +390,9 @@ describe("runtime configuration", () => {
         AUTH_PROVIDER: "local",
         AUTH_SESSION_SECRET: sessionSecret,
         AUTH_THROTTLE_SECRET: throttleSecret,
-        TRUST_PROXY: "true"
+        TRUST_PROXY: "true",
+        SECRETS_MASTER_KEY: encryptionKey,
+        API_KEY_PEPPER: apiKeyPepper
       })
     ).not.toThrow();
   });
