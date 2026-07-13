@@ -251,13 +251,19 @@ export function normalizeTwilioInbound(payload: TwilioWebhookPayload): Normalize
 export function normalizeTwilioStatus(payload: TwilioWebhookPayload): NormalizedTwilioStatus | null {
   const providerMessageId = firstRequiredProviderValue(payload.MessageSid, payload.SmsSid);
   const rawStatus = firstRequiredProviderValue(payload.MessageStatus, payload.SmsStatus);
-  if (!providerMessageId || !rawStatus) {
+  if (
+    !providerMessageId ||
+    providerMessageId.length > 191 ||
+    !rawStatus ||
+    rawStatus.length > 64
+  ) {
     return null;
   }
 
   const status = rawStatus.toLowerCase();
 
   const errorCode = normalizeOptionalProviderValue(payload.ErrorCode);
+  if (errorCode && errorCode.length > 128) return null;
 
   return {
     providerMessageId,

@@ -10,6 +10,11 @@ import {
   runContinuousCustomerWebhookWorker,
   type CustomerWebhookWorkerRunResult
 } from "@/lib/integrations/customer-webhooks/worker";
+import {
+  processDueDirectMessageAttempts,
+  runContinuousDirectMessageWorker,
+  type DirectMessageWorkerRunResult
+} from "@/lib/messaging/outbox/worker";
 
 applyDemoSafeRuntimeDefaults();
 
@@ -31,15 +36,34 @@ function logWebhookResult(result: CustomerWebhookWorkerRunResult, prefix = "Sign
   );
 }
 
+function logDirectMessageResult(
+  result: DirectMessageWorkerRunResult,
+  prefix = "SignalStack direct-message worker"
+) {
+  if (result.blocked) {
+    logger.warn(`${prefix} blocked by the direct-message worker readiness gate (${result.reason}).`);
+    return;
+  }
+  logger.info(
+    `${prefix} recovered ${result.recovered}, claimed ${result.claimed}, sent ${result.sent}, delivered ${result.delivered}, retried ${result.retried}, failed ${result.failed}, ambiguous ${result.ambiguous}, cancelled ${result.cancelled}, skipped ${result.skipped}.`
+  );
+}
+
 async function main() {
   const options = parseWorkerRuntimeOptions({ argv: process.argv.slice(2), env: process.env });
 
   if (options.mode === "once") {
-    const [campaignResult, webhookResult] = await Promise.all([
-      processDueScheduledCampaignJobs(new Date(), { maxJobsPerPoll: options.maxJobsPerPoll }),
+    const directWorker = processDueDirectMessageAttempts(options.maxJobsPerPoll);
+    const campaignWorker = process.env.WORKER_DEPLOYMENT_CLASS === "production-live-direct"
+      ? Promise.resolve(null)
+      : processDueScheduledCampaignJobs(new Date(), { maxJobsPerPoll: options.maxJobsPerPoll });
+    const [directResult, campaignResult, webhookResult] = await Promise.all([
+      directWorker,
+      campaignWorker,
       processDueCustomerWebhookDeliveries(options.maxJobsPerPoll)
     ]);
-    logResult(campaignResult);
+    logDirectMessageResult(directResult);
+    if (campaignResult) logResult(campaignResult);
     logWebhookResult(webhookResult);
     return;
   }
@@ -53,14 +77,25 @@ async function main() {
   process.once("SIGTERM", stop);
 
   logger.info(`SignalStack SMS worker polling every ${options.pollIntervalMs}ms with up to ${options.maxJobsPerPoll} job(s) per poll.`);
-  await Promise.all([
-    runContinuousScheduledCampaignWorker({
+  const campaignWorker = process.env.WORKER_DEPLOYMENT_CLASS === "production-live-direct"
+    ? Promise.resolve()
+    : runContinuousScheduledCampaignWorker({
       pollIntervalMs: options.pollIntervalMs,
       maxJobsPerPoll: options.maxJobsPerPoll,
       maxIterations: options.maxIterations,
       shouldContinue: () => running,
       onResult: (result, iteration) => logResult(result, `SignalStack SMS worker iteration ${iteration}`)
+    });
+  await Promise.all([
+    runContinuousDirectMessageWorker({
+      pollIntervalMs: options.pollIntervalMs,
+      maxAttemptsPerPoll: options.maxJobsPerPoll,
+      maxIterations: options.maxIterations,
+      shouldContinue: () => running,
+      onResult: (result, iteration) =>
+        logDirectMessageResult(result, `SignalStack direct-message worker iteration ${iteration}`)
     }),
+    campaignWorker,
     runContinuousCustomerWebhookWorker({
       pollIntervalMs: options.pollIntervalMs,
       maxDeliveriesPerPoll: options.maxJobsPerPoll,

@@ -399,6 +399,45 @@ describe("Twilio provider retry classification and response bounds", () => {
     });
   });
 
+  it("only treats a validated SID-free create 4xx as definitive", async () => {
+    const fetchMock = createFetchMock(
+      jsonResponse({ code: 21614 }, 400),
+      jsonResponse({}, 400),
+      jsonResponse({ code: 20429 }, 429)
+    );
+    const provider = createTwilioProvider(credentials, {
+      fetch: fetchMock as unknown as typeof fetch
+    });
+    const create = () => provider.createMessage({
+      orgId: "org_1",
+      to: "+15555550100",
+      from: "+15555550199",
+      body: "hello",
+      idempotencyKey: "request_1"
+    });
+
+    const terminal = await capturedError(create);
+    expect(provider.classifyError(terminal, "create_message")).toMatchObject({
+      disposition: "terminal",
+      retryable: false,
+      providerCode: "TWILIO_21614"
+    });
+
+    const malformed = await capturedError(create);
+    expect(provider.classifyError(malformed, "create_message")).toMatchObject({
+      disposition: "ambiguous",
+      retryable: false,
+      providerCode: null
+    });
+
+    const throttled = await capturedError(create);
+    expect(provider.classifyError(throttled, "create_message")).toMatchObject({
+      disposition: "retryable",
+      retryable: true,
+      providerCode: "TWILIO_20429"
+    });
+  });
+
   it("fails closed on oversized and non-JSON responses", async () => {
     const fetchMock = createFetchMock(
       jsonResponse({ sid: accountSid }, 200, { "Content-Length": "999999" }),

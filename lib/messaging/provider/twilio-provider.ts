@@ -113,7 +113,8 @@ export function createTwilioProvider(
     const payload = await readBoundedJson(response, operation);
     if (!response.ok) {
       const parsedError = twilioErrorApiResponseSchema.safeParse(payload);
-      const providerCode = parsedError.success && parsedError.data.code !== undefined
+      const validatedProviderError = parsedError.success && parsedError.data.code !== undefined;
+      const providerCode = validatedProviderError
         ? `TWILIO_${parsedError.data.code}`
         : null;
       const responseContainsMessageId = parsedError.success && Boolean(parsedError.data.sid);
@@ -127,7 +128,7 @@ export function createTwilioProvider(
         providerCode,
         outcomeUnknown:
           operation === "create_message" &&
-          (responseContainsMessageId || response.status >= 500)
+          (responseContainsMessageId || response.status >= 500 || !validatedProviderError)
       });
     }
 

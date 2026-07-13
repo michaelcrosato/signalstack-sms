@@ -57,7 +57,7 @@ cookie-session ADMIN boundary.
 
 ### Frozen route table
 
-The exact M3 routes and minimum scopes are:
+The M3 route table remains compatible; M5 adds only direct-message cancellation. Minimum scopes are:
 
 - `GET /api/v1/openapi.json` — public metadata exception.
 - `GET /api/v1/organization` — `organization:read`.
@@ -78,8 +78,10 @@ The exact M3 routes and minimum scopes are:
 - `POST /api/v1/templates`, `PATCH /api/v1/templates/:templateId`,
   `DELETE /api/v1/templates/:templateId` — `templates:write`.
 - `GET /api/v1/messages`, `GET /api/v1/messages/:messageId` — `messages:read`.
-- `POST /api/v1/messages` — `messages:send`; M3 remains dummy-only.
+- `POST /api/v1/messages` — `messages:send`; M5 reserves the durable direct-message outbox while preserving
+  deterministic dummy behavior in demo/local mode.
 - `GET /api/v1/messages/:messageId/status` — `deliveries:read`.
+- `POST /api/v1/messages/:messageId/cancel` — `messages:send`.
 - `GET /api/v1/campaigns`, `GET /api/v1/campaigns/:campaignId` — `campaigns:read`.
 - `POST /api/v1/campaigns`, `PATCH /api/v1/campaigns/:campaignId` — `campaigns:write`.
 - `POST /api/v1/campaigns/:campaignId/schedule`, `POST /api/v1/campaigns/:campaignId/cancel` —
@@ -97,6 +99,55 @@ The exact M3 routes and minimum scopes are:
   `POST /api/v1/webhook-endpoints/:endpointId/rotate-secret` — `webhooks:write`.
 - `GET /api/v1/webhook-endpoints/:endpointId/deliveries` — `deliveries:read`.
 - `POST /api/v1/webhook-deliveries/:deliveryId/replay` — `webhooks:replay`.
+
+### M5 direct-message acceptance and DTOs
+
+`POST /api/v1/messages` accepts `contactId`, optional same-contact `conversationId`, a required trimmed body
+of 1–1,600 characters, and zero to ten unique HTTPS media URLs. SMS is body-only; media requires the selected
+verified owned number to advertise MMS capability. The server snapshots the normalized destination and
+content so a later contact edit cannot silently retarget accepted work.
+
+After bearer authentication, exact `messages:send` scope, rate consumption, JSON validation, and recipient
+preflight, the route executes the centralized reservation inside the public idempotency transaction. It
+atomically creates the stable `Message`, attempt one, permanent keyed payload binding, conversation
+projection, and `message.accepted` customer-event outbox before returning `202` with `Location`. It never
+calls Twilio. Missing/cross-tenant contact or conversation is `404`; current recipient-policy denial is
+`422 OPERATION_NOT_ALLOWED` without a message. An exact public replay returns the original `202`, body,
+request ID, and location; changed binding is `409 IDEMPOTENCY_CONFLICT`.
+
+Public API idempotency retains the M3 `(orgId, apiCredentialId, Idempotency-Key)` scope and encrypted 24-hour
+response snapshot. The message's permanent opaque credential-bound key and keyed canonical fingerprint
+survive response expiry. The same identity may return an existing message only when route, direction,
+contact, conversation, destination, body, media, and transport all match; any changed binding conflicts.
+
+`POST /api/v1/conversations/:conversationId/messages` uses the same reservation and `202` contract after
+exact `conversations:write` plus `messages:send` authorization. The URL conversation is part of the permanent
+fingerprint and must belong to the selected contact. Neither public route permits caller-selected provider
+credentials, exact provider account IDs, sender numbers, callback URLs, transport overrides, provider IDs,
+application/attempt status, or retry controls.
+
+`GET /api/v1/messages`, `GET /api/v1/messages/:messageId`, and
+`GET /api/v1/messages/:messageId/status` expose distinct `applicationStatus`, compatibility `status`,
+explicit lower-case `transport: dummy|twilio`, `attemptCount`, latest safe attempt status, `requiresReview`,
+normalized provider status/error code, and delivery timestamps. `applicationStatus` is one of `ACCEPTED`, `SCHEDULED`,
+`PROCESSING`, `SENT`, `DELIVERED`, `FAILED`, `CANCELLED`, or `AMBIGUOUS`; latest attempt status is one of
+`QUEUED`, `PROCESSING`, `SUCCEEDED`, `FAILED`, `CANCELLED`, `AMBIGUOUS`, or `RESOLVED_NOT_SENT`. The legacy
+`status` field remains a documented compatibility projection and never determines claimability. Legacy
+`mode: dummy|provider` is derived from explicit transport, never provider-status text. Ambiguity is
+first-class and is not reported as ordinary pending.
+
+Public DTOs never expose the message body through the status-only resource, accepted destination/sender,
+media-fetch credentials, exact provider account identity, credential generation, owner/lease tokens,
+callback correlation/HMAC, request fingerprint, raw provider response, internal error/disposition,
+attestation reason, or other-tenant evidence.
+
+### `POST /api/v1/messages/:messageId/cancel`
+
+Requires bearer `messages:send` authorization and the normal public `Idempotency-Key`. It conditionally
+cancels the same-tenant message/current attempt only before `providerCallStartedAt`. Success returns the
+cancelled message resource; an exact replay returns the same response. Cross-tenant/unknown messages are
+`404`. Any post-frontier, already-sent, delivered, failed, ambiguous, or otherwise incompatible state is
+`409 CONFLICT`. Cancellation never calls a provider, deletes attempt evidence, or creates a retry.
 
 ### `GET /api/settings/api-keys`
 
@@ -414,7 +465,18 @@ Creates a demo-safe inbound message on an existing conversation. Explicit `idemp
 
 ### `POST /api/inbox/conversations/:conversationId/reply`
 
-Records a demo-safe **outbound** reply on the conversation through the dummy provider — never a live send. Requires `MEMBER`. Opted-out, archived, or missing contacts are blocked with `422` and `{ "reasons": [...] }`, creating no message row. An explicit `idempotencyKey` duplicate returns the existing local message with `deduped: true` and does not insert again.
+Requires same-origin cookie authentication and `MEMBER`. The strict body is `{ "body": "...",
+"idempotencyKey": "client-uuid" }`; the browser creates one UUID before submission, retains it across
+network retries, and clears it only after a conclusive response. The permanent identity is
+`(orgId, conversationId, client UUID)` and is bound to direction, contact, destination, body, media, and
+transport. An exact replay returns the original message with `deduped: true`; changed reuse is `409` and
+never returns an unrelated inbound row.
+
+The route uses the same M5 reservation service as public direct messaging and never calls Twilio. A new
+reservation retains browser compatibility with `201`, an exact replay returns `200`, and both include the
+same stable message resource and `Location`. Opted-out, archived, or missing contacts are blocked with `422`
+and safe reasons without creating a message. Demo/dummy mode remains deterministic and network-free; live
+transport is performed later only by the authorized direct worker and final gate.
 
 ### `POST /api/inbox/conversations/:conversationId/assign`
 
@@ -470,7 +532,11 @@ Returns deterministic fake lead qualification score, stage, and reasons from sup
 
 ### `GET /api/analytics/overview`
 
-Returns tenant-scoped counts for contacts, total and scheduled campaigns, conversations, local outbound message delivery breakdowns including delivered, pending, failed outbound counts, the newest outbound local message timestamp, and local usage totals. Delivered outbound counts exclude rows with terminal failure evidence so stale delivery timestamps do not inflate delivery rates.
+Returns tenant-scoped counts for contacts, total and scheduled campaigns, conversations, outbound message
+delivery breakdowns including delivered, pending, ambiguous, failed, and cancelled application outcomes, the
+newest outbound evidence timestamp, and local usage totals. Ambiguous is never counted as ordinary pending.
+Delivered counts exclude rows with terminal failure evidence so stale delivery timestamps do not inflate
+delivery rates.
 
 ### `GET /api/billing/usage`
 
@@ -494,14 +560,56 @@ path. The handler disables sentiment analysis and keyword auto-replies and never
 Accepts Twilio `application/x-www-form-urlencoded` delivery status webhooks. M4 resolves one candidate from
 strict `AccountSid` plus the owned outbound `From` number/service, validates with that account's active
 credential, and rechecks the locked tenant state before storing the event or mutating delivery evidence.
-Valid payloads retain the existing idempotent owner-lease and monotonic-status path. The handler does not
-call any provider.
+M5 additionally requires the callback URL's attempt correlation plus domain-separated HMAC, then binds the
+exact attempt/account/sender/destination/provider SID before mutation. A valid correlation may attach a SID
+when create-result persistence was lost; conflicting evidence fails closed. Valid payloads retain the
+idempotent owner-lease and monotonic-status path and atomically update attempt, message projection, and
+deduplicated customer events. The handler does not call any provider.
 
 For both Twilio routes, malformed forms return `400`. Wrong signature/credential/destination, crossed or
 unknown account/resource, detected ambiguity, disabled/revoked state, and rotation races share `403` with
 `{ "error": "Provider callback rejected.", "code": "INVALID_PROVIDER_CALLBACK" }` and no tenant mutation.
 Routing/crypto storage unavailability returns secret-free `503 WEBHOOK_ROUTING_UNAVAILABLE`. All denials are
 `Cache-Control: no-store` and reveal no account, tenant, number, service, or credential existence.
+
+### `GET /api/settings/delivery-attempts`
+
+Requires cookie-session ADMIN authorization and returns a bounded, tenant-scoped review list. Allowlisted
+filters may select application/attempt state and `requiresReview`; pagination/order must be deterministic.
+Rows expose only stable message/attempt IDs, redacted destination/sender last-four, application/attempt/
+provider status, safe provider error code, attempt number, timestamps, and review eligibility. They never
+include message body/media, exact account/sender/destination, credentials, fingerprints, owner tokens,
+callback correlation/HMAC, raw provider response, or internal attestation text.
+
+### `GET /api/settings/delivery-attempts/:attemptId`
+
+Returns one safe same-tenant ADMIN review DTO under the same redaction boundary. Unknown and cross-tenant
+identifiers share `404`; the read performs no provider call or mutation.
+
+### `POST /api/settings/delivery-attempts/:attemptId/reconcile`
+
+Requires cookie-session ADMIN, exact same origin, no request body, and `Cache-Control: no-store`. It performs
+provider fetch only when the ambiguous attempt has a known SID and current exact stored account credential.
+Fetched account/SID/destination/sender evidence must match the durable attempt. It may conditionally converge
+to `SENT`, `DELIVERED`, or `FAILED`; fetch failure/mismatch preserves ambiguity. It never calls create,
+creates a retry, or accepts caller-supplied provider identity. Success or a conclusive no-change appends a
+secret-free `MESSAGE_ATTEMPT_RECONCILED` integration audit event.
+
+### `POST /api/settings/delivery-attempts/:attemptId/attest-not-sent`
+
+Requires cookie-session ADMIN, exact same origin, and strict `{ "confirmation": "ATTEST NOT SENT",
+"reason": "..." }` with a trimmed bounded reason. It conditionally marks only an ambiguous no-provider-
+proof attempt `RESOLVED_NOT_SENT`; stale, non-ambiguous, SID-bearing/proven-impact, already-resolved, or
+concurrent requests return `409`. It makes no provider call and appends secret-free
+`MESSAGE_ATTEMPT_ATTESTED_NOT_SENT` audit evidence without outwardly returning the reason.
+
+### `POST /api/settings/delivery-attempts/:attemptId/retry`
+
+Requires cookie-session ADMIN, exact same origin, and strict `{ "confirmation": "RETRY MESSAGE" }`. Only a
+current `RESOLVED_NOT_SENT` attempt without an existing successor may create the next attempt number once.
+The route returns the successor and appends `MESSAGE_ATTEMPT_RETRY_CREATED` audit evidence; it does not call
+a provider. Stale, concurrent, non-attested, or already-retried requests return `409`. The successor is an
+ordinary queued attempt and must pass the complete worker gate later.
 
 ### `GET /api/settings/provider`
 
@@ -642,6 +750,16 @@ Renders a read-only local operator checklist based on `docs/LOCAL_OPERATOR_RUNBO
 
 Renders a read-only queue operations view for the current organization. It may display scheduled-campaign queue job status counts, due versus future queued jobs, payload validity, idempotency keys, worker poll settings, queue backend metadata, Redis presence, and related campaign names. The page must not enqueue jobs, run workers, mutate queue rows, update campaign status, call Redis, call messaging providers, create billing records, send notifications, expose secrets, send SMS, or enable live messaging.
 
+### `/settings/delivery-attempts`
+
+Renders the cookie-authenticated ADMIN M5 direct-message attempt review surface. It may list safe tenant-
+scoped attempt/application/provider state, redacted destination/sender last-four, timestamps, and review
+eligibility and may submit the explicit reconcile, `NOT_SENT` attestation, and retry actions above. Rendering
+performs no provider call or mutation. It never shows body/media, exact destination/sender/account identity,
+credential/envelope/fingerprint material, owner tokens, callback correlation/HMAC, raw provider responses,
+or attestation reason. Reconcile is fetch-only; attestation and retry require their exact confirmations; no
+browser action directly calls provider create or bypasses the worker gate.
+
 ### `/settings/validation`
 
 Renders a read-only validation operations view for the current organization. It may display static local validation gate inventory, repair signals, no-impact summary states, and validation safety-boundary text. The page may display the current demo organization name, but must not execute commands, inspect logs or test reports, scan files, read `.env.local`, create or mutate records, call providers, call live AI, call Stripe, send SMS, send email, send notifications, expose secrets, disable rate limits, or enable live messaging, live billing, or live AI.
@@ -676,7 +794,14 @@ Renders the product-facing campaign workspace for the current organization. It m
 
 ### `/dashboard/inbox`
 
-Renders the product-facing inbox workspace for the current organization. It may display tenant-scoped conversations, select a visible local thread with `conversationId` query state, fall back to the first visible thread when the query does not match the current tenant inbox, create local inbound demo messages, add internal notes, assign conversations, resolve or reopen threads through existing inbox endpoints, and request deterministic fake-AI conversation summary plus lead qualification from existing local AI endpoints. It must not send outbound SMS, call providers, create billing records, call live AI, expose secrets, notify contacts, or enable live messaging.
+Renders the product-facing inbox workspace for the current organization. It may display tenant-scoped
+conversations, select a visible local thread with `conversationId` query state, fall back to the first
+visible thread, create local inbound demo messages, add notes, assign/resolve/reopen threads, request
+deterministic fake-AI insights, and reserve an outbound reply through the M5 route. Message cards distinguish
+accepted, processing, sent, delivered, failed, cancelled, and ambiguous state; ambiguous is never ordinary
+pending. The client retains its reply UUID across uncertain network outcomes. The page/route does not call a
+provider, reconcile, attest, retry, create billing records, call live AI, expose secrets, or enable live
+messaging; any live create occurs later in the separately authorized direct worker.
 
 ### `/dashboard/templates`
 
@@ -688,7 +813,12 @@ Renders the product-facing template detail workflow for a tenant-scoped message 
 
 ### `/dashboard/analytics`
 
-Renders the product-facing analytics workspace for the current organization. It may display tenant-scoped contact, campaign, scheduled-campaign, conversation, local outbound message delivery counts, latest outbound evidence timestamp, a campaign-level delivery review summary including failed and pending campaign counts, bounded delivery review rows linking to existing campaign detail pages, and local usage totals from existing local analytics and campaign records. It must not execute reports, create exports, mutate records, retry deliveries, run workers, call providers, call Stripe, create billing artifacts, send SMS, call live AI, expose secrets, or enable live messaging.
+Renders the product-facing analytics workspace for the current organization. It may display tenant-scoped
+contact, campaign, scheduled-campaign, conversation, and outbound delivery counts, latest evidence, campaign
+review summaries, and local usage. M5 application ambiguity is a separate count/review priority and cannot
+be collapsed into pending; direct-message review links route ADMIN users to the dedicated attempt surface.
+It must not execute reports, create exports, mutate records, retry deliveries, run workers, call providers,
+call Stripe, create billing artifacts, send SMS, call live AI, expose secrets, or enable live messaging.
 
 ### `/dashboard/compliance`
 

@@ -47,6 +47,7 @@ describe("product analytics", () => {
         delivered: 4,
         pending: 0,
         failed: 1,
+        ambiguous: 0,
         lastOutboundAt: "2026-01-04T12:00:00.000Z"
       },
       usage: {
@@ -158,6 +159,7 @@ describe("product analytics", () => {
       { key: "delivered", label: "Delivered", value: "4" },
       { key: "pending", label: "Pending", value: "0" },
       { key: "failed", label: "Failed", value: "1" },
+      { key: "ambiguous", label: "Ambiguous", value: "0" },
       { key: "deliveryRate", label: "Delivery rate", value: "80%" },
       { key: "reviewStatus", label: "Review status", value: "1 failed; review evidence" },
       { key: "lastDeliveryEvidence", label: "Last delivery evidence", value: "2026-01-04T12:00:00.000Z" }
@@ -242,6 +244,7 @@ describe("product analytics", () => {
         delivered: 0,
         pending: 0,
         failed: 0,
+        ambiguous: 0,
         lastOutboundAt: null
       },
       usage: {
@@ -291,6 +294,7 @@ describe("product analytics", () => {
         delivered: 0,
         pending: 0,
         failed: 0,
+        ambiguous: 0,
         lastOutboundAt: null
       },
       usage: {
@@ -335,6 +339,35 @@ describe("product analytics", () => {
       "Campaign 04",
       "Campaign 05"
     ]);
+  });
+
+  it("routes ambiguous direct delivery evidence to ADMIN review", async () => {
+    vi.mocked(getAnalyticsOverview).mockResolvedValue({
+      contacts: { total: 1, optedIn: 1, optedOut: 0 },
+      campaigns: { total: 0, scheduled: 0 },
+      conversations: { total: 1, open: 1, resolved: 0 },
+      messages: {
+        total: 1,
+        inbound: 0,
+        outbound: 1,
+        delivered: 0,
+        pending: 0,
+        failed: 0,
+        ambiguous: 1,
+        lastOutboundAt: "2026-01-04T12:00:00.000Z"
+      },
+      usage: {
+        [UsageEventType.CONTACT_IMPORTED]: 0,
+        [UsageEventType.MESSAGE_INBOUND]: 0,
+        [UsageEventType.CAMPAIGN_SCHEDULED]: 0,
+        [UsageEventType.AI_REQUEST]: 0
+      }
+    });
+
+    const analytics = await getProductAnalytics("org_123");
+
+    expect(analytics.derived.deliveryReviewStatus).toBe("1 ambiguous; ADMIN review required");
+    expect(analytics.deliveryRows).toContainEqual({ key: "ambiguous", label: "Ambiguous", value: "1" });
   });
 
   it("freezes product analytics metric metadata before rendering", () => {
@@ -389,6 +422,7 @@ describe("product analytics", () => {
       "delivered",
       "pending",
       "failed",
+      "ambiguous",
       "deliveryRate",
       "reviewStatus",
       "lastDeliveryEvidence"

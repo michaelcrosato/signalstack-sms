@@ -13,6 +13,36 @@ const nullableShortTextSchema = z.string().trim().min(1).max(500).nullable();
 const publicLabelNameSchema = z.string().trim().min(1).max(120);
 const publicLabelNamesSchema = z.array(publicLabelNameSchema).max(100);
 const publicTemplateVariablesSchema = z.array(z.string().trim().min(1).max(80)).max(100);
+export const publicMessageMediaUrlsSchema = z
+  .array(
+    z
+      .string()
+      .max(2_048)
+      .url()
+      .refine(
+        (value) => normalizeHttpsMediaUrl(value) !== null,
+        "Media URLs must use HTTPS without embedded credentials."
+      )
+  )
+  .max(10)
+  .superRefine((values, context) => {
+    const normalized = values.map(normalizeHttpsMediaUrl);
+    if (
+      normalized.every((value): value is string => value !== null) &&
+      new Set(normalized).size !== values.length
+    ) {
+      context.addIssue({ code: z.ZodIssueCode.custom, message: "Media URLs must be unique." });
+    }
+  });
+
+function normalizeHttpsMediaUrl(value: string): string | null {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && !url.username && !url.password ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
 
 export const publicApiResourceIdSchema = boundedIdentifierSchema;
 
@@ -112,6 +142,7 @@ export const publicMessageCreateSchema = z
   .object({
     contactId: boundedIdentifierSchema,
     conversationId: boundedIdentifierSchema.optional(),
-    body: z.string().trim().min(1).max(1_600)
+    body: z.string().trim().min(1).max(1_600),
+    mediaUrls: publicMessageMediaUrlsSchema.default([])
   })
   .strict();

@@ -252,13 +252,14 @@ export function createLocalCredentialService(
       };
 
       // Serializable isolation makes the empty-credential predicate part of the first-owner claim.
-      // PostgreSQL may abort a concurrent claimant with P2034/40001; retry that bounded transient only,
-      // so the winner can commit and the loser can observe the now-closed bootstrap predicate.
+      // PostgreSQL may abort a concurrent claimant with P2034/40001 or surface the winner's unique
+      // email/slug as P2002 before the serializable loser observes it. Retry those bounded bootstrap-race
+      // outcomes so the winner can commit and the loser can observe the now-closed predicate.
       for (let attempt = 0; attempt < 4; attempt += 1) {
         try {
           return await dependencies.store.transaction(operation, { isolationLevel: "Serializable" });
         } catch (error) {
-          if (!isSerializableConflict(error) || attempt === 3) {
+          if (!isBootstrapRaceConflict(error) || attempt === 3) {
             throw new LocalCredentialServiceError("First-owner bootstrap failed.");
           }
           await waitForSerializableRetry(attempt);
@@ -395,12 +396,12 @@ function boundedPositiveInteger(value: number | undefined, fallback: number): nu
   return Number.isSafeInteger(value) && value! > 0 ? value! : fallback;
 }
 
-function isSerializableConflict(error: unknown): boolean {
+function isBootstrapRaceConflict(error: unknown): boolean {
   if (!error || typeof error !== "object") {
     return false;
   }
   const candidate = error as { code?: unknown; meta?: unknown; cause?: unknown };
-  if (candidate.code === "P2034" || candidate.code === "40001") {
+  if (candidate.code === "P2002" || candidate.code === "P2034" || candidate.code === "40001") {
     return true;
   }
   if (candidate.meta && typeof candidate.meta === "object") {
@@ -409,7 +410,7 @@ function isSerializableConflict(error: unknown): boolean {
       return true;
     }
   }
-  return candidate.cause !== error && isSerializableConflict(candidate.cause);
+  return candidate.cause !== error && isBootstrapRaceConflict(candidate.cause);
 }
 
 function waitForSerializableRetry(attempt: number) {

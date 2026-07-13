@@ -1,10 +1,13 @@
 import { withTenantTransaction } from "@/lib/db/tenant-context";
 import {
   publicConversationMessagesCursorResource,
-  publicConversationSelect,
-  submitDummyPublicConversationReply
+  publicConversationSelect
 } from "@/lib/public-api/conversations";
 import { publicMessageSelect, serializePublicMessage } from "@/lib/public-api/dummy-messages";
+import {
+  reserveDirectMessage,
+  resolveDirectMessageTransport
+} from "@/lib/messaging/direct-message-reservation";
 import {
   createPublicApiErrorResponse,
   createPublicApiSuccessResponse
@@ -110,19 +113,39 @@ export async function POST(request: Request, context: RouteContext) {
     );
     const requestBody = await readPublicApiJson(request);
     const input = publicConversationReplySchema.parse(requestBody);
+    const transport = resolveDirectMessageTransport();
     return await runPublicApiIdempotentMutation(
       request,
       authorization,
       "/api/v1/conversations/:conversationId/messages",
       { conversationId, body: requestBody },
       async (tx) => {
-        const result = await submitDummyPublicConversationReply(tx, {
+        if (!transport) {
+          return publicApiErrorSnapshot(
+            "OPERATION_NOT_ALLOWED",
+            authorization.requestId,
+            422,
+            "The configured direct-message transport is unavailable."
+          );
+        }
+        const result = await reserveDirectMessage(tx, {
           orgId: authorization.principal.orgId,
+          route: "public_conversation_reply",
+          identity: {
+            kind: "public_api",
+            credentialId: authorization.principal.credentialId,
+            idempotencyKey: request.headers.get("idempotency-key") ?? ""
+          },
+          transport,
           conversationId,
-          body: input.body
+          body: input.body,
+          mediaUrls: input.mediaUrls
         });
         if (!result.ok && result.kind === "not_found") {
           return publicApiErrorSnapshot("NOT_FOUND", authorization.requestId, 404);
+        }
+        if (!result.ok && result.kind === "conflict") {
+          return publicApiErrorSnapshot("IDEMPOTENCY_CONFLICT", authorization.requestId, 409);
         }
         if (!result.ok) {
           return publicApiErrorSnapshot(
@@ -132,10 +155,15 @@ export async function POST(request: Request, context: RouteContext) {
             "The conversation cannot accept a reply."
           );
         }
+        const message = await tx.message.findUniqueOrThrow({
+          where: { id: result.message.id },
+          select: publicMessageSelect
+        });
         return publicApiSuccessSnapshot(
-          toPublicApiJson({ message: result.message }),
+          toPublicApiJson({ message: serializePublicMessage(message) }),
           authorization.requestId,
-          202
+          202,
+          { Location: `/api/v1/messages/${result.message.id}` }
         );
       }
     );

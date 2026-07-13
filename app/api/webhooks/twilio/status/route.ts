@@ -9,13 +9,20 @@ import { withTenantTransaction } from "@/lib/db/tenant-context";
 import {
   assertProviderCallbackBindingActive,
   authenticateTwilioProviderCallback,
-  createProviderCallbackFailureResponse
+  createProviderCallbackFailureResponse,
+  ProviderCallbackAuthenticationError
 } from "@/lib/integrations/provider-accounts/webhook-routing";
+import { readProviderCredentialMasterKey } from "@/lib/integrations/provider-accounts/credential-encryption";
 import {
   normalizeTwilioStatus,
   readTwilioFormPayload
 } from "@/lib/messaging/twilio-webhooks";
 import { isTerminalDeliveryFailureProviderStatus } from "@/lib/messaging/delivery-status";
+import {
+  readMessageStatusCallbackCorrelation,
+  validateMessageStatusCallbackCorrelation
+} from "@/lib/messaging/status-callback-correlation";
+import { e164PhoneNumberSchema } from "@/lib/validation/provider";
 import { twilioWebhookPayloadSchema } from "@/lib/validation/webhooks";
 import { recordMetric, smsPipelineMetrics } from "@/lib/observability/metrics";
 
@@ -41,6 +48,53 @@ export async function POST(request: Request) {
   const status = normalizeTwilioStatus(payload);
   if (!status) {
     return NextResponse.json({ error: "Invalid Twilio status payload." }, { status: 400 });
+  }
+
+  let callbackCorrelation:
+    | Readonly<{
+        attemptId: string;
+        correlationId: string;
+        providerAccountId: string;
+        providerPhoneNumberId: string;
+        destination: string;
+      }>
+    | undefined;
+  if (hasCallbackCorrelationEvidence(request.url)) {
+    const correlation = readMessageStatusCallbackCorrelation(request.url);
+    if (!correlation) {
+      return createProviderCallbackFailureResponse(
+        new ProviderCallbackAuthenticationError("INVALID_PROVIDER_CALLBACK")
+      );
+    }
+
+    let masterKey: Buffer;
+    try {
+      masterKey = readProviderCredentialMasterKey(process.env);
+    } catch {
+      return createProviderCallbackFailureResponse(
+        new ProviderCallbackAuthenticationError("WEBHOOK_ROUTING_UNAVAILABLE")
+      );
+    }
+    const destination = e164PhoneNumberSchema.safeParse(rawPayload.To);
+    if (
+      !destination.success ||
+      !validateMessageStatusCallbackCorrelation({
+        orgId: binding.orgId,
+        correlation,
+        masterKey
+      })
+    ) {
+      return createProviderCallbackFailureResponse(
+        new ProviderCallbackAuthenticationError("INVALID_PROVIDER_CALLBACK")
+      );
+    }
+    callbackCorrelation = {
+      attemptId: correlation.attemptId,
+      correlationId: correlation.correlationId,
+      providerAccountId: binding.providerAccountId,
+      providerPhoneNumberId: binding.providerPhoneNumberId,
+      destination: destination.data
+    };
   }
 
   return withTenantTransaction({ orgId: binding.orgId }, async (tx) => {
@@ -73,11 +127,17 @@ export async function POST(request: Request) {
         orgId: binding.orgId,
         providerMessageId: status.providerMessageId,
         status: status.status,
-        errorCode: status.errorCode
+        errorCode: status.errorCode,
+        ...(callbackCorrelation ? { correlation: callbackCorrelation } : {})
       });
 
       if (!statusUpdate.matched) {
         await releaseWebhookEventClaim(binding.orgId, recorded.event.id, recorded.claimToken);
+        if (callbackCorrelation) {
+          return createProviderCallbackFailureResponse(
+            new ProviderCallbackAuthenticationError("INVALID_PROVIDER_CALLBACK")
+          );
+        }
         return new NextResponse(null, {
           status: 409,
           headers: { "Retry-After": "5" }
@@ -115,5 +175,10 @@ export async function POST(request: Request) {
 
     return new NextResponse(null, { status: 204 });
   });
+}
+
+function hasCallbackCorrelationEvidence(callbackUrl: string): boolean {
+  const url = new URL(callbackUrl);
+  return ["attempt", "correlation", "proof"].some((key) => url.searchParams.has(key));
 }
 

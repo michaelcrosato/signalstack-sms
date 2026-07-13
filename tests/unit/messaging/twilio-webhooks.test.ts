@@ -287,6 +287,28 @@ describe("Twilio webhook helpers", () => {
     });
   });
 
+  it("rejects status evidence that exceeds durable provider bounds", () => {
+    expect(
+      normalizeTwilioStatus({
+        MessageSid: "SM123",
+        MessageStatus: "x".repeat(65)
+      })
+    ).toBeNull();
+    expect(
+      normalizeTwilioStatus({
+        MessageSid: "SM123",
+        MessageStatus: "failed",
+        ErrorCode: "x".repeat(129)
+      })
+    ).toBeNull();
+    expect(
+      normalizeTwilioStatus({
+        MessageSid: `SM${"1".repeat(190)}`,
+        MessageStatus: "sent"
+      })
+    ).toBeNull();
+  });
+
   it("normalizes inbound provider message IDs for idempotent event keys", () => {
     expect(
       normalizeTwilioInbound({

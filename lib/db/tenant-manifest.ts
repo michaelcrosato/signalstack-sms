@@ -17,6 +17,7 @@ export const ordinaryTenantTables = Object.freeze([
   "Conversation",
   "QueueJob",
   "Message",
+  "MessageAttempt",
   "InternalNote",
   "ComplianceProfile",
   "UsageEvent",
@@ -73,7 +74,8 @@ export const nonDeletableTenantTables = Object.freeze([
   "CustomerWebhookSigningSecret",
   "CustomerWebhookEvent",
   "CustomerWebhookDelivery",
-  "CustomerWebhookDeliveryAttempt"
+  "CustomerWebhookDeliveryAttempt",
+  "MessageAttempt"
 ] as const);
 
 export const globalControlTables = Object.freeze([

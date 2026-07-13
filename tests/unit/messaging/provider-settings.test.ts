@@ -45,7 +45,7 @@ describe("provider settings", () => {
     });
 
     expect(settings.liveMessagingAllowed).toBe(false);
-    expect(settings.blockers).toContain("TWILIO_GENERAL_TRANSPORT_UNAVAILABLE");
+    expect(settings.blockers).toContain("TWILIO_CREDENTIALS_INCOMPLETE");
     expect(settings.twilio).toEqual({
       accountSidConfigured: true,
       authTokenConfigured: true,
@@ -106,7 +106,7 @@ describe("provider settings", () => {
     expect(JSON.stringify(settings)).not.toContain("abc123");
   });
 
-  it("reports verified encrypted account and owned-number readiness without enabling M5 transport", () => {
+  it("reports verified encrypted account and owned-number readiness for M5 transport", () => {
     const settings = getProviderSettings({
       demoMode: false,
       liveMessagingEnabled: true,
@@ -129,7 +129,7 @@ describe("provider settings", () => {
       env: {}
     });
 
-    expect(settings.liveMessagingAllowed).toBe(false);
+    expect(settings.liveMessagingAllowed).toBe(true);
     expect(settings.twilio).toMatchObject({
       configured: true,
       source: "encrypted_database",
@@ -139,6 +139,6 @@ describe("provider settings", () => {
       verifiedNumberCount: 1,
       legacyMetadataPresent: false
     });
-    expect(settings.blockers).toContain("TWILIO_GENERAL_TRANSPORT_UNAVAILABLE");
+    expect(settings.blockers).toEqual([]);
   });
 });

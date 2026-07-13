@@ -1,9 +1,9 @@
 # Codex Summary
 
-Run number: 832
+Run number: 833
 
-- **M4 provider ownership is complete.** Eight migrations extend the current substrate to 51 migrations / 39 protected tables with account-hash/AAD-bound AES-256-GCM credentials, verified account/number/service ownership, safe ADMIN lifecycle, deterministic provider fixtures, and exact signed callback routing without sends or provider-resource mutation.
-- **M4 evidence:** the mandatory tenant runner is 14 files / 57 tests (13 files / 56 tests plus the one-file / one-test literal-network M3 exit); provider routing uses non-owner two-account PostgreSQL proof plus HTTP route fixtures and does not claim a literal callback-server E2E.
-- **Validation snapshot:** full Vitest is **219 files / 1,490 tests: 1,405 passing / 85 skipped**. M4 retains dummy-safe defaults, fixture-only provider tests, secret-safe DTO/audit boundaries, and no carrier call in tests or CI.
-- **Production remains intentionally blocked.** M5 owns the durable direct-message outbox and general Twilio transport; live campaigns/workers, provider retry policy, real secret provisioning/rotation, paid-lookup caps, production packaging, and human-reviewed integrity-gate changes remain gated.
+- **M5 durable direct messaging is complete.** Four migrations extend the current substrate to 55 migrations / 40 protected tables with permanent public/inbox reservation, immutable PostgreSQL attempts, a final-gated stored-credential Twilio SMS/MMS worker, bounded definitive retry, and durable no-blind-resend ambiguity.
+- **M5 reconciliation is complete.** Signed callback correlation, lost-SID binding, duplicate/out-of-order/cross-tenant protection, provider fetch, cancellation, redacted ADMIN review, explicit no-send attestation, and concurrent single-successor retry are fixture and PostgreSQL tested.
+- **Validation snapshot:** protected-gate Vitest is **233 files / 1,581 tests: 1,580 passing / 1 skipped**. The mandatory tenant runner is **16 files / 65 tests** (15/64 plus the literal-network M3 exit). Defaults, tests, examples, builds, and acceptance routes make no carrier call.
+- **Production remains intentionally incomplete.** M6 trusted inbound/shared-inbox completion, M7 campaigns/throughput/kill switches, real secret provisioning/rotation, paid-lookup caps, real carrier canaries, packaging, backup/restore, and final release proof remain gated.
 - History is in `git log`; start with `npm run agent:brief`.

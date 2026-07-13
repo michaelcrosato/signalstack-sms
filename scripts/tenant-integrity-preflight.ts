@@ -118,6 +118,58 @@ export const tenantIntegrityChecks: readonly TenantIntegrityCheck[] = Object.fre
      WHERE child."campaignId" IS NOT NULL AND child."orgId" <> parent."orgId"`
   ),
   strictRelation(
+    "message-attempt.message",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "MessageAttempt" child
+     JOIN "Message" parent ON parent."id" = child."messageId"
+     WHERE child."orgId" <> parent."orgId"`
+  ),
+  strictRelation(
+    "message-attempt.retry-parent",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "MessageAttempt" child
+     JOIN "MessageAttempt" parent ON parent."id" = child."retryOfAttemptId"
+     WHERE child."retryOfAttemptId" IS NOT NULL
+       AND (child."orgId" <> parent."orgId" OR child."messageId" <> parent."messageId")`
+  ),
+  strictRelation(
+    "message-attempt.provider-account",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "MessageAttempt" child
+     JOIN "ProviderAccount" parent ON parent."id" = child."providerAccountId"
+     WHERE child."providerAccountId" IS NOT NULL AND child."orgId" <> parent."orgId"`
+  ),
+  strictRelation(
+    "message-attempt.provider-credential",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "MessageAttempt" child
+     JOIN "ProviderCredentialSecret" parent ON parent."id" = child."providerCredentialSecretId"
+     WHERE child."providerCredentialSecretId" IS NOT NULL
+       AND (
+         child."orgId" <> parent."orgId"
+         OR child."providerAccountId" <> parent."providerAccountId"
+         OR child."providerCredentialVersion" <> parent."version"
+       )`
+  ),
+  strictRelation(
+    "message-attempt.provider-phone",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "MessageAttempt" child
+     JOIN "ProviderPhoneNumber" parent ON parent."id" = child."providerPhoneNumberId"
+     WHERE child."providerPhoneNumberId" IS NOT NULL
+       AND (
+         child."orgId" <> parent."orgId"
+         OR child."providerAccountId" <> parent."providerAccountId"
+       )`
+  ),
+  strictRelation(
+    "message-attempt.reconciler-membership",
+    `SELECT COUNT(*)::bigint AS "count"
+     FROM "MessageAttempt" child
+     JOIN "Membership" parent ON parent."userId" = child."reconciledByUserId"
+     WHERE child."reconciledByUserId" IS NOT NULL AND child."orgId" <> parent."orgId"`
+  ),
+  strictRelation(
     "internal-note.conversation",
     `SELECT COUNT(*)::bigint AS "count"
      FROM "InternalNote" child
@@ -214,10 +266,14 @@ export const tenantIntegrityChecks: readonly TenantIntegrityCheck[] = Object.fre
            SELECT 1 FROM "ProviderPhoneNumber" parent
            WHERE parent."orgId" = child."orgId" AND parent."id" = child."subjectId"
          ))
+         OR (child."subjectType" = 'message_attempt' AND NOT EXISTS (
+           SELECT 1 FROM "MessageAttempt" parent
+           WHERE parent."orgId" = child."orgId" AND parent."id" = child."subjectId"
+         ))
          OR child."subjectType" NOT IN (
            'organization', 'api_credential', 'customer_webhook_endpoint', 'customer_webhook_delivery',
            'provider_account', 'provider_credential_secret', 'provider_messaging_service',
-           'provider_phone_number'
+           'provider_phone_number', 'message_attempt'
          )
        )`
   ),

@@ -11,9 +11,10 @@ Every tenant-scoped model must include `orgId` unless explicitly documented here
 PostgreSQL independently enforces the tenant rule; repository predicates are defense in depth, not the
 authorization boundary:
 
-- The M2 baseline contained 22 ordinary tenant tables. M3 adds nine public-integration tables and M4 adds
-  three provider-control tables, so the canonical manifest contains 34 ordinary tenant tables plus five
-  identity/control tables (`Organization`, `Membership`, `AppUser`, `AuthSession`, and `AuthToken`). All 39 enable and force RLS,
+- The M2 baseline contained 22 ordinary tenant tables. M3 adds nine public-integration tables, M4 adds
+  three provider-control tables, and M5 adds `MessageAttempt`, so the canonical manifest contains 35
+  ordinary tenant tables plus five identity/control tables (`Organization`, `Membership`, `AppUser`,
+  `AuthSession`, and `AuthToken`). All 40 enable and force RLS,
   deny missing context, and expose no `PUBLIC` read/write privilege. Runtime posture verifies the exact
   tenant policy name, command, role, permissiveness, `USING`, and `WITH CHECK` expression for every table;
   a catalog with the right policy count but weakened semantics is rejected.
@@ -62,13 +63,13 @@ authorization boundary:
 - The direct-Prisma inventory permits reviewed control-plane/context seams only. M2 closes with zero
   `tenant-migration-debt` imports; new tenant paths must use the transaction boundary and join its tests.
 
-Mandatory proof covers tenant A and B across all 39 protected tables, missing context, cross-tenant
+Mandatory proof covers tenant A and B across all 40 protected tables, missing context, cross-tenant
 read/write/relation forgery, rollback, command-specific control policy denial, runtime policy semantic
 fingerprints, worker dispatch, multi-connection pool reuse, and the literal non-owner external-network
 lifecycle. `npm run test:tenant-db` is the current 14-file / 57-test gate (13 files / 56 tests in the tenant
 batch plus one literal-network public-API file / one test); the complete database-directory
 run remains mandatory without freezing a stale aggregate count here. The least-privilege test creates a fresh
-database, applies all 51 migrations through a
+database, applies all 55 migrations through a
 non-superuser/non-BYPASSRLS table owner, exercises historical triggers and dispatch, and proves the
 dispatch function has no `PUBLIC` EXECUTE ACL. Production local-auth browser proof uses separate
 owner/runtime credentials and serves the app under the non-owner login.
@@ -218,6 +219,60 @@ Verified discovery returns no persistent ownership. Import locks and rechecks th
 credential generation, and selected fresh discovery evidence before installing globally unique ownership.
 Concurrent crossed/stale/duplicate imports roll back completely. Import never purchases, releases, ports, or
 changes the provider-side resource.
+
+## M5 Durable Direct-Message Outbox
+
+`Message` remains the stable customer/API resource. It carries an explicit application lifecycle
+(`ACCEPTED`, `SCHEDULED`, `PROCESSING`, `SENT`, `DELIVERED`, `FAILED`, `CANCELLED`, or `AMBIGUOUS`), an
+explicit `DUMMY|TWILIO` database transport, immutable accepted destination/body/bounded-HTTPS-media and
+keyed request fingerprints, lifecycle timestamps, and an attempt count. Existing provider ID/status/error and delivered/
+failed fields remain compatibility projections of the latest authoritative attempt; they are not queue state.
+
+`MessageAttempt` is the tenant-scoped PostgreSQL outbox for one possible direct-message provider mutation.
+It contains the same-tenant message and optional retry-parent relations, a monotonic attempt number, due time,
+owner token/lease/claim evidence, `providerCallStartedAt`, completion/reconciliation evidence, immutable
+payload/callback correlation, and the exact provider account, credential generation, and verified owned
+number authorized for the call. Its states are `QUEUED`, `PROCESSING`, `SUCCEEDED`, `FAILED`, `CANCELLED`,
+`AMBIGUOUS`, and `RESOLVED_NOT_SENT`. Attempts are never hard-deleted.
+
+Required invariants are:
+
+- unique `(orgId, messageId, attemptNumber)` and globally unambiguous callback correlation;
+- provider message identity unique within its tenant/provider account when present;
+- same-tenant composite relations for message, retry parent, provider account, credential, and owned sender;
+- exactly one verified owned sender number on a Twilio attempt in M5; dynamic messaging-service sender-pool
+  execution remains deferred;
+- immutable attempt identity, payload/sender/correlation binding, and lineage after insert; and
+- guarded state/result/lease/reconciliation transitions only, with no raw credential, callback HMAC, or
+  provider response persisted.
+
+The reservation service runs inside the caller's tenant transaction. A domain advisory lock and permanent
+opaque idempotency identity return an existing `Message` only when the keyed canonical fingerprint exactly
+matches route, direction, contact, conversation, destination, body, media, and transport. Any changed binding
+conflicts. Public API replay remains scoped by `(orgId, apiCredentialId, Idempotency-Key)`; the domain message
+derivation remains tenant-unique after the 24-hour API response snapshot expires. Browser replies bind
+`(orgId, conversationId, client request UUID)`. Reservation atomically commits `Message`, attempt one,
+conversation projection, and `message.accepted` customer-event outbox evidence before returning.
+
+`MessageAttempt` joins the ordinary protected-table manifest, forced RLS/runtime-policy fingerprints,
+least-privilege grants, static Prisma inventory, relation preflight, and mandatory two-tenant PostgreSQL
+matrix when implemented. Cross-tenant attempt, retry-parent, provider, sender, or message links must fail in
+PostgreSQL rather than rely only on repository predicates.
+
+Due direct attempts are discovered only through a separate fixed-search-path, database-clocked
+`SECURITY DEFINER` claim capability. It returns bounded identities, is executable only by the worker role,
+has no `PUBLIC`, web, runtime, or control-role execute grant, and confers no ordinary table access. `QUEUED`
+attempts and expired pre-frontier `PROCESSING` attempts are reclaimable. Immediately before provider create,
+the worker commits `providerCallStartedAt`, exact credential generation, callback correlation, and current
+owner evidence; this is the at-most-once frontier. Expiry at or beyond the frontier conditionally records
+attempt/message `AMBIGUOUS` and can never authorize another automatic create. Cancellation can win only
+before that frontier.
+
+A validated no-impact retry closes its predecessor and transactionally inserts one successor attempt with
+the next number and bounded due time. Possible-impact outcomes never create a successor. ADMIN attestation
+may move one ambiguous no-SID attempt to `RESOLVED_NOT_SENT`; a separate conditional retry may then create
+one successor. Concurrent, stale, non-ambiguous, or already-retried operations conflict without erasing prior
+evidence. Existing `QueueJob` rows remain campaign-specific and are not the M5 direct-message outbox.
 
 ## Post-MVP Live Readiness Audit Foundation
 

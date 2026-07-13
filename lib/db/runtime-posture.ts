@@ -258,6 +258,14 @@ async function inspectRuntimeDatabasePosture(client: PrismaClient): Promise<void
           AND functions.proargtypes = '23 23 2950'::oidvector
         )
         OR (
+          functions.proname = 'claim_due_message_attempts'
+          AND functions.proargtypes = '23 23 2950'::oidvector
+        )
+        OR (
+          functions.proname = 'recover_expired_message_attempts'
+          AND functions.proargtypes = '23'::oidvector
+        )
+        OR (
           functions.proname = 'resolve_verified_provider_destination'
           AND functions.proargtypes = '25 25 25'::oidvector
         )
@@ -346,6 +354,8 @@ export function assertDispatchCapabilityShape(rows: readonly DispatchCapabilityR
   const expectedFunctions = new Map<string, "worker" | "web">([
     ["claim_due_queue_jobs", "worker"],
     ["claim_due_customer_webhook_deliveries", "worker"],
+    ["claim_due_message_attempts", "worker"],
+    ["recover_expired_message_attempts", "worker"],
     ["resolve_verified_provider_destination", "web"]
   ]);
   if (rows.length !== expectedFunctions.size) {

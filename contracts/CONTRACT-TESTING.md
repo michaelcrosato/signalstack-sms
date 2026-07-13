@@ -51,6 +51,46 @@ with demo-safe defaults rather than treating direct validation calls as green.
 - **M4 exit proof** uses non-owner web/worker roles plus deterministic HTTP/provider fixtures. It must pass
   without a real credential, carrier message, provider purchase/release/port/configuration, paid lookup, or
   external network call.
+- **M5 acceptance/idempotency**: public direct, public conversation, and browser inbox routes atomically
+  reserve one `Message`, attempt one, immutable keyed payload binding, conversation projection, and
+  `message.accepted` event before returning. Exact concurrent/replayed bindings return one resource; changed
+  route/direction/contact/conversation/destination/body/media/transport conflicts. Public replay remains
+  credential scoped, browser UUID replay remains conversation scoped, and no acceptance route invokes a
+  provider.
+- **M5 state separation**: table-driven DTO/database tests cover every frozen application and attempt state,
+  compatibility provider projections, explicit transport/mode, and first-class ambiguity. Aggregate,
+  inbox, status, and ADMIN projections never count ambiguity as pending or infer claimability from raw
+  provider text.
+- **M5 tenant/database boundary**: fresh least-privilege install/no-diff proof adds `MessageAttempt` to the
+  protected manifest, forced RLS/fingerprint/grant/static-inventory/relation matrix. Two tenants cannot read,
+  mutate, link, claim, callback-bind, reconcile, attest, or retry each other's messages, attempts, provider
+  accounts, credentials, senders, or correlation identifiers. The bounded direct dispatch function has a
+  fixed search path, database clock, worker-only execute ACL, and no ordinary table privilege.
+- **M5 claim/frontier races**: two workers cannot own one attempt. Expired pre-frontier work is reclaimable;
+  injected crashes after acceptance, before the frontier, after frontier commit, after fixture provider
+  impact, and before result persistence prove at most one automatic adapter create per attempt. Frontier or
+  possible-impact expiry becomes durable ambiguity and never auto-requeues. Cancellation/provider-call,
+  lease/finish, and retry-successor races have one database winner.
+- **M5 final gate**: fixture workers recheck live flag, non-demo runtime, exact direct-worker class, Twilio
+  selection, profile/A2P, contact archive/consent/opt-out/evidence/quiet hours, and exact M4 account,
+  credential generation, sender ownership/capability immediately before create. Opt-out/archive/quiet-hour/
+  disable/revoke/rotation races prove a single winner and zero provider calls when the gate loses.
+- **M5 provider policy**: deterministic transports prove exact SMS/MMS create fields, HTTPS callback
+  correlation, bounded timeout, redacted errors, normalized results, three-attempt maximum with 5-second/
+  30-second no-impact backoff, terminal no-retry, and no successor for network/timeout/5xx/malformed/SID-
+  bearing/persistence-uncertain outcomes. No test assumes provider create idempotency.
+- **M5 callbacks/reconciliation**: signed two-tenant fixtures attach a lost SID through valid attempt
+  correlation, reject crossed account/sender/destination/SID/HMAC evidence, and remain idempotent/monotonic
+  under duplicate, out-of-order, callback/create/fetch races. Attempt, message, and deduplicated customer
+  events commit together. Fetch can converge known-SID ambiguity but never creates or clears ambiguity on
+  failure.
+- **M5 ADMIN review**: cookie auth, ADMIN role, exact same origin, no-store, redacted DTOs, explicit
+  `ATTEST NOT SENT` plus bounded reason, and separate `RETRY MESSAGE` confirmation are covered before body or
+  provider work. Stale/non-ambiguous/SID-bearing/concurrent/already-retried actions conflict; one attested
+  attempt creates at most one successor, and that successor still passes the worker gate.
+- **M5 no-carrier gate**: unit, PostgreSQL, HTTP, browser, build, seed, OpenAPI/example, validation, and
+  default worker runs use dummy/injected transports with real live flags and carrier credentials absent.
+  Any unexpected Twilio network attempt fails the suite.
 - **Demo path**: `npm run test:e2e:demo` (investor) and `npm run test:e2e:product-demo` (product) run against a
   seeded database, separate from the default gate.
 

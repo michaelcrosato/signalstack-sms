@@ -379,7 +379,7 @@ describe.runIf(run)("M3 literal external-network exit path", () => {
     const messageEnvelope = dataObject(messageSnapshots[0]!.body);
     const message = objectField(messageEnvelope, "message");
     const messageId = stringField(message, "id");
-    expect(message).toMatchObject({ mode: "dummy", status: "accepted_dummy" });
+    expect(message).toMatchObject({ mode: "dummy", status: "sent" });
     expect(await database().message.count({ where: { orgId, id: messageId } })).toBe(1);
     expect(
       await database().customerWebhookEvent.count({
@@ -394,7 +394,7 @@ describe.runIf(run)("M3 literal external-network exit path", () => {
     expect(dataObject(status.body)).toMatchObject({
       deliveryStatus: {
         messageId,
-        status: "accepted_dummy",
+        status: "sent",
         mode: "dummy"
       }
     });

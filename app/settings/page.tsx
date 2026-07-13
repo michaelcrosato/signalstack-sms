@@ -428,14 +428,15 @@ export default async function SettingsPage({
       <Panel title="Delivery Operations">
         <Link
           className="mb-4 inline-flex text-sm font-medium text-teal-700"
-          href="/settings/health"
+          href="/settings/delivery-attempts"
         >
-          Delivery Operations
+          Delivery Attempt Review
         </Link>
         <p className="text-sm leading-6 text-slate-700">
-          Review existing message delivery metadata and provider status counts
-          without sending SMS, retrying delivery, replaying webhooks, mutating
-          messages, billing, sending notifications, or enabling live messaging.
+          Review redacted direct-message attempt evidence. ADMIN-only explicit
+          controls can fetch known provider evidence, record a no-send
+          attestation, or create one queued successor that still passes the
+          complete worker gate.
         </p>
       </Panel>
 

@@ -247,6 +247,7 @@ export function runContractsCheck() {
     "Conversation",
     "QueueJob",
     "Message",
+    "MessageAttempt",
     "InternalNote",
     "ComplianceProfile",
     "UsageEvent",

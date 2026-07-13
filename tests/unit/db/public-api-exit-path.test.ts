@@ -32,6 +32,7 @@ let orgAId: string;
 let orgBId: string;
 let tokenA: string;
 let tokenB: string;
+let credentialAId: string;
 let endpointId: string;
 let originalWebhookSecret: string;
 
@@ -81,6 +82,7 @@ describe.runIf(run)("M3 external application exit path", () => {
     ]);
     tokenA = credentialA.token;
     tokenB = credentialB.token;
+    credentialAId = credentialA.credential.id;
 
     const endpoint = await createCustomerWebhookEndpoint({
       orgId: orgA.id,
@@ -146,13 +148,81 @@ describe.runIf(run)("M3 external application exit path", () => {
     const envelope = await first.json() as { data: { message: { id: string; mode: string } } };
     expect(envelope.data.message.mode).toBe("dummy");
     expect(await prisma.message.count({ where: { orgId: orgAId, id: envelope.data.message.id } })).toBe(1);
+    expect(await prisma.messageAttempt.count({
+      where: { orgId: orgAId, messageId: envelope.data.message.id }
+    })).toBe(1);
+    expect(await prisma.customerWebhookEvent.count({
+      where: {
+        orgId: orgAId,
+        type: "message.accepted",
+        aggregateId: envelope.data.message.id
+      }
+    })).toBe(1);
+
+    await prisma.apiIdempotencyRecord.updateMany({
+      where: {
+        orgId: orgAId,
+        credentialId: credentialAId,
+        method: "POST",
+        canonicalRoute: "/api/v1/messages"
+      },
+      data: {
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1_000),
+        expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1_000)
+      }
+    });
+    const permanentReplay = await createMessage(
+      jsonRequest("/api/v1/messages", tokenA, "POST", "message-once", messageBody)
+    );
+    expect(permanentReplay.status).toBe(202);
+    expect(permanentReplay.headers.get("Idempotency-Replayed")).not.toBe("true");
+    await expect(permanentReplay.json()).resolves.toMatchObject({
+      data: { message: { id: envelope.data.message.id } }
+    });
+    expect(await prisma.message.count({ where: { orgId: orgAId, id: envelope.data.message.id } })).toBe(1);
+    expect(await prisma.messageAttempt.count({
+      where: { orgId: orgAId, messageId: envelope.data.message.id }
+    })).toBe(1);
+    expect(await prisma.customerWebhookEvent.count({
+      where: {
+        orgId: orgAId,
+        type: "message.accepted",
+        aggregateId: envelope.data.message.id
+      }
+    })).toBe(1);
+
+    await prisma.apiIdempotencyRecord.updateMany({
+      where: {
+        orgId: orgAId,
+        credentialId: credentialAId,
+        method: "POST",
+        canonicalRoute: "/api/v1/messages"
+      },
+      data: {
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1_000),
+        expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1_000)
+      }
+    });
+    const changedBinding = await createMessage(
+      jsonRequest("/api/v1/messages", tokenA, "POST", "message-once", {
+        ...messageBody,
+        body: "Changed content must conflict permanently."
+      })
+    );
+    expect(changedBinding.status).toBe(409);
+    await expect(changedBinding.json()).resolves.toMatchObject({
+      error: { code: "IDEMPOTENCY_CONFLICT" }
+    });
+    expect(await prisma.messageAttempt.count({
+      where: { orgId: orgAId, messageId: envelope.data.message.id }
+    })).toBe(1);
 
     const status = await getMessageStatus(authRequest(`/api/v1/messages/${envelope.data.message.id}/status`, tokenA), {
       params: Promise.resolve({ messageId: envelope.data.message.id })
     });
     expect(status.status).toBe(200);
     await expect(status.json()).resolves.toMatchObject({
-      data: { deliveryStatus: { messageId: envelope.data.message.id, status: "accepted_dummy", mode: "dummy" } }
+      data: { deliveryStatus: { messageId: envelope.data.message.id, status: "sent", mode: "dummy" } }
     });
 
     const contactEvent = await prisma.customerWebhookEvent.findFirstOrThrow({

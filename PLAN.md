@@ -21,15 +21,15 @@ are optional adapters or accelerators, never core requirements.
 - Built-in local identity, onboarding, team lifecycle, operator recovery, and production-session browser
   proof are complete; deterministic identity remains only in explicit demo mode.
 - Database-enforced tenant integrity and the public integration identity/event-delivery platform are
-  complete. M4 extends the current substrate to 51 migrations/39 protected tables with encrypted provider
-  credentials, verified account/number/service ownership, safe ADMIN lifecycle, and trusted callback
-  routing. `/api/v1` message acceptance remains deliberately dummy/local; the direct-message outbox and
-  campaign worker remain incomplete.
+  complete. M5 extends the current substrate to 55 migrations/40 protected tables with encrypted provider
+  credentials, verified account/number/service ownership, durable direct-message acceptance/attempts,
+  correlated callbacks, safe ADMIN reconciliation, and a final-gated direct worker. Campaign execution and
+  trusted inbound completion remain incomplete.
 - Deployment is not a standalone package: current Compose contains backing services only; no hardened
   app/worker/ingress/migration/backup stack or restore proof exists.
 - Live external impact remains disabled while implementation proceeds.
 
-## Active move: M5 durable direct messaging
+## Active move: M6 trusted inbound messaging and shared-inbox completion
 
 ### Completed: M0 — Roadmap and package safety
 
@@ -97,15 +97,31 @@ are optional adapters or accelerators, never core requirements.
   routing is proven through non-owner two-account PostgreSQL resolution plus HTTP route fixtures, including
   crossed/unknown, rotated, and revoked evidence. The tenant runner is 14 files / 57 tests.
 
+### Completed: M5 — Durable individual-message outbox and Twilio transport
+
+- Four forward migrations extend the current substrate to 55 migrations/40 protected tables with separate
+  message application state and an immutable, forced-RLS `MessageAttempt` PostgreSQL outbox.
+- Public direct messages, public conversation replies, and browser inbox replies reserve one permanent
+  message/payload/attempt/event binding before `202`; exact replay survives API-cache expiry and changed
+  input conflicts without another attempt.
+- The exact `production-live-direct` worker class rechecks organization demo mode, live configuration,
+  contact consent/archive/opt-out, quiet hours, compliance/A2P, current encrypted credential generation,
+  verified owned sender, and SMS/MMS capability immediately before its durable call frontier.
+- Only definitive no-impact failures create bounded 5-second/30-second successors, with three total
+  attempts. Possible impact becomes visible ambiguity and never automatically resends.
+- Signed callback correlation, provider fetch, redacted ADMIN review, explicit no-send attestation, and a
+  separately confirmed single-winner retry converge state without exposing message bodies or credentials.
+- The mandatory PostgreSQL runner is 16 files / 65 tests (15 files / 64 tests plus the one-file / one-test
+  literal-network M3 exit), including replay, frontier, crash, callback, cross-tenant, fetch, and review races.
+
 ## Following dependency queue
 
-1. M5 direct-message outbox and Twilio transport with ambiguity reconciliation.
-2. M6 inbound/status/shared-inbox production path.
-3. M7 campaign worker, audiences, throttling, DLQ/replay, and kill switches.
-4. M8 compliance evidence, audit, suppression, retention, and privacy lifecycle.
-5. M9 complete setup/product/admin UX and local entitlements/quotas.
-6. M10 clean-host package, health/metrics, backups, restore, and upgrades.
-7. M11 complete production/API/provider/container/recovery proof.
+1. M6 inbound/status/shared-inbox production path.
+2. M7 campaign worker, audiences, throttling, DLQ/replay, and kill switches.
+3. M8 compliance evidence, audit, suppression, retention, and privacy lifecycle.
+4. M9 complete setup/product/admin UX and local entitlements/quotas.
+5. M10 clean-host package, health/metrics, backups, restore, and upgrades.
+6. M11 complete production/API/provider/container/recovery proof.
 
 ## Validation rule
 

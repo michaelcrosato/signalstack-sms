@@ -70,6 +70,25 @@ provider signature, then enters the resolved tenant and rechecks locked account/
 Wrong/unknown/ambiguous/revoked evidence shares generic denial and never falls back to the current browser,
 demo organization, API bearer, or installation-global environment token.
 
+## Direct-message authorization (M5)
+
+Public direct acceptance and cancellation require the exact `messages:send` API-key scope; public
+conversation reply additionally requires `conversations:write`. These grants authorize durable tenant
+reservation/cancellation only. Public HTTP routes never possess worker authority and never call a provider.
+API idempotency remains bound to the authenticated credential, while the permanent domain fingerprint
+prevents changed payload reuse after the response snapshot expires.
+
+Browser inbox reply requires a verified current-organization session, at least MEMBER, and exact same origin
+before parsing its UUID/body. This route may reserve one durable reply but cannot reconcile, attest, retry,
+or call a provider. ADMIN delivery-attempt list/get/reconcile/attest/retry routes require a verified same-
+tenant session; every mutation requires exact same origin before body parsing. Reconcile is provider fetch
+only, and attestation/retry cannot bypass worker authorization or the final messaging gate.
+
+The direct worker is a separate database capability, not a user/API credential. Only the exact authorized
+`production-live-direct` deployment class and worker role may claim due attempt identities and reach the
+provider-call frontier. Browser sessions, API keys, provider/customer-webhook signatures, demo identity,
+installation-global live-test credentials, and the campaign worker class never substitute for that role.
+
 ## Password credentials
 
 - Email identity is stored and looked up by a trimmed lowercase `normalizedEmail` unique key.

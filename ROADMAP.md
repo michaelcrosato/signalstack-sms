@@ -18,7 +18,7 @@ its own software while requiring no application SaaS beyond an unavoidable carri
 | M2 | Database-enforced tenant integrity | done |
 | M3 | Public API identity and customer webhooks | done |
 | M4 | Provider secrets, accounts, and owned-number routing | done |
-| M5 | Durable direct-message outbox and Twilio transport | partial foundation |
+| M5 | Durable direct-message outbox and Twilio transport | done |
 | M6 | Trusted inbound messaging and shared inbox | partial foundation |
 | M7 | Production campaigns and audience management | partial foundation |
 | M8 | Compliance, audit, and data lifecycle | partial foundation |
@@ -30,15 +30,16 @@ M1 through M3 establish identity, tenant, and integration trust and are complete
 least-privileged 40-migration install,
 database-enforced tenant relations, forced RLS with semantic policy attestation, and exact runtime/control/
 dispatch capabilities. M3 extended that boundary to its 43-migration/36-protected-table checkpoint and added
-scoped `/api/v1` identity plus durable signed customer events without live carrier impact. M4 now extends the
-current substrate to 51 migrations/39 protected tables with encrypted provider credentials, verified
-account/number/service ownership, safe ADMIN lifecycle, and trusted callback routing. General live provider
-mutation still waits for M5's durable-before-external semantics.
+scoped `/api/v1` identity plus durable signed customer events without live carrier impact. M4 established
+encrypted provider credentials and verified account/number/service ownership at 51 migrations/39 protected
+tables. M5 now extends the substrate to 55/40 with durable direct-message attempts, safe ADMIN ambiguity
+review, trusted callback correlation, and an explicitly authorized final-gated live direct worker.
+Production campaigns and trusted inbound completion remain M7 and M6 work.
 
 ## Immediate execution queue
 
-1. Build the M5 durable direct-message outbox and Twilio transport without weakening the completed M4 trust boundary.
-2. Continue through M6–M11 without narrowing the completion definition.
+1. Build M6 trusted inbound messaging and complete the shared inbox without weakening M5's send boundary.
+2. Continue through M7–M11 without narrowing the completion definition.
 
 ## Rules
 

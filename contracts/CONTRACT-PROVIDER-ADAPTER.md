@@ -29,10 +29,57 @@ import does not purchase, release, port, configure, or otherwise mutate a provid
 or external effects. General live messaging remains blocked until M5's durable-before-provider path and the
 central hard gate are complete.
 
-M5/M6 central gate requirements:
+## M5 durable direct-message create and fetch
 
-- Provider-backed send entrypoints must call `evaluateMessagingHardGate` before any external provider mutation.
-- `dummy` remains the default provider and is considered a blocker for live messaging readiness.
+Only an explicitly authorized direct worker may invoke Twilio message create. Public/inbox acceptance,
+page rendering, health/readiness, builds, tests, seeds, default workers, and customer/provider webhook
+delivery never call create. Immediately before mutation, the worker must own a durable `MessageAttempt` at
+its committed call frontier and must pass `evaluateMessagingHardGate` plus exact M4 provider account,
+credential-generation, owned-number, capability, and organization checks.
+
+General M5 operations decrypt the active credential from the tenant provider account store. Installation-
+global `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, sender, and messaging-service environment values remain
+limited to the isolated live-test exception below and cannot authorize or supply the general outbox. The
+selected sender is the attempt's exact verified owned number. The adapter retains messaging-service types,
+but dynamic service sender-pool execution is deferred until its callback routing and throughput controls are
+completed with M7.
+
+The bounded Twilio create request contains only the stored account credential, normalized destination, exact
+owned sender, immutable body/media snapshot, and correlated HTTPS status callback URL. Media is zero to ten
+unique HTTPS URLs and requires verified MMS capability; body-only requests are SMS. The adapter uses a
+bounded abort timeout and must never log or return authorization headers, tokens, complete provider
+responses, message content, callback HMAC, or exact outward account identifiers.
+
+The status callback URL contains the immutable attempt correlation identifier plus a domain-separated
+master-key HMAC. The HMAC is recomputed for validation and is never stored or logged. Twilio signature
+validation covers the complete URL and all form parameters. A create result may be accepted only when its
+provider account, SID, destination, sender, and messaging-service evidence match the attempt; mismatched or
+malformed success is possible-impact ambiguity.
+
+Create result normalization is fixed:
+
+- accepted, queued, sending, sent, or unknown with a valid SID completes the attempt as `SUCCEEDED` and
+  projects the message to `SENT`; delivered projects `DELIVERED`;
+- immediate failed, undelivered, or canceled results are definitive `FAILED` and are never automatically
+  resent;
+- only a validated no-impact retryable failure may authorize the queue layer to create a successor; and
+- network/timeout, create-side 5xx, malformed/mismatched success, SID-bearing error, success without SID,
+  local result-persistence uncertainty, and any unclassified possible-impact result are `AMBIGUOUS` and
+  authorize no automatic successor.
+
+The adapter's retry classification describes impact certainty; it never retries internally. SignalStack
+does not assume Twilio message create has an idempotency primitive. Each external create belongs to exactly
+one durable attempt, and every successor is created by the guarded queue state machine.
+
+Provider fetch is reconciliation only. It is allowed for an ambiguous/unfinished attempt with a known SID
+and current exact account credential. The fetched account, SID, destination, and sender must match durable
+attempt evidence before state changes. Fetch may converge to `SENT`, `DELIVERED`, or `FAILED`; any fetch
+failure or mismatch preserves ambiguity and can never cause message create.
+
+`dummy` remains the default, implements the same create/fetch normalization deterministically, reads no
+environment secret, and performs no network effect. Demo/local acceptance may finalize its durable attempt
+transactionally. Selecting `dummy` remains a blocker for live Twilio readiness, not a reason to omit outbox
+evidence.
 
 Post-MVP live test SMS exception:
 

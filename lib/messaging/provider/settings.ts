@@ -56,16 +56,12 @@ export function getProviderSettings(input: ProviderSettingsInput) {
   });
   const blockers = [...gate.reasons];
 
-  if (input.messagingProvider === "twilio" && !twilioConfigured) {
+  if (input.messagingProvider === "twilio" && !storedTwilioConfigured) {
     blockers.push("TWILIO_CREDENTIALS_INCOMPLETE");
   }
   if (input.messagingProvider === "twilio" && verifiedAccounts.length > 0 && verifiedNumbers.length === 0) {
     blockers.push("TWILIO_SENDER_NOT_VERIFIED");
   }
-  if (input.messagingProvider === "twilio") {
-    blockers.push("TWILIO_GENERAL_TRANSPORT_UNAVAILABLE");
-  }
-
   const accountLast4 = verifiedAccounts[0]?.externalAccountIdLast4;
   const numberLast4 = verifiedNumbers[0]?.phoneNumber.slice(-4);
 
@@ -73,8 +69,7 @@ export function getProviderSettings(input: ProviderSettingsInput) {
     provider: input.messagingProvider,
     demoMode: input.demoMode,
     liveMessagingEnabled: input.liveMessagingEnabled,
-    liveMessagingAllowed:
-      input.messagingProvider !== "twilio" && gate.allowed,
+    liveMessagingAllowed: gate.allowed && storedTwilioConfigured,
     twilio: {
       accountSidConfigured: Boolean(input.env.TWILIO_ACCOUNT_SID || verifiedAccounts.length),
       authTokenConfigured: Boolean(input.env.TWILIO_AUTH_TOKEN || verifiedAccounts.length),

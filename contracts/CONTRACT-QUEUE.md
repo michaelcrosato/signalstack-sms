@@ -20,6 +20,57 @@ Queue job records are persisted in `QueueJob` before any worker/provider behavio
 
 Milestone 4 does not call live providers.
 
+## M5 Durable Direct-Message Outbox
+
+`MessageAttempt`, not `QueueJob`, is the authoritative PostgreSQL outbox for individual public and inbox
+messages. `QueueJob` and every existing local/BullMQ worker rule below remain campaign-specific; M5 neither
+routes direct sends through `SCHEDULED_CAMPAIGN` nor authorizes the reserved `production-live-campaign`
+class.
+
+Direct acceptance commits a stable `Message`, attempt one, permanent payload/idempotency binding,
+conversation projection, and `message.accepted` customer-event evidence before any worker or carrier
+behavior. HTTP routes never call Twilio. Dummy/local acceptance may deterministically complete its attempt
+inside that transaction because it has no external impact, but it still records the same message/attempt
+state and never contacts a network.
+
+Direct attempts use these independent states: `QUEUED`, `PROCESSING`, `SUCCEEDED`, `FAILED`, `CANCELLED`,
+`AMBIGUOUS`, and `RESOLVED_NOT_SENT`. The parent `Message.applicationStatus` is a separate customer lifecycle;
+raw provider status is evidence only and cannot make work claimable. A fixed-search-path, database-clocked,
+worker-only dispatch capability claims bounded due attempt identities. The worker then enters the returned
+tenant, conditionally owns the exact attempt, and validates its immutable payload and relations.
+
+Claim/recovery rules are:
+
+- due `QUEUED` attempts and expired `PROCESSING` attempts with no `providerCallStartedAt` are reclaimable;
+- the owner reloads contact, compliance, provider account, active credential generation, verified owned
+  sender, and capability state, then runs the centralized live gate immediately before provider mutation;
+- immediately before Twilio create, the owner commits `providerCallStartedAt`, exact credential generation,
+  callback correlation, and owner evidence; this is the at-most-once frontier;
+- a crash before the frontier is reclaimable; a crash or lease expiry at/after the frontier conditionally
+  becomes attempt/message `AMBIGUOUS` and is never automatically claimed for another create;
+- cancellation wins only through a conditional pre-frontier transition and conflicts after the frontier;
+  it never erases an attempt or claims that a possible provider impact was cancelled; and
+- only the matching owner token may renew or finish `PROCESSING`, and every terminal transition clears
+  active lease evidence without deleting lineage.
+
+A validated no-impact retryable create failure may close the old attempt and insert exactly one successor.
+Automatic policy is at most three total attempts with 5-second and then 30-second backoff. Immediate terminal
+provider failures and every possible-impact outcome create no automatic successor. Network/timeout, create
+5xx, malformed or mismatched success, SID-bearing error, success without SID, and local result-persistence
+uncertainty are possible-impact `AMBIGUOUS` outcomes.
+
+The only M5 production direct worker class is the exact `production-live-direct` label. It requires
+`WORKER_ENABLED=true`, `LIVE_MESSAGING_ENABLED=true`, `MESSAGING_PROVIDER=twilio`, non-demo runtime, the
+direct-worker authorization boundary, and current M4 stored account/credential/sender authority. The default
+profile authorizes neither live direct nor live campaign work. Malformed, case-drifted, whitespace-padded,
+unsupported, or campaign deployment classes fail closed. Installation-global Twilio environment credentials
+and the isolated live-test route never authorize this worker.
+
+ADMIN ambiguity review is outside automatic claiming. Provider reconciliation may fetch only a known SID
+and can never create. Explicit `NOT_SENT` attestation conditionally closes one no-proof ambiguous attempt as
+`RESOLVED_NOT_SENT`; a separate confirmed retry inserts at most one successor and leaves all prior evidence
+intact. The successor follows ordinary due claiming and cannot bypass the final live gate.
+
 ## Post-MVP Local Worker Foundation
 
 `npm run worker` processes due `SCHEDULED_CAMPAIGN` jobs only in local/demo runtimes when `MESSAGING_PROVIDER=dummy`, `LIVE_MESSAGING_ENABLED` is unset, empty, or exactly `false`, and no production-like runtime marker is present. Runtime-unknown or malformed live-messaging flag values must fail closed before worker jobs can process. The database worker must reject every production-like runtime marker (`NODE_ENV`, `VERCEL_ENV`, `DEPLOYMENT_ENV`, or `APP_ENV`) before provider or live-worker-class checks can fall through.

@@ -92,7 +92,7 @@ describe("getProviderSettings", () => {
     expect(result.compliance.a2pRegistrationStatus).toBe(A2pRegistrationStatus.NOT_STARTED);
   });
 
-  it("should keep general Twilio transport unavailable until M5", () => {
+  it("requires encrypted stored provider authority instead of environment credentials", () => {
     const input: ProviderSettingsInput = {
       ...baseInput,
       // Fully complete compliance profile
@@ -118,7 +118,7 @@ describe("getProviderSettings", () => {
 
     const result = getProviderSettings(input);
     expect(result.liveMessagingAllowed).toBe(false);
-    expect(result.blockers).toEqual(["TWILIO_GENERAL_TRANSPORT_UNAVAILABLE"]);
+    expect(result.blockers).toEqual(["TWILIO_CREDENTIALS_INCOMPLETE"]);
   });
 
   it("should not allow live messaging if twilio is not configured but hard gates pass", () => {

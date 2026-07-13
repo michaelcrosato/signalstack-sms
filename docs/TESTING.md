@@ -17,8 +17,8 @@ Milestone 0 validation runs:
 PostgreSQL tenant enforcement is mandatory evidence, not an optional RLS mode:
 
 - The completed M2 checkpoint was the eight-file / 33-test gate over 40 migrations and 27 protected tables.
-  The current `npm run test:tenant-db` is a 14-file / 57-test superset: 13 files / 56 tests in the tenant
-  batch plus the one-file / one-test literal-network M3 exit. It covers all 51 migrations and 39 protected
+  The current `npm run test:tenant-db` is a 16-file / 65-test superset: 15 files / 64 tests in the tenant
+  batch plus the one-file / one-test literal-network M3 exit. It covers all 55 migrations and 40 protected
   tables, including API-key control resolution/rate concurrency, encrypted public idempotency,
   customer-event/delivery rows, M4 provider ownership/routing, worker dispatch, and the M3 exit path. It creates non-owner
   NOINHERIT runtime roles and tenant A/B fixtures, then covers scoped reads/writes, missing context,
@@ -27,8 +27,8 @@ PostgreSQL tenant enforcement is mandatory evidence, not an optional RLS mode:
 - The M2 tenant gate proved a fresh install of 40 migrations under a non-superuser/non-BYPASSRLS
   table owner using `signalstack_owner`. That proof exercises the historical triggers and dispatch
   function and verifies its fixed search path and revoked `PUBLIC` EXECUTE ACL. The current superset proves
-  a fresh 51-migration install, the bounded worker-only customer-webhook claim function, and the exact
-  web-only provider-routing capability under the same
+  a fresh 55-migration install, the bounded worker-only customer-webhook/direct-message claim and recovery
+  functions, and the exact web-only provider-routing capability under the same
   least-privilege posture, with no Prisma schema diff.
 - The M2 checkpoint's complete `RUN_DB_TESTS=true` database-directory run was 37 files / 186 tests, and its
   focused auth database run was nine files / 38 tests. Current DB coverage is intentionally reported by the
@@ -85,7 +85,7 @@ only with the milestone checkpoint they describe.
   replay and status, signed raw lifecycle receipt, a terminal failed delivery, replay under the newly rotated
   webhook secret, rejection by the old verifier, and immediate API-key rotation/revocation denial.
 - `tests/unit/db/public-api-network-exit-path.test.ts` is the literal external-application proof. It creates
-  a fresh disposable 51-migration database and NOINHERIT web/worker logins, starts a real Next App Router HTTP
+  a fresh disposable 55-migration database and NOINHERIT web/worker logins, starts a real Next App Router HTTP
   child on the forced-RLS web role plus an independent local receiver socket, and runs claims/finalization on
   the worker role. Organization A/B keys prove foreign `GET`/`PATCH` both return `404` without mutation;
   root/nested unknown paths and unauthenticated/authenticated `HEAD`/`OPTIONS` prove canonical auth/method
@@ -98,6 +98,13 @@ only with the milestone checkpoint they describe.
   dummy and bounded Twilio fixtures, migration invariants, and two-account signed routing. The routing exit
   proof uses a non-owner PostgreSQL web role; HTTP route fixtures separately exercise inbound/status handler
   behavior, so M4 does not claim a literal callback-server E2E.
+- M5 direct-message coverage spans permanent reservation after API replay expiry, changed-binding conflict,
+  one message/attempt/accepted event, immutable payload/frontier state, worker-only claim/recovery, exact
+  final organization/compliance/contact/current-credential/sender gates, bounded definitive retry, and
+  possible-impact ambiguity with no blind successor. Real PostgreSQL tests cover provider-impact process
+  termination, duplicate/out-of-order/cross-tenant correlated callbacks, known-SID provider fetch without
+  create, audited ADMIN no-send attestation, and a concurrent single-winner retry. Fixtures cover bounded
+  Twilio SMS/MMS requests and errors; defaults, validation, and tests have no carrier credentials or call.
 
 Additional deterministic checks:
 

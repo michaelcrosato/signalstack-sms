@@ -115,8 +115,13 @@ class SignalStackClient:
     def create_contact(self, body: Mapping[str, Any], idempotency_key: str) -> ApiResult:
         return self.request("/api/v1/contacts", "POST", body, idempotency_key)
 
-    def submit_dummy_message(self, body: Mapping[str, Any], idempotency_key: str) -> ApiResult:
+    def submit_message(self, body: Mapping[str, Any], idempotency_key: str) -> ApiResult:
         return self.request("/api/v1/messages", "POST", body, idempotency_key)
+
+    def cancel_message(self, message_id: str, idempotency_key: str) -> ApiResult:
+        return self.request(
+            f"/api/v1/messages/{message_id}/cancel", "POST", None, idempotency_key
+        )
 
     def get_message_status(self, message_id: str) -> ApiResult:
         return self.request(f"/api/v1/messages/{message_id}/status")
@@ -194,11 +199,20 @@ def run_example_flow(environment: Mapping[str, str] = os.environ) -> None:
         "body": "SignalStack dummy integration message. No carrier call is made.",
     }
     message_key = f"message:{run_id}"
-    first_message = client.submit_dummy_message(message_body, message_key)
-    retried_message = client.submit_dummy_message(message_body, message_key)
+    first_message = client.submit_message(message_body, message_key)
+    retried_message = client.submit_message(message_body, message_key)
     message_id = first_message.data["message"]["id"]
     if retried_message.data["message"]["id"] != message_id:
         raise RuntimeError("idempotent message retry returned a different message ID")
+    lifecycle = first_message.data["message"]
+    if (
+        lifecycle.get("transport") != "dummy"
+        or lifecycle.get("applicationStatus") != "SENT"
+        or lifecycle.get("attemptCount") != 1
+        or lifecycle.get("latestAttemptStatus") != "SUCCEEDED"
+        or lifecycle.get("requiresReview") is not False
+    ):
+        raise RuntimeError("example must run against the deterministic dummy lifecycle")
     status = client.get_message_status(message_id)
 
     for row in client.iterate_collection("/api/v1/contacts", "contacts", 25):
@@ -217,6 +231,10 @@ def run_example_flow(environment: Mapping[str, str] = os.environ) -> None:
                 "contactId": contact_id,
                 "messageId": message_id,
                 "messageMode": first_message.data["message"]["mode"],
+                "applicationStatus": lifecycle["applicationStatus"],
+                "transport": lifecycle["transport"],
+                "attemptCount": lifecycle["attemptCount"],
+                "requiresReview": lifecycle["requiresReview"],
                 "deliveryStatus": status.data["deliveryStatus"]["status"],
                 "idempotencyReplayed": retried_message.replayed,
                 "priorKeyDeniedAfterRotation": True,

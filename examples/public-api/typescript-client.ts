@@ -32,6 +32,26 @@ export type PublicApiResult<T> = Readonly<{
   replayed: boolean;
 }>;
 
+export type DirectMessageLifecycle = Readonly<{
+  id: string;
+  status: string;
+  applicationStatus:
+    | "ACCEPTED"
+    | "SCHEDULED"
+    | "PROCESSING"
+    | "SENT"
+    | "DELIVERED"
+    | "FAILED"
+    | "CANCELLED"
+    | "AMBIGUOUS";
+  transport: "dummy" | "twilio";
+  attemptCount: number;
+  latestAttemptStatus: string | null;
+  latestAttemptNumber: number | null;
+  requiresReview: boolean;
+  mode: "dummy" | "provider";
+}>;
+
 type FetchImplementation = (input: string | URL | Request, init?: RequestInit) => Promise<Response>;
 
 export class SignalStackApiError extends Error {
@@ -141,12 +161,19 @@ export class SignalStackClient {
     });
   }
 
-  async submitDummyMessage(body: JsonObject, idempotencyKey: string) {
-    return this.request<{ message: { id: string; mode: string; status: string } }>("/api/v1/messages", {
+  async submitMessage(body: JsonObject, idempotencyKey: string) {
+    return this.request<{ message: DirectMessageLifecycle }>("/api/v1/messages", {
       method: "POST",
       body,
       idempotencyKey
     });
+  }
+
+  async cancelMessage(messageId: string, idempotencyKey: string) {
+    return this.request<{ message: DirectMessageLifecycle }>(
+      `/api/v1/messages/${encodeURIComponent(messageId)}/cancel`,
+      { method: "POST", idempotencyKey }
+    );
   }
 
   async getMessageStatus(messageId: string) {
@@ -199,10 +226,19 @@ export async function runExampleFlow(environment: NodeJS.ProcessEnv = process.en
     body: "SignalStack dummy integration message. No carrier call is made."
   };
   const messageKey = `message:${runId}`;
-  const firstMessage = await client.submitDummyMessage(messageBody, messageKey);
-  const retriedMessage = await client.submitDummyMessage(messageBody, messageKey);
+  const firstMessage = await client.submitMessage(messageBody, messageKey);
+  const retriedMessage = await client.submitMessage(messageBody, messageKey);
   if (firstMessage.data.message.id !== retriedMessage.data.message.id) {
     throw new Error("Idempotent message retry returned a different message ID.");
+  }
+  if (
+    firstMessage.data.message.transport !== "dummy" ||
+    firstMessage.data.message.applicationStatus !== "SENT" ||
+    firstMessage.data.message.attemptCount !== 1 ||
+    firstMessage.data.message.latestAttemptStatus !== "SUCCEEDED" ||
+    firstMessage.data.message.requiresReview
+  ) {
+    throw new Error("Example must run against the deterministic dummy lifecycle.");
   }
   const status = await client.getMessageStatus(firstMessage.data.message.id);
 
@@ -222,6 +258,10 @@ export async function runExampleFlow(environment: NodeJS.ProcessEnv = process.en
       contactId: contact.data.id,
       messageId: firstMessage.data.message.id,
       messageMode: firstMessage.data.message.mode,
+      applicationStatus: firstMessage.data.message.applicationStatus,
+      transport: firstMessage.data.message.transport,
+      attemptCount: firstMessage.data.message.attemptCount,
+      requiresReview: firstMessage.data.message.requiresReview,
       deliveryStatus: status.data.deliveryStatus.status,
       idempotencyReplayed: retriedMessage.replayed,
       priorKeyDeniedAfterRotation: true,

@@ -41,8 +41,18 @@ export async function POST(request: Request, { params }: ConversationParams) {
     );
   }
 
+  if ("conflict" in result) {
+    return NextResponse.json(
+      { error: "The reply request ID was already used for different message content." },
+      { status: 409 }
+    );
+  }
+
   return NextResponse.json(
     { message: result.message, deduped: result.deduped },
-    { status: result.deduped ? 200 : 201 }
+    {
+      status: result.deduped ? 200 : 201,
+      headers: { Location: `/api/v1/messages/${result.message.id}` }
+    }
   );
 }

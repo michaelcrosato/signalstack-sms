@@ -39,6 +39,8 @@ describe("runtime policy posture", () => {
     const rows = [
       reviewed("claim_due_queue_jobs", "worker"),
       reviewed("claim_due_customer_webhook_deliveries", "worker"),
+      reviewed("claim_due_message_attempts", "worker"),
+      reviewed("recover_expired_message_attempts", "worker"),
       reviewed("resolve_verified_provider_destination", "web")
     ];
     expect(() => assertDispatchCapabilityShape(rows)).not.toThrow();

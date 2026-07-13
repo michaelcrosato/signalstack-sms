@@ -15,9 +15,10 @@ This is the compact handoff for the next automated loop. History lives in `git l
 
 ## Current State
 
-- Latest validated checkpoint: Run 832 completes M4 provider ownership. Eight migrations extend the current substrate to 51 migrations / 39
-  protected tables with encrypted credential envelopes, verified account/number/service ownership, safe
-  ADMIN lifecycle, a complete deterministic provider factory, and trusted callback routing without sends.
+- Latest validated checkpoint: Run 833 completes M5 durable direct messaging. Four migrations extend the
+  current substrate to 55 migrations / 40 protected tables with permanent public/inbox reservation,
+  immutable message attempts, an exact final-gated stored-credential Twilio worker, bounded definitive
+  retry, durable ambiguity, correlated callbacks, provider-fetch reconciliation, and safe ADMIN review.
 - Run 818 adds seeded delivered, pending, and failed local outbound delivery evidence so fresh demos show realistic delivery-review states without live providers.
 - Run 817 adds failed and pending summary counts to the product analytics delivery review queue.
 - Run 816 adds visible/hidden and needs-review summary counts to the product analytics delivery review queue.
@@ -39,9 +40,10 @@ This is the compact handoff for the next automated loop. History lives in `git l
   operations inventory, and validation gates. Legacy provider credential/rotation rows remain explicitly
   unverified/display-only; canonical M4 provider-control audit evidence is `IntegrationAuditEvent`.
 - The browser product has a usable local demo path across dashboard with seeded delivered/pending/failed local outbound evidence, next-step delivery evidence review, and centralized outbound-only local delivery evidence/rate/pending/failure/review/latest-evidence signals, contacts import/detail/archive/restore/merge, campaign fake-AI copy/preflight count/schedule/detail/edit/cancel plus campaign-list recipient readiness and delivered/pending/failed/rate/review-status/latest-evidence reporting, campaign-detail aggregate recipient readiness, all-outbound delivery-rate/count/review-status/last-message/provider-status/provider-error-code metrics, visible recent-evidence row count, explicit recent-row boundary copy and newest-first recent delivery rows with provider error-code evidence, recipient send-state/human-readable block reasons, mutually exclusive outbound-only delivery detail visibility with per-row delivery states, inbox query-selected thread work, template create/detail/edit, analytics delivery review/latest-evidence status plus campaign-level delivery review summary/links with failed/pending count labels and delivery operations with outbound-only `failed`/`undelivered` breakdowns, and compliance readiness.
-- General provider sends, live campaigns, live billing, live AI, production workers, and the complete
-  production package remain blocked by default. Encrypted M4 provider credentials authorize explicit ADMIN
-  verification/discovery/health and signed callbacks only; they do not enable messaging.
+- General direct provider sends are available only to the exact `production-live-direct` worker after M5's
+  complete live/organization/compliance/contact/current-credential/sender/frontier gate. Defaults remain
+  dummy/network-free. Live campaigns, live billing, live AI, and the complete production package remain
+  blocked.
 - Production auth/RBAC has a checked implementation contract at `docs/PRODUCTION_AUTH_RBAC.md`, an executable mutating-route RBAC matrix, `npm run production-auth:check`, keyed opaque sessions, operator recovery, and a production browser proof; Clerk remains optional and accidental configuration is blocked with `CLERK_AUTH_CONFIG_PRESENT`.
 - GitHub `ci` and `premerge` workflows now run `pwsh ./scripts/local-gate.ps1` with demo-safe defaults after install/browser setup, and unit coverage pins that they do not treat raw `npm run validate`/`premerge` calls as green.
 - The only intentional live external-impact route is the isolated `/demo` live-test SMS path, gated by explicit Twilio credentials, live flags, recipient allowlist, confirmation phrase, and a server-only operator token; public readiness is last-four/count only, and ambiguous provider outcomes stay durably pending without resend.
@@ -55,7 +57,7 @@ This is the compact handoff for the next automated loop. History lives in `git l
 
 ## Next Work
 
-M0–M4 in `docs/STANDALONE_ROADMAP.md` are DONE. M2 evidence is a fresh 40-migration/no-diff install under
+M0–M5 in `docs/STANDALONE_ROADMAP.md` are DONE. M2 evidence is a fresh 40-migration/no-diff install under
 a non-superuser/non-BYPASSRLS table owner, owner capability barred from runtimes, 27-table fail-closed RLS
 with semantic policy fingerprints, composite tenant integrity, exact command-specific control policies,
 atomic database-timed dispatch with no public ACL, short tenant/control/dispatch contexts, zero migration-
@@ -64,11 +66,13 @@ database files / 38 tests, and production local-auth build/browser proof 1/1 und
 checkpoint is 43 migrations / 36 protected tables; its 12-file / 49-test mandatory tenant
 gate, 30-file / 111-test public API suite, generated OpenAPI/examples, and literal non-owner Next HTTP +
 receiver-socket proof cover scoped keys, dummy/local resources, signed events, failure/replay, and secret/key
-rotation without a carrier call. M4 extends the current substrate to 51 migrations / 39 protected tables;
+rotation without a carrier call. M4 reached 51 migrations / 39 protected tables;
 its eight migrations, account-hash/AAD-bound AES-256-GCM envelopes, safe ADMIN/provider fixtures, and
 two-account non-owner PostgreSQL routing plus HTTP route fixtures close provider identity and ownership. The
-mandatory tenant runner is 14 files / 57 tests. The active queue is M5 durable direct messaging, then
-M6–M11; do not claim live transport or later milestones early.
+M5 extends the current substrate to 55 migrations / 40 protected tables. Its permanent replay, outbox,
+frontier/crash/recovery, callback replay/order/cross-tenant, fetch, audit, and single-successor race proof is
+in the mandatory 16-file / 65-test tenant runner. The active queue is M6 trusted inbound/shared-inbox
+completion, then M7–M11; do not claim those later milestones early.
 
 Rules: run the protected gate (`pwsh scripts/local-gate.ps1`, now fully green incl `e2e:smoke` after
 `npm run afk:preflight`) before treating work as green; commit only when green. Keep all live

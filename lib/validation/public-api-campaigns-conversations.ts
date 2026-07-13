@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { publicApiResourceIdSchema } from "@/lib/validation/public-api-resources";
+import {
+  publicApiResourceIdSchema,
+  publicMessageMediaUrlsSchema
+} from "@/lib/validation/public-api-resources";
 
 const publicCampaignNameSchema = z.string().trim().min(1).max(120);
 const publicMessageBodySchema = z.string().trim().min(1).max(1_600);
@@ -33,7 +36,10 @@ export const publicCampaignScheduleSchema = z
   .strict();
 
 export const publicConversationReplySchema = z
-  .object({ body: publicMessageBodySchema })
+  .object({
+    body: publicMessageBodySchema,
+    mediaUrls: publicMessageMediaUrlsSchema.default([])
+  })
   .strict();
 
 export type PublicCampaignCreateInput = z.infer<typeof publicCampaignCreateSchema>;

@@ -69,8 +69,20 @@ assertExampleMarkers("examples/public-api/curl-flow.sh", [
   "/api-keys/current/rotate",
   "Idempotency-Key"
 ]);
-assertExampleMarkers("examples/public-api/typescript-client.ts", ["iterateCollection", "Idempotency-Key"]);
-assertExampleMarkers("examples/public-api/python_client.py", ["iterate_collection", "Idempotency-Key"]);
+assertExampleMarkers("examples/public-api/typescript-client.ts", [
+  "iterateCollection",
+  "Idempotency-Key",
+  "applicationStatus",
+  "requiresReview",
+  "cancelMessage"
+]);
+assertExampleMarkers("examples/public-api/python_client.py", [
+  "iterate_collection",
+  "Idempotency-Key",
+  "applicationStatus",
+  "requiresReview",
+  "cancel_message"
+]);
 assertExampleExcludes("examples/public-api/curl-flow.sh", [
   'post_json "/api/v1/api-keys/current/rotate"',
   '"$ROTATE_KEY" \'{}\'',
@@ -101,7 +113,7 @@ if (python) {
 }
 
 console.log(
-  `M3 examples verified: production-signer vector, TypeScript receiver, ${python ? "Python receiver, " : ""}provider callback, and public client inventory.`
+  `Integration examples verified: production-signer vector, TypeScript receiver, ${python ? "Python receiver, " : ""}provider callback, and M5 public message lifecycle.`
 );
 
 function expectWebhookRejection(

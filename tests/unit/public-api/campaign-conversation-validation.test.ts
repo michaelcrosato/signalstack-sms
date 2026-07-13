@@ -39,8 +39,21 @@ describe("public campaign and conversation boundaries", () => {
     expect(() => publicCampaignScheduleSchema.parse({ scheduledAt: "tomorrow" })).toThrow();
     expect(() => publicConversationReplySchema.parse({ body: "", provider: "twilio" })).toThrow();
     expect(publicConversationReplySchema.parse({ body: " Local reply " })).toEqual({
-      body: "Local reply"
+      body: "Local reply",
+      mediaUrls: []
     });
+    expect(
+      publicConversationReplySchema.parse({
+        body: "Photo",
+        mediaUrls: ["https://cdn.example.test/photo.jpg"]
+      })
+    ).toEqual({ body: "Photo", mediaUrls: ["https://cdn.example.test/photo.jpg"] });
+    expect(() =>
+      publicConversationReplySchema.parse({
+        body: "Photo",
+        mediaUrls: ["http://cdn.example.test/photo.jpg"]
+      })
+    ).toThrow("HTTPS");
   });
 
   it("serializes campaign state without tenant, queue payload, or idempotency fields", () => {

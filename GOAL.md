@@ -21,7 +21,8 @@ The detailed product contract, milestone graph, acceptance matrix, and verificat
   fake/local AI, trusted Twilio callback routing, encrypted provider ownership, observability seams, and
   product UI.
 - The seeded browser product path works at `/dashboard`; mandatory PostgreSQL coverage now includes the
-  current 51-migration/39-protected-table tenant substrate plus the public API and provider-routing exit
+  current 55-migration/40-protected-table tenant substrate plus the public API, provider-routing, and M5
+  durable direct-message exit
   paths. The M2 checkpoint remains
   recorded as 37 PostgreSQL files / 186 passing tests, including its eight-file / 33-test tenant gate and
   nine-file / 38-test auth database run. Playwright smoke, a production local-auth browser proof under a
@@ -43,9 +44,12 @@ The detailed product contract, milestone graph, acceptance matrix, and verificat
   complete deterministic provider factory, and exact signed callback routing. Non-owner PostgreSQL routing
   plus HTTP route fixtures cover two accounts and crossed/unknown/rotated/revoked evidence without sending
   or changing provider resources. Legacy provider credential/rotation rows remain unverified/display-only.
-- The repository is not yet a production SMS platform. The durable carrier message outbox and general
-  Twilio send path are not implemented; the campaign worker is dummy-only and production-blocked; there is
-  no production container bundle or backup/restore proof.
+- M5 durable direct messaging is complete: transactional public/inbox acceptance, immutable PostgreSQL
+  attempts, stored-credential Twilio SMS/MMS, the final live gate, bounded definitive retry, no blind
+  ambiguous resend, correlated callbacks, provider-fetch reconciliation, and safe ADMIN resolution/retry
+  are database and fixture tested.
+- The repository is not yet a production SMS platform. Trusted inbound/shared-inbox completion and the
+  live campaign worker remain pending; there is no production container bundle or backup/restore proof.
 - Live SMS, billing, and hosted AI remain off by default. The isolated operator-gated live-test SMS path
   is not evidence of production campaign readiness.
 

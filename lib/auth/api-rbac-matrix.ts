@@ -318,6 +318,27 @@ const apiRouteRbacMatrixItems = [
   {
     auth: "role",
     method: "POST",
+    path: "app/api/settings/delivery-attempts/[attemptId]/reconcile/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "fetch provider evidence for one ambiguous delivery attempt"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/settings/delivery-attempts/[attemptId]/attest-not-sent/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "attest one ambiguous no-proof delivery attempt not sent"
+  },
+  {
+    auth: "role",
+    method: "POST",
+    path: "app/api/settings/delivery-attempts/[attemptId]/retry/route.ts",
+    requiredRole: MembershipRole.ADMIN,
+    scope: "create one successor for an attested delivery attempt"
+  },
+  {
+    auth: "role",
+    method: "POST",
     path: "app/api/settings/numbers/route.ts",
     requiredRole: MembershipRole.ADMIN,
     scope: "upsert local provider number metadata"
@@ -537,7 +558,14 @@ const apiRouteRbacMatrixItems = [
     method: "POST",
     path: "app/api/v1/messages/route.ts",
     requiredScopes: ["messages:send"],
-    scope: "accept one consent-safe dummy message and its lifecycle event atomically"
+    scope: "accept one durable consent-safe direct message and its first attempt atomically"
+  },
+  {
+    auth: "api-key",
+    method: "POST",
+    path: "app/api/v1/messages/[messageId]/cancel/route.ts",
+    requiredScopes: ["messages:send"],
+    scope: "conditionally cancel one direct message before its provider-call frontier"
   },
   {
     auth: "api-key",

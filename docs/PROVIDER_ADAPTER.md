@@ -1,7 +1,8 @@
 # Provider Adapter
 
 The default provider is `dummy`. It is deterministic, reads no provider environment credentials, and makes
-no network call. M4 completes provider identity and ownership; it does not enable general live messaging.
+no network call. M4 completes provider identity/ownership; M5 enables direct live messaging only through
+the durable, separately authorized final-gated worker.
 
 ## M4 Provider Control Plane
 
@@ -40,5 +41,8 @@ account's active credential for signature validation, and recheck tenant/generat
 Unknown, crossed, ambiguous, disabled, revoked, or stale evidence fails generically. Non-owner PostgreSQL
 routing plus HTTP route fixtures prove the boundary; M4 does not claim a literal callback-server E2E.
 
-General Twilio message creation remains an M5 concern. The existing isolated live-test SMS continues to use
-its separate environment credentials and operator gates; it does not consume the M4 credential store.
+General Twilio SMS/MMS creation is implemented for the exact `production-live-direct` worker class. It uses
+the attempt's encrypted tenant credential and verified owned sender, supplies a signed correlated HTTPS
+callback, applies a bounded timeout, and never retries possible-impact ambiguity. Public/inbox acceptance,
+pages, tests, builds, and default workers do not call Twilio. The isolated live-test SMS continues to use its
+separate environment credentials/operator gates and does not authorize the general outbox.

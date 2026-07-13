@@ -52,9 +52,22 @@
   identity transitions.
 - `20260712017000_provider_legacy_promotion_identity` preserves row identity and creation evidence during
   the sole legacy CONFIGURED-to-VERIFIED ownership promotion.
-- The current substrate is 51 migrations and 39 protected tables. M4 provider-control actions use append-
+- The M4 checkpoint is 51 migrations and 39 protected tables. M4 provider-control actions use append-
   only `IntegrationAuditEvent`; legacy `ProviderCredential`/`ProviderCredentialRotation` rows are preserved
   unverified/display-only and are not promoted to provider authority.
+
+## Standalone M5 Durable Direct Messages
+
+- `20260712018000_message_attempt_outbox` adds explicit `Message` application state and the durable,
+  tenant-scoped `MessageAttempt` PostgreSQL outbox with provider authority, payload, result, reconciliation,
+  and retry-lineage evidence.
+- `20260712019000_message_attempt_invariants` makes accepted payload/correlation/frontier identity immutable,
+  guards state transitions, and extends canonical audit-subject validation.
+- `20260712020000_message_attempt_dispatch_security` installs forced RLS/runtime posture plus bounded,
+  worker-only, fixed-search-path claim and post-frontier recovery capabilities.
+- `20260712021000_message_attempt_payload_bounds` enforces canonical E.164 length and UUID callback
+  correlation at rest.
+- The current substrate is 55 migrations, 35 ordinary tenant tables, and 40 protected tables.
 
 ## Post-MVP Webhook Foundations
 

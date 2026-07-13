@@ -407,7 +407,13 @@ const resourceSchemas: Record<string, OpenApiObject> = {
     properties: {
       contactId: identifierSchema,
       conversationId: identifierSchema,
-      body: { type: "string", minLength: 1, maxLength: 1_600 }
+      body: { type: "string", minLength: 1, maxLength: 1_600 },
+      mediaUrls: {
+        type: "array",
+        maxItems: 10,
+        uniqueItems: true,
+        items: { type: "string", format: "uri", pattern: "^https://", maxLength: 2048 }
+      }
     },
     example: {
       contactId: "contact_01J2A3B4C5D6E7F8G9H0",
@@ -426,6 +432,12 @@ const resourceSchemas: Record<string, OpenApiObject> = {
     required: [
       "messageId",
       "status",
+      "applicationStatus",
+      "transport",
+      "attemptCount",
+      "latestAttemptStatus",
+      "latestAttemptNumber",
+      "requiresReview",
       "providerStatus",
       "providerErrorCode",
       "deliveredAt",
@@ -434,9 +446,21 @@ const resourceSchemas: Record<string, OpenApiObject> = {
     ],
     properties: {
       messageId: identifierSchema,
-      status: { type: "string", example: "accepted_dummy" },
+      status: { type: "string", example: "sent" },
+      applicationStatus: {
+        type: "string",
+        enum: ["ACCEPTED", "SCHEDULED", "PROCESSING", "SENT", "DELIVERED", "FAILED", "CANCELLED", "AMBIGUOUS"]
+      },
+      transport: { type: "string", enum: ["dummy", "twilio"] },
+      attemptCount: { type: "integer", minimum: 0, maximum: 3 },
+      latestAttemptStatus: {
+        type: ["string", "null"],
+        enum: ["QUEUED", "PROCESSING", "SUCCEEDED", "FAILED", "CANCELLED", "AMBIGUOUS", "RESOLVED_NOT_SENT", null]
+      },
+      latestAttemptNumber: { type: ["integer", "null"], minimum: 1, maximum: 3 },
+      requiresReview: { type: "boolean" },
       providerStatus: nullableStringSchema,
-      providerErrorCode: { type: ["integer", "null"] },
+      providerErrorCode: nullableStringSchema,
       deliveredAt: nullableDateTimeSchema,
       failedAt: nullableDateTimeSchema,
       mode: { type: "string", enum: ["dummy", "provider"], example: "dummy" }
@@ -497,7 +521,15 @@ const resourceSchemas: Record<string, OpenApiObject> = {
     type: "object",
     additionalProperties: false,
     required: ["body"],
-    properties: { body: { type: "string", minLength: 1, maxLength: 1_600 } },
+    properties: {
+      body: { type: "string", minLength: 1, maxLength: 1_600 },
+      mediaUrls: {
+        type: "array",
+        maxItems: 10,
+        uniqueItems: true,
+        items: { type: "string", format: "uri", pattern: "^https://" }
+      }
+    },
     example: { body: "Thanks — we will have that ready for you." }
   },
   ApiCredential: apiCredentialSchema(),
@@ -959,15 +991,23 @@ function messageSchema(): OpenApiObject {
       "direction",
       "body",
       "status",
+      "applicationStatus",
+      "transport",
+      "attemptCount",
+      "latestAttemptStatus",
+      "latestAttemptNumber",
+      "requiresReview",
       "providerStatus",
       "providerErrorCode",
       "providerMessageId",
       "mode",
+      "mediaUrls",
       "contact",
       "conversation",
       "deliveredAt",
       "failedAt",
-      "createdAt"
+      "createdAt",
+      "updatedAt"
     ],
     properties: {
       id: identifierSchema,
@@ -976,11 +1016,29 @@ function messageSchema(): OpenApiObject {
       campaignId: { ...identifierSchema, type: ["string", "null"] },
       direction: { type: "string", enum: ["INBOUND", "OUTBOUND"], example: "OUTBOUND" },
       body: { type: "string", example: "Your order is ready for pickup." },
-      status: { type: "string", example: "accepted_dummy" },
+      status: { type: "string", example: "sent" },
+      applicationStatus: {
+        type: "string",
+        enum: ["ACCEPTED", "SCHEDULED", "PROCESSING", "SENT", "DELIVERED", "FAILED", "CANCELLED", "AMBIGUOUS"]
+      },
+      transport: { type: "string", enum: ["dummy", "twilio"] },
+      attemptCount: { type: "integer", minimum: 0, maximum: 3 },
+      latestAttemptStatus: {
+        type: ["string", "null"],
+        enum: ["QUEUED", "PROCESSING", "SUCCEEDED", "FAILED", "CANCELLED", "AMBIGUOUS", "RESOLVED_NOT_SENT", null]
+      },
+      latestAttemptNumber: { type: ["integer", "null"], minimum: 1, maximum: 3 },
+      requiresReview: { type: "boolean" },
       providerStatus: nullableStringSchema,
-      providerErrorCode: { type: ["integer", "null"] },
+      providerErrorCode: nullableStringSchema,
       providerMessageId: nullableStringSchema,
       mode: { type: "string", enum: ["dummy", "provider"], example: "dummy" },
+      mediaUrls: {
+        type: "array",
+        maxItems: 10,
+        uniqueItems: true,
+        items: { type: "string", format: "uri", pattern: "^https://" }
+      },
       contact: {
         type: ["object", "null"],
         properties: { phone: { type: "string" }, displayName: nullableStringSchema }
@@ -991,7 +1049,8 @@ function messageSchema(): OpenApiObject {
       },
       deliveredAt: nullableDateTimeSchema,
       failedAt: nullableDateTimeSchema,
-      createdAt: dateTimeSchema
+      createdAt: dateTimeSchema,
+      updatedAt: dateTimeSchema
     }
   };
 }

@@ -37,8 +37,9 @@ Forbidden for the current deployment class:
 `/settings/provider` now stores verified provider Auth Tokens only as account-hash/AAD-bound AES-256-GCM
 ciphertext. Plaintext must never be stored, logged, returned, exported, committed, or placed in browser-
 delivered configuration. Provisioning/rotation of the separate `SECRETS_MASTER_KEY` and any real credential
-remains human-controlled; M4 ownership does not authorize M5 sends. Legacy provider credential/rotation rows
-remain unverified/display-only.
+remains human-controlled; M4 ownership alone does not authorize M5 sends. The exact
+`production-live-direct` worker additionally requires M5 live/runtime/organization/compliance/consent/
+quiet-hour/frontier gates. Legacy provider credential/rotation rows remain unverified/display-only.
 
 ## Pre-Deploy Checks
 

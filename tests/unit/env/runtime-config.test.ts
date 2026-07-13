@@ -219,7 +219,7 @@ describe("runtime configuration", () => {
     );
   });
 
-  it("requires Twilio credential, sender, and master-key readiness for live messaging", () => {
+  it("requires stored-credential encryption and an HTTPS callback origin for live messaging", () => {
     const error = captureConfigError({
       APP_ENV: "production",
       DEMO_MODE: "false",
@@ -233,13 +233,26 @@ describe("runtime configuration", () => {
     });
 
     expect(error.issues.map((issue) => issue.path)).toEqual(
-      expect.arrayContaining([
-        "TWILIO_ACCOUNT_SID",
-        "TWILIO_AUTH_TOKEN",
-        "TWILIO_FROM_NUMBER",
-        "SECRETS_MASTER_KEY"
-      ])
+      expect.arrayContaining(["SECRETS_MASTER_KEY", "NEXT_PUBLIC_APP_URL"])
     );
+    expect(error.issues.map((issue) => issue.path)).not.toEqual(
+      expect.arrayContaining(["TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_FROM_NUMBER"])
+    );
+
+    expect(() => parseRuntimeConfig({
+      APP_ENV: "production",
+      DEMO_MODE: "false",
+      AUTH_PROVIDER: "local",
+      AUTH_SESSION_SECRET: sessionSecret,
+      AUTH_THROTTLE_SECRET: throttleSecret,
+      TRUST_PROXY: "true",
+      DATABASE_RLS_ENFORCED: "true",
+      MESSAGING_PROVIDER: "twilio",
+      LIVE_MESSAGING_ENABLED: "true",
+      NEXT_PUBLIC_APP_URL: "https://sms.example.test",
+      SECRETS_MASTER_KEY: encryptionKey,
+      API_KEY_PEPPER: apiKeyPepper
+    })).not.toThrow();
   });
 
   it("requires trusted ingress for production built-in auth", () => {
@@ -268,6 +281,7 @@ describe("runtime configuration", () => {
       DATABASE_RLS_ENFORCED: "true",
       MESSAGING_PROVIDER: "twilio",
       LIVE_MESSAGING_ENABLED: "true",
+      NEXT_PUBLIC_APP_URL: "https://sms.example.test",
       TWILIO_ACCOUNT_SID: twilioAccountSid,
       TWILIO_AUTH_TOKEN: twilioAuthToken,
       TWILIO_MESSAGING_SERVICE_SID: twilioMessagingServiceSid,
@@ -293,6 +307,11 @@ describe("runtime configuration", () => {
     for (const secret of [sessionSecret, throttleSecret, twilioAccountSid, twilioAuthToken, twilioMessagingServiceSid, encryptionKey, apiKeyPepper]) {
       expect(serialized).not.toContain(secret);
     }
+  });
+
+  it("accepts the M5 direct worker class without authorizing the reserved campaign class", () => {
+    const config = parseRuntimeConfig({ WORKER_DEPLOYMENT_CLASS: "production-live-direct" });
+    expect(config.worker.deploymentClass).toBe("production-live-direct");
   });
 
   it("requires Redis when BullMQ is selected and never returns the Redis URL", () => {

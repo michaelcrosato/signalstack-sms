@@ -2,6 +2,9 @@ import { createHash, randomUUID } from "node:crypto";
 import {
   AuthTokenType,
   MembershipRole,
+  MessageApplicationStatus,
+  MessageAttemptStatus,
+  MessageTransport,
   PrismaClient,
   ProviderAccountStatus,
   ProviderMessagingServiceStatus,
@@ -583,6 +586,7 @@ async function seedOwnerFixtures(): Promise<OwnerFixture> {
     });
     remember("QueueJob", queueA.id, queueB.id);
 
+    const messageAttemptAt = new Date();
     const messageA = await tx.message.create({
       data: {
         orgId: orgA.id,
@@ -591,8 +595,16 @@ async function seedOwnerFixtures(): Promise<OwnerFixture> {
         campaignId: campaignA.id,
         direction: "OUTBOUND",
         body: "Runtime matrix",
+        applicationStatus: MessageApplicationStatus.SENT,
+        transport: MessageTransport.DUMMY,
+        destination: contactA.phone,
+        requestFingerprint: "runtime-message-fingerprint-a",
         providerMessageId: fixtureLabel,
-        idempotencyKey: fixtureLabel
+        acceptedAt: messageAttemptAt,
+        sentAt: messageAttemptAt,
+        attemptCount: 1,
+        idempotencyKey: fixtureLabel,
+        createdAt: messageAttemptAt
       }
     });
     const messageB = await tx.message.create({
@@ -603,11 +615,59 @@ async function seedOwnerFixtures(): Promise<OwnerFixture> {
         campaignId: campaignB.id,
         direction: "OUTBOUND",
         body: "Runtime matrix",
+        applicationStatus: MessageApplicationStatus.SENT,
+        transport: MessageTransport.DUMMY,
+        destination: contactB.phone,
+        requestFingerprint: "runtime-message-fingerprint-b",
         providerMessageId: fixtureLabel,
-        idempotencyKey: fixtureLabel
+        acceptedAt: messageAttemptAt,
+        sentAt: messageAttemptAt,
+        attemptCount: 1,
+        idempotencyKey: fixtureLabel,
+        createdAt: messageAttemptAt
       }
     });
     remember("Message", messageA.id, messageB.id);
+
+    const messageAttemptA = await tx.messageAttempt.create({
+      data: {
+        orgId: orgA.id,
+        messageId: messageA.id,
+        attemptNumber: 1,
+        status: MessageAttemptStatus.SUCCEEDED,
+        transport: MessageTransport.DUMMY,
+        dueAt: messageAttemptAt,
+        destination: contactA.phone,
+        body: messageA.body,
+        requestFingerprint: "runtime-message-fingerprint-a",
+        callbackCorrelationId: randomUUID(),
+        providerMessageId: fixtureLabel,
+        providerStatus: "queued",
+        disposition: "success",
+        completedAt: messageAttemptAt,
+        createdAt: messageAttemptAt
+      }
+    });
+    const messageAttemptB = await tx.messageAttempt.create({
+      data: {
+        orgId: orgB.id,
+        messageId: messageB.id,
+        attemptNumber: 1,
+        status: MessageAttemptStatus.SUCCEEDED,
+        transport: MessageTransport.DUMMY,
+        dueAt: messageAttemptAt,
+        destination: contactB.phone,
+        body: messageB.body,
+        requestFingerprint: "runtime-message-fingerprint-b",
+        callbackCorrelationId: randomUUID(),
+        providerMessageId: fixtureLabel,
+        providerStatus: "queued",
+        disposition: "success",
+        completedAt: messageAttemptAt,
+        createdAt: messageAttemptAt
+      }
+    });
+    remember("MessageAttempt", messageAttemptA.id, messageAttemptB.id);
 
     const noteA = await tx.internalNote.create({
       data: {

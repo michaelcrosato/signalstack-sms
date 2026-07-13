@@ -5,6 +5,7 @@ import {
   publicContactUpdateSchema,
   publicListCreateSchema,
   publicListMembershipCreateSchema,
+  publicMessageCreateSchema,
   publicSegmentCreateSchema,
   publicTagCreateSchema,
   publicTemplateUpdateSchema
@@ -58,6 +59,48 @@ describe("public API resource validation", () => {
     ).toThrow();
     expect(() =>
       publicListMembershipCreateSchema.parse({ contactIds: ["contact_a"], orgId: "foreign" })
+    ).toThrow();
+  });
+
+  it("accepts at most ten unique HTTPS media URLs for direct messages", () => {
+    expect(
+      publicMessageCreateSchema.parse({
+        contactId: "contact_a",
+        body: "Photo",
+        mediaUrls: ["https://cdn.example.test/a.jpg"]
+      })
+    ).toEqual({
+      contactId: "contact_a",
+      body: "Photo",
+      mediaUrls: ["https://cdn.example.test/a.jpg"]
+    });
+    expect(() =>
+      publicMessageCreateSchema.parse({
+        contactId: "contact_a",
+        body: "Photo",
+        mediaUrls: ["https://cdn.example.test/a.jpg", "https://cdn.example.test/a.jpg"]
+      })
+    ).toThrow("unique");
+    expect(() =>
+      publicMessageCreateSchema.parse({
+        contactId: "contact_a",
+        body: "Photo",
+        mediaUrls: ["http://cdn.example.test/a.jpg"]
+      })
+    ).toThrow("HTTPS");
+    expect(() =>
+      publicMessageCreateSchema.parse({
+        contactId: "contact_a",
+        body: "Photo",
+        mediaUrls: ["not-a-url"]
+      })
+    ).toThrow();
+    expect(() =>
+      publicMessageCreateSchema.parse({
+        contactId: "contact_a",
+        body: "Photo",
+        mediaUrls: [`https://cdn.example.test/${"a".repeat(2_100)}`]
+      })
     ).toThrow();
   });
 });

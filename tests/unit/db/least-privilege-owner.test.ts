@@ -224,6 +224,8 @@ describe.runIf(run)("least-privilege migration owner", () => {
           AND routine_name IN (
             'claim_due_queue_jobs',
             'claim_due_customer_webhook_deliveries',
+            'claim_due_message_attempts',
+            'recover_expired_message_attempts',
             'resolve_verified_provider_destination'
           )
           AND grantee = 'PUBLIC'

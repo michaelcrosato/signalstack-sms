@@ -84,6 +84,14 @@ network delivery occurs outside the transaction and finalization is conditional 
 Eight migrations (`20260712010000` through `20260712017000`) extend the current schema to 51 migrations,
 34 ordinary tenant tables, and five identity/control tables: 39 protected tables total.
 
+M5 adds four forward migrations (`20260712018000` through `20260712021000`) and one ordinary protected
+table, bringing the current schema to 55 migrations, 35 ordinary tenant tables, and 40 protected tables.
+`Message.applicationStatus` is the customer lifecycle while `MessageAttempt.status` is independent outbox
+state. Accepted payload/correlation/provider-call-frontier identity is immutable; a bounded worker-only
+database capability reclaims pre-frontier work and converts expired post-frontier ownership to ambiguity.
+Attempts retain provider authority, destination/body/media snapshot, callback correlation, provider
+evidence, reconciliation evidence, and retry lineage without storing plaintext credentials.
+
 - `ProviderAccount` stores one tenant-scoped provider identity, exact non-secret external account ID,
   globally unique keyed account hash, safe display/last-four metadata, verification/health/generation state,
   local default selection, and revocation evidence.

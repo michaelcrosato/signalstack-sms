@@ -3906,7 +3906,7 @@
       },
       "post": {
         "operationId": "submitMessage",
-        "summary": "Submit a dummy message",
+        "summary": "Submit a direct message",
         "tags": [
           "Messages"
         ],
@@ -4264,6 +4264,132 @@
         ],
         "x-required-scopes": [
           "deliveries:read"
+        ]
+      }
+    },
+    "/api/v1/messages/{messageId}/cancel": {
+      "post": {
+        "operationId": "cancelMessage",
+        "summary": "Cancel a direct message before provider-call authorization",
+        "tags": [
+          "Messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RequestId"
+          },
+          {
+            "name": "messageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 191,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+              "example": "resource_01J2A3B4C5D6E7F8G9H0"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation.",
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/XRequestId"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/CacheControl"
+              },
+              "RateLimit-Limit": {
+                "$ref": "#/components/headers/RateLimitLimit"
+              },
+              "RateLimit-Remaining": {
+                "$ref": "#/components/headers/RateLimitRemaining"
+              },
+              "RateLimit-Reset": {
+                "$ref": "#/components/headers/RateLimitReset"
+              },
+              "Idempotency-Replayed": {
+                "$ref": "#/components/headers/IdempotencyReplayed"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "ok",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MessageSubmission"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "405": {
+            "$ref": "#/components/responses/Error405"
+          },
+          "409": {
+            "$ref": "#/components/responses/Error409"
+          },
+          "413": {
+            "$ref": "#/components/responses/Error413"
+          },
+          "415": {
+            "$ref": "#/components/responses/Error415"
+          },
+          "422": {
+            "$ref": "#/components/responses/Error422"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error429"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          },
+          "502": {
+            "$ref": "#/components/responses/Error502"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error503"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-required-scopes": [
+          "messages:send"
         ]
       }
     },
@@ -5381,7 +5507,7 @@
       },
       "post": {
         "operationId": "replyToConversation",
-        "summary": "Submit a dummy conversation reply",
+        "summary": "Submit a direct conversation reply",
         "tags": [
           "Conversations"
         ],
@@ -8753,15 +8879,23 @@
           "direction",
           "body",
           "status",
+          "applicationStatus",
+          "transport",
+          "attemptCount",
+          "latestAttemptStatus",
+          "latestAttemptNumber",
+          "requiresReview",
           "providerStatus",
           "providerErrorCode",
           "providerMessageId",
           "mode",
+          "mediaUrls",
           "contact",
           "conversation",
           "deliveredAt",
           "failedAt",
-          "createdAt"
+          "createdAt",
+          "updatedAt"
         ],
         "properties": {
           "id": {
@@ -8815,7 +8949,59 @@
           },
           "status": {
             "type": "string",
-            "example": "accepted_dummy"
+            "example": "sent"
+          },
+          "applicationStatus": {
+            "type": "string",
+            "enum": [
+              "ACCEPTED",
+              "SCHEDULED",
+              "PROCESSING",
+              "SENT",
+              "DELIVERED",
+              "FAILED",
+              "CANCELLED",
+              "AMBIGUOUS"
+            ]
+          },
+          "transport": {
+            "type": "string",
+            "enum": [
+              "dummy",
+              "twilio"
+            ]
+          },
+          "attemptCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "latestAttemptStatus": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "QUEUED",
+              "PROCESSING",
+              "SUCCEEDED",
+              "FAILED",
+              "CANCELLED",
+              "AMBIGUOUS",
+              "RESOLVED_NOT_SENT",
+              null
+            ]
+          },
+          "latestAttemptNumber": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 3
+          },
+          "requiresReview": {
+            "type": "boolean"
           },
           "providerStatus": {
             "type": [
@@ -8825,7 +9011,7 @@
           },
           "providerErrorCode": {
             "type": [
-              "integer",
+              "string",
               "null"
             ]
           },
@@ -8842,6 +9028,16 @@
               "provider"
             ],
             "example": "dummy"
+          },
+          "mediaUrls": {
+            "type": "array",
+            "maxItems": 10,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://"
+            }
           },
           "contact": {
             "type": [
@@ -8891,6 +9087,11 @@
             "type": "string",
             "format": "date-time",
             "example": "2026-07-12T18:30:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-07-12T18:30:00.000Z"
           }
         }
       },
@@ -8935,6 +9136,17 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 1600
+          },
+          "mediaUrls": {
+            "type": "array",
+            "maxItems": 10,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://",
+              "maxLength": 2048
+            }
           }
         },
         "example": {
@@ -8960,6 +9172,12 @@
         "required": [
           "messageId",
           "status",
+          "applicationStatus",
+          "transport",
+          "attemptCount",
+          "latestAttemptStatus",
+          "latestAttemptNumber",
+          "requiresReview",
           "providerStatus",
           "providerErrorCode",
           "deliveredAt",
@@ -8976,7 +9194,59 @@
           },
           "status": {
             "type": "string",
-            "example": "accepted_dummy"
+            "example": "sent"
+          },
+          "applicationStatus": {
+            "type": "string",
+            "enum": [
+              "ACCEPTED",
+              "SCHEDULED",
+              "PROCESSING",
+              "SENT",
+              "DELIVERED",
+              "FAILED",
+              "CANCELLED",
+              "AMBIGUOUS"
+            ]
+          },
+          "transport": {
+            "type": "string",
+            "enum": [
+              "dummy",
+              "twilio"
+            ]
+          },
+          "attemptCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "latestAttemptStatus": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "QUEUED",
+              "PROCESSING",
+              "SUCCEEDED",
+              "FAILED",
+              "CANCELLED",
+              "AMBIGUOUS",
+              "RESOLVED_NOT_SENT",
+              null
+            ]
+          },
+          "latestAttemptNumber": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 3
+          },
+          "requiresReview": {
+            "type": "boolean"
           },
           "providerStatus": {
             "type": [
@@ -8986,7 +9256,7 @@
           },
           "providerErrorCode": {
             "type": [
-              "integer",
+              "string",
               "null"
             ]
           },
@@ -9464,6 +9734,16 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 1600
+          },
+          "mediaUrls": {
+            "type": "array",
+            "maxItems": 10,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://"
+            }
           }
         },
         "example": {

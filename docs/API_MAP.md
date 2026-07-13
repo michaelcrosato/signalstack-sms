@@ -53,9 +53,11 @@ Standalone M3 public integration platform (implemented; milestone complete):
 - `POST /api/v1/templates`, `PATCH /api/v1/templates/:templateId`, and
   `DELETE /api/v1/templates/:templateId`: mutate templates idempotently (`templates:write`).
 - `GET /api/v1/messages` and `GET /api/v1/messages/:messageId`: read messages (`messages:read`).
-- `POST /api/v1/messages`: submits one idempotent dummy message in M3 (`messages:send`); this does not enable
-  live carrier transport.
+- `POST /api/v1/messages`: durably reserves one idempotent direct message and first attempt
+  (`messages:send`); demo mode finalizes the deterministic dummy attempt without a carrier call.
 - `GET /api/v1/messages/:messageId/status`: reads normalized delivery state (`deliveries:read`).
+- `POST /api/v1/messages/:messageId/cancel`: conditionally cancels a direct message before its durable
+  provider-call frontier (`messages:send`).
 - `GET /api/v1/campaigns` and `GET /api/v1/campaigns/:campaignId`: read campaigns (`campaigns:read`).
 - `POST /api/v1/campaigns` and `PATCH /api/v1/campaigns/:campaignId`: create/update drafts idempotently
   (`campaigns:write`).
@@ -201,6 +203,12 @@ Standalone M4 provider control plane:
 - `/settings/security`: renders the read-only security boundary, production override posture, rate-limit policy, and validation references without exposing secrets or enabling live features.
 - `/settings/validation`: renders the read-only local validation inventory and repair signals without executing commands or inspecting logs.
 - `/settings/queue`: renders read-only scheduled-job timing, payload validity, worker settings, and queue-backend metadata without enqueueing jobs, running workers, or calling Redis/providers.
+- `/settings/delivery-attempts`: renders the ADMIN-only, tenant-scoped direct-message attempt review surface with redacted last-four hints and explicit fetch-only reconcile, `NOT_SENT` attestation, and separate queued-retry controls.
+- `GET /api/settings/delivery-attempts`: lists a bounded deterministic page of same-tenant safe delivery-attempt review DTOs with allowlisted lifecycle/review filters and no-store headers.
+- `GET /api/settings/delivery-attempts/:attemptId`: returns one safe same-tenant delivery-attempt review DTO; unknown and cross-tenant identifiers share `404`.
+- `POST /api/settings/delivery-attempts/:attemptId/reconcile`: requires ADMIN and exact same origin, accepts no body, and conditionally converges a known-SID ambiguous attempt through one exact provider fetch without creating a message or retry.
+- `POST /api/settings/delivery-attempts/:attemptId/attest-not-sent`: requires ADMIN, exact same origin, `ATTEST NOT SENT`, and a bounded internal reason before conditionally resolving one ambiguous no-SID attempt.
+- `POST /api/settings/delivery-attempts/:attemptId/retry`: requires ADMIN, exact same origin, and `RETRY MESSAGE` before atomically creating at most one ordinary queued successor for a current `RESOLVED_NOT_SENT` attempt; it makes no provider call.
 - `GET /api/settings/provider`: returns secret-safe aggregate readiness, live-messaging blockers, and verified/revoked account, owned-number, messaging-service, and health summaries without a provider call.
 - `PATCH /api/settings/provider`: authenticates an ADMIN and returns no-store `410 PROVIDER_METADATA_ENDPOINT_RETIRED` before reading a body; verified account endpoints replace metadata-only writes.
 - `DELETE /api/settings/provider`: locally revokes the selected default verified account and credential authority while retaining encrypted-version and audit history; it does not revoke anything at Twilio or send.

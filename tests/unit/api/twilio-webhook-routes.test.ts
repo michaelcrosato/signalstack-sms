@@ -2,8 +2,10 @@ import { createHmac } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST as inboundWebhookRoute } from "@/app/api/webhooks/twilio/inbound/route";
 import { POST as statusWebhookRoute } from "@/app/api/webhooks/twilio/status/route";
+import { createMessageStatusCallbackUrl } from "@/lib/messaging/status-callback-correlation";
 
 const originalTwilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
+const originalSecretsMasterKey = process.env.SECRETS_MASTER_KEY;
 
 const mocks = vi.hoisted(() => ({
   assertProviderCallbackBindingActive: vi.fn(),
@@ -20,6 +22,14 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@/lib/integrations/provider-accounts/webhook-routing", () => ({
   assertProviderCallbackBindingActive: mocks.assertProviderCallbackBindingActive,
   authenticateTwilioProviderCallback: mocks.authenticateTwilioProviderCallback,
+  ProviderCallbackAuthenticationError: class ProviderCallbackAuthenticationError extends Error {
+    readonly code: "INVALID_PROVIDER_CALLBACK" | "WEBHOOK_ROUTING_UNAVAILABLE";
+
+    constructor(code: "INVALID_PROVIDER_CALLBACK" | "WEBHOOK_ROUTING_UNAVAILABLE") {
+      super(code);
+      this.code = code;
+    }
+  },
   createProviderCallbackFailureResponse: (error: { code?: string }) =>
     Response.json(
       error?.code === "WEBHOOK_ROUTING_UNAVAILABLE"
@@ -67,12 +77,13 @@ function sign(url: string, params: Record<string, string>) {
   return createHmac("sha1", "test_token").update(base).digest("base64");
 }
 
-function twilioFormRequest(path: string, params: Record<string, string>, signature = sign(`http://localhost${path}`, params)) {
-  return new Request(`http://localhost${path}`, {
+function twilioFormRequest(pathOrUrl: string, params: Record<string, string>, signature?: string) {
+  const url = /^https?:\/\//.test(pathOrUrl) ? pathOrUrl : `http://localhost${pathOrUrl}`;
+  return new Request(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
-      "X-Twilio-Signature": signature
+      "X-Twilio-Signature": signature ?? sign(url, params)
     },
     body: new URLSearchParams(params)
   });
@@ -90,6 +101,7 @@ describe("Twilio webhook routes", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.TWILIO_AUTH_TOKEN = "test_token";
+    process.env.SECRETS_MASTER_KEY = Buffer.alloc(32, 7).toString("base64");
     mocks.authenticateTwilioProviderCallback.mockResolvedValue({
       orgId: "org_demo",
       provider: "twilio",
@@ -126,6 +138,11 @@ describe("Twilio webhook routes", () => {
       delete process.env.TWILIO_AUTH_TOKEN;
     } else {
       process.env.TWILIO_AUTH_TOKEN = originalTwilioAuthToken;
+    }
+    if (originalSecretsMasterKey === undefined) {
+      delete process.env.SECRETS_MASTER_KEY;
+    } else {
+      process.env.SECRETS_MASTER_KEY = originalSecretsMasterKey;
     }
   });
 
@@ -315,6 +332,106 @@ describe("Twilio webhook routes", () => {
     expect(mocks.updateMessageFromTwilioStatus.mock.invocationCallOrder[0]).toBeLessThan(
       mocks.markWebhookEventProcessed.mock.invocationCallOrder[0]
     );
+  });
+
+  it("reconciles a signed status callback against its exact message attempt", async () => {
+    const callbackUrl = createMessageStatusCallbackUrl({
+      appUrl: "https://app.signalstack.test",
+      orgId: "org_demo",
+      attemptId: "attempt_demo",
+      correlationId: "3f32e2c5-9b0f-48ae-9510-d3d27acafed1",
+      masterKey: process.env.SECRETS_MASTER_KEY!
+    });
+    const params = {
+      AccountSid: "AC00000000000000000000000000000000",
+      From: "+15555550199",
+      To: "+15555550100",
+      MessageSid: "SM123",
+      MessageStatus: "delivered"
+    };
+
+    const response = await statusWebhookRoute(twilioFormRequest(callbackUrl, params));
+
+    expect(response.status).toBe(204);
+    expect(mocks.updateMessageFromTwilioStatus).toHaveBeenCalledWith({
+      orgId: "org_demo",
+      providerMessageId: "SM123",
+      status: "delivered",
+      errorCode: undefined,
+      correlation: {
+        attemptId: "attempt_demo",
+        correlationId: "3f32e2c5-9b0f-48ae-9510-d3d27acafed1",
+        providerAccountId: "provider_account_demo",
+        providerPhoneNumberId: "provider_number_demo",
+        destination: "+15555550100"
+      }
+    });
+    expect(mocks.markWebhookEventProcessed).toHaveBeenCalledWith(
+      "org_demo",
+      "event_demo",
+      "claim_owner"
+    );
+  });
+
+  it("rejects invalid callback correlation before claiming a webhook event", async () => {
+    const callbackUrl = new URL(
+      createMessageStatusCallbackUrl({
+        appUrl: "https://app.signalstack.test",
+        orgId: "org_demo",
+        attemptId: "attempt_demo",
+        correlationId: "3f32e2c5-9b0f-48ae-9510-d3d27acafed1",
+        masterKey: process.env.SECRETS_MASTER_KEY!
+      })
+    );
+    callbackUrl.searchParams.set("proof", "A".repeat(43));
+
+    const response = await statusWebhookRoute(
+      twilioFormRequest(callbackUrl.toString(), {
+        AccountSid: "AC00000000000000000000000000000000",
+        From: "+15555550199",
+        To: "+15555550100",
+        MessageSid: "SM123",
+        MessageStatus: "sent"
+      })
+    );
+
+    expect(response.status).toBe(403);
+    expect(mocks.recordWebhookEvent).not.toHaveBeenCalled();
+    expect(mocks.updateMessageFromTwilioStatus).not.toHaveBeenCalled();
+  });
+
+  it("fails closed when signed callback correlation does not match an attempt", async () => {
+    mocks.updateMessageFromTwilioStatus.mockResolvedValueOnce({
+      matched: false,
+      updated: false,
+      createdAt: null
+    });
+    const callbackUrl = createMessageStatusCallbackUrl({
+      appUrl: "https://app.signalstack.test",
+      orgId: "org_demo",
+      attemptId: "attempt_demo",
+      correlationId: "3f32e2c5-9b0f-48ae-9510-d3d27acafed1",
+      masterKey: process.env.SECRETS_MASTER_KEY!
+    });
+
+    const response = await statusWebhookRoute(
+      twilioFormRequest(callbackUrl, {
+        AccountSid: "AC00000000000000000000000000000000",
+        From: "+15555550199",
+        To: "+15555550100",
+        MessageSid: "SM123",
+        MessageStatus: "sent"
+      })
+    );
+
+    expect(response.status).toBe(403);
+    expect(response.headers.get("retry-after")).toBeNull();
+    expect(mocks.releaseWebhookEventClaim).toHaveBeenCalledWith(
+      "org_demo",
+      "event_demo",
+      "claim_owner"
+    );
+    expect(mocks.markWebhookEventProcessed).not.toHaveBeenCalled();
   });
 
   it("records canceled as a terminal delivery failure using the shared status vocabulary", async () => {

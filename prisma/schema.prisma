@@ -74,6 +74,32 @@ enum QueueJobStatus {
   FAILED
 }
 
+enum MessageApplicationStatus {
+  ACCEPTED
+  SCHEDULED
+  PROCESSING
+  SENT
+  DELIVERED
+  FAILED
+  CANCELLED
+  AMBIGUOUS
+}
+
+enum MessageTransport {
+  DUMMY
+  TWILIO
+}
+
+enum MessageAttemptStatus {
+  QUEUED
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  AMBIGUOUS
+  RESOLVED_NOT_SENT
+}
+
 enum A2pRegistrationStatus {
   NOT_STARTED
   PENDING
@@ -147,6 +173,7 @@ model Organization {
   queueJobs                       QueueJob[]
   conversations                   Conversation[]
   messages                        Message[]
+  messageAttempts                 MessageAttempt[]
   internalNotes                   InternalNote[]
   complianceProfile               ComplianceProfile?
   usageEvents                     UsageEvent[]
@@ -270,17 +297,18 @@ model AuthThrottle {
 }
 
 model Membership {
-  id                    String           @id @default(cuid())
-  orgId                 String
-  userId                String
-  role                  MembershipRole   @default(MEMBER)
-  status                MembershipStatus @default(ACTIVE)
-  createdAt             DateTime         @default(now())
-  updatedAt             DateTime         @updatedAt
-  org                   Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  user                  AppUser          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  authSessions          AuthSession[]    @relation("AuthSessionMembership")
-  assignedConversations Conversation[]   @relation("ConversationAssigneeMembership")
+  id                        String           @id @default(cuid())
+  orgId                     String
+  userId                    String
+  role                      MembershipRole   @default(MEMBER)
+  status                    MembershipStatus @default(ACTIVE)
+  createdAt                 DateTime         @default(now())
+  updatedAt                 DateTime         @updatedAt
+  org                       Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user                      AppUser          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  authSessions              AuthSession[]    @relation("AuthSessionMembership")
+  assignedConversations     Conversation[]   @relation("ConversationAssigneeMembership")
+  reconciledMessageAttempts MessageAttempt[] @relation("MessageAttemptReconciler")
 
   @@unique([orgId, userId])
   @@index([orgId])
@@ -535,36 +563,107 @@ model QueueJob {
 }
 
 model Message {
-  id                String        @id @default(cuid())
-  orgId             String
-  contactId         String?
-  conversationId    String?
-  campaignId        String?
-  direction         String
-  body              String
-  providerMessageId String?
-  providerStatus    String?
-  providerErrorCode String?
-  deliveredAt       DateTime?
-  failedAt          DateTime?
-  idempotencyKey    String
-  createdAt         DateTime      @default(now())
-  org               Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  id                 String                   @id @default(cuid())
+  orgId              String
+  contactId          String?
+  conversationId     String?
+  campaignId         String?
+  direction          String
+  body               String
+  applicationStatus  MessageApplicationStatus @default(ACCEPTED)
+  transport          MessageTransport         @default(DUMMY)
+  destination        String?
+  mediaUrls          String[]                 @default([])
+  requestFingerprint String?
+  providerMessageId  String?
+  providerStatus     String?
+  providerErrorCode  String?
+  deliveredAt        DateTime?
+  failedAt           DateTime?
+  acceptedAt         DateTime                 @default(now())
+  scheduledAt        DateTime?
+  sentAt             DateTime?
+  cancelledAt        DateTime?
+  ambiguousAt        DateTime?
+  attemptCount       Int                      @default(0)
+  idempotencyKey     String
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+  org                Organization             @relation(fields: [orgId], references: [id], onDelete: Cascade)
   /// PostgreSQL migration SQL uses column-specific SET NULL so orgId remains non-null.
-  contact           Contact?      @relation(fields: [orgId, contactId], references: [orgId, id], onDelete: SetNull)
+  contact            Contact?                 @relation(fields: [orgId, contactId], references: [orgId, id], onDelete: SetNull)
   /// PostgreSQL migration SQL uses column-specific SET NULL so orgId remains non-null.
-  conversation      Conversation? @relation(fields: [orgId, conversationId], references: [orgId, id], onDelete: SetNull)
+  conversation       Conversation?            @relation(fields: [orgId, conversationId], references: [orgId, id], onDelete: SetNull)
   /// PostgreSQL migration SQL uses column-specific SET NULL so orgId remains non-null.
-  campaign          Campaign?     @relation(fields: [orgId, campaignId], references: [orgId, id], onDelete: SetNull)
+  campaign           Campaign?                @relation(fields: [orgId, campaignId], references: [orgId, id], onDelete: SetNull)
+  attempts           MessageAttempt[]
 
+  @@unique([orgId, id])
   @@unique([orgId, idempotencyKey])
   @@unique([orgId, providerMessageId])
   @@index([orgId])
   @@index([orgId, contactId])
   @@index([orgId, conversationId])
   @@index([orgId, campaignId])
+  @@index([orgId, applicationStatus])
+  @@index([orgId, applicationStatus, scheduledAt])
   @@index([conversationId])
   @@index([contactId])
+  @@index([providerMessageId])
+}
+
+model MessageAttempt {
+  id                         String                    @id @default(cuid())
+  orgId                      String
+  messageId                  String
+  attemptNumber              Int
+  retryOfAttemptId           String?
+  status                     MessageAttemptStatus      @default(QUEUED)
+  transport                  MessageTransport
+  dueAt                      DateTime                  @default(now())
+  processingToken            String?
+  processingExpiresAt        DateTime?
+  claimedAt                  DateTime?
+  providerCallStartedAt      DateTime?
+  providerAccountId          String?
+  providerCredentialSecretId String?
+  providerCredentialVersion  Int?
+  providerPhoneNumberId      String?
+  destination                String
+  body                       String
+  mediaUrls                  String[]                  @default([])
+  requestFingerprint         String
+  callbackCorrelationId      String                    @unique
+  providerMessageId          String?
+  providerStatus             String?
+  providerErrorCode          String?
+  errorCode                  String?
+  disposition                String?
+  completedAt                DateTime?
+  reconciledAt               DateTime?
+  reconciledByUserId         String?
+  reconciliationNote         String?
+  createdAt                  DateTime                  @default(now())
+  updatedAt                  DateTime                  @updatedAt
+  org                        Organization              @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  message                    Message                   @relation(fields: [orgId, messageId], references: [orgId, id], onDelete: Restrict)
+  retryOf                    MessageAttempt?           @relation("MessageAttemptRetry", fields: [orgId, messageId, retryOfAttemptId], references: [orgId, messageId, id], onDelete: Restrict)
+  retries                    MessageAttempt[]          @relation("MessageAttemptRetry")
+  providerAccount            ProviderAccount?          @relation(fields: [orgId, providerAccountId], references: [orgId, id], onDelete: Restrict)
+  providerCredentialSecret   ProviderCredentialSecret? @relation(fields: [orgId, providerAccountId, providerCredentialSecretId, providerCredentialVersion], references: [orgId, providerAccountId, id, version], onDelete: Restrict)
+  providerPhoneNumber        ProviderPhoneNumber?      @relation(fields: [orgId, providerAccountId, providerPhoneNumberId], references: [orgId, providerAccountId, id], onDelete: Restrict)
+  reconciledByMembership     Membership?               @relation("MessageAttemptReconciler", fields: [orgId, reconciledByUserId], references: [orgId, userId], onDelete: Restrict)
+
+  @@unique([orgId, id])
+  @@unique([orgId, messageId, id])
+  @@unique([orgId, messageId, attemptNumber])
+  @@unique([orgId, providerAccountId, providerMessageId])
+  @@index([orgId])
+  @@index([orgId, status, dueAt, processingExpiresAt])
+  @@index([orgId, messageId, createdAt])
+  @@index([orgId, providerAccountId])
+  @@index([orgId, providerPhoneNumberId])
+  @@index([orgId, reconciledByUserId])
   @@index([providerMessageId])
 }
 
@@ -651,6 +750,7 @@ model ProviderAccount {
   credentialSecrets      ProviderCredentialSecret[]
   messagingServices      ProviderMessagingService[]
   phoneNumbers           ProviderPhoneNumber[]
+  messageAttempts        MessageAttempt[]
 
   @@unique([orgId, id])
   @@unique([orgId, id, provider])
@@ -660,24 +760,26 @@ model ProviderAccount {
 }
 
 model ProviderCredentialSecret {
-  id                String          @id @default(cuid())
+  id                String           @id @default(cuid())
   orgId             String
   providerAccountId String
   version           Int
-  envelopeVersion   Int             @default(1)
-  algorithm         String          @default("aes-256-gcm")
+  envelopeVersion   Int              @default(1)
+  algorithm         String           @default("aes-256-gcm")
   keyVersion        Int
   iv                String
   ciphertext        String
   authTag           String
   fingerprint       String
-  activeFrom        DateTime        @default(now())
+  activeFrom        DateTime         @default(now())
   retiredAt         DateTime?
-  createdAt         DateTime        @default(now())
-  org               Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  providerAccount   ProviderAccount @relation(fields: [orgId, providerAccountId], references: [orgId, id], onDelete: Restrict)
+  createdAt         DateTime         @default(now())
+  org               Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  providerAccount   ProviderAccount  @relation(fields: [orgId, providerAccountId], references: [orgId, id], onDelete: Restrict)
+  messageAttempts   MessageAttempt[]
 
   @@unique([orgId, id])
+  @@unique([orgId, providerAccountId, id, version])
   @@unique([providerAccountId, version])
   @@index([orgId])
   @@index([orgId, providerAccountId])
@@ -734,8 +836,10 @@ model ProviderPhoneNumber {
   org                        Organization              @relation(fields: [orgId], references: [id], onDelete: Cascade)
   providerAccount            ProviderAccount?          @relation(fields: [orgId, providerAccountId, provider], references: [orgId, id, provider], onDelete: Restrict)
   providerMessagingService   ProviderMessagingService? @relation(fields: [orgId, providerAccountId, provider, providerMessagingServiceId], references: [orgId, providerAccountId, provider, id], onDelete: Restrict)
+  messageAttempts            MessageAttempt[]
 
   @@unique([orgId, id])
+  @@unique([orgId, providerAccountId, id])
   @@unique([orgId, phoneNumber])
   @@unique([provider, externalNumberId])
   @@index([orgId])

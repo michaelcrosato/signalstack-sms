@@ -355,7 +355,7 @@ export const PUBLIC_API_OPERATIONS = Object.freeze([
     method: "post",
     path: "/api/v1/messages",
     operationId: "submitMessage",
-    summary: "Submit a dummy message",
+    summary: "Submit a direct message",
     tag: "Messages",
     scopes: ["messages:send"],
     requestSchema: "MessageCreate",
@@ -379,6 +379,15 @@ export const PUBLIC_API_OPERATIONS = Object.freeze([
     tag: "Messages",
     scopes: ["deliveries:read"],
     responseSchema: "MessageStatusResult"
+  }),
+  operation({
+    method: "post",
+    path: "/api/v1/messages/{messageId}/cancel",
+    operationId: "cancelMessage",
+    summary: "Cancel a direct message before provider-call authorization",
+    tag: "Messages",
+    scopes: ["messages:send"],
+    responseSchema: "MessageSubmission"
   }),
   operation({
     method: "get",
@@ -473,7 +482,7 @@ export const PUBLIC_API_OPERATIONS = Object.freeze([
     method: "post",
     path: "/api/v1/conversations/{conversationId}/messages",
     operationId: "replyToConversation",
-    summary: "Submit a dummy conversation reply",
+    summary: "Submit a direct conversation reply",
     tag: "Conversations",
     scopes: ["conversations:write", "messages:send"],
     requestSchema: "ConversationReply",

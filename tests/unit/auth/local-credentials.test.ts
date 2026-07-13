@@ -170,31 +170,34 @@ describe("local credential domain service", () => {
     });
   });
 
-  it("retries only bounded serializable conflicts and then observes the bootstrap predicate", async () => {
-    const memory = createMemoryStore();
-    let transactionAttempts = 0;
-    const store: LocalCredentialStore = {
-      ...memory.store,
-      async transaction(operation, options) {
-        transactionAttempts += 1;
-        if (transactionAttempts === 1) {
-          throw Object.assign(new Error("serialization detail"), { code: "P2034" });
+  it.each(["P2034", "P2002"])(
+    "retries bounded bootstrap race %s and then observes the predicate",
+    async (code) => {
+      const memory = createMemoryStore();
+      let transactionAttempts = 0;
+      const store: LocalCredentialStore = {
+        ...memory.store,
+        async transaction(operation, options) {
+          transactionAttempts += 1;
+          if (transactionAttempts === 1) {
+            throw Object.assign(new Error("bootstrap race detail"), { code });
+          }
+          return memory.store.transaction(operation, options);
         }
-        return memory.store.transaction(operation, options);
-      }
-    };
-    const service = createLocalCredentialService({
-      store,
-      bootstrapToken,
-      authenticationFallbackHash,
-      now: () => now,
-      crypto: createCrypto()
-    });
+      };
+      const service = createLocalCredentialService({
+        store,
+        bootstrapToken,
+        authenticationFallbackHash,
+        now: () => now,
+        crypto: createCrypto()
+      });
 
-    await expect(service.bootstrapFirstOwner(bootstrapInput)).resolves.toMatchObject({ created: true });
-    expect(transactionAttempts).toBe(2);
-    expect(memory.getState()).toMatchObject({ credentialCount: 1 });
-  });
+      await expect(service.bootstrapFirstOwner(bootstrapInput)).resolves.toMatchObject({ created: true });
+      expect(transactionAttempts).toBe(2);
+      expect(memory.getState()).toMatchObject({ credentialCount: 1 });
+    }
+  );
 
   it("normalizes email, authenticates an enabled user, and clears prior failures", async () => {
     const record = authenticationRecord({ failedAttempts: 2, lockedUntil: new Date(now.getTime() - 1) });

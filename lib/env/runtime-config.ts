@@ -53,7 +53,7 @@ export type RuntimeConfig = Readonly<{
   }>;
   worker: Readonly<{
     enabled: boolean;
-    deploymentClass: "local-demo" | "production-live-campaign";
+    deploymentClass: "local-demo" | "production-live-direct" | "production-live-campaign";
     concurrency: number;
     pollIntervalMs: number;
   }>;
@@ -238,7 +238,9 @@ const runtimeEnvironmentSchema = z
     DATABASE_RLS_ENFORCED: booleanFromEnv(false),
 
     WORKER_ENABLED: booleanFromEnv(false),
-    WORKER_DEPLOYMENT_CLASS: z.enum(["local-demo", "production-live-campaign"]).default("local-demo"),
+    WORKER_DEPLOYMENT_CLASS: z
+      .enum(["local-demo", "production-live-direct", "production-live-campaign"])
+      .default("local-demo"),
     WORKER_CONCURRENCY: integerFromEnv(5, 1, 100),
     WORKER_POLL_INTERVAL_MS: integerFromEnv(1_000, 100, 60_000),
 
@@ -384,17 +386,15 @@ const runtimeEnvironmentSchema = z
     }
 
     if (config.LIVE_MESSAGING_ENABLED && config.MESSAGING_PROVIDER === "twilio") {
-      if (!isTwilioAccountSid(config.TWILIO_ACCOUNT_SID)) {
-        addIssue(context, "TWILIO_ACCOUNT_SID", "Live Twilio messaging requires account credential readiness.");
-      }
-      if (!isMinimumSecret(config.TWILIO_AUTH_TOKEN, 16)) {
-        addIssue(context, "TWILIO_AUTH_TOKEN", "Live Twilio messaging requires auth-token readiness.");
-      }
-      if (!isTwilioSenderConfigured(config)) {
-        addIssue(context, "TWILIO_FROM_NUMBER", "Live Twilio messaging requires a from number or messaging service.");
-      }
-      if (!production && !isEncryptionKey(config.SECRETS_MASTER_KEY)) {
+      if (!isEncryptionKey(config.SECRETS_MASTER_KEY)) {
         addIssue(context, "SECRETS_MASTER_KEY", "Live Twilio messaging requires a valid 256-bit secrets master key.");
+      }
+      if (!isHttpsUrl(config.NEXT_PUBLIC_APP_URL)) {
+        addIssue(
+          context,
+          "NEXT_PUBLIC_APP_URL",
+          "Live Twilio messaging requires an HTTPS public callback origin."
+        );
       }
     }
 
@@ -493,7 +493,9 @@ function buildSafeRuntimeConfig(config: ParsedRuntimeEnvironment): RuntimeConfig
     provider: Object.freeze({
       name: config.MESSAGING_PROVIDER,
       liveMessagingEnabled: config.LIVE_MESSAGING_ENABLED,
-      credentialsReady: twilio.accountSidConfigured && twilio.authTokenConfigured && twilio.senderConfigured,
+      // General M5 transport resolves per-tenant encrypted credentials and owned senders at dispatch.
+      // Environment Twilio fields remain safe readiness metadata for the isolated live-test exception.
+      credentialsReady: masterKeyConfigured,
       twilio
     }),
     queue: Object.freeze({
@@ -549,6 +551,15 @@ function addIssue(context: z.RefinementCtx, path: string, message: string): void
 function hasProtocol(value: string, allowedProtocols: readonly string[]): boolean {
   try {
     return allowedProtocols.includes(new URL(value).protocol);
+  } catch {
+    return false;
+  }
+}
+
+function isHttpsUrl(value: string): boolean {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "https:" && !parsed.username && !parsed.password;
   } catch {
     return false;
   }

@@ -18,7 +18,7 @@ Stack: Next.js App Router + TypeScript (strict) + Prisma/Postgres + BullMQ/Redis
 | --- | --- | --- |
 | DB | `lib/db/` | `prisma.ts`, `tenant.ts` (orgId guard), `repositories/**` (tenant-scoped) |
 | Validation | `lib/validation/` | Zod schemas per domain (boundary contracts) |
-| Messaging | `lib/messaging/` | `provider/**` adapter (dummy/twilio), `render-template`, `send-preflight`, `twilio-webhooks`, `delivery-*` |
+| Messaging | `lib/messaging/` | `provider/**` adapter (dummy/twilio), direct-message outbox/callback/review, `render-template`, `send-preflight`, `twilio-webhooks`, `delivery-*` |
 | Provider accounts | `lib/integrations/provider-accounts/` | AES-GCM credential envelopes, safe DTOs, ADMIN lifecycle service, trusted callback authentication |
 | Queue | `lib/queue/` | `worker`, `bullmq*`, `jobs`, `idempotency`, `live-worker-controls` (frozen hard-gate metadata) |
 | Compliance | `lib/compliance/` | `gates`, `opt-out`, `readiness-audit-export` |

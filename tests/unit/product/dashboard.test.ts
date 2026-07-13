@@ -1,8 +1,9 @@
-import { UsageEventType } from "@prisma/client";
+import { MessageApplicationStatus, UsageEventType } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { prisma } from "@/lib/db/prisma";
 import {
   outboundDeliveredMessageWhere,
+  outboundAmbiguousMessageWhere,
   outboundFailedMessageWhere,
   outboundPendingMessageWhere
 } from "@/lib/messaging/delivery-counts";
@@ -54,20 +55,19 @@ vi.mock("@/lib/db/prisma", () => ({
         }: {
           where: {
             direction?: string;
-            deliveredAt?: { not: null } | null;
-            failedAt?: null;
-            OR?: Array<Record<string, unknown>>;
+            applicationStatus?: MessageApplicationStatus | { in: MessageApplicationStatus[] };
           };
         }) => {
-          if (where.deliveredAt && where.failedAt === null) {
+          if (where.applicationStatus === MessageApplicationStatus.DELIVERED) {
             return 3;
           }
-          if (where.deliveredAt === null && where.failedAt === null) {
+          if (typeof where.applicationStatus === "object") {
             return 2;
           }
-          if (where.OR) {
+          if (where.applicationStatus === MessageApplicationStatus.FAILED) {
             return 1;
           }
+          if (where.applicationStatus === MessageApplicationStatus.AMBIGUOUS) return 0;
           if (where.direction === "OUTBOUND") {
             return 5;
           }
@@ -327,6 +327,7 @@ describe("product dashboard navigation", () => {
         delivered: 3,
         pending: 2,
         failed: 1,
+        ambiguous: 0,
         deliveryRatePercent: 60,
         deliveryReviewStatus: "1 failed; review evidence",
         lastEvidenceAt: "2026-01-04T12:00:00.000Z"
@@ -448,6 +449,9 @@ describe("product dashboard navigation", () => {
     });
     expect(vi.mocked(prisma.message.count)).toHaveBeenCalledWith({
       where: outboundFailedMessageWhere("org_1")
+    });
+    expect(vi.mocked(prisma.message.count)).toHaveBeenCalledWith({
+      where: outboundAmbiguousMessageWhere("org_1")
     });
     expect(vi.mocked(prisma.message.findFirst)).toHaveBeenCalledWith({
       where: { orgId: "org_1", direction: "OUTBOUND" },

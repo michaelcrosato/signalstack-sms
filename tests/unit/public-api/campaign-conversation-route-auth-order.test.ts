@@ -9,7 +9,9 @@ const mocks = vi.hoisted(() => ({
   runPublicApiIdempotentMutation: vi.fn(),
   createPublicCampaign: vi.fn(),
   schedulePublicCampaign: vi.fn(),
-  submitDummyPublicConversationReply: vi.fn()
+  reserveDirectMessage: vi.fn(),
+  resolveDirectMessageTransport: vi.fn(() => "DUMMY"),
+  serializePublicMessage: vi.fn((message) => message)
 }));
 
 vi.mock("@/lib/public-api/request", async (importOriginal) => ({
@@ -29,9 +31,15 @@ vi.mock("@/lib/public-api/campaigns", async (importOriginal) => ({
   schedulePublicCampaign: mocks.schedulePublicCampaign
 }));
 
-vi.mock("@/lib/public-api/conversations", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/lib/public-api/conversations")>()),
-  submitDummyPublicConversationReply: mocks.submitDummyPublicConversationReply
+vi.mock("@/lib/messaging/direct-message-reservation", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/messaging/direct-message-reservation")>()),
+  reserveDirectMessage: mocks.reserveDirectMessage,
+  resolveDirectMessageTransport: mocks.resolveDirectMessageTransport
+}));
+
+vi.mock("@/lib/public-api/dummy-messages", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/public-api/dummy-messages")>()),
+  serializePublicMessage: mocks.serializePublicMessage
 }));
 
 const denied = {
@@ -110,20 +118,25 @@ describe("public campaign and conversation route authorization order", () => {
     expect(mocks.readPublicApiJson).not.toHaveBeenCalled();
   });
 
-  it("passes the same idempotency transaction to the dummy reply transition", async () => {
+  it("passes the same idempotency transaction to the durable reply reservation", async () => {
     const requestBody = { body: "Hello" };
-    const tx = { marker: "same-transaction" };
+    const tx = {
+      marker: "same-transaction",
+      message: { findUniqueOrThrow: vi.fn().mockResolvedValue({ id: "message_demo" }) }
+    };
     mocks.authorizePublicApiRequest.mockResolvedValue(authorized);
     mocks.readPublicApiJson.mockResolvedValue(requestBody);
     mocks.runPublicApiIdempotentMutation.mockResolvedValue(new Response("{}", { status: 202 }));
-    mocks.submitDummyPublicConversationReply.mockResolvedValue({
+    mocks.reserveDirectMessage.mockResolvedValue({
       ok: true,
+      deduped: false,
       message: { id: "message_demo" }
     });
 
     await replyRoute(
       new Request("http://localhost/api/v1/conversations/conversation_demo/messages", {
-        method: "POST"
+        method: "POST",
+        headers: { "Idempotency-Key": "reply-once" }
       }),
       { params: Promise.resolve({ conversationId: "conversation_demo" }) }
     );
@@ -137,10 +150,18 @@ describe("public campaign and conversation route authorization order", () => {
     );
     const mutation = mocks.runPublicApiIdempotentMutation.mock.calls[0]?.[4];
     const snapshot = await mutation(tx);
-    expect(mocks.submitDummyPublicConversationReply).toHaveBeenCalledWith(tx, {
+    expect(mocks.reserveDirectMessage).toHaveBeenCalledWith(tx, {
       orgId: "org_demo",
+      route: "public_conversation_reply",
+      identity: {
+        kind: "public_api",
+        credentialId: "credential_demo",
+        idempotencyKey: "reply-once"
+      },
+      transport: "DUMMY",
       conversationId: "conversation_demo",
-      body: "Hello"
+      body: "Hello",
+      mediaUrls: []
     });
     expect(snapshot).toMatchObject({ status: 202, body: { ok: true } });
   });

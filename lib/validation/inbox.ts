@@ -19,7 +19,7 @@ export const conversationMessageCreateSchema = z.object({
 
 export const conversationReplyCreateSchema = z.object({
   body: bodySchema,
-  idempotencyKey: z.string().trim().min(1).max(255).optional()
+  idempotencyKey: z.string().uuid()
 });
 
 export const conversationAssignSchema = z.object({

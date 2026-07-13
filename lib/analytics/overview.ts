@@ -2,6 +2,7 @@ import { withTenantTransaction } from "@/lib/db/tenant-context";
 import { aggregateUsageEvents } from "@/lib/billing/metering";
 import {
   outboundDeliveredMessageWhere,
+  outboundAmbiguousMessageWhere,
   outboundFailedMessageWhere,
   outboundMessageWhere,
   outboundPendingMessageWhere
@@ -23,6 +24,7 @@ export async function getAnalyticsOverview(orgId: string) {
     deliveredMessages,
     pendingMessages,
     failedMessages,
+    ambiguousMessages,
     lastOutboundMessage,
     usageEvents
   ] = await Promise.all([
@@ -39,6 +41,7 @@ export async function getAnalyticsOverview(orgId: string) {
     prisma.message.count({ where: outboundDeliveredMessageWhere(orgId) }),
     prisma.message.count({ where: outboundPendingMessageWhere(orgId) }),
     prisma.message.count({ where: outboundFailedMessageWhere(orgId) }),
+    prisma.message.count({ where: outboundAmbiguousMessageWhere(orgId) }),
     prisma.message.findFirst({
       where: outboundMessageWhere(orgId),
       orderBy: { createdAt: "desc" },
@@ -69,6 +72,7 @@ export async function getAnalyticsOverview(orgId: string) {
       delivered: deliveredMessages,
       pending: pendingMessages,
       failed: failedMessages,
+      ambiguous: ambiguousMessages,
       lastOutboundAt: lastOutboundMessage?.createdAt.toISOString() ?? null
     },
     usage: aggregateUsageEvents(usageEvents)

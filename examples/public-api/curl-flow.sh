@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# M3 is dummy-only: this flow persists local records and never calls a carrier.
+# Run only against the default demo/dummy profile. A live direct worker may deliver accepted Twilio work.
 # Keep tracing disabled because Authorization headers and the one-time rotated key are sensitive.
 set +x
 
@@ -105,6 +105,15 @@ test "$MESSAGE_ID" = "$REPLAY_MESSAGE_ID" || {
   echo "Idempotent message retry returned a different message ID." >&2
   exit 1
 }
+printf '%s' "$MESSAGE_RESPONSE" | node -e '
+  const fs = require("node:fs");
+  const message = JSON.parse(fs.readFileSync(0, "utf8")).data.message;
+  if (message.transport !== "dummy" || message.applicationStatus !== "SENT" ||
+      message.attemptCount !== 1 || message.latestAttemptStatus !== "SUCCEEDED" ||
+      message.requiresReview !== false) {
+    throw new Error("Example must run against the deterministic dummy lifecycle.");
+  }
+'
 
 STATUS_RESPONSE="$(curl_with_bearer "$SIGNALSTACK_API_KEY" --silent --show-error --fail-with-body \
   "${SIGNALSTACK_BASE_URL}/api/v1/messages/${MESSAGE_ID}/status")"
@@ -120,5 +129,5 @@ curl_with_bearer "$SIGNALSTACK_API_KEY" --silent --show-error --fail-with-body \
   --header "Idempotency-Key: ${REVOKE_KEY}" >/dev/null
 expect_invalid_key "$SIGNALSTACK_API_KEY"
 
-printf 'contact=%s message=%s status=%s idempotent=yes old-key-denied=yes revoked-key-denied=yes\n' \
+printf 'contact=%s message=%s status=%s transport=dummy attempt=1 review=no idempotent=yes old-key-denied=yes revoked-key-denied=yes\n' \
   "$CONTACT_ID" "$MESSAGE_ID" "$DELIVERY_STATUS"

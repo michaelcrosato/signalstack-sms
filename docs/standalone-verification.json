@@ -152,12 +152,26 @@
     },
     {
       "id": "M5",
-      "status": "partial foundation",
+      "status": "done",
       "evidence": [
-        "lib/messaging/live-test-sms.ts",
-        "lib/messaging/provider/dummy-provider.ts",
-        "lib/queue/worker.ts",
-        "tests/unit/messaging/live-test-sms.test.ts"
+        "plan/specs/SPEC-033-durable-direct-messaging.md",
+        "prisma/migrations/20260712018000_message_attempt_outbox/migration.sql",
+        "prisma/migrations/20260712019000_message_attempt_invariants/migration.sql",
+        "prisma/migrations/20260712020000_message_attempt_dispatch_security/migration.sql",
+        "prisma/migrations/20260712021000_message_attempt_payload_bounds/migration.sql",
+        "lib/messaging/direct-message-reservation.ts",
+        "lib/messaging/outbox/worker.ts",
+        "lib/messaging/delivery-attempt-review.ts",
+        "lib/messaging/status-callback-correlation.ts",
+        "app/api/v1/messages/route.ts",
+        "app/api/webhooks/twilio/status/route.ts",
+        "app/settings/delivery-attempts/page.tsx",
+        "tests/unit/db/message-attempt-substrate.test.ts",
+        "tests/unit/db/message-attempt-worker.test.ts",
+        "tests/unit/db/public-api-exit-path.test.ts",
+        "tests/unit/messaging/direct-message-reservation.test.ts",
+        "tests/unit/messaging/outbox-worker.test.ts",
+        "tests/unit/messaging/delivery-attempt-review.test.ts"
       ]
     },
     {
