@@ -601,7 +601,11 @@ export async function importProviderResources(
                 data: {
                   providerAccountId: account.id,
                   status: ProviderMessagingServiceStatus.VERIFIED,
-                  isDefault: input.defaultMessagingServiceCandidateId === candidateId,
+                  // Preserve the current default unless one is explicitly requested (matches the
+                  // phone-number import), so re-importing the default service does not demote it.
+                  isDefault: input.defaultMessagingServiceCandidateId
+                    ? input.defaultMessagingServiceCandidateId === candidateId
+                    : existing.isDefault,
                   capabilities: ["sms", "mms"],
                   lastCheckedAt: now,
                   disabledAt: null
@@ -676,7 +680,12 @@ export async function importProviderResources(
             externalNumberIdLast4: lastFour(record.externalNumberId),
             status: ProviderPhoneNumberStatus.VERIFIED,
             capabilities: capabilitiesFromNumber(record),
-            isDefault: input.defaultPhoneNumberCandidateId === candidateId,
+            // Only change the default when one is explicitly requested (the org-wide clear above also
+            // runs only then). Otherwise preserve the row's current default flag, so re-importing the
+            // number that is currently the org default does not silently demote it and leave no sender.
+            isDefault: input.defaultPhoneNumberCandidateId
+              ? input.defaultPhoneNumberCandidateId === candidateId
+              : existing?.isDefault ?? false,
             lastCheckedAt: now,
             disabledAt: null
           } as const;

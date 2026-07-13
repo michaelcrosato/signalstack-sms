@@ -525,6 +525,60 @@ describe("provider discovery and import proof", () => {
     ]);
   });
 
+  it("preserves an existing default number when re-imported without an explicit default", async () => {
+    mockLoadedCredential();
+    const phone = {
+      externalNumberId: `PN${"f".repeat(32)}`,
+      externalAccountId: accountSid,
+      phoneNumber: "+15555550199",
+      friendlyName: "Support",
+      capabilities: { sms: true, mms: true }
+    };
+    const candidateId = providerCandidateId("phone_number", phone.phoneNumber);
+    const providerFactory = factory(
+      adapter({ discoverPhoneNumbers: vi.fn().mockResolvedValue([phone]) })
+    );
+    // The number being re-imported is currently the org default.
+    mocks.tx.providerPhoneNumber.findFirst.mockResolvedValue({
+      id: "provider_number_1",
+      provider: "twilio",
+      providerAccountId: accountId,
+      externalNumberId: phone.externalNumberId,
+      phoneNumber: phone.phoneNumber,
+      phoneNumberHash: "existing-hash",
+      status: "VERIFIED",
+      isDefault: true,
+      verifiedAt: now
+    });
+    mocks.tx.providerPhoneNumber.update.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({
+      id: "provider_number_1",
+      label: null,
+      externalNumberIdLast4: "ffff",
+      createdAt: now,
+      updatedAt: now,
+      ...data
+    }));
+
+    await importProviderResources(
+      {
+        orgId: "org_1",
+        providerAccountId: accountId,
+        credentialVersion: 1,
+        phoneNumberCandidateIds: [candidateId],
+        messagingServiceCandidateIds: [],
+        actor: { userId: "user_1" }
+      },
+      { factory: providerFactory, environment, now: () => now }
+    );
+
+    // Default preserved, and the org-wide default clear was not triggered.
+    expect(mocks.tx.providerPhoneNumber.update).toHaveBeenCalledWith({
+      where: { id: "provider_number_1" },
+      data: expect.objectContaining({ isDefault: true })
+    });
+    expect(mocks.tx.providerPhoneNumber.updateMany).not.toHaveBeenCalled();
+  });
+
   it("rejects a stale credential generation before rediscovery or persistence", async () => {
     mockLoadedCredential(2);
     const providerFactory = factory(adapter());
