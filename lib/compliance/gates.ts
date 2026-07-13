@@ -1,6 +1,7 @@
 import { A2pRegistrationStatus, ConsentStatus, type ComplianceProfile } from "@prisma/client";
 import { isWithinQuietHours } from "@/lib/compliance/quiet-hours";
 import { resolveTimezoneFromPhone } from "@/lib/compliance/area-codes";
+import { hasCompleteConsentEvidence } from "@/lib/compliance/consent-evidence";
 
 export type MessagingHardGateInput = {
   demoMode: boolean;
@@ -104,12 +105,15 @@ export function evaluateMessagingHardGate(input: MessagingHardGateInput): Messag
 
 // SPEC-009: a live send requires stored consent evidence — exact capture timestamp, capture method, and
 // the verbatim disclosure shown at opt-in (retained alongside the contact number). Missing any → blocked.
+// Delegates to the same completeness check enforced at write time (`hasCompleteConsentEvidence`), so the
+// send gate cannot be looser than the write path: whitespace-only method/disclosure and an Invalid Date
+// capture timestamp are rejected, not merely truthy-checked.
 export function hasConsentEvidence(contact: {
   consentCapturedAt?: Date | null;
   consentMethod?: string | null;
   consentDisclosure?: string | null;
 }): boolean {
-  return Boolean(contact.consentCapturedAt && contact.consentMethod && contact.consentDisclosure);
+  return hasCompleteConsentEvidence(contact);
 }
 
 export function complianceProfileIsComplete(
