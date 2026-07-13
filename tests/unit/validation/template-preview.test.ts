@@ -53,6 +53,20 @@ describe("Message Template Variable Substitution Validator & Preview Seam", () =
     expect(resSinglePass.rendered).toBe("{{second}} safe");
   });
 
+  it("recognizes the same placeholders as the send path (whitespace, and literal for malformed)", () => {
+    // Preview and send share one grammar: surrounding whitespace is tolerated...
+    const spaced = renderTemplatePreview("Hi {{ firstName }}!", { firstName: "Ada" });
+    expect(spaced.rendered).toBe("Hi Ada!");
+    expect(spaced.missing).toEqual([]);
+
+    // ...and a malformed placeholder is literal text in preview just as it is at send time, so a
+    // preview can no longer look fine while the sent message renders it differently.
+    const malformed = renderTemplatePreview("Hi {{first-name}}", { firstName: "Ada" });
+    expect(malformed.rendered).toBe("Hi {{first-name}}");
+    expect(malformed.missing).toEqual([]);
+    expect(malformed.unused).toEqual(["firstName"]);
+  });
+
   it("uses only own string variables and does not apply HTML encoding to SMS text", () => {
     const variables = Object.create({ inherited: "unsafe" }) as Record<string, string>;
     variables.name = "<b>Ada & Bob</b>";

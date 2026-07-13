@@ -46,11 +46,6 @@ Milestone-level product gaps (public API, live provider transport, packaging, ba
   an opt-in it cannot prove with retained evidence — but it is silent (no audit entry) and can surprise
   operators merging legacy/seeded contacts. Changing it requires a compliance review, not a quiet code
   edit, because consent evidence is write-once by contract (SPEC-009/014).
-- **Template preview and send use different placeholder grammars.** Send-time `renderTemplate`
-  (`lib/messaging/render-template.ts`) matches `{{[a-zA-Z0-9_.-]+}}` and blanks unknown keys, while
-  `renderTemplatePreview` and the template-variable schema only accept `{{[a-zA-Z_$][\w$]*}}`. A
-  hyphenated/dotted placeholder such as `{{first-name}}` previews as literal text but sends blank. Align
-  the render regex with the validated variable grammar when touching templates.
 - **`campaignScheduleSchema` accepts past datetimes** (`lib/validation/campaigns.ts`); a past schedule
   fires on the next poll. This may be intentional (immediate send) but is undocumented.
 - **`/api/metrics` loads all outbound message rows per scrape** (`app/api/metrics/route.ts`) rather than

@@ -2,6 +2,7 @@ import { Worker } from "bullmq";
 import { scheduledCampaignBullMqQueueName } from "@/lib/queue/bullmq";
 import { scheduledCampaignBullMqJobDataSchema } from "@/lib/queue/jobs";
 import { getRedisQueueConfig, redisConnectionFromUrl } from "@/lib/queue/redis";
+import { positiveIntFromEnv } from "@/lib/queue/parse-env";
 import { localWorkerReadiness, processScheduledCampaignQueueJobById } from "@/lib/queue/worker";
 import { logger } from "@/lib/observability/logger";
 import { recordMetric, smsPipelineMetrics } from "@/lib/observability/metrics";
@@ -56,12 +57,8 @@ export function createScheduledCampaignBullMqWorker(env: Record<string, string |
     throw new Error("REDIS_URL is required for BullMQ worker startup.");
   }
 
-  const lockDuration = env.BULLMQ_LOCK_DURATION_MS
-    ? Number.parseInt(env.BULLMQ_LOCK_DURATION_MS, 10)
-    : 30000; // 30 seconds
-  const stalledInterval = env.BULLMQ_STALLED_INTERVAL_MS
-    ? Number.parseInt(env.BULLMQ_STALLED_INTERVAL_MS, 10)
-    : 30000; // 30 seconds
+  const lockDuration = positiveIntFromEnv(env.BULLMQ_LOCK_DURATION_MS, 30000); // 30 seconds
+  const stalledInterval = positiveIntFromEnv(env.BULLMQ_STALLED_INTERVAL_MS, 30000); // 30 seconds
 
   const worker = new Worker(
     scheduledCampaignBullMqQueueName,

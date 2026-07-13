@@ -64,6 +64,43 @@ describe("messaging hard gates", () => {
     expect(result.reasons).toEqual(["CONSENT_EVIDENCE_MISSING"]);
   });
 
+  it("blocks whitespace-only or invalid-date consent evidence (send gate matches write-time strictness)", () => {
+    const base = {
+      demoMode: false,
+      liveMessagingEnabled: true,
+      messagingProvider: "twilio" as const,
+      complianceProfile: completeProfile
+    };
+    // Whitespace-only method/disclosure are not real evidence.
+    expect(
+      evaluateMessagingHardGate({
+        ...base,
+        contact: {
+          consentStatus: ConsentStatus.OPTED_IN,
+          optedOutAt: null,
+          archivedAt: null,
+          consentCapturedAt: new Date("2026-01-01T00:00:00.000Z"),
+          consentMethod: "   ",
+          consentDisclosure: "   "
+        }
+      }).reasons
+    ).toEqual(["CONSENT_EVIDENCE_MISSING"]);
+    // An Invalid Date capture timestamp is not a real timestamp.
+    expect(
+      evaluateMessagingHardGate({
+        ...base,
+        contact: {
+          consentStatus: ConsentStatus.OPTED_IN,
+          optedOutAt: null,
+          archivedAt: null,
+          consentCapturedAt: new Date("not-a-date"),
+          consentMethod: "web_form",
+          consentDisclosure: "I agree to receive texts. Reply STOP to opt out."
+        }
+      }).reasons
+    ).toEqual(["CONSENT_EVIDENCE_MISSING"]);
+  });
+
   it("blocks opted-out contacts even when provider gates are otherwise ready", () => {
     const result = evaluateMessagingHardGate({
       demoMode: false,

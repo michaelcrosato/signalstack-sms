@@ -15,6 +15,14 @@ describe("resolveTimezoneFromPhone", () => {
     );
   });
 
+  it("maps Phoenix-metro Arizona area codes to America/Phoenix (no DST), not America/Denver", () => {
+    for (const areaCode of ["480", "602", "623"]) {
+      expect(resolveTimezoneFromPhone(`+1${areaCode}5551234`)).toBe("America/Phoenix");
+    }
+    // New Mexico shares the Mountain area but observes DST, so it stays America/Denver.
+    expect(resolveTimezoneFromPhone("+15055551234")).toBe("America/Denver");
+  });
+
   it("resolves timezone from 10-digit formatted number", () => {
     expect(resolveTimezoneFromPhone("2125551234")).toBe("America/New_York");
     expect(resolveTimezoneFromPhone("3125551234")).toBe("America/Chicago");
