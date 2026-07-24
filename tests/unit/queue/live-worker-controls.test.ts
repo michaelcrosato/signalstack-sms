@@ -1,5 +1,13 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import {
+  checkCampaignWorkerKillSwitch,
+  checkProviderRateLimit,
+  clearWorkerHeartbeats,
+  getWorkerHeartbeat,
+  isGlobalEmergencyKillSwitchActive,
+  isOrgEmergencyKillSwitchActive,
+  isWorkerShutdownRequested,
+  listWorkerHeartbeats,
   liveWorkerControlArrayExposesOnlyIndexedEntries,
   liveWorkerControlEvidenceUsesFrozenDataDescriptors,
   liveWorkerControlIdsMatchRequiredChecklist,
@@ -9,7 +17,14 @@ import {
   liveWorkerControlsUseSupportedStatuses,
   liveWorkerDeploymentClassIsAuthorized,
   productionLiveCampaignWorkerControls,
+  recordWorkerHeartbeat,
+  requestWorkerShutdown,
   reservedLiveWorkerDeploymentClass,
+  resetEmergencyKillSwitches,
+  resetProviderRateLimiters,
+  resetWorkerShutdown,
+  setGlobalEmergencyKillSwitch,
+  setOrgEmergencyKillSwitch,
   supportedLiveWorkerControlStatuses
 } from "@/lib/queue/live-worker-controls";
 import { supportedWorkerDeploymentClasses, workerDeploymentClassIsAllowed } from "@/lib/queue/worker";
@@ -218,5 +233,87 @@ describe("workerDeploymentClassIsAllowed", () => {
 
   it.each(["production-live-campaign", "production", "staging", "prod"])("denies %j", (workerDeploymentClass) => {
     expect(allow(workerDeploymentClass)).toBe(false);
+  });
+});
+
+describe("emergency pause and kill switch controls", () => {
+  beforeEach(() => {
+    resetEmergencyKillSwitches();
+  });
+
+  it("defaults to inactive global and org kill switches", () => {
+    expect(isGlobalEmergencyKillSwitchActive()).toBe(false);
+    expect(isOrgEmergencyKillSwitchActive("org_test")).toBe(false);
+    expect(checkCampaignWorkerKillSwitch("org_test")).toEqual({ active: false });
+  });
+
+  it("triggers global emergency kill switch and blocks worker dispatch", () => {
+    setGlobalEmergencyKillSwitch(true);
+    expect(isGlobalEmergencyKillSwitchActive()).toBe(true);
+    expect(checkCampaignWorkerKillSwitch("org_test")).toEqual({
+      active: true,
+      reason: "GLOBAL_EMERGENCY_KILL_SWITCH_ACTIVE"
+    });
+  });
+
+  it("triggers per-organization emergency kill switch", () => {
+    setOrgEmergencyKillSwitch("org_test_1", true);
+    expect(isOrgEmergencyKillSwitchActive("org_test_1")).toBe(true);
+    expect(isOrgEmergencyKillSwitchActive("org_test_2")).toBe(false);
+
+    expect(checkCampaignWorkerKillSwitch("org_test_1")).toEqual({
+      active: true,
+      reason: "ORG_EMERGENCY_KILL_SWITCH_ACTIVE"
+    });
+    expect(checkCampaignWorkerKillSwitch("org_test_2")).toEqual({ active: false });
+  });
+
+  it("resets emergency kill switches cleanly", () => {
+    setGlobalEmergencyKillSwitch(true);
+    setOrgEmergencyKillSwitch("org_test", true);
+    resetEmergencyKillSwitches();
+    expect(isGlobalEmergencyKillSwitchActive()).toBe(false);
+    expect(isOrgEmergencyKillSwitchActive("org_test")).toBe(false);
+    expect(checkCampaignWorkerKillSwitch("org_test")).toEqual({ active: false });
+  });
+});
+
+describe("worker heartbeat and graceful shutdown controls", () => {
+  beforeEach(() => {
+    clearWorkerHeartbeats();
+    resetWorkerShutdown();
+  });
+
+  it("records and retrieves worker heartbeats", () => {
+    const hb = recordWorkerHeartbeat("worker-1", { status: "active", metadata: { mode: "continuous" } });
+    expect(hb.workerId).toBe("worker-1");
+    expect(hb.status).toBe("active");
+    expect(getWorkerHeartbeat("worker-1")).toEqual(hb);
+    expect(listWorkerHeartbeats()).toHaveLength(1);
+  });
+
+  it("manages graceful shutdown request", () => {
+    expect(isWorkerShutdownRequested()).toBe(false);
+    requestWorkerShutdown();
+    expect(isWorkerShutdownRequested()).toBe(true);
+    resetWorkerShutdown();
+    expect(isWorkerShutdownRequested()).toBe(false);
+  });
+});
+
+describe("provider rate limiting and backpressure controls", () => {
+  beforeEach(() => {
+    resetProviderRateLimiters();
+  });
+
+  it("enforces provider throughput rate limits", () => {
+    const orgId = "org_rate_limit_test";
+    const res1 = checkProviderRateLimit(orgId, { maxPerSecond: 2 });
+    expect(res1.allowed).toBe(true);
+    const res2 = checkProviderRateLimit(orgId, { maxPerSecond: 2 });
+    expect(res2.allowed).toBe(true);
+    const res3 = checkProviderRateLimit(orgId, { maxPerSecond: 2 });
+    expect(res3.allowed).toBe(false);
+    expect(res3.retryAfterMs).toBeGreaterThan(0);
   });
 });

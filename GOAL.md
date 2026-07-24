@@ -5,11 +5,20 @@
 SignalStack SMS is a self-hostable, multi-tenant SMS/MMS platform for companies that need contacts,
 audiences, campaigns, transactional messaging, a shared inbox, compliance controls, analytics, and a
 stable integration API. The complete product must run from one supported package on infrastructure the
-operator controls.
+operator controls under the **Zero-SaaS North Star specification**.
 
-The only unavoidable external boundary is access to the mobile carrier network through Twilio, another
-CPaaS, or a direct carrier/SMSC connection. Clerk, Stripe, Vercel, Redis, hosted AI, hosted email,
-hosted monitoring, and hosted object storage must not be core requirements.
+ZERO external SaaS services are required for core operation (no Clerk, Stripe, Vercel, Redis SaaS/SQS,
+hosted AI, hosted email, or hosted object storage like AWS S3).
+
+Physical direct connection to a telecom carrier (Twilio / CPaaS or direct SMSC / SMPP) is the ONLY
+unavoidable external boundary.
+
+The platform is built on 5 self-contained pillars:
+1. **Auth:** Built-in local identity (`scrypt`, opaque session storage, operator CLI reset).
+2. **DB:** Multi-tenant self-hosted PostgreSQL with fail-closed RLS.
+3. **Queue:** PostgreSQL `QueueJob` transactional outbox & worker (zero external queue SaaS).
+4. **Storage:** Local encrypted filesystem volume.
+5. **Admin/Billing:** Built-in Next.js management UI & local plan/quota enforcement.
 
 The detailed product contract, milestone graph, acceptance matrix, and verification ledger are in
 `docs/STANDALONE_ROADMAP.md`.

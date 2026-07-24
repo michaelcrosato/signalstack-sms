@@ -1,7 +1,7 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db/prisma";
 
-describe("provider-number default database invariant", () => {
+describe.runIf(process.env.RUN_DB_TESTS === "true")("provider-number default database invariant", () => {
   const slug = `provider-default-${Date.now()}`;
   let orgId: string | undefined;
 

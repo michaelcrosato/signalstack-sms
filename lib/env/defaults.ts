@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 export const envDefaults = Object.freeze({
   DEMO_MODE: "true",
   LIVE_MESSAGING_ENABLED: "false",
@@ -6,7 +8,7 @@ export const envDefaults = Object.freeze({
   AI_PROVIDER: "fake"
 } as const);
 
-export const localDatabaseUrl = "postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public";
+export const localDatabaseUrl = "postgresql://signalstack:signalstack@127.0.0.1:5432/signalstack_sms?schema=public";
 
 export function applyDemoSafeRuntimeDefaults(env: Record<string, string | undefined> = process.env) {
   for (const [key, value] of Object.entries(envDefaults)) {

@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   contactUpdate: vi.fn(),
   contactUpdateMany: vi.fn(),
   conversationUpdate: vi.fn(),
+  integrationAuditEventCreate: vi.fn(),
   messageUpsert: vi.fn(),
   providerSend: vi.fn(),
   transaction: vi.fn()
@@ -28,7 +29,13 @@ function fakeTransaction() {
   return {
     contact: { update: mocks.contactUpdate, updateMany: mocks.contactUpdateMany },
     conversation: { update: mocks.conversationUpdate },
-    message: { upsert: mocks.messageUpsert }
+    message: { upsert: mocks.messageUpsert },
+    integrationAuditEvent: { create: mocks.integrationAuditEventCreate },
+    $executeRaw: vi.fn(),
+    $queryRaw: vi.fn(async () => [{ now: new Date() }]),
+    customerWebhookSubscription: { findMany: vi.fn(async () => []) },
+    customerWebhookEvent: { findUnique: vi.fn(async () => null), create: vi.fn(async () => ({ id: "evt_1" })) },
+    customerWebhookDelivery: { create: vi.fn() }
   } as unknown as Prisma.TransactionClient;
 }
 
@@ -193,5 +200,39 @@ describe("inbound opt-in consent evidence", () => {
     expect(mocks.providerSend).not.toHaveBeenCalled();
     expect(mocks.messageUpsert).not.toHaveBeenCalled();
     expect(mocks.conversationUpdate).not.toHaveBeenCalled();
+  });
+
+  it("outputs compliant help text and records an audit event when contact replies HELP", async () => {
+    await processInboundKeywordsAndAutoReply(
+      "org_1",
+      {
+        id: "contact_1",
+        phone: "+15555550100",
+        consentStatus: ConsentStatus.OPTED_IN,
+        consentCapturedAt: new Date("2026-01-01T12:00:00.000Z"),
+        consentMethod: "web_form",
+        consentDisclosure: "Original verbatim disclosure"
+      },
+      "conversation_1",
+      "HELP",
+      "twilio:inbound:SM-help"
+    );
+
+    expect(mocks.integrationAuditEventCreate).toHaveBeenCalledWith({
+      data: {
+        orgId: "org_1",
+        action: "contact.help_requested",
+        subjectType: "organization",
+        subjectId: "org_1",
+        metadata: { keyword: "HELP", phone: "+15555550100", contactId: "contact_1", source: "inbound_sms" }
+      }
+    });
+    expect(mocks.providerSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "+15555550100",
+        body: expect.stringContaining("Reply STOP to unsubscribe"),
+        idempotencyKey: "help-confirm:twilio:inbound:SM-help"
+      })
+    );
   });
 });

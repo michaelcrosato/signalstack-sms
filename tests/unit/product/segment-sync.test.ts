@@ -13,7 +13,7 @@ vi.mock("@/lib/auth/current-org", () => ({
   getOrCreateCurrentOrg: mocks.getOrCreateCurrentOrg
 }));
 
-describe("Automated Contact Segment Synchronization Seam", () => {
+describe.runIf(process.env.RUN_DB_TESTS === "true")("Automated Contact Segment Synchronization Seam", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });

@@ -1,4 +1,21 @@
 import { ConsentStatus, type Contact } from "@prisma/client";
+import { isWithinQuietHours } from "@/lib/compliance/quiet-hours";
+import { resolveTimezoneFromPhone } from "@/lib/compliance/area-codes";
+
+export type PreflightOptions = {
+  now?: Date;
+  timeZone?: string;
+  state?: string;
+  checkQuietHours?: boolean;
+};
+
+export type PreflightContactInput = Pick<
+  Contact,
+  "id" | "phone" | "consentStatus" | "optedOutAt" | "archivedAt"
+> & {
+  timezone?: string | null;
+  state?: string | null;
+};
 
 export type CampaignPreflightRecipient = {
   contactId: string;
@@ -16,8 +33,9 @@ export type CampaignPreflightResult = {
 };
 
 export function preflightCampaignRecipients(
-  contacts: Array<Pick<Contact, "id" | "phone" | "consentStatus" | "optedOutAt" | "archivedAt">>,
-  selectedContactIds?: string[]
+  contacts: Array<PreflightContactInput>,
+  selectedContactIds?: string[],
+  options?: PreflightOptions
 ): CampaignPreflightResult {
   const contactsById = new Map(contacts.map((contact) => [contact.id, contact]));
   const recipientRows = selectedContactIds
@@ -49,6 +67,14 @@ export function preflightCampaignRecipients(
     }
     if (contact.optedOutAt || contact.consentStatus === ConsentStatus.OPTED_OUT) {
       reasons.push("CONTACT_OPTED_OUT");
+    }
+    if (options?.checkQuietHours && options?.now) {
+      const recipientTz =
+        contact.timezone || resolveTimezoneFromPhone(contact.phone, options.timeZone);
+      const recipientState = contact.state || options.state;
+      if (isWithinQuietHours(options.now, recipientTz, recipientState ?? undefined)) {
+        reasons.push("QUIET_HOURS");
+      }
     }
 
     return {

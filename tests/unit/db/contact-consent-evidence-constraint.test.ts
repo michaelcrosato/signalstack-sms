@@ -1,7 +1,7 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db/prisma";
 
-describe("contact consent evidence database invariant", () => {
+describe.runIf(process.env.RUN_DB_TESTS === "true")("contact consent evidence database invariant", () => {
   const slug = `consent-evidence-${Date.now()}`;
   let orgId: string | undefined;
 

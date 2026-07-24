@@ -1,5 +1,6 @@
 # TICKET014 — Trim permutation prose from TESTING.md and CONTRACT-TESTING.md
 
+- **Milestone:** M0
 - **Status:** Done (2026-05-28)
 - **Priority:** P2 (ULTRAPLAN Phase A / A2)
 
@@ -34,9 +35,9 @@ read-with-care large file.
 4. `npm run contracts:check`; `npm run context:check`; `npm run validate`.
 
 ## Acceptance criteria
-- [ ] No prose claims exhaustive permutation coverage that no longer exists.
-- [ ] `contracts/CONTRACT-TESTING.md` materially smaller; `contracts:check` still passes.
-- [ ] `npm run validate` green.
+- [x] No prose claims exhaustive permutation coverage that no longer exists.
+- [x] `contracts/CONTRACT-TESTING.md` materially smaller; `contracts:check` still passes.
+- [x] `npm run validate` green.
 
 ## Commands
 `npm run contracts:check`, `npm run context:check`, `npm run validate`

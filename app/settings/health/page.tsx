@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { envDefaults } from "@/lib/env/defaults";
 import { getHealthOperationLinks } from "@/lib/operations/operator-surfaces";
 import { getSystemStatus } from "@/lib/operations/system-status";
+import { getWorkerHealthDiagnostics } from "@/lib/operations/worker-health";
 
 export const dynamic = "force-dynamic";
 
@@ -25,8 +26,9 @@ const healthSignals = [
   },
 ];
 
-export default function HealthOperationsPage() {
+export default async function HealthOperationsPage() {
   const status = getSystemStatus(process.env);
+  const diagnostics = await getWorkerHealthDiagnostics();
   const operationLinks = getHealthOperationLinks();
 
   return (
@@ -44,25 +46,21 @@ export default function HealthOperationsPage() {
             Settings
           </p>
           <h1 className="text-4xl font-semibold text-slate-950">
-            Health Operations
+            Health Operations & SLI Diagnostics
           </h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-            Read-only local health checkpoint for demo-safe defaults, runtime
-            blockers, and the existing health endpoint. This page does not
-            execute checks, call APIs, mutate records, expose secrets, call
-            providers, bill, notify, send SMS or email, or enable live features.
+            Read-only local health checkpoint and worker SLI diagnostics (queue latency, throughput, heartbeat status, DB pool state, and failure metrics).
           </p>
         </div>
       </header>
 
-      <section className="grid gap-3 md:grid-cols-4">
+      <section className="grid gap-3 md:grid-cols-4 lg:grid-cols-6">
         <Metric label="Service" value="signalstack-sms" />
-        <Metric label="Health route" value="/api/health" />
-        <Metric label="Demo mode" value={String(status.safety.demoMode)} />
-        <Metric
-          label="External impact"
-          value={status.safety.externalImpactBlocked ? "blocked" : "review"}
-        />
+        <Metric label="DB Pool State" value={`${diagnostics.dbPoolState.status} (${diagnostics.dbPoolState.latencyMs}ms)`} />
+        <Metric label="Heartbeat Status" value={diagnostics.heartbeatStatus} />
+        <Metric label="Queue Latency" value={`${diagnostics.queueLatencyMs}ms`} />
+        <Metric label="Throughput/min" value={`${diagnostics.throughputPerMinute} msgs/min`} />
+        <Metric label="Failure Rate" value={`${diagnostics.failureMetrics.failureRatePercentage}%`} />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">

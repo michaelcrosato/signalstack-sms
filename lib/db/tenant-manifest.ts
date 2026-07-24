@@ -38,7 +38,10 @@ export const ordinaryTenantTables = Object.freeze([
   "CustomerWebhookSigningSecret",
   "CustomerWebhookEvent",
   "CustomerWebhookDelivery",
-  "CustomerWebhookDeliveryAttempt"
+  "CustomerWebhookDeliveryAttempt",
+  "ConsentEvent",
+  "AuditEvent",
+  "SuppressionEntry"
 ] as const);
 
 export const specialTenantTables = Object.freeze([
@@ -58,7 +61,9 @@ export const protectedTenantTables = Object.freeze([
 export const appendOnlyTenantTables = Object.freeze([
   "IntegrationAuditEvent",
   "CustomerWebhookEvent",
-  "CustomerWebhookDeliveryAttempt"
+  "CustomerWebhookDeliveryAttempt",
+  "ConsentEvent",
+  "AuditEvent"
 ] as const);
 
 /** Durable M3 control/event rows are revoked or disabled, never hard-deleted by application code. */
@@ -75,7 +80,10 @@ export const nonDeletableTenantTables = Object.freeze([
   "CustomerWebhookEvent",
   "CustomerWebhookDelivery",
   "CustomerWebhookDeliveryAttempt",
-  "MessageAttempt"
+  "MessageAttempt",
+  "ConsentEvent",
+  "AuditEvent",
+  "SuppressionEntry"
 ] as const);
 
 export const globalControlTables = Object.freeze([

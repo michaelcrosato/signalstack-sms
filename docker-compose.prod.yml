@@ -1,0 +1,99 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: signalstack-app
+    restart: unless-stopped
+    user: "10001:10001"
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      TRUST_PROXY: "true"
+      DATABASE_URL: ${DATABASE_URL:-postgresql://signalstack:signalstack_prod_pass@db:5432/signalstack_sms?schema=public}
+      SECRETS_MASTER_KEY: ${SECRETS_MASTER_KEY:-}
+      API_KEY_PEPPER: ${API_KEY_PEPPER:-}
+      AUTH_SESSION_SECRET: ${AUTH_SESSION_SECRET:-}
+      AUTH_THROTTLE_SECRET: ${AUTH_THROTTLE_SECRET:-}
+      MEDIA_STORAGE_PATH: /app/media
+    volumes:
+      - media-data:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: signalstack-worker
+    command: ["npm", "run", "worker"]
+    restart: unless-stopped
+    user: "10001:10001"
+    environment:
+      NODE_ENV: production
+      WORKER_ENABLED: "true"
+      WORKER_DEPLOYMENT_CLASS: production-live-direct
+      DATABASE_URL: ${DATABASE_URL:-postgresql://signalstack:signalstack_prod_pass@db:5432/signalstack_sms?schema=public}
+      SECRETS_MASTER_KEY: ${SECRETS_MASTER_KEY:-}
+      MEDIA_STORAGE_PATH: /app/media
+    volumes:
+      - media-data:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  db:
+    image: postgres:16-alpine
+    container_name: signalstack-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-signalstack_sms}
+      POSTGRES_USER: ${POSTGRES_USER:-signalstack}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-signalstack_prod_pass}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-signalstack} -d $${POSTGRES_DB:-signalstack_sms}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: signalstack-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "caddy", "version"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  postgres-data:
+  media-data:
+  caddy-data:
+  caddy-config:

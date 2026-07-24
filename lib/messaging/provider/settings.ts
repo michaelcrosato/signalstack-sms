@@ -11,7 +11,7 @@ export type ProviderSettingsInput = {
   demoMode: boolean;
   liveMessagingEnabled: boolean;
   messagingProvider: string;
-  complianceProfile?: ComplianceProfile | null;
+  complianceProfile?: Partial<ComplianceProfile> | null;
   providerAccounts?: readonly Readonly<{
     status: string;
     revokedAt: Date | string | null;

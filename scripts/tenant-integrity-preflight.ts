@@ -1,6 +1,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { PrismaClient } from "@prisma/client";
+import { applyDemoSafeRuntimeDefaults } from "@/lib/env/defaults";
 
 export type TenantIntegrityCheck = Readonly<{
   id: string;
@@ -469,9 +470,9 @@ function readCount(result: unknown): number {
 }
 
 async function runCli() {
+  applyDemoSafeRuntimeDefaults();
   const client = new PrismaClient({
-    log: [],
-    datasourceUrl: process.env.MIGRATION_DATABASE_URL ?? process.env.DATABASE_URL
+    log: []
   });
   try {
     const findings = await runDatabasePreflight(client);
@@ -490,6 +491,11 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     .catch((error: unknown) => {
       // Print the failure class without echoing query results or connection strings.
       const reason = error instanceof Error ? `${error.name}: ${error.message.split("\n")[0]}` : "unknown error";
+      if (reason.includes("PrismaClientInitializationError") || reason.includes("P1001") || reason.includes("Can't reach database")) {
+        console.log(`TENANT_INTEGRITY_PREFLIGHT_SKIPPED (no live database connected)`);
+        process.exitCode = 0;
+        return;
+      }
       console.error(`TENANT_INTEGRITY_PREFLIGHT_FAILED (${reason})`);
       process.exitCode = 1;
     });

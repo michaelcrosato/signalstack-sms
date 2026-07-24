@@ -1,5 +1,6 @@
 # TICKET002 — Verify full local gate incl. e2e against real Postgres
 
+- **Milestone:** M0
 - **Status:** Done (2026-05-30)
 - **Priority:** P1
 
@@ -27,10 +28,10 @@ Postgres and installed Chromium. Build, lint, typecheck, vitest (795), and all d
 5. `npm run validate` (full). Fix any demo-path regression; update `docs/CURRENT_STATE_MATRIX.md`.
 
 ## Acceptance criteria
-- [ ] `npm run db:migrate` and `npm run demo:seed` succeed against local Postgres.
-- [ ] `npm run test:e2e:smoke` passes.
-- [ ] `npm run test:e2e:product-demo` passes.
-- [ ] Full `npm run validate` exits 0; result recorded in `SUMMARY.codex.md`.
+- [x] `npm run db:migrate` and `npm run demo:seed` succeed against local Postgres.
+- [x] `npm run test:e2e:smoke` passes.
+- [x] `npm run test:e2e:product-demo` passes.
+- [x] Full `npm run validate` exits 0; result recorded in `SUMMARY.codex.md`.
 
 ## Commands
 `docker compose up -d`, `npm run db:migrate`, `npm run demo:seed`, `npx playwright install chromium`, `npm run validate`

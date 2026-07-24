@@ -59,6 +59,27 @@ $env:DATABASE_URL='postgresql://signalstack:signalstack@localhost:5432/signalsta
 npm run validate
 ```
 
+## Production Docker Bundle and Backup Harness Operations
+
+### Running Single-Package Production Docker Compose Bundle
+To start the production container stack (`app`, `worker`, `db`, `caddy`) locally:
+```bash
+npm run docker:context:check
+docker compose -f docker-compose.prod.yml up -d
+```
+
+### Encrypted Database Backup & Restore CLI
+To take an encrypted database backup with AES-256-GCM and SHA-256 checksum:
+```bash
+tsx scripts/backup-restore.ts backup --out=backups/signalstack-local.dump --dry-run
+```
+To verify or restore an encrypted backup drill:
+```bash
+tsx scripts/backup-restore.ts verify --in=backups/signalstack-local.dump
+tsx scripts/backup-restore.ts restore --in=backups/signalstack-local.dump --dry-run
+```
+
+
 ## Built-in Administrator Bootstrap and Recovery
 
 `npm run admin:create` is a noninteractive local-auth operation. It accepts no command-line arguments.

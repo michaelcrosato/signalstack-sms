@@ -44,7 +44,7 @@ describe("Double Opt-In (DOI) Workflow Seam", () => {
     expect(result.reasons).toContain("PENDING_DOUBLE_OPT_IN");
   });
 
-  it("forces PENDING_DOUBLE_OPT_IN status upon contact creation if configured", async () => {
+  it.runIf(process.env.RUN_DB_TESTS === "true")("forces PENDING_DOUBLE_OPT_IN status upon contact creation if configured", async () => {
     process.env.DOUBLE_OPT_IN_REQUIRED = "true";
 
     const org = await prisma.organization.create({

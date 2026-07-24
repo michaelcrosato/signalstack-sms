@@ -3,6 +3,9 @@ import { randomUUID } from "node:crypto";
 import {
   CampaignRecipientStatus,
   CampaignStatus,
+  MessageApplicationStatus,
+  MessageAttemptStatus,
+  MessageTransport,
   QueueJobStatus,
   QueueJobType,
   type Contact,
@@ -13,7 +16,13 @@ import { withTenantTransaction } from "@/lib/db/tenant-context";
 import { environmentIsProductionLike } from "@/lib/deployment/production-gate";
 import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
 import { renderTemplate } from "@/lib/messaging/render-template";
-import { liveWorkerDeploymentClassIsAuthorized } from "@/lib/queue/live-worker-controls";
+import {
+  checkCampaignWorkerKillSwitch,
+  checkProviderRateLimit,
+  isWorkerShutdownRequested,
+  liveWorkerDeploymentClassIsAuthorized,
+  recordWorkerHeartbeat
+} from "@/lib/queue/live-worker-controls";
 import { preflightCampaignRecipients } from "@/lib/messaging/send-preflight";
 import { scheduledCampaignJobSchema } from "@/lib/queue/jobs";
 import { outboundCampaignMessageIdempotencyKey } from "@/lib/queue/idempotency";
@@ -62,7 +71,9 @@ export type SingleQueueJobProcessResult = {
     | "invalid-campaign"
     | "stale-schedule"
     | "send-preflight-failed"
-    | "processing-failed";
+    | "processing-failed"
+    | "emergency-kill-switch-active"
+    | "worker-shutdown-requested";
 };
 
 export type WorkerReadinessResult =
@@ -203,7 +214,7 @@ export function campaignMessageValues(contact: {
 export function scheduledCampaignSendIsAllowed(
   contacts: Array<Pick<Contact, "id" | "phone" | "consentStatus" | "optedOutAt" | "archivedAt">>
 ) {
-  return preflightCampaignRecipients(contacts).allowed;
+  return preflightCampaignRecipients(contacts, undefined, { now: new Date(), checkQuietHours: true }).allowed;
 }
 
 async function claimScheduledCampaignQueueJob(
@@ -418,9 +429,9 @@ async function loadDispatchedQueueJob(claim: ScheduledCampaignQueueJobClaim): Pr
   });
 }
 
-async function processClaimedQueueJobSafely(job: ClaimedQueueJob): Promise<SingleQueueJobProcessResult> {
+async function processClaimedQueueJobSafely(job: ClaimedQueueJob, now = new Date()): Promise<SingleQueueJobProcessResult> {
   try {
-    return await processClaimedScheduledCampaignQueueJob(job);
+    return await processClaimedScheduledCampaignQueueJob(job, now);
   } catch (error) {
     // Surface the underlying failure: this catch marks the job FAILED and pauses its campaign, and
     // without a log the operator has no signal (the metric is a no-op unless observability is on).
@@ -473,7 +484,7 @@ export async function processDueScheduledCampaignJobs(
   for (const claim of claims) {
     const job = await loadDispatchedQueueJob(claim);
     const result = job
-      ? await processClaimedQueueJobSafely(job)
+      ? await processClaimedQueueJobSafely(job, now)
       : { processed: 0 as const, skipped: 1 as const, blocked: false, reason: "already-claimed" as const };
     processed += result.processed;
     skipped += result.skipped;
@@ -506,10 +517,28 @@ export async function processScheduledCampaignQueueJobById(
     } satisfies SingleQueueJobProcessResult;
   }
 
-  return processClaimedQueueJobSafely(claim.job);
+  return processClaimedQueueJobSafely(claim.job, now);
 }
 
-async function processClaimedScheduledCampaignQueueJob(job: ClaimedQueueJob): Promise<SingleQueueJobProcessResult> {
+async function processClaimedScheduledCampaignQueueJob(job: ClaimedQueueJob, now = new Date()): Promise<SingleQueueJobProcessResult> {
+  const killSwitch = checkCampaignWorkerKillSwitch(job.orgId);
+  if (killSwitch.active) {
+    await failClaimedQueueJob(job, { requireCampaignTransition: true });
+    recordMetric(smsPipelineMetrics.queueThroughput, {
+      action: "process",
+      status: "failure",
+      reason: "processing-failed",
+      backend: "database"
+    });
+    return { processed: 0, skipped: 1, blocked: true, reason: "emergency-kill-switch-active" };
+  }
+
+  if (isWorkerShutdownRequested()) {
+    return { processed: 0, skipped: 1, blocked: true, reason: "worker-shutdown-requested" };
+  }
+
+  recordWorkerHeartbeat(`worker-${process.pid}`, { status: "active", metadata: { orgId: job.orgId, jobId: job.id } });
+
   const payload = scheduledCampaignJobSchema.safeParse(job.payload);
   if (!payload.success || payload.data.orgId !== job.orgId || payload.data.campaignId !== job.campaignId) {
     await transitionClaimedQueueJob(job, QueueJobStatus.FAILED);
@@ -517,15 +546,28 @@ async function processClaimedScheduledCampaignQueueJob(job: ClaimedQueueJob): Pr
     return { processed: 0, skipped: 1, blocked: false, reason: "invalid-payload" };
   }
 
-  const campaign = await withTenantTransaction({ orgId: job.orgId }, (tx) => tx.campaign.findFirst({
-    where: { id: payload.data.campaignId, orgId: job.orgId },
-    include: {
-      recipients: {
-        where: { orgId: job.orgId, contact: { orgId: job.orgId } },
-        include: { contact: true }
+  const campaignData = await withTenantTransaction({ orgId: job.orgId }, async (tx) => {
+    const campaign = await tx.campaign.findFirst({
+      where: { id: payload.data.campaignId, orgId: job.orgId },
+      include: {
+        recipients: {
+          where: { orgId: job.orgId, contact: { orgId: job.orgId } },
+          include: { contact: true }
+        }
       }
-    }
-  }));
+    });
+    const organization = typeof tx.organization?.findFirst === "function"
+      ? await tx.organization.findFirst({
+          where: { id: job.orgId },
+          select: { timezone: true, demoMode: true }
+        })
+      : null;
+    return { campaign, organization };
+  });
+
+  const campaign = campaignData.campaign;
+  const orgTimeZone = campaignData.organization?.timezone ?? "America/Los_Angeles";
+
   if (!campaign || campaign.status !== CampaignStatus.SCHEDULED) {
     await transitionClaimedQueueJob(job, QueueJobStatus.FAILED);
     recordMetric(smsPipelineMetrics.queueThroughput, { action: "process", status: "failure", reason: "invalid-campaign", backend: "database" });
@@ -540,7 +582,11 @@ async function processClaimedScheduledCampaignQueueJob(job: ClaimedQueueJob): Pr
   }
 
   const recipientContacts = campaign.recipients.map((recipient) => recipient.contact);
-  const sendPreflight = preflightCampaignRecipients(recipientContacts);
+  const sendPreflight = preflightCampaignRecipients(recipientContacts, undefined, {
+    now,
+    timeZone: orgTimeZone,
+    checkQuietHours: true
+  });
   const preflightByContactId = new Map(
     sendPreflight.recipients.map((recipient) => [recipient.contactId, recipient])
   );
@@ -587,30 +633,184 @@ async function processClaimedScheduledCampaignQueueJob(job: ClaimedQueueJob): Pr
 
   for (const recipient of sendableRecipients) {
     await renewClaimedQueueJob(job);
-    const idempotencyKey = outboundCampaignMessageIdempotencyKey(job.orgId, job.id, recipient.contactId);
-    const body = renderTemplate(campaign.body, campaignMessageValues(recipient.contact));
-    const result = await dummyProvider.send({
-      to: recipient.contact.phone,
-      from: "demo-signalstack",
-      body,
-      orgId: job.orgId,
-      idempotencyKey
+
+    const midFlightKillSwitch = checkCampaignWorkerKillSwitch(job.orgId);
+    if (midFlightKillSwitch.active) {
+      await failClaimedQueueJob(job, { requireCampaignTransition: true });
+      return { processed: 0, skipped: 1, blocked: true, reason: "emergency-kill-switch-active" };
+    }
+
+    const rateLimit = checkProviderRateLimit(job.orgId);
+    if (!rateLimit.allowed && rateLimit.retryAfterMs) {
+      await sleep(rateLimit.retryAfterMs);
+    }
+
+    // Fresh DB Re-Check for Mid-Flight Opt-Out / Consent
+    const freshContact = await withTenantTransaction({ orgId: job.orgId }, async (tx) => {
+      if (typeof tx.contact?.findFirst === "function") {
+        return (
+          (await tx.contact.findFirst({
+            where: { id: recipient.contactId, orgId: job.orgId },
+            select: {
+              id: true,
+              phone: true,
+              email: true,
+              firstName: true,
+              lastName: true,
+              displayName: true,
+              consentStatus: true,
+              optedOutAt: true,
+              archivedAt: true
+            }
+          })) ?? recipient.contact
+        );
+      }
+      return recipient.contact;
     });
 
-    await withTenantTransaction({ orgId: job.orgId }, (tx) => tx.message.upsert({
-      where: { orgId_idempotencyKey: { orgId: job.orgId, idempotencyKey } },
-      update: {},
-      create: {
-        orgId: job.orgId,
-        contactId: recipient.contactId,
-        campaignId: campaign.id,
-        direction: "OUTBOUND",
-        body,
-        providerMessageId: result.providerMessageId,
-        providerStatus: result.status,
-        idempotencyKey
+    if (!freshContact) {
+      await withTenantTransaction({ orgId: job.orgId }, (tx) =>
+        tx.campaignRecipient.updateMany({
+          where: { orgId: job.orgId, id: recipient.id },
+          data: { status: CampaignRecipientStatus.BLOCKED, blockReason: "CONTACT_NOT_FOUND" }
+        })
+      );
+      continue;
+    }
+
+    // Re-check consent and quiet hours immediately before each message attempt enqueue
+    const immediatePreflight = preflightCampaignRecipients([freshContact], undefined, {
+      now,
+      timeZone: orgTimeZone,
+      checkQuietHours: true
+    });
+    if (!immediatePreflight.allowed) {
+      const reason = immediatePreflight.recipients[0]?.reasons.join(",") || "SEND_TIME_PREFLIGHT_BLOCKED";
+      await withTenantTransaction({ orgId: job.orgId }, (tx) =>
+        tx.campaignRecipient.updateMany({
+          where: { orgId: job.orgId, id: recipient.id },
+          data: { status: CampaignRecipientStatus.BLOCKED, blockReason: reason }
+        })
+      );
+      continue;
+    }
+
+    const idempotencyKey = outboundCampaignMessageIdempotencyKey(job.orgId, job.id, recipient.contactId);
+    const body = renderTemplate(campaign.body, campaignMessageValues(freshContact));
+    const correlationId = randomUUID();
+
+    // Durable-Before-External Outbox Transaction Ordering:
+    // Create Message and MessageAttempt in PostgreSQL BEFORE making external provider call
+    let msgRecord: { id: string } | null = null;
+    let attemptRecord: { id: string } | null = null;
+
+    await withTenantTransaction({ orgId: job.orgId }, async (tx) => {
+      if (typeof tx.message?.upsert === "function") {
+        msgRecord = await tx.message.upsert({
+          where: { orgId_idempotencyKey: { orgId: job.orgId, idempotencyKey } },
+          update: {},
+          create: {
+            orgId: job.orgId,
+            contactId: freshContact.id,
+            campaignId: campaign.id,
+            direction: "OUTBOUND",
+            body,
+            applicationStatus: MessageApplicationStatus.PROCESSING,
+            transport: MessageTransport.DUMMY,
+            destination: freshContact.phone,
+            idempotencyKey
+          }
+        });
       }
-    }));
+
+      if (msgRecord && typeof tx.messageAttempt?.create === "function") {
+        const existingAttempt = typeof tx.messageAttempt?.findFirst === "function"
+          ? await tx.messageAttempt.findFirst({
+              where: { orgId: job.orgId, messageId: msgRecord.id, attemptNumber: 1 }
+            })
+          : null;
+        if (existingAttempt) {
+          attemptRecord = existingAttempt;
+        } else {
+          attemptRecord = await tx.messageAttempt.create({
+            data: {
+              orgId: job.orgId,
+              messageId: msgRecord.id,
+              attemptNumber: 1,
+              status: MessageAttemptStatus.PROCESSING,
+              transport: MessageTransport.DUMMY,
+              dueAt: new Date(),
+              destination: freshContact.phone,
+              body,
+              requestFingerprint: idempotencyKey,
+              callbackCorrelationId: correlationId
+            }
+          });
+        }
+      }
+    });
+
+    let providerResult;
+    try {
+      providerResult = await dummyProvider.send({
+        to: freshContact.phone,
+        from: "demo-signalstack",
+        body,
+        orgId: job.orgId,
+        idempotencyKey
+      });
+    } catch (err) {
+      await withTenantTransaction({ orgId: job.orgId }, async (tx) => {
+        if (msgRecord && typeof tx.message?.update === "function") {
+          await tx.message.update({
+            where: { id: msgRecord.id },
+            data: {
+              applicationStatus: MessageApplicationStatus.FAILED,
+              failedAt: new Date()
+            }
+          });
+        }
+        if (attemptRecord && typeof tx.messageAttempt?.update === "function") {
+          await tx.messageAttempt.update({
+            where: { id: attemptRecord.id },
+            data: {
+              status: MessageAttemptStatus.FAILED,
+              completedAt: new Date(),
+              errorCode: err instanceof Error ? err.name : "PROVIDER_ERROR",
+              disposition: "failed"
+            }
+          });
+        }
+      });
+      throw err;
+    }
+
+    await withTenantTransaction({ orgId: job.orgId }, async (tx) => {
+      if (msgRecord && typeof tx.message?.update === "function") {
+        await tx.message.update({
+          where: { id: msgRecord.id },
+          data: {
+            applicationStatus: MessageApplicationStatus.SENT,
+            providerMessageId: providerResult.providerMessageId,
+            providerStatus: providerResult.status,
+            sentAt: new Date()
+          }
+        });
+      }
+
+      if (attemptRecord && typeof tx.messageAttempt?.update === "function") {
+        await tx.messageAttempt.update({
+          where: { id: attemptRecord.id },
+          data: {
+            status: MessageAttemptStatus.SUCCEEDED,
+            providerMessageId: providerResult.providerMessageId,
+            providerStatus: providerResult.status,
+            completedAt: new Date(),
+            disposition: "success"
+          }
+        });
+      }
+    });
   }
 
   await transitionClaimedQueueJobWithCampaign(job, {

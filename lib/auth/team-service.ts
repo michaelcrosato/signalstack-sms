@@ -27,6 +27,7 @@ import type {
   LocalAuthenticationInput,
   LocalAuthenticationResult
 } from "@/lib/auth/local-credentials";
+import { enforceSeatQuota } from "@/lib/operations/entitlements";
 
 const SERIALIZABLE_ATTEMPTS = 4;
 const IDENTIFIER_MAX_CHARACTERS = 256;
@@ -331,6 +332,12 @@ export const prismaTeamServiceStore: TeamServiceStore = {
       }
       if (!canGrantTeamRole(actorRole, input.role)) {
         return failure("ROLE_DENIED");
+      }
+
+      try {
+        await enforceSeatQuota(transaction, input.actor.orgId);
+      } catch {
+        return failure("CONFLICT");
       }
 
       const [existingMembership, existingInvite] = await Promise.all([

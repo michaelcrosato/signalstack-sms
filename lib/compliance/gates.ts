@@ -7,15 +7,7 @@ export type MessagingHardGateInput = {
   demoMode: boolean;
   liveMessagingEnabled: boolean;
   messagingProvider: string;
-  complianceProfile?: Pick<
-    ComplianceProfile,
-    | "businessName"
-    | "messagingUseCase"
-    | "optInDescription"
-    | "privacyPolicyUrl"
-    | "termsOfServiceUrl"
-    | "a2pRegistrationStatus"
-  > | null;
+  complianceProfile?: Partial<ComplianceProfile> | null;
   contact?: {
     phone?: string | null;
     state?: string | null;
@@ -28,6 +20,9 @@ export type MessagingHardGateInput = {
     consentMethod?: string | null;
     consentDisclosure?: string | null;
   } | null;
+  // Suppression list check (org-level or global).
+  suppressed?: boolean;
+  suppressionReason?: string | null;
   // Optional TCPA quiet-hours check. When supplied, sending outside 08:00–21:00 in the given timezone
   // adds a QUIET_HOURS block reason. Omitted by demo/non-time-sensitive callers (backward compatible).
   quietHours?: {
@@ -41,7 +36,6 @@ export type MessagingHardGateResult = {
   allowed: boolean;
   reasons: string[];
 };
-
 
 export function evaluateMessagingHardGate(input: MessagingHardGateInput): MessagingHardGateResult {
   const reasons: string[] = [];
@@ -60,6 +54,9 @@ export function evaluateMessagingHardGate(input: MessagingHardGateInput): Messag
   }
   if (input.complianceProfile?.a2pRegistrationStatus !== A2pRegistrationStatus.APPROVED) {
     reasons.push("A2P_NOT_APPROVED");
+  }
+  if (input.suppressed || input.suppressionReason) {
+    reasons.push("CONTACT_SUPPRESSED");
   }
   if (input.contact) {
     if (input.contact.archivedAt) {
@@ -83,9 +80,7 @@ export function evaluateMessagingHardGate(input: MessagingHardGateInput): Messag
     let resolvedState = input.quietHours.state;
 
     if (input.contact?.phone) {
-      // Fall back to the org-configured quiet-hours timezone (not a hardcoded Eastern default) when the
-      // contact's area code is not in the map, so an unmapped number is evaluated in the operator's
-      // intended zone rather than up to three hours off.
+      // Fall back to the org-configured quiet-hours timezone when the contact's area code is not in the map.
       resolvedTimeZone = resolveTimezoneFromPhone(input.contact.phone, input.quietHours.timeZone);
     }
     if (input.contact?.state) {
@@ -103,11 +98,6 @@ export function evaluateMessagingHardGate(input: MessagingHardGateInput): Messag
   };
 }
 
-// SPEC-009: a live send requires stored consent evidence — exact capture timestamp, capture method, and
-// the verbatim disclosure shown at opt-in (retained alongside the contact number). Missing any → blocked.
-// Delegates to the same completeness check enforced at write time (`hasCompleteConsentEvidence`), so the
-// send gate cannot be looser than the write path: whitespace-only method/disclosure and an Invalid Date
-// capture timestamp are rejected, not merely truthy-checked.
 export function hasConsentEvidence(contact: {
   consentCapturedAt?: Date | null;
   consentMethod?: string | null;

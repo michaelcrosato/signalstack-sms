@@ -126,9 +126,9 @@ CREATE TABLE "CustomerWebhookSubscription" (
     "eventTypes" IS NOT NULL
     AND cardinality("eventTypes") > 0
     AND "eventTypes" <@ ARRAY[
-      'contact.created', 'contact.updated', 'contact.archived',
+      'contact.created', 'contact.updated', 'contact.archived', 'contact.consent.updated',
       'message.accepted', 'message.sent', 'message.delivered', 'message.failed',
-      'message.received', 'message.status.updated',
+      'message.received', 'message.updated', 'message.status.updated',
       'campaign.scheduled', 'campaign.started', 'campaign.completed', 'campaign.failed',
       'campaign.canceled',
       'conversation.created', 'conversation.updated',
@@ -183,9 +183,9 @@ CREATE TABLE "CustomerWebhookEvent" (
     length("deduplicationKey") > 0
     AND length("type") > 0
     AND "type" = ANY(ARRAY[
-      'contact.created', 'contact.updated', 'contact.archived',
+      'contact.created', 'contact.updated', 'contact.consent.updated', 'contact.archived',
       'message.accepted', 'message.sent', 'message.delivered', 'message.failed',
-      'message.received', 'message.status.updated',
+      'message.received', 'message.updated', 'message.status.updated',
       'campaign.scheduled', 'campaign.started', 'campaign.completed', 'campaign.failed',
       'campaign.canceled',
       'conversation.created', 'conversation.updated',

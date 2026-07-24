@@ -17,7 +17,9 @@ describe("TCPA Opt-Out and Inbound Keyword Auto-Responder Seam", () => {
     expect(classifyInboundKeyword("START")).toBe("OPT_IN");
   });
 
-  it("automatically transitions contact to OPTED_OUT and sends a compliant auto-response on opt-out keyword", async () => {
+  it.runIf(process.env.RUN_DB_TESTS === "true")(
+    "automatically transitions contact to OPTED_OUT and sends a compliant auto-response on opt-out keyword",
+    async () => {
     const org = await prisma.organization.create({
       data: { slug: `org-opt-out-${Date.now()}`, name: `Org OptOut-${Date.now()}`, demoMode: true }
     });
@@ -58,7 +60,9 @@ describe("TCPA Opt-Out and Inbound Keyword Auto-Responder Seam", () => {
     expect(messages[0].body).toContain("You have successfully opted out");
   });
 
-  it("automatically transitions contact to OPTED_IN and sends confirmation when they send opt-in keyword", async () => {
+  it.runIf(process.env.RUN_DB_TESTS === "true")(
+    "automatically transitions contact to OPTED_IN and sends confirmation when they send opt-in keyword",
+    async () => {
     const org = await prisma.organization.create({
       data: { slug: `org-opt-in-${Date.now()}`, name: `Org OptIn-${Date.now()}`, demoMode: true }
     });

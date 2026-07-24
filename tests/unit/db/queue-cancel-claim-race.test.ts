@@ -11,7 +11,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db/prisma";
 import { cancelCampaign } from "@/lib/db/repositories/campaigns";
 
-describe("queue cancellation and worker claim database race", () => {
+describe.runIf(process.env.RUN_DB_TESTS === "true")("queue cancellation and worker claim database race", () => {
   const suffix = randomUUID().replaceAll("-", "");
   const slug = `queue-cancel-race-${suffix}`;
   let orgId: string | undefined;

@@ -467,3 +467,123 @@ export function liveWorkerDeploymentClassIsAuthorized(input: {
   const controls = authorizationInputDataFieldValue(input, "controls");
   return liveWorkerControlsAreImplemented(controls);
 }
+
+// Emergency Kill Switch Controls
+let globalEmergencyKillSwitchActive = false;
+const orgEmergencyKillSwitches = new Map<string, boolean>();
+
+export function setGlobalEmergencyKillSwitch(active: boolean): void {
+  globalEmergencyKillSwitchActive = Boolean(active);
+}
+
+export function isGlobalEmergencyKillSwitchActive(): boolean {
+  return globalEmergencyKillSwitchActive;
+}
+
+export function setOrgEmergencyKillSwitch(orgId: string, active: boolean): void {
+  if (typeof orgId === "string" && orgId.trim().length > 0) {
+    orgEmergencyKillSwitches.set(orgId.trim(), Boolean(active));
+  }
+}
+
+export function isOrgEmergencyKillSwitchActive(orgId: string): boolean {
+  if (typeof orgId !== "string" || orgId.trim().length === 0) return false;
+  return orgEmergencyKillSwitches.get(orgId.trim()) ?? false;
+}
+
+export function checkCampaignWorkerKillSwitch(orgId?: string): { active: boolean; reason?: string } {
+  if (globalEmergencyKillSwitchActive) {
+    return { active: true, reason: "GLOBAL_EMERGENCY_KILL_SWITCH_ACTIVE" };
+  }
+  if (orgId && isOrgEmergencyKillSwitchActive(orgId)) {
+    return { active: true, reason: "ORG_EMERGENCY_KILL_SWITCH_ACTIVE" };
+  }
+  return { active: false };
+}
+
+export function resetEmergencyKillSwitches(): void {
+  globalEmergencyKillSwitchActive = false;
+  orgEmergencyKillSwitches.clear();
+}
+
+// Worker Heartbeat Monitoring & Graceful Shutdown
+export type WorkerHeartbeatStatus = "active" | "draining" | "stopped";
+
+export type WorkerHeartbeat = Readonly<{
+  workerId: string;
+  status: WorkerHeartbeatStatus;
+  lastHeartbeat: Date;
+  metadata?: Record<string, unknown>;
+}>;
+
+const workerHeartbeats = new Map<string, WorkerHeartbeat>();
+let globalWorkerShutdownRequested = false;
+
+export function recordWorkerHeartbeat(
+  workerId: string,
+  options: { status?: WorkerHeartbeatStatus; metadata?: Record<string, unknown> } = {}
+): WorkerHeartbeat {
+  const heartbeat: WorkerHeartbeat = Object.freeze({
+    workerId,
+    status: options.status ?? "active",
+    lastHeartbeat: new Date(),
+    metadata: options.metadata ? Object.freeze({ ...options.metadata }) : undefined
+  });
+  workerHeartbeats.set(workerId, heartbeat);
+  return heartbeat;
+}
+
+export function getWorkerHeartbeat(workerId: string): WorkerHeartbeat | undefined {
+  return workerHeartbeats.get(workerId);
+}
+
+export function listWorkerHeartbeats(): readonly WorkerHeartbeat[] {
+  return Object.freeze(Array.from(workerHeartbeats.values()));
+}
+
+export function clearWorkerHeartbeats(): void {
+  workerHeartbeats.clear();
+}
+
+export function requestWorkerShutdown(): void {
+  globalWorkerShutdownRequested = true;
+}
+
+export function isWorkerShutdownRequested(): boolean {
+  return globalWorkerShutdownRequested;
+}
+
+export function resetWorkerShutdown(): void {
+  globalWorkerShutdownRequested = false;
+}
+
+// Provider Rate Limiting & Backpressure
+const orgRateLimiterState = new Map<string, { count: number; windowStart: number }>();
+
+export function checkProviderRateLimit(
+  orgId: string,
+  options: { maxPerSecond?: number } = {}
+): { allowed: boolean; retryAfterMs?: number } {
+  const maxPerSecond = options.maxPerSecond ?? 100;
+  const now = Date.now();
+  const windowMs = 1000;
+
+  let state = orgRateLimiterState.get(orgId);
+  if (!state || now - state.windowStart >= windowMs) {
+    state = { count: 1, windowStart: now };
+    orgRateLimiterState.set(orgId, state);
+    return { allowed: true };
+  }
+
+  if (state.count >= maxPerSecond) {
+    const retryAfterMs = windowMs - (now - state.windowStart);
+    return { allowed: false, retryAfterMs };
+  }
+
+  state.count += 1;
+  return { allowed: true };
+}
+
+export function resetProviderRateLimiters(): void {
+  orgRateLimiterState.clear();
+}

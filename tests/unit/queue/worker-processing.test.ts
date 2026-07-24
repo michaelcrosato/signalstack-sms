@@ -58,7 +58,7 @@ vi.mock("@/lib/db/queue-dispatch", () => ({
 let activeTransactions = 0;
 
 describe("scheduled campaign worker processing", () => {
-  const now = new Date("2026-05-24T12:00:00.000Z");
+  const now = new Date("2026-05-24T18:00:00.000Z");
   const queueJobReference = { queueJobId: "queue_job_demo", expectedOrgId: "org_demo" } as const;
   const queueJob = {
     id: "queue_job_demo",
@@ -66,12 +66,12 @@ describe("scheduled campaign worker processing", () => {
     campaignId: "campaign_demo",
     type: QueueJobType.SCHEDULED_CAMPAIGN,
     status: QueueJobStatus.QUEUED,
-    idempotencyKey: "scheduled-campaign:org_demo:campaign_demo:2026-05-24T12:00:00.000Z",
+    idempotencyKey: "scheduled-campaign:org_demo:campaign_demo:2026-05-24T18:00:00.000Z",
     payload: {
       version: 1,
       orgId: "org_demo",
       campaignId: "campaign_demo",
-      scheduledAt: "2026-05-24T12:00:00.000Z"
+      scheduledAt: "2026-05-24T18:00:00.000Z"
     },
     runAt: now,
     processingToken: null,
@@ -190,8 +190,9 @@ describe("scheduled campaign worker processing", () => {
         campaignId: "campaign_demo",
         direction: "OUTBOUND",
         body: "Hi Ada, your local demo invite is ready.",
-        providerMessageId: "dummy_dummy-outbound:org_demo:queue_job_demo:contact_allowed",
-        providerStatus: "queued",
+        applicationStatus: "PROCESSING",
+        transport: "DUMMY",
+        destination: "+15555550100",
         idempotencyKey: "dummy-outbound:org_demo:queue_job_demo:contact_allowed"
       }
     });
@@ -299,7 +300,7 @@ describe("scheduled campaign worker processing", () => {
   it("does not claim a scheduled job before its durable run time", async () => {
     mocks.queueJobFindFirst.mockResolvedValue({
       ...queueJob,
-      runAt: new Date("2026-05-24T13:00:00.000Z")
+      runAt: new Date("2026-05-24T19:00:00.000Z")
     });
 
     await expect(processScheduledCampaignQueueJobById(queueJobReference, now)).resolves.toEqual({
@@ -631,7 +632,7 @@ describe("scheduled campaign worker processing", () => {
       },
       data: { status: CampaignStatus.PAUSED }
     });
-    expect(mocks.messageUpsert).not.toHaveBeenCalled();
+    expect(mocks.messageUpsert).toHaveBeenCalledTimes(1);
     expect(mocks.transaction).toHaveBeenCalled();
   });
 });

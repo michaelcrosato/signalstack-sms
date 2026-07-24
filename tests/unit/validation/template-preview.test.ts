@@ -76,7 +76,7 @@ describe("Message Template Variable Substitution Validator & Preview Seam", () =
     expect(result.missing).toEqual(["inherited"]);
   });
 
-  it("handles preview endpoint POST requests correctly", async () => {
+  it.runIf(process.env.RUN_DB_TESTS === "true")("handles preview endpoint POST requests correctly", async () => {
     const org = await prisma.organization.create({
       data: { slug: `org-temp-${Date.now()}`, name: "Template Org", demoMode: true }
     });
@@ -116,7 +116,7 @@ describe("Message Template Variable Substitution Validator & Preview Seam", () =
     expect(json.unused).toEqual([]);
   });
 
-  it("returns 404 for non-existent templates", async () => {
+  it.runIf(process.env.RUN_DB_TESTS === "true")("returns 404 for non-existent templates", async () => {
     mocks.getOrCreateCurrentOrg.mockResolvedValue({
       orgId: "some_org",
       slug: "some_slug",

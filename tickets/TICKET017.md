@@ -1,5 +1,6 @@
 # TICKET017 — AFK shell wrapper portability and explicit agent scripts
 
+- **Milestone:** M0
 - **Status:** Done
 - **Priority:** P1
 - **Context:** Bash helpers assumed npm and missed explicit `agent:*` package aliases, reducing portability across environments.

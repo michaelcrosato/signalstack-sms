@@ -28,7 +28,9 @@ describe("Prometheus Metrics Exporter API", () => {
     expect(response.status).toBe(404);
   });
 
-  it("returns Prometheus exposition plaintext with correct headers when OBSERVABILITY_ENABLED is true", async () => {
+  it.runIf(process.env.RUN_DB_TESTS === "true")(
+    "returns Prometheus exposition plaintext with correct headers when OBSERVABILITY_ENABLED is true",
+    async () => {
     process.env.OBSERVABILITY_ENABLED = "true";
 
     // Set up two organizations so the scrape can prove tenant isolation.

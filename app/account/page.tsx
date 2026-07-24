@@ -32,6 +32,7 @@ export default async function AccountPage() {
         <div className="flex flex-wrap gap-4 text-sm">
           <Link className="font-semibold text-teal-700" href="/organizations">Manage organizations</Link>
           <Link className="font-semibold text-teal-700" href="/team">Manage team</Link>
+          <Link className="font-semibold text-teal-700" href="/settings">Settings & Operations</Link>
         </div>
       </main>
     </>

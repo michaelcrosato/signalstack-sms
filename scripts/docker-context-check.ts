@@ -27,7 +27,8 @@ export const sensitiveDockerContextPaths = Object.freeze([
   "debug.log",
   "logs/app.log",
   "dist/server.js",
-  "tsconfig.tsbuildinfo"
+  "tsconfig.tsbuildinfo",
+  "tests/unit/operations/backup-restore.test.ts"
 ] as const);
 
 export const requiredDockerBuildInputs = Object.freeze([

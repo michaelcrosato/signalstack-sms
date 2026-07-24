@@ -557,4 +557,34 @@ describe("Twilio webhook routes", () => {
       "claim_owner"
     );
   });
+
+  it("parses inbound MMS media URLs and passes them to message persistence", async () => {
+    const params = {
+      From: "+15555550100",
+      To: "+15555550199",
+      Body: "Check out this image",
+      MessageSid: "MM999",
+      NumMedia: "2",
+      MediaUrl0: "https://api.twilio.com/2010-04-01/Accounts/AC000/Messages/MM999/Media/ME001",
+      MediaUrl1: "https://api.twilio.com/2010-04-01/Accounts/AC000/Messages/MM999/Media/ME002"
+    };
+
+    const response = await inboundWebhookRoute(twilioFormRequest("/api/webhooks/twilio/inbound", params));
+
+    expect(response.status).toBe(204);
+    expect(mocks.createDemoInboundMessage).toHaveBeenCalledWith(
+      "org_demo",
+      {
+        phone: "+15555550100",
+        body: "Check out this image",
+        providerMessageId: "MM999",
+        idempotencyKey: "twilio:inbound:MM999",
+        mediaUrls: [
+          "https://api.twilio.com/2010-04-01/Accounts/AC000/Messages/MM999/Media/ME001",
+          "https://api.twilio.com/2010-04-01/Accounts/AC000/Messages/MM999/Media/ME002"
+        ]
+      },
+      { analyzeSentiment: false, sendKeywordAutoReply: false }
+    );
+  });
 });

@@ -1,5 +1,6 @@
 # TICKET015 — Collapse operator-surfaces permutation test
 
+- **Milestone:** M9
 - **Status:** Done (2026-05-28)
 - **Priority:** P1 (ULTRAPLAN Phase A / debt paydown)
 

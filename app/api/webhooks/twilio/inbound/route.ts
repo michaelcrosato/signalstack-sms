@@ -73,7 +73,8 @@ export async function POST(request: Request) {
           phone: inbound.from,
           body: inbound.body,
           providerMessageId: inbound.providerMessageId,
-          idempotencyKey: inbound.idempotencyKey
+          idempotencyKey: inbound.idempotencyKey,
+          mediaUrls: inbound.mediaUrls
         },
         { analyzeSentiment: false, sendKeywordAutoReply: false }
       );

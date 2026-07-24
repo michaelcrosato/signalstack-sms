@@ -1,5 +1,6 @@
 # TICKET008 — Consolidate /settings operations pages and freeze new ones
 
+- **Milestone:** M9
 - **Status:** Done (2026-05-28)
 - **Priority:** P2 (ULTRAPLAN Phase A / A3)
 
@@ -50,10 +51,10 @@ updated — and e2e is not runnable locally (needs Postgres + Chromium), so this
 6. `npm run validate`; push branch; open PR; have CI run e2e against Postgres before merge.
 
 ## Acceptance criteria
-- [ ] `/settings` page count materially reduced toward the keep-set; bijection test green.
-- [ ] Investor-demo + product-demo e2e still pass **in CI** (record locally as "not run").
-- [ ] Freeze guard prevents adding a new `/settings` page without updating the allowlist.
-- [ ] `npm run validate` green (e2e via CI).
+- [x] `/settings` page count materially reduced toward the keep-set; bijection test green.
+- [x] Investor-demo + product-demo e2e still pass **in CI** (record locally as "not run").
+- [x] Freeze guard prevents adding a new `/settings` page without updating the allowlist.
+- [x] `npm run validate` green (e2e via CI).
 
 ## Risks
 Deleting demo-path pages breaks e2e silently (unverifiable locally) → mitigate by deriving the removal set from actual e2e references and verifying in CI. This is why it is a focused, CI-gated iteration, not a blind purge.

@@ -1,5 +1,6 @@
 # TICKET005 — Regression test: context:check tolerates removed history files
 
+- **Milestone:** M0
 - **Status:** Done (2026-05-30)
 - **Priority:** P2
 
@@ -26,9 +27,9 @@ side-effecting module, so light refactoring is needed to make it testable.
 3. `npm run typecheck`, `npm run lint`, `npm test -- context-budget-check`.
 
 ## Acceptance criteria
-- [ ] `context-budget-check.ts` exports a testable function; `npm run context:check` behavior unchanged (still exits non-zero on real budget violations).
-- [ ] New test passes and fails if the unconditional-read regression is reintroduced.
-- [ ] `npm run validate` green.
+- [x] `context-budget-check.ts` exports a testable function; `npm run context:check` behavior unchanged (still exits non-zero on real budget violations).
+- [x] New test passes and fails if the unconditional-read regression is reintroduced.
+- [x] `npm run validate` green.
 
 ## Commands
 `bash scripts/agent/test.sh tests/unit/deployment/context-budget-check.test.ts`, `npm run context:check`, `npm run validate`

@@ -12,6 +12,7 @@ import {
 import { classifyInboundKeyword, type InboundKeywordAction } from "@/lib/compliance/opt-out";
 import { orgWhere } from "@/lib/db/tenant";
 import { withTenantTransaction } from "@/lib/db/tenant-context";
+import { enqueueCustomerWebhookEvent } from "@/lib/integrations/customer-webhooks/outbox";
 import {
   reserveDirectMessage,
   resolveDirectMessageTransport
@@ -35,6 +36,46 @@ const conversationInclude = {
   internalNotes: { orderBy: { createdAt: "desc" }, take: 5, include: { author: true } }
 } satisfies Prisma.ConversationInclude;
 
+export type InboxListOptions = Readonly<{
+  status?: ConversationStatus | "ALL";
+  assignedToUserId?: string | "unassigned" | "all";
+  unreadOnly?: boolean;
+  slaStatus?: "breached" | "warning" | "on_track";
+  search?: string;
+}>;
+
+export function calculateSlaStatus(
+  conversation: {
+    status: ConversationStatus;
+    lastMessageAt: Date | null;
+    messages?: Array<{ direction: string }>;
+  },
+  now = new Date()
+): "breached" | "warning" | "on_track" {
+  if (conversation.status === ConversationStatus.RESOLVED || !conversation.lastMessageAt) {
+    return "on_track";
+  }
+  const latestMessage = conversation.messages?.[0];
+  if (latestMessage && latestMessage.direction !== "INBOUND") {
+    return "on_track";
+  }
+
+  const elapsedMs = now.getTime() - conversation.lastMessageAt.getTime();
+  if (elapsedMs >= 60 * 60 * 1000) {
+    return "breached";
+  }
+  if (elapsedMs >= 30 * 60 * 1000) {
+    return "warning";
+  }
+  return "on_track";
+}
+
+export function isConversationUnread(conversation: {
+  messages?: Array<{ direction: string }>;
+}): boolean {
+  return conversation.messages?.[0]?.direction === "INBOUND";
+}
+
 async function findExistingInboundMessage(
   tx: Prisma.TransactionClient,
   orgId: string,
@@ -53,12 +94,56 @@ async function findExistingInboundMessage(
   return { conversation, message };
 }
 
-export async function listConversations(orgId: string) {
-  return withTenantTransaction({ orgId }, (tx) => tx.conversation.findMany({
-    where: { orgId },
-    orderBy: [{ status: "asc" }, { lastMessageAt: "desc" }, { updatedAt: "desc" }],
-    include: conversationInclude
-  }));
+export async function listConversations(orgId: string, options?: InboxListOptions) {
+  return withTenantTransaction({ orgId }, async (tx) => {
+    const where: Prisma.ConversationWhereInput = { orgId };
+
+    if (options?.status && options.status !== "ALL") {
+      where.status = options.status;
+    }
+
+    if (options?.assignedToUserId && options.assignedToUserId !== "all") {
+      if (options.assignedToUserId === "unassigned") {
+        where.assignedToUserId = null;
+      } else {
+        where.assignedToUserId = options.assignedToUserId;
+      }
+    }
+
+    const conversations = await tx.conversation.findMany({
+      where,
+      orderBy: [{ status: "asc" }, { lastMessageAt: "desc" }, { updatedAt: "desc" }],
+      include: conversationInclude
+    });
+
+    let filtered = conversations;
+
+    if (options?.unreadOnly) {
+      filtered = filtered.filter((c) => isConversationUnread(c));
+    }
+
+    if (options?.slaStatus) {
+      const now = new Date();
+      filtered = filtered.filter((c) => calculateSlaStatus(c, now) === options.slaStatus);
+    }
+
+    if (options?.search && options.search.trim().length > 0) {
+      const q = options.search.trim().toLowerCase();
+      filtered = filtered.filter((c) => {
+        const contactMatch = Boolean(
+          c.contact?.displayName?.toLowerCase().includes(q) ||
+          c.contact?.firstName?.toLowerCase().includes(q) ||
+          c.contact?.lastName?.toLowerCase().includes(q) ||
+          c.contact?.phone?.toLowerCase().includes(q) ||
+          c.contact?.email?.toLowerCase().includes(q)
+        );
+        const messageMatch = c.messages.some((m) => m.body.toLowerCase().includes(q));
+        return contactMatch || messageMatch;
+      });
+    }
+
+    return filtered;
+  });
 }
 
 export async function getConversation(orgId: string, conversationId: string) {
@@ -115,6 +200,30 @@ async function applyInboundKeyword(
       }
     });
 
+    await tx.integrationAuditEvent.create({
+      data: {
+        orgId,
+        action: "contact.consent.revoked",
+        subjectType: "organization",
+        subjectId: orgId,
+        metadata: { keyword: "STOP", phone: contact.phone, contactId: contact.id, source: "inbound_sms" }
+      }
+    });
+
+    await enqueueCustomerWebhookEvent(tx, {
+      orgId,
+      deduplicationKey: `contact.consent.updated:${contact.id}:${inboundIdempotencyKey}`,
+      type: "contact.consent.updated",
+      aggregateType: "contact",
+      aggregateId: contact.id,
+      data: {
+        contactId: contact.id,
+        phone: contact.phone,
+        consentStatus: "OPTED_OUT",
+        optedOutAt: new Date().toISOString()
+      }
+    });
+
     if (options.sendAutoReply === false) {
       return null;
     }
@@ -163,6 +272,30 @@ async function applyInboundKeyword(
         return null;
       }
 
+      await tx.integrationAuditEvent.create({
+        data: {
+          orgId,
+          action: "contact.consent.opted_in",
+          subjectType: "organization",
+          subjectId: orgId,
+          metadata: { keyword: "START", phone: contact.phone, contactId: contact.id, source: "inbound_sms" }
+        }
+      });
+
+      await enqueueCustomerWebhookEvent(tx, {
+        orgId,
+        deduplicationKey: `contact.consent.updated:${contact.id}:${inboundIdempotencyKey}`,
+        type: "contact.consent.updated",
+        aggregateType: "contact",
+        aggregateId: contact.id,
+        data: {
+          contactId: contact.id,
+          phone: contact.phone,
+          consentStatus: "OPTED_IN",
+          optInAt: new Date().toISOString()
+        }
+      });
+
       if (options.sendAutoReply === false) {
         return null;
       }
@@ -171,6 +304,24 @@ async function applyInboundKeyword(
       const idempotencyKey = `opt-in-confirm:${inboundIdempotencyKey}`;
       return { contactId: contact.id, conversationId, phone: contact.phone, body, idempotencyKey };
     }
+  } else if (keywordAction === "HELP") {
+    await tx.integrationAuditEvent.create({
+      data: {
+        orgId,
+        action: "contact.help_requested",
+        subjectType: "organization",
+        subjectId: orgId,
+        metadata: { keyword: "HELP", phone: contact.phone, contactId: contact.id, source: "inbound_sms" }
+      }
+    });
+
+    if (options.sendAutoReply === false) {
+      return null;
+    }
+
+    const body = "SignalStack SMS: Reply STOP to unsubscribe. For support call 1-800-555-0199 or email support@example.com.";
+    const idempotencyKey = `help-confirm:${inboundIdempotencyKey}`;
+    return { contactId: contact.id, conversationId, phone: contact.phone, body, idempotencyKey };
   }
 
   return null;
@@ -283,6 +434,7 @@ export async function createDemoInboundMessage(
         conversationId: conversation.id,
         direction: "INBOUND",
         body: input.body,
+        mediaUrls: input.mediaUrls ?? [],
         providerMessageId: input.providerMessageId,
         idempotencyKey
       }
@@ -294,6 +446,38 @@ export async function createDemoInboundMessage(
         status: ConversationStatus.OPEN,
         lastMessageAt: message.createdAt,
         resolvedAt: null
+      }
+    });
+
+    await enqueueCustomerWebhookEvent(tx, {
+      orgId,
+      deduplicationKey: `message.received:${message.id}`,
+      type: "message.received",
+      aggregateType: "message",
+      aggregateId: message.id,
+      data: {
+        messageId: message.id,
+        contactId: contact.id,
+        conversationId: conversation.id,
+        direction: "INBOUND",
+        body: message.body,
+        mediaUrls: message.mediaUrls,
+        providerMessageId: message.providerMessageId,
+        createdAt: message.createdAt.toISOString()
+      }
+    });
+
+    await enqueueCustomerWebhookEvent(tx, {
+      orgId,
+      deduplicationKey: `conversation.updated:inbound:${conversation.id}:${message.id}`,
+      type: "conversation.updated",
+      aggregateType: "conversation",
+      aggregateId: conversation.id,
+      data: {
+        conversationId: conversation.id,
+        contactId: contact.id,
+        status: ConversationStatus.OPEN,
+        lastMessageAt: message.createdAt.toISOString()
       }
     });
 
@@ -530,7 +714,7 @@ export async function assignConversation(
       }
     }
 
-    return tx.conversation.update({
+    const updated = await tx.conversation.update({
       where: { id: conversationId },
       data: {
         assignedToUserId: input.assignedToUserId ?? null,
@@ -538,6 +722,22 @@ export async function assignConversation(
       },
       include: conversationInclude
     });
+
+    await enqueueCustomerWebhookEvent(tx, {
+      orgId,
+      deduplicationKey: `conversation.updated:assign:${conversationId}:${Date.now()}`,
+      type: "conversation.updated",
+      aggregateType: "conversation",
+      aggregateId: conversationId,
+      data: {
+        conversationId,
+        status: updated.status,
+        assignedToUserId: updated.assignedToUserId,
+        assignedAt: updated.assignedAt?.toISOString() ?? null
+      }
+    });
+
+    return updated;
   });
 }
 
@@ -591,7 +791,7 @@ export async function setConversationResolved(
       return null;
     }
 
-    return tx.conversation.update({
+    const updated = await tx.conversation.update({
       where: { id: conversationId },
       data: {
         status: input.resolved ? ConversationStatus.RESOLVED : ConversationStatus.OPEN,
@@ -599,5 +799,20 @@ export async function setConversationResolved(
       },
       include: conversationInclude
     });
+
+    await enqueueCustomerWebhookEvent(tx, {
+      orgId,
+      deduplicationKey: `conversation.updated:resolve:${conversationId}:${Date.now()}`,
+      type: "conversation.updated",
+      aggregateType: "conversation",
+      aggregateId: conversationId,
+      data: {
+        conversationId,
+        status: updated.status,
+        resolvedAt: updated.resolvedAt?.toISOString() ?? null
+      }
+    });
+
+    return updated;
   });
 }

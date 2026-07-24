@@ -11,7 +11,15 @@ export const complianceProfileUpdateSchema = z.object({
   optInDescription: optionalText,
   privacyPolicyUrl: optionalUrl,
   termsOfServiceUrl: optionalUrl,
-  a2pRegistrationStatus: z.nativeEnum(A2pRegistrationStatus).optional()
+  a2pRegistrationStatus: z.nativeEnum(A2pRegistrationStatus).optional(),
+  brandRegistrationId: optionalShortText,
+  campaignRegistrationId: optionalShortText,
+  sampleMessages: z.array(z.string().trim().min(1).max(500)).optional(),
+  helpKeywordsCopy: optionalText,
+  optOutKeywordsCopy: optionalText,
+  evidenceReference: optionalText,
+  verificationStatus: optionalShortText,
+  verificationDetails: z.record(z.unknown()).optional()
 });
 
 export type ComplianceProfileUpdateInput = z.infer<typeof complianceProfileUpdateSchema>;

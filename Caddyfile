@@ -1,0 +1,11 @@
+{
+	email {$CADDY_LETSENCRYPT_EMAIL:admin@example.com}
+}
+
+{$DOMAIN_NAME:localhost} {
+	reverse_proxy app:3000 {
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Forwarded-Host {host}
+	}
+}

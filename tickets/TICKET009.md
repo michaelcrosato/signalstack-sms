@@ -1,5 +1,6 @@
 # TICKET009 — Clerk-backed auth/RBAC slice behind `production-auth:check`
 
+- **Milestone:** M1
 - **Status:** Done — demo-safe gated seam (2026-05-29). Shipped `lib/auth/session.ts`
   (`resolveProductionCurrentOrg` → verified subject → active membership → org/role, **fail-closed**;
   `productionAuthIsEnabled`/`clerkConfigIsPresent`, behind `PRODUCTION_AUTH_ENABLED`, no Clerk SDK/secrets),

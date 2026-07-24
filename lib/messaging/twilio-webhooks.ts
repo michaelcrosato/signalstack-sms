@@ -12,6 +12,7 @@ export type NormalizedTwilioInbound = {
   body: string;
   providerMessageId: string;
   idempotencyKey: string;
+  mediaUrls?: string[];
 };
 
 export type NormalizedTwilioStatus = {
@@ -239,12 +240,26 @@ export function normalizeTwilioInbound(payload: TwilioWebhookPayload): Normalize
     return null;
   }
 
+  const mediaUrls: string[] = [];
+  const rawNumMedia = (payload as Record<string, unknown>).NumMedia;
+  const numMediaStr = typeof rawNumMedia === "string" ? rawNumMedia : "0";
+  const numMedia = parseInt(numMediaStr, 10);
+  if (!isNaN(numMedia) && numMedia > 0) {
+    for (let i = 0; i < numMedia; i++) {
+      const url = (payload as Record<string, unknown>)[`MediaUrl${i}`];
+      if (typeof url === "string" && url.trim().length > 0) {
+        mediaUrls.push(url.trim());
+      }
+    }
+  }
+
   return {
     from,
     to,
     body: rawBody,
     providerMessageId,
-    idempotencyKey: `twilio:inbound:${providerMessageId}`
+    idempotencyKey: `twilio:inbound:${providerMessageId}`,
+    mediaUrls: mediaUrls.length > 0 ? mediaUrls : undefined
   };
 }
 

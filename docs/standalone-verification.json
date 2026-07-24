@@ -176,60 +176,86 @@
     },
     {
       "id": "M6",
-      "status": "partial foundation",
+      "status": "done",
       "evidence": [
         "app/api/webhooks/twilio/inbound/route.ts",
         "app/api/webhooks/twilio/status/route.ts",
         "lib/db/repositories/inbox.ts",
-        "tests/unit/api/twilio-webhook-routes.test.ts"
+        "lib/compliance/opt-out.ts",
+        "tests/unit/api/twilio-webhook-routes.test.ts",
+        "tests/unit/compliance/opt-out.test.ts",
+        "tests/unit/db/inbox-idempotency.test.ts",
+        "tests/unit/product/inbox.test.ts"
       ]
     },
     {
       "id": "M7",
-      "status": "partial foundation",
+      "status": "done",
       "evidence": [
         "lib/queue/worker.ts",
         "lib/queue/bullmq.ts",
         "lib/queue/bullmq-worker.ts",
-        "tests/unit/db/queue-cancel-claim-race.test.ts",
-        "tests/unit/queue/bullmq-worker.test.ts"
+        "lib/messaging/outbox/worker.ts",
+        "app/api/campaigns/route.ts",
+        "tests/unit/messaging/outbox-worker.test.ts",
+        "tests/unit/queue/bullmq-worker.test.ts",
+        "tests/unit/queue/jobs.test.ts"
       ]
     },
     {
       "id": "M8",
-      "status": "partial foundation",
+      "status": "done",
       "evidence": [
         "lib/compliance/gates.ts",
         "lib/compliance/quiet-hours.ts",
+        "lib/compliance/opt-out.ts",
+        "lib/compliance/retention-worker.ts",
         "tests/unit/compliance/hard-gates.test.ts",
-        "tests/unit/db/contact-consent-evidence-constraint.test.ts"
+        "tests/unit/compliance/suppression-gates.test.ts",
+        "tests/unit/compliance/retention-worker.test.ts"
       ]
     },
     {
       "id": "M9",
-      "status": "partial foundation",
+      "status": "done",
       "evidence": [
         "app/dashboard/page.tsx",
+        "app/settings/page.tsx",
+        "lib/operations/entitlements.ts",
+        "tests/unit/operations/quota.test.ts",
+        "tests/unit/operations/system-status.test.ts",
         "e2e/product-demo-path.spec.ts",
         "docs/CURRENT_STATE_MATRIX.md"
       ]
     },
     {
       "id": "M10",
-      "status": "not started",
+      "status": "done",
       "evidence": [
-        "docker-compose.yml",
+        "Dockerfile",
+        ".dockerignore",
+        "docker-compose.prod.yml",
+        "scripts/docker-context-check.ts",
+        "scripts/backup-restore.ts",
+        "tests/unit/operations/backup-restore.test.ts",
         "docs/PRODUCTION_DEPLOYMENT.md",
-        "docs/PRODUCTION_OBSERVABILITY.md"
+        "docs/LOCAL_OPERATOR_RUNBOOK.md"
       ]
     },
     {
       "id": "M11",
-      "status": "not started",
+      "status": "done",
       "evidence": [
+        "docs/CARRIER_CANARY.md",
+        "lib/operations/carrier-canary.ts",
+        "lib/operations/operational-drills.ts",
+        "scripts/carrier-canary-check.ts",
+        "scripts/operational-drills-check.ts",
         "scripts/validate.ts",
-        ".github/workflows/ci.yml",
-        "playwright.config.ts",
+        "scripts/production-gate.ts",
+        "scripts/standalone-roadmap-check.ts",
+        "tests/unit/operations/carrier-canary.test.ts",
+        "tests/unit/operations/operational-drills.test.ts",
         "e2e/smoke.spec.ts"
       ]
     }

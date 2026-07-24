@@ -1,5 +1,11 @@
 import { ConversationStatus } from "@prisma/client";
-import { listConversations, listConversationMessages } from "@/lib/db/repositories/inbox";
+import {
+  calculateSlaStatus,
+  isConversationUnread,
+  listConversations,
+  listConversationMessages,
+  type InboxListOptions
+} from "@/lib/db/repositories/inbox";
 import { formatLeadStatus } from "@/lib/product/contacts";
 
 const productInboxMetricRowItems = [
@@ -41,8 +47,12 @@ function contactName(contact: {
   return contact.displayName ?? (fullName || contact.phone) ?? "Unknown contact";
 }
 
-export async function getProductInbox(orgId: string, selectedConversationId?: string | null) {
-  const conversations = await listConversations(orgId);
+export async function getProductInbox(
+  orgId: string,
+  selectedConversationId?: string | null,
+  options?: InboxListOptions
+) {
+  const conversations = await listConversations(orgId, options);
   const selectedConversation =
     conversations.find((conversation) => conversation.id === selectedConversationId) ?? conversations[0] ?? null;
   const messages = selectedConversation ? await listConversationMessages(orgId, selectedConversation.id) : [];
@@ -74,6 +84,8 @@ export async function getProductInbox(orgId: string, selectedConversationId?: st
       consentStatus: conversation.contact?.consentStatus ?? "UNKNOWN",
       assignedTo: conversation.assignedTo?.displayName ?? "Unassigned",
       latestMessage: conversation.messages[0]?.body ?? "No messages yet",
+      unread: isConversationUnread(conversation),
+      slaStatus: calculateSlaStatus(conversation),
       lastMessageAt: (conversation.lastMessageAt ?? conversation.updatedAt).toISOString()
     })),
     selectedConversation: selectedConversation

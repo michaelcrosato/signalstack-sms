@@ -30,6 +30,7 @@ afterEach(async () => {
 });
 
 describe("admin:create operator command", () => {
+  vi.setConfig({ testTimeout: 20000 });
   it("reads an exact stdin password, creates an existing-org owner, and emits sanitized JSON", async () => {
     const harness = createHarness();
     const exitCode = await runAdminCreate(
@@ -274,7 +275,7 @@ describe("admin:create operator command", () => {
     expect(serialized).toContain("existing-org");
   });
 
-  it("runs the real npm entrypoint and sanitizes Prisma connection failures", () => {
+  it("runs the real npm entrypoint and sanitizes Prisma connection failures", { timeout: 20000 }, () => {
     const npmExecPath = process.env.npm_execpath;
     expect(npmExecPath).toBeTruthy();
     const databaseSentinel = "CLI_DB_DETAIL_MUST_NOT_ESCAPE";
@@ -294,7 +295,7 @@ describe("admin:create operator command", () => {
       },
       input: rawPassword,
       encoding: "utf8",
-      timeout: 15_000,
+      timeout: 20_000,
       windowsHide: true
     });
 

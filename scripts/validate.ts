@@ -1,5 +1,8 @@
 import { existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { applyDemoSafeRuntimeDefaults } from "@/lib/env/defaults";
+
+applyDemoSafeRuntimeDefaults();
 
 const scripts = [
   "contracts:check",
@@ -21,6 +24,8 @@ const scripts = [
   "context:check",
   "security:check",
   "ai:check",
+  "carrier-canary:check",
+  "operational-drills:check",
   "lint",
   "typecheck",
   "db:validate",
@@ -54,7 +59,7 @@ for (const script of scripts) {
       AI_PROVIDER: process.env.AI_PROVIDER ?? "fake",
       DATABASE_URL:
         process.env.DATABASE_URL ??
-        "postgresql://signalstack:signalstack@localhost:5432/signalstack_sms?schema=public"
+        "postgresql://signalstack:signalstack@127.0.0.1:5432/signalstack_sms?schema=public"
     }
   });
 

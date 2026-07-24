@@ -14,6 +14,7 @@ import { enqueueCustomerWebhookEvent } from "@/lib/integrations/customer-webhook
 import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
 import { readApiKeyPepper } from "@/lib/public-api/api-key-crypto";
 import { requireIdempotencyKey } from "@/lib/public-api/idempotency";
+import { checkMessageSegmentQuota } from "@/lib/operations/entitlements";
 
 const E164_PATTERN = /^\+[1-9]\d{4,14}$/;
 const BROWSER_REQUEST_ID_PATTERN =
@@ -111,6 +112,23 @@ export async function reserveDirectMessage(
   const policyReasons = acceptancePolicyReasons(normalized.route, contact);
   if (policyReasons.length > 0) {
     return Object.freeze({ ok: false, kind: "blocked", reasons: Object.freeze(policyReasons) });
+  }
+
+  const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  const currentMonthlyMessages =
+    typeof tx.message?.count === "function"
+      ? await tx.message.count({
+          where: {
+            orgId: normalized.orgId,
+            direction: "OUTBOUND",
+            createdAt: { gte: startOfMonth }
+          }
+        })
+      : 0;
+  const segmentsNeeded = Math.ceil(normalized.body.length / 160);
+  const quotaCheck = checkMessageSegmentQuota(currentMonthlyMessages, segmentsNeeded);
+  if (!quotaCheck.allowed) {
+    return Object.freeze({ ok: false, kind: "blocked", reasons: Object.freeze(["MONTHLY_SEGMENT_QUOTA_EXCEEDED"]) });
   }
 
   const providerBinding = await resolveProviderBinding(tx, normalized, contact.phone);

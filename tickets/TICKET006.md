@@ -1,5 +1,6 @@
 # TICKET006 — Collapse api-route-authorization permutation tests
 
+- **Milestone:** M1
 - **Status:** Done (2026-05-28)
 - **Priority:** P1 (ULTRAPLAN Phase A / A1)
 
@@ -37,9 +38,9 @@ test-name strings — preserve those (see TICKET007 for that pattern).
 5. Update docs (TICKET014 trims the prose).
 
 ## Acceptance criteria
-- [ ] File < ~400 LOC; all tests pass; total test LOC now < ~14k (ULTRAPLAN Phase A exit metric).
-- [ ] Every mutating route still asserted to call `requireApiRole` before body parsing.
-- [ ] Any gate-required test-name strings preserved; `npm run validate` green.
+- [x] File < ~400 LOC; all tests pass; total test LOC now < ~14k (ULTRAPLAN Phase A exit metric).
+- [x] Every mutating route still asserted to call `requireApiRole` before body parsing.
+- [x] Any gate-required test-name strings preserved; `npm run validate` green.
 
 ## Commands
 `wc -l tests/unit/auth/api-route-authorization.test.ts`, `bash scripts/agent/test.sh tests/unit/auth/api-route-authorization.test.ts`, `npm run validate`

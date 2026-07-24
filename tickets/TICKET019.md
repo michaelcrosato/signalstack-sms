@@ -1,5 +1,6 @@
 # TICKET019 — Update AFK onboarding docs for agent script portability
 
+- **Milestone:** M0
 - **Status:** Done
 - **Priority:** P2
 

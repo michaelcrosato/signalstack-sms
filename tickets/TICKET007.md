@@ -1,5 +1,6 @@
 # TICKET007 — Collapse live-worker-controls permutation tests
 
+- **Milestone:** M7
 - **Status:** Done (2026-05-28)
 - **Priority:** P1 (ULTRAPLAN Phase A / A1)
 
@@ -36,11 +37,11 @@ are not touched, so `npm run validate` stays green.
 5. Trim `docs/TESTING.md` permutation prose; update matrix + summary.
 
 ## Acceptance criteria
-- [ ] File < ~300 LOC; all new tests pass.
-- [ ] Reserved class blocked: `liveWorkerDeploymentClassIsAuthorized()` and real-checklist wrapper → false.
-- [ ] Positive path covered: implemented frozen wrapper → true.
-- [ ] `workerDeploymentClassIsAllowed` allows unset/""/local-demo, denies production-live-campaign.
-- [ ] `npm run validate` green (or failures explained + ticketed).
+- [x] File < ~300 LOC; all new tests pass.
+- [x] Reserved class blocked: `liveWorkerDeploymentClassIsAuthorized()` and real-checklist wrapper → false.
+- [x] Positive path covered: implemented frozen wrapper → true.
+- [x] `workerDeploymentClassIsAllowed` allows unset/""/local-demo, denies production-live-campaign.
+- [x] `npm run validate` green (or failures explained + ticketed).
 
 ## Commands
 `bash scripts/agent/test.sh tests/unit/queue/live-worker-controls.test.ts`, `npm run typecheck`, `npm run lint`, `npm run validate`

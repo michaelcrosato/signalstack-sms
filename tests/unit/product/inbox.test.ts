@@ -10,6 +10,8 @@ import { productInboxWorkspaceDefaults } from "@/lib/product/inbox-workspace-def
 import { getProductInbox, productInboxMetricRows, productInboxThreadStatusRows } from "@/lib/product/inbox";
 
 vi.mock("@/lib/db/repositories/inbox", () => ({
+  calculateSlaStatus: vi.fn(() => "on_track"),
+  isConversationUnread: vi.fn((c) => c.messages?.[0]?.direction === "INBOUND"),
   listConversations: vi.fn(async () => [
     {
       id: "conversation_1",

@@ -1,5 +1,6 @@
 # TICKET003 — Demo-safe local outbound reply in the inbox
 
+- **Milestone:** M6
 - **Status:** Done (2026-05-29)
 - **Priority:** P2
 
@@ -29,11 +30,11 @@ This must route through the existing dummy provider + hard messaging gate, never
 5. Add unit tests: malformed JSON → 400; opted-out/STOP recipient → blocked; happy path persists one outbound row.
 
 ## Acceptance criteria
-- [ ] Reply creates exactly one local OUTBOUND `Message` (dummy provider), no live send.
-- [ ] Opted-out / STOP'd contacts are blocked with a reason; no message row created.
-- [ ] Duplicate submit (same idempotency key) does not double-insert.
-- [ ] Unit tests cover 400, blocked, and happy path; `npm run validate` green.
-- [ ] `docs/CURRENT_STATE_MATRIX.md` inbox row updated.
+- [x] Reply creates exactly one local OUTBOUND `Message` (dummy provider), no live send.
+- [x] Opted-out / STOP'd contacts are blocked with a reason; no message row created.
+- [x] Duplicate submit (same idempotency key) does not double-insert.
+- [x] Unit tests cover 400, blocked, and happy path; `npm run validate` green.
+- [x] `docs/CURRENT_STATE_MATRIX.md` inbox row updated.
 
 ## Commands
 `bash scripts/agent/test.sh tests/unit/api/inbox-json-route.test.ts`, `npm run validate`

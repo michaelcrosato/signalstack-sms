@@ -6,6 +6,7 @@ import { preflightCampaignRecipients } from "@/lib/messaging/send-preflight";
 import { scheduledCampaignIdempotencyKey } from "@/lib/queue/idempotency";
 import { scheduledCampaignJobSchema } from "@/lib/queue/jobs";
 import type { CampaignCreateInput, CampaignUpdateInput } from "@/lib/validation/campaigns";
+import { evaluateSegmentContacts, type SegmentFilter } from "@/lib/db/repositories/segments";
 
 function campaignListInclude(orgId: string) {
   return {
@@ -161,12 +162,44 @@ export async function updateCampaign(orgId: string, campaignId: string, input: C
   });
 }
 
-export async function preflightCampaign(orgId: string, campaignId: string, contactIds?: string[]) {
-  return withTenantTransaction({ orgId }, async (tx) => {
-    const campaign = await tx.campaign.findFirst({
-      where: orgWhere(orgId, { id: campaignId }),
-      include: { recipients: { where: { orgId } } }
+export async function snapshotCampaignAudience(
+  orgId: string,
+  campaignId: string,
+  filter: SegmentFilter,
+  existingTx?: Prisma.TransactionClient
+) {
+  const execute = async (tx: Prisma.TransactionClient) => {
+    const contacts = await evaluateSegmentContacts(orgId, filter, tx);
+    const contactIds = contacts.map((c) => c.id);
+    await syncCampaignRecipients(tx, orgId, campaignId, contactIds);
+    return tx.campaignRecipient.findMany({
+      where: { orgId, campaignId },
+      include: { contact: true }
     });
+  };
+
+  return existingTx ? execute(existingTx) : withTenantTransaction({ orgId }, execute);
+}
+
+export async function preflightCampaign(
+  orgId: string,
+  campaignId: string,
+  contactIds?: string[],
+  options?: { now?: Date }
+) {
+  return withTenantTransaction({ orgId }, async (tx) => {
+    const [campaign, organization] = await Promise.all([
+      tx.campaign.findFirst({
+        where: orgWhere(orgId, { id: campaignId }),
+        include: { recipients: { where: { orgId } } }
+      }),
+      typeof tx.organization?.findFirst === "function"
+        ? tx.organization.findFirst({
+            where: { id: orgId },
+            select: { timezone: true }
+          })
+        : Promise.resolve(null)
+    ]);
 
     if (!campaign) {
       return null;
@@ -187,7 +220,11 @@ export async function preflightCampaign(orgId: string, campaignId: string, conta
       }
     });
 
-    return preflightCampaignRecipients(contacts, selectedContactIds);
+    return preflightCampaignRecipients(contacts, selectedContactIds, {
+      now: options?.now ?? new Date(),
+      timeZone: organization?.timezone,
+      checkQuietHours: true
+    });
   });
 }
 
@@ -218,13 +255,19 @@ export async function scheduleCampaign(orgId: string, campaignId: string, schedu
       throw new Error("Campaign schedule is already processing.");
     }
 
-    const contacts = await tx.contact.findMany({
-      where: { orgId, id: { in: campaign.recipients.map((recipient) => recipient.contactId) } },
-      select: { id: true, phone: true, consentStatus: true, optedOutAt: true, archivedAt: true }
-    });
+    const [organization, contacts] = await Promise.all([
+      typeof tx.organization?.findFirst === "function"
+        ? tx.organization.findFirst({ where: { id: orgId }, select: { timezone: true } })
+        : Promise.resolve(null),
+      tx.contact.findMany({
+        where: { orgId, id: { in: campaign.recipients.map((recipient) => recipient.contactId) } },
+        select: { id: true, phone: true, consentStatus: true, optedOutAt: true, archivedAt: true }
+      })
+    ]);
     const preflight = preflightCampaignRecipients(
       contacts,
-      campaign.recipients.map((recipient) => recipient.contactId)
+      campaign.recipients.map((recipient) => recipient.contactId),
+      { now: scheduledAt, timeZone: organization?.timezone, checkQuietHours: true }
     );
     if (!preflight.allowed) {
       throw new Error("Campaign preflight failed.");

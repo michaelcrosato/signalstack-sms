@@ -2,7 +2,9 @@
 .git
 .git/**
 .agents
+.agents/**
 .agent-cleaner
+.agent-cleaner/**
 
 # Local environment files and secrets; the placeholder template is safe to retain.
 .env
@@ -22,6 +24,8 @@ out
 out/**
 
 # Test, coverage, and automation artifacts
+tests
+tests/**
 coverage
 coverage/**
 playwright-report

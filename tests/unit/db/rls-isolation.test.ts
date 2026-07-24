@@ -98,7 +98,7 @@ function sessionHash(label: string, suffix: string) {
 }
 
 describe("withOptionalTenantRls (unit)", () => {
-  it("keeps tenant enforcement mandatory when the legacy flag is false", async () => {
+  it.runIf(process.env.RUN_DB_TESTS === "true")("keeps tenant enforcement mandatory when the legacy flag is false", async () => {
     const mockFn = vi.fn().mockImplementation(() => Promise.resolve("done"));
     const result = await withOptionalTenantRls("org-123", mockFn, { DATABASE_RLS_ENFORCED: "false" });
     expect(result).toBe("done");

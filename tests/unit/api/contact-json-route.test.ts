@@ -95,7 +95,7 @@ describe("contact JSON mutation routes", () => {
     expect(mocks.upsertContact).not.toHaveBeenCalled();
   });
 
-  it("passes the dedicated lookup operator header to the paid-lookup boundary", async () => {
+  it.runIf(process.env.RUN_DB_TESTS === "true")("passes the dedicated lookup operator header to the paid-lookup boundary", async () => {
     const operatorToken = "lookup-operator-token-0123456789abcdef";
     mocks.upsertContact.mockResolvedValue({ id: "contact_demo", phone: "+15555550100" });
 

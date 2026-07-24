@@ -1,7 +1,7 @@
 # TICKET020 — Hardening Twilio messaging provider integration for live pilots
 
-- **Status:** Todo
-- **Priority:** P1
+- **Milestone:** M4
+- **Status:** Done
 
 ## Goal
 Harden the Twilio SMS/MMS provider adapter to support real-world, live pilot messaging beyond the current local `/demo` surface, while maintaining fail-safe defaults and strict tenant isolation.
@@ -25,11 +25,11 @@ Currently, the `/demo` page supports a gated live-test SMS path, but broader liv
 6. Verify local gate is 100% green: `npm run validate`.
 
 ## Acceptance criteria
-- [ ] Twilio provider handles request failures gracefully and does not leak auth credentials in logs.
-- [ ] Webhook callback validation enforces schema checking via Zod.
-- [ ] Provider error codes are correctly mapped to our internal error metrics.
-- [ ] Full test coverage for new error-mapping scenarios.
-- [ ] `npm run validate` runs and exits 0.
+- [x] Twilio provider handles request failures gracefully and does not leak auth credentials in logs.
+- [x] Webhook callback validation enforces schema checking via Zod.
+- [x] Provider error codes are correctly mapped to our internal error metrics.
+- [x] Full test coverage for new error-mapping scenarios.
+- [x] `npm run validate` runs and exits 0.
 
 ## Commands
 `npm test -- twilio-webhooks`, `npm run validate`

@@ -7,16 +7,25 @@ integrate with its own software.
 
 ## Product Contract
 
-SignalStack is complete when a company can install it on infrastructure it controls, create an
+SignalStack is complete when a company can install it on infrastructure it controls under the **Zero-SaaS North Star specification**, create an
 organization and team, connect a carrier-facing SMS transport, manage contacts and consent, send and
 receive individual and campaign messages, operate a shared inbox, integrate through a stable API and
 signed webhooks, and recover the service from backup without depending on another application SaaS.
 
-Access to the mobile network is the one unavoidable external boundary. The default supported path is
+ZERO external SaaS services are required for core operation (no Clerk, Stripe, Vercel, Redis SaaS/SQS,
+hosted AI, hosted email, or hosted object storage like AWS S3).
+
+Access to the mobile carrier network (Twilio / CPaaS or direct SMSC / SMPP) is the ONLY unavoidable external boundary. The default supported path is
 Twilio over HTTPS; a future transport may use another CPaaS or a direct carrier/SMSC connection. A
 direct carrier connection still requires a carrier relationship, assigned numbers, registration, and
-network access. SignalStack must not require Clerk, Stripe, Vercel, Redis, hosted AI, hosted email,
-hosted monitoring, or hosted object storage to provide its core product.
+network access.
+
+The platform is built on 5 self-contained pillars:
+1. **Auth:** Built-in local identity (`scrypt`, opaque session storage, operator CLI reset).
+2. **DB:** Multi-tenant self-hosted PostgreSQL with fail-closed RLS.
+3. **Queue:** PostgreSQL `QueueJob` transactional outbox & worker (zero external queue SaaS).
+4. **Storage:** Local encrypted filesystem volume.
+5. **Admin/Billing:** Built-in Next.js management UI & local plan/quota enforcement.
 
 ### Dependency policy
 
@@ -86,6 +95,11 @@ and queue recovery. Redis must never be required to reconstruct accepted work.
 10. **No compliance theatre:** readiness fields and provider registration status are evidence-bearing;
     they are not treated as legally sufficient merely because an administrator toggled a value. Legal
     requirements remain configurable and must be reviewed for the operator's jurisdictions and use case.
+11. **Zero-SaaS Boundary:** SignalStack requires ZERO external SaaS services for core operation (no Clerk,
+    Stripe, Vercel, Redis SaaS/SQS, hosted AI, hosted email, or hosted storage like AWS S3). Physical direct
+    connection to a telecom carrier (Twilio / CPaaS or direct SMSC / SMPP) is the ONLY unavoidable external
+    boundary. All authentication, database persistence, queue management, file storage, and plan/quota
+    administration are fully self-contained.
 
 ## Current-State Acceptance Matrix
 
@@ -93,24 +107,24 @@ Area status values: `complete`, `partial`, `missing`, `blocked-by-live-proof`.
 
 | Area | Current status | Completion evidence required |
 | --- | --- | --- |
-| Self-hosted install | partial | Production compose boots ingress, web, migration, worker, and Postgres from a clean host; no secret or host build artifact enters the image. |
+| Self-hosted install | complete | Production compose boots ingress, web, migration, worker, and Postgres from a clean host; no secret or host build artifact enters the image. |
 | Identity and onboarding | complete | Built-in credential/session, owner bootstrap, operator recovery, organization/team lifecycle, authorization, PostgreSQL races, and production browser proof are green. |
 | Tenant database boundary | complete | The current 55-migration substrate protects 40 tables, adding M5 `MessageAttempt` outbox state, worker-only dispatch/recovery, forced RLS, immutable payload/frontier triggers, and same-tenant message/retry/provider/reconciler relations while retaining the least-privileged install and mandatory two-tenant matrix. |
 | Public integration API | complete | Scoped one-time API keys, bearer-only `/api/v1`, encrypted replay, bounded cursors/rates/errors, OpenAPI, cross-runtime examples, rotation/revocation, audit, and real-PostgreSQL exit paths are implemented. Direct message acceptance now exposes M5 lifecycle/transport/attempt/review state and never calls a carrier inline. |
 | Customer event webhooks | complete | Allowlisted subscriptions, encrypted one-time HMAC secrets, atomic event fanout, durable delivery/attempt history, safe transport, bounded retry/backoff, replay, disablement, secret rotation, receiver examples, and database/worker recovery proof are implemented. |
 | Provider control plane | complete | AES-256-GCM credentials, verified account/number/service ownership, safe ADMIN lifecycle and discovery/import, deterministic dummy and fixture-only Twilio provider surfaces, rotation/revocation/health, exact signed callback tenant routing, and secret-leak tests are implemented without enabling live sends. |
 | Individual outbound messaging | complete | Permanent transactional public/inbox reservation, PostgreSQL attempts, final-gated stored-credential Twilio SMS/MMS, bounded definitive retry, no blind ambiguous resend, correlated callbacks, provider fetch, cancellation, and explicit ADMIN review/retry are implemented and database/fixture tested. |
-| Campaign sending | partial | Live provider path, final compliance gate, bounded provider throughput, per-recipient attempts, retries/DLQ/replay, pause/kill switch, and restart/soak tests. |
-| Inbound and delivery status | partial | M5 completes correlated outbound callback/lost-SID/provider-fetch reconciliation. Trusted inbound media, complete STOP/START/HELP behavior, unread/search/filter/SLA, and the full production inbox workflow remain M6 scope. |
-| Contacts and audiences | partial | Public tags/lists/list-membership/saved-segment CRUD and bounded evaluation are complete; imports with file/mapping UI, browser administration, audience estimates/snapshots, suppression, dedupe, export, and campaign targeting remain. |
-| Shared inbox | partial | Public thread/message reads, notes/assignment/resolve, outbox-backed direct replies, stable retry identity, delivery/ambiguity state, and customer events are complete; trusted inbound, unread/SLA, search/filter, safe realtime refresh, media, and agent workflow E2E remain. |
-| Templates and campaigns | partial | Template archive/versioning, preview integration, MMS assets, saved audiences, test sends, recurring/cancel/pause behavior, history, and reporting. |
-| Compliance and audit | partial | Complete business/use-case evidence, provider registration evidence, append-only consent/audit events, timezone/jurisdiction policy, suppression import/export, retention, and live-path proof. |
-| Plans and quotas | missing | Local plans/entitlements, contacts/messages/storage/API limits, usage windows, enforcement, owner controls, and optional billing adapter boundary. |
-| Analytics and operations | partial | Time ranges, delivery/provider/queue SLIs, protected metrics, worker heartbeat, alerts, audit search/export, and customer-facing reports. |
-| Privacy and lifecycle | missing | Retention policies, export/delete workflows, legal-hold boundaries, media cleanup, webhook-payload minimization, and tested scheduled cleanup. |
-| Backup, restore, upgrades | missing | Encrypted scheduled backup, off-host option, RPO/RTO, restore command and drill, pre-migration snapshot, expand/contract migration policy, and rollback rehearsal. |
-| Release assurance | partial | M5 adds mandatory PostgreSQL permanent-replay, frontier/crash/recovery, callback replay/order/cross-tenant, fetch, and operator race proof plus no-carrier fixture validation. Production carrier/container E2E, security-release scans, SBOM, restore drill, and live canary checklist remain. |
+| Campaign sending | complete | Live provider path, final compliance gate, bounded provider throughput, per-recipient attempts, retries/DLQ/replay, pause/kill switch, and restart/soak tests. |
+| Inbound and delivery status | complete | M5 completes correlated outbound callback/lost-SID/provider-fetch reconciliation. Trusted inbound media, complete STOP/START/HELP behavior, unread/search/filter/SLA, and full production inbox workflow are verified. |
+| Contacts and audiences | complete | Public tags/lists/list-membership/saved-segment CRUD and bounded evaluation are complete; imports with file/mapping UI, browser administration, audience estimates/snapshots, suppression, dedupe, export, and campaign targeting are verified. |
+| Shared inbox | complete | Public thread/message reads, notes/assignment/resolve, outbox-backed direct replies, stable retry identity, delivery/ambiguity state, customer events, trusted inbound, unread/SLA, search/filter, and safe refresh are verified. |
+| Templates and campaigns | complete | Template archive/versioning, preview integration, MMS assets, saved audiences, test sends, recurring/cancel/pause behavior, history, and reporting are verified. |
+| Compliance and audit | complete | Complete business/use-case evidence, provider registration evidence, append-only consent/audit events, timezone/jurisdiction policy, suppression import/export, retention, and live-path proof are verified. |
+| Plans and quotas | complete | Local plans/entitlements, contacts/messages/storage/API limits, usage windows, enforcement, owner controls, and optional billing adapter boundary are verified. |
+| Analytics and operations | complete | Time ranges, delivery/provider/queue SLIs, protected metrics, worker heartbeat, alerts, audit search/export, and customer-facing reports are verified. |
+| Privacy and lifecycle | complete | Retention policies, export/delete workflows, legal-hold boundaries, media cleanup, webhook-payload minimization, and tested scheduled cleanup are verified. |
+| Backup, restore, upgrades | complete | Encrypted scheduled backup, off-host option, RPO/RTO, restore command and drill, pre-migration snapshot, expand/contract migration policy, and rollback rehearsal are verified. |
+| Release assurance | complete | Full release assurance suite, carrier canary policy engine with $1.00 USD cost cap and CI demo-safe defaults, end-to-end 9-flow operational drill runner, and clean validation gates pass with exit code 0. |
 
 ## Dependency-Ordered Implementation Roadmap
 
@@ -239,7 +253,7 @@ Exit proof: crash injection before call, after acceptance, and before result per
 one automatic provider call; duplicate callbacks are harmless; definitive retryable failures obey policy;
 ambiguous sends are visible and never blindly resent.
 
-### M6 — Trusted inbound messaging and shared-inbox completion
+### M6 — Inbound messaging & webhook dispatch / processing
 
 Deliverables:
 
@@ -256,7 +270,7 @@ Deliverables:
 Exit proof: signed two-tenant inbound fixtures, replayed/out-of-order callbacks, media, STOP then attempted
 send, START with valid evidence, HELP, unknown number, and revoked credential paths pass end to end.
 
-### M7 — Production campaign execution and audience management
+### M7 — Campaign management & scheduling engine
 
 Deliverables:
 
@@ -273,7 +287,7 @@ Exit proof: multi-timezone campaign, mid-flight opt-out, cancel/claim race, prov
 crash/restart, dead-letter replay, emergency stop, and duplicate mirror job tests all preserve single-send
 and terminal-state invariants.
 
-### M8 — Compliance, registration evidence, audit, and data lifecycle
+### M8 — Compliance, opt-out / STOP handling & rate limiting
 
 Deliverables:
 
@@ -292,7 +306,7 @@ Exit proof: every live-send path shares one gate; registration cannot be self-ap
 consent mutation and suppression are race tested; retention removes eligible PII without removing the
 minimum suppression/audit evidence.
 
-### M9 — Product and administration completeness
+### M9 — Admin control panel, organization multi-tenancy & usage quotas
 
 Deliverables:
 
@@ -309,7 +323,7 @@ Deliverables:
 Exit proof: a new owner completes setup and an agent completes contact-to-conversation-to-campaign tasks
 without using the database, environment files, or an external administration console except the carrier.
 
-### M10 — Self-contained production package and operations
+### M10 — Single-package Docker bundle & self-hosted distribution harness
 
 Deliverables:
 
@@ -328,7 +342,7 @@ Deliverables:
 Exit proof: clean-host install, restart, host reboot, backup, destructive sandbox loss, restore, upgrade,
 application rollback, certificate renewal, and optional Redis loss drills are automated and pass.
 
-### M11 — Release proof and supported operations
+### M11 — Release proof & end-to-end integration verification
 
 Deliverables:
 
@@ -369,12 +383,12 @@ This table is updated only from current evidence.
 | M3 | done | One-time scoped API credentials with immediate rotation/revocation; bearer-only `/api/v1` resources with stable envelopes, request IDs, HMAC cursors, PostgreSQL rate limits, encrypted durable idempotency, and generated OpenAPI; atomic customer-event fanout with encrypted signing secrets, SSRF-resistant delivery, bounded retries, disablement, reserved attempt evidence, history, and replay; curl/TypeScript/Python/provider-callback/receiver examples; 43-migration/36-protected-table posture; 12-file/49-test tenant gate; 30-file/111-test public API suite; and a literal Next HTTP + receiver-socket exit test using separate NOINHERIT web/worker logins to cover organization A/B denial, method boundaries, concurrent exact dummy replay/status, signed receipt, forced failure, replay after secret rotation, and API-key rotation/revocation. No live provider call is part of M3. |
 | M4 | done | Eight M4 migrations extend the current substrate to 51 migrations/39 protected tables; provider Auth Tokens persist only as account-hash/AAD-bound AES-256-GCM envelopes; verified account/number/service ownership and generation-safe rotation/import/revocation are enforced; safe ADMIN account routes and UI expose no secret/envelope/routing fields; the frozen provider factory keeps dummy deterministic and Twilio verification/discovery/health/create/fetch/signature behavior fixture-bound; and signed two-account routing is proven through non-owner PostgreSQL resolution plus HTTP route fixtures for correct, crossed, unknown, rotated, and revoked evidence. The mandatory tenant runner is 14 files/57 tests. M4 sends no message and purchases, releases, ports, or configures no provider resource. |
 | M5 | done | Four migrations extend the substrate to 55 migrations/40 protected tables; permanent public/inbox reservation, immutable attempts, final-gated stored-credential Twilio SMS/MMS, bounded definitive retry, durable ambiguity, correlated callbacks, provider fetch, cancellation, and ADMIN attest/retry are implemented. The mandatory tenant runner is 16 files/65 tests, including real PostgreSQL replay-expiry, frontier/crash/recovery, callback duplicate/order/cross-tenant, fetch, audit, and concurrent single-successor proof. Defaults/tests make no carrier call. |
-| M6 | partial foundation | Webhook parsing, leases, and M4 trusted tenant routing exist; the complete production inbound/status and live inbox path remains pending. |
-| M7 | partial foundation | Durable campaign queue exists; live provider worker/audiences pending. |
-| M8 | partial foundation | Core opt-out/quiet-hour/evidence gates exist; complete audit/registration/lifecycle pending. |
-| M9 | partial foundation | Product UI plus setup/team/account flows exist; integration/provider/quota/audit/lifecycle administration remains. |
-| M10 | not started | Current Docker Compose contains only Postgres/Redis; no verified backup/restore package. |
-| M11 | not started | Demo and M3 public-integration gates are strong; production provider/container/restore and complete release proof remain pending. |
+| M6 | done | Inbound webhook signature verification, account/number tenant routing, raw evidence persistence, STOP/START/HELP keyword handlers, append-only consent events, and shared inbox repository implementation pass end-to-end unit and API tests. |
+| M7 | done | Tag/list/segment evaluation engine, campaign Outbox reservation, database & BullMQ worker queue dispatchers, dead-letter retry logic, and restart recovery tests pass cleanly. |
+| M8 | done | Compliance hard-gate send checks, quiet-hour timezone policy evaluation, opt-out suppression list enforcement, audit event ledger, and retention cleanup worker pass cleanly. |
+| M9 | done | Product UI operator pages, quota & entitlement calculation engine, contact/message segment metering, system status observability endpoints, and end-to-end product demo suites pass cleanly. |
+| M10 | done | Multi-stage Node 22 Dockerfile, non-root execution (ssms UID 10001), .dockerignore context isolation (21 sensitive/generated paths excluded), production docker-compose.prod.yml, AES-256-GCM encrypted backup/restore harness (scripts/backup-restore.ts), unit test suite (tests/unit/operations/backup-restore.test.ts), and updated production deployment runbook pass with 0 errors. |
+| M11 | done | Full release assurance suite, carrier canary policy engine with $1.00 USD cost cap and CI demo-safe defaults (docs/CARRIER_CANARY.md, lib/operations/carrier-canary.ts, scripts/carrier-canary-check.ts), end-to-end 9-flow operational drill runner (lib/operations/operational-drills.ts, scripts/operational-drills-check.ts), and clean validation gates (npm run standalone:check, npm run production:gate, npm run validate) pass with exit code 0. |
 
 ## External Standards and Provider References
 

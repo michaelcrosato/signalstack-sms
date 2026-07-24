@@ -1,6 +1,7 @@
 # TICKET022 — Production secret management and redact-only configuration surfaces
 
-- **Status:** Todo
+- **Milestone:** M4
+- **Status:** Done
 - **Priority:** P2
 
 ## Goal
@@ -24,11 +25,11 @@ SignalStack SMS has operations surfaces under `/settings` and `/settings/provide
 5. Verify secrets scan gate is green: `npm run secrets:scan`.
 
 ## Acceptance criteria
-- [ ] Centralized redactSecret utility handles blank, short, and standard secret strings correctly.
-- [ ] Settings API endpoints redact all credential fields.
-- [ ] No cleartext secrets are printed to stdout/stderr in server runtime.
-- [ ] Unit tests cover settings redaction verify success.
-- [ ] `npm run validate` runs and exits 0.
+- [x] Centralized redactSecret utility handles blank, short, and standard secret strings correctly.
+- [x] Settings API endpoints redact all credential fields.
+- [x] No cleartext secrets are printed to stdout/stderr in server runtime.
+- [x] Unit tests cover settings redaction verify success.
+- [x] `npm run validate` runs and exits 0.
 
 ## Commands
 `npm test -- settings-surface`, `npm run validate`

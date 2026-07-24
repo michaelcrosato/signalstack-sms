@@ -5,6 +5,7 @@ import { hasAnyConsentEvidence, hasCompleteConsentEvidence } from "@/lib/complia
 import type { ContactCreateInput, ContactUpdateInput } from "@/lib/validation/contacts";
 import { dummyProvider } from "@/lib/messaging/provider/dummy-provider";
 import type { ParsedContactImport } from "@/lib/csv/import-contacts";
+import { enforceContactQuota } from "@/lib/operations/entitlements";
 
 const contactInclude = {
   tagLinks: { include: { tag: true } },
@@ -63,6 +64,8 @@ export async function upsertContact(
 
     if (existing) {
       verifyConsentEvidenceImmutability(existing, input);
+    } else {
+      await enforceContactQuota(t, orgId, 1);
     }
     verifyConsentEvidenceCompleteness(existing, input);
 
@@ -95,6 +98,7 @@ export async function createContact(
   tx?: Prisma.TransactionClient
 ) {
   const execute = async (client: Prisma.TransactionClient) => {
+    await enforceContactQuota(client, orgId, 1);
     verifyConsentEvidenceCompleteness(null, input);
     const contact = await client.contact.create({
       data: {
@@ -261,6 +265,10 @@ export async function importContacts(
       );
     }
     const existingByPhone = new Map(existingContacts.map((contact) => [contact.phone, contact]));
+    const newContactsCount = parsed.contacts.filter((contact) => !existingByPhone.has(contact.phone)).length;
+    if (newContactsCount > 0) {
+      await enforceContactQuota(tx, orgId, newContactsCount);
+    }
 
     for (const contact of parsed.contacts) {
       const existing = existingByPhone.get(contact.phone);

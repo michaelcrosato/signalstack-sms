@@ -197,6 +197,9 @@ model Organization {
   customerWebhookEvents           CustomerWebhookEvent[]
   customerWebhookDeliveries       CustomerWebhookDelivery[]
   customerWebhookDeliveryAttempts CustomerWebhookDeliveryAttempt[]
+  consentEvents                   ConsentEvent[]
+  auditEvents                     AuditEvent[]
+  suppressionEntries              SuppressionEntry[]
 }
 
 model AppUser {
@@ -347,6 +350,7 @@ model Contact {
   campaignRecipients CampaignRecipient[]
   conversations      Conversation[]
   messages           Message[]
+  consentEvents      ConsentEvent[]
 
   @@unique([orgId, id])
   @@unique([orgId, phone])
@@ -686,17 +690,25 @@ model InternalNote {
 }
 
 model ComplianceProfile {
-  id                    String                @id @default(cuid())
-  orgId                 String                @unique
-  businessName          String?
-  messagingUseCase      String?
-  optInDescription      String?
-  privacyPolicyUrl      String?
-  termsOfServiceUrl     String?
-  a2pRegistrationStatus A2pRegistrationStatus @default(NOT_STARTED)
-  createdAt             DateTime              @default(now())
-  updatedAt             DateTime              @updatedAt
-  org                   Organization          @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  id                     String                @id @default(cuid())
+  orgId                  String                @unique
+  businessName           String?
+  messagingUseCase       String?
+  optInDescription       String?
+  privacyPolicyUrl       String?
+  termsOfServiceUrl      String?
+  a2pRegistrationStatus  A2pRegistrationStatus @default(NOT_STARTED)
+  brandRegistrationId    String?
+  campaignRegistrationId String?
+  sampleMessages         String[]              @default([])
+  helpKeywordsCopy       String?
+  optOutKeywordsCopy     String?
+  evidenceReference      String?
+  verificationStatus     String?
+  verificationDetails    Json?
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+  org                    Organization          @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
   @@index([orgId])
 }
@@ -1155,3 +1167,70 @@ model CustomerWebhookDeliveryAttempt {
   @@index([orgId, deliveryId, createdAt])
   @@index([deliveryId])
 }
+
+model ConsentEvent {
+  id                String        @id @default(cuid())
+  orgId             String
+  contactId         String?
+  phone             String
+  consentStatus     ConsentStatus
+  previousStatus    ConsentStatus?
+  source            String
+  sourceIp          String?
+  channel           String?
+  actorUserId       String?
+  consentCapturedAt DateTime      @default(now())
+  consentMethod     String?
+  consentDisclosure String?
+  evidenceReference String?
+  metadata          Json?
+  createdAt         DateTime      @default(now())
+  org               Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  contact           Contact?      @relation(fields: [orgId, contactId], references: [orgId, id], onDelete: SetNull)
+
+  @@unique([orgId, id])
+  @@index([orgId])
+  @@index([orgId, phone])
+  @@index([orgId, contactId])
+  @@index([createdAt])
+}
+
+model AuditEvent {
+  id              String        @id @default(cuid())
+  orgId           String
+  actorUserId     String?
+  apiCredentialId String?
+  action          String
+  subjectType     String
+  subjectId       String?
+  sourceIp        String?
+  channel         String?
+  metadata        Json?
+  createdAt       DateTime      @default(now())
+  org             Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, id])
+  @@index([orgId])
+  @@index([orgId, actorUserId])
+  @@index([orgId, action])
+  @@index([orgId, subjectType, subjectId])
+  @@index([createdAt])
+}
+
+model SuppressionEntry {
+  id        String        @id @default(cuid())
+  orgId     String?
+  phone     String
+  reason    String
+  source    String
+  metadata  Json?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  org       Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, phone])
+  @@index([phone])
+  @@index([orgId])
+  @@index([orgId, phone])
+}
+

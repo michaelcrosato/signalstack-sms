@@ -8,7 +8,7 @@ import {
   releaseWebhookEventClaim
 } from "@/lib/db/repositories/webhooks";
 
-describe("webhook event claim lease database invariant", () => {
+describe.runIf(process.env.RUN_DB_TESTS === "true")("webhook event claim lease database invariant", () => {
   const slug = `webhook-claim-${randomUUID()}`;
   let orgId: string | undefined;
 

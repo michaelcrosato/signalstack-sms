@@ -5,6 +5,7 @@ import { runAdminResetLink } from "@/scripts/admin-reset-link";
 const TOKEN = `ss_reset_${"z".repeat(43)}`;
 
 describe("admin:reset-link operator command", () => {
+  vi.setConfig({ testTimeout: 20000 });
   it("prints one reset fragment from a zero-argument sanitized operator boundary", async () => {
     const stdout: string[] = [];
     const stderr: string[] = [];
@@ -59,7 +60,7 @@ describe("admin:reset-link operator command", () => {
     }
   });
 
-  it("runs the real entrypoint and hides Prisma connection details", () => {
+  it("runs the real entrypoint and hides Prisma connection details", { timeout: 20000 }, () => {
     const npmExecPath = process.env.npm_execpath;
     expect(npmExecPath).toBeTruthy();
     const sentinel = "RESET_LINK_DB_DETAIL_MUST_NOT_ESCAPE";
@@ -71,7 +72,7 @@ describe("admin:reset-link operator command", () => {
         DATABASE_URL: `postgresql://reset_user:${sentinel}@127.0.0.1:1/missing?connect_timeout=1`
       },
       encoding: "utf8",
-      timeout: 15_000,
+      timeout: 20_000,
       windowsHide: true
     });
     const output = `${result.stdout ?? ""}${result.stderr ?? ""}`;

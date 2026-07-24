@@ -1,5 +1,6 @@
 # TICKET001 — AFK onboarding: agent scripts, .env bootstrap, ditch LOOP_LOG
 
+- **Milestone:** M0
 - **Status:** Done (2026-05-28)
 - **Priority:** P1
 

@@ -2,6 +2,7 @@ import type { ApiCredential, Prisma } from "@prisma/client";
 import { withTenantTransaction } from "@/lib/db/tenant-context";
 import { generateApiKey, readApiKeyPepper } from "@/lib/public-api/api-key-crypto";
 import { normalizeApiScopes, type ApiScope } from "@/lib/public-api/scopes";
+import { enforceApiKeyQuota } from "@/lib/operations/entitlements";
 
 const DEFAULT_API_RATE_LIMIT_PER_MINUTE = 60;
 const MIN_API_RATE_LIMIT_PER_MINUTE = 1;
@@ -88,6 +89,7 @@ export async function createApiCredential(
   const pepper = readApiKeyPepper(environment);
 
   return runCredentialOperation(input.orgId, tx, async (client) => {
+    await enforceApiKeyQuota(client, normalized.orgId);
     for (let attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt += 1) {
       const generated = generateApiKey(pepper);
       try {

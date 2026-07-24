@@ -1,5 +1,6 @@
 # TICKET016 — Remove dead operator-surface code for consolidated pages
 
+- **Milestone:** M9
 - **Status:** Done
 - **Priority:** P3 (ULTRAPLAN Phase A cleanup)
 

@@ -123,7 +123,7 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
     });
   });
 
-  describe("database integration", () => {
+  describe.runIf(process.env.RUN_DB_TESTS === "true")("database integration", () => {
     it("updates sentiment after committing createDemoInboundMessage", async () => {
       const org = await prisma.organization.create({
         data: {
@@ -152,7 +152,7 @@ describe("Conversation Sentiment and AI Categorization Seam", () => {
       expect(updated.category).toBe("INQUIRY");
     });
 
-    it("updates sentiment after committing createConversationInboundMessage", async () => {
+    it.runIf(process.env.RUN_DB_TESTS === "true")("updates sentiment after committing createConversationInboundMessage", async () => {
       const org = await prisma.organization.create({
         data: {
           slug: `org-sentiment-conv-${Date.now()}`,

@@ -318,6 +318,49 @@ describe.runIf(run)("worker runtime dispatch capability", () => {
       })
     ).rejects.toThrow("Queue dispatch arguments are invalid");
   });
+
+  it("aborts campaign processing when emergency kill switch is activated", async () => {
+    const { setOrgEmergencyKillSwitch, resetEmergencyKillSwitches } = await import("@/lib/queue/live-worker-controls");
+    const { processScheduledCampaignQueueJobById } = await import("@/lib/queue/worker");
+
+    const ksScheduledAt = new Date(Date.now() - 30_000);
+    const ksCampaign = await prisma.campaign.create({
+      data: {
+        orgId,
+        name: "Kill Switch Campaign",
+        status: "SCHEDULED",
+        body: "Hello KS",
+        scheduledAt: ksScheduledAt
+      }
+    });
+    const ksJob = await prisma.queueJob.create({
+      data: {
+        orgId,
+        campaignId: ksCampaign.id,
+        type: "SCHEDULED_CAMPAIGN",
+        status: "QUEUED",
+        idempotencyKey: `ks-runtime-${suffix}`,
+        payload: { orgId, campaignId: ksCampaign.id, scheduledAt: ksScheduledAt.toISOString() },
+        runAt: ksScheduledAt
+      }
+    });
+
+    setOrgEmergencyKillSwitch(orgId, true);
+
+    const result = await processScheduledCampaignQueueJobById({
+      queueJobId: ksJob.id,
+      expectedOrgId: orgId
+    });
+
+    expect(result).toMatchObject({
+      processed: 0,
+      skipped: 1,
+      blocked: true,
+      reason: "emergency-kill-switch-active"
+    });
+
+    resetEmergencyKillSwitches();
+  });
 });
 
 function requireClient(value: PrismaClient | undefined): PrismaClient {

@@ -8,13 +8,15 @@ export const inboundMessageSchema = z.object({
   phone: phoneSchema,
   body: bodySchema,
   providerMessageId: z.string().trim().min(1).max(255).optional(),
-  idempotencyKey: z.string().trim().min(1).max(255).optional()
+  idempotencyKey: z.string().trim().min(1).max(255).optional(),
+  mediaUrls: z.array(z.string().trim().min(1).max(2048)).optional()
 });
 
 export const conversationMessageCreateSchema = z.object({
   body: bodySchema,
   providerMessageId: z.string().trim().min(1).max(255).optional(),
-  idempotencyKey: z.string().trim().min(1).max(255).optional()
+  idempotencyKey: z.string().trim().min(1).max(255).optional(),
+  mediaUrls: z.array(z.string().trim().min(1).max(2048)).optional()
 });
 
 export const conversationReplyCreateSchema = z.object({

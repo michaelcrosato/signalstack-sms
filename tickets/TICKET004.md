@@ -1,5 +1,6 @@
 # TICKET004 — Keep repo-map and state matrix current
 
+- **Milestone:** M0
 - **Status:** Todo (recurring)
 - **Priority:** P3
 
